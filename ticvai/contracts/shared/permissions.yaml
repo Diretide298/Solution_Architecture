@@ -162,6 +162,25 @@ components:
         - RESOURCE_VIEW
         - RESOURCE_BOOK                # reserve, check out, check in
         - RESOURCE_MANAGE              # define resources, set qualifications
+        - RESOURCE_CONFIGURE           # types, categories, attributes, packages, policies
+        # **`CONFIGURE` is separate from `MANAGE` because the blast radius differs.**
+        # Managing a resource changes one cabana; configuring a resource type changes what
+        # every resource of that class can do, and board 1.02 asks for approval on exactly
+        # that boundary. One permission for both would give every duty manager the ability
+        # to turn off check-in for the whole estate.
+        - RENTAL_VIEW
+        - RENTAL_BOOK                  # reserve a rental, sign the agreement
+        - RENTAL_OPERATE               # check out, assign equipment, inspect, return
+        - RENTAL_MANAGE                # blackouts, closures, capacity blocking
+        - RENTAL_CONFIGURE             # products, categories, rules, durations, agreements
+        - RENTAL_PRICE                 # pricing profiles, deposit and fee policies
+        - RENTAL_APPROVE               # publish a product through maker/checker
+        - RENTAL_OVERRIDE              # waive a deposit, a late fee or a damage charge
+        # **`PRICE`, `APPROVE` and `OVERRIDE` are deliberately three.** Board 1.10 wants
+        # maker/checker on publication, board 4.9 wants manager approval on a waiver, and
+        # the person who sets the price list is rarely the person who forgives a charge at
+        # the counter. Collapsing them would make the segregation of duties the boards ask
+        # for unexpressible.
         # A developer is not a partner and not a tenant. **A partner resells tickets; a developer
         # writes software**, and one organisation may be both (CF-135, CF-135a).
         - DEVELOPER_VIEW

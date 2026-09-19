@@ -1,0 +1,3181 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Rental
+  version: 1.0.0
+  x-ticvai-screen-count: 100
+  x-ticvai-tier: satellite
+  x-ticvai-module: 1 — Ticketing Catalogue
+  x-ticvai-platforms:
+  - P08 Venue Management
+  description: '**A rental is a commercial agreement with a return date.** A bike goes out at ten, comes
+    back at eleven-fifteen, and between those two times the venue is holding money against it and nobody
+    else can have it.
+
+    ## Why this is not `resources`, and not `catalogue`
+
+    **`resources` owns the object.** Which cabana, held by whom, returned when. That context was built
+    for exactly this and it stops at the object — it has no price, no deposit policy, no late fee, no
+    grace period, no agreement and no damage charge.
+
+    **`catalogue` owns what is sold.** It prices a slot and it has no opinion about what happens after
+    the slot ends. A rental''s money is decided *after* the transaction the catalogue understands: the
+    late fee depends on when the bike actually came back, and the damage charge depends on what it looked
+    like.
+
+    So the split is: `catalogue` sells it, `resources` holds the object, **and this owns the agreement
+    between them** — duration and turnaround, the deposit and its settlement, the condition at both ends,
+    and the money that only exists because something was returned late or broken.
+
+    ## The three things that make it its own context
+
+    **Price is not known at checkout.** *Expected return 14:00, actual return 15:12, grace 15 minutes,
+    chargeable late time 57 minutes* (board 4.8). A context whose total is fixed when the order is placed
+    cannot express that, and `orders` is such a context — an order completes and the rental is still out.
+
+    **The deposit is held against the object and settled against its condition.** Board 4.7 runs
+    authorised → held → active → inspection → partial capture or release. *Capture AED 120, release
+    AED 380* is one act with two outcomes, and it is decided by an inspection rather than by a payment.
+
+    **Turnaround feeds availability.** *Rental 10:00–11:00, turnaround 11:00–11:15, next available
+    11:15* (board 1.7). **This is the same rule `resources` states for setup and teardown**, and it is
+    stated in both places because a rental product can be pooled — a hundred and fifty lockers with no
+    individual resource behind them still need the buffer.
+
+    ## What it deliberately does not own
+
+    **Not the physical asset register.** `maintenance.Asset` already carries serial, acquisition,
+    warranty, condition and history, and `maintenance` carries the work orders, inspections and
+    return-to-service approvals that rental board 9 draws. **Board 9 is a join, not a gap.**
+
+    **Not stock movements.** `inventory` owns locations, transfers, adjustments and counts. Rental board
+    2''s pooled inventory, transfer and adjustment screens are that context seen from here.
+
+    **Not the payment.** Deposits authorise and capture through `orders` stored value (CF-126); this
+    decides the amounts and when.
+
+    '
+servers:
+- url: https://api.ticvai.com/v1
+paths:
+  /rental-products:
+    get:
+      operationId: listRentalProducts
+      summary: Rental products across venues and locations
+      description: 'Board 1.1. Filterable by tenant, venue, rental location, category, status, **tracking
+        model** and configuration status — the tracking model is a filter because it changes what the
+        operator can do with the row.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: categoryId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: trackingModel
+        in: query
+        schema:
+          type: string
+          enum:
+          - pooled
+          - serialised
+          - hybrid
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Rental products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalProduct'
+    post:
+      operationId: createRentalProduct
+      summary: Define a rental product
+      description: 'Board 1.2. **Created as a draft and published separately.** The wizard has seven
+        steps and a product half-configured is not sellable — `publishRentalProduct` is where the
+        completeness check lives, so a draft can be saved at step three without the platform pretending
+        it is a product.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalProduct'
+      responses:
+        '201':
+          description: Created as a draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalProduct'
+  /rental-products/{productId}:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getRentalProduct
+      summary: The master configuration of one rental product
+      description: 'Board 1.3. **The profile is the master reference every downstream board reads** —
+        inventory, availability, pricing, booking and checkout all resolve their rules from here, so it
+        returns the whole thing rather than a header the client then has to assemble.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalProduct'
+    put:
+      operationId: updateRentalProduct
+      summary: Change a rental product
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalProduct'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalProduct'
+  /rental-products/{productId}/validate:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: validateRentalProduct
+      summary: What is still missing before this can be sold
+      description: 'Board 1.10 and 4.10. **The board draws this as a checklist and that is exactly what
+        it is** — basic information, category, location, inventory model, duration, rules, customer
+        requirements, agreement, pricing profile, deposit policy, availability, channels.
+
+        **It returns findings, it does not refuse.** *"Kayak – Double has inventory assigned but no
+        turnaround minutes"* (board 1.1) is a warning a venue may knowingly ship; *no pricing profile*
+        is not. The severity travels with the finding so the publish gate can decide and the operator can
+        see why.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalConfigurationFinding'
+  /rental-products/{productId}/publish:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: publishRentalProduct
+      summary: Move a product through draft, review, approval and activation
+      description: 'Board 1.10. *Draft → Configuration Review → Approval → Active → Suspended.*
+
+        **Maker/checker, and the reason is recorded on both sides.** A rejection with no reason sends the
+        configurer back to a screen with no idea which of forty fields was wrong.
+
+        **Effective dating is why this is not a boolean.** A product approved today to go live on 1
+        November is approved and not active, and a flag cannot hold both facts.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_APPROVE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - state
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - draft
+                  - configurationReview
+                  - approved
+                  - active
+                  - suspended
+                  - archived
+                comment:
+                  type: string
+                  nullable: true
+                rejectionReason:
+                  type: string
+                  nullable: true
+                effectiveFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalProduct'
+        '409':
+          description: Blocking findings remain; they are listed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-categories:
+    get:
+      operationId: listRentalCategories
+      summary: Reusable categories, with the defaults products inherit
+      description: 'Board 1.4. **Configure categories rather than hard-coding rental types.** A category
+        carries a default inventory model, duration, turnaround, customer requirements, waiver and
+        deposit behaviour, **and an individual product may override within a permitted set** — which is
+        the part that makes inheritance safe to use.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalCategory'
+    post:
+      operationId: createRentalCategory
+      summary: Define a category and its defaults
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalCategory'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalCategory'
+  /rental-products/{productId}/locations:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalProductLocations
+      summary: Where it can be collected, and where it can be returned
+      description: 'Board 1.6. **Pickup and return are configured separately and the board shows why** —
+        *Adventure Zone: available ✓, pickup ✓, return —*. A station that hands out kayaks and has no way
+        to receive them back is a real operating shape, and a single "enabled" flag cannot say it.
+
+        **Cross-location return is the commercially interesting one.** Allowing it means inventory
+        drifts between stations, which is a transfer `inventory` has to carry out; refusing it means a
+        guest who paddles from Marina to North cannot get out of the boat there.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - locations
+              properties:
+                locations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RentalLocationRule'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalLocationRule'
+  /rental-products/{productId}/duration:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalDurationRules
+      summary: Minimum, maximum, increment, extension and turnaround
+      description: 'Board 1.7. **The turnaround buffer feeds availability automatically** — *rental
+        10:00–11:00, turnaround 11:00–11:15, next available 11:15.* A venue that has to remember to
+        leave a gap will not, and the bike goes out wet.
+
+        **Fixed and customer-defined durations are one model.** A fixed-duration product is one whose
+        increment equals its default; splitting them into two shapes would double every downstream
+        branch for nothing.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalDurationRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDurationRules'
+  /rental-products/{productId}/rules:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalOperationalRules
+      summary: Who may rent it, how many, and what must happen at the counter
+      description: 'Board 1.8. Age, height, weight, ID, guardian, membership, driving licence and safety
+        briefing on the customer side; scan, inspection and photo requirements on the operational side.
+
+        **Every rule is required, optional or not applicable — three states, not two.** *Not applicable*
+        and *optional* look the same at the counter and are entirely different in an audit: one means the
+        venue chose not to check, the other means there was nothing to check.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalOperationalRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalOperationalRules'
+  /rental-products/{productId}/agreement:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalAgreementRequirements
+      summary: The agreement, waiver and signature a rental needs
+      description: 'Board 1.9. **The signed agreement is linked to the booking and the version is kept.**
+        A waiver is only a defence if it can be shown that *this* guest signed *that* text, and a venue
+        that updates its liability wording has changed the text under every prior signature unless the
+        version travels with the signature.
+
+        Group and guardian cases are first-class: a minor''s guardian signs, and a group may sign once or
+        individually depending on configuration.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalAgreementRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAgreementRules'
+  /rental-products/{productId}/inventory-model:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalInventoryModel
+      summary: Pooled, serialised or hybrid
+      description: 'Board 1.5, and **the single most load-bearing choice in this contract.**
+
+        **Pooled** — a hundred and fifty lockers. The engine reserves quantity and never asks which one.
+
+        **Serialised** — BIKE-001, BIKE-002. Every physical asset has an identity, and *the original
+        requirements specifically call for a unique serial number*. These resolve to `resources`
+        resources and to `maintenance.Asset`; this contract does not keep a third register of them.
+
+        **Hybrid** — *one serialised kayak, two pooled paddles, two pooled life jackets.* One booking,
+        two mechanisms, and the reason neither of the first two models can be the only one.
+
+        **Changing the model on a product that has bookings is refused.** A pooled booking has no asset
+        to hand over and a serialised one has nothing to count; converting between them under live
+        bookings loses the answer to *which one did the guest take*.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalInventoryModel'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalInventoryModel'
+        '409':
+          description: Bookings exist under the current model
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-products/import:
+    post:
+      operationId: importRentalCatalogue
+      summary: Load a client's rental items and inventory at onboarding
+      description: '**26 August, and it is the reason this operation exists at all:** *"rental item and
+        inventory data is expected to be provided by each client during onboarding, with a screen
+        provided to update inventory and item details thereafter."*
+
+        So the first load is a file and everything after it is the ordinary edit screens. **Validated as
+        a whole before any row is written** — a partial import of a rental catalogue leaves a venue
+        selling half its kayaks, which is worse than selling none.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - assetId
+              properties:
+                assetId:
+                  type: string
+                  format: uuid
+                  description: The uploaded workbook, through `assets`.
+                mode:
+                  type: string
+                  enum:
+                  - validateOnly
+                  - commit
+                  default: validateOnly
+      responses:
+        '200':
+          description: What it found, and what it wrote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalImportResult'
+  /rental-availability:
+    get:
+      operationId: getRentalAvailability
+      summary: What can be rented, when, with turnaround already subtracted
+      description: 'Board 3. **Free windows, not a booking list for the caller to subtract from.** A
+        client computing this itself will forget the turnaround buffer, and a bike returned at 11:00 with
+        a fifteen-minute clean is not available at 11:00.
+
+        Holds, buffers and blackouts are included with their reason. **A pooled product answers with a
+        count and a serialised one answers with assets** — the shape differs because the question does:
+        *how many kayaks* against *which kayak*.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: productId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: quantity
+        in: query
+        schema:
+          type: integer
+          default: 1
+      responses:
+        '200':
+          description: Availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAvailability'
+  /rental-products/{productId}/availability-rules:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setRentalAvailabilityRules
+      summary: Operating hours, rental windows, buffers and release rules
+      description: 'Boards 3.2, 3.3 and 3.9. **The buffer and the hold-release rule are the two that get
+        forgotten.** An inventory buffer keeps a reserve back from online sale so the counter always has
+        something; a hold that never releases quietly removes stock from the pool after every abandoned
+        basket.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalAvailabilityRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAvailabilityRules'
+  /rental-blackouts:
+    post:
+      operationId: createRentalBlackout
+      summary: Close a product, location or window
+      description: 'Board 3.7. **Closure and capacity reduction are the same act at different strengths**
+        — a lake closed for weather and a lake down to half capacity both come from one operational
+        decision, and modelling them separately means a venue reduces capacity in one screen and closes
+        in another and the two disagree.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalBlackout'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBlackout'
+        '409':
+          description: Bookings exist in the window; they are listed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-pricing-profiles:
+    get:
+      operationId: listRentalPricingProfiles
+      summary: Pricing profiles, and the products with none
+      description: 'Board 4.1. **Products without pricing is a KPI on the board and therefore a filter
+        here** — an unpriced published product is the failure this screen exists to catch.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: unpricedOnly
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalPricingProfile'
+    post:
+      operationId: createRentalPricingProfile
+      summary: Define how a rental is priced
+      description: 'Board 4.2. Flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic
+        or hybrid, scoped by venue, location, channel, segment and effective dates.
+
+        **Several profiles will apply at once and the board says the precedence must be configurable and
+        auditable** (board 4.10): base → location → date/season → dynamic → channel eligibility →
+        promotion → authorised override. `explainRentalPrice` is how the audit part is kept honest.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_PRICE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalPricingProfile'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalPricingProfile'
+  /rental-pricing-profiles/{profileId}:
+    parameters:
+    - name: profileId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateRentalPricingProfile
+      summary: Change a pricing profile
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_PRICE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalPricingProfile'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalPricingProfile'
+  /rental-price:
+    post:
+      operationId: quoteRentalPrice
+      summary: What this rental would cost, and the deposit it would hold
+      description: 'Board 4.10. **One quote covers both numbers and they are not the same kind of
+        money.** *Base 2 × AED 120 = 240, peak +40, deposit 2 × 300.* The board is explicit that **the
+        deposit is not rental revenue**, and a quote that adds them into one total invites exactly that
+        mistake downstream.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalQuoteRequest'
+      responses:
+        '200':
+          description: The quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalQuote'
+  /rental-price/explain:
+    post:
+      operationId: explainRentalPrice
+      summary: Why the price is what it is, rule by rule
+      description: '**Board 4.10 asks for this in as many words** — *"the system should show why the
+        price was calculated. This is important for customer service and auditability."*
+
+        A rental price is base, duration, calendar, season, dynamic, promotion, channel and override
+        stacked in a configurable order. **Without this, a supervisor facing an angry guest has a number
+        and no argument**, and nobody can tell a pricing bug from a pricing rule.
+
+        Returns the ordered trace: every rule considered, whether it applied, and what it moved.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalQuoteRequest'
+      responses:
+        '200':
+          description: The trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalPriceExplanation'
+  /rental-deposit-policies:
+    put:
+      operationId: setRentalDepositPolicy
+      summary: How much is held, how, and what happens to it
+      description: 'Boards 4.6 and 4.7. Fixed or percentage, with minimum and maximum, by
+        pre-authorisation, card charge, cash or wallet.
+
+        **Held, not taken.** Authorisation goes through `orders.authoriseStoredValue` (CF-126) — *a
+        deposit taken and refunded is two transactions and a fee; a deposit held and released is
+        neither*, and a guest returning an undamaged stroller should not wait three days for their money.
+
+        **The settlement rules are the half that is usually missing:** automatic release or mandatory
+        inspection, a supervisor threshold above which capture needs a second pair of eyes, whether
+        partial capture is permitted, and the auto-release delay.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_PRICE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalDepositPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDepositPolicy'
+  /rental-fee-policies:
+    put:
+      operationId: setRentalFeePolicy
+      summary: Grace period, late fees and extension pricing
+      description: 'Board 4.8. *Expected 14:00, actual 15:12, grace 15 minutes, chargeable 57 minutes.*
+
+        **The extension price is set deliberately below the late fee**, and the board says why: *"this
+        encourages customers to extend properly rather than returning late."* A venue that prices them
+        the other way round has built an incentive to disappear with the equipment.
+
+        A maximum daily charge is part of the policy because an unbounded per-minute fee on a bike nobody
+        returned reaches an absurd number by Tuesday.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_PRICE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalFeePolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalFeePolicy'
+  /rental-price/simulate:
+    post:
+      operationId: simulateRentalPricing
+      summary: Test a commercial configuration before publishing it
+      description: 'Board 4.10. **Rental pricing is the stack most likely to be wrong in a way nobody
+        notices** — duration, calendar, location, deposit and dynamic pricing all compose — so it is
+        simulated against a concrete basket before it goes live, and the validation names missing prices,
+        conflicting rules, invalid effective dates, missing deposit policies, dynamic prices outside the
+        guardrails, pricing gaps and channel conflicts.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_PRICE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalQuoteRequest'
+      responses:
+        '200':
+          description: The simulated price and the findings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote:
+                    $ref: '#/components/schemas/RentalQuote'
+                  findings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RentalConfigurationFinding'
+  /rental-overrides:
+    post:
+      operationId: requestRentalCommercialOverride
+      summary: Deviate from policy, with a reason and an approver
+      description: 'Board 4.9. Price override, complimentary rental, deposit waiver or reduction, late-fee
+        waiver, damage-fee waiver, extension-fee waiver, manual refund, goodwill.
+
+        **Every override records the original amount as well as the adjusted one**, plus reason,
+        requester and approver. An override log that shows only the final number cannot tell a discount
+        from a correction, and *the original requirement explicitly requires manager approval.*
+
+        Routed through `approvals` where the configured threshold is exceeded — the approval machinery
+        already exists and a second one here would drift from it.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OVERRIDE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalOverride'
+      responses:
+        '201':
+          description: Applied, or sent for approval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalOverride'
+  /rental-bookings:
+    get:
+      operationId: listRentalBookings
+      summary: Reservations across venues and locations
+      description: 'Board 5.1. Today''s, upcoming, awaiting arrival, checked out, completed, cancelled,
+        no-shows and group bookings — **the status set the command centre counts, which is why it is an
+        enum and not a free string.**
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalBooking'
+    post:
+      operationId: createRentalBooking
+      summary: Reserve a rental
+      description: 'Board 5.2. **Reserves capacity, not an asset.** Even for a serialised product the
+        specific bike is chosen at the counter by `assignRentalEquipment` — deciding it days ahead means
+        re-deciding it every time that bike comes back late or breaks.
+
+        Group bookings are one booking with participants rather than N bookings, because the agreement,
+        the deposit and the return are handled together.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_BOOK
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalBookingRequest'
+      responses:
+        '201':
+          description: Reserved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: Not available for that window, quantity or location
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-bookings/{bookingId}:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getRentalBooking
+      summary: One booking, its timeline and its readiness
+      description: 'Board 5.10. **Readiness is computed, not stored** — agreement signed, requirements
+        captured, deposit authorised, equipment available. A counter that discovers an unsigned waiver
+        when the guest is standing there has discovered it too late.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+    patch:
+      operationId: updateRentalBooking
+      summary: Modify, cancel or mark a no-show
+      description: 'Board 5.9. **A no-show is not a cancellation** and the money differs — a cancellation
+        may be refundable under policy and a no-show generally is not. Keeping them as one status with a
+        note would make the revenue question unanswerable.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - confirmed
+                  - cancelled
+                  - noShow
+                from:
+                  type: string
+                  format: date-time
+                  nullable: true
+                to:
+                  type: string
+                  format: date-time
+                  nullable: true
+                quantity:
+                  type: integer
+                  nullable: true
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+  /rental-bookings/{bookingId}/agreement:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: signRentalAgreement
+      summary: Capture the signature, against a version
+      description: 'Boards 1.9 and 5.6. **The version signed is stored with the signature.** A venue that
+        updates its liability wording has otherwise changed the text under every signature already given,
+        and the waiver stops being a defence.
+
+        Guardian and group signatures are the same operation with a different signatory.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_BOOK
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalAgreementSignature'
+      responses:
+        '201':
+          description: Signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAgreementSignature'
+  /rental-bookings/{bookingId}/check-out:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: checkOutRental
+      summary: Hand it over, with the deposit held and the condition recorded
+      description: 'Board 6. **The readiness gate is enforced here and not on the screen before it.** A
+        checkout that proceeds without the signed agreement, the captured requirements or the authorised
+        deposit is the one the venue cannot defend, and a client-side check is one the next client
+        forgets.
+
+        **The condition note and photo taken on the way out are the only defence against a dispute on the
+        way back** (board 6.5), so the operational rules decide whether they are required and this
+        refuses without them when they are.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalCheckOut'
+      responses:
+        '200':
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: '**A required precondition is not met**, and the response names which — the
+            counter needs to know whether to fetch a signature or a supervisor.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-bookings/{bookingId}/equipment:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: assignRentalEquipment
+      summary: Bind specific assets to the booking, by scan where required
+      description: 'Boards 6.4 and 6.5. **This is the moment a serialised rental stops being a quantity.**
+        Until now the booking held *two mountain bikes*; now it holds BIKE-014 and BIKE-022, and every
+        later question — who had it, what condition, whose damage — depends on this record existing.
+
+        **Scan-required is a product rule and it is enforced here.** Typing a serial number at a busy
+        counter is how BIKE-014 goes out recorded as BIKE-041.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - assignments
+              properties:
+                assignments:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RentalEquipmentAssignment'
+      responses:
+        '200':
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalEquipmentAssignment'
+        '409':
+          description: Asset already out, under maintenance, or of the wrong product
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-bookings/{bookingId}/extend:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: extendRental
+      summary: Keep it longer, if it is free and the guest accepts the price
+      description: '**Board 4.10 traces this end to end and the order matters:** *"Can I keep the bike
+        another hour?"* → availability check → **if it is reserved for somebody else the extension cannot
+        be accepted** → otherwise price it, take acceptance, take payment.
+
+        **Checking availability after quoting is the failure mode**, because a guest told a price has
+        been made a promise, and a venue that then takes the bike back has a worse problem than a refused
+        extension.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - newReturnAt
+              properties:
+                newReturnAt:
+                  type: string
+                  format: date-time
+                acceptedQuoteId:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        '200':
+          description: Extended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: '**The equipment is reserved for a later booking.** The conflicting booking''s
+            window is named, so the counter can offer a shorter extension instead of a refusal.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /rental-bookings/{bookingId}/swap:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: swapRentalEquipment
+      summary: Replace a faulty item mid-rental
+      description: 'Board 7.5. **The rental continues; only the asset changes.** The deposit, the
+        agreement and the clock stay where they are, and the returned item goes to `maintenance` with the
+        fault recorded rather than back into the pool.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - outgoingAssetId
+              - reason
+              properties:
+                outgoingAssetId:
+                  type: string
+                  format: uuid
+                incomingAssetId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                reason:
+                  type: string
+                raiseWorkOrder:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Swapped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalBooking'
+  /rental-bookings/{bookingId}/return:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: returnRental
+      summary: Take it back, inspect it, and settle everything at once
+      description: 'Board 8, and **this is the operation the whole contract is shaped around.**
+
+        Actual return time decides the late fee against the grace period; condition decides the damage
+        charge; partial return decides what is still missing. **All three land on one deposit**, and
+        settling them as three separate acts means three authorisations against one hold and a guest
+        charged twice for one dispute.
+
+        *Capture AED 120, release AED 380* (board 4.7) is therefore one outcome of one operation.
+
+        **A partial return does not complete the booking.** Two of three kayaks back is an open rental
+        with one item outstanding, and marking it complete loses the venue a kayak quietly.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalReturn'
+      responses:
+        '200':
+          description: Settled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalSettlement'
+  /rental-bookings/{bookingId}/inspection:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordRentalInspection
+      summary: Condition before or after, with evidence
+      description: 'Boards 6.5 and 8.4. **Before and after are the same record with a different phase**,
+        which is what makes board 8.5 — the before/after comparison — possible at all. Two differently
+        shaped records could not be compared.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalInspection'
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalInspection'
+  /rental-bookings/{bookingId}/damage:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: assessRentalDamage
+      summary: Price the damage, and say who approved it
+      description: 'Board 8.6. **A damage charge is a commercial decision taken under pressure at a
+        counter**, which is why it carries an assessor, an approver above the configured threshold, the
+        evidence it rests on and the guest''s acknowledgement or dispute.
+
+        A disputed charge is still recorded and still held — **the dispute is a state, not a deletion**,
+        and a venue that resolves disputes by removing the record cannot report on them.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalDamageAssessment'
+      responses:
+        '201':
+          description: Assessed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDamageAssessment'
+  /rental-bookings/overdue:
+    get:
+      operationId: listOverdueRentals
+      summary: What is late, by how long, and what it is accruing
+      description: 'Boards 7.7 and 7.8. **Due-soon and overdue are one query at two thresholds**, because
+        the venue''s action is the same — contact the guest — and only the tone changes.
+
+        Carries the accruing late fee so the conversation can be specific. *"Your bike is late"* moves
+        nobody; *"it is 57 minutes late and that is AED 35 so far"* moves people.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: dueWithinMinutes
+        in: query
+        schema:
+          type: integer
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Late and due-soon rentals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalBooking'
+  /rental-incidents:
+    post:
+      operationId: reportRentalIncident
+      summary: Something happened during a rental
+      description: 'Board 7.6. Injury, loss, theft, a complaint, an equipment failure. **Distinct from
+        damage**, which is assessed at return against a deposit — an incident may have no charge attached
+        and still be the most important thing that happened that day.
+
+        Raises a `maintenance` work order where equipment is involved, rather than keeping a second
+        repair queue here.
+
+        '
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalIncident'
+      responses:
+        '201':
+          description: Reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalIncident'
+components:
+  schemas:
+    RentalProduct:
+      type: object
+      x-ticvai-persistence: rental.product
+      description: 'Board 1.3. **The master reference every later board resolves against.**'
+      required:
+      - code
+      - name
+      - venueId
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        internalName:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        imageAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        tenantId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+        trackingModel:
+          type: string
+          enum:
+          - pooled
+          - serialised
+          - hybrid
+        catalogueProductId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The thing the guest actually buys.** `catalogue` sells it and this configures
+            how it behaves once sold; the link is here so a rental is never sold twice through two
+            different product records.
+
+            '
+        resourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**For serialised products, the `resources` type its assets belong to.** The
+            individual bikes are resources and maintenance assets — this contract does not keep a third
+            register of them.
+
+            '
+        status:
+          type: string
+          enum:
+          - draft
+          - configurationReview
+          - approved
+          - active
+          - suspended
+          - archived
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          default: 1
+        isActive:
+          type: boolean
+          default: true
+    RentalCategory:
+      type: object
+      x-ticvai-persistence: rental.category
+      description: 'Board 1.4. **Defaults cascade and products override within a permitted set.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        parentCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        iconAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        defaultTrackingModel:
+          type: string
+          nullable: true
+        defaultDurationMinutes:
+          type: integer
+          nullable: true
+        defaultTurnaroundMinutes:
+          type: integer
+          nullable: true
+        defaultWaiverRequired:
+          type: boolean
+          default: false
+        defaultDepositPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+        overridableFields:
+          type: array
+          items:
+            type: string
+          description: '**Which defaults a product may override.** An empty list means the category is
+            binding, which is the whole point of a category for a venue that wants consistency.
+
+            '
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    RentalInventoryModel:
+      type: object
+      x-ticvai-persistence: rental.inventory_model
+      description: 'Board 1.5. **Pooled, serialised or hybrid**, and the switches the counter obeys.'
+      required:
+      - trackingModel
+      properties:
+        trackingModel:
+          type: string
+          enum:
+          - pooled
+          - serialised
+          - hybrid
+        inventoryUnit:
+          type: string
+          nullable: true
+        totalQuantity:
+          type: integer
+          nullable: true
+          description: Pooled only. *150 lockers.*
+        components:
+          type: array
+          description: '**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life
+            jackets.* One booking, two mechanisms.
+
+            '
+          items:
+            type: object
+            properties:
+              resourceTypeId:
+                type: string
+                format: uuid
+                nullable: true
+              label:
+                type: string
+              quantity:
+                type: integer
+              serialised:
+                type: boolean
+        assignmentRequiredAtCheckout:
+          type: boolean
+          default: false
+        scanRequired:
+          type: boolean
+          default: false
+        allowManualAssignment:
+          type: boolean
+          default: true
+        allowSubstitution:
+          type: boolean
+          default: true
+        allowEquipmentSwap:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+    RentalLocationRule:
+      type: object
+      x-ticvai-persistence: rental.location_rule
+      description: 'Board 1.6. **Pickup and return are separate flags**, because a station that hands out
+        kayaks and cannot receive them is a real shape.
+
+        '
+      required:
+      - locationId
+      properties:
+        locationId:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
+          default: true
+        pickupAllowed:
+          type: boolean
+          default: true
+        returnAllowed:
+          type: boolean
+          default: true
+        crossLocationReturnAllowed:
+          type: boolean
+          default: false
+        inventoryAllocation:
+          type: integer
+          nullable: true
+        inventoryBuffer:
+          type: integer
+          default: 0
+          description: '**Held back from online sale**, so the counter always has something to give the
+            guest standing in front of it.
+
+            '
+        operatingHours:
+          type: object
+          nullable: true
+          additionalProperties: true
+        scopePath:
+          type: string
+    RentalDurationRules:
+      type: object
+      x-ticvai-persistence: rental.duration_rules
+      description: 'Board 1.7. **Turnaround feeds availability automatically.** *10:00–11:00 rental,
+        11:00–11:15 turnaround, next available 11:15.*
+
+        '
+      properties:
+        minimumMinutes:
+          type: integer
+        maximumMinutes:
+          type: integer
+        incrementMinutes:
+          type: integer
+          default: 15
+        defaultMinutes:
+          type: integer
+        turnaroundMinutes:
+          type: integer
+          default: 0
+        extensionAllowed:
+          type: boolean
+          default: true
+        maximumExtensionMinutes:
+          type: integer
+          nullable: true
+        sameDayReturnRequired:
+          type: boolean
+          default: false
+        overnightAllowed:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    RentalOperationalRules:
+      type: object
+      x-ticvai-persistence: rental.operational_rules
+      description: 'Board 1.8. **Three states per rule — required, optional, not applicable.** *Optional*
+        and *not applicable* look identical at the counter and are entirely different in an audit.
+
+        '
+      properties:
+        minimumAge:
+          type: integer
+          nullable: true
+        maximumAge:
+          type: integer
+          nullable: true
+        minimumHeightCm:
+          type: integer
+          nullable: true
+        maximumWeightKg:
+          type: integer
+          nullable: true
+        idRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        guardianRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        membershipRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        drivingLicenceRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        safetyBriefingRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        checkoutScanRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        returnScanRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        conditionInspectionRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        photoAtCheckoutRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        photoAtReturnRequired:
+          $ref: '#/components/schemas/RuleRequirement'
+        maximumQuantityPerCustomer:
+          type: integer
+          nullable: true
+        returnLocationRestricted:
+          type: boolean
+          default: false
+        partialReturnAllowed:
+          type: boolean
+          default: true
+        staffApprovalRequired:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    RuleRequirement:
+      type: string
+      enum:
+      - required
+      - optional
+      - notApplicable
+      default: notApplicable
+    RentalAgreementRules:
+      type: object
+      x-ticvai-persistence: rental.agreement_rules
+      description: 'Board 1.9. **The version is part of the rule**, because a signature against text
+        nobody kept is not a defence.
+
+        '
+      properties:
+        customerFields:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/RuleRequirement'
+        agreementRequired:
+          type: boolean
+          default: false
+        liabilityWaiverRequired:
+          type: boolean
+          default: false
+        termsDocumentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        agreementVersion:
+          type: string
+          nullable: true
+        eSignatureRequired:
+          type: boolean
+          default: false
+        guardianSignatureForMinor:
+          type: boolean
+          default: true
+        groupWaiverMode:
+          type: string
+          enum:
+          - perParticipant
+          - singleGroupWaiver
+          default: perParticipant
+        scopePath:
+          type: string
+    RentalConfigurationFinding:
+      type: object
+      description: 'Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can
+        distinguish a missing turnaround buffer from a missing price.
+
+        '
+      properties:
+        code:
+          type: string
+        severity:
+          type: string
+          enum:
+          - blocking
+          - warning
+          - advisory
+        message:
+          type: string
+        field:
+          type: string
+          nullable: true
+        source:
+          type: string
+          enum:
+          - validation
+          - ai
+          default: validation
+          description: '**AI findings are advisory unless the client configures otherwise** (board 1.10),
+            so the origin is on the record rather than assumed by the reader.
+
+            '
+    RentalImportResult:
+      type: object
+      description: '26 August onboarding load. **Validated whole, written whole.**'
+      properties:
+        rowsRead:
+          type: integer
+        productsCreated:
+          type: integer
+        assetsCreated:
+          type: integer
+        rowsRejected:
+          type: integer
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalConfigurationFinding'
+        committed:
+          type: boolean
+    RentalAvailability:
+      type: object
+      description: 'Board 3. **A pooled product answers with a count, a serialised one with assets.**'
+      properties:
+        productId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        windows:
+          type: array
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+                format: date-time
+              to:
+                type: string
+                format: date-time
+              availableQuantity:
+                type: integer
+              availableAssetIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        blockedWindows:
+          type: array
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+                format: date-time
+              to:
+                type: string
+                format: date-time
+              reason:
+                type: string
+                enum:
+                - booked
+                - turnaround
+                - maintenance
+                - blackout
+                - closed
+                - buffer
+                - held
+    RentalAvailabilityRules:
+      type: object
+      x-ticvai-persistence: rental.availability_rules
+      description: 'Boards 3.2, 3.3 and 3.9. **The hold-release rule is the one that quietly loses
+        stock.**
+
+        '
+      properties:
+        operatingWindows:
+          type: array
+          items:
+            type: object
+            properties:
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+              from:
+                type: string
+              to:
+                type: string
+        slotMinutes:
+          type: integer
+          nullable: true
+        holdMinutes:
+          type: integer
+          default: 15
+          description: '**How long an unconfirmed basket keeps stock.** A hold that never expires removes
+            inventory from sale after every abandoned checkout.
+
+            '
+        releaseOnPaymentFailure:
+          type: boolean
+          default: true
+        overbookPercent:
+          type: number
+          default: 0
+        scopePath:
+          type: string
+    RentalBlackout:
+      type: object
+      x-ticvai-persistence: rental.blackout
+      description: 'Board 3.7. **Closure and capacity reduction are one act at different strengths.**'
+      required:
+      - from
+      - to
+      - reason
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        reason:
+          type: string
+        capacityPercent:
+          type: integer
+          default: 0
+          description: Zero closes it; fifty halves it.
+        scopePath:
+          type: string
+    RentalPricingProfile:
+      type: object
+      x-ticvai-persistence: rental.pricing_profile
+      description: 'Board 4.2. **Several will apply at once**, and the precedence is configurable and
+        auditable (board 4.10).
+
+        '
+      required:
+      - code
+      - name
+      - model
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        locationIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        currency:
+          type: string
+        salesChannel:
+          type: string
+          nullable: true
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+        model:
+          type: string
+          enum:
+          - flat
+          - durationBased
+          - tiered
+          - peakOffPeak
+          - weekend
+          - seasonal
+          - dynamic
+          - hybrid
+        basePrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        durationTiers:
+          type: array
+          description: 'Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*'
+          items:
+            type: object
+            properties:
+              minutes:
+                type: integer
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        minimumCharge:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        billingIncrementMinutes:
+          type: integer
+          nullable: true
+        additionalIncrementPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        rounding:
+          type: string
+          enum:
+          - exactUsage
+          - roundUp15
+          - roundUp30
+          - roundUpHour
+          default: exactUsage
+        calendarRules:
+          type: array
+          description: 'Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak
+            season 1 Nov – 31 Mar.*
+
+            '
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - peak
+                - offPeak
+                - weekend
+                - seasonal
+                - special
+              from:
+                type: string
+                nullable: true
+              to:
+                type: string
+                nullable: true
+              dateFrom:
+                type: string
+                format: date
+                nullable: true
+              dateTo:
+                type: string
+                format: date
+                nullable: true
+              adjustmentPercent:
+                type: number
+                nullable: true
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        dynamicEnabled:
+          type: boolean
+          default: false
+        dynamicMaxIncreasePercent:
+          type: number
+          default: 25
+        dynamicMaxDecreasePercent:
+          type: number
+          default: 15
+        priority:
+          type: integer
+          default: 0
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - pendingApproval
+          - active
+          - scheduled
+          - expired
+        scopePath:
+          type: string
+    RentalQuoteRequest:
+      type: object
+      required:
+      - productId
+      - from
+      - to
+      properties:
+        productId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+          default: 1
+        salesChannel:
+          type: string
+          nullable: true
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        promotionCode:
+          type: string
+          nullable: true
+    RentalQuote:
+      type: object
+      description: 'Board 4.10. **Rental amount and deposit are returned apart, because the deposit is
+        not revenue.**
+
+        '
+      properties:
+        quoteId:
+          type: string
+          format: uuid
+        rentalAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        addOnAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        discountAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        totalPayable:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        depositAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        depositInstrument:
+          type: string
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+    RentalPriceExplanation:
+      type: object
+      description: 'Board 4.10 — *"show why the price was calculated."* **The ordered trace, including
+        the rules that did not apply**, because *"why is it not the peak price"* is asked as often as
+        *"why is it"*.
+
+        '
+      properties:
+        quote:
+          $ref: '#/components/schemas/RentalQuote'
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              order:
+                type: integer
+              stage:
+                type: string
+                enum:
+                - basePrice
+                - locationRule
+                - calendarRule
+                - dynamicPricing
+                - channelEligibility
+                - promotion
+                - manualOverride
+                - tax
+              ruleId:
+                type: string
+                format: uuid
+                nullable: true
+              ruleName:
+                type: string
+                nullable: true
+              applied:
+                type: boolean
+              skippedBecause:
+                type: string
+                nullable: true
+              amountBefore:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              amountAfter:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+    RentalDepositPolicy:
+      type: object
+      x-ticvai-persistence: rental.deposit_policy
+      description: 'Boards 4.6 and 4.7. **Held, not taken**, and settled against an inspection.'
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        required:
+          type: boolean
+          default: true
+        basis:
+          type: string
+          enum:
+          - fixed
+          - percentage
+          - riskBased
+        fixedAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        percentage:
+          type: number
+          nullable: true
+        minimumAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        maximumAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        instruments:
+          type: array
+          items:
+            type: string
+            enum:
+            - cardPreAuthorisation
+            - cardCharge
+            - cash
+            - wallet
+        autoRelease:
+          type: boolean
+          default: true
+        inspectionRequiredBeforeRelease:
+          type: boolean
+          default: false
+        autoReleaseDelayHours:
+          type: integer
+          default: 0
+        partialCapturePermitted:
+          type: boolean
+          default: true
+        supervisorApprovalThreshold:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        waiverEligible:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    RentalFeePolicy:
+      type: object
+      x-ticvai-persistence: rental.fee_policy
+      description: 'Board 4.8. **Extension is priced below late return on purpose** — *"this encourages
+        customers to extend properly rather than returning late."*
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        gracePeriodMinutes:
+          type: integer
+          default: 0
+        lateFeeBasis:
+          type: string
+          enum:
+          - fixed
+          - perMinute
+          - per15Minutes
+          - per30Minutes
+          - perHour
+          - tiered
+        lateFeeAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        lateFeeTiers:
+          type: array
+          items:
+            type: object
+            properties:
+              afterMinutes:
+                type: integer
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        maximumDailyCharge:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        extensionPricePerIncrement:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        extensionIncrementMinutes:
+          type: integer
+          default: 30
+        notReturnedAfterHours:
+          type: integer
+          nullable: true
+          description: '**When a late rental becomes a lost one.** The deposit is captured in full and
+            the asset retired; without a threshold the fee accrues forever and nobody decides.
+
+            '
+        scopePath:
+          type: string
+    RentalOverride:
+      type: object
+      x-ticvai-persistence: rental.override
+      description: 'Board 4.9. **The original amount is recorded as well as the adjusted one.**'
+      required:
+      - kind
+      - reason
+      properties:
+        id:
+          type: string
+          format: uuid
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - priceOverride
+          - complimentary
+          - depositWaiver
+          - depositReduction
+          - lateFeeWaiver
+          - damageFeeWaiver
+          - extensionFeeWaiver
+          - manualRefund
+          - goodwill
+        originalAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        adjustedAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        reason:
+          type: string
+        requestedBy:
+          type: string
+          format: uuid
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        at:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    RentalBookingRequest:
+      type: object
+      required:
+      - productId
+      - from
+      - to
+      properties:
+        productId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+        returnLocationId:
+          type: string
+          format: uuid
+          nullable: true
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+          default: 1
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalParticipant'
+        acceptedQuoteId:
+          type: string
+          format: uuid
+          nullable: true
+    RentalBooking:
+      type: object
+      x-ticvai-persistence: rental.booking
+      description: 'Board 5. **The booking outlives the order** — an order completes at payment and the
+        rental is still out.
+
+        '
+      required:
+      - id
+      - productId
+      - from
+      - to
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+        returnLocationId:
+          type: string
+          format: uuid
+          nullable: true
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+        status:
+          type: string
+          enum:
+          - draft
+          - confirmed
+          - awaitingArrival
+          - checkedOut
+          - overdue
+          - partiallyReturned
+          - completed
+          - completedWithDamage
+          - notReturned
+          - cancelled
+          - noShow
+        checkedOutAt:
+          type: string
+          format: date-time
+          nullable: true
+        dueBackAt:
+          type: string
+          format: date-time
+          nullable: true
+        returnedAt:
+          type: string
+          format: date-time
+          nullable: true
+        depositAuthorisationId:
+          type: string
+          format: uuid
+          nullable: true
+        accruedLateFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        readiness:
+          type: array
+          readOnly: true
+          description: '**Computed, not stored** — agreement, requirements, deposit, equipment.'
+          items:
+            type: object
+            properties:
+              check:
+                type: string
+              satisfied:
+                type: boolean
+              detail:
+                type: string
+                nullable: true
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalParticipant'
+        scopePath:
+          type: string
+    RentalParticipant:
+      type: object
+      x-ticvai-persistence: rental.participant
+      description: 'Board 5.5. **A group rental is one booking with participants**, because the
+        agreement, the deposit and the return are handled together.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        isPrimaryRenter:
+          type: boolean
+          default: false
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+        idNumber:
+          type: string
+          nullable: true
+        guardianName:
+          type: string
+          nullable: true
+        emergencyContact:
+          type: string
+          nullable: true
+        hasSignedWaiver:
+          type: boolean
+          readOnly: true
+        customFields:
+          type: object
+          additionalProperties: true
+    RentalAgreementSignature:
+      type: object
+      x-ticvai-persistence: rental.agreement_signature
+      description: 'Boards 1.9 and 5.6. **The version signed travels with the signature.**'
+      required:
+      - agreementVersion
+      properties:
+        id:
+          type: string
+          format: uuid
+        participantId:
+          type: string
+          format: uuid
+          nullable: true
+        agreementVersion:
+          type: string
+        signatoryName:
+          type: string
+        signatoryRole:
+          type: string
+          enum:
+          - renter
+          - participant
+          - guardian
+        signatureAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        documentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        signedAt:
+          type: string
+          format: date-time
+        ipAddress:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    RentalCheckOut:
+      type: object
+      description: 'Board 6. **The readiness gate is enforced server-side.**'
+      properties:
+        depositAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        depositInstrument:
+          type: string
+          nullable: true
+        conditionNote:
+          type: string
+          nullable: true
+        photoAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        safetyBriefingGiven:
+          type: boolean
+          default: false
+        dueBackAt:
+          type: string
+          format: date-time
+          nullable: true
+        overrideId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**A supervisor override for a failed precondition**, which is recorded rather
+            than allowed silently.
+
+            '
+    RentalEquipmentAssignment:
+      type: object
+      x-ticvai-persistence: rental.equipment_assignment
+      description: 'Board 6.4. **The moment a serialised rental stops being a quantity.**'
+      required:
+      - assetId
+      properties:
+        id:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+          description: A `maintenance.Asset`, which is also a `resources` resource where the product is
+            schedule-controlled.
+        serialNumber:
+          type: string
+          nullable: true
+        scannedCode:
+          type: string
+          nullable: true
+        assignedManually:
+          type: boolean
+          default: false
+        assignedAt:
+          type: string
+          format: date-time
+        returnedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    RentalInspection:
+      type: object
+      x-ticvai-persistence: rental.inspection
+      description: 'Boards 6.5 and 8.4. **Before and after are one record shape with a phase**, which is
+        what makes the comparison view possible.
+
+        '
+      required:
+      - phase
+      - condition
+      properties:
+        id:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+        phase:
+          type: string
+          enum:
+          - preRental
+          - postRental
+        condition:
+          type: string
+          enum:
+          - good
+          - minorDamage
+          - majorDamage
+          - faulty
+          - notReturned
+          description: '**26 August: simplified state attributes.** *"rental/equipment items can be
+            tracked with simplified state attributes (e.g., available, rented, faulty) rather than
+            requiring granular custom attributes for this category — agreed by Allam."* So the condition
+            is a short enum, and anything finer belongs in the note or the photographs.
+
+            '
+        checklist:
+          type: array
+          items:
+            type: object
+            properties:
+              item:
+                type: string
+              passed:
+                type: boolean
+              note:
+                type: string
+                nullable: true
+        note:
+          type: string
+          nullable: true
+        photoAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        inspectedBy:
+          type: string
+          format: uuid
+        inspectedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    RentalDamageAssessment:
+      type: object
+      x-ticvai-persistence: rental.damage_assessment
+      description: 'Board 8.6. **A dispute is a state, not a deletion.**'
+      required:
+      - amount
+      - description
+      properties:
+        id:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        inspectionId:
+          type: string
+          format: uuid
+          nullable: true
+        assessedBy:
+          type: string
+          format: uuid
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        customerAcknowledgement:
+          type: string
+          enum:
+          - accepted
+          - disputed
+          - notPresented
+          default: notPresented
+        workOrderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Raised in `maintenance`, so the repair is tracked where every other repair is.
+        scopePath:
+          type: string
+    RentalReturn:
+      type: object
+      description: 'Board 8. **Late fee, damage and partial return all land on one deposit.**'
+      required:
+      - returnedAt
+      properties:
+        returnedAt:
+          type: string
+          format: date-time
+        returnLocationId:
+          type: string
+          format: uuid
+          nullable: true
+        returnedAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        missingAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        inspection:
+          $ref: '#/components/schemas/RentalInspection'
+        damage:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalDamageAssessment'
+        waiveLateFee:
+          type: boolean
+          default: false
+        overrideId:
+          type: string
+          format: uuid
+          nullable: true
+    RentalSettlement:
+      type: object
+      x-ticvai-persistence: rental.settlement
+      description: 'Board 8.8. **One statement, because there is one deposit.** *Capture AED 120, release
+        AED 380.*
+
+        '
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+        expectedReturnAt:
+          type: string
+          format: date-time
+        actualReturnAt:
+          type: string
+          format: date-time
+        gracePeriodMinutes:
+          type: integer
+        chargeableLateMinutes:
+          type: integer
+        lateFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        damageFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        missingItemFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        totalCharged:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        depositCaptured:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        depositReleased:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        balanceDue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Where the charges exceed the deposit.** A bike written off against a AED 200
+            hold leaves a real debt, and netting it to zero hides it.
+
+            '
+        outcome:
+          type: string
+          enum:
+          - completed
+          - completedWithDamage
+          - partiallyReturned
+          - notReturned
+        scopePath:
+          type: string
+    RentalIncident:
+      type: object
+      x-ticvai-persistence: rental.incident
+      description: 'Board 7.6. **Distinct from damage** — an incident may carry no charge and still be
+        the most important thing that happened.
+
+        '
+      required:
+      - kind
+      - description
+      properties:
+        id:
+          type: string
+          format: uuid
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - injury
+          - loss
+          - theft
+          - complaint
+          - equipmentFailure
+          - safetyBreach
+          - other
+        description:
+          type: string
+        severity:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          - critical
+        reportedBy:
+          type: string
+          format: uuid
+        reportedAt:
+          type: string
+          format: date-time
+        photoAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        workOrderId:
+          type: string
+          format: uuid
+          nullable: true
+        authorityNotified:
+          type: boolean
+          default: false
+        scopePath:
+          type: string

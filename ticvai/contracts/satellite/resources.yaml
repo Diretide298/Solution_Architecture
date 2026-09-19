@@ -174,29 +174,83 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResourceAvailability'
   /resource-bookings:
+    get:
+      operationId: listResourceBookings
+      summary: Bookings, filtered
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: resourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceBooking'
     post:
       operationId: bookResource
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
-      summary: Reserve a specific resource for a window
+      summary: Reserve a specific resource for a window — staff only
       description: '**Refuses on conflict, including setup and teardown.** This is the operation the whole
         context exists for — **two bookings on one cabana is a guest arriving to find somebody in their
         chair**, and it must be impossible rather than unlikely.
 
         Where the caller does not care which one, `resourceId` may be omitted and a kind supplied: **the
-        platform picks and tells you which.** A guest booking *a* cabana does not choose cabana seven,
-        and a system that makes them choose has leaked its model.
+        platform picks and tells you which.**
+
+        ## Amended 19 September — no longer guest-callable
+
+        This shipped with `x-ticvai-guest-callable: true`, and the 26 August minute says otherwise:
+
+        > *"a guest always books a product or package — **never a resource directly, and never a specific
+        room/vehicle/instructor by itself** — across all sales channels. The product''s configuration
+        determines which resources are associated and get booked behind the scenes."*
+
+        **The original reasoning was right and stopped one step short.** It argued a guest booking *a*
+        cabana does not choose cabana seven; the minute goes further and says the guest does not address
+        the cabana at all. They buy a product, the product declares what it needs
+        (`setExperienceResourceRequirements`), and `allocateResources` fills it — rotating, per the same
+        minute, so one cabana is not worn out while others sit empty.
+
+        **This closes the open question on `F25-a-guest-rents-a-cabana`**, which recorded that the venue
+        had not said whether a guest may book a cabana themselves. They had; it was minuted on 26 August
+        and nothing read the minutes.
 
         '
       tags:
       - resources
       x-ticvai-permission: RESOURCE_BOOK
-      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
-      - guest
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -531,8 +585,2178 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SessionParticipant'
+  /resource-types:
+    get:
+      operationId: listResourceTypes
+      summary: The classes of resource this organisation supports
+      description: 'Board 1.02. **A resource type is configuration, not code.** The board is explicit
+        that administrators define staff, instructor, venue, room, hall, area, cabana, equipment, rental
+        item, vehicle and locker *without requiring software development* — so the list is a table, and
+        the `Resource.kind` enum that shipped first is a seed for it rather than the law.
+
+        **The flags are the reason this is not just a label.** Reservable, rentable, capacity-controlled,
+        schedule-controlled, inventory-controlled, qualification-required, maintenance-controlled,
+        check-in/out supported, deposit-applicable and customer-selectable each switch on a different
+        part of the platform. A locker is rentable and deposit-applicable and not schedule-controlled;
+        an instructor is schedule-controlled and qualification-required and not rentable.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Resource types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceType'
+    post:
+      operationId: createResourceType
+      summary: Define a class of resource
+      description: '**Tenant scope, because 26 August says it may be either.** *"some elements of resource
+        management configuration may be controlled at the tenant level rather than only centrally"* —
+        so the type vocabulary belongs to the tenant and a venue inherits it. A venue that needs its own
+        class asks for one rather than minting it silently.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceType'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceType'
+  /resource-types/{resourceTypeId}:
+    parameters:
+    - name: resourceTypeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateResourceType
+      summary: Change a class of resource
+      description: '**Existing resources are re-evaluated when their type changes** (board 1.02,
+        Governance). Turning off `checkInOutSupported` on a type whose resources are currently checked
+        out is refused rather than applied, and the response names them.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceType'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceType'
+        '409':
+          description: Resources exist that the new definition would invalidate
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-categories:
+    get:
+      operationId: listResourceCategories
+      summary: The classification tree beneath the types
+      description: 'Board 1.03. **Categories inherit from their parent** — default attributes, default
+        availability policies and the default approval workflow all cascade, which is what makes a tree
+        worth having rather than a flat tag.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceCategory'
+    post:
+      operationId: createResourceCategory
+      summary: Add a category or subcategory
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceCategory'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCategory'
+  /resource-categories/{categoryId}:
+    parameters:
+    - name: categoryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateResourceCategory
+      summary: Change a category
+      description: '**Warn before changing one that is in use** (board 1.03). The count of resources
+        beneath it comes back with the refusal, so the warning can say how many.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceCategory'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceCategory'
+  /resource-attributes:
+    get:
+      operationId: listResourceAttributes
+      summary: The customer-defined fields on a resource
+      description: 'Board 1.05. **The customer extends the record; we do not ship their fields.** Skill
+        level, height, seating capacity, equipment model, serial number, warranty expiry, language,
+        certification level and rental condition are all one mechanism — a typed, validated, per-type
+        attribute definition — and shipping them as columns would mean a release per customer.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Attribute definitions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceAttributeDefinition'
+    post:
+      operationId: createResourceAttribute
+      summary: Define a customer attribute
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceAttributeDefinition'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceAttributeDefinition'
+  /resources/{resourceId}:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getResource
+      summary: One resource, with every configured section
+      description: 'Board 1.04. Identity, organisation, operational configuration, location, commercial,
+        integration and the customer attributes in one read — **the profile is one screen, and a client
+        assembling it from seven calls renders it in pieces.**
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+    put:
+      operationId: updateResource
+      summary: Change a resource
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resource'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /resources/{resourceId}/state:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setResourceLifecycleState
+      summary: Move a resource through its lifecycle, with a reason
+      description: 'Board 1.10. **One operation, not seven.** Draft, pending approval, approved, active,
+        temporarily unavailable, under maintenance, suspended, retired and archived are states of one
+        machine, and *the allowed transitions are themselves configuration* — so `activateResource`,
+        `suspendResource` and `retireResource` as separate operations would each re-implement the same
+        transition table and still not cover a state the customer adds.
+
+        **The reason is required on the states that need one.** Retirement carries disposal and
+        depreciation references, suspension carries a cause, and either may name a replacement resource.
+        The board asks for all three, and an audit whose reason column is blank answers nothing.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - state
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - draft
+                  - pendingApproval
+                  - approved
+                  - active
+                  - temporarilyUnavailable
+                  - underMaintenance
+                  - suspended
+                  - retired
+                  - archived
+                reason:
+                  type: string
+                  nullable: true
+                effectiveFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+                replacementResourceId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                disposal:
+                  type: object
+                  nullable: true
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '409':
+          description: '**The transition is not allowed from the current state**, or an approval the
+            configuration requires has not been given. The response names which.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resources/{resourceId}/clone:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cloneResource
+      summary: Copy a resource and its configuration into new ones
+      description: '**A venue with forty identical strollers has forty resources.** That is the model,
+        and it is only bearable if the fortieth is one action rather than forty fields.
+
+        Clone copies configuration and never copies identity: code, serial and barcode are cleared, and
+        bookings, history and deposits are not carried.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  default: 1
+                  description: '**Forty strollers in one act.** Codes are generated from the source
+                    resource''s code pattern.
+
+                    '
+                codePattern:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+  /resources/{resourceId}/hierarchy:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getResourceHierarchy
+      summary: What this resource contains, and what contains it
+      description: 'Board 1.06. Venue → building → floor → hall → room; AV system → projector, screen,
+        speakers, microphones. **Booking a parent takes its children with it**, so the tree is
+        load-bearing rather than presentational.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The subtree and the ancestors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHierarchy'
+    put:
+      operationId: setResourceHierarchy
+      summary: Re-parent a resource, or attach children to it
+      description: '**Refuses a circular hierarchy, an invalid parent, and an unauthorised cross-tenant
+        relationship** (board 1.06). The first is the one that cannot be left to the client: a cycle
+        makes availability computation non-terminating, not merely wrong.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceHierarchy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHierarchy'
+        '409':
+          description: Circular, invalid, or cross-tenant without authorisation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resources/{resourceId}/dependencies:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getResourceDependencies
+      summary: What this resource requires, conflicts with, or substitutes for
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Dependencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceDependency'
+    put:
+      operationId: setResourceDependencies
+      summary: Define what must come with it, and what cannot
+      description: 'Board 1.07. *Stage A requires Sound System A and Lighting Rig A; a private ski lesson
+        requires one instructor and one training zone.*
+
+        **Dependencies are evaluated before an assignment is confirmed, not after.** A stage allocated
+        without its sound system is a show that does not happen, and finding out at the allocation review
+        is finding out too late. `allocateResources` refuses and names what is missing.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - dependencies
+              properties:
+                dependencies:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ResourceDependency'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceDependency'
+  /resource-packages:
+    get:
+      operationId: listResourcePackages
+      summary: Predefined combinations assigned as one
+      description: 'Board 1.08. *Conference Package — meeting room, projector, screen, microphone,
+        technician. VIP Cabana Package — cabana, towels, locker, service attendant.*
+
+        **A package may hold a placeholder rather than a resource.** "One technician" and "one instructor"
+        are resource-type slots filled at allocation time by `allocateResources`; naming a specific
+        technician in the package would make the package unbookable whenever that person is off.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourcePackage'
+    post:
+      operationId: createResourcePackage
+      summary: Define a reusable combination
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourcePackage'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePackage'
+  /resource-packages/{packageId}:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateResourcePackage
+      summary: Change a combination
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourcePackage'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcePackage'
+  /resources/{resourceId}/venues:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setResourceVenueAssignment
+      summary: Where it may operate, and whether it travels
+      description: 'Board 1.09. **The travel buffer is the part that is not a permission.** A resource
+        shared between two venues is unavailable for the journey between them, and a calendar that treats
+        the two bookings as adjacent sends an instructor to a class they cannot reach.
+        `getResourceAvailability` subtracts it exactly as it subtracts setup and teardown.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceVenueAssignment'
+      responses:
+        '200':
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceVenueAssignment'
+        '409':
+          description: Overlapping assignment, or the travel buffer cannot be met
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resources/{resourceId}/audit:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getResourceAuditTrail
+      summary: Every material change, with who and why
+      description: 'Board 1.10. **Immutable, and it records the previous value as well as the new one.**
+        An audit line saying a field changed, without saying what it changed from, cannot answer the only
+        question anybody ever asks of it.
+
+        Carries the source channel and API origin, so a change made by an integration is distinguishable
+        from one made by a person.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceAuditEntry'
+  /resource-calendar:
+    get:
+      operationId: getResourceCalendar
+      summary: Every resource against time, with conflicts already marked
+      description: 'Board 2.01. **This is a grid, not a list of bookings.** The calendar answers *"what
+        is the state of every resource over this window"* — available, reserved, assigned, partially
+        utilised, fully utilised, unavailable, on break, on leave, under maintenance, operationally
+        blocked, pending approval, in conflict — and a client deriving those twelve states from a
+        booking list will get the last three wrong every time.
+
+        **Conflicts are computed here rather than found by eye.** The board asks the calendar to *detect*
+        scheduling conflicts; a colour applied by the browser is a description of what the operator can
+        already see.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: resourceTypeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: categoryId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - day
+          - week
+          - month
+          - agenda
+      responses:
+        '200':
+          description: The grid
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceCalendarRow'
+  /resources/{resourceId}/schedule:
+    parameters:
+    - name: resourceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getResourceSchedule
+      summary: The pattern of when it is normally available
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceSchedule'
+    put:
+      operationId: setResourceSchedule
+      summary: Operating hours, working pattern and bookable slots
+      description: 'Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as
+        concrete dates has to be rewritten every season and silently expires; a recurring pattern with
+        exceptions does not.
+
+        **Slot length is here and not on the product**, because the same instructor may teach a
+        forty-minute private lesson and a ninety-minute group session, and the constraint being modelled
+        is the resource''s — how finely its time can be cut.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceSchedule'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceSchedule'
+  /resource-bookings/{bookingId}:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateResourceBooking
+      summary: Extend, shorten or reassign a booking
+      description: 'Board 2.01, Smart Actions — *view, edit, reassign, extend, shorten, cancel*. **All
+        four are one write and all four re-run conflict detection**, because extending into the next
+        booking and moving onto an occupied resource are the same failure reached by different routes.
+
+        **Reassignment carries the guest with it.** Moving a booking from cabana seven to cabana nine is
+        not a cancel and a rebook — the deposit, the check-out state and the order reference stay
+        attached, and a cancel/rebook would release the deposit and take it again.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resourceId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                from:
+                  type: string
+                  format: date-time
+                  nullable: true
+                to:
+                  type: string
+                  format: date-time
+                  nullable: true
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+        '409':
+          description: The change conflicts; the response names the times
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+    delete:
+      operationId: cancelResourceBooking
+      summary: Cancel one occurrence, or the whole series
+      description: '**Cancelling one week does not cancel the series**, and cancelling the series is a
+        separate act — the `scope` parameter makes the caller say which, and there is no default. A
+        default here would eventually cancel a term of swimming lessons because somebody meant one
+        Tuesday.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: scope
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - occurrence
+          - series
+      - name: reason
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceBooking'
+  /resource-blocks:
+    get:
+      operationId: listResourceBlocks
+      summary: Operational, setup and maintenance blocks
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: resourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Blocks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceBlock'
+    post:
+      operationId: createResourceBlock
+      summary: Take a resource out of service for a window, with a reason
+      description: 'Board 2.07. **A block is not a booking and the difference is operational.** An
+        operator looking for something free needs to know whether to wait or to look elsewhere, so
+        `getResourceAvailability` returns the reason — booked, setup, teardown, maintenance, blackout,
+        closed — rather than a single "unavailable".
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceBlock'
+      responses:
+        '201':
+          description: Blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBlock'
+        '409':
+          description: '**Bookings already exist in the window.** They are listed, because blocking over
+            a booked resource is sometimes right and must never be silent.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-blocks/{blockId}:
+    parameters:
+    - name: blockId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: releaseResourceBlock
+      summary: Put it back into service
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      responses:
+        '204':
+          description: Released
+  /resource-allocations:
+    post:
+      operationId: allocateResources
+      summary: Fill a requirement from the pool, rotating rather than repeating
+      description: '**The 26 August decision is the whole of this operation.** *"resource allocation
+        should rotate across all available resources (e.g., resource 1, then 2, then 3) rather than
+        repeatedly reusing the same resource, to avoid overburdening any single resource while others
+        remain unused."*
+
+        A naive allocator picks the first free match and is correct on every individual booking while
+        being wrong overall — the same instructor takes every lesson and the same cabana wears out first.
+        **Rotation is therefore a property of the platform, not advice to an operator**, and this is the
+        one place it can be enforced.
+
+        Fills resource-type placeholders in a package, evaluates dependencies before confirming, and
+        refuses naming what is missing rather than allocating a stage without its sound system.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from
+              - to
+              properties:
+                packageId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                requirements:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ResourceRequirement'
+                from:
+                  type: string
+                  format: date-time
+                to:
+                  type: string
+                  format: date-time
+                subjectId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                orderId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                preferredResourceIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: '**Only honoured where the product allows the guest to choose** — see
+                    `setResourceSelectionPolicy`. A preference that the policy does not permit is
+                    ignored rather than refused, because it is the caller''s error and not the guest''s.
+
+                    '
+      responses:
+        '201':
+          description: Allocated, and which ones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceBooking'
+        '409':
+          description: '**Nothing available, or a dependency is missing.** Both are named — "no
+            instructor free" and "the stage has no sound system" need different actions from the person
+            reading it.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-allocations/{bookingId}/replace:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: replaceResourceAllocation
+      summary: Swap in a substitute when the allocated resource falls through
+      description: 'Board 5.09. **The substitute list is configuration, not a search.** `substituteFor`
+        and `backupFor` are dependency kinds set on the resource, so recovery picks from a set somebody
+        approved rather than from whatever is free — an instructor without the right qualification is
+        free precisely because they cannot take the class.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                replacementResourceId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Omit to let the platform pick from the approved substitutes.
+      responses:
+        '200':
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+  /resource-allocation-policy:
+    get:
+      operationId: getResourceAllocationPolicy
+      summary: How the platform chooses between equally valid resources
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceAllocationPolicy'
+    put:
+      operationId: setResourceAllocationPolicy
+      summary: Rotation, priority and scoring
+      description: 'Board 5.08. **Rotation is the default and 26 August is why**, but a venue that
+        genuinely wants its best room filled first can say so. The policy names the strategy rather than
+        hiding it in the allocator, so the behaviour is inspectable when somebody asks why cabana three
+        never gets used.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceAllocationPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceAllocationPolicy'
+  /resource-selection-policy:
+    put:
+      operationId: setResourceSelectionPolicy
+      summary: Whether the guest may choose the resource, per ticket type
+      description: '**Two 26 August decisions meet here and they have to be read together.**
+
+        > *"a guest always books a product or package — never a resource directly, and never a specific
+        room/vehicle/instructor by itself — across all sales channels. The product''s configuration
+        determines which resources are associated and get booked behind the scenes."*
+
+        > *"instructor/resource selection will be a configurable, per-ticket-type setting — private-session
+        ticket types can optionally allow the guest to choose a specific instructor, while group-session
+        ticket types auto-assign an instructor without exposing the choice to the guest. Private and
+        group sessions are modelled as two separate products with separate pricing, not variants of the
+        same product."*
+
+        So the guest never addresses a resource, and may sometimes express a preference *within a
+        product that permits it.* **That is why this is a policy on the ticket type rather than a flag on
+        the resource** — the same instructor is choosable in the private lesson and invisible in the
+        group one, and nothing about the instructor changed.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - ticketTypeId
+              - mode
+              properties:
+                ticketTypeId:
+                  type: string
+                  format: uuid
+                mode:
+                  type: string
+                  enum:
+                  - autoAssign
+                  - guestMayChoose
+                resourceTypeId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                showQualifications:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Set
+  /resource-suggestions:
+    get:
+      operationId: suggestResources
+      summary: Resources matching a requirement, by attribute
+      description: '**Deliberately not AI, and 26 August says so.** *"skill-based resource matching
+        should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather
+        than a full AI-based matching system, to avoid unnecessary complexity."*
+
+        Attributes come from the customer''s own attribute definitions, so matching a guest who wants an
+        Arabic-speaking level-3 instructor needs no model and no training data — it is a query, and it is
+        explainable to the operator who has to defend the result.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: resourceTypeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: attributes
+        in: query
+        description: 'Attribute code and value pairs, e.g. `language=ar,skillLevel=3`.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Matching resources, free in the window
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+  /experiences/{experienceId}/resource-requirements:
+    parameters:
+    - name: experienceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getExperienceResourceRequirements
+      summary: What an experience needs before it can run
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Requirements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceRequirement'
+    put:
+      operationId: setExperienceResourceRequirements
+      summary: Bind resource requirements to an experience
+      description: 'Board 5.01. **This is the join between the catalogue and the pool**, and it is what
+        makes the 26 August rule enforceable: the guest buys a product, the product states what it needs,
+        and `allocateResources` fills it. Without this the product has no way to reserve anything and the
+        resource has no way to know it is spoken for.
+
+        Requirements are stated as type and quantity with optional qualifications — *one instructor, one
+        training zone* — never as named resources.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - requirements
+              properties:
+                requirements:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ResourceRequirement'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceRequirement'
+  /resource-utilisation:
+    get:
+      operationId: getResourceUtilisation
+      summary: How much of each resource's available time was used
+      description: 'Board 10.02. **The reporting the original contract said had no source.** Utilisation
+        is booked time over available time, and both halves need this context: available time knows about
+        schedules, blocks, setup and travel buffers, and a report computed from bookings alone divides by
+        the wrong denominator and flatters every resource.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - resource
+          - resourceType
+          - category
+          - venue
+      responses:
+        '200':
+          description: Utilisation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceUtilisation'
+
 components:
   schemas:
+    ResourceType:
+      type: object
+      x-ticvai-persistence: resources.resource_type
+      description: 'Board 1.02. **The class, and the ten switches that decide which parts of the platform
+        a resource of this class touches.** `Resource.kind` was an enum and this is the table behind it —
+        a customer adding "Golf Buggy" does not need a release.
+
+        '
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+        displayColour:
+          type: string
+          nullable: true
+        nature:
+          type: string
+          enum:
+          - physical
+          - human
+          - virtual
+          description: '**Human resources point at a principal and are rostered by `workforce`.** The
+            nature decides which other context owns the thing, which is why it is not a free label.
+
+            '
+        reservable:
+          type: boolean
+          default: true
+        rentable:
+          type: boolean
+          default: false
+        capacityControlled:
+          type: boolean
+          default: false
+        scheduleControlled:
+          type: boolean
+          default: true
+        inventoryControlled:
+          type: boolean
+          default: false
+        qualificationRequired:
+          type: boolean
+          default: false
+        maintenanceControlled:
+          type: boolean
+          default: false
+        checkInOutSupported:
+          type: boolean
+          default: false
+        depositApplicable:
+          type: boolean
+          default: false
+        customerSelectable:
+          type: boolean
+          default: false
+          description: '**A ceiling, not a permission.** Whether a guest may actually choose is decided
+            per ticket type by `setResourceSelectionPolicy`; a type with this false can never be
+            choosable, and a type with it true still is not until a product says so.
+
+            '
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    ResourceCategory:
+      type: object
+      x-ticvai-persistence: resources.resource_category
+      description: 'Board 1.03. Beneath the type — *Equipment → AV → Lighting*, *Rental → Towels*.
+        **Configuration cascades down the tree**, which is the reason it is a tree.
+
+        '
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        parentCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        applicableResourceTypeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        displayOrder:
+          type: integer
+          default: 0
+        tags:
+          type: array
+          items:
+            type: string
+        reportingGroup:
+          type: string
+          nullable: true
+        costCentre:
+          type: string
+          nullable: true
+        defaultAttributes:
+          type: object
+          additionalProperties: true
+        defaultApprovalWorkflowId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    ResourceAttributeDefinition:
+      type: object
+      x-ticvai-persistence: resources.attribute_definition
+      description: 'Board 1.05. **A typed, validated field the customer adds.** The alternative was a
+        column per customer request, which is a release per customer.
+
+        '
+      required:
+      - code
+      - label
+      - dataType
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        label:
+          type: string
+        dataType:
+          type: string
+          enum:
+          - text
+          - number
+          - decimal
+          - currency
+          - date
+          - dateTime
+          - boolean
+          - singleSelect
+          - multiSelect
+          - lookup
+          - attachment
+          - url
+          - measurement
+          - formula
+        applicableResourceTypeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        applicableCategoryIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        mandatory:
+          type: boolean
+          default: false
+        defaultValue:
+          nullable: true
+        allowedValues:
+          type: array
+          items:
+            type: string
+        minimum:
+          type: number
+          nullable: true
+        maximum:
+          type: number
+          nullable: true
+        validationExpression:
+          type: string
+          nullable: true
+        searchable:
+          type: boolean
+          default: false
+          description: '**The flag that decides whether `suggestResources` can use it.** An attribute
+            nobody can filter by cannot take part in skill-based matching, which is the main reason the
+            customer defined it.
+
+            '
+        scopePath:
+          type: string
+    ResourceHierarchy:
+      type: object
+      description: 'Board 1.06. Ancestors and the immediate subtree, with the relationship named.'
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceRelation'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceRelation'
+    ResourceRelation:
+      type: object
+      x-ticvai-persistence: resources.resource_relation
+      required:
+      - resourceId
+      - relation
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        relation:
+          type: string
+          enum:
+          - contains
+          - belongsTo
+          - locatedIn
+          - operatedBy
+          - supportedBy
+          - partOf
+          - dedicatedTo
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        priority:
+          type: integer
+          default: 0
+        scopePath:
+          type: string
+    ResourceDependency:
+      type: object
+      x-ticvai-persistence: resources.resource_dependency
+      description: 'Board 1.07. **Evaluated before an assignment is confirmed.** *Stage A requires Sound
+        System A and Lighting Rig A.*
+
+        '
+      required:
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - requires
+          - requiresOneOf
+          - requiresAll
+          - conflictsWith
+          - cannotOperateSimultaneously
+          - preferredWith
+          - substituteFor
+          - backupFor
+          - sharesCapacityWith
+        targetResourceId:
+          type: string
+          format: uuid
+          nullable: true
+        targetResourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+        minimumQuantity:
+          type: integer
+          default: 1
+        maximumQuantity:
+          type: integer
+          nullable: true
+        mandatory:
+          type: boolean
+          default: true
+        priority:
+          type: integer
+          default: 0
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    ResourcePackage:
+      type: object
+      x-ticvai-persistence: resources.resource_package
+      description: 'Board 1.08. **A package may hold placeholders.** "One technician" is a slot, and
+        naming a person would make the package unbookable whenever they are off.
+
+        '
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        applicableVenueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceRequirement'
+        allocationPriority:
+          type: integer
+          default: 0
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        minimumMinutes:
+          type: integer
+          nullable: true
+        maximumMinutes:
+          type: integer
+          nullable: true
+        requiresApproval:
+          type: boolean
+          default: false
+        internalCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+    ResourceRequirement:
+      type: object
+      x-ticvai-persistence: resources.resource_requirement
+      description: '**A type and a quantity, never a named resource.** This is what makes the 26 August
+        rule enforceable — the product states what it needs and the platform decides which one.
+
+        '
+      required:
+      - quantity
+      properties:
+        id:
+          type: string
+          format: uuid
+        resourceTypeId:
+          type: string
+          format: uuid
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**A fixed component, and the exception rather than the rule.** Meeting Room A
+            really is Meeting Room A; the technician is not.
+
+            '
+        quantity:
+          type: integer
+          default: 1
+        mandatory:
+          type: boolean
+          default: true
+        requiredQualifications:
+          type: array
+          items:
+            type: string
+        requiredAttributes:
+          type: object
+          additionalProperties: true
+        substituteResourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        scopePath:
+          type: string
+    ResourceVenueAssignment:
+      type: object
+      x-ticvai-persistence: resources.venue_assignment
+      description: 'Board 1.09. **The travel buffer is subtracted from availability**, like setup and
+        teardown, so a shared instructor is not double-booked across a journey they cannot make.
+
+        '
+      required:
+      - primaryVenueId
+      properties:
+        primaryVenueId:
+          type: string
+          format: uuid
+        secondaryVenueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        sharedPool:
+          type: boolean
+          default: false
+        crossVenueBookingAllowed:
+          type: boolean
+          default: false
+        travelBufferMinutes:
+          type: integer
+          default: 0
+        transferRequired:
+          type: boolean
+          default: false
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        scopePath:
+          type: string
+    ResourceSchedule:
+      type: object
+      x-ticvai-persistence: resources.resource_schedule
+      description: 'Boards 2.03 and 2.04. **A recurring pattern with exceptions, not a list of dates.**
+        A schedule written as concrete dates silently expires.
+
+        '
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        availabilityMode:
+          type: string
+          enum:
+          - alwaysAvailable
+          - scheduled
+          - onRequest
+        windows:
+          type: array
+          items:
+            type: object
+            properties:
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+              from:
+                type: string
+              to:
+                type: string
+              effectiveFrom:
+                type: string
+                format: date
+                nullable: true
+              effectiveTo:
+                type: string
+                format: date
+                nullable: true
+        slotMinutes:
+          type: integer
+          nullable: true
+          description: '**How finely this resource''s time can be cut**, which is a property of the
+            resource and not of the product sold against it.
+
+            '
+        minimumBookingMinutes:
+          type: integer
+          nullable: true
+        maximumBookingMinutes:
+          type: integer
+          nullable: true
+        advanceBookingDays:
+          type: integer
+          nullable: true
+        exceptions:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              closed:
+                type: boolean
+              from:
+                type: string
+                nullable: true
+              to:
+                type: string
+                nullable: true
+        scopePath:
+          type: string
+    ResourceBlock:
+      type: object
+      x-ticvai-persistence: resources.resource_block
+      description: 'Board 2.07. **A block is not a booking**, and the reason travels with it so an
+        operator knows whether to wait or to look elsewhere.
+
+        '
+      required:
+      - resourceId
+      - from
+      - to
+      - reason
+      properties:
+        id:
+          type: string
+          format: uuid
+        resourceId:
+          type: string
+          format: uuid
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          enum:
+          - setup
+          - teardown
+          - maintenance
+          - blackout
+          - closed
+          - operational
+          - training
+        note:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    ResourceCalendarRow:
+      type: object
+      description: 'Board 2.01. **One resource across the window, with its states already computed** —
+        including conflict, which a client cannot derive from a booking list.
+
+        '
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        resourceName:
+          type: string
+        resourceTypeId:
+          type: string
+          format: uuid
+        utilisationPercent:
+          type: number
+        segments:
+          type: array
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+                format: date-time
+              to:
+                type: string
+                format: date-time
+              state:
+                type: string
+                enum:
+                - available
+                - reserved
+                - assigned
+                - partiallyUtilised
+                - fullyUtilised
+                - unavailable
+                - onBreak
+                - onLeave
+                - underMaintenance
+                - operationallyBlocked
+                - pendingApproval
+                - conflict
+              bookingId:
+                type: string
+                format: uuid
+                nullable: true
+              conflictsWith:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+    ResourceAllocationPolicy:
+      type: object
+      x-ticvai-persistence: resources.allocation_policy
+      description: 'Board 5.08, and the 26 August rotation decision. **Named rather than hidden in the
+        allocator**, so somebody can answer why cabana three never gets used.
+
+        '
+      properties:
+        strategy:
+          type: string
+          enum:
+          - rotate
+          - leastUtilised
+          - priorityOrder
+          - nearestFirst
+          default: rotate
+          description: '**`rotate` is the default because 26 August made it one.** *"rotate across all
+            available resources… rather than repeatedly reusing the same resource, to avoid overburdening
+            any single resource while others remain unused."*
+
+            '
+        respectResourcePriority:
+          type: boolean
+          default: true
+        scoringWeights:
+          type: object
+          additionalProperties:
+            type: number
+        allowPartialAllocation:
+          type: boolean
+          default: false
+          description: '**False by default.** A stage allocated without its sound system is worse than
+            no allocation, because it looks finished.
+
+            '
+        scopePath:
+          type: string
+    ResourceAuditEntry:
+      type: object
+      x-ticvai-persistence: resources.resource_audit
+      description: 'Board 1.10. **Immutable, and it carries the previous value.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        resourceId:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        actorId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          type: string
+        field:
+          type: string
+          nullable: true
+        previousValue:
+          nullable: true
+        newValue:
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        sourceChannel:
+          type: string
+          nullable: true
+        apiOrigin:
+          type: string
+          nullable: true
+        correlationId:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    ResourceUtilisation:
+      type: object
+      description: 'Board 10.02. **Booked time over available time**, where available knows about
+        schedules, blocks, setup and travel.
+
+        '
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        availableMinutes:
+          type: integer
+        bookedMinutes:
+          type: integer
+        blockedMinutes:
+          type: integer
+        utilisationPercent:
+          type: number
+        bookingCount:
+          type: integer
     Resource:
       type: object
       x-ticvai-persistence: resources.resource
