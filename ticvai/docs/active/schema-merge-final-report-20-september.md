@@ -46,6 +46,24 @@ moved **38 rows**, almost all of them in your favour.
 **Thirteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
 is how we found most of them.
 
+### The biggest thing you found, and we had it the wrong way round — 15 tables
+
+**We said we had reached this conclusion independently. We had not.** F&B and Retail have their
+own schemas and their own services in our package, but **not their own catalogue data**:
+
+    fnb.menu_item.product_variant_id   ->  catalogue.variant
+    retail.merchandise.variant_id      ->  catalogue.variant
+    retail.merchandise.price           ->  a column, not a price table
+
+There is no `fnb.product`, `fnb.price`, `fnb.price_list`, `fnb.variant` or `fnb.product_category`
+in our package, and no `retail.` equivalent either. **Both read `catalogue.variant` on every
+sale.**
+
+That is exactly the contention we argue `catalogue` must be protected from. We make that argument
+against your `rental_rate` in §2 — while our own F&B and Retail sit on the hot table while we make
+it. **Your fifteen tables are the single most valuable thing in this workbook**, and we are taking
+every one of them.
+
 ### Things that are wrong today
 
 | | |
@@ -91,7 +109,7 @@ screen changes** — your table names already carry the domain.
 
 | | move | to | why |
 |---|---|---|---|
-| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** That is the flash-sale contention argument that gave F&B and Retail their own price tables, reintroduced. Your layout also splits rental across CatalogueService and VenueOpsService |
+| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** That is the flash-sale contention argument — the same one that says F&B and Retail need their own price tables, which §1 now concedes they do not yet have. Your layout also splits rental across CatalogueService and VenueOpsService |
 | **payments** | 5 tables from `orders` | `payments` | all five are **configuration**. `orders` is the highest-churn schema in the system, and config read on every checkout should not share a schema with rows written on every sale |
 | **subscription** | 2 tables from `platform` | `subscription` | your placement puts billing in TenancyService and licensing in PlatformService. **A plan lookup becomes a cross-service call** |
 | **accreditation** | 4 tables from `access` | `accreditation` | same principle |
