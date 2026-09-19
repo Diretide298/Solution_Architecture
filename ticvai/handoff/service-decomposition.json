@@ -53,7 +53,9 @@
    "schemas": [
     "platform",
     "workforce",
-    "approvals"
+    "approvals",
+    "accreditation",
+    "tenancy"
    ],
    "operations": 136,
    "tables": 54,
@@ -121,7 +123,8 @@
     "payments"
    ],
    "schemas": [
-    "orders"
+    "orders",
+    "payments"
    ],
    "operations": 217,
    "tables": 47,
@@ -387,7 +390,8 @@
     "resources",
     "venuemap",
     "assets",
-    "games"
+    "games",
+    "rental"
    ],
    "operations": 218,
    "tables": 86,
@@ -423,7 +427,8 @@
     "public-api"
    ],
    "schemas": [
-    "control"
+    "control",
+    "subscription"
    ],
    "operations": 182,
    "tables": 55,
