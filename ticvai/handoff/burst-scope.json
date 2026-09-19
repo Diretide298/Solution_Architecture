@@ -624,7 +624,7 @@
    "note": "**Money going back**, always against a payment and never editing it. The ledger posts both"
   },
   {
-   "table": "platform.org_unit",
+   "table": "platform.scope",
    "schema": "platform",
    "columns": 8,
    "burstOperations": 1,
@@ -1007,7 +1007,7 @@
     "approvals.matrix",
     "approvals.rule",
     "identity.delegated_access",
-    "platform.org_unit"
+    "platform.scope"
    ],
    "writes": [],
    "lock": null

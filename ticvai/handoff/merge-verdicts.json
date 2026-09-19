@@ -829,63 +829,63 @@
  ],
  "workforce.employee": [
   "ADDITIVE",
-  "an employee master; we use identity.principal and hold no HR record"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". matrix 1.2.83 validates certifications and working-hour limits, and 1.2.84 costs labour by department - both need an employee record here, synchronised from HRMS."
  ],
  "workforce.employment": [
   "ADDITIVE",
-  "employment terms and contract validity"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". employment terms, for the working-hour and overtime limits in 1.2.83."
  ],
  "workforce.job_title": [
   "ADDITIVE",
-  "job definitions such as Cashier or Chef"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". role coverage rules in 1.2.82 need a job definition."
  ],
  "workforce.leave_balance": [
   "ADDITIVE",
-  "entitlement, used and remaining per period"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". the Staff Eligibility Engine on Board 3 evaluates Leave alongside availability, skills and certifications."
  ],
  "workforce.leave_type": [
   "ADDITIVE",
-  "leave categories"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". matrix 1.2.37 says INTEGRATE approved leave requests, so the categories come from outside and are held here to evaluate eligibility."
  ],
  "workforce.pay_component": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a pay component."
  ],
  "workforce.payroll_employee": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold an employee on a payroll run."
  ],
  "workforce.payroll_line": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a line on a payroll run."
  ],
  "workforce.payroll_run": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a payroll run."
  ],
  "workforce.payslip": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a payslip."
  ],
  "workforce.roster": [
   "DECLINE",
   "our workforce.rota_assignment"
  ],
  "workforce.salary": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a salary."
  ],
  "workforce.salary_component": [
-  "DECIDE",
-  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a salary component."
  ],
  "workforce.shift": [
   "ADDITIVE",
-  "a shift pattern (Morning/Evening), not a till session"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". their shift record beside our shift_template and open_shift; matrix 1.2.33 says the system shall manage employee shifts."
  ],
  "workforce.work_assignment": [
   "ADDITIVE",
-  "assigns an employee to a job and a location"
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". assigns an employee to a job and a location; Board 4 converts these into rosters."
  ],
  "workforce.work_time": [
   "DECLINE",

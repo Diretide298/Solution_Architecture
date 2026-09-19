@@ -140,6 +140,12 @@
  "document:docs\\active\\phase0-identity-pass-all-clusters.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\rename-worklist-20-september.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\schema-merge-decision-log.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\screen-duplicate-triage.md": [
   "ai:names it"
  ],
@@ -506,6 +512,9 @@
  "state:schedule.yaml": [
   "ai:reached via whitelabel.contentPublished"
  ],
+ "table:ai.activity": [
+  "ai:owned"
+ ],
  "table:ai.chunk_ref": [
   "ai:owned"
  ],
@@ -522,9 +531,6 @@
   "ai:owned"
  ],
  "table:ai.index_source": [
-  "ai:owned"
- ],
- "table:ai.interaction": [
   "ai:owned"
  ],
  "table:ai.knowledge_collection": [
@@ -608,10 +614,10 @@
  "table:marketing.loyalty_programme": [
   "ai:read or written"
  ],
- "table:platform.org_unit": [
+ "table:platform.region_settings": [
   "ai:read or written"
  ],
- "table:platform.region_settings": [
+ "table:platform.scope": [
   "ai:read or written"
  ],
  "table:promotions.promotion": [

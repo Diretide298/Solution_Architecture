@@ -30,7 +30,7 @@ cost again.
 | 3 | Subscription domain | **consolidate into `subscription`**, decline `platform` | 20 Sep |
 | 4 | `venue` schema | **their name, our table** — `platform.scope`; decline all five | 20 Sep |
 | 5 | `pricing` schema | **take all three**, and give the schema an owner | 20 Sep |
-| 6 | Payroll and HR scope | **client question** — and payroll wants its own owner | 20 Sep |
+| 6 | Payroll and HR scope | **closed on their own sources** — decline payroll, take HR as a projection | 20 Sep |
 | 7 | Where a customer lives | **keep the three-way split** | 20 Sep |
 | 8 | Loyalty: one rules table or four | **take theirs** — ours has three faults | 20 Sep |
 | 9 | Membership hierarchy | **take it** | 20 Sep |
@@ -311,7 +311,7 @@ on `catalogue.price`, `games.pricing`, F&B or retail.
 CatalogueService, which already owns `price`, `price_list` and `promotions`. Leaving a schema
 unowned is how the last fifty unowned tables happened.
 
-## 6 · Payroll and HR — **still a client question, and the rubric adds one thing**
+## 6 · Payroll and HR — superseded, see the closed entry at the end of this file
 
 Unchanged: seven payroll tables with **no requirement behind them**, and seven HR master tables
 already accepted *conditionally* on the answer.
@@ -408,3 +408,78 @@ plumbing — `cell_connection`, `cross_cell_request`, `rejection` — which is w
 has to reach. On maintainability and optimised access that is not close.
 
 **Call: drop theirs.** If it carries state ours lacks, take the body.
+
+---
+
+## 6 · Payroll and HR — **closed on their own sources, not by asking**
+
+**We had this down as a client question. It did not need to be one.** The answer is in the
+client's own reference pack and in the requirement matrix, and citing those rather than arguing
+preference is what makes the decline stick.
+
+### What their pack says
+
+`Resource_Management_Configuration_Reference.pdf`, **Board 3, page 45 — "Workforce Integration &
+Synchronization Center"**:
+
+> **Purpose.** Connect TICVAI Resource Management with **external** HR, workforce management,
+> **payroll**, identity, and employee systems where applicable.
+>
+> **Integration Sources.** HRMS · Workforce Management · **Payroll** · Time & Attendance ·
+> Identity Management · External staffing agencies
+>
+> **External System Master.** *"This prevents conflicting updates."*
+>
+> **Conflict handling.** *"Employee exists in HR but not TICVAI."* · *"Employee terminated
+> externally but has future TICVAI assignments."*
+
+**Board 10** lists Payroll again — as an integration to **monitor**, with sync status, failed
+records and latency beside HRMS.
+
+### What the matrix says
+
+**Zero rows mention payroll, payslip, salary, wage, HRMS or HR system.** Not one, across all five
+sheets. What it requires at the rows Board 4 itself cites:
+
+| | |
+|---|---|
+| 1.2.32–33 | staff scheduling, assignment, shifts |
+| **1.2.37** | *"System shall **integrate** approved leave requests"* — integrate, not manage |
+| 1.2.80–81 | shift swaps, check-in and check-out, lateness, no-shows, overtime hours |
+| 1.2.83 | validate against working-hour limits, breaks, **certifications**, rest periods, union rules |
+| **1.2.84** | *"calculate **labor costs**, staffing budgets, overtime costs… by venue, department, attraction"* |
+
+**1.2.84 is labour costing, not payroll.** Costing a roster is not paying anybody, and it is the
+closest the matrix comes.
+
+### The call
+
+| | |
+|---|---|
+| **the seven payroll tables** | **decline.** `payroll_run`, `payroll_employee`, `payroll_line`, `payslip`, `salary`, `salary_component`, `pay_component`. No requirement, and their own pack names payroll as an external system to integrate with and monitor |
+| **the seven HR tables** | **take — as an externally mastered projection, not an HR master.** 1.2.83 needs certifications and job roles, 1.2.84 needs a cost rate per employee, and Board 3's eligibility engine evaluates leave. The rows live here; the system of record does not |
+
+### The gap this exposes, which is in neither workbook
+
+**Board 3 requires a field-ownership model** — *"for every field, administrators shall
+determine"* which system is master, because that is what *"prevents conflicting updates"*. Board
+10 specifies a six-state integration monitor: connected systems, last synchronisation, successful
+records, failed records, warnings, mapping errors, authentication status.
+
+**We hold none of it. Neither do they.** Taking their employee tables without it takes the data
+and leaves the governance behind — and their own conflict cases, *"employee terminated externally
+but has future TICVAI assignments"*, are exactly what goes wrong without it.
+
+### A note on where their seven payroll tables came from
+
+`payroll_run` → `payroll_employee` → `payroll_line` → `payslip`, with `salary`,
+`salary_component` and `pay_component` beside them, **is a standard payroll schema completed to
+its usual shape.** It is what you get when a model is asked to finish a `workforce` schema rather
+than to satisfy a requirement. **That is worth saying plainly and without accusation**, because it
+also means the reverse may be true elsewhere in the workbook: a generated schema fills in what is
+conventional and omits what is specific — which is consistent with the field-ownership and sync
+layer above being missing from both sides, since nothing conventional would have supplied it.
+
+**It is also the reason to cite their sources rather than our judgement.** A decline backed by
+their own Board 3 and by an empty search of the matrix is checkable. A decline backed by "we did
+not think it was in scope" is not.

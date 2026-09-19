@@ -99,12 +99,18 @@ DECISIONS = [
      "increase and decrease - and no engine under them, and nothing at all on tickets, F&B or "
      "retail. A second pricing behaviour is currently a schema change. The pricing schema has no "
      "service owner; assign it to CatalogueService."),
-    (6, "Payroll and HR scope", "OPEN - a client question", 7,
-     "-", "-", "-", "-",
-     "Seven payroll tables with no requirement behind them in anything we hold, and seven HR "
-     "master tables already accepted conditionally on the answer. Are we building payroll, or "
-     "rostering against an external HR system? Note either way: workforce is TenancyService and "
-     "payroll is a finance function - if yes, it wants its own schema and owner."),
+    (6, "Payroll and HR scope", "CLOSED on their own sources - decline payroll, take HR as a "
+        "projection", 14,
+     "ours", "-", "-", "-",
+     "Answered without asking. Resource_Management_Configuration_Reference.pdf Board 3 p45, "
+     "'Workforce Integration & Synchronization Center': connect TICVAI with EXTERNAL HR, "
+     "workforce management, payroll, identity and employee systems; its Integration Sources list "
+     "names HRMS, Payroll and Time & Attendance, and Board 10 monitors Payroll as an integration. "
+     "The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR "
+     "system across all five sheets. The nearest, 1.2.84, is labour COSTING by venue and "
+     "department, and 1.2.37 says INTEGRATE approved leave requests. So: decline the seven "
+     "payroll tables, take the seven HR tables as an externally mastered projection, and add the "
+     "field-ownership and sync layer Board 3 requires that neither workbook has."),
     (7, "Where a customer lives", "Keep the three-way split", 4,
      "ours", "ours", "ours", "ours",
      "identity.principal carries 134 inbound foreign keys, the most connected table in the "
@@ -174,6 +180,13 @@ ACTIONS = [
     ("Pricing", "Assign the pricing schema to CatalogueService",
      "It has no service owner. Leaving a schema unowned is how the last fifty unowned tables "
      "happened.", "Ownership"),
+    ("Workforce", "Add a field-ownership and synchronisation layer for externally mastered staff "
+                  "data",
+     "Board 3 requires that for every field administrators determine which system is master, "
+     "which is what prevents conflicting updates, and Board 10 specifies a six-state integration "
+     "monitor. We hold no field-ownership record, no sync status and no conflict record - and "
+     "neither does their workbook. Taking their employee tables without this takes the data and "
+     "leaves the governance.", "Gap in both"),
     ("Arrays", "Review the 140 tables carrying an array column that encodes a relationship",
      "Their workbook normalised six and we took all six. "
      "access.admission_rules.allowed_access_point_ids is the proof - their entry_rule_point IS "

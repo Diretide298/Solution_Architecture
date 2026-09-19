@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-19",
+ "generated": "2026-09-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
@@ -178,11 +178,11 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "public-api",
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "ai",
    "operations": 5
   },
   {

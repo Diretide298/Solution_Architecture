@@ -32,8 +32,8 @@ moved **38 rows**, almost all of them in your favour.
 | | tables | |
 |---|---:|---|
 | **we take yours** | **105** | your table, your name, or your columns |
-| we keep ours | 105 | with the reason stated per row |
-| **open** | **7** | payroll — a scope question, not a schema one |
+| we keep ours | 112 | with the reason stated per row |
+| **open** | **0** | payroll closed on your own sources — §4 |
 | corrections | 6 | matches we had wrong |
 
 **100 more of your tables already carry a name we use**, so the workbook agrees with us on 204 of
@@ -43,7 +43,7 @@ moved **38 rows**, almost all of them in your favour.
 
 ## 1 · What we are changing on our side
 
-**Thirteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
+**Fourteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
 is how we found most of them.
 
 ### The biggest thing you found, and we had it the wrong way round — 15 tables
@@ -145,29 +145,67 @@ reporting layer flattens joins into one namespace, and we would rather hear it.
 
 ---
 
-## 4 · What we need back
+## 4 · Payroll, and why we are declining it on your own sources
 
-**One question, and it is the only thing still open.**
+**Nothing in this merge is still open.** We had payroll down as a question for the client. It did
+not need to be one — the answer is in the client's reference pack and in the requirement matrix,
+and we would rather cite those than tell you what we think.
 
-**Is payroll in scope?** Your `workforce` is a full HR and payroll system; ours is rostering.
-Seven payroll tables — `payroll_run`, `payroll_employee`, `payroll_line`, `payslip`, `salary`,
-`salary_component`, `pay_component` — have **no requirement behind them in anything we hold**, and
-**seven HR master tables we have already accepted are conditional on the answer**.
+### Your pack
 
-*Are we building payroll, or rostering against an external HR system?*
+`Resource_Management_Configuration_Reference.pdf`, **Board 3, page 45 — "Workforce Integration &
+Synchronization Center"**:
 
-**One thing to note whichever way it goes:** `workforce` is TenancyService. Payroll is a finance
-function, and putting payslips and salary components inside the service that manages tenants and
-staff rosters is wrong on maintainability regardless of scope. **If the answer is yes, payroll
-wants its own schema and its own owner** — not thirteen more tables in `workforce`.
+> **Purpose.** Connect TICVAI Resource Management with **external** HR, workforce management,
+> **payroll**, identity, and employee systems where applicable.
+>
+> **Integration Sources.** HRMS · Workforce Management · **Payroll** · Time & Attendance ·
+> Identity Management · External staffing agencies
+
+**Board 10** lists Payroll again — as an integration to **monitor**, beside HRMS, with sync
+status, failed records and latency.
+
+### The matrix
+
+**Zero rows mention payroll, payslip, salary, wage, HRMS or HR system**, across all five sheets.
+What it does require, at the rows Board 4 itself cites:
+
+| | |
+|---|---|
+| 1.2.32–33 | staff scheduling, assignment, shifts |
+| **1.2.37** | *"System shall **integrate** approved leave requests"* — integrate, not manage |
+| 1.2.80–81 | shift swaps, check-in and check-out, lateness, no-shows, overtime |
+| 1.2.83 | validate against working-hour limits, breaks, **certifications**, rest periods, union rules |
+| **1.2.84** | *"calculate **labor costs**, staffing budgets, overtime costs… by venue, department, attraction"* |
+
+**1.2.84 is labour costing, not payroll.** Costing a roster is not paying anybody, and it is the
+closest the matrix comes.
+
+### So
+
+| | |
+|---|---|
+| **the seven payroll tables** | **declined.** `payroll_run`, `payroll_employee`, `payroll_line`, `payslip`, `salary`, `salary_component`, `pay_component` |
+| **the seven HR tables** | **taken — as an externally mastered projection, not an HR master.** 1.2.83 needs certifications and job roles, 1.2.84 needs a cost rate per employee, and your Board 3 eligibility engine evaluates leave. The rows live with us; the system of record does not |
+
+### And a gap this turned up in both of us
+
+**Board 3 requires a field-ownership model** — *"for every field, administrators shall determine"*
+which system is master, because that is what *"prevents conflicting updates"*. Board 10 specifies
+a six-state integration monitor: connected systems, last synchronisation, successful records,
+failed records, warnings, mapping errors, authentication status.
+
+**We hold none of it. Neither does your workbook.** Your own conflict cases — *"employee exists
+in HR but not TICVAI"*, *"employee terminated externally but has future TICVAI assignments"* — are
+exactly what goes wrong without it. **Taking your employee tables without this layer takes the
+data and leaves the governance behind**, so we are adding it and would rather build it with you
+than beside you.
 
 ### Two smaller ones, where either answer works
 
 - **Column prefixes** — §2. If you want them, we want the reason.
 - **`platform.scope`** — we are taking your name. Confirm you are happy for the hierarchy to stay
   one table rather than five.
-
----
 
 ## 5 · Corrections to things we told you earlier
 

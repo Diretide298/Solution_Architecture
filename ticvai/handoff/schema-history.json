@@ -556,9 +556,121 @@
   "workforce.shift_swap": "2026-09-19",
   "workforce.shift_template": "2026-09-19",
   "workforce.staffing_rules": "2026-09-19",
-  "workforce.training_record": "2026-09-19"
+  "workforce.training_record": "2026-09-19",
+  "ai.activity": "2026-09-20",
+  "control.api_limit": "2026-09-20",
+  "fnb.dining_table": "2026-09-20",
+  "fnb.service_order": "2026-09-20",
+  "fnb.service_order_line": "2026-09-20",
+  "fnb.sold_out_item": "2026-09-20",
+  "maintenance.asset_category": "2026-09-20",
+  "maintenance.preventive_plan": "2026-09-20",
+  "marketing.journey_enrollment": "2026-09-20",
+  "orders.pos_shift": "2026-09-20",
+  "payments.provider": "2026-09-20",
+  "payments.token": "2026-09-20",
+  "platform.scope": "2026-09-20",
+  "queue.entry": "2026-09-20",
+  "subscription.contract": "2026-09-20",
+  "subscription.plan": "2026-09-20"
  },
  "renames": [
+  {
+   "from": "platform.org_unit",
+   "to": "platform.scope",
+   "on": "2026-09-20",
+   "why": "scope is the word 58 of our configuration profiles already address by; org_unit is generic ERP vocabulary that appears nowhere else in our language"
+  },
+  {
+   "from": "fnb.fnb_order",
+   "to": "fnb.service_order",
+   "on": "2026-09-20",
+   "why": "fnb_order repeats its schema, which is the fault we ask them to fix in approvals.approval_matrix. Their name is fnb.order and we are not taking it: order is a reserved word in Postgres, so the table would need quoting in every hand-written query forever. We solved this once already with orders.sales_order, and their own purpose line calls this the operational food-service order"
+  },
+  {
+   "from": "fnb.fnb_order_line",
+   "to": "fnb.service_order_line",
+   "on": "2026-09-20",
+   "why": "their order_item plus our word: a line is what an order has"
+  },
+  {
+   "from": "fnb.table",
+   "to": "fnb.dining_table",
+   "on": "2026-09-20",
+   "why": "table alone is vague beside fnb.table_reservation and fnb.table_session"
+  },
+  {
+   "from": "fnb.eighty_six_event",
+   "to": "fnb.sold_out_item",
+   "on": "2026-09-20",
+   "why": "86 is US restaurant jargon and this platform ships in the Gulf"
+  },
+  {
+   "from": "ai.interaction",
+   "to": "ai.activity",
+   "on": "2026-09-20",
+   "why": "their purpose line: any AI request, including non-chat calls. An interaction reads as a conversation and most of these rows are not one"
+  },
+  {
+   "from": "control.api_quota",
+   "to": "control.api_limit",
+   "on": "2026-09-20",
+   "why": "rate limits and usage limits; quota covers only the second"
+  },
+  {
+   "from": "queue.waiting_guest",
+   "to": "queue.entry",
+   "on": "2026-09-20",
+   "why": "their purpose says a customer or party; waiting_guest misnames a party of six"
+  },
+  {
+   "from": "orders.shift",
+   "to": "orders.pos_shift",
+   "on": "2026-09-20",
+   "why": "disambiguates from workforce.shift, which they also hold"
+  },
+  {
+   "from": "maintenance.maintenance_plan",
+   "to": "maintenance.preventive_plan",
+   "on": "2026-09-20",
+   "why": "repeats its schema, and preventive is more specific"
+  },
+  {
+   "from": "marketing.journey_entrant",
+   "to": "marketing.journey_enrollment",
+   "on": "2026-09-20",
+   "why": "entrant reads as a person, not a record"
+  },
+  {
+   "from": "orders.payment_provider",
+   "to": "payments.provider",
+   "on": "2026-09-20",
+   "why": "decision 2: configuration belongs in payments, the transaction stays in orders"
+  },
+  {
+   "from": "orders.payment_token",
+   "to": "payments.token",
+   "on": "2026-09-20",
+   "why": "decision 2, same boundary"
+  },
+  {
+   "from": "control.subscription",
+   "to": "subscription.contract",
+   "on": "2026-09-20",
+   "why": "decision 3: subscription lived in three places. contract rather than subscription.subscription, which would repeat the schema"
+  },
+  {
+   "from": "control.subscription_plan",
+   "to": "subscription.plan",
+   "on": "2026-09-20",
+   "why": "decision 3, and it drops the repeated prefix"
+  },
+  {
+   "from": "rental.category",
+   "to": "maintenance.asset_category",
+   "on": "2026-09-20",
+   "why": "it is the asset-category master for the whole venue - maintenance.asset, maintenance_plan, inspection_template, resources.resource_category and resource_requirement all point at it. A forklift that is never rented had its category defined in rental"
+  },
   {
    "from": "retail.wallet",
    "to": "wallet.wallet",
@@ -580,5 +692,5 @@
  ],
  "withdrawn": {},
  "baseline": "2026-09-19",
- "generated": "2026-09-19"
+ "generated": "2026-09-20"
 }
