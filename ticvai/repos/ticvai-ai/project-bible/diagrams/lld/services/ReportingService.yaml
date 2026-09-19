@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 29 operations, 13 tables
+title: ReportingService — 42 operations, 20 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,21 +9,21 @@ why: '**Reads almost everything and writes only its own definitions.** Separate 
 scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
-  operations: 29
+  operations: 42
   inAFlow: 18
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: reporting
-  tables: 13
+  tables: 20
   stores:
   - derived
   - postgres
   largestTable: reporting.report_definition
 operationsByContract:
 - contract: reporting
-  count: 29
+  count: 42
   operations:
   - operation: acknowledgeAlert
     verb: POST
@@ -57,6 +57,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: createKpi
+    verb: POST
+    path: /kpis
+    scope: tenant
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createReport
     verb: POST
     path: /reports
@@ -73,6 +81,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: createReportSubscription
+    verb: POST
+    path: /report-subscriptions
+    scope: venue
+    permission: REPORT_SCHEDULE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: deleteReport
     verb: DELETE
     path: /reports/{reportId}
@@ -97,6 +113,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getAnalyticsBenchmark
+    verb: GET
+    path: /analytics-benchmarks
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getAnalyticsUsage
+    verb: GET
+    path: /analytics-usage
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getDashboard
     verb: GET
     path: /dashboards/{dashboardId}
@@ -104,6 +136,14 @@ operationsByContract:
     permission: REPORT_VIEW_VENUE
     offline: false
     reads: 2
+    writes: 0
+  - operation: getKpiValues
+    verb: GET
+    path: /kpi-values
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 0
     writes: 0
   - operation: getReport
     verb: GET
@@ -137,6 +177,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getSemanticModel
+    verb: GET
+    path: /semantic-model
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getSupplierPerformance
     verb: GET
     path: /suppliers/{supplierId}/performance
@@ -161,6 +209,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listAnalyticsAnomalies
+    verb: GET
+    path: /analytics-anomalies
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAnalyticsPipelines
+    verb: GET
+    path: /analytics-pipelines
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDashboards
     verb: GET
     path: /dashboards
@@ -168,6 +232,22 @@ operationsByContract:
     permission: REPORT_VIEW_VENUE
     offline: false
     reads: 2
+    writes: 0
+  - operation: listKpis
+    verb: GET
+    path: /kpis
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReportDeliveries
+    verb: GET
+    path: /report-deliveries
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
     writes: 0
   - operation: listReportExecutions
     verb: GET
@@ -188,6 +268,14 @@ operationsByContract:
   - operation: listReportSchedules
     verb: GET
     path: /report-schedules
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReportSubscriptions
+    verb: GET
+    path: /report-subscriptions
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
@@ -233,6 +321,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: setKpiTargets
+    verb: PUT
+    path: /kpis/{kpiId}/targets
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setSemanticModel
+    verb: PUT
+    path: /semantic-model
+    scope: tenant
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updateDashboard
     verb: PUT
     path: /dashboards/{dashboardId}
@@ -279,6 +383,12 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.anomaly
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: reporting.dashboard
   columns: 8
   store: postgres
@@ -293,6 +403,12 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.delivery
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: reporting.execution
   columns: 15
   store: postgres
@@ -306,6 +422,26 @@ tables:
   parent: null
   writtenBy:
   - reporting
+  foreignWriters: null
+- table: reporting.kpi_definition
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.kpi_target
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.pipeline
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: reporting.report_column
   columns: 9
@@ -355,6 +491,20 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.semantic_model
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.subscription
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
 readsFrom:
 - service: AiService
   operations: 4
@@ -380,12 +530,27 @@ screens:
 - P08:BO-060 Attendance & Footfall
 - P08:BO-061 Scheduled Reports
 - P08:BO-083 Suppliers
+- P08:BO-1052 Occupancy Reporting
+- P08:BO-1053 Zone Performance Reporting
+- P08:BO-1054 Revenue by Section
+- P08:BO-1056 Seat Utilization Analytics
+- P08:BO-1059 Heat Maps & Drill-Down
+- P08:BO-1060 Report Builder, Export & Audit
+- P08:BO-1081 Finance Dashboard
+- P08:BO-1082 Admissions Revenue
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-118 Campaign & Audience Management
 - P08:BO-125 Product & Category Button Configuration
 - P08:BO-126 Deployment, Preview & Audit
 - P08:BO-133 Offline Alerts, Limits & Audit
 - P08:BO-141 Operational Alerts, AI Replenishment & Action Center
+- P08:BO-472 Operational Alerts & Exception Center
+- P08:BO-585 Rental Revenue & Commercial Analytics
+- P08:BO-590 Location & Channel Performance
+- P08:BO-593 AI Rental Management Copilot & Action Center
+- P08:BO-688 Accreditation Trend & Comparative Analysis
+- P08:BO-733 Service Channel Configuration
+- P08:BO-951 Resource Integration & System Health Center
 - P09:ADM-031 Security & Compliance Dashboard
 - P10:PTR-018 Reports & Sales Performance
 - P12:SUP-008 Agent Performance & SLA View
@@ -399,6 +564,60 @@ screens:
 - P16:ANL-007 Guest & Conversion Intelligence
 - P16:ANL-008 Demand Forecasting
 - P16:ANL-009 AI Assistant & Action Center
+- P16:ANL-012 Live Operations Dashboard
+- P16:ANL-013 Revenue Pulse
+- P16:ANL-014 Attendance & Footfall Intelligence
+- P16:ANL-015 Capacity & Utilization Monitor
+- P16:ANL-016 Sales & Channel Performance
+- P16:ANL-017 Customer, Membership & Loyalty Pulse
+- P16:ANL-019 AI Management Insights
+- P16:ANL-020 Multi-Site & Performance Comparison
+- P16:ANL-021 Dashboard Library
+- P16:ANL-022 Dashboard Creation Wizard
+- P16:ANL-023 Drag-and-Drop Dashboard Canvas
+- P16:ANL-024 Widget & Visualization Library
+- P16:ANL-025 KPI Builder
+- P16:ANL-026 Targets, Thresholds & KPI Status Rules
+- P16:ANL-027 Data & Filter Configuration
+- P16:ANL-028 Drill-Down & Interaction Designer
+- P16:ANL-029 Dashboard Access, Publishing & Versioning
+- P16:ANL-030 Dashboard Preview, Validation & Health
+- P16:ANL-031 Report Catalogue & Library
+- P16:ANL-032 Report Creation Wizard
+- P16:ANL-033 Data Domain & Dataset Selector
+- P16:ANL-034 Field & Column Selector
+- P16:ANL-035 Filter & Parameter Builder
+- P16:ANL-036 Grouping, Aggregation & Calculation Builder
+- P16:ANL-037 Cross-Domain Report Composer
+- P16:ANL-038 Report Layout & Formatting Designer
+- P16:ANL-039 Report Preview, Test & Validation
+- P16:ANL-040 Save, Run & Report Results Viewer
+- P16:ANL-041 Reporting Governance Command Center
+- P16:ANL-042 Report Scheduler
+- P16:ANL-043 Subscription Manager
+- P16:ANL-044 Distribution & Delivery Configuration
+- P16:ANL-045 Export & Download Center
+- P16:ANL-046 Report API & Data Delivery Manager
+- P16:ANL-048 Delivery Monitoring & Failure Management
+- P16:ANL-049 Report Audit Trail & Compliance
+- P16:ANL-051 AI Analytics Command Center
+- P16:ANL-052 Ask TICVAI — Natural Language Analytics
+- P16:ANL-053 AI-Generated Dashboard Studio
+- P16:ANL-054 AI Report Generator
+- P16:ANL-055 Anomaly Detection Center
+- P16:ANL-056 Root-Cause Analysis Explorer
+- P16:ANL-057 Forecasting & Predictive Analytics Studio
+- P16:ANL-058 AI Recommendation & Next-Best-Action Center
+- P16:ANL-059 AI Insight History, Evidence & Explainability
+- P16:ANL-061 BI & Analytics Administration Command Center
+- P16:ANL-062 Enterprise KPI Library
+- P16:ANL-063 KPI Targets, Thresholds & Scorecards
+- P16:ANL-064 Benchmark & Comparative Analytics Configuration
+- P16:ANL-065 Data Source & Integration Registry
+- P16:ANL-066 Semantic Model & Business Data Catalogue
+- P16:ANL-067 Data Refresh, Pipeline & Data Health Monitor
+- P16:ANL-068 Embedded BI, Workspace & Tenant Administration
+- P16:ANL-069 Analytics Performance, Usage & Cost Monitor
 flows:
 - F106 A security dashboard surfaces something and it is investigated
 - F107 A report is defined, scheduled and delivered

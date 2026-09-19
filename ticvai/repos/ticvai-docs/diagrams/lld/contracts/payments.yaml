@@ -1,0 +1,358 @@
+id: LLD-payments
+title: payments — 31 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: OrderService
+operations:
+- operation: createB2bCreditAccount
+  verb: POST
+  path: /b2b-credit-accounts
+  scope: tenant
+  permission: CREDIT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.credit_account
+  writes:
+  - payments.credit_account
+- operation: createPaymentMethod
+  verb: POST
+  path: /payment-methods
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.method
+  writes:
+  - payments.method
+- operation: createPaymentProviderConnection
+  verb: POST
+  path: /payment-providers
+  scope: tenant
+  permission: PAYMENT_PROVIDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.provider_connection
+  writes:
+  - payments.provider_connection
+- operation: getMixedTenderRules
+  verb: GET
+  path: /mixed-tender-rules
+  scope: venue
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.mixed_tender_rules
+  writes: []
+- operation: getPaymentPerformance
+  verb: GET
+  path: /payment-performance
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getPaymentProviderEconomics
+  verb: GET
+  path: /payment-providers/economics
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getPaymentProviderHealth
+  verb: GET
+  path: /payment-providers/health
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listB2bCreditAccounts
+  verb: GET
+  path: /b2b-credit-accounts
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.credit_account
+  writes: []
+- operation: listMerchantAccounts
+  verb: GET
+  path: /merchant-accounts
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.merchant_account
+  writes: []
+- operation: listPaymentMethods
+  verb: GET
+  path: /payment-methods
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.method
+  writes: []
+- operation: listPaymentProviderConnections
+  verb: GET
+  path: /payment-providers
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.provider_connection
+  writes: []
+- operation: listPaymentRoutingRules
+  verb: GET
+  path: /payment-routing-rules
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.routing_rule
+  writes: []
+- operation: listPaymentTerminals
+  verb: GET
+  path: /payment-terminals
+  scope: venue
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.terminal
+  writes: []
+- operation: listReconciliationSources
+  verb: GET
+  path: /reconciliation-sources
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.reconciliation_source
+  writes: []
+- operation: listStoredForwardTransactions
+  verb: GET
+  path: /payment-terminals/{terminalId}/forwarded
+  scope: venue
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.stored_forward
+  writes: []
+- operation: setB2bPaymentTerms
+  verb: PUT
+  path: /b2b-credit-accounts/{accountId}/terms
+  scope: tenant
+  permission: CREDIT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.payment_terms
+  writes:
+  - payments.payment_terms
+- operation: setHostedCheckoutConfiguration
+  verb: PUT
+  path: /hosted-checkout-config
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.hosted_checkout
+  writes:
+  - payments.hosted_checkout
+- operation: setMerchantAccount
+  verb: PUT
+  path: /merchant-accounts
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.merchant_account
+  writes:
+  - payments.merchant_account
+- operation: setMixedTenderRules
+  verb: PUT
+  path: /mixed-tender-rules
+  scope: venue
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.mixed_tender_rules
+  writes:
+  - payments.mixed_tender_rules
+- operation: setPaymentAuthenticationPolicy
+  verb: PUT
+  path: /payment-authentication-policy
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.authentication_policy
+  writes:
+  - payments.authentication_policy
+- operation: setPaymentFailoverPolicy
+  verb: PUT
+  path: /payment-failover-policy
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.failover_policy
+  writes:
+  - payments.failover_policy
+- operation: setPaymentRiskRules
+  verb: PUT
+  path: /payment-risk-rules
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.risk_rules
+  writes:
+  - payments.risk_rules
+- operation: setPaymentRoutingRules
+  verb: PUT
+  path: /payment-routing-rules
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.routing_rule
+  writes:
+  - payments.routing_rule
+- operation: setPaymentTerminalConfiguration
+  verb: PUT
+  path: /payment-terminals
+  scope: venue
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.terminal
+  writes:
+  - payments.terminal
+- operation: setReconciliationMatchingRules
+  verb: PUT
+  path: /reconciliation-rules
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.matching_rules
+  writes:
+  - payments.matching_rules
+- operation: setReconciliationSource
+  verb: PUT
+  path: /reconciliation-sources
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.reconciliation_source
+  writes:
+  - payments.reconciliation_source
+- operation: simulatePaymentConfiguration
+  verb: POST
+  path: /payment-configuration/simulate
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulatePaymentRouting
+  verb: POST
+  path: /payment-routing/simulate
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: submitChargebackEvidence
+  verb: POST
+  path: /chargebacks/{chargebackId}/evidence
+  scope: tenant
+  permission: PAYMENT_DISPUTE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.chargeback_evidence
+  writes:
+  - payments.chargeback_evidence
+- operation: testPaymentProviderConnection
+  verb: POST
+  path: /payment-providers/{connectionId}/test
+  scope: tenant
+  permission: PAYMENT_PROVIDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: updatePaymentMethod
+  verb: PUT
+  path: /payment-methods/{methodId}
+  scope: venue
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.method
+  writes:
+  - payments.method

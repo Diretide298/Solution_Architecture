@@ -92,6 +92,7 @@ paths:
       operationId: listVenueMaps
       x-ticvai-consumed-by:
         - "P08 BO-092 Venue Maps"
+        - "P08 BO-1061 Platform Command Center"
       summary: Maps for this venue
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW

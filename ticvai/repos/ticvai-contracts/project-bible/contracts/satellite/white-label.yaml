@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 30
+  x-ticvai-screen-count: 32
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -100,6 +100,7 @@ paths:
     post:
       operationId: claimCustomDomain
       x-ticvai-consumed-by:
+        - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
       summary: Claim a domain and get a verification token
@@ -277,6 +278,8 @@ paths:
   /content-blocks:
     post:
       operationId: createContentBlock
+      x-ticvai-consumed-by:
+        - "P08 BO-839 Dynamic Product Pages"
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -365,6 +368,8 @@ paths:
         - "P01 WEB-001 Home / Landing"
         - "P02 GST-001 Home – Default"
         - "P05 KSK-002 Language Select"
+        - "P08 BO-599 Manual Configuration Center"
+        - "P08 BO-834 Digital Experience Center"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
@@ -500,6 +505,7 @@ paths:
     put:
       operationId: setBrandIdentity
       x-ticvai-consumed-by:
+        - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
       x-ticvai-audience:
@@ -841,6 +847,7 @@ paths:
     put:
       operationId: setHomepageLayout
       x-ticvai-consumed-by:
+        - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
@@ -1153,6 +1160,7 @@ paths:
         - "P01 WEB-045 Help Centre & Accessibility"
         - "P02 GST-040 Help & Support"
         - "P02 GST-057 Accessibility Information"
+        - "P08 BO-837 Page & Landing Builder"
       x-ticvai-audience:
       - staff
       - guest
@@ -1193,6 +1201,8 @@ paths:
                         $ref: '#/components/schemas/ContentPage'
     post:
       operationId: createContentPage
+      x-ticvai-consumed-by:
+        - "P08 BO-837 Page & Landing Builder"
       x-ticvai-audience:
       - staff
       summary: Create a content page
@@ -1739,6 +1749,7 @@ paths:
     post:
       operationId: publishTenantConfig
       x-ticvai-consumed-by:
+        - "P08 BO-843 Publishing, Analytics & Audit"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-014 Publishing Workflow"

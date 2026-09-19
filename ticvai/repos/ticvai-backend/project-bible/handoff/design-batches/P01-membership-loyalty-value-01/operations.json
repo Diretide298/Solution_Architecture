@@ -18,12 +18,12 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
- "claimCart": {
+ "createReferral": {
   "method": "POST",
-  "path": "/carts/{cartId}/claim",
-  "contract": "orders",
-  "summary": "Attach an anonymous cart to a guest",
-  "permission": null,
+  "path": "/referrals",
+  "contract": "marketing-crm",
+  "summary": "Issue a referral code",
+  "permission": "MARKETING_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -34,33 +34,14 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "CartMergeResult"
+  "requestBody": "Referral",
+  "responds": "Referral"
  },
- "completeSsoAuthorization": {
-  "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
+ "deleteGuestAccount": {
+  "method": "DELETE",
+  "path": "/auth/guest/account",
   "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoginResponse"
- },
- "createMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
+  "summary": "Self-service account deletion",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -75,13 +56,13 @@
   "requestBody": null,
   "responds": null
  },
- "createRefundRequest": {
+ "evaluatePromotions": {
   "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -91,15 +72,15 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
  },
- "enrolMfaMethod": {
+ "exportSubjectData": {
   "method": "POST",
-  "path": "/auth/mfa/methods",
+  "path": "/guests/{subjectId}/data-export",
   "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
+  "summary": "Everything the platform holds about one guest",
+  "permission": "GUEST_VIEW_PII",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -111,33 +92,117 @@
    }
   ],
   "requestBody": null,
-  "responds": "MfaEnrolment"
+  "responds": null
  },
- "getEntitlement": {
+ "getFacePassEnrolment": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}",
+  "path": "/face-pass/enrolments/{enrolmentId}",
   "contract": "access",
-  "summary": "One entitlement, with what remains on it",
-  "permission": "ORDER_VIEW",
+  "summary": "Whether a pass has a face registered, and when",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FacePassEnrolment"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "GameCard"
  },
- "getEntitlementCredential": {
+ "getGiftCard": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}/credential",
-  "contract": "access",
-  "summary": "The thing that gets scanned",
+  "path": "/gift-cards/{cardCode}",
+  "contract": "retail",
+  "summary": "Check a gift card balance",
   "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
+ "getLoyaltyPosition": {
+  "method": "GET",
+  "path": "/loyalty/position",
+  "contract": "marketing-crm",
+  "summary": "A guest's points, tier and what is within reach",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getMyMemberships": {
+  "method": "GET",
+  "path": "/guests/me/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's own memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "rotate",
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMembership"
+ },
+ "getProduct": {
+  "method": "GET",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Read a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "getWaiverStatus": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/waiver-status",
+  "contract": "marketing-crm",
+  "summary": "Whether this guest may be issued a ticket that requires a waiver",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
     "in": "query",
     "required": null
    }
@@ -145,70 +210,18 @@
   "requestBody": null,
   "responds": null
  },
- "getEntitlementHistory": {
+ "getWallet": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}/history",
-  "contract": "access",
-  "summary": "Every scan, freeze, share and reissue against it",
+  "path": "/wallets/{subjectId}",
+  "contract": "retail",
+  "summary": "Read a guest wallet",
   "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
- },
- "getGuestProfile": {
-  "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
- },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "getMyChallenges": {
-  "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ChallengeProgress"
- },
- "getOrder": {
-  "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Order"
+  "responds": "Wallet"
  },
  "getWishlist": {
   "method": "GET",
@@ -223,69 +236,12 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
- "guestLogout": {
-  "method": "DELETE",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "End a guest session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "allDevices",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "guestSocialLogin": {
+ "grantDelegation": {
   "method": "POST",
-  "path": "/auth/guest/social",
+  "path": "/guests/{subjectId}/delegations",
   "contract": "identity",
-  "summary": "Sign in with Apple or Google",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "guestUaePassLogin": {
-  "method": "POST",
-  "path": "/auth/guest/uae-pass",
-  "contract": "identity",
-  "summary": "Sign in with a national identity provider",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "issueWalletPass": {
-  "method": "POST",
-  "path": "/wallet-passes",
-  "contract": "orders",
-  "summary": "Generate an Apple or Google wallet pass",
-  "permission": "ORDER_VIEW",
+  "summary": "Let one guest act for another",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -297,66 +253,18 @@
    }
   ],
   "requestBody": null,
-  "responds": "WalletPass"
+  "responds": "DelegatedAccess"
  },
- "linkGuestCheckout": {
-  "method": "POST",
-  "path": "/auth/guest/link-checkout",
-  "contract": "identity",
-  "summary": "Attach a guest checkout to an account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "listConsentPurposes": {
+ "listDelegations": {
   "method": "GET",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configured consent purposes",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
   "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
- "listEntitlements": {
-  "method": "GET",
-  "path": "/my/entitlements/all",
-  "contract": "access",
-  "summary": "Every entitlement this guest holds, including expired",
-  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "includeExpired",
-    "in": "query",
-    "required": false
-   },
    {
     "name": null,
     "in": null,
@@ -369,7 +277,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": null
  },
  "listGuestDevices": {
   "method": "GET",
@@ -395,40 +303,46 @@
   "requestBody": null,
   "responds": "GuestDevice"
  },
- "listMfaMethods": {
+ "listGuestMemberships": {
   "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
+  "path": "/guest/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "GuestMembership"
  },
- "listMyEntitlements": {
+ "listLoyaltyProgrammes": {
   "method": "GET",
-  "path": "/guests/me/entitlements",
-  "contract": "access",
-  "summary": "Every ticket, pass and membership this guest holds",
-  "permission": "ORDER_VIEW",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "List loyalty programmes",
+  "permission": "MARKETING_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "state",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "includeShared",
-    "in": "query",
-    "required": null
-   },
-   {
     "name": null,
     "in": null,
     "required": null
@@ -440,23 +354,18 @@
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "LoyaltyProgramme"
  },
- "listMyOrders": {
+ "listPaymentTokens": {
   "method": "GET",
-  "path": "/my/orders",
+  "path": "/payment-tokens",
   "contract": "orders",
-  "summary": "The orders this guest placed",
-  "permission": null,
+  "summary": "A guest's saved payment methods",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "since",
-    "in": "query",
-    "required": false
-   },
    {
     "name": null,
     "in": null,
@@ -469,14 +378,14 @@
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "PaymentToken"
  },
- "listOrders": {
+ "listProducts": {
   "method": "GET",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "List orders",
-  "permission": "ORDER_VIEW",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -487,27 +396,12 @@
     "required": null
    },
    {
-    "name": "principalId",
+    "name": "kind",
     "in": "query",
     "required": null
    },
    {
-    "name": "shiftId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdTo",
+    "name": "isSellable",
     "in": "query",
     "required": null
    },
@@ -525,37 +419,68 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listPromotions": {
   "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProvider"
- },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "retail",
+  "summary": "Wallet transaction history",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "recordConsent": {
   "method": "POST",
@@ -576,15 +501,15 @@
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
  },
- "refreshToken": {
+ "redeemLoyaltyPoints": {
   "method": "POST",
-  "path": "/auth/refresh",
-  "contract": "identity",
-  "summary": "Rotate the access token",
-  "permission": null,
+  "path": "/loyalty/redemptions",
+  "contract": "marketing-crm",
+  "summary": "Spend points",
+  "permission": "LOYALTY_REDEEM",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -593,26 +518,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "TokenPair"
- },
- "registerGuest": {
-  "method": "POST",
-  "path": "/auth/guest/register",
-  "contract": "identity",
-  "summary": "Create a guest account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RegisterGuestRequest",
-  "responds": "GuestSession"
+  "responds": "LoyaltyPosition"
  },
  "registerGuestDevice": {
   "method": "POST",
@@ -652,50 +558,12 @@
   "requestBody": null,
   "responds": null
  },
- "removeMfaMethod": {
+ "revokeFacePass": {
   "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp",
-  "contract": "identity",
-  "summary": "Request a one-time code",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "respondToInvitation": {
-  "method": "POST",
-  "path": "/invitations/{token}/respond",
-  "contract": "marketing-crm",
-  "summary": "Accept or decline",
-  "permission": "GUEST_VIEW",
+  "path": "/face-pass/enrolments/{enrolmentId}",
+  "contract": "access",
+  "summary": "Remove a facial profile",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -707,7 +575,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Invitation"
+  "responds": null
  },
  "revokeGuestDevice": {
   "method": "DELETE",
@@ -728,12 +596,12 @@
   "requestBody": null,
   "responds": null
  },
- "shareEntitlement": {
+ "storePaymentToken": {
   "method": "POST",
-  "path": "/entitlements/{entitlementId}/share",
+  "path": "/payment-tokens",
   "contract": "orders",
-  "summary": "Let somebody else use this, without giving it away",
-  "permission": "ORDER_MODIFY",
+  "summary": "Save a payment method for future use",
+  "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -745,26 +613,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Problem"
- },
- "startSsoAuthorization": {
-  "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": null
+  "responds": "PaymentToken"
  },
  "transferOrderTickets": {
   "method": "POST",
@@ -785,15 +634,15 @@
   "requestBody": null,
   "responds": null
  },
- "updateGuestPreferences": {
-  "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
+ "transferWalletBalance": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/transfer",
+  "contract": "retail",
+  "summary": "Send balance to another guest",
+  "permission": "ORDER_MODIFY",
   "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -803,100 +652,5 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "updateMyProfile": {
-  "method": "PATCH",
-  "path": "/guests/me/profile",
-  "contract": "marketing-crm",
-  "summary": "A guest correcting their own details",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestProfile"
- },
- "verifyGuestEmail": {
-  "method": "POST",
-  "path": "/auth/guest/verify-email",
-  "contract": "identity",
-  "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp/verify",
-  "contract": "identity",
-  "summary": "Verify a one-time code and issue a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "verifyMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a step-up challenge",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
  }
 }

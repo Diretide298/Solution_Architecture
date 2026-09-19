@@ -1,74 +1,77 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
+  "id": "ADM-005",
+  "name": "Tenant Directory",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
   "wave": 1,
-  "capability": "C36",
+  "capability": "C95",
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "ticvai-web",
+   "route": "/general/tenant-directory",
+   "component": "apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-002"
    ],
    "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-008",
+    "ADM-012"
    ],
+   "fromFlows": true,
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "to": "ADM-012",
+     "trigger": "Provisions or assigns a cell",
+     "provenance": "flow F16 step 1→2"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ADM-008",
+     "trigger": "Subscription & Plan Management",
+     "provenance": "flow F96 step 1→2"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
      "carries": [
-      "orderId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "patternReason": "`listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
+  "purpose": "Find the right one quickly, and act on it without opening it.",
   "gaps": [
    {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getSsoConfig",
+    "why": "**4 declared operations reach no component on this screen**: getSsoConfig, getTenant, getTenantLicences, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -81,20 +84,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
        "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.planId",
+        "Tenant.planName",
+        "Tenant.cellCount",
+        "Tenant.venueCount",
+        "Tenant.billingEmail",
+        "Tenant.accountManagerPrincipalId"
        ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -104,481 +111,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
+       "label": "The selected tenant",
+       "bindsTo": "EntitlementUsage",
        "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
        ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
       }
      ]
     },
@@ -589,32 +129,56 @@
       {
        "kind": "primaryButton",
        "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "operation": "addLicenceAddOn",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "label": "Create",
+       "operation": "createTenant",
+       "provenance": "contract subscription.yaml POST /tenants"
       },
       {
        "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+       "label": "Provision",
+       "operation": "provisionCell",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reactivate",
+       "operation": "reactivateTenant",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/reactivate"
       },
       {
        "kind": "destructiveButton",
        "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+       "operation": "removeLicenceAddOn",
+       "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setSsoConfig",
+       "provenance": "contract identity.yaml PUT /tenants/sso-config"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+       "label": "Suspend",
+       "operation": "suspendTenant",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Terminate",
+       "operation": "terminateTenant",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateTenant",
+       "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
       }
      ]
     }
@@ -622,227 +186,263 @@
   },
   "overlays": [
    {
-    "id": "confirmRemoveFromWishlist",
+    "id": "confirmRemoveLicenceAddOn",
     "component": "confirmDialog",
     "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
-    "id": "confirmRevokeGuestDevice",
+    "id": "confirmSuspendTenant",
     "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+    "trigger": "Suspend",
+    "body": "**Names what `suspendTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
+   },
+   {
+    "id": "confirmTerminateTenant",
+    "component": "confirmDialog",
+    "trigger": "Terminate",
+    "body": "**Names what `terminateTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
    }
   ],
   "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The tenant list.",
+   "error": "Could not load. Names which read failed and leaves the tenant untouched.",
+   "emptyFirstRun": "No tenant yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
+    "operationId": "addLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "License a module outside the plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "createTenant",
+    "contract": "subscription",
+    "purpose": "Create a tenant",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
     "trigger": "onLoad"
    },
    {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
     "trigger": "onLoad"
    },
    {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "provisionCell",
+    "contract": "subscription",
+    "purpose": "Provision a cell for a region",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "reactivateTenant",
+    "contract": "subscription",
+    "purpose": "Lift a suspension",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "removeLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "Remove an add-on",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "setSsoConfig",
+    "contract": "identity",
+    "purpose": "Configure an identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "suspendTenant",
+    "contract": "subscription",
+    "purpose": "Suspend a tenant",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "terminateTenant",
+    "contract": "subscription",
+    "purpose": "Begin termination",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "updateTenant",
+    "contract": "subscription",
+    "purpose": "Amend tenant details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
+     "name": "tenantId",
+     "from": "ADM-002"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
+    "EntitlementUsage.metrics",
+    "EntitlementUsage.asAt"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
+  "id": "ADM-006",
+  "name": "Tenant Hierarchy Explorer",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
   "wave": 1,
-  "capability": "C09",
+  "capability": "C20",
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "app": "ticvai-web",
+   "route": "/general/tenant-hierarchy-explorer",
+   "component": "apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-002"
    ],
    "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-007"
    ],
+   "fromFlows": true,
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "to": "ADM-007",
+     "trigger": "Enables the modules the tenant bought",
+     "provenance": "flow F16 step 3→4"
     },
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
      "carries": [
-      "orderId"
+      "tenantId"
      ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "patternReason": "`listTenants` reads the population and `getSsoConfig` reads one of them — list, select, act",
+  "purpose": "See tenant hierarchy explorer for this venue.",
   "gaps": [
    {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getEntitlementUsage",
+    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getTenant, getTenantLicences, listTenantCells, listOrgUnits. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -855,24 +455,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
+       "label": "Every tenant hierarchy",
+       "bindsTo": "Tenant",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.planId",
+        "Tenant.planName",
+        "Tenant.cellCount",
+        "Tenant.venueCount",
+        "Tenant.billingEmail",
+        "Tenant.accountManagerPrincipalId"
        ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -882,531 +482,23 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
+       "label": "The selected tenant hierarchy",
+       "bindsTo": "SsoProviderConfig",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
        ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
-  },
-  "apis": [
-   {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
-   "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
       }
      ]
     },
@@ -1417,20 +509,276 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+       "operation": "updateTenant",
+       "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "label": "Create",
+       "operation": "createOrgUnit",
+       "provenance": "contract tenancy.yaml POST /org-units"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tenant hierarchy list.",
+   "error": "Could not load. Names which read failed and leaves the tenant hierarchy untouched.",
+   "emptyFirstRun": "No tenant hierarchy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant hierarchy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateTenant",
+    "contract": "subscription",
+    "purpose": "Amend tenant details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "List scope nodes visible to the session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Create a scope node",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenants"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "SsoProviderConfig.id",
+    "SsoProviderConfig.displayName",
+    "SsoProviderConfig.protocol",
+    "SsoProviderConfig.metadataUrl",
+    "SsoProviderConfig.issuer"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-006"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-007",
+  "name": "Module & Feature Entitlement",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 1,
+  "capability": "C75",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/module-and-feature-entitlement",
+   "component": "apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-011"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-012"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "ADM-012",
+     "trigger": "Tenant Isolation & Resource Pool",
+     "provenance": "flow F96 step 4→5"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-074",
+     "trigger": "Finance sets the chart of accounts",
+     "provenance": "flow F16 step 4→5",
+     "operation": "getTenantLicences",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: BO-074. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Removed 24 August**: generateInvoice, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: createTenant, provisionCell, reactivateTenant, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act",
+  "purpose": "See module & feature entitlement for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementUsage",
+    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getSubscription, getTenant, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every module feature entitlement",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected module feature entitlement",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addLicenceAddOn",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeLicenceAddOn",
+       "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
       }
      ]
     },
@@ -1441,14 +789,655 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
+       "impliedBy": "addLicenceAddOn",
+       "label": "Add licence add on",
        "provenance": "carried from the previous definition"
       },
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listConsentPurposes",
+       "impliedBy": "listTenantCells",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "removeLicenceAddOn",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "label": "Remove licence add on",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addLicenceAddOn",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveLicenceAddOn",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A module feature entitlement this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+   }
+  ],
+  "states": {
+   "loading": "The module feature entitlement list.",
+   "error": "Could not load. Names which read failed and leaves the module feature entitlement untouched.",
+   "emptyFirstRun": "No module feature entitlement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module feature entitlement are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "License a module outside the plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSubscription",
+    "contract": "subscription",
+    "purpose": "Read the current subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "removeLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "Remove an add-on",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "LicencePosition.planId",
+    "LicencePosition.licensedModules",
+    "LicencePosition.limits"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-007"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-008",
+  "name": "Subscription & Plan Management",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 1,
+  "capability": "C74",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/subscription-and-plan-management",
+   "component": "apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-005"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-011"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-011",
+     "trigger": "Licence & Seat Management",
+     "provenance": "flow F96 step 2→3"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPlans` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
+  "purpose": "Find subscription & plan management for this venue.",
+  "gaps": [
+   {
+    "operation": "getPlan",
+    "why": "**10 declared operations reach no component on this screen**: getPlan, getSsoConfig, getSubscription, getTenant, getTenantLicences, getUsageMetering, listSubscriptionInvoices, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every subscription plan",
+       "bindsTo": "Plan",
+       "columns": [
+        "Plan.code",
+        "Plan.name",
+        "Plan.description",
+        "Plan.cellTier",
+        "Plan.licensedModules",
+        "Plan.limits",
+        "Plan.basePrice",
+        "Plan.billingPeriod",
+        "Plan.includesBrandedApp",
+        "Plan.includedAiTokens",
+        "Plan.id",
+        "Plan.isActive"
+       ],
+       "operation": "listPlans",
+       "provenance": "contract subscription.yaml GET /plans"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected subscription plan",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setSubscription",
+       "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPlan",
+       "provenance": "contract subscription.yaml POST /plans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPlanVersion",
+       "provenance": "contract subscription.yaml POST /plans/{planId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Generate",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSubscriptionChange",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPartnerAgreement",
+       "provenance": "contract subscription.yaml POST /partner-agreements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePartnerAgreement",
+       "provenance": "contract subscription.yaml PATCH /partner-agreements/{agreementId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The subscription plan list.",
+   "error": "Could not load. Names which read failed and leaves the subscription plan untouched.",
+   "emptyFirstRun": "No subscription plan yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the subscription plan are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSubscription",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPlan",
+    "contract": "subscription",
+    "purpose": "Create a subscription plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "createPlanVersion",
+    "contract": "subscription",
+    "purpose": "Publish a new version of a plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "generateInvoice",
+    "contract": "subscription",
+    "purpose": "Generate an invoice for a period",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPlan",
+    "contract": "subscription",
+    "purpose": "Read a plan",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSubscription",
+    "contract": "subscription",
+    "purpose": "Read the current subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getUsageMetering",
+    "contract": "subscription",
+    "purpose": "Metered usage for a period",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSubscriptionInvoices",
+    "contract": "subscription",
+    "purpose": "List subscription invoices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "previewSubscriptionChange",
+    "contract": "subscription",
+    "purpose": "Preview the effect of a plan change",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "listPartnerAgreements",
+    "contract": "subscription",
+    "purpose": "Commercial agreements with B2B partners",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerAgreement",
+    "contract": "subscription",
+    "purpose": "Agree commercial terms with a partner",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "updatePartnerAgreement",
+    "contract": "subscription",
+    "purpose": "Amend, suspend or terminate",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "planId",
+     "from": "deepLink"
+    },
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `agreementId`, `planId`.",
+   "preloaded": [
+    "EntitlementUsage.metrics",
+    "EntitlementUsage.asAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-008"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-009",
+  "name": "Tenant Billing & Invoicing",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 2,
+  "capability": "C74",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/tenant-billing-and-invoicing",
+   "component": "apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: getUsageMetering, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSubscriptionInvoices` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
+  "purpose": "Find tenant billing & invoicing for this venue.",
+  "gaps": [
+   {
+    "operation": "getSsoConfig",
+    "why": "**6 declared operations reach no component on this screen**: getSsoConfig, getSubscription, getTenant, getTenantLicences, listTenantCells, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tenant billing invoicing",
+       "bindsTo": "SubscriptionInvoice",
+       "columns": [
+        "SubscriptionInvoice.id",
+        "SubscriptionInvoice.invoiceNumber",
+        "SubscriptionInvoice.periodStart",
+        "SubscriptionInvoice.periodEnd",
+        "SubscriptionInvoice.status",
+        "SubscriptionInvoice.lines",
+        "SubscriptionInvoice.subtotal",
+        "SubscriptionInvoice.taxAmount",
+        "SubscriptionInvoice.total",
+        "SubscriptionInvoice.planVersionUsed",
+        "SubscriptionInvoice.issuedAt",
+        "SubscriptionInvoice.dueAt"
+       ],
+       "operation": "listSubscriptionInvoices",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/invoices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tenant billing invoicing",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Generate",
+       "operation": "generateInvoice",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSubscriptionInvoices",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
        "provenance": "carried from the previous definition"
       },
@@ -1457,7 +1446,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "updateMyProfile",
+       "impliedBy": "generateInvoice",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -1465,109 +1454,1133 @@
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The tenant billing invoicing list.",
+   "error": "Could not load. Names which read failed and leaves the tenant billing invoicing untouched.",
+   "emptyFirstRun": "No tenant billing invoicing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant billing invoicing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "listSubscriptionInvoices",
+    "contract": "subscription",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
    },
    {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
+    "operationId": "generateInvoice",
+    "contract": "subscription",
+    "purpose": "Generate an invoice for a period",
     "trigger": "onAction",
     "invalidates": [
-     "listConsentPurposes"
+     "listSubscriptionInvoices"
     ]
    },
    {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
     "trigger": "onLoad"
    },
    {
-    "operationId": "verifyGuestEmail",
+    "operationId": "getSsoConfig",
     "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
    },
    {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
+    "operationId": "getSubscription",
+    "contract": "subscription",
+    "purpose": "Read the current subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "subjectId",
-     "from": "session"
+     "name": "tenantId",
+     "from": "ADM-002"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "EntitlementUsage.metrics",
+    "EntitlementUsage.asAt"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-009"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-010",
+  "name": "Usage Metering",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 2,
+  "capability": "C74",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/usage-metering",
+   "component": "apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getSubscription, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listTenantCells` reads the population and `getUsageMetering` reads one of them — list, select, act",
+  "purpose": "See usage metering for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementUsage",
+    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getTenant, getTenantLicences, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every usage metering",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected usage metering",
+       "bindsTo": "UsageReport",
+       "columns": [
+        "UsageReport.periodStart",
+        "UsageReport.periodEnd",
+        "UsageReport.metrics"
+       ],
+       "operation": "getUsageMetering",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/usage"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listTenantCells",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The usage metering list.",
+   "error": "Could not load. Names which read failed and leaves the usage metering untouched.",
+   "emptyFirstRun": "No usage metering yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the usage metering are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getUsageMetering",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "UsageReport.periodStart",
+    "UsageReport.periodEnd",
+    "UsageReport.metrics"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-010"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-011",
+  "name": "Licence & Seat Management",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 2,
+  "capability": "C75",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/licence-and-seat-management",
+   "component": "apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-008",
+    "ADM-015"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-007"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-007",
+     "trigger": "Module & Feature Entitlement",
+     "provenance": "flow F96 step 3→4"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-020",
+     "trigger": "Sub-Agent Management",
+     "provenance": "flow F105 step 2→3",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getUsageMetering, listSubscriptionInvoices. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: createTenant, provisionCell, reactivateTenant, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
+  "purpose": "See licence & seat management for this venue.",
+  "gaps": [
+   {
+    "operation": "getSsoConfig",
+    "why": "**5 declared operations reach no component on this screen**: getSsoConfig, getSubscription, getTenant, getTenantLicences, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every licence seat",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected licence seat",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addLicenceAddOn",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSubscriptionChange",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeLicenceAddOn",
+       "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setSubscription",
+       "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveLicenceAddOn",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A licence seat this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+   }
+  ],
+  "states": {
+   "loading": "The licence seat list.",
+   "error": "Could not load. Names which read failed and leaves the licence seat untouched.",
+   "emptyFirstRun": "No licence seat yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the licence seat are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "License a module outside the plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSubscription",
+    "contract": "subscription",
+    "purpose": "Read the current subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "previewSubscriptionChange",
+    "contract": "subscription",
+    "purpose": "Preview the effect of a plan change",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   },
+   {
+    "operationId": "removeLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "Remove an add-on",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   },
+   {
+    "operationId": "setSubscription",
+    "contract": "subscription",
+    "purpose": "Assign or change a subscription",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "EntitlementUsage.metrics",
+    "EntitlementUsage.asAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-011"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-012",
+  "name": "Tenant Isolation & Resource Pool",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 1,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/tenant-isolation-and-resource-pool",
+   "component": "apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-007"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-006",
+    "ADM-013"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "ADM-006",
+     "trigger": "Builds the scope tree",
+     "provenance": "flow F16 step 2→3"
+    },
+    {
+     "to": "ADM-013",
+     "trigger": "Tenant Performance Monitor",
+     "provenance": "flow F97 step 1→2"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
+  "purpose": "Work with tenant isolation & resource pool for this venue.",
+  "gaps": [
+   {
+    "operation": "getSsoConfig",
+    "why": "**5 declared operations reach no component on this screen**: getSsoConfig, getTenant, getTenantLicences, listTenants, getCellCapacity. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tenant isolation resource",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tenant isolation resource",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Provision",
+       "operation": "provisionCell",
+       "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listTenantCells",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "provisionCell",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tenant isolation resource list.",
+   "error": "Could not load. Names which read failed and leaves the tenant isolation resource untouched.",
+   "emptyFirstRun": "No tenant isolation resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant isolation resource are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "provisionCell",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    },
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "EntitlementUsage.metrics",
+    "EntitlementUsage.asAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-012"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-015",
+  "name": "API Rate Limit & Quota Management",
+  "module": "Tenants & Licensing",
+  "requiresModule": "membership",
+  "wave": 3,
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/api-rate-limit-and-quota-management",
+   "component": "apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-011"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-011",
+     "trigger": "Licence & Seat Management",
+     "provenance": "flow F105 step 1→2"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned a tenant. **`setApiQuota` wired 24 August.** This screen is named *API Rate Limit & Quota Management* and **declared no quota operation at all** — it carried nine subscription operations and six tenant-lifecycle ones instead. **The screen for the job could not do the job**, and only writing F105 against it surfaced that.",
+  "openQuestions": [
+   "Blocked — Developer & API workshop"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act",
+  "purpose": "See api rate limit & quota management for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementUsage",
+    "why": "**6 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getTenant, listTenants, getApiUsage, listApiClients. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every api rate limit",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected api rate limit",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setApiQuota",
+       "provenance": "contract public-api.yaml PUT /api-quotas"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The api rate limit list.",
+   "error": "Could not load. Names which read failed and leaves the api rate limit untouched.",
+   "emptyFirstRun": "No api rate limit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the api rate limit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "What a tenant is licensed to use",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementUsage",
+    "contract": "subscription",
+    "purpose": "Usage against licensed limits",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSsoConfig",
+    "contract": "identity",
+    "purpose": "Read SSO configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenant",
+    "contract": "subscription",
+    "purpose": "Read a tenant with cells and subscription",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenantCells",
+    "contract": "subscription",
+    "purpose": "List a tenant's cells",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "List tenants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setApiQuota",
+    "contract": "public-api",
+    "purpose": "Rate limits and throttling per client",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTenantCells"
+    ]
+   },
+   {
+    "operationId": "getApiUsage",
+    "contract": "public-api",
+    "purpose": "Calls, errors, latency and success rate",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "Registered clients for this developer",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "ADM-002"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "LicencePosition.planId",
+    "LicencePosition.licensedModules",
+    "LicencePosition.limits"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-015"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }

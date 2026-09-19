@@ -1,14 +1,14 @@
-# P01-account-self-service-01 — P01 · Account & Self-Service
+# P17-purchase-activation-01 — P17 · Purchase & Activation
 
-**5 screens · 46 operations · 37 schemas · 5 permissions**
+**7 screens · 0 operations · 0 schemas · 0 permissions**
 
-Platform P01 Guest Web · ships as **guest** ·
-guest audience · web ·
+Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
+public audience · web ·
 online only
 
 ## Who this is for
 
-**guest on web.** Everything below is how you know what is
+**public on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 0 permissions apply here:
+  ``. A control nobody can use must say so,
   not sit enabled and fail.
-- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
-- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
+- **0 of these operations work offline**
+  
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +61,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
-| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
-| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
-| `WEB-019` | Order History | listDetail | 5 | 0 | — |
-| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
+| `SGN-018` | Purchase / Trial Journey Selection | listDetail | 0 | 0 | — |
+| `SGN-019` | Contract & Billing Cycle Selection | listDetail | 0 | 0 | — |
+| `SGN-020` | Billing & Legal Entity Information | listDetail | 0 | 0 | — |
+| `SGN-021` | Payment Method & Settlement Setup | listDetail | 0 | 0 | — |
+| `SGN-022` | Order & Commercial Pricing Review | listDetail | 0 | 0 | — |
+| `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | listDetail | 0 | 0 | — |
+| `SGN-024` | Subscription Confirmation & Commercial Activation | listDetail | 0 | 0 | — |
 
 ## Thin screens in this batch
 
-**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**SGN-018, SGN-019, SGN-020, SGN-021, SGN-022, SGN-023, SGN-024 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

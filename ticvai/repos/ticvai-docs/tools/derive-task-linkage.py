@@ -39,10 +39,38 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PACK = os.path.join(ROOT, 'sources', 'workshop', 'pack.json')
 LINEAGE = os.path.join(ROOT, 'handoff', 'api-data-lineage.json')
 
-# Sections whose lines describe something the screen DOES. `Purpose` is prose about
-# why it exists and `Example` is sample data; neither names a task.
-TASK_SECTIONS = ('Actions', 'Configure', 'Capture', 'Show', 'Display', 'Support',
-                 'Filters', 'Result', 'Scope of Work', 'Acceptance Condition')
+# **A whitelist of section names cannot work, and the measurement is unambiguous: the
+# pack uses 7,092 distinct section headings.** The ten this tool started with are the
+# head of that distribution and nothing else — past rank twelve every heading is the
+# author's own words. `Rental_Management.pdf` calls its directories `Work Order
+# Information`, `Expected Return` and `Attachments`; `Resource_Management_
+# Configuration_Reference.pdf` uses `Backend Configuration` and `Administrators shall
+# configure`. Across those two packs, 199 screens, the whitelist reached **15 `Actions`
+# sections and 14 `Configure`** and skipped the rest — and the tool then reported that
+# nothing in any contract covered them. **That was the whitelist, not the contracts.**
+#
+# So the rule is inverted. A section is prose unless proven otherwise is the wrong
+# default; a section is a task directory unless it is *named* as prose.
+PROSE_SECTION = re.compile(
+    r'^\s*(purpose|examples?|for example|worked examples?|reason|rationale|note|notes|'
+    r'important|important boundary|boundary|board objective|board \d+ owns|'
+    r'ai recommendation|ai capability|recommendations?|recommended|overview|context|'
+    r'background|description|summary|definition|why|scenario|outcome|benefit)\b', re.I)
+
+# The verb a heading implies when its lines carry none. **`Work Order Information` is a
+# directory of fields, which is a read; `Deposit & Security Hold Policy` is settings.**
+SECTION_VERB = (
+    (re.compile(r'config|set-?up|rule|polic|setting|parameter|threshold|template|'
+                r'builder|model|structure|govern', re.I), 'set'),
+    (re.compile(r'captur|record|log\b|intake', re.I), 'record'),
+    (re.compile(r'approv|sign.?off|authoris|authoriz', re.I), 'approve'),
+    (re.compile(r'validat|verif|inspect|check', re.I), 'validate'),
+)
+
+# Headings where a line without a verb is a label rather than a task, so the phrase
+# must supply the verb itself. `Actions` was always this; acceptance text is prose
+# with verbs in it, and reading a verbless acceptance line as a read invents work.
+NO_IMPLIED_VERB = re.compile(r'^\s*(actions?|quick actions?|acceptance)', re.I)
 
 # A task phrase leads with a verb. These map the client's vocabulary onto the verb
 # an operationId would use.
@@ -70,7 +98,17 @@ STOP = set('''a an the of for to in with per by on at from into its it this that
 be can may must should all any each every other via using their its when where which what who
 new same only more most less least such than then also not no yes if while during after before
 screen page view tab section panel list item items data record records value values field fields
-system user users staff guest venue tenant across within based over under between'''.split())
+system user users staff guest venue tenant across within based over under between
+information detail details overview summary management center centre command control console
+workspace dashboard home main general profile engine builder wizard configuration setup settings
+requirement requirements capability capabilities module option options type types kind status
+idempotency cache key header token request response payload'''.split())
+# **The last two lines are the ones that were silently breaking matches.** `Work Order
+# Information` contributes `information`, which appears in almost no operation — so the
+# rarest-token guard picked it, found it absent from `createWorkOrder`, and scored zero.
+# A structural noun is rare *and* meaningless, which is the one combination the rarity
+# weighting cannot defend against. `idempotency` and `cache` leak in from the shared
+# parameter `$ref` on every write operation and do the same damage from the other side.
 
 
 def singular(w):
@@ -110,8 +148,14 @@ def operations():
             if len(seg) > 2 and seg not in STOP:
                 ent.add(singular(seg))
         for tbl in (r.get('reads') or []) + (r.get('writes') or []):
-            for seg in re.findall(r'[a-z]+', tbl.split('.')[-1].lower()):
-                if len(seg) > 2:
+            # **The whole qualified name, not the part after the last dot.**
+            # `maintenance.work_order` was yielding `work` and `order` and throwing
+            # away `maintenance` — the one token that says which domain the operation
+            # belongs to. `createWorkOrder` was therefore invisible to any task phrase
+            # mentioning maintenance, while `lookupAsset` matched at 1.00 because its
+            # summary happened to contain the word.
+            for seg in re.findall(r'[a-z]+', tbl.lower()):
+                if len(seg) > 2 and seg not in STOP:
                     ent.add(singular(seg))
         ent |= nouns(r.get('summary') or '')
         out[oid] = (verb, ent, r)
@@ -120,21 +164,60 @@ def operations():
 
 # ---------------------------------------------------------------- screens
 
+def implied_verb(name):
+    """The verb a heading implies for its verbless lines — `list` unless it says otherwise."""
+    if NO_IMPLIED_VERB.match(name):
+        return None
+    for rx, verb in SECTION_VERB:
+        if rx.search(name):
+            return verb
+    return 'list'
+
+
 def tasks(screen):
-    """[(verb, entity tokens)] — one per action phrase the screen declares."""
+    """[(verb, entity tokens)] — one per task the screen states.
+
+    **The verb-led phrase is the minority case and assuming otherwise caps this tool
+    at a quarter of the pack.** 65% of screens carry a task-bearing section and only
+    25% contain a phrase that leads with a verb, because `Display` and `Support` are
+    column lists — `Tenant | Venue | Asset Type | Status | Owner` — and a column list
+    is a read, stated in nouns.
+
+    So a phrase with a verb uses that verb, and a phrase without one inherits the
+    verb its section implies. `Actions` has no implied verb on purpose: a line there
+    with no verb is a label, not a task.
+    """
     found = []
     for name, lines in (screen.get('sections') or {}).items():
-        if name not in TASK_SECTIONS:
-            continue
+        prose = bool(PROSE_SECTION.match(name))
+        # **Skipping a prose heading outright loses whole packs.**
+        # `Marketing_CRM_Configuration_Reference` and `Seat_Management_Venue_Mapping`
+        # are prose PDFs with no directories at all — 120 and 129 screens whose only
+        # heading is `Purpose`, holding text like *"Maintain standard and custom
+        # attributes… Define primary and external identifiers, source-system priority,
+        # survivorship rules… Version and audit schema changes."* Those are tasks. The
+        # tool reported 107 of 107 and 97 of 97 screens with no candidate operation in
+        # any contract, against a `marketing-crm` that has 167 of them.
+        #
+        # What prose actually justifies is refusing to *infer* a verb, not refusing to
+        # read the line. A verbless sentence under `Purpose` is background; one that
+        # leads with `Maintain` or `Configure` is a task wherever it is written.
+        implied = None if prose else implied_verb(name)
+        # **The heading is part of the entity, not just the verb.** `Created Date`
+        # under `Work Order Information` reaches nothing on its own; the same line
+        # under that heading carries `work` and `order` and reaches
+        # `maintenance.createWorkOrder`. This is the signal the whitelist threw away
+        # even for the sections it did read.
+        head_ent = set() if prose else nouns(name)
         for line in lines:
-            for phrase in re.split(r'[;|•]|\s{2,}', line):
+            for phrase in re.split(r'[;|•]|\s{2,}|(?<=[a-z])\.\s+', line):
                 words = re.findall(r'[A-Za-z]{2,}', phrase.lower())
                 if not words:
                     continue
-                verb = next((TASK_VERB[w] for w in words[:3] if w in TASK_VERB), None)
+                verb = next((TASK_VERB[w] for w in words[:3] if w in TASK_VERB), implied)
                 if not verb:
                     continue
-                ent = nouns(phrase)
+                ent = nouns(phrase) | head_ent
                 if ent:
                     found.append((verb, ent))
     return found
@@ -177,10 +260,85 @@ def score(task_ent, op_ent, df, nops):
     import math
     got = sum(math.log(nops / float(1 + df.get(w, 0))) for w in shared)
     want = sum(math.log(nops / float(1 + df.get(w, 0))) for w in task_ent)
+    # **A ratio alone lets a one-token task score 1.00 against anything.** `Export &
+    # Download Center` matched `openShift`, `getCurrentSession` and `getEntitlementUsage`
+    # at a perfect score, because a task carrying a single common token is wholly
+    # contained by every operation that happens to use it. The ratio was right — all of
+    # the task's evidence was present — and the evidence was worth nothing.
+    #
+    # So the shared evidence has to clear an absolute floor as well as a relative one.
+    # `MIN_EVIDENCE` is roughly one term used by 2% of operations; a task whose overlap
+    # is only common words never reaches it however complete the overlap is.
+    if got < MIN_EVIDENCE:
+        return 0.0
     return got / want if want else 0.0
 
 
+MIN_EVIDENCE = 5.0
+
+
 WIRE_AT = 0.45
+
+# **One weak cross-domain hit is noise; two tasks agreeing on a contract is signal.**
+# A CMS screen with an `Attachments` heading reaches `maintenance.attachWorkOrderEvidence`
+# at 0.67, because attaching a document is genuinely what both do — the phrase is right
+# and the domain is wrong, and no threshold separates those. What separates them is
+# corroboration: a screen that really belongs to a contract matches several of its
+# operations, not one.
+CORROBORATE_AT = 0.60   # a single match this strong stands on its own
+
+
+STRONG_ENOUGH_ALONE = 0.80   # clears the affinity guard on its own
+
+
+def confirm(picks, owner, module=None, affinity=None):
+    """Drop contracts a screen touched only once, only weakly, or out of its domain.
+
+    `picks` is {operationId: score}; `owner` maps operationId -> contract. Returns the
+    same shape with the unsupported contracts removed.
+
+    **The second guard is the one that matters, and it is learned rather than written
+    down.** Thresholds could not separate `Export & Download Center` from
+    `identity.getCurrentSession` at 1.00, because the phrase really did match and only
+    the domain was wrong. `affinity` is the set of contracts each `requiresModule`
+    already calls across the 669 screens wired before this tool ran — `access` screens
+    call `access` 94% of the time, `membership` screens call `subscription`. A proposal
+    outside that set has to be very strong to stand.
+
+    **It is deliberately a guard and not a filter.** A thin module like `resources`
+    has only 19 existing references, so treating its affinity as complete would freeze
+    today's bias in place and block the very wiring this run exists to find.
+    """
+    by_contract = collections.defaultdict(list)
+    for oid, sc in picks.items():
+        by_contract[owner.get(oid, '?')].append((oid, sc))
+    keep = {}
+    for c, items in by_contract.items():
+        top = max(s for _o, s in items)
+        if not (len(items) >= 2 or top >= CORROBORATE_AT):
+            continue
+        if affinity is not None and module and c not in affinity.get(module, ()):
+            if top < STRONG_ENOUGH_ALONE:
+                continue
+        keep.update(dict(items))
+    return keep
+
+
+def module_affinity():
+    """{requiresModule: {contracts it already calls}} — learned from what is wired."""
+    lin = json.load(io.open(LINEAGE, encoding='utf8'))
+    out = collections.defaultdict(set)
+    for f in glob.glob(os.path.join(ROOT, 'screens', 'P*.yaml')):
+        d = yaml.safe_load(io.open(f, encoding='utf8')) or {}
+        for s in d.get('screens') or []:
+            m = s.get('requiresModule')
+            if not m:
+                continue
+            for a in (s.get('apis') or []):
+                c = a.get('contract') or lin.get(a.get('operationId'), {}).get('contract')
+                if c:
+                    out[m].add(c)
+    return out
 
 
 def main():
@@ -199,12 +357,22 @@ def main():
             if src.get('pack'):
                 declared[key] = (f, s)
 
+    owner = {oid: (r.get('contract') or '?') for oid, (_v, _e, r) in ops.items()}
+    affinity = module_affinity()
+    only = None
+    for a in sys.argv[1:]:
+        if a.startswith('--only='):
+            only = a.split('=', 1)[1]
+
     gained = collections.Counter()
     new_refs = 0
     screens_lifted = 0
     per_screen = {}
+    per_file = collections.defaultdict(dict)
 
     for sc in pack:
+        if only and only not in (sc.get('source') or ''):
+            continue
         key = (sc.get('source'), str(sc.get('board')), str(sc.get('number')))
         hit = declared.get(key)
         if not hit:
@@ -223,8 +391,10 @@ def main():
                     best, best_s = oid, sc_
             if best and best_s >= WIRE_AT and best not in have:
                 picks[best] = max(best_s, picks.get(best, 0))
+        picks = confirm(picks, owner, s.get('requiresModule'), affinity)
         if picks:
             per_screen[s['id']] = picks
+            per_file[f][s['id']] = picks
             new_refs += len(picks)
             if not have:
                 screens_lifted += 1
@@ -241,14 +411,50 @@ def main():
     print('coverage %.0f%% -> %.0f%%'
           % (100.0 * withops / total, 100.0 * (withops + screens_lifted) / total))
     print()
+    by_contract = collections.Counter()
+    for picks in per_screen.values():
+        for oid in picks:
+            by_contract[owner.get(oid, '?')] += 1
+    print('references by contract:')
+    for c, k in by_contract.most_common(12):
+        print('    %-16s %d' % (c, k))
+    print()
     for sid, picks in list(per_screen.items())[:8]:
         print('  %-9s %s' % (sid, ', '.join('%s (%.2f)' % (k, v) for k, v in
                                             sorted(picks.items(), key=lambda x: -x[1])[:4])))
     if '--apply' not in sys.argv:
         print('\n  nothing written — pass --apply')
         return
-    # wiring deferred: see the report first
-    print('\n  --apply is not implemented until the sample above is reviewed')
+
+    # **A read is `onLoad`, anything else is `onAction`.** The verb already decided
+    # this when the operation was named, so it is read back rather than guessed again.
+    READ_VERB = ('list', 'get', 'search', 'lookup', 'find', 'export')
+    written = 0
+    for f, screens_ in sorted(per_file.items()):
+        d = yaml.safe_load(io.open(f, encoding='utf8'))
+        by_id = {s['id']: s for s in d['screens']}
+        for sid, picks in screens_.items():
+            s = by_id.get(sid)
+            if not s:
+                continue
+            have = {a.get('operationId') for a in (s.get('apis') or [])}
+            for oid, _sc in sorted(picks.items(), key=lambda x: -x[1]):
+                if oid in have:
+                    continue
+                r = ops[oid][2]
+                verb = re.match(r'[a-z]+', oid).group(0)
+                s.setdefault('apis', []).append({
+                    'operationId': oid,
+                    'contract': owner.get(oid, '?'),
+                    'purpose': (r.get('summary') or '').strip() or 'Derived from the screen tasks',
+                    'trigger': 'onLoad' if verb in READ_VERB else 'onAction',
+                    'provenance': 'derived — task linkage, 19 September 2026',
+                })
+                written += 1
+        io.open(f, 'w', encoding='utf8').write(
+            yaml.safe_dump(d, sort_keys=False, allow_unicode=True, width=100))
+        print('  -> %s' % f)
+    print('\n%d reference(s) written' % written)
 
 
 if __name__ == '__main__':

@@ -1,14 +1,14 @@
-# P01-account-self-service-01 — P01 · Account & Self-Service
+# WS52 — Promotions   Bundles Management board 8
 
-**5 screens · 46 operations · 37 schemas · 5 permissions**
+**10 screens · 10 operations · 11 schemas · 2 permissions**
 
-Platform P01 Guest Web · ships as **guest** ·
-guest audience · web ·
+Platform P09 TICVAI Web · ships as **ticvai-control** ·
+platformAdmin audience · web ·
 online only
 
 ## Who this is for
 
-**guest on web.** Everything below is how you know what is
+**platformAdmin on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
-- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
+- **0 of these operations work offline**
+  
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +61,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
-| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
-| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
-| `WEB-019` | Order History | listDetail | 5 | 0 | — |
-| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
+| `ADM-208` | Stacking & Conflict Command Center | commandCentre | 1 | 0 | — |
+| `ADM-209` | Promotion Priority & Hierarchy Manager | listDetail | 1 | 0 | — |
+| `ADM-210` | Promotion Stacking Rule Builder | listDetail | 1 | 0 | — |
+| `ADM-211` | Promotion Exclusion & Compatibility Matrix | listDetail | 1 | 0 | — |
+| `ADM-212` | Discount Calculation & Application Sequence | configEditor | 1 | 0 | — |
+| `ADM-213` | Best Offer & Customer Benefit Resolver | listDetail | 1 | 0 | — |
+| `ADM-214` | Discount Cap & Maximum Benefit Controller | configEditor | 1 | 0 | — |
+| `ADM-215` | Conflict Detection & Resolution Center | listDetail | 1 | 1 | — |
+| `ADM-216` | Promotion Decision Trace & Transaction Explainer | listDetail | 1 | 0 | — |
+| `ADM-217` | Conflict Simulation & AI Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-209, ADM-210, ADM-211, ADM-213, ADM-216, ADM-217 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -80,850 +85,303 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
+  "id": "ADM-208",
+  "name": "Stacking & Conflict Command Center",
+  "module": "Commercial",
   "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "1",
+   "page": 109
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "app": "ticvai-web",
+   "route": "/commercial/stacking-conflict-command-center-adm-208",
+   "component": "apps/ticvai-web/src/routes/commercial/StackingConflictCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-002"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
+    "ADM-002",
+    "ADM-209",
+    "ADM-210",
+    "ADM-211",
+    "ADM-212",
+    "ADM-213",
+    "ADM-214",
+    "ADM-215",
+    "ADM-216",
+    "ADM-217"
    ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "tenantId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ADM-209",
+     "trigger": "Works in Promotion Priority & Hierarchy Manager",
+     "provenance": "flow F161 step 1→2",
+     "operation": "listStackingConflict"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "ADM-210",
+     "trigger": "Works in Promotion Stacking Rule Builder",
+     "provenance": "flow F161 step 3→4",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-211",
+     "trigger": "Works in Promotion Exclusion & Compatibility Matrix",
+     "provenance": "flow F161 step 5→6",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-212",
+     "trigger": "Works in Discount Calculation & Application Sequence",
+     "provenance": "flow F161 step 7→8",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-213",
+     "trigger": "Works in Best Offer & Customer Benefit Resolver",
+     "provenance": "flow F161 step 9→10",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-214",
+     "trigger": "Works in Discount Cap & Maximum Benefit Controller",
+     "provenance": "flow F161 step 11→12",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-215",
+     "trigger": "Works in Conflict Detection & Resolution Center",
+     "provenance": "flow F161 step 13→14",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-216",
+     "trigger": "Works in Promotion Decision Trace & Transaction Explainer",
+     "provenance": "flow F161 step 15→16",
+     "operation": "listStackingConflict"
+    },
+    {
+     "to": "ADM-217",
+     "trigger": "Works in Conflict Simulation & AI Optimization",
+     "provenance": "flow F161 step 17→18",
+     "operation": "listStackingConflict"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide centralized operational visibility into promotion interactions across TICVAI.",
   "layout": {
-   "template": "split",
+   "template": "dashboard",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "headline",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "kind": "metricTile",
+       "label": "Active Promotion Rules",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.activePromotionRules"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "kind": "metricTile",
+       "label": "Stackable Promotions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.stackablePromotions"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+       "kind": "metricTile",
+       "label": "Exclusive Promotions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.exclusivePromotions"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+       "kind": "metricTile",
+       "label": "Priority Rules",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.priorityRules"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+       "kind": "metricTile",
+       "label": "Conflicts Detected",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.conflictsDetected"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Critical Conflicts",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.criticalConflicts"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Auto-Resolved Conflicts",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.autoResolvedConflicts"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Transactions with Multiple Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.transactionsWithMultipleOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Promotions per Transaction",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.averagePromotionsPerTransaction"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Discount Exposure",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.discountExposure"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Prevented Over-Discount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.preventedOverDiscount"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue Protected",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 109 §KPI Cards",
+       "bindsTo": "StackingConflictCommandCenterView.revenueProtected"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
   "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The stacking conflict list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the stacking conflict untouched.",
+   "emptyFirstRun": "No stacking conflict yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stacking conflict are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
+    "operationId": "listStackingConflict",
+    "contract": "promotions",
+    "purpose": "Stacking & Conflict Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
+    "StackingConflictCommandCenterView.activePromotionRules",
+    "StackingConflictCommandCenterView.stackablePromotions",
+    "StackingConflictCommandCenterView.exclusivePromotions",
+    "StackingConflictCommandCenterView.priorityRules",
+    "StackingConflictCommandCenterView.conflictsDetected",
+    "StackingConflictCommandCenterView.criticalConflicts"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-208"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 109. 12 of 12 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
+  "id": "ADM-209",
+  "name": "Promotion Priority & Hierarchy Manager",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "2",
+   "page": 110
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "app": "ticvai-web",
+   "route": "/commercial/promotion-priority-hierarchy-manager-adm-209",
+   "component": "apps/ticvai-web/src/routes/commercial/PromotionPriorityHierarchyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-208"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
+    "ADM-208"
    ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 2→3",
+     "operation": "listPromotionPriorityHierarchy"
     }
    ]
   },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define the relative priority of different promotion families and individual offers.",
   "gaps": [
    {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operation": null,
+    "why": "**Promotion Priority & Hierarchy Manager declares no operation that writes anything** — its only declared call is `listPromotionPriorityHierarchy`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 110"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 110"
    }
   ],
   "layout": {
@@ -931,565 +389,126 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
-       ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
-       ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
      "components": [
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "listPromotionPriorityHierarchy",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "loading": "The promotion priority hierarchy list.",
+   "error": "Could not load. Names which read failed and leaves the promotion priority hierarchy untouched.",
+   "emptyFirstRun": "No promotion priority hierarchy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the promotion priority hierarchy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
+    "operationId": "listPromotionPriorityHierarchy",
+    "contract": "promotions",
+    "purpose": "Promotion Priority & Hierarchy Manager",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
+    "PromotionPriorityHierarchyManagerView.promotionFamily",
+    "PromotionPriorityHierarchyManagerView.promotion",
+    "PromotionPriorityHierarchyManagerView.priorityNumber",
+    "PromotionPriorityHierarchyManagerView.priorityGroup",
+    "PromotionPriorityHierarchyManagerView.effectiveDates"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-209"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "id": "ADM-210",
+  "name": "Promotion Stacking Rule Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "3",
+   "page": 111
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "ticvai-web",
+   "route": "/commercial/promotion-stacking-rule-builder-adm-210",
+   "component": "apps/ticvai-web/src/routes/commercial/PromotionStackingRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-208"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "ADM-208"
    ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 4→5",
+     "operation": "setPromotionStackingRule"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define which promotions can be combined.",
   "gaps": [
    {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 111"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 111"
    }
   ],
   "layout": {
    "template": "split",
    "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
     {
      "name": "actionBar",
      "slot": "rowActions",
@@ -1497,157 +516,1029 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+       "provenance": "contract operation setPromotionStackingRule"
       }
      ]
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "setPromotionStackingRule"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The promotion stacking rule list.",
+   "error": "Could not load. Names which read failed and leaves the promotion stacking rule untouched.",
+   "emptyFirstRun": "No promotion stacking rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the promotion stacking rule are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "setPromotionStackingRule",
+    "contract": "promotions",
+    "purpose": "Promotion Stacking Rule Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPromotionStackingRule"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-210"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 111. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-211",
+  "name": "Promotion Exclusion & Compatibility Matrix",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "4",
+   "page": 112
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/promotion-exclusion-compatibility-matrix-adm-211",
+   "component": "apps/ticvai-web/src/routes/commercial/PromotionExclusionCompatibilityMatrix.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 6→7",
+     "operation": "listPromotionExclusionCompatibility"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Clicking a relationship should show) and no metric row",
+  "purpose": "Provide administrators with a visual matrix showing which promotion categories can interact.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every promotion exclusion compatibility",
+       "columns": [
+        "PromotionExclusionCompatibilityMatrixView.applicableProducts",
+        "PromotionExclusionCompatibilityMatrixView.applicableVenues",
+        "PromotionExclusionCompatibilityMatrixView.channels",
+        "PromotionExclusionCompatibilityMatrixView.customerSegments",
+        "PromotionExclusionCompatibilityMatrixView.rule",
+        "PromotionExclusionCompatibilityMatrixView.priority",
+        "PromotionExclusionCompatibilityMatrixView.effectiveDates",
+        "PromotionExclusionCompatibilityMatrixView.exceptions"
+       ],
+       "bindsTo": "PromotionExclusionCompatibilityMatrixView",
+       "operation": "listPromotionExclusionCompatibility",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 112 §Clicking a relationship should show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected promotion exclusion compatibility",
+       "bindsTo": "PromotionExclusionCompatibilityMatrixView",
+       "columns": [
+        "PromotionExclusionCompatibilityMatrixView.applicableProducts",
+        "PromotionExclusionCompatibilityMatrixView.applicableVenues",
+        "PromotionExclusionCompatibilityMatrixView.channels",
+        "PromotionExclusionCompatibilityMatrixView.customerSegments",
+        "PromotionExclusionCompatibilityMatrixView.rule",
+        "PromotionExclusionCompatibilityMatrixView.priority",
+        "PromotionExclusionCompatibilityMatrixView.effectiveDates",
+        "PromotionExclusionCompatibilityMatrixView.exceptions"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Coupo Members Loyal Ban BOG”, “Membershi”, “Use”, “Conflict Detection”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 112 §Clicking a relationship should show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The promotion exclusion compatibility list.",
+   "error": "Could not load. Names which read failed and leaves the promotion exclusion compatibility untouched.",
+   "emptyFirstRun": "No promotion exclusion compatibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the promotion exclusion compatibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPromotionExclusionCompatibility",
+    "contract": "promotions",
+    "purpose": "Promotion Exclusion & Compatibility Matrix",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "PromotionExclusionCompatibilityMatrixView.applicableProducts",
+    "PromotionExclusionCompatibilityMatrixView.applicableVenues",
+    "PromotionExclusionCompatibilityMatrixView.channels",
+    "PromotionExclusionCompatibilityMatrixView.customerSegments",
+    "PromotionExclusionCompatibilityMatrixView.rule",
+    "PromotionExclusionCompatibilityMatrixView.priority"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-211"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 112. 8 of 8 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-212",
+  "name": "Discount Calculation & Application Sequence",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "5",
+   "page": 113
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/discount-calculation-application-sequence-adm-212",
+   "component": "apps/ticvai-web/src/routes/commercial/DiscountCalculationApplicationSequence.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 8→9",
+     "operation": "listDiscountCalculationApplication"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure whether promotion applies) and no display directory — it is settings, not a population",
+  "purpose": "Control the mathematical order in which multiple permitted benefits are calculated.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Before tax",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      },
+      {
+       "kind": "selectField",
+       "label": "After tax",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      },
+      {
+       "kind": "selectField",
+       "label": "Before fee",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      },
+      {
+       "kind": "selectField",
+       "label": "After fee",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product only",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction total",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 113 §Configure whether promotion applies"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The discount calculation application configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the discount calculation application untouched.",
+   "emptyFirstRun": "No discount calculation application configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDiscountCalculationApplication",
+    "contract": "promotions",
+    "purpose": "Discount Calculation & Application Sequence",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-212"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 113. 0 of 0 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-213",
+  "name": "Best Offer & Customer Benefit Resolver",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "6",
+   "page": 114
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/best-offer-customer-benefit-resolver-adm-213",
+   "component": "apps/ticvai-web/src/routes/commercial/BestOfferCustomerBenefitResolver.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 10→11",
+     "operation": "listBestOfferCustomer"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Determine which promotion or combination gives the guest the correct/best permitted commercial outcome.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 114"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 114"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBestOfferCustomer",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The best offer customer list.",
+   "error": "Could not load. Names which read failed and leaves the best offer customer untouched.",
+   "emptyFirstRun": "No best offer customer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the best offer customer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBestOfferCustomer",
+    "contract": "promotions",
+    "purpose": "Best Offer & Customer Benefit Resolver",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BestOfferCustomerBenefitResolverView.useTheHighestRankedPromotion",
+    "BestOfferCustomerBenefitResolverView.favorAStrategicallySelectedCampaign",
+    "BestOfferCustomerBenefitResolverView.honorContractualCustomerSpecificPricingFirst",
+    "BestOfferCustomerBenefitResolverView.family15Aed",
+    "BestOfferCustomerBenefitResolverView.bank1011750"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-213"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-214",
+  "name": "Discount Cap & Maximum Benefit Controller",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "7",
+   "page": 115
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/discount-cap-maximum-benefit-controller-adm-214",
+   "component": "apps/ticvai-web/src/routes/commercial/DiscountCapMaximumBenefitController.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 12→13",
+     "operation": "listDiscountCapMaximum"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configured maximum) and no display directory — it is settings, not a population",
+  "purpose": "Prevent stacked promotions from exceeding financial or contractual limits.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Maximum total discount %",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Maximum total discount amount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum transaction value",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum product price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum margin",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum free-item value",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum promotional benefit",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Maximum promotions per basket",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "30%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 115 §Configured maximum"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The discount cap maximum configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the discount cap maximum untouched.",
+   "emptyFirstRun": "No discount cap maximum configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDiscountCapMaximum",
+    "contract": "promotions",
+    "purpose": "Discount Cap & Maximum Benefit Controller",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-214"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 115. 0 of 0 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-215",
+  "name": "Conflict Detection & Resolution Center",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "8",
+   "page": 116
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/conflict-detection-resolution-center-adm-215",
+   "component": "apps/ticvai-web/src/routes/commercial/ConflictDetectionResolutionCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 14→15",
+     "operation": "listConflictDetectionResolution"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Detect promotion conflicts during both configuration and runtime.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Best price, Reject transaction where necessary. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every conflict detection resolution",
+       "columns": [
+        "ConflictDetectionResolutionCenterView.sameProduct",
+        "ConflictDetectionResolutionCenterView.sameAudience",
+        "ConflictDetectionResolutionCenterView.sameChannel",
+        "ConflictDetectionResolutionCenterView.sameValidity",
+        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
+        "ConflictDetectionResolutionCenterView.missingHierarchy",
+        "ConflictDetectionResolutionCenterView.missingStackingRule",
+        "ConflictDetectionResolutionCenterView.discountCapBreach",
+        "ConflictDetectionResolutionCenterView.circularDependency"
+       ],
+       "bindsTo": "ConflictDetectionResolutionCenterView",
+       "operation": "listConflictDetectionResolution",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected conflict detection resolution",
+       "bindsTo": "ConflictDetectionResolutionCenterView",
+       "columns": [
+        "ConflictDetectionResolutionCenterView.sameProduct",
+        "ConflictDetectionResolutionCenterView.sameAudience",
+        "ConflictDetectionResolutionCenterView.sameChannel",
+        "ConflictDetectionResolutionCenterView.sameValidity",
+        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
+        "ConflictDetectionResolutionCenterView.missingHierarchy",
+        "ConflictDetectionResolutionCenterView.missingStackingRule",
+        "ConflictDetectionResolutionCenterView.discountCapBreach",
+        "ConflictDetectionResolutionCenterView.circularDependency"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Customer qualifies for”, “Eligibility”, “Compatibility”, “Priority”, “Calculation sequence”, “Discount cap”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Best price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Support"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject transaction where necessary",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRejectTransactionWhereNe",
+    "component": "confirmDialog",
+    "trigger": "Reject transaction where necessary",
+    "body": "**Reject transaction where necessary on a conflict detection resolution is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Support"
+   }
+  ],
+  "states": {
+   "loading": "The conflict detection resolution list.",
+   "error": "Could not load. Names which read failed and leaves the conflict detection resolution untouched.",
+   "emptyFirstRun": "No conflict detection resolution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the conflict detection resolution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listConflictDetectionResolution",
+    "contract": "promotions",
+    "purpose": "Conflict Detection & Resolution Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ConflictDetectionResolutionCenterView.sameProduct",
+    "ConflictDetectionResolutionCenterView.sameAudience",
+    "ConflictDetectionResolutionCenterView.sameChannel",
+    "ConflictDetectionResolutionCenterView.sameValidity",
+    "ConflictDetectionResolutionCenterView.incompatiblePromotions",
+    "ConflictDetectionResolutionCenterView.missingHierarchy"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-215"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 116. 9 of 9 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-216",
+  "name": "Promotion Decision Trace & Transaction Explainer",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "9",
+   "page": 117
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/promotion-decision-trace-transaction-explainer-adm-216",
+   "component": "apps/ticvai-web/src/routes/commercial/PromotionDecisionTraceTransactionExplainer.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-208",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F161 step 16→17",
+     "operation": "listPromotionDecisionTrace"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide complete explainability of how TICVAI arrived at the final promotional price. This screen will be extremely important for: Customer service Finance Operations Audit Partner disputes Technical support",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 117"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 117"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPromotionDecisionTrace",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The promotion decision trace list.",
+   "error": "Could not load. Names which read failed and leaves the promotion decision trace untouched.",
+   "emptyFirstRun": "No promotion decision trace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the promotion decision trace are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPromotionDecisionTrace",
+    "contract": "promotions",
+    "purpose": "Promotion Decision Trace & Transaction Explainer",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "PromotionDecisionTraceTransactionExplainerView.family20",
+    "PromotionDecisionTraceTransactionExplainerView.summer25",
+    "PromotionDecisionTraceTransactionExplainerView.bank10",
+    "PromotionDecisionTraceTransactionExplainerView.loyalty5",
+    "PromotionDecisionTraceTransactionExplainerView.family20Eligible"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-216"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-217",
+  "name": "Conflict Simulation & AI Optimization",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "8",
+   "number": "10",
+   "page": 118
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/conflict-simulation-ai-optimization-adm-217",
+   "component": "apps/ticvai-web/src/routes/commercial/ConflictSimulationAiOptimization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-208"
+   ],
+   "exitTo": [
+    "ADM-208"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-208, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Test promotion interaction scenarios before publishing campaigns.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 118"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 118"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Change priority, Allow stacking, Create exclusions, Change calculation sequence, Change discount cap, Override margin floor, Create emergency rule, Activate hierarchy changes. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 118 §Separate permissions should control"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConflict",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The conflict simulation optimization list.",
+   "error": "Could not load. Names which read failed and leaves the conflict simulation optimization untouched.",
+   "emptyFirstRun": "No conflict simulation optimization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the conflict simulation optimization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listConflict",
+    "contract": "promotions",
+    "purpose": "Conflict Simulation & AI Optimization",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ConflictSimulationAiOptimizationView.customerSegment",
+    "ConflictSimulationAiOptimizationView.membership",
+    "ConflictSimulationAiOptimizationView.loyalty",
+    "ConflictSimulationAiOptimizationView.products",
+    "ConflictSimulationAiOptimizationView.basket"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-217"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 118. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }
@@ -1661,905 +1552,135 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "addToWishlist": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
- "claimCart": {
-  "method": "POST",
-  "path": "/carts/{cartId}/claim",
-  "contract": "orders",
-  "summary": "Attach an anonymous cart to a guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CartMergeResult"
- },
- "completeSsoAuthorization": {
-  "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
-  "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoginResponse"
- },
- "createMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "createRefundRequest": {
-  "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "enrolMfaMethod": {
-  "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaEnrolment"
- },
- "getEntitlement": {
+ "listBestOfferCustomer": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}",
-  "contract": "access",
-  "summary": "One entitlement, with what remains on it",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "getEntitlementCredential": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}/credential",
-  "contract": "access",
-  "summary": "The thing that gets scanned",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "rotate",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "getEntitlementHistory": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}/history",
-  "contract": "access",
-  "summary": "Every scan, freeze, share and reissue against it",
-  "permission": "ORDER_VIEW",
+  "path": "/best-offer-customer",
+  "contract": "promotions",
+  "summary": "Best Offer & Customer Benefit Resolver",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "BestOfferCustomerBenefitResolverView"
  },
- "getGuestProfile": {
+ "listConflict": {
   "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
+  "path": "/conflict",
+  "contract": "promotions",
+  "summary": "Conflict Simulation & AI Optimization",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestProfileDetail"
+  "responds": "ConflictSimulationAiOptimizationView"
  },
- "getGuestSession": {
+ "listConflictDetectionResolution": {
   "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "getMyChallenges": {
-  "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
+  "path": "/conflict-detection-resolution",
+  "contract": "promotions",
+  "summary": "Conflict Detection & Resolution Center",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ChallengeProgress"
+  "responds": "ConflictDetectionResolutionCenterView"
  },
- "getOrder": {
+ "listDiscountCalculationApplication": {
   "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
+  "path": "/discount-calculation-application",
+  "contract": "promotions",
+  "summary": "Discount Calculation & Application Sequence",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "DiscountCalculationApplicationSequenceView"
  },
- "getWishlist": {
+ "listDiscountCapMaximum": {
   "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
+  "path": "/discount-cap-maximum",
+  "contract": "promotions",
+  "summary": "Discount Cap & Maximum Benefit Controller",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Wishlist"
+  "responds": "DiscountCapMaximumBenefitControllerView"
  },
- "guestLogout": {
-  "method": "DELETE",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "End a guest session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "allDevices",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "guestSocialLogin": {
-  "method": "POST",
-  "path": "/auth/guest/social",
-  "contract": "identity",
-  "summary": "Sign in with Apple or Google",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "guestUaePassLogin": {
-  "method": "POST",
-  "path": "/auth/guest/uae-pass",
-  "contract": "identity",
-  "summary": "Sign in with a national identity provider",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "issueWalletPass": {
-  "method": "POST",
-  "path": "/wallet-passes",
-  "contract": "orders",
-  "summary": "Generate an Apple or Google wallet pass",
-  "permission": "ORDER_VIEW",
+ "listPromotionDecisionTrace": {
+  "method": "GET",
+  "path": "/promotion-decision-trace",
+  "contract": "promotions",
+  "summary": "Promotion Decision Trace & Transaction Explainer",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletPass"
- },
- "linkGuestCheckout": {
-  "method": "POST",
-  "path": "/auth/guest/link-checkout",
-  "contract": "identity",
-  "summary": "Attach a guest checkout to an account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "listConsentPurposes": {
-  "method": "GET",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configured consent purposes",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
- "listEntitlements": {
-  "method": "GET",
-  "path": "/my/entitlements/all",
-  "contract": "access",
-  "summary": "Every entitlement this guest holds, including expired",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "includeExpired",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "listGuestDevices": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "PromotionDecisionTraceTransactionExplainerView"
  },
- "listMyEntitlements": {
+ "listPromotionExclusionCompatibility": {
   "method": "GET",
-  "path": "/guests/me/entitlements",
-  "contract": "access",
-  "summary": "Every ticket, pass and membership this guest holds",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "state",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "includeShared",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "listMyOrders": {
-  "method": "GET",
-  "path": "/my/orders",
-  "contract": "orders",
-  "summary": "The orders this guest placed",
-  "permission": null,
+  "path": "/promotion-exclusion-compatibility",
+  "contract": "promotions",
+  "summary": "Promotion Exclusion & Compatibility Matrix",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "since",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
- },
- "listOrders": {
-  "method": "GET",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "List orders",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "principalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "shiftId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSsoProviders": {
-  "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "SsoProvider"
+  "responds": "PromotionExclusionCompatibilityMatrixView"
  },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
- },
- "recordConsent": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Record a consent decision",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordConsentRequest",
-  "responds": "ConsentState"
- },
- "refreshToken": {
-  "method": "POST",
-  "path": "/auth/refresh",
-  "contract": "identity",
-  "summary": "Rotate the access token",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TokenPair"
- },
- "registerGuest": {
-  "method": "POST",
-  "path": "/auth/guest/register",
-  "contract": "identity",
-  "summary": "Create a guest account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RegisterGuestRequest",
-  "responds": "GuestSession"
- },
- "registerGuestDevice": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "Register a device for push",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp",
-  "contract": "identity",
-  "summary": "Request a one-time code",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "respondToInvitation": {
-  "method": "POST",
-  "path": "/invitations/{token}/respond",
-  "contract": "marketing-crm",
-  "summary": "Accept or decline",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Invitation"
- },
- "revokeGuestDevice": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/devices/{deviceId}",
-  "contract": "marketing-crm",
-  "summary": "Revoke a device registration",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "shareEntitlement": {
-  "method": "POST",
-  "path": "/entitlements/{entitlementId}/share",
-  "contract": "orders",
-  "summary": "Let somebody else use this, without giving it away",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Problem"
- },
- "startSsoAuthorization": {
+ "listPromotionPriorityHierarchy": {
   "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "transferOrderTickets": {
-  "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
+  "path": "/promotion-priority-hierarchy",
+  "contract": "promotions",
+  "summary": "Promotion Priority & Hierarchy Manager",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
+  "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "PromotionPriorityHierarchyManagerView"
  },
- "updateGuestPreferences": {
+ "listStackingConflict": {
+  "method": "GET",
+  "path": "/stacking-conflict",
+  "contract": "promotions",
+  "summary": "Stacking & Conflict Command Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "StackingConflictCommandCenterView"
+ },
+ "setPromotionStackingRule": {
   "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "updateMyProfile": {
-  "method": "PATCH",
-  "path": "/guests/me/profile",
-  "contract": "marketing-crm",
-  "summary": "A guest correcting their own details",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestProfile"
- },
- "verifyGuestEmail": {
-  "method": "POST",
-  "path": "/auth/guest/verify-email",
-  "contract": "identity",
-  "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "path": "/promotion-stacking-rule",
+  "contract": "promotions",
+  "summary": "Promotion Stacking Rule Builder",
+  "permission": "PRICE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp/verify",
-  "contract": "identity",
-  "summary": "Verify a one-time code and issue a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "verifyMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a step-up challenge",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PromotionStackingRuleBuilderInput",
+  "responds": "PromotionStackingRuleBuilderView"
  }
 }
 ```
@@ -2570,1741 +1691,852 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "Cart": {
+ "BestOfferCustomerBenefitResolverView": {
   "type": "object",
-  "x-ticvai-persistence": "orders.cart",
-  "required": [
-   "id",
-   "venueId",
-   "channel",
-   "status",
-   "lines"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Best Offer & Customer Benefit Resolver displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "id": {
+   "useTheHighestRankedPromotion": {
     "type": "string",
-    "format": "uuid"
+    "description": "Use the highest-ranked promotion"
    },
-   "token": {
+   "favorAStrategicallySelectedCampaign": {
     "type": "string",
-    "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "description": "Favor a strategically selected campaign"
    },
-   "venueId": {
+   "honorContractualCustomerSpecificPricingFirst": {
     "type": "string",
-    "format": "uuid"
+    "description": "Honor contractual/customer-specific pricing first"
+   },
+   "family15Aed": {
+    "type": "string",
+    "description": "FAMILY15 + AED"
+   },
+   "bank1011750": {
+    "type": "string",
+    "description": "BANK10 117.50"
+   },
+   "saving": {
+    "type": "string",
+    "description": "Saving (the pack shows AED 117.50)"
+   },
+   "bestAvailableOfferAppliedAutomatically": {
+    "type": "string",
+    "description": "Best available offer applied automatically"
+   }
+  }
+ },
+ "ConflictDetectionResolutionCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Conflict Detection & Resolution Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sameProduct": {
+    "type": "string",
+    "description": "Same product"
+   },
+   "sameAudience": {
+    "type": "string",
+    "description": "Same audience"
+   },
+   "sameChannel": {
+    "type": "string",
+    "description": "Same channel"
+   },
+   "sameValidity": {
+    "type": "string",
+    "description": "Same validity"
+   },
+   "incompatiblePromotions": {
+    "type": "string",
+    "description": "Incompatible promotions"
+   },
+   "missingHierarchy": {
+    "type": "string",
+    "description": "Missing hierarchy"
+   },
+   "missingStackingRule": {
+    "type": "string",
+    "description": "Missing stacking rule"
+   },
+   "discountCapBreach": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount-cap breach"
+   },
+   "circularDependency": {
+    "type": "string",
+    "description": "Circular dependency"
+   },
+   "family20": {
+    "type": "string",
+    "description": "FAMILY20"
+   },
+   "vip15": {
+    "type": "string",
+    "description": "VIP15"
+   },
+   "summer25": {
+    "type": "string",
+    "description": "SUMMER25"
+   },
+   "bank10": {
+    "type": "string",
+    "description": "BANK10"
+   },
+   "automatic": {
+    "type": "string",
+    "description": "Automatic"
+   },
+   "ruleBased": {
+    "type": "string",
+    "description": "Rule-based"
+   },
+   "bestPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Best price"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "manualIntervention": {
+    "type": "string",
+    "description": "Manual intervention"
+   }
+  }
+ },
+ "ConflictSimulationAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Conflict Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "basket": {
+    "type": "string",
+    "description": "Basket"
+   },
+   "coupon": {
+    "type": "string",
+    "description": "Coupon"
    },
    "channel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-   },
-   "subjectId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null while anonymous. Set by `claimCart`."
+    "description": "Channel"
    },
-   "status": {
-    "$ref": "#/components/schemas/CartStatus"
+   "venue": {
+    "type": "string",
+    "description": "Venue"
    },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartLine"
-    }
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
    },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartConflict"
-    }
-   },
-   "subtotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "discountTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPromotionIds": {
-    "type": "array",
-    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "expiresAt": {
+   "dateTime": {
     "type": "string",
     "format": "date-time",
-    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+    "description": "Date/time"
    },
-   "extensionsUsed": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "maxExtensions": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "locale": {
-    "type": "string"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CartMergeResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "cart"
-  ],
-  "properties": {
-   "cart": {
-    "$ref": "#/components/schemas/Cart"
-   },
-   "mergedLineCount": {
-    "type": "integer"
-   },
-   "droppedLines": {
-    "type": "array",
-    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "productName": {
-       "type": "string"
-      },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "noCapacity",
-        "expired",
-        "notSellableOnChannel",
-        "duplicate"
-       ]
-      }
-     }
-    }
-   }
-  }
- },
- "ChallengeProgress": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.challenge_progress",
-  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
-  "required": [
-   "id",
-   "challengeId",
-   "subjectId",
-   "current",
-   "target"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "portfolioId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a family or group challenge — where the shared progress accrues."
-   },
-   "current": {
-    "type": "number"
-   },
-   "target": {
-    "type": "number"
-   },
-   "streakCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rewardIssuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "ConsentDecision": {
-  "type": "string",
-  "enum": [
-   "granted",
-   "withdrawn",
-   "notAsked"
-  ]
- },
- "ConsentPurpose": {
-  "type": "string",
-  "enum": [
-   "marketing",
-   "personalisation",
-   "profiling",
-   "thirdPartySharing",
-   "aiProcessing",
-   "transactional"
-  ]
- },
- "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
-  "type": "object",
-  "required": [
-   "purpose",
-   "channels",
-   "noticeVersion",
-   "isRequiredForService"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string",
-    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
-   },
-   "isRequiredForService": {
-    "type": "boolean",
-    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
-   },
-   "expiresAfterMonths": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
- "ConsentSource": {
-  "type": "string",
-  "enum": [
-   "guestApp",
-   "website",
-   "kiosk",
-   "pos",
-   "callCentre",
-   "import",
-   "agentRecorded"
-  ]
- },
- "ConsentState": {
-  "x-ticvai-persistence": "none — projection over consent_record",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "purposes"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "purpose",
-      "decision",
-      "requiresRenewal"
-     ],
-     "properties": {
-      "purpose": {
-       "$ref": "#/components/schemas/ConsentPurpose"
-      },
-      "decision": {
-       "$ref": "#/components/schemas/ConsentDecision"
-      },
-      "channels": {
-       "type": "array",
-       "items": {
-        "$ref": "#/components/schemas/MessageChannel"
-       }
-      },
-      "noticeVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "requiresRenewal": {
-       "type": "boolean",
-       "description": "True where the notice has been superseded since consent was given."
-      },
-      "decidedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
- },
- "Entitlement": {
-  "type": "object",
-  "x-ticvai-persistence": "access.entitlement",
-  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
-  "required": [
-   "id",
-   "templateId",
-   "productId",
-   "orderId",
-   "subjectId",
-   "status",
-   "validFrom",
-   "validTo"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
-   },
-   "templateId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderLineId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "mediaCode": {
-    "type": "string",
-    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
-   },
-   "status": {
-    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
-   },
-   "statusNote": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
-   },
-   "entriesUsed": {
-    "type": "integer",
-    "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
-   },
-   "entriesAllowed": {
-    "type": "integer",
-    "nullable": true
-   },
-   "lastEntryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "frozenDays": {
-    "type": "integer",
-    "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
-   },
-   "suspendedReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "isNameBound": {
-    "type": "boolean",
-    "default": false
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "sharedWithSubjectIds": {
-    "type": "array",
-    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "issuedVia": {
-    "type": "string",
-    "enum": [
-     "sale",
-     "invitation",
-     "reissue",
-     "transfer",
-     "resale",
-     "membership",
-     "groupBooking"
-    ],
-    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
-   },
-   "supersedesEntitlementId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
-   },
-   "walletValueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
-   }
-  }
- },
- "GuestDevice": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
-  "required": [
-   "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
-   },
-   "tokenFingerprint": {
-    "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
-   },
-   "appVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "osVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceModel": {
-    "type": "string",
-    "nullable": true
-   },
-   "locale": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
-   },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "GuestProfile": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "isActive"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "email": {
-    "type": "string",
-    "nullable": true
-   },
-   "phone": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredChannel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells. Marketing acts locally."
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "engagementScore": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100,
-    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
-   },
-   "engagementTier": {
+   "whoQualifies": {
     "type": "string",
-    "nullable": true,
-    "enum": [
-     "new",
-     "active",
-     "occasional",
-     "lapsing",
-     "lapsed",
-     "dormant"
-    ],
-    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+    "description": "Who qualifies?"
    },
-   "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "visitCount": {
-    "type": "integer"
-   },
-   "lastVisitAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
- },
- "GuestProfileDetail": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/GuestProfile"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid",
-      "readOnly": true,
-      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-     },
-     "consents": {
-      "$ref": "#/components/schemas/ConsentState"
-     },
-     "loyalty": {
-      "$ref": "#/components/schemas/LoyaltyPosition"
-     },
-     "openCaseCount": {
-      "type": "integer"
-     },
-     "recentOrderIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "membershipIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "notes": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
- },
- "Invitation": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
-  "required": [
-   "id",
-   "campaignId",
-   "token",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recipientEmail": {
-    "type": "string",
-    "format": "email",
-    "nullable": true
-   },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
-    ]
-   },
-   "entitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "respondedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "LoginRequest": {
-  "type": "object",
-  "required": [
-   "username",
-   "credential",
-   "workstationId"
-  ],
-  "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
-   },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
-   },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
-   }
-  }
- },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   {
-    "type": "object",
-    "required": [
-     "requiresRoleSelection"
-    ],
-    "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
-     },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
-     },
-     "session": {
-      "$ref": "#/components/schemas/Session"
-     }
-    }
-   }
-  ]
- },
- "LoyaltyPosition": {
-  "x-ticvai-persistence": "marketing.loyalty_position",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "programmeId",
-   "pointsBalance",
-   "tierCode"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "lifetimePoints": {
-    "type": "integer"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "pointsToNextTier": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryPoints": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryAt": {
+   "boards24PromotionMechanics": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "MessageChannel": {
-  "type": "string",
-  "enum": [
-   "email",
-   "sms",
-   "whatsapp",
-   "push",
-   "inApp",
-   "post"
-  ]
- },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
-  "type": "string",
-  "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
-  ]
- },
- "MfaMethod": {
-  "x-ticvai-persistence": "identity.mfa_method",
-  "type": "object",
-  "required": [
-   "id",
-   "kind",
-   "isActive",
-   "enrolledAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "label": {
-    "type": "string",
-    "nullable": true
-   },
-   "maskedTarget": {
-    "type": "string",
-    "nullable": true,
-    "description": "Partially masked destination, so a person can tell two methods apart."
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   },
-   "enrolledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastUsedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
+    "description": "Boards 2–4 — Promotion Mechanics"
    },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
+   "collectFinalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Collect final amount"
    },
-   "currency": {
+   "sameCentralizedEngine": {
     "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+    "description": "same centralized engine"
    },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectId": {
+   "paymentMethodOffers": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "OrderChannel": {
-  "type": "string",
-  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice"
-  ]
- },
- "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderLine"
-   },
-   {
-    "type": "object",
-    "required": [
-     "serverUnitPrice",
-     "taxAmount",
-     "netAmount",
-     "grossAmount"
-    ],
-    "properties": {
-     "serverUnitPrice": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "What the server computed on ingest."
-     },
-     "priceVariance": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
-     },
-     "taxAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "netAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "grossAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "entitlementIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "crossRegionRightIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Redemption rights propagated to other cells for this line."
-     }
-    }
-   }
-  ]
- },
- "OrderStatus": {
-  "type": "string",
-  "enum": [
-   "pending",
-   "held",
-   "paid",
-   "partiallyPaid",
-   "completed",
-   "voided",
-   "refunded",
-   "partiallyRefunded",
-   "failed"
-  ],
-  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "Payment": {
-  "x-ticvai-persistence": "orders.payment",
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "status",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "Payment-method offers"
    },
-   "fxRate": {
+   "goldMember15": {
     "type": "number",
-    "nullable": true,
-    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+    "description": "Gold Member 15%"
    },
-   "fxRateSource": {
+   "buy4Pay3": {
     "type": "string",
-    "nullable": true,
-    "enum": [
-     "manual",
-     "feed",
-     "cardScheme"
-    ],
-    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+    "description": "Buy 4 Pay 3"
    },
-   "changeCurrency": {
+   "summer20": {
     "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "SUMMER20"
    },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "bankAbc10": {
+    "type": "number",
+    "description": "Bank ABC 10%"
    },
-   "changeAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "status": {
+   "gND": {
     "type": "string",
-    "enum": [
-     "authorised",
-     "captured",
-     "pendingConfirmation",
-     "declined",
-     "failed",
-     "voided",
-     "refunded"
-    ]
+    "description": "g n d"
    },
-   "providerName": {
-    "type": "string",
-    "nullable": true
+   "member36": {
+    "type": "number",
+    "description": "Member 36% ✓"
    },
-   "providerReference": {
-    "type": "string",
-    "nullable": true
+   "bogo29": {
+    "type": "number",
+    "description": "BOGO 29% ✓"
    },
-   "lastInquiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "coupon33": {
+    "type": "number",
+    "description": "Coupon 33% ✓"
    },
-   "recordedAt": {
+   "memberAed": {
     "type": "string",
-    "format": "date-time"
+    "description": "Member + AED"
    },
-   "syncedAt": {
+   "bogoBank24": {
+    "type": "number",
+    "description": "BOGO + Bank 24% ✓"
+   },
+   "bogoAed": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true
+    "description": "BOGO + AED"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin (the pack shows 24%)"
+   },
+   "mutuallyExclusive": {
+    "type": "string",
+    "description": "mutually exclusive"
+   },
+   "estimatedProtectedMarginAed284kMonth": {
+    "type": "number",
+    "description": "Estimated protected margin: AED 284K/month"
+   },
+   "areCommercialLimitsRespected": {
+    "type": "string",
+    "description": "Are commercial limits respected?"
+   },
+   "calculateAuthoritativeFinalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Calculate authoritative final price"
+   },
+   "marketingAdministrator": {
+    "type": "string",
+    "description": "Marketing Administrator"
+   },
+   "campaignManager": {
+    "type": "string",
+    "description": "Campaign Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "revenueManager": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Manager"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "b2bManager": {
+    "type": "string",
+    "description": "B2B Manager"
+   },
+   "systemAdministrator": {
+    "type": "string",
+    "description": "System Administrator"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver"
+   },
+   "auditor": {
+    "type": "string",
+    "description": "Auditor"
    }
   }
  },
- "Problem": {
+ "DiscountCalculationApplicationSequenceView": {
   "type": "object",
-  "description": "RFC 9457 problem details. Every error response uses this shape.",
-  "required": [
-   "type",
-   "title",
-   "status"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Discount Calculation & Application Sequence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "type": {
+   "aed100Aed80": {
     "type": "string",
-    "format": "uri"
+    "description": "AED 100 → AED 80"
    },
-   "title": {
-    "type": "string"
+   "then10": {
+    "type": "number",
+    "description": "Then 10%"
    },
-   "status": {
-    "type": "integer"
+   "aed80Aed72": {
+    "type": "string",
+    "description": "AED 80 → AED 72"
    },
-   "detail": {
-    "type": "string"
+   "aed100Aed70": {
+    "type": "string",
+    "description": "AED 100 → AED 70"
    },
-   "instance": {
-    "type": "string"
+   "sequential": {
+    "type": "string",
+    "description": "Sequential"
    },
-   "traceId": {
-    "type": "string"
+   "additivePercentage": {
+    "type": "number",
+    "description": "Additive percentage"
    },
-   "errors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "field",
-      "code"
-     ],
-     "properties": {
-      "field": {
-       "type": "string"
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
+   "fixedThenPercentage": {
+    "type": "number",
+    "description": "Fixed then percentage"
+   },
+   "percentageThenFixed": {
+    "type": "number",
+    "description": "Percentage then fixed"
+   },
+   "bestPriceOnly": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Best price only"
+   },
+   "highestValueDiscountOnly": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Highest-value discount only"
+   },
+   "lowestPriceResult": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Lowest-price result"
+   },
+   "priorityOrder": {
+    "type": "string",
+    "description": "Priority order"
+   },
+   "beforeTax": {
+    "type": "string",
+    "description": "Before tax"
+   },
+   "afterTax": {
+    "type": "string",
+    "description": "After tax"
+   },
+   "beforeFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Before fee"
+   },
+   "afterFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "After fee"
+   },
+   "productOnly": {
+    "type": "string",
+    "description": "Product only"
+   },
+   "transactionTotal": {
+    "type": "string",
+    "description": "Transaction total"
    }
   }
  },
- "RecordConsentRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "DiscountCapMaximumBenefitControllerView": {
   "type": "object",
-  "required": [
-   "purpose",
-   "decision",
-   "noticeVersion",
-   "source",
-   "recordedAt"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Discount Cap & Maximum Benefit Controller displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
+   "maximumTotalDiscount": {
+    "type": "number",
+    "description": "Maximum total discount %"
    },
-   "decision": {
-    "$ref": "#/components/schemas/ConsentDecision"
+   "maximumTotalDiscountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maximum total discount amount"
    },
-   "channels": {
-    "type": "array",
-    "description": "Omit to apply to every channel the purpose covers.",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "recordedAt": {
+   "minimumTransactionValue": {
     "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "RegisterGuestRequest": {
-  "type": "object",
-  "required": [
-   "identifier",
-   "channel"
-  ],
-  "properties": {
-   "identifier": {
+    "description": "Minimum transaction value"
+   },
+   "minimumProductPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum product price"
+   },
+   "minimumMargin": {
+    "type": "number",
+    "description": "Minimum margin"
+   },
+   "maximumFreeItemValue": {
     "type": "string",
-    "maxLength": 256,
-    "description": "Email address or mobile number in E.164."
+    "description": "Maximum free-item value"
+   },
+   "maximumPromotionalBenefit": {
+    "type": "string",
+    "description": "Maximum promotional benefit"
+   },
+   "maximumPromotionsPerBasket": {
+    "type": "string",
+    "description": "Maximum promotions per basket"
+   },
+   "membership15": {
+    "type": "number",
+    "description": "Membership 15%"
+   },
+   "bank10": {
+    "type": "number",
+    "description": "Bank 10%"
+   },
+   "coupon20": {
+    "type": "number",
+    "description": "Coupon 20%"
+   },
+   "potentialCombinedBenefit": {
+    "type": "string",
+    "description": "Potential combined benefit (the pack shows 45%)"
+   },
+   "configuredMaximum": {
+    "type": "string",
+    "description": "Configured maximum (the pack shows 30%)"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "transaction": {
+    "type": "string",
+    "description": "Transaction"
    },
    "channel": {
     "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp"
-    ]
+    "description": "Channel"
    },
-   "displayName": {
+   "reduceDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Reduce discount"
+   },
+   "useBestPermittedCombination": {
     "type": "string",
-    "maxLength": 200
+    "description": "Use best permitted combination"
    },
-   "password": {
-    "type": "string",
-    "minLength": 8,
-    "maxLength": 256,
-    "description": "Optional. OTP-only accounts are supported and are the default."
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "pattern": "^[a-z]{2}$"
-   },
-   "consents": {
-    "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "purpose": {
-       "type": "string"
-      },
-      "granted": {
-       "type": "boolean"
-      },
-      "noticeVersion": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   }
-  }
- },
- "Session": {
-  "type": "object",
-  "required": [
-   "sessionId",
-   "principalId",
-   "roleId",
-   "scope",
-   "effectivePermissions",
-   "saleBoardId"
-  ],
-  "properties": {
-   "sessionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "scope": {
-    "type": "array",
-    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
-    "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
-    }
-   },
-   "effectivePermissions": {
-    "allOf": [
-     {
-      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
-     }
-    ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
-   },
-   "permissionsByScope": {
-    "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
-    "items": {
-     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
-    }
-   },
-   "saleBoardId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
-   },
-   "workstation": {
-    "$ref": "#/components/schemas/WorkstationContext"
-   },
-   "openedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "isEnforced": {
+   "requireApproval": {
     "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "description": "Require approval"
    }
   }
  },
- "TokenPair": {
-  "x-ticvai-persistence": "none — transient",
+ "PromotionDecisionTraceTransactionExplainerView": {
   "type": "object",
-  "required": [
-   "accessToken",
-   "refreshToken",
-   "expiresIn"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Decision Trace & Transaction Explainer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "accessToken": {
+   "family20": {
     "type": "string",
-    "description": "JWT carrying `sid`, validated per request against the session registry."
+    "description": "FAMILY20 ✓"
    },
-   "refreshToken": {
-    "type": "string"
+   "summer25": {
+    "type": "string",
+    "description": "SUMMER25 ✓"
    },
-   "expiresIn": {
+   "bank10": {
+    "type": "string",
+    "description": "BANK10 ✓"
+   },
+   "loyalty5": {
+    "type": "string",
+    "description": "LOYALTY5 ✓"
+   },
+   "family20Eligible": {
+    "type": "string",
+    "description": "FAMILY20 eligible"
+   },
+   "family20Retained": {
+    "type": "string",
+    "description": "FAMILY20 retained"
+   },
+   "bank10StackableWithFamily20": {
+    "type": "string",
+    "description": "BANK10 stackable with FAMILY20"
+   },
+   "bestPermittedCombinationCalculated": {
+    "type": "string",
+    "description": "Best permitted combination calculated"
+   },
+   "aed160": {
+    "type": "string",
+    "description": "−AED 160"
+   },
+   "aed64": {
+    "type": "string",
+    "description": "−AED 64"
+   },
+   "totalSaving": {
     "type": "integer",
-    "description": "Seconds"
+    "description": "Total Saving (the pack shows AED 224 / 28%)"
    }
   }
  },
- "WalletPass": {
+ "PromotionExclusionCompatibilityMatrixView": {
   "type": "object",
-  "x-ticvai-persistence": "orders.wallet_pass",
-  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
-  "required": [
-   "id",
-   "entitlementId",
-   "platform",
-   "serialNumber",
-   "status"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Exclusion & Compatibility Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "id": {
+   "nHipTyKO": {
     "type": "string",
-    "format": "uuid"
+    "description": "n hip ty k O"
    },
-   "entitlementId": {
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed"
+   },
+   "notAllowed": {
+    "type": "boolean",
+    "description": "Not Allowed"
+   },
+   "conditional": {
     "type": "string",
-    "format": "uuid"
+    "description": "Conditional"
    },
-   "platform": {
+   "priorityBased": {
+    "type": "string",
+    "description": "Priority Based"
+   },
+   "notConfigured": {
+    "type": "string",
+    "description": "Not Configured"
+   },
+   "applicableProducts": {
+    "type": "integer",
+    "description": "Applicable products"
+   },
+   "applicableVenues": {
+    "type": "integer",
+    "description": "Applicable venues"
+   },
+   "channels": {
+    "type": "integer",
+    "description": "Channels"
+   },
+   "customerSegments": {
+    "type": "integer",
+    "description": "Customer segments"
+   },
+   "rule": {
+    "type": "string",
+    "description": "Rule"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "effectiveDates": {
+    "type": "integer",
+    "description": "Effective dates"
+   },
+   "exceptions": {
+    "type": "integer",
+    "description": "Exceptions"
+   }
+  }
+ },
+ "PromotionPriorityHierarchyManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Priority & Hierarchy Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionFamily": {
+    "type": "string",
+    "description": "Promotion family"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "priorityNumber": {
+    "type": "string",
+    "description": "Priority number"
+   },
+   "priorityGroup": {
+    "type": "string",
+    "description": "Priority group"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "priority200": {
+    "type": "string",
+    "description": "Priority: 200"
+   },
+   "priority300": {
+    "type": "string",
+    "description": "Priority: 300"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer type"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   }
+  }
+ },
+ "PromotionStackingRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Promotion Stacking Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "promotionAPromotionB": {
+    "type": "string",
+    "description": "Promotion A + Promotion B"
+   },
+   "onlyOnePromotionCanApply": {
+    "type": "string",
+    "description": "Only one promotion can apply"
+   },
+   "but": {
+    "type": "string",
+    "description": "but"
+   },
+   "couponDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coupon Discount"
+   },
+   "entireTransaction": {
+    "type": "string",
+    "description": "Entire transaction"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "individualTicket": {
+    "type": "string",
+    "description": "Individual ticket"
+   },
+   "bundleComponent": {
+    "type": "string",
+    "description": "Bundle component"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   }
+  }
+ },
+ "PromotionStackingRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Stacking Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionAPromotionB": {
+    "type": "string",
+    "description": "Promotion A + Promotion B"
+   },
+   "onlyOnePromotionCanApply": {
+    "type": "string",
+    "description": "Only one promotion can apply"
+   },
+   "but": {
+    "type": "string",
+    "description": "but"
+   },
+   "couponDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coupon Discount"
+   },
+   "entireTransaction": {
+    "type": "string",
+    "description": "Entire transaction"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "individualTicket": {
+    "type": "string",
+    "description": "Individual ticket"
+   },
+   "bundleComponent": {
+    "type": "string",
+    "description": "Bundle component"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   }
+  }
+ },
+ "StackingConflictCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Stacking & Conflict Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activePromotionRules": {
+    "type": "integer",
+    "description": "Active Promotion Rules"
+   },
+   "stackablePromotions": {
+    "type": "integer",
+    "description": "Stackable Promotions"
+   },
+   "exclusivePromotions": {
+    "type": "integer",
+    "description": "Exclusive Promotions"
+   },
+   "priorityRules": {
+    "type": "integer",
+    "description": "Priority Rules"
+   },
+   "conflictsDetected": {
+    "type": "string",
+    "description": "Conflicts Detected"
+   },
+   "criticalConflicts": {
+    "type": "integer",
+    "description": "Critical Conflicts"
+   },
+   "autoResolvedConflicts": {
+    "type": "integer",
+    "description": "Auto-Resolved Conflicts"
+   },
+   "transactionsWithMultipleOffers": {
+    "type": "string",
+    "description": "Transactions with Multiple Offers"
+   },
+   "averagePromotionsPerTransaction": {
+    "type": "number",
+    "description": "Average Promotions per Transaction"
+   },
+   "discountExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Exposure"
+   },
+   "preventedOverDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Prevented Over-Discount"
+   },
+   "revenueProtected": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Protected"
+   },
+   "promotionType": {
     "type": "string",
     "enum": [
-     "apple",
-     "google"
-    ]
+     "vs",
+     "couponVs",
+     "couponVsCoupon",
+     "bogoVsDiscount",
+     "bundleVs",
+     "membershipVs",
+     "loyaltyVs",
+     "bankOfferVs",
+     "partnerOfferVs",
+     "specialPriceVs"
+    ],
+    "description": "Vocabulary listed under Conflict Categories."
    },
-   "serialNumber": {
-    "type": "string"
-   },
-   "authenticationToken": {
+   "information": {
     "type": "string",
-    "format": "password",
-    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+    "description": "Information"
    },
-   "status": {
+   "warning": {
     "type": "string",
-    "enum": [
-     "issued",
-     "updated",
-     "voided",
-     "expired"
-    ]
+    "description": "Warning"
    },
-   "lastPushedAt": {
+   "high": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true
+    "description": "High"
    },
-   "deviceRegistrations": {
-    "type": "integer",
-    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
-   },
-   "scopePath": {
+   "critical": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "Wishlist": {
-  "type": "object",
-  "required": [
-   "subjectId",
-   "items"
-  ],
-  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "items": {
-    "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
+    "description": "Critical"
    }
   }
  }

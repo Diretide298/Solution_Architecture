@@ -1,13 +1,13 @@
 {
- "addToWishlist": {
+ "acceptShiftVariance": {
   "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
+  "path": "/shifts/{shiftId}/accept-variance",
+  "contract": "shift",
+  "summary": "Accept an over/short beyond the threshold",
+  "permission": "OVERSHORT_ACCEPT",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -16,14 +16,71 @@
    }
   ],
   "requestBody": null,
-  "responds": "Wishlist"
+  "responds": "Shift"
  },
- "claimCart": {
+ "addTip": {
   "method": "POST",
-  "path": "/carts/{cartId}/claim",
+  "path": "/payments/{paymentId}/tip",
   "contract": "orders",
-  "summary": "Attach an anonymous cart to a guest",
-  "permission": null,
+  "summary": "Record a tip against a payment",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "appendEntitlementToMedia": {
+  "method": "POST",
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "Add something to a ticket the guest already holds",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AppendEntitlementRequest",
+  "responds": "AppendEntitlementResult"
+ },
+ "applyManualDiscount": {
+  "method": "POST",
+  "path": "/orders/{orderId}/discounts",
+  "contract": "orders",
+  "summary": "Apply a discount a cashier chose",
+  "permission": "ORDER_DISCOUNT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ManualDiscountRequest",
+  "responds": "Order"
+ },
+ "approveShiftOpen": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/approve-open",
+  "contract": "shift",
+  "summary": "Approve a shift opening outside tolerance",
+  "permission": "SHIFT_APPROVE_OPEN",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -35,17 +92,17 @@
    }
   ],
   "requestBody": null,
-  "responds": "CartMergeResult"
+  "responds": "Shift"
  },
- "completeSsoAuthorization": {
+ "askReportingQuestion": {
   "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
-  "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
-  "permission": null,
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -54,17 +111,17 @@
    }
   ],
   "requestBody": null,
-  "responds": "LoginResponse"
+  "responds": "NaturalLanguageAnswer"
  },
- "createMfaChallenge": {
+ "capturePayment": {
   "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
-  "permission": null,
+  "path": "/payments/{paymentId}/capture",
+  "contract": "orders",
+  "summary": "Capture a previously authorised payment",
+  "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "workstation",
   "parameters": [
    {
     "name": null,
@@ -73,6 +130,120 @@
    }
   ],
   "requestBody": null,
+  "responds": "Payment"
+ },
+ "closeDepositBoxes": {
+  "method": "POST",
+  "path": "/deposit-boxes/close",
+  "contract": "shift",
+  "summary": "Close one box or all of them",
+  "permission": "SHIFT_CLOSE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DepositBox"
+ },
+ "closeShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/close",
+  "contract": "shift",
+  "summary": "Blind close-out",
+  "permission": "SHIFT_CLOSE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CloseShiftRequest",
+  "responds": "ShiftCloseResult"
+ },
+ "createCashMovement": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/cash-movements",
+  "contract": "shift",
+  "summary": "Record a cash lift or add",
+  "permission": "CASH_LIFT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCashMovementRequest",
+  "responds": "CashMovement"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
   "responds": null
  },
  "createRefundRequest": {
@@ -94,15 +265,34 @@
   "requestBody": null,
   "responds": null
  },
- "enrolMfaMethod": {
+ "createReport": {
   "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "Create a custom report definition",
+  "permission": "REPORT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ },
+ "deleteReport": {
+  "method": "DELETE",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Retire a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -111,91 +301,104 @@
    }
   ],
   "requestBody": null,
-  "responds": "MfaEnrolment"
+  "responds": null
  },
- "getEntitlement": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}",
-  "contract": "access",
-  "summary": "One entitlement, with what remains on it",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "getEntitlementCredential": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}/credential",
-  "contract": "access",
-  "summary": "The thing that gets scanned",
-  "permission": "ORDER_VIEW",
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "rotate",
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getCurrentShift": {
+  "method": "GET",
+  "path": "/shifts/current",
+  "contract": "shift",
+  "summary": "The open or suspended shift on the session's workstation",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "getFinancialReport": {
+  "method": "GET",
+  "path": "/reports/financial",
+  "contract": "finance",
+  "summary": "P&L, balance sheet or cash flow",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "report",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "fiscalPeriodId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "costCenterId",
     "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "FinancialReport"
  },
- "getEntitlementHistory": {
+ "getMediaAsset": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}/history",
-  "contract": "access",
-  "summary": "Every scan, freeze, share and reissue against it",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
- },
- "getGuestProfile": {
-  "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
- },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Read an asset with derivatives and usage",
+  "permission": "ASSET_LIBRARY_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestSession"
+  "responds": "MediaAssetDetail"
  },
- "getMyChallenges": {
+ "getMediaEntitlements": {
   "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "What is already on this media",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ChallengeProgress"
+  "responds": "MediaEntitlements"
  },
  "getOrder": {
   "method": "GET",
@@ -210,258 +413,94 @@
   "requestBody": null,
   "responds": "Order"
  },
- "getWishlist": {
+ "getOrderStatement": {
   "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
- "guestLogout": {
-  "method": "DELETE",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "End a guest session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "allDevices",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "guestSocialLogin": {
-  "method": "POST",
-  "path": "/auth/guest/social",
-  "contract": "identity",
-  "summary": "Sign in with Apple or Google",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "guestUaePassLogin": {
-  "method": "POST",
-  "path": "/auth/guest/uae-pass",
-  "contract": "identity",
-  "summary": "Sign in with a national identity provider",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "issueWalletPass": {
-  "method": "POST",
-  "path": "/wallet-passes",
+  "path": "/orders/{orderId}/statement",
   "contract": "orders",
-  "summary": "Generate an Apple or Google wallet pass",
+  "summary": "Full financial history of an order",
   "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletPass"
- },
- "linkGuestCheckout": {
-  "method": "POST",
-  "path": "/auth/guest/link-checkout",
-  "contract": "identity",
-  "summary": "Attach a guest checkout to an account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "listConsentPurposes": {
-  "method": "GET",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configured consent purposes",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
- "listEntitlements": {
-  "method": "GET",
-  "path": "/my/entitlements/all",
-  "contract": "access",
-  "summary": "Every entitlement this guest holds, including expired",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "includeExpired",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "listGuestDevices": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "OrderStatement"
  },
- "listMyEntitlements": {
+ "getProduct": {
   "method": "GET",
-  "path": "/guests/me/entitlements",
-  "contract": "access",
-  "summary": "Every ticket, pass and membership this guest holds",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Read a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "getRefundPolicy": {
+  "method": "GET",
+  "path": "/venues/{venueId}/refund-policy",
+  "contract": "orders",
+  "summary": "Read a venue's refund policy",
   "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "state",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "includeShared",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
+  "parameters": [],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "RefundPolicy"
  },
- "listMyOrders": {
+ "getReport": {
   "method": "GET",
-  "path": "/my/orders",
-  "contract": "orders",
-  "summary": "The orders this guest placed",
-  "permission": null,
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Read a report definition",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "getSettlement": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}",
+  "contract": "finance",
+  "summary": "Settlement detail with match results",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Settlement"
+ },
+ "getShift": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}",
+  "contract": "shift",
+  "summary": "Read a shift",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "holdOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/hold",
+  "contract": "orders",
+  "summary": "Park a sale and free the till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "workstation",
   "parameters": [
-   {
-    "name": "since",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -470,6 +509,92 @@
   ],
   "requestBody": null,
   "responds": "Order"
+ },
+ "ingestSettlementFile": {
+  "method": "POST",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "Ingest a provider settlement file",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "listCashMovements": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}/cash-movements",
+  "contract": "shift",
+  "summary": "Lifts, adds and the opening float",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CashMovement"
+ },
+ "listOrderRefunds": {
+  "method": "GET",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "List refunds against an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
  },
  "listOrders": {
   "method": "GET",
@@ -525,178 +650,13 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listProductVariants": {
   "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProvider"
- },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
- },
- "recordConsent": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Record a consent decision",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordConsentRequest",
-  "responds": "ConsentState"
- },
- "refreshToken": {
-  "method": "POST",
-  "path": "/auth/refresh",
-  "contract": "identity",
-  "summary": "Rotate the access token",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TokenPair"
- },
- "registerGuest": {
-  "method": "POST",
-  "path": "/auth/guest/register",
-  "contract": "identity",
-  "summary": "Create a guest account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RegisterGuestRequest",
-  "responds": "GuestSession"
- },
- "registerGuestDevice": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "Register a device for push",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp",
-  "contract": "identity",
-  "summary": "Request a one-time code",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "respondToInvitation": {
-  "method": "POST",
-  "path": "/invitations/{token}/respond",
-  "contract": "marketing-crm",
-  "summary": "Accept or decline",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
+  "path": "/products/{productId}/variants",
+  "contract": "catalogue",
+  "summary": "List generated variants",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -704,21 +664,7 @@
     "name": null,
     "in": null,
     "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Invitation"
- },
- "revokeGuestDevice": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/devices/{deviceId}",
-  "contract": "marketing-crm",
-  "summary": "Revoke a device registration",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
+   },
    {
     "name": null,
     "in": null,
@@ -726,13 +672,149 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
- "shareEntitlement": {
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSettlementExceptions": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Unmatched or mismatched settlement lines",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSettlements": {
+  "method": "GET",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "List settlement batches",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "providerName",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listShifts": {
+  "method": "GET",
+  "path": "/shifts",
+  "contract": "shift",
+  "summary": "List shifts",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "modifyOrder": {
   "method": "POST",
-  "path": "/entitlements/{entitlementId}/share",
+  "path": "/orders/{orderId}/modify",
   "contract": "orders",
-  "summary": "Let somebody else use this, without giving it away",
+  "summary": "Add or remove lines on an existing order",
   "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -744,34 +826,224 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "Problem"
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
  },
- "startSsoAuthorization": {
-  "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+ "openShift": {
+  "method": "POST",
+  "path": "/shifts",
+  "contract": "shift",
+  "summary": "Open a shift",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
   "parameters": [
    {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OpenShiftRequest",
+  "responds": "Shift"
+ },
+ "recordNoSale": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/no-sale",
+  "contract": "shift",
+  "summary": "Open the drawer without a sale",
+  "permission": "SHIFT_SUSPEND",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NoSaleEvent"
+ },
+ "reopenShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/reopen",
+  "contract": "shift",
+  "summary": "Reopen a shift closed in error",
+  "permission": "SHIFT_REOPEN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "replaceMediaAsset": {
+  "method": "POST",
+  "path": "/media/{mediaId}/replace",
+  "contract": "assets",
+  "summary": "Replace the file behind an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaReplaceResult"
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": null
  },
- "transferOrderTickets": {
+ "rescheduleOrder": {
   "method": "POST",
-  "path": "/orders/{orderId}/transfer",
+  "path": "/orders/{orderId}/reschedule",
   "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
+ "resolveSettlementException": {
+  "method": "POST",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Resolve a settlement exception",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SettlementException"
+ },
+ "resumeOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/resume",
+  "contract": "orders",
+  "summary": "Bring a parked sale back to a till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderResumeResult"
+ },
+ "resumeShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/resume",
+  "contract": "shift",
+  "summary": "Resume a suspended shift",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "saveNaturalLanguageQuery": {
+  "method": "POST",
+  "path": "/reports/ask/{conversationId}/save",
+  "contract": "reporting",
+  "summary": "Save a natural-language answer as a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "setProductAttributes": {
+  "method": "PUT",
+  "path": "/products/{productId}/attributes",
+  "contract": "catalogue",
+  "summary": "Set the attribute axes for a product",
+  "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -785,15 +1057,15 @@
   "requestBody": null,
   "responds": null
  },
- "updateGuestPreferences": {
-  "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
+ "settleDeposit": {
+  "method": "POST",
+  "path": "/deposits/{depositId}/settle",
+  "contract": "finance",
+  "summary": "Convert to revenue, return it, or forfeit it",
+  "permission": "LEDGER_POST",
   "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -802,36 +1074,36 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Deposit"
  },
- "updateMyProfile": {
+ "suspendShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/suspend",
+  "contract": "shift",
+  "summary": "Suspend a shift so another user can log in",
+  "permission": "SHIFT_SUSPEND",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "updateProduct": {
   "method": "PATCH",
-  "path": "/guests/me/profile",
-  "contract": "marketing-crm",
-  "summary": "A guest correcting their own details",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestProfile"
- },
- "verifyGuestEmail": {
-  "method": "POST",
-  "path": "/auth/guest/verify-email",
-  "contract": "identity",
-  "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Update a product",
+  "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -839,18 +1111,18 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "UpdateProductRequest",
+  "responds": "Product"
  },
- "verifyGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp/verify",
-  "contract": "identity",
-  "summary": "Verify a one-time code and issue a session",
-  "permission": null,
+ "updateReport": {
+  "method": "PUT",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Publish a new version of a definition",
+  "permission": "REPORT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -858,18 +1130,18 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "GuestSession"
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
  },
- "verifyMfaChallenge": {
+ "voidOrder": {
   "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a step-up challenge",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -878,25 +1150,6 @@
    }
   ],
   "requestBody": null,
-  "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "Order"
  }
 }

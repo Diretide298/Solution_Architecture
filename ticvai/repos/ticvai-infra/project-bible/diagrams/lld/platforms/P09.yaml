@@ -33,25 +33,31 @@ modulesUsed:
   screens: 19
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 243
+  operationCalls: 311
 - service: PlatformService
-  operationCalls: 199
+  operationCalls: 287
 - service: OrderService
-  operationCalls: 49
+  operationCalls: 139
 - service: TenancyService
-  operationCalls: 29
+  operationCalls: 85
 - service: IdentityService
-  operationCalls: 25
+  operationCalls: 29
 - service: WhiteLabelService
   operationCalls: 20
 - service: MarketingService
-  operationCalls: 10
+  operationCalls: 12
+- service: LedgerService
+  operationCalls: 9
 - service: AiService
   operationCalls: 5
 - service: ReportingService
   operationCalls: 4
 - service: CrossRegionService
   operationCalls: 3
+- service: RetailService
+  operationCalls: 2
+- service: VenueOpsService
+  operationCalls: 1
 coverage:
   screens: 676
   inAFlow: 661
@@ -7684,7 +7690,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setVisualWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7704,7 +7711,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setVisualWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7724,7 +7732,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listConditionDecisionLogic
+  - setVisualBusinessRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7745,7 +7755,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setVisualWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7766,7 +7777,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTriggerActionCross
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7787,7 +7799,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateWorkflowTestingImpact
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7808,7 +7821,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listWorkflow
+  - setVisualWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7828,7 +7843,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listVersioningEffectiveDate
+  - listWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7849,7 +7866,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listApprovalMatrices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7879,7 +7897,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7899,7 +7918,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7920,7 +7940,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7940,7 +7961,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7961,7 +7983,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7982,7 +8005,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8003,7 +8027,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalControlPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8024,7 +8049,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - evaluateApprovalRequirement
+  - simulateWorkflowTestingImpact
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8045,7 +8072,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listApprovalMatrices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8066,7 +8094,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
+  - listApprovalControlPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8096,7 +8126,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setSegregationRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8116,7 +8147,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listApprovalControlPolicies
+  - setApprovalControlPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8160,7 +8193,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listStepUpPolicies
+  - setStepUpPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8180,7 +8215,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - signApprovalDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8200,7 +8236,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalRecord
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8221,7 +8258,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setApprovalRetentionPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8241,7 +8279,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createApprovalEvidencePackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8262,7 +8301,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8283,7 +8323,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listCrossModuleOrchestration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8313,7 +8354,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listCrossModuleOrchestration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8334,7 +8376,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listApprovalRequests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8354,7 +8397,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTriggerActionCross
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8375,7 +8419,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createWebhookSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8395,7 +8440,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listApiClients
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8415,7 +8461,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTriggerActionCross
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8436,7 +8483,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAccessPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8457,7 +8505,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listWorkflowExceptionFailure
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8478,7 +8527,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listWorkflowProcessPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8499,7 +8549,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8529,7 +8580,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8550,7 +8602,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8571,7 +8624,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSlaEscalationBottleneck
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8592,7 +8646,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8613,7 +8668,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8657,7 +8713,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8678,7 +8735,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateWorkflowTestingImpact
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8699,7 +8757,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getApprovalAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8720,7 +8779,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getSubscription
+  - listTenants
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8750,7 +8811,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listTenants
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8771,7 +8833,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getEntitlementUsage
+  - getSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8792,7 +8856,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8813,7 +8878,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getBillingReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8834,7 +8900,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listTenants
+  - setTrialConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8877,7 +8945,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRenewalAuto
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8898,7 +8967,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8919,7 +8989,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getLicenceEnforcement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8940,7 +9011,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8970,7 +9042,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - submitOnboardingApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8991,7 +9064,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9012,7 +9086,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9055,7 +9130,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9076,7 +9152,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9097,7 +9174,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9118,7 +9197,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9139,7 +9219,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9160,7 +9241,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listLicensingModels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9190,7 +9272,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getVsiModel
+  - setVsiModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9211,7 +9295,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setVsiModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9232,7 +9317,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPlan
+  - listPlans
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9253,7 +9340,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setLicensingModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9274,7 +9362,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setLicensingModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9295,7 +9384,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setLicensingModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9316,7 +9406,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - addCapacityPack
+  - setLicensingModel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9337,7 +9429,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9358,7 +9451,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPlanVersion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9379,7 +9473,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9409,7 +9504,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPlans
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9430,7 +9527,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9451,7 +9549,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9472,7 +9571,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9493,7 +9593,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
+  - setModuleListing
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9514,7 +9616,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - addCapacityPack
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9535,7 +9638,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9556,7 +9660,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9577,7 +9682,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPartnerQuote
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9598,7 +9704,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTrialConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9628,7 +9735,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9649,7 +9757,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createLegalEntity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9670,7 +9779,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentProvider
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9691,7 +9801,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTrialConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9712,7 +9823,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - previewSubscriptionChange
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9733,7 +9845,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setAgreementContractTerm
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9754,7 +9867,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9775,7 +9889,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9796,7 +9911,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9817,7 +9933,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createTenant
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9846,7 +9963,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createOrgUnit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9867,7 +9985,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPrincipal
+  - setPasswordPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9888,7 +10008,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - addLicenceAddOn
+  - getTenantLicences
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9909,7 +10031,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9930,7 +10053,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listVenueTypeTemplates
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9951,7 +10075,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRegionSettings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9972,7 +10097,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - runGoLiveValidation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9993,7 +10119,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getGoLiveReadiness
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10014,7 +10141,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getEntitlementUsage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10044,7 +10172,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getTenantLicences
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10065,7 +10194,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getUsageMetering
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10086,7 +10216,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getLicenceEnforcement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10107,7 +10238,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setLicenceEnforcementPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10128,7 +10260,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getLicenceEnforcement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10149,7 +10282,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - addCapacityPack
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10170,7 +10304,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getBillingReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10191,7 +10326,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getEntitlementUsage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10212,7 +10348,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getUsageMetering
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10233,7 +10370,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSubscriptionInvoices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10263,7 +10401,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - generateInvoice
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10284,7 +10423,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getBillingReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10305,7 +10445,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSubscriptionInvoices
+  - recordInvoicePayment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10326,7 +10468,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - previewSubscriptionChange
+  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10347,7 +10491,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRenewalAuto
+  - setRenewalAutoMembership
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10368,7 +10514,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10389,7 +10536,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10410,7 +10558,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - cancelInvoice
+  - disputeInvoice
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10431,7 +10581,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getBillingReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12426,7 +12577,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentPerformance
+  - listPaymentMethods
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12456,7 +12609,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPaymentMethod
+  - listPaymentMethods
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12477,7 +12632,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12498,7 +12654,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12519,7 +12676,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12540,7 +12698,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12561,7 +12720,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12582,7 +12742,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12603,7 +12764,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createApprovalRequest
+  - listPaymentMethods
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12624,7 +12787,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulatePaymentConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12645,7 +12809,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentProviderHealth
+  - listPaymentProviderConnections
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12675,7 +12841,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPaymentProviderConnection
+  - listPaymentProviderConnections
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12696,7 +12864,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPaymentProviderConnection
+  - testPaymentProviderConnection
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12717,7 +12887,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPaymentProviderConnections
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12738,7 +12909,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPaymentRoutingRules
+  - setPaymentRoutingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12759,7 +12932,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentRoutingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12780,7 +12954,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentFailoverPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12801,7 +12976,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentProviderHealth
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12822,7 +12998,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentProviderEconomics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12843,7 +13020,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulatePaymentRouting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12864,7 +13042,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPaymentTerminals
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12894,7 +13073,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listDevices
+  - listPaymentTerminals
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12915,7 +13096,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - enrolDevice
+  - setPaymentTerminalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12936,7 +13119,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setDeviceAssignment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12957,7 +13141,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentTerminalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12978,7 +13163,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getDeviceTelemetry
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12999,7 +13185,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPaymentTerminals
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13020,7 +13207,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listStoredForwardTransactions
+  - setPaymentTerminalConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13041,7 +13230,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createWorkOrder
+  - getDeviceTelemetry
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13062,7 +13253,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - testPaymentProviderConnection
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13083,7 +13275,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13113,7 +13306,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPaymentMethods
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13134,7 +13329,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updatePaymentMethod
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13155,7 +13351,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createPaymentLink
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13176,7 +13373,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentLink
+  - resendPaymentLink
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13197,7 +13396,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setHostedCheckoutConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13218,7 +13418,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - inquirePaymentStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13239,7 +13440,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentAuthenticationPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13260,7 +13462,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - inquirePaymentStatus
+  - setHostedCheckoutConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13281,7 +13485,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulatePaymentConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13302,7 +13507,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMixedTenderRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13332,7 +13538,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMixedTenderRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13353,7 +13560,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMixedTenderRules
+  - setMultiPaymentSplit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13374,7 +13583,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createB2bCreditAccount
+  - listB2bCreditAccounts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13395,7 +13606,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setB2bPaymentTerms
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13416,7 +13628,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getCreditConsumptionPolicy
+  - setMixedTenderRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13437,7 +13651,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMixedTenderRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13458,7 +13673,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMixedTenderRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13479,7 +13695,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listOrderPaymentDetail
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13500,7 +13717,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listB2bCreditAccounts
+  - simulatePaymentConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13521,7 +13740,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listOrderRefunds
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13551,7 +13771,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createRefundRequest
+  - getRefundPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13595,7 +13817,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setWalletRefundPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13616,7 +13839,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - voidPayment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13637,7 +13861,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - approveRefund
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13658,7 +13883,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - inquirePaymentStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13679,7 +13905,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createRefund
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13700,7 +13927,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listOrderPaymentDetail
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13742,7 +13970,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listReconciliationSources
+  - listSettlements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13772,7 +14002,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - ingestSettlementFile
+  - setReconciliationSource
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13793,7 +14025,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setReconciliationMatchingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13814,7 +14047,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSettlementExceptions
+  - resolveSettlementException
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13835,7 +14070,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSettlements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13856,7 +14092,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentProviderEconomics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13877,7 +14114,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMerchantAccounts
+  - setMerchantAccount
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13898,7 +14137,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - recordSettlement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13919,7 +14159,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getUnifiedReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13940,7 +14181,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getUnifiedReconciliation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13961,7 +14203,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13991,7 +14234,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentRiskRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14012,7 +14256,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentRiskRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14033,7 +14278,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentRiskRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14054,7 +14300,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listChargebacks
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14075,7 +14322,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listChargebacks
+  - respondToChargeback
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14096,7 +14345,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - submitChargebackEvidence
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14117,7 +14367,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14138,7 +14389,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getPaymentPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14159,7 +14411,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulatePaymentConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14180,7 +14433,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
+  - listRecommendationStrategies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14210,7 +14465,10 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createRecommendationStrategy
+  - listRecommendationStrategies
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14231,7 +14489,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14252,7 +14511,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listProductRelationships
+  - setProductRelationships
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14273,7 +14534,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14294,7 +14556,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14315,7 +14578,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setRecommendationSuppression
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14336,7 +14601,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14357,7 +14623,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRecommendationStrategies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14378,7 +14645,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14399,7 +14667,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14429,7 +14698,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listProductRelationships
+  - setProductRelationships
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14450,7 +14721,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14471,7 +14743,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - quoteUpgrade
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14492,7 +14765,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - quoteUpgrade
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14513,7 +14787,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - quoteUpgrade
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14534,7 +14809,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14555,7 +14831,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - quoteUpgrade
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14576,7 +14854,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14597,7 +14876,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14619,6 +14899,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getRecommendationPerformance
   - listUpsellCrossSell
   states:
   - emptyFirstRun
@@ -14649,7 +14930,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setProductRelationships
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14670,7 +14952,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getProductAffinity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14691,7 +14974,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getProductAffinity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14712,7 +14996,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setProductRelationships
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14733,7 +15018,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setProductRelationships
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14754,7 +15040,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14775,7 +15062,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14796,7 +15084,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getProductAffinity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14817,7 +15106,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14838,7 +15128,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14868,7 +15159,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRecommendationStrategies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14889,7 +15181,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14910,7 +15203,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14931,7 +15225,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14952,7 +15247,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14973,7 +15269,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14994,7 +15291,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRecommendationStrategies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15015,7 +15313,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setRecommendationSuppression
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15036,7 +15335,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15057,7 +15358,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15087,7 +15389,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
+  - getGuestProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15108,7 +15412,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15129,7 +15434,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15150,7 +15456,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15171,7 +15479,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15192,7 +15501,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setRecommendationSuppression
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15213,7 +15523,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15234,7 +15545,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15255,7 +15567,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15276,7 +15589,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15306,7 +15620,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15327,7 +15642,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createRecommendationExperiment
+  - listRecommendationExperiments
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15348,7 +15665,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - concludeRecommendationExperiment
+  - listRecommendationExperiments
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15369,7 +15688,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15390,7 +15710,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getRecommendationPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15411,7 +15732,9 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listRecommendationStrategies
+  - updateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15432,7 +15755,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15453,7 +15777,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15474,7 +15799,8 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateRecommendationStrategy
   states:
   - emptyFirstRun
   - emptyNoAccess

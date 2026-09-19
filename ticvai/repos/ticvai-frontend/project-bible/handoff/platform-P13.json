@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
-  "operations": 122,
+  "operations": 140,
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 109
+  "operationsWithNoScreen": 90
  },
  "waves": {
   "wave2": 20,
@@ -50,6 +50,10 @@
    "operations": 52
   },
   {
+   "contract": "assets",
+   "operations": 26
+  },
+  {
    "contract": "white-label",
    "operations": 23
   },
@@ -58,20 +62,16 @@
    "operations": 19
   },
   {
-   "contract": "assets",
-   "operations": 10
-  },
-  {
    "contract": "maintenance",
    "operations": 7
   },
   {
-   "contract": "fnb",
-   "operations": 5
+   "contract": "identity",
+   "operations": 6
   },
   {
-   "contract": "identity",
-   "operations": 4
+   "contract": "fnb",
+   "operations": 5
   },
   {
    "contract": "orders",
@@ -625,7 +625,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/digital-asset-management-command-center-cms-061",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -634,7 +634,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/central-digital-asset-library-cms-062",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -643,7 +643,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/upload-asset-ingestion-workspace-cms-063",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -652,7 +652,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/folder-collection-workspace-management-cms-064",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -661,7 +661,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/metadata-taxonomy-management-cms-065",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -670,7 +670,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/tags-keywords-classification-cms-066",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -679,7 +679,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/advanced-search-discovery-cms-067",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -688,7 +688,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/digital-asset-360-profile-cms-068",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -697,7 +697,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/bulk-asset-management-workspace-cms-069",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -706,7 +706,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-activity-recent-assets-library-health-cms-070",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -715,7 +715,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/ai-asset-intelligence-command-center-cms-071",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -724,7 +724,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/ai-auto-tagging-content-understanding-cms-072",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -733,7 +733,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/semantic-natural-language-asset-search-cms-073",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -742,7 +742,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/visual-similarity-related-asset-discovery-cms-074",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -751,7 +751,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/duplicate-near-duplicate-management-cms-075",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -760,7 +760,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-version-control-revision-history-cms-076",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -769,7 +769,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/version-comparison-replacement-impact-cms-077",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -778,7 +778,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/transformation-rendition-management-cms-078",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -787,7 +787,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/rendition-processing-delivery-readiness-cms-079",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -796,7 +796,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/ai-quality-intelligence-review-recommendations-cms-080",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -805,7 +805,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/dam-governance-rights-command-center-cms-081",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -814,7 +814,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-ownership-responsibility-management-cms-082",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -823,7 +823,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/rights-license-usage-policy-management-cms-083",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -832,7 +832,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-approval-workflow-management-cms-084",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -841,7 +841,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/publication-eligibility-governance-validation-cms-085",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -850,7 +850,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/role-based-asset-access-permission-management-cms-086",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -859,7 +859,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/secure-internal-external-sharing-cms-087",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -868,7 +868,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/rights-expiry-renewal-usage-impact-cms-088",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -877,7 +877,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/governance-audit-trail-compliance-evidence-cms-089",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -886,7 +886,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/governance-risk-compliance-ai-recommendations-cms-090",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -895,7 +895,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-distribution-delivery-command-center-cms-091",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -904,7 +904,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-usage-distribution-map-cms-092",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -913,7 +913,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/channel-distribution-configuration-cms-093",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -922,7 +922,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -931,7 +931,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-replacement-propagation-management-cms-095",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -940,7 +940,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/fallback-expiry-distribution-continuity-cms-096",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -949,7 +949,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/dam-api-integration-hub-cms-097",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -958,7 +958,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/delivery-monitoring-integration-health-cms-098",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -967,7 +967,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-usage-performance-analytics-cms-099",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -976,7 +976,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/distribution-intelligence-ai-insights-optimization-cms-100",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   }
  ],
@@ -1085,28 +1085,64 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "setPasswordPolicy",
+    "operation": "createEmergencyAccessOverride",
     "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
-   },
-   {
-    "operation": "setSegregationRules",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Which permissions may not be held together"
-   },
-   {
-    "operation": "updateMaintenancePlan",
-    "contract": "maintenance",
-    "verb": "PATCH",
-    "summary": "Amend or suspend a plan"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Start it, or stop it"
+    "summary": "Bypass the policy, loudly"
+   },
+   {
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "addGuestNote",
@@ -1121,40 +1157,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -1169,18 +1175,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1193,34 +1187,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -1259,12 +1229,6 @@
     "summary": "Start a cart"
    },
    {
-    "operation": "createPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Send a guest a link to pay later"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -1281,12 +1245,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listChargebacks",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Open disputes, by deadline"
    },
    {
     "operation": "listFraudRules",
@@ -1325,28 +1283,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
     "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
     "summary": "Give a hold back"
-   },
-   {
-    "operation": "resendPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
-    "operation": "respondToChargeback",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Submit evidence, or accept the loss"
    },
    {
     "operation": "setFraudRules",
@@ -1355,28 +1295,10 @@
     "summary": ""
    },
    {
-    "operation": "setPaymentProvider",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Configure a gateway and its routing"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "voidPayment",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Release an authorisation before it is captured"
-   },
-   {
-    "operation": "cancelInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Cancel or credit an invoice"
    },
    {
     "operation": "cancelSubscription",
@@ -1395,12 +1317,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Tear it down"
-   },
-   {
-    "operation": "disputeInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Raise a dispute"
    },
    {
     "operation": "drainBurstEnvironment",
@@ -1451,12 +1367,6 @@
     "summary": "Tenant moves between cells"
    },
    {
-    "operation": "listVenueTypeTemplates",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Starting configurations by venue kind"
-   },
-   {
     "operation": "planTenantMigration",
     "contract": "subscription",
     "verb": "POST",
@@ -1467,12 +1377,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Move the orders into the permanent platform"
-   },
-   {
-    "operation": "recordInvoicePayment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Record payment against an invoice"
    },
    {
     "operation": "registerPartner",
@@ -1505,28 +1409,10 @@
     "summary": "Turn metered AI interactions into a billable usage record"
    },
    {
-    "operation": "submitOnboardingApplication",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "A prospect signs themselves up"
-   },
-   {
     "operation": "createBanner",
     "contract": "white-label",
     "verb": "POST",
     "summary": "Create a banner"
-   },
-   {
-    "operation": "createContentBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Author a block of content"
-   },
-   {
-    "operation": "createContentPage",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a content page"
    },
    {
     "operation": "createPromoBlock",

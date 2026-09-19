@@ -9058,10 +9058,6 @@ screens:
     contract: fnb
     purpose: Change or cancel a booking
     trigger: onAction
-  - operationId: bookResource
-    contract: resources
-    purpose: Reserve a specific resource for a window
-    trigger: onAction
   - operationId: getResourceAvailability
     contract: resources
     purpose: When it is free, with conflicts already resolved

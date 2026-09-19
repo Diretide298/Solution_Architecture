@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 44 operations
+title: identity — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -20,6 +20,18 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+- operation: createAccessPolicy
+  verb: POST
+  path: /access-policies
+  scope: tenant
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes:
+  - identity.access_policy
 - operation: createDelegatedAccess
   verb: POST
   path: /delegated-access
@@ -36,6 +48,17 @@ operations:
   - cache:idempotency
   - cache:resolution
   - identity.delegated_access
+- operation: createEmergencyAccessOverride
+  verb: POST
+  path: /access-overrides
+  scope: venue
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_override
+  writes: []
 - operation: createMfaChallenge
   verb: POST
   path: /auth/mfa/challenge
@@ -131,6 +154,17 @@ operations:
   - cache:idempotency
   - identity.mfa_method
   - identity.mfa_recovery_code
+- operation: evaluateAccess
+  verb: POST
+  path: /access-decisions
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  writes: []
 - operation: exportSubjectData
   verb: POST
   path: /guests/{subjectId}/data-export
@@ -166,6 +200,27 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+- operation: getAccessPolicy
+  verb: GET
+  path: /access-policies/{policyId}
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes: []
+- operation: getAccessPolicyBundle
+  verb: GET
+  path: /access-policies/bundle
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: true
+  reads: []
+  writes: []
 - operation: getCurrentSession
   verb: GET
   path: /auth/session
@@ -295,6 +350,50 @@ operations:
   - cache:idempotency
   - orders.sales_order
   - pii.subject
+- operation: listAccessDecisions
+  verb: GET
+  path: /access-decisions/audit
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  writes: []
+- operation: listAccessPolicies
+  verb: GET
+  path: /access-policies
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes: []
+- operation: listAccessPolicyHistory
+  verb: GET
+  path: /access-policies/{policyId}/history
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy_version
+  writes: []
+- operation: listAccessPolicyTemplates
+  verb: GET
+  path: /access-policy-templates
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes: []
 - operation: listActiveSessions
   verb: GET
   path: /auth/sessions
@@ -526,6 +625,17 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+- operation: setAccessPolicyState
+  verb: POST
+  path: /access-policies/{policyId}/state
+  scope: tenant
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes: []
 - operation: setPasswordPolicy
   verb: PUT
   path: /password-policy
@@ -571,6 +681,18 @@ operations:
   - cache:idempotency
   - identity.sso_group_mapping
   - identity.sso_provider
+- operation: simulateAccessPolicy
+  verb: POST
+  path: /access-policies/simulate
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  writes:
+  - identity.access_policy
 - operation: startSsoAuthorization
   verb: GET
   path: /auth/sso/{providerId}/authorize
@@ -582,6 +704,18 @@ operations:
   reads:
   - identity.sso_provider
   writes: []
+- operation: updateAccessPolicy
+  verb: PUT
+  path: /access-policies/{policyId}
+  scope: tenant
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_policy
+  writes:
+  - identity.access_policy
 - operation: updatePrincipal
   verb: PATCH
   path: /principals/{principalId}

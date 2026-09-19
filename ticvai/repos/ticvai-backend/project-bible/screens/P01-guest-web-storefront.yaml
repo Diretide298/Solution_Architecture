@@ -5115,10 +5115,6 @@ screens:
     trigger: onAction
     invalidates:
     - listReservations
-  - operationId: bookResource
-    contract: resources
-    purpose: Book a cabana or similar
-    trigger: onAction
   - operationId: getGroupBooking
     contract: orders
     purpose: A group booking this guest belongs to

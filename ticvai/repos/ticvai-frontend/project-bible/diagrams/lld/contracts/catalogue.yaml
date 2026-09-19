@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 176 operations
+title: catalogue — 192 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -66,6 +66,16 @@ operations:
   - orders.cart
   - orders.sales_order
   writes: []
+- operation: assignSessionMedia
+  verb: POST
+  path: /sessions/{sessionId}/media
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: bulkChangePrices
   verb: POST
   path: /products/bulk-price
@@ -97,6 +107,16 @@ operations:
   - cache:idempotency
   - catalogue.performance
   - platform.outbox
+- operation: cloneEvent
+  verb: POST
+  path: /events/{eventId}/clone
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: cloneProduct
   verb: POST
   path: /products/{productId}/clone
@@ -338,6 +358,17 @@ operations:
   offline: false
   reads:
   - catalogue.event
+  writes: []
+- operation: getEventResourcePlan
+  verb: GET
+  path: /events/{eventId}/resource-plan
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_resource_plan
   writes: []
 - operation: getLatestBundle
   verb: GET
@@ -802,6 +833,17 @@ operations:
   offline: true
   reads:
   - catalogue.entitlement_template
+  writes: []
+- operation: listEventTypes
+  verb: GET
+  path: /event-types
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_type
   writes: []
 - operation: listEvents
   verb: GET
@@ -1366,6 +1408,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listSessionTemplates
+  verb: GET
+  path: /session-templates
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.session_template
+  writes: []
 - operation: listSignalDataQuality
   verb: GET
   path: /signal-data-quality
@@ -1375,6 +1428,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listSpaces
+  verb: GET
+  path: /spaces
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.space
   writes: []
 - operation: listTaxFeeCalculation
   verb: GET
@@ -1580,6 +1644,18 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.published_bundle
+- operation: rescheduleEvent
+  verb: POST
+  path: /events/{eventId}/reschedule
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_reschedule
+  writes:
+  - catalogue.event_reschedule
 - operation: resolveProductByCode
   verb: GET
   path: /products/resolve
@@ -1711,6 +1787,76 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setEventCapacityProfile
+  verb: PUT
+  path: /events/{eventId}/capacity-profile
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_capacity_profile
+  writes:
+  - catalogue.event_capacity_profile
+- operation: setEventLifecycleState
+  verb: POST
+  path: /events/{eventId}/lifecycle
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setEventRegistration
+  verb: PUT
+  path: /events/{eventId}/registration
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_registration
+  writes:
+  - catalogue.event_registration
+- operation: setEventResourcePlan
+  verb: PUT
+  path: /events/{eventId}/resource-plan
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_resource_plan
+  writes:
+  - catalogue.event_resource_plan
+- operation: setEventSchedule
+  verb: PUT
+  path: /events/{eventId}/schedule
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_schedule
+  writes:
+  - catalogue.event_schedule
+- operation: setEventType
+  verb: PUT
+  path: /event-types
+  scope: tenant
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_type
+  writes:
+  - catalogue.event_type
 - operation: setFeeApplicabilityCharging
   verb: PUT
   path: /fee-applicability-charging
@@ -1731,6 +1877,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setPrepaidMinutePackage
+  verb: PUT
+  path: /prepaid-minute-packages
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.prepaid_minutes
+  writes:
+  - catalogue.prepaid_minutes
 - operation: setPriceHierarchyInheritance
   verb: PUT
   path: /price-hierarchy-inheritance
@@ -1867,6 +2025,30 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setSessionTemplate
+  verb: PUT
+  path: /session-templates
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.session_template
+  writes:
+  - catalogue.session_template
+- operation: setSpace
+  verb: PUT
+  path: /spaces
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.space
+  writes:
+  - catalogue.space
 - operation: setTaxProfileJurisdiction
   verb: PUT
   path: /tax-profile-jurisdiction

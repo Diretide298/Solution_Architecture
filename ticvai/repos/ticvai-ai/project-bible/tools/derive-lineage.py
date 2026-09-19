@@ -72,20 +72,45 @@ def tables_in(node, persist: dict) -> list:
     return sorted({persist[r] for r in refs if r in persist})
 
 
+# **A contract with no stored entry needs a person, and on 19 September five arrived at once.**
+# The inference below reads the service off a contract's existing neighbours, which cannot work for
+# a contract that has none — `derive-diagrams.py` then sorted a set containing `None` and stopped
+# the whole refresh. These are the decisions, made once, in the same terms the existing ones use.
+NEW_CONTRACT_SERVICE = {
+    # Rental is venue floor operations — check-out, condition, return — beside `resources`,
+    # `maintenance` and `games`, which are all VenueOps.
+    "rental": "VenueOpsService",
+    # Wallet configuration is stored value, which is Retail's: `retail` already owns the balance,
+    # the transactions and the gift cards, and splitting the configuration onto another service
+    # would put the rules a different side of a network boundary from the money.
+    "wallet": "RetailService",
+    # Payment orchestration routes and settles, which is the Order service's existing work —
+    # `createPayment` and `capturePayment` are already there.
+    "payments": "OrderService",
+    # Accreditation grants places and times and is enforced at gates, so it sits with `access`
+    # rather than with identity: the read that matters happens at a turnstile.
+    "accreditation": "AccessService",
+}
+
+
 def service_by_contract(stored: dict) -> dict:
     """Which service serves each contract, taken from the entries that already exist.
 
     **`service` is a deployment decision, not a contract fact**, so it cannot be read off the
     OpenAPI — and `derive-diagrams.py` indexes screens by it and raises `KeyError` without it.
     Every contract in the package already has operations assigned to a service, so the answer is
-    the service its neighbours use; a contract with no stored entry at all would need a person.
+    the service its neighbours use; a contract with no stored entry at all is in
+    `NEW_CONTRACT_SERVICE` above.
     """
     import collections
     by = collections.defaultdict(collections.Counter)
     for v in stored.values():
         if v.get("service"):
             by[v.get("contract")][v["service"]] += 1
-    return {c: n.most_common(1)[0][0] for c, n in by.items()}
+    out = {c: n.most_common(1)[0][0] for c, n in by.items()}
+    for c, s in NEW_CONTRACT_SERVICE.items():
+        out.setdefault(c, s)
+    return out
 
 
 def stores_by_contract(stored: dict) -> dict:
@@ -95,7 +120,13 @@ def stores_by_contract(stored: dict) -> dict:
     for v in stored.values():
         for st in (v.get("stores") or []):
             by[v.get("contract")][st] += 1
-    return {c: sorted(n) for c, n in by.items()}
+    out = {c: sorted(n) for c, n in by.items()}
+    # Same gap as the service, and the same fix: a brand-new contract has no neighbours to read
+    # from. Every one of the five writes relational state and caches, which is what every other
+    # contract in the package does.
+    for c in NEW_CONTRACT_SERVICE:
+        out.setdefault(c, ["postgres", "redis"])
+    return out
 
 
 def derive(stored: dict) -> dict:
@@ -170,10 +201,30 @@ def main() -> int:
                     print("     ~ %-30s %s" % (o, ", ".join(bad)))
         print("  entries whose stored value differs from the contract  %d" % diffs)
 
+    # **`--apply` adds and never updates, which is right and has one sharp edge.** An operation
+    # written once with a null `service` keeps it forever: the next run sees the key present and
+    # leaves it alone. On 19 September that happened to 133 operations across four new contracts,
+    # and `derive-diagrams.py` then sorted a set containing `None` and stopped the whole refresh —
+    # twice, because re-running the pipeline could not repair what re-running does not touch.
+    #
+    # So a null `service` or empty `stores` is repairable in place. Nothing else is: a stored value
+    # that disagrees with the contract is a judgement somebody made, and `--audit` reports it
+    # rather than overwriting it.
+    repaired = 0
+    if a.apply:
+        for o in sorted(set(stored) & set(fresh)):
+            if not stored[o].get("service") and fresh[o].get("service"):
+                stored[o]["service"] = fresh[o]["service"]
+                repaired += 1
+            if not stored[o].get("stores") and fresh[o].get("stores"):
+                stored[o]["stores"] = fresh[o]["stores"]
+    if repaired:
+        print("  repaired %d entry(s) that had no service" % repaired)
+
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    if not missing:
+    if not missing and not repaired:
         print("  nothing to add")
         return 0
     for o in missing:

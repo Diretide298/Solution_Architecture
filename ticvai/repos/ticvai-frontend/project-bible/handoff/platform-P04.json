@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 166
+  "operationsWithNoScreen": 124
  },
  "waves": {
   "wave1": 27,
@@ -514,12 +514,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "getUnifiedReconciliation",
-    "contract": "finance",
-    "verb": "GET",
-    "summary": "Every money source against the ledger, in one view"
-   },
-   {
     "operation": "ingestFxRates",
     "contract": "finance",
     "verb": "POST",
@@ -530,18 +524,6 @@
     "contract": "finance",
     "verb": "GET",
     "summary": "What one entity owes another"
-   },
-   {
-    "operation": "recordDeposit",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Money taken before the sale is complete"
-   },
-   {
-    "operation": "recordSettlement",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "One entity paid another"
    },
    {
     "operation": "recordWriteOff",
@@ -688,52 +670,76 @@
     "summary": "Register a game"
    },
    {
-    "operation": "createPrize",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Add a prize"
-   },
-   {
-    "operation": "listPrizes",
-    "contract": "games",
-    "verb": "GET",
-    "summary": "The prize catalogue"
-   },
-   {
-    "operation": "redeemPrize",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Redeem points for a prize"
-   },
-   {
     "operation": "transferGameCard",
     "contract": "games",
     "verb": "POST",
     "summary": "Move balances to another card"
    },
    {
-    "operation": "setPasswordPolicy",
+    "operation": "createEmergencyAccessOverride",
     "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
+    "verb": "POST",
+    "summary": "Bypass the policy, loudly"
    },
    {
-    "operation": "setSegregationRules",
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
     "contract": "identity",
     "verb": "PUT",
-    "summary": "Which permissions may not be held together"
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "submitCountLines",
     "contract": "inventory",
     "verb": "POST",
     "summary": "Submit counted quantities"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Start it, or stop it"
    },
    {
     "operation": "addGuestNote",
@@ -748,40 +754,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -796,18 +772,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -820,34 +784,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -886,12 +826,6 @@
     "summary": "Start a cart"
    },
    {
-    "operation": "createPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Send a guest a link to pay later"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -908,12 +842,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listChargebacks",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Open disputes, by deadline"
    },
    {
     "operation": "listFraudRules",
@@ -952,28 +880,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
     "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
     "summary": "Give a hold back"
-   },
-   {
-    "operation": "resendPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
-    "operation": "respondToChargeback",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Submit evidence, or accept the loss"
    },
    {
     "operation": "setFraudRules",
@@ -982,22 +892,10 @@
     "summary": ""
    },
    {
-    "operation": "setPaymentProvider",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Configure a gateway and its routing"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "voidPayment",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Release an authorisation before it is captured"
    },
    {
     "operation": "assignCoupon",
@@ -1048,6 +946,12 @@
     "summary": "Preview how an amount divides"
    },
    {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   },
+   {
     "operation": "redeemVoucher",
     "contract": "promotions",
     "verb": "POST",
@@ -1096,70 +1000,16 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
    },
    {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "updateReportSchedule",
     "contract": "reporting",
     "verb": "PATCH",
     "summary": "Amend, pause or resume a schedule"
-   },
-   {
-    "operation": "activateGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Activate a card at the point of sale"
-   },
-   {
-    "operation": "adjustWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Manually adjust a wallet balance"
    },
    {
     "operation": "blockGiftCard",
@@ -1210,12 +1060,6 @@
     "summary": "Dispose of an uncollected item"
    },
    {
-    "operation": "issueGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Issue or activate a gift card"
-   },
-   {
     "operation": "listRetailReturns",
     "contract": "retail",
     "verb": "GET",
@@ -1240,108 +1084,6 @@
     "summary": "Freeze a wallet"
    },
    {
-    "operation": "topUpWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Add value to a wallet"
-   },
-   {
-    "operation": "assignSeats",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Pick and hold the best available seats"
-   },
-   {
-    "operation": "cloneSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Clone a map, optionally into another venue"
-   },
-   {
-    "operation": "commitImportJob",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Apply a parsed import"
-   },
-   {
-    "operation": "copySeatMapSection",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Copy one section into another map"
-   },
-   {
-    "operation": "createSeatCategory",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Create a seat category"
-   },
-   {
-    "operation": "createSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Create a seat map"
-   },
-   {
-    "operation": "createSeatMapTemplate",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Save a map as a reusable template"
-   },
-   {
-    "operation": "diffSeatMapVersions",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Compare two versions of a layout"
-   },
-   {
-    "operation": "getImportJob",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Import progress and findings"
-   },
-   {
-    "operation": "getSeatMap",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Read a seat map with its structure"
-   },
-   {
-    "operation": "getSeatMapImport",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "How the import went"
-   },
-   {
-    "operation": "getSeatingRules",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Read seating rules"
-   },
-   {
-    "operation": "importSeatGeometry",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import seat geometry from a plan"
-   },
-   {
-    "operation": "importSeatManifest",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import the logical seat structure"
-   },
-   {
-    "operation": "importSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import a seat map from a plan or a manifest"
-   },
-   {
-    "operation": "publishSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Validate and publish a seat map"
-   },
-   {
     "operation": "releaseSeatBlock",
     "contract": "seating",
     "verb": "DELETE",
@@ -1354,46 +1096,52 @@
     "summary": "Release a hold"
    },
    {
-    "operation": "setMapZones",
-    "contract": "seating",
-    "verb": "PUT",
-    "summary": "Standing areas, suites, stages and obstructions"
-   },
-   {
-    "operation": "setSeatingRules",
-    "contract": "seating",
-    "verb": "PUT",
-    "summary": "Set seating rules"
-   },
-   {
-    "operation": "updateSeatMap",
-    "contract": "seating",
-    "verb": "PATCH",
-    "summary": "Rename or amend a seat map"
-   },
-   {
-    "operation": "updateSeats",
-    "contract": "seating",
-    "verb": "PATCH",
-    "summary": "Bulk-amend seats"
-   },
-   {
-    "operation": "validateSeatMap",
-    "contract": "seating",
+    "operation": "issueDeviceCredential",
+    "contract": "tenancy",
     "verb": "POST",
-    "summary": "Run validation without publishing"
+    "summary": "Give the device an identity it can prove"
    },
    {
-    "operation": "getRegionSettings",
+    "operation": "listDeviceAuditRecords",
     "contract": "tenancy",
     "verb": "GET",
-    "summary": "Read region settings"
+    "summary": "What was done to this device, and what it did"
    },
    {
-    "operation": "updateRegionSettings",
+    "operation": "listDeviceFirmware",
     "contract": "tenancy",
-    "verb": "PUT",
-    "summary": "Update region settings"
+    "verb": "GET",
+    "summary": "Firmware and software versions, and what is running where"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
+   },
+   {
+    "operation": "revokeDeviceCredential",
+    "contract": "tenancy",
+    "verb": "DELETE",
+    "summary": "Cut a device off now"
+   },
+   {
+    "operation": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Put the fleet back on the previous version"
+   },
+   {
+    "operation": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Push an update to a fleet, in waves"
    },
    {
     "operation": "broadcastToGuests",

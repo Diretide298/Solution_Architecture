@@ -3,14 +3,14 @@
  "generated": "2026-09-19",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 1628,
-  "contracts": 28,
-  "tables": 388,
+  "operations": 1974,
+  "contracts": 32,
+  "tables": 556,
   "stores": 5,
-  "foreignKeys": 569,
-  "indexes": 279,
-  "tablesWritten": 384,
-  "relationships": 978,
+  "foreignKeys": 571,
+  "indexes": 613,
+  "tablesWritten": 552,
+  "relationships": 1158,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -26,15 +26,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1052,
-    "total": 1635,
-    "percent": 64,
+    "done": 1334,
+    "total": 1981,
+    "percent": 67,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 1628,
-    "total": 1628,
+    "done": 1974,
+    "total": 1974,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -62,29 +62,29 @@
    {
     "name": "Contracts touched by a flow",
     "done": 28,
-    "total": 28,
-    "percent": 100,
+    "total": 32,
+    "percent": 88,
     "note": "Every contract appears in at least one journey."
    },
    {
     "name": "State models",
     "done": 125,
-    "total": 133,
-    "percent": 94,
+    "total": 173,
+    "percent": 72,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 376,
-    "total": 397,
-    "percent": 95,
+    "done": 491,
+    "total": 565,
+    "percent": 87,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 1145,
+    "done": 2265,
     "total": 2427,
-    "percent": 47,
+    "percent": 93,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -103,9 +103,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 1392,
-    "total": 1628,
-    "percent": 86,
+    "done": 1786,
+    "total": 1974,
+    "percent": 90,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {
@@ -126,8 +126,8 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 384,
-    "total": 388,
+    "done": 552,
+    "total": 556,
     "percent": 99,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
@@ -172,7 +172,7 @@
   }
  },
  "headline": {
-  "design": 84,
+  "design": 91,
   "build": 33
  },
  "waves": {

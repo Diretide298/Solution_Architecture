@@ -1,74 +1,53 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
+  "id": "EMP-001",
+  "name": "Sign in",
+  "module": "Operations",
+  "requiresModule": "core",
   "wave": 1,
-  "capability": "C36",
+  "capability": "C00",
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/sign-in",
+   "component": "apps/venue-staff-app/src/routes/operations/SignInDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "entryFrom": [
-    "WEB-001"
+   "exitTo": [
+    "EMP-002",
+    "EMP-003",
+    "EMP-048"
    ],
    "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
-   ],
+   "fromFlows": true,
+   "isEntryPoint": true,
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "to": "EMP-002",
+     "trigger": "Selects venue and role",
+     "provenance": "flow F08 step 1→2, F64 step 1→2"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "provenance": "structural — EMP-001 is P06's home screen and its exits are its launcher"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "to": "EMP-048",
+     "trigger": "Opening checklist",
+     "provenance": "structural — EMP-001 is P06's home screen and its exits are its launcher"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Sign in.** A shared device between shifts shows nothing until somebody identifies themselves. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Removed 24 August**: forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**",
+  "density": "comfortable",
   "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "patternReason": "`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act",
+  "purpose": "Get an employee onto a shared device fast.",
   "gaps": [
    {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getGuestSession",
+    "why": "**2 declared operations reach no component on this screen**: getGuestSession, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -81,7 +60,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every login register",
+       "label": "Every sign",
        "bindsTo": "MfaMethod",
        "columns": [
         "MfaMethod.id",
@@ -104,21 +83,23 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
+       "label": "The selected sign",
+       "bindsTo": "Session",
        "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
        ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
       }
      ]
     },
@@ -128,145 +109,60 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Login",
        "operation": "login",
        "provenance": "contract identity.yaml POST /auth/login"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMfaMethods",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "login",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
   "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "loading": "The sign list.",
+   "error": "Could not load. Names which read failed and leaves the sign untouched.",
+   "emptyFirstRun": "No sign yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sign are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
+   "offline": "Signs in against the cached principal list. A technician in a basement still needs their tasks"
   },
   "apis": [
    {
-    "operationId": "registerGuest",
+    "operationId": "login",
     "contract": "identity",
-    "purpose": "from page inventory",
+    "purpose": "From the flow it appears in",
     "trigger": "onLoad"
    },
    {
-    "operationId": "completeSsoAuthorization",
+    "operationId": "getCurrentSession",
     "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
    },
    {
     "operationId": "getGuestSession",
@@ -275,40 +171,232 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "guestLogout",
+    "operationId": "listMfaMethods",
     "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
    },
    {
-    "operationId": "guestSocialLogin",
+    "operationId": "listSsoProviders",
     "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Session.sessionId",
+    "Session.principalId",
+    "Session.roleId",
+    "Session.displayName",
+    "Session.scope"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-002",
+  "name": "Select venue & role",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/select-venue-role",
+   "component": "apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-003",
+    "EMP-048"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "EMP-048",
+     "trigger": "Works the opening checklist",
+     "provenance": "flow F08 step 2→3, F64 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught by F08.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act",
+  "purpose": "Confirm which hat this person is wearing today.",
+  "gaps": [
+   {
+    "operation": "getGuestSession",
+    "why": "**3 declared operations reach no component on this screen**: getGuestSession, listSsoProviders, listRoles. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every select venue role",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected select venue role",
+       "bindsTo": "Session",
+       "columns": [
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
+       ],
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Select",
+       "operation": "selectRole",
+       "provenance": "contract identity.yaml POST /auth/select-role"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMfaMethods",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "selectRole",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The select venue role list.",
+   "error": "Could not load. Names which read failed and leaves the select venue role untouched.",
+   "emptyFirstRun": "No select venue role yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the select venue role are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached from the last session"
+  },
+  "apis": [
+   {
+    "operationId": "selectRole",
+    "contract": "identity",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
    },
    {
-    "operationId": "guestUaePassLogin",
+    "operationId": "getCurrentSession",
     "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
    },
    {
-    "operationId": "linkGuestCheckout",
+    "operationId": "getGuestSession",
     "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
    },
    {
     "operationId": "listMfaMethods",
@@ -323,298 +411,498 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "login",
+    "operationId": "listRoles",
     "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
+    "purpose": "Roles this principal may take",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "cartId",
+     "name": "sessionId",
      "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
+    "Session.sessionId",
+    "Session.principalId",
+    "Session.roleId",
+    "Session.displayName",
+    "Session.scope"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-002"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
+  "id": "EMP-003",
+  "name": "Home — on duty",
+  "module": "Operations",
+  "requiresModule": "maintenance",
   "wave": 1,
-  "capability": "C36",
+  "capability": "C00",
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/home-on-duty",
+   "component": "apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "entryFrom": [
-    "WEB-001"
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-004",
+    "EMP-048",
+    "EMP-051",
+    "EMP-052",
+    "EMP-053",
+    "EMP-054",
+    "EMP-055",
+    "EMP-056",
+    "EMP-057",
+    "EMP-058",
+    "EMP-059",
+    "EMP-060",
+    "EMP-061",
+    "EMP-062",
+    "EMP-063",
+    "EMP-064",
+    "EMP-065",
+    "EMP-066",
+    "EMP-067",
+    "EMP-068",
+    "EMP-069",
+    "EMP-070",
+    "EMP-071",
+    "EMP-081",
+    "EMP-091"
    ],
    "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
+   "fromFlows": true,
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "to": "EMP-004",
+     "trigger": "Works the task list",
+     "provenance": "flow F08 step 4→5"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
+     "to": "EMP-001",
+     "trigger": "Sign in",
      "carries": [
-      "entitlementId",
-      "orderId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
      "carries": [
-      "orderId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-051",
+     "trigger": "Restaurant Service Command Center",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-051 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-052",
+     "trigger": "Floor Plan & Table Map",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-052 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-053",
+     "trigger": "Table & Seating Configuration",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-053 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-054",
+     "trigger": "Reservation Calendar & Timeline",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-054 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-055",
+     "trigger": "Create / Edit Reservation",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-055 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-056",
+     "trigger": "Walk-In & Waitlist Management",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-056 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-057",
+     "trigger": "Guest Profile & Dining History",
+     "carries": [
+      "subjectId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-057 declares entryState.params subjectId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-058",
+     "trigger": "Live Table & Service Management",
+     "carries": [
+      "entryId",
+      "outletId",
+      "reservationId",
+      "ticketId",
+      "venueId",
+      "visitId"
+     ],
+     "provenance": "derived — EMP-058 declares entryState.params entryId, outletId, reservationId, ticketId, venueId, visitId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-059",
+     "trigger": "Table Order, Bill & Payment Management",
+     "carries": [
+      "venueId",
+      "visitId"
+     ],
+     "provenance": "derived — EMP-059 declares entryState.params venueId, visitId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-060",
+     "trigger": "Reservation & Table Performance",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-060 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-061",
+     "trigger": "Retail Inventory Command Center",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-061 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-062",
+     "trigger": "Store Stock & SKU Availability",
+     "carries": [
+      "itemId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-062 declares entryState.params itemId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-063",
+     "trigger": "Requisition & Smart Store Replenishment",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-063 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-064",
+     "trigger": "Store-to-Store & Warehouse Transfers",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-064 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-065",
+     "trigger": "Receiving & Store Put-Away",
+     "carries": [
+      "receiptId",
+      "transferId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-065 declares entryState.params receiptId, transferId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-066",
+     "trigger": "Stock Count & Cycle Count Management",
+     "carries": [
+      "countId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-066 declares entryState.params countId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-067",
+     "trigger": "Damage, Loss, Shrinkage & Stock Adjustment",
+     "carries": [
+      "actionId",
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-067 declares entryState.params actionId, outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-068",
+     "trigger": "Reservation, Allocation & Omnichannel Inventory",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-068 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-069",
+     "trigger": "Barcode, RFID, Serialized Stock & Traceability",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — EMP-069 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-070",
+     "trigger": "Inventory Exceptions, AI Replenishment & Action Center",
+     "carries": [
+      "alertId",
+      "venueId"
+     ],
+     "provenance": "derived — EMP-070 declares entryState.params alertId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-071",
+     "trigger": "Rental Checkout Command Center",
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+    },
+    {
+     "to": "EMP-081",
+     "trigger": "Active Rental Operations Command Center",
+     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026"
+    },
+    {
+     "to": "EMP-091",
+     "trigger": "Rental Return Command Center",
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
     }
+   ],
+   "entryFrom": [
+    "EMP-071",
+    "EMP-081",
+    "EMP-091"
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "density": "comfortable",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listIncidents` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "The screen the device sits on between tasks.",
+  "gaps": [
+   {
+    "operation": "getIncident",
+    "why": "**4 declared operations reach no component on this screen**: getIncident, getShift, listCashMovements, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
   ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "queue",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
+       "label": "Waiting for a decision",
+       "bindsTo": "Incident",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId"
        ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
+     "slot": "item",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
+       "label": "The selected home duty",
+       "bindsTo": "Shift",
        "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
        ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "decision",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "label": "Accept",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
       },
       {
        "kind": "secondaryButton",
        "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "operation": "recordAuthorityNotification",
+       "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
       },
       {
        "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+       "label": "Record",
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Report",
+       "operation": "reportIncident",
+       "provenance": "contract maintenance.yaml POST /incidents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateIncident",
+       "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listIncidents",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "label": "Accept shift variance",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -622,227 +910,272 @@
   },
   "overlays": [
    {
-    "id": "confirmRemoveFromWishlist",
+    "id": "confirmCloseShift",
     "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "trigger": "Close",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A home duty this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
    },
    {
-    "id": "confirmRevokeGuestDevice",
+    "id": "confirmSuspendShift",
     "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A home duty this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
    }
   ],
   "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "loading": "The home duty list.",
+   "error": "Could not load. Names which read failed and leaves the home duty untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the home duty are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "Last synced view, with its age. The pending count is always current because it is local"
   },
   "apis": [
    {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "From the flow it appears in",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
+    "operationId": "listIncidents",
+    "contract": "maintenance",
+    "purpose": "From the flow it appears in",
     "trigger": "onLoad"
    },
    {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
     "trigger": "onAction",
     "invalidates": [
-     "listGuestDevices"
+     "listIncidents"
     ]
    },
    {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
     "trigger": "onAction",
     "invalidates": [
-     "listGuestDevices"
+     "listIncidents"
     ]
    },
    {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
     "trigger": "onAction",
     "invalidates": [
-     "listGuestDevices"
+     "listIncidents"
     ]
    },
    {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
+    "operationId": "getIncident",
+    "contract": "maintenance",
+    "purpose": "Read an incident",
     "trigger": "onLoad"
    },
    {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "recordAuthorityNotification",
+    "contract": "maintenance",
+    "purpose": "Record notification to an external authority",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "reportIncident",
+    "contract": "maintenance",
+    "purpose": "Report an incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
+   },
+   {
+    "operationId": "updateIncident",
+    "contract": "maintenance",
+    "purpose": "Investigate, escalate or close an incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIncidents"
+    ]
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "deviceId",
+     "name": "incidentId",
      "from": "deepLink"
     },
     {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
+     "name": "shiftId",
      "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
    "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
+  "id": "EMP-009",
+  "name": "End shift",
+  "module": "Operations",
+  "requiresModule": "core",
   "wave": 1,
-  "capability": "C09",
+  "capability": "C00",
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/end-shift",
+   "component": "apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "entryFrom": [
-    "WEB-001"
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
    ],
    "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
+   "entryFrom": [
+    "EMP-017"
    ],
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "EMP-001",
+     "trigger": "Sign in",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
      "carries": [
-      "orderId"
+      "incidentId",
+      "shiftId"
      ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Close out cleanly, including anything unsynced.",
   "gaps": [
    {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getShift",
+    "why": "**2 declared operations reach no component on this screen**: getShift, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -851,586 +1184,118 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "queue",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
+       "label": "Waiting for a decision",
+       "bindsTo": "CashMovement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
        ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
       }
      ]
     },
     {
      "name": "contextPanel",
-     "slot": "selection",
+     "slot": "item",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
+       "label": "The selected end shift",
+       "bindsTo": "Shift",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
        ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "decision",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
-  },
-  "apis": [
-   {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
-   "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Accept",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
       {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
       {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+       "kind": "secondaryButton",
+       "label": "Open",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
       },
       {
        "kind": "secondaryButton",
        "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
       },
       {
        "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+       "label": "Reopen",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
       }
      ]
     },
@@ -1439,16 +1304,14 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
        "provenance": "carried from the previous definition"
       },
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listConsentPurposes",
+       "impliedBy": "listCashMovements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
        "provenance": "carried from the previous definition"
       },
@@ -1457,7 +1320,2055 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "updateMyProfile",
+       "impliedBy": "closeShift",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseShift",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+   },
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   }
+  ],
+  "states": {
+   "loading": "The end shift list.",
+   "error": "Could not load. Names which read failed and leaves the end shift untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the end shift are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Cannot close.** Closing needs the server total, and a locally computed variance is not a variance"
+  },
+  "apis": [
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-009"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-010",
+  "name": "Scan — ready",
+  "module": "Operations",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/scan-ready",
+   "component": "apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Absorbed EMP-011, EMP-012, EMP-013, EMP-016 on 18 August.** A scanner is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted` for something gone in 1.5 seconds is a page load per guest**, and at a gate doing 40 a minute that is the whole problem. Every absorbed screen kept its copy as a named state.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act",
+  "purpose": "The raised centre action, and the thing this app is for.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every scan ready",
+       "bindsTo": "ScanEvent",
+       "columns": [
+        "ScanEvent.id",
+        "ScanEvent.accessPointId",
+        "ScanEvent.venueId",
+        "ScanEvent.scopePath",
+        "ScanEvent.ticketId",
+        "ScanEvent.mediaCode",
+        "ScanEvent.outcome",
+        "ScanEvent.denyReason",
+        "ScanEvent.direction",
+        "ScanEvent.operatorPrincipalId",
+        "ScanEvent.deviceId",
+        "ScanEvent.overriddenByPrincipalId"
+       ],
+       "operation": "listScans",
+       "provenance": "contract access.yaml GET /access/scans"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected scan ready",
+       "bindsTo": "OfflinePackage",
+       "columns": [
+        "OfflinePackage.generatedAt",
+        "OfflinePackage.validFrom",
+        "OfflinePackage.validTo",
+        "OfflinePackage.accessPointId",
+        "OfflinePackage.entitlements",
+        "OfflinePackage.delegatedRights",
+        "OfflinePackage.blacklist",
+        "OfflinePackage.admissionRules"
+       ],
+       "operation": "getOfflinePackage",
+       "provenance": "contract access.yaml GET /access/offline-package"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sync",
+       "operation": "syncScans",
+       "provenance": "contract access.yaml POST /access/scans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupTicket",
+       "provenance": "contract access.yaml GET /access/lookup"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Override",
+       "operation": "overrideAccess",
+       "provenance": "contract access.yaml POST /access/override"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateAccess",
+       "provenance": "contract access.yaml POST /access/validate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateGroupAccess",
+       "provenance": "contract access.yaml POST /access/group-validate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "listScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupTicket",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "syncScans",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmOverrideAccess",
+    "component": "confirmDialog",
+    "trigger": "Override",
+    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan ready this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml POST /access/override"
+   }
+  ],
+  "states": {
+   "loading": "The scan ready list.",
+   "error": "Could not load. Names which read failed and leaves the scan ready untouched.",
+   "emptyFirstRun": "No scan ready yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the scan ready are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Keep working when the network does not.** The screen already had an `offline` state."
+  },
+  "apis": [
+   {
+    "operationId": "listScans",
+    "contract": "access",
+    "purpose": "List scan events",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "syncScans",
+    "contract": "access",
+    "purpose": "Replay scans recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "getOfflinePackage",
+    "contract": "access",
+    "purpose": "Entitlement and rule set for offline validation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupTicket",
+    "contract": "access",
+    "purpose": "Read-only validity check without admitting",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "overrideAccess",
+    "contract": "access",
+    "purpose": "Admit against a failed validation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "validateAccess",
+    "contract": "access",
+    "purpose": "Validate media at an access point and admit or deny",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "validateGroupAccess",
+    "contract": "access",
+    "purpose": "Admit a group on one read",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OfflinePackage.generatedAt",
+    "OfflinePackage.validFrom",
+    "OfflinePackage.validTo",
+    "OfflinePackage.accessPointId",
+    "OfflinePackage.entitlements"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-010"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-004",
+  "name": "Task list",
+  "module": "Operations",
+  "requiresModule": "maintenance",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/task-list",
+   "component": "apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-005"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "EMP-005",
+     "trigger": "Completes a task",
+     "provenance": "flow F08 step 5→6, F12 step 2→3, F65 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ],
+   "entryFrom": [
+    "EMP-006"
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createWorkOrder. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act",
+  "purpose": "See what is assigned, and what is overdue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every task list",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.downtimeMinutes",
+        "WorkOrder.rootCause",
+        "WorkOrder.rootCauseNote",
+        "WorkOrder.escalatedAt",
+        "WorkOrder.escalationLevel",
+        "WorkOrder.id",
+        "WorkOrder.workOrderNumber",
+        "WorkOrder.title",
+        "WorkOrder.venueId",
+        "WorkOrder.assetId",
+        "WorkOrder.assetName",
+        "WorkOrder.status"
+       ],
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected task list",
+       "bindsTo": "WorkOrderDetail",
+       "columns": [
+        "WorkOrderDetail.downtimeMinutes",
+        "WorkOrderDetail.rootCause",
+        "WorkOrderDetail.rootCauseNote",
+        "WorkOrderDetail.escalatedAt",
+        "WorkOrderDetail.escalationLevel",
+        "WorkOrderDetail.id",
+        "WorkOrderDetail.workOrderNumber",
+        "WorkOrderDetail.title",
+        "WorkOrderDetail.venueId",
+        "WorkOrderDetail.assetId",
+        "WorkOrderDetail.assetName",
+        "WorkOrderDetail.status",
+        "WorkOrderDetail.priority",
+        "WorkOrderDetail.kind",
+        "WorkOrderDetail.assignedToPrincipalId",
+        "WorkOrderDetail.raisedByPrincipalId"
+       ],
+       "operation": "getWorkOrder",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "acceptWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/accept"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attach",
+       "operation": "attachWorkOrderEvidence",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderParts",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/parts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderTime",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/start"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateWorkOrder",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "acceptWorkOrder",
+       "label": "Accept work order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelWorkOrder",
+       "label": "Cancel work order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acceptWorkOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRejectWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+   },
+   {
+    "id": "confirmCancelWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+   },
+   {
+    "id": "confirmCloseWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+   }
+  ],
+  "states": {
+   "loading": "The task list list.",
+   "error": "Could not load. Names which read failed and leaves the task list untouched.",
+   "emptyFirstRun": "No task list yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the task list are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Local queue. Tasks completed offline sync on return"
+  },
+  "apis": [
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "List work orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acceptWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee takes the job",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "rejectWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee declines, with a reason",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photo, video, document, note or signature",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "cancelWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Cancel a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "closeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Administratively closed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "completeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Complete a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "getWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Read a work order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "pauseWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Stopped, and why",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderParts",
+    "contract": "maintenance",
+    "purpose": "Record parts consumed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderTime",
+    "contract": "maintenance",
+    "purpose": "Start, pause or stop work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "resumeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Back to work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "startWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Work has begun",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "updateWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Assign, reprioritise or amend",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "verifyWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Supervisor verification",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `workOrderId`.",
+   "preloaded": [
+    "WorkOrderDetail.downtimeMinutes",
+    "WorkOrderDetail.rootCause",
+    "WorkOrderDetail.rootCauseNote",
+    "WorkOrderDetail.escalatedAt",
+    "WorkOrderDetail.escalationLevel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-005",
+  "name": "Task detail",
+  "module": "Operations",
+  "requiresModule": "maintenance",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/task-detail",
+   "component": "apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-007"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "EMP-007",
+     "trigger": "Writes handover notes",
+     "provenance": "flow F08 step 6→7, F65 step 4→5"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-030",
+     "trigger": "Supervisor verifies",
+     "provenance": "flow F12 step 3→4",
+     "operation": "completeWorkOrder",
+     "crossesDevice": true,
+     "back": false
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Raises a requisition against the work order",
+     "provenance": "flow F15 step 1→2",
+     "operation": "pauseWorkOrder",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Cross-platform navigation removed 24 August**: BO-030, BO-078. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Removed 24 August**: createWorkOrder. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act",
+  "purpose": "Do the task and record that it was done.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every task",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.downtimeMinutes",
+        "WorkOrder.rootCause",
+        "WorkOrder.rootCauseNote",
+        "WorkOrder.escalatedAt",
+        "WorkOrder.escalationLevel",
+        "WorkOrder.id",
+        "WorkOrder.workOrderNumber",
+        "WorkOrder.title",
+        "WorkOrder.venueId",
+        "WorkOrder.assetId",
+        "WorkOrder.assetName",
+        "WorkOrder.status"
+       ],
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected task",
+       "bindsTo": "WorkOrderDetail",
+       "columns": [
+        "WorkOrderDetail.downtimeMinutes",
+        "WorkOrderDetail.rootCause",
+        "WorkOrderDetail.rootCauseNote",
+        "WorkOrderDetail.escalatedAt",
+        "WorkOrderDetail.escalationLevel",
+        "WorkOrderDetail.id",
+        "WorkOrderDetail.workOrderNumber",
+        "WorkOrderDetail.title",
+        "WorkOrderDetail.venueId",
+        "WorkOrderDetail.assetId",
+        "WorkOrderDetail.assetName",
+        "WorkOrderDetail.status",
+        "WorkOrderDetail.priority",
+        "WorkOrderDetail.kind",
+        "WorkOrderDetail.assignedToPrincipalId",
+        "WorkOrderDetail.raisedByPrincipalId"
+       ],
+       "operation": "getWorkOrder",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Start",
+       "operation": "startWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/start"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Accept",
+       "operation": "acceptWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/accept"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attach",
+       "operation": "attachWorkOrderEvidence",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderParts",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/parts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderTime",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateWorkOrder",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelWorkOrder",
+       "label": "Cancel work order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "startWorkOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+   },
+   {
+    "id": "confirmCloseWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+   },
+   {
+    "id": "confirmRejectWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+   }
+  ],
+  "states": {
+   "loading": "The task list.",
+   "error": "Could not load. Names which read failed and leaves the task untouched.",
+   "emptyFirstRun": "No task yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the task are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Editable offline. Findings and photos queue"
+  },
+  "apis": [
+   {
+    "operationId": "getWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Read a work order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "startWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Work has begun",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "pauseWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Stopped, and why",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "completeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Complete a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "acceptWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee takes the job",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photo, video, document, note or signature",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "cancelWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Cancel a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "closeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Administratively closed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "List work orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordWorkOrderParts",
+    "contract": "maintenance",
+    "purpose": "Record parts consumed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderTime",
+    "contract": "maintenance",
+    "purpose": "Start, pause or stop work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "rejectWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee declines, with a reason",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "resumeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Back to work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "updateWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Assign, reprioritise or amend",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "verifyWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Supervisor verification",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `workOrderId`.",
+   "preloaded": [
+    "WorkOrderDetail.downtimeMinutes",
+    "WorkOrderDetail.rootCause",
+    "WorkOrderDetail.rootCauseNote",
+    "WorkOrderDetail.escalatedAt",
+    "WorkOrderDetail.escalationLevel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-005"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-006",
+  "name": "Raise a task",
+  "module": "Operations",
+  "requiresModule": "maintenance",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/raise-a-task",
+   "component": "apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-004"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-004",
+     "trigger": "It appears on the list for whoever is free",
+     "provenance": "flow F65 step 1→2",
+     "operation": "createWorkOrder"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act",
+  "purpose": "Report something without finding a manager.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every raise task",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.downtimeMinutes",
+        "WorkOrder.rootCause",
+        "WorkOrder.rootCauseNote",
+        "WorkOrder.escalatedAt",
+        "WorkOrder.escalationLevel",
+        "WorkOrder.id",
+        "WorkOrder.workOrderNumber",
+        "WorkOrder.title",
+        "WorkOrder.venueId",
+        "WorkOrder.assetId",
+        "WorkOrder.assetName",
+        "WorkOrder.status"
+       ],
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected raise task",
+       "bindsTo": "WorkOrderDetail",
+       "columns": [
+        "WorkOrderDetail.downtimeMinutes",
+        "WorkOrderDetail.rootCause",
+        "WorkOrderDetail.rootCauseNote",
+        "WorkOrderDetail.escalatedAt",
+        "WorkOrderDetail.escalationLevel",
+        "WorkOrderDetail.id",
+        "WorkOrderDetail.workOrderNumber",
+        "WorkOrderDetail.title",
+        "WorkOrderDetail.venueId",
+        "WorkOrderDetail.assetId",
+        "WorkOrderDetail.assetName",
+        "WorkOrderDetail.status",
+        "WorkOrderDetail.priority",
+        "WorkOrderDetail.kind",
+        "WorkOrderDetail.assignedToPrincipalId",
+        "WorkOrderDetail.raisedByPrincipalId"
+       ],
+       "operation": "getWorkOrder",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Accept",
+       "operation": "acceptWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/accept"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attach",
+       "operation": "attachWorkOrderEvidence",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderParts",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/parts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordWorkOrderTime",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/start"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateWorkOrder",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createWorkOrder",
+       "label": "Create work order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelWorkOrder",
+       "label": "Cancel work order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createWorkOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A raise task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+   },
+   {
+    "id": "confirmCloseWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A raise task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+   },
+   {
+    "id": "confirmRejectWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A raise task this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
+   }
+  ],
+  "states": {
+   "loading": "The raise task list.",
+   "error": "Could not load. Names which read failed and leaves the raise task untouched.",
+   "emptyFirstRun": "No raise task yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the raise task are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Queues locally. A task raised in a plant room must not need signal"
+  },
+  "apis": [
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Raise a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "acceptWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee takes the job",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photo, video, document, note or signature",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "cancelWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Cancel a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "closeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Administratively closed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "completeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Complete a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "getWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Read a work order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "List work orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "pauseWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Stopped, and why",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderParts",
+    "contract": "maintenance",
+    "purpose": "Record parts consumed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "recordWorkOrderTime",
+    "contract": "maintenance",
+    "purpose": "Start, pause or stop work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "rejectWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee declines, with a reason",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "resumeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Back to work",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "startWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Work has begun",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "updateWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Assign, reprioritise or amend",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "verifyWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Supervisor verification",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "workOrderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `workOrderId`.",
+   "preloaded": [
+    "WorkOrderDetail.downtimeMinutes",
+    "WorkOrderDetail.rootCause",
+    "WorkOrderDetail.rootCauseNote",
+    "WorkOrderDetail.escalatedAt",
+    "WorkOrderDetail.escalationLevel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-006"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-007",
+  "name": "Handover notes",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/handover-notes",
+   "component": "apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-009"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "EMP-009",
+     "trigger": "Ends the shift",
+     "provenance": "flow F08 step 7→8"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
+  "purpose": "Tell the next shift what they are walking into.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every handover notes",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected handover notes",
+       "bindsTo": "AnnouncementReach",
+       "columns": [
+        "AnnouncementReach.announcementId",
+        "AnnouncementReach.targeted",
+        "AnnouncementReach.delivered",
+        "AnnouncementReach.acknowledged",
+        "AnnouncementReach.outstanding"
+       ],
+       "operation": "getAnnouncementReach",
+       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnnouncements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "label": "Publish announcement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -1465,109 +3376,350 @@
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "loading": "The handover notes list.",
+   "error": "Could not load. Names which read failed and leaves the handover notes untouched.",
+   "emptyFirstRun": "No handover notes yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the handover notes are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "Editable offline and synced at end of shift"
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What staff have been told",
     "trigger": "onLoad"
    },
    {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Tell staff something",
     "trigger": "onAction",
     "invalidates": [
-     "listConsentPurposes"
+     "listAnnouncements"
     ]
    },
    {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
+    "operationId": "acknowledgeAnnouncement",
+    "contract": "workforce",
+    "purpose": "Confirm you have read it",
     "trigger": "onAction",
     "invalidates": [
-     "listConsentPurposes"
+     "listAnnouncements"
     ]
    },
    {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
+    "operationId": "getAnnouncementReach",
+    "contract": "workforce",
+    "purpose": "Who has acknowledged, and who has not",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "subjectId",
-     "from": "session"
+     "name": "announcementId",
+     "from": "deepLink"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "AnnouncementReach.announcementId",
+    "AnnouncementReach.targeted",
+    "AnnouncementReach.delivered",
+    "AnnouncementReach.acknowledged",
+    "AnnouncementReach.outstanding"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-007"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-008",
+  "name": "Shift summary",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/shift-summary",
+   "component": "apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-017"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-017",
+     "trigger": "Anything unsynced is pushed first",
+     "provenance": "flow F72 step 1→2"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: openShift, recordNoSale, reopenShift, resumeShift. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listShifts` reads the population and `getCurrentShift` reads one of them — list, select, act",
+  "purpose": "See what this person actually did today.",
+  "gaps": [
+   {
+    "operation": "getShift",
+    "why": "**2 declared operations reach no component on this screen**: getShift, listCashMovements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every shift summary",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected shift summary",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listShifts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "suspendShift",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift summary this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   }
+  ],
+  "states": {
+   "loading": "The shift summary list.",
+   "error": "Could not load. Names which read failed and leaves the shift summary untouched.",
+   "emptyFirstRun": "No shift summary yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the shift summary are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Local totals, marked as unreconciled"
+  },
+  "apis": [
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-008"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }

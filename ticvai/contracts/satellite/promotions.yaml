@@ -6007,75 +6007,6 @@ paths:
       responses:
         '202':
           description: Recorded
-  /upgrade-offers:
-    post:
-      operationId: quoteUpgrade
-      x-ticvai-consumed-by:
-        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
-        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
-        - "P09 ADM-654 Membership & Pass Upgrade Engine"
-        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
-      summary: What upgrading this order or ticket would cost
-      description: 'Upsell boards 2.4, 2.5 and 2.6. **The price difference, not the new price.** A guest
-        upgrading from standard to VIP pays the gap, and computing that gap needs the original paid
-        amount, the current price of the target and the venue''s policy on whether a price rise since
-        purchase is the guest''s problem.
-
-        **Post-purchase upgrades are the same operation** (board 2.8). A guest upgrading in the car park
-        on the day is doing what a guest upgrading at checkout did, later.
-
-        '
-      tags:
-      - recommendations
-      x-ticvai-permission: PRODUCT_VIEW
-      x-ticvai-guest-callable: true
-      x-ticvai-audience:
-      - staff
-      - guest
-      x-ticvai-scope-level: venue
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - targetProductId
-              properties:
-                orderId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                ticketId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                membershipId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                targetProductId:
-                  type: string
-                  format: uuid
-                quantity:
-                  type: integer
-                  default: 1
-      responses:
-        '200':
-          description: The upgrade quote
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpgradeQuote'
-        '409':
-          description: '**Not an eligible upgrade path**, or the target is unavailable. Named, because
-            *no* and *sold out* need different words at a counter.
-
-            '
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
   /recommendation-experiments:
     get:
       operationId: listRecommendationExperiments
@@ -6705,41 +6636,6 @@ components:
           description: '**The control group.** Without it there is attribution and no incrementality.'
         scopePath:
           type: string
-    UpgradeQuote:
-      type: object
-      description: 'Upsell board 2.4. **The gap, not the new price.**'
-      properties:
-        quoteId:
-          type: string
-          format: uuid
-        fromProductId:
-          type: string
-          format: uuid
-        toProductId:
-          type: string
-          format: uuid
-        originalPaid:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-        targetCurrentPrice:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-        difference:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-        priceProtectionApplied:
-          type: boolean
-          default: false
-          description: '**Whether a price rise since purchase is charged to the guest.** A venue policy,
-            and one the guest will ask about.
-
-            '
-        valuePoints:
-          type: array
-          items:
-            type: string
-          description: What the guest gains — the reason to say yes, in their words.
-        expiresAt:
-          type: string
-          format: date-time
-          nullable: true
     RecommendationExperiment:
       type: object
       x-ticvai-persistence: promotions.recommendation_experiment

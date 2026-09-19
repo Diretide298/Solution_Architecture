@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 166 operations
+title: marketing-crm — 183 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -21,6 +21,18 @@ operations:
   writes:
   - cache:idempotency
   - marketing.loyalty_position
+- operation: activateAudience
+  verb: POST
+  path: /audience-activations
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.audience_activation
+  writes:
+  - marketing.audience_activation
 - operation: activateJourney
   verb: POST
   path: /journeys/{journeyId}/activate
@@ -332,6 +344,17 @@ operations:
   - cache:idempotency
   - cache:resolution
   - control.url_redirect
+- operation: decideDuplicateCandidate
+  verb: POST
+  path: /duplicate-candidates/{candidateId}/decide
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.duplicate_candidate
+  writes: []
 - operation: endKioskAssist
   verb: POST
   path: /kiosk-assists/{sessionId}/end
@@ -361,6 +384,16 @@ operations:
   writes:
   - cache:idempotency
   - marketing.case
+- operation: getAudienceOverlap
+  verb: GET
+  path: /audience-overlap
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getCampaign
   verb: GET
   path: /campaigns/{campaignId}
@@ -422,6 +455,17 @@ operations:
   - marketing.conversation_message
   - pii.subject
   writes: []
+- operation: getGuestAttributeModel
+  verb: GET
+  path: /guest-attribute-model
+  scope: tenant
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_attribute_model
+  writes: []
 - operation: getGuestConsents
   verb: GET
   path: /guests/{subjectId}/consents
@@ -435,6 +479,16 @@ operations:
   - marketing.consent_purpose
   - marketing.consent_record
   - pii.subject
+  writes: []
+- operation: getGuestIntelligence
+  verb: GET
+  path: /guests/{guestId}/intelligence
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getGuestLoyalty
   verb: GET
@@ -462,6 +516,38 @@ operations:
   - marketing.loyalty_position
   - pii.subject
   - pii.subject_contact
+  writes: []
+- operation: getGuestRelationships
+  verb: GET
+  path: /guests/{guestId}/relationships
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_relationship
+  writes: []
+- operation: getGuestTimeline
+  verb: GET
+  path: /guests/{guestId}/timeline
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getIdentityResolutionRules
+  verb: GET
+  path: /identity-resolution-rules
+  scope: tenant
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.identity_rules
   writes: []
 - operation: getJourneyPerformance
   verb: GET
@@ -605,6 +691,18 @@ operations:
   - marketing.loyalty_position
   - pii.subject
   writes: []
+- operation: importAudienceList
+  verb: POST
+  path: /audience-lists
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.audience_list
+  writes:
+  - marketing.audience_list
 - operation: launchCampaign
   verb: POST
   path: /campaigns/{campaignId}/launch
@@ -628,6 +726,28 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listAudienceActivations
+  verb: GET
+  path: /audience-activations
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.audience_activation
+  writes: []
+- operation: listAudienceLists
+  verb: GET
+  path: /audience-lists
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.audience_list
   writes: []
 - operation: listBusinessEventNotification
   verb: GET
@@ -888,6 +1008,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listDuplicateCandidates
+  verb: GET
+  path: /duplicate-candidates
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.duplicate_candidate
   writes: []
 - operation: listDynamicFieldQuestion
   verb: GET
@@ -1566,6 +1697,16 @@ operations:
   writes:
   - cache:idempotency
   - marketing.guest_profile
+- operation: runDataRetention
+  verb: POST
+  path: /retention-runs
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: searchGuests
   verb: GET
   path: /guests
@@ -1713,6 +1854,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setDataRetentionPolicy
+  verb: PUT
+  path: /retention-policies
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.retention_policy
+  writes:
+  - marketing.retention_policy
 - operation: setDigitalWaiverForm
   verb: PUT
   path: /digital-waiver-form
@@ -1723,6 +1876,42 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setGuestAttributeModel
+  verb: PUT
+  path: /guest-attribute-model
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_attribute_model
+  writes:
+  - marketing.guest_attribute_model
+- operation: setGuestRelationships
+  verb: PUT
+  path: /guests/{guestId}/relationships
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_relationship
+  writes:
+  - marketing.guest_relationship
+- operation: setIdentityResolutionRules
+  verb: PUT
+  path: /identity-resolution-rules
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.identity_rules
+  writes:
+  - marketing.identity_rules
 - operation: setIntelligentRoutingSkill
   verb: PUT
   path: /intelligent-routing-skill

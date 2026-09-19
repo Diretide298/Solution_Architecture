@@ -1,14 +1,14 @@
-# P01-account-self-service-01 — P01 · Account & Self-Service
+# P16-analytics-01 — P16 · Analytics
 
-**5 screens · 46 operations · 37 schemas · 5 permissions**
+**10 screens · 20 operations · 26 schemas · 11 permissions**
 
-Platform P01 Guest Web · ships as **guest** ·
-guest audience · web ·
+Platform P16 Venue Analytics · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**guest on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `AI_APPROVE, AI_USE, DEVICE_VIEW, LEDGER_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRODUCT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
-- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
+- **5 of these operations work offline**: getCountVariance, listDevices, listExpiringBatches, listOrders, listProducts
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
-| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
-| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
-| `WEB-019` | Order History | listDetail | 5 | 0 | — |
-| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
-
-## Thin screens in this batch
-
-**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ANL-001` | Executive Command Center | listDetail | 4 | 0 | — |
+| `ANL-002` | Sales, Revenue & Channel | statusTracker | 2 | 0 | — |
+| `ANL-003` | Operational Performance | listDetail | 5 | 0 | — |
+| `ANL-004` | Product Performance | listDetail | 3 | 0 | — |
+| `ANL-005` | Cost, Margin & Profitability | statusTracker | 3 | 0 | — |
+| `ANL-006` | Inventory & Waste Intelligence | listDetail | 4 | 0 | — |
+| `ANL-007` | Guest & Conversion Intelligence | listDetail | 5 | 0 | — |
+| `ANL-008` | Demand Forecasting | statusTracker | 2 | 0 | — |
+| `ANL-009` | AI Assistant & Action Center | approvalInbox | 8 | 0 | — |
+| `ANL-010` | Suggestions & Advice | configEditor | 2 | 0 | — |
 
 ---
 
@@ -80,541 +81,172 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
+  "id": "ANL-001",
+  "name": "Executive Command Center",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "venue-management-web",
+   "route": "/analytics/executive-command-center",
+   "component": "apps/venue-management-web/src/routes/analytics/ExecutiveCommandCenterDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
+   "isEntryPoint": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
+    "ANL-002",
+    "ANL-003",
+    "ANL-004",
+    "ANL-005",
+    "ANL-006",
+    "ANL-007",
+    "ANL-008",
+    "ANL-009",
+    "ANL-010",
+    "ANL-012",
+    "ANL-013",
+    "ANL-014",
+    "ANL-015",
+    "ANL-016",
+    "ANL-017",
+    "ANL-018",
+    "ANL-019",
+    "ANL-020",
+    "ANL-021",
+    "ANL-031",
+    "ANL-041",
+    "ANL-051",
+    "ANL-061"
    ],
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "to": "ANL-020",
+     "trigger": "Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ANL-061",
+     "trigger": "BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "ANL-021",
+     "trigger": "Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
     },
     {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "to": "ANL-031",
+     "trigger": "Report Catalogue & Library",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-041",
+     "trigger": "Reporting Governance Command Center",
+     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-051",
+     "trigger": "AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-002",
+     "trigger": "Sales, Revenue & Channel",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-003",
+     "trigger": "Operational Performance",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-004",
+     "trigger": "Product Performance",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-005",
+     "trigger": "Cost, Margin & Profitability",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-006",
+     "trigger": "Inventory & Waste Intelligence",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-007",
+     "trigger": "Guest & Conversion Intelligence",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-008",
+     "trigger": "Demand Forecasting",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-009",
+     "trigger": "AI Assistant & Action Center",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-010",
+     "trigger": "Suggestions & Advice",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-012",
+     "trigger": "Live Operations Dashboard",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-013",
+     "trigger": "Revenue Pulse",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-014",
+     "trigger": "Attendance & Footfall Intelligence",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-015",
+     "trigger": "Capacity & Utilization Monitor",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-016",
+     "trigger": "Sales & Channel Performance",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-017",
+     "trigger": "Customer, Membership & Loyalty Pulse",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-018",
+     "trigger": "Alerts & Exception Center",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-019",
+     "trigger": "AI Management Insights",
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "notes": "**Built 20 August. Answers 3 board screens**: F&B Executive Command Center; Retail Executive Command Center; Enterprise Frontline Operations Dashboard. **Three board screens, one screen with a domain selector.** F&B, Retail and POS each drew an executive command centre and they differ only in which numbers fill the tiles. **Owns POS board frame(s) POS-6A** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6a` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.** When these screens were repointed from the client pack to their own board on 24 August, the status stayed `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom` keeps the pack frame, which is where the design came from; `status` describes the file being pointed at, and those are different facts.",
   "density": "compact",
   "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
+   "FnB Board 6.dc.html#fnb-6a",
+   "POS Board 6.dc.html#pos-6a",
+   "Retail Board 6.dc.html#ret-6a"
   ],
   "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "patternReason": "`listAlerts` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "Executive Command Center — across F&B, retail, ticketing and frontline, filtered by domain.",
   "layout": {
    "template": "split",
    "regions": [
@@ -624,24 +256,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
+       "label": "Every executive",
+       "bindsTo": "Alert",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
        ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
       }
      ]
     },
@@ -651,14 +283,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
+       "label": "The selected executive",
+       "bindsTo": "DashboardData",
        "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
+        "DashboardData.tileData"
        ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
       }
      ]
     },
@@ -668,334 +299,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
-       ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
-       ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     },
@@ -1004,10 +316,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -1015,189 +331,331 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "requestSuggestion",
     "trigger": "onAction",
     "invalidates": [
-     "listMyEntitlements"
+     "listAlerts"
     ]
    },
    {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-001",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn as POS-6A in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
+   "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6a"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Provide senior management with an immediate consolidated view of overall organizational performance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall display"
+   }
+  ],
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-002",
+  "name": "Sales, Revenue & Channel",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/sales-revenue-channel",
+   "component": "apps/venue-management-web/src/routes/analytics/SalesRevenueChannelDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Sales, Revenue & Channel Analytics; Sales, Revenue & Channel Analytics. **The same screen twice in the client set, word for word.** Revenue by channel is revenue by channel whether the line is a burger or a t-shirt. **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6l` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 6.dc.html#fnb-6b",
+   "Retail Board 6.dc.html#ret-6l"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getDashboard` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Sales, Revenue & Channel — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected sales revenue channel",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
    },
    {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "entitlementId",
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
      "from": "deepLink"
     },
     {
-     "name": "orderId",
+     "name": "reportId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
-   "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
-   ]
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-002",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn as RET-6L in the client Retail pack.**",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6l"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P16",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P08",
+     "P12",
+     "P13"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "id": "ANL-003",
+  "name": "Operational Performance",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "venue-management-web",
+   "route": "/analytics/operational-performance",
+   "component": "apps/venue-management-web/src/routes/analytics/OperationalPerformanceDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ANL-001"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "ANL-001"
    ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "**Built 20 August. Answers 4 board screens**: Outlet, Service & Guest Performance; Store & Operational Performance; Venue Operations Dashboard and 1 more. **Four board screens.** Outlet, store, venue and department are the same question at four levels of `scope_path` — which is a filter, not four screens. **Owns POS board frame(s) POS-6B, POS-6C, POS-6D** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6b` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
   "density": "compact",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4k",
+   "FnB Board 6.dc.html#fnb-6c",
+   "FnB Board 6.dc.html#fnb-6g",
+   "POS Board 6.dc.html#pos-6b",
+   "POS Board 6.dc.html#pos-6c",
+   "POS Board 6.dc.html#pos-6d",
+   "Retail Board 6.dc.html#ret-6b"
+  ],
   "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
+  "patternReason": "`listAlerts` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.",
   "gaps": [
    {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listDevices",
+    "why": "**2 declared operations reach no component on this screen**: listDevices, listPrincipals. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -1210,24 +668,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
+       "label": "Every operational performance",
+       "bindsTo": "Alert",
        "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
        ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
       }
      ]
     },
@@ -1237,28 +695,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
+       "label": "The selected operational performance",
+       "bindsTo": "DashboardData",
        "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "DashboardData.tileData"
        ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
       }
      ]
     },
@@ -1268,43 +711,1381 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
     "trigger": "onAction",
     "invalidates": [
-     "listMyOrders"
+     "listAlerts"
     ]
    },
    {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "List registered devices",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "List principals",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-003",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn as POS-6B, POS-6C, POS-6D in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
+   "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6b"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-004",
+  "name": "Product Performance",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/product-performance",
+   "component": "apps/venue-management-web/src/routes/analytics/ProductPerformanceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-007"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-006"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-006",
+     "trigger": "Inventory & Waste Intelligence",
+     "provenance": "flow F82 step 3→4"
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Product Performance & Menu Engineering; Product, SKU & Merchandise Performance. **Menu engineering and SKU performance are one analysis.** Both rank products by margin against volume; only the vocabulary differs. **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6c` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 6.dc.html#fnb-6d",
+   "Retail Board 6.dc.html#ret-6c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "Product Performance — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product performance",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product performance",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-004",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn as RET-6C in the client Retail pack.**",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6c"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-005",
+  "name": "Cost, Margin & Profitability",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/cost-margin-profitability",
+   "component": "apps/venue-management-web/src/routes/analytics/CostMarginProfitabilityDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-007"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-007",
+     "trigger": "Guest & Conversion Intelligence",
+     "provenance": "flow F82 step 1→2",
+     "operation": "getStockValuation"
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Food Cost, Margin & Profitability Intelligence; Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 6.dc.html#fnb-6e",
+   "Retail Board 6.dc.html#ret-6f"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getDashboard` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "gaps": [
+   {
+    "operation": "getStockValuation",
+    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected cost margin profitability",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getStockValuation",
+    "contract": "inventory",
+    "purpose": "Stock value by location and category",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-005",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn as RET-6F in the client Retail pack.**",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6f"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-006",
+  "name": "Inventory & Waste Intelligence",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/inventory-waste-intelligence",
+   "component": "apps/venue-management-web/src/routes/analytics/InventoryWasteIntelligenceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-004"
+   ],
+   "exitTo": [
+    "ANL-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-058",
+     "trigger": "Reporting Home",
+     "provenance": "flow F82 step 4→5",
+     "operation": "listExpiringBatches",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence; Inventory, Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis** — a recipe says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6d` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `Retail Board 6.dc.html` frame `ret-6d`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Inventory &amp; Stock Intelligence* matched at 0.89. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 6.dc.html#fnb-6f",
+   "Retail Board 6.dc.html#ret-6d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listExpiringBatches` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "gaps": [
+   {
+    "operation": "getCountVariance",
+    "why": "**1 declared operation reach no component on this screen**: getCountVariance. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every inventory waste intelligence",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inventory waste intelligence",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExpiringBatches"
+    ]
+   },
+   {
+    "operationId": "getCountVariance",
+    "contract": "inventory",
+    "purpose": "Variance between counted and expected",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listExpiringBatches",
+    "contract": "inventory",
+    "purpose": "What is about to go out of date",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "countId",
+     "from": "deepLink"
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-006",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6d"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-007",
+  "name": "Guest & Conversion Intelligence",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/guest-conversion-intelligence",
+   "component": "apps/venue-management-web/src/routes/analytics/GuestConversionIntelligenceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-005"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-004"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-004",
+     "trigger": "Product Performance",
+     "provenance": "flow F82 step 2→3"
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Guest, Conversion & Basket Intelligence; Kitchen, Service & Fulfilment Performance. Who bought, what else they nearly bought, and how long they waited. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6e` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 6.dc.html#ret-6e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSegments` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "Guest & Conversion Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every guest conversion intelligence",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guest conversion intelligence",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSegments"
+    ]
+   },
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "List segments",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createSegment",
+    "contract": "marketing-crm",
+    "purpose": "Create a segment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSegments"
+    ]
+   },
+   {
+    "operationId": "previewSegment",
+    "contract": "marketing-crm",
+    "purpose": "Estimate segment size and reachability",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSegments"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    },
+    {
+     "name": "segmentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A segment opened from the list.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-007",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn as RET-6E in the client Retail pack.**",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6e"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-008",
+  "name": "Demand Forecasting",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/demand-forecasting",
+   "component": "apps/venue-management-web/src/routes/analytics/DemandForecastingDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 2 board screens**: Demand Forecasting & Operational Planning; Demand Forecasting & Merchandise Planning. **A forecast is an input to a requisition, not a report.** Its value is that somebody orders differently because of it. **Board repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 6.dc.html#fnb-6h",
+   "Retail Board 6.dc.html#ret-6g"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getDashboard` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Demand Forecasting — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected demand forecasting",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-008",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn as RET-6G in the client Retail pack.**",
+   "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6g"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-009",
+  "name": "AI Assistant & Action Center",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/ai-assistant-action-center",
+   "component": "apps/venue-management-web/src/routes/analytics/AiAssistantActionCenterDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001"
+   ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-010",
+     "trigger": "Promotions & Coupons",
+     "provenance": "flow F77 step 3→4",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization Center; AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and 2 more. **Five board screens, and the collapse is the point.** Every domain drew an AI centre and an alert centre; **an alert nobody can act on from the screen showing it is a notification**, so recommendation and action are one place. **Owns POS board frame(s) POS-6E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6e` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5k",
+   "FnB Board 6.dc.html#fnb-6j",
+   "FnB Board 6.dc.html#fnb-6k",
+   "POS Board 6.dc.html#pos-6e",
+   "Retail Board 5.dc.html#ret-5k",
+   "Retail Board 6.dc.html#ret-6k"
+  ],
+  "pattern": "approvalInbox",
+  "patternReason": "`decideProposedAction` decides items that `listAlerts` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "AI Assistant & Action Center — across F&B, retail, ticketing and frontline, filtered by domain.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**2 declared operations reach no component on this screen**: listOrders, listProposedActions. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected assistant action",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAlert",
+       "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAlertRule",
+       "provenance": "contract reporting.yaml PUT /alert-rules"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decide",
+       "operation": "decideProposedAction",
+       "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tiles render in place; **each resolves on its own** so one slow source does not hold the page.",
+   "error": "Could not load. **Trading is unaffected** — this reads and writes nothing.",
+   "emptyFirstRun": "**A venue with no trading history.** Links to the seeded reports rather than showing zeroes — a dashboard of zeroes teaches a new manager nothing.",
+   "emptyNoResults": "Nothing in this window. **Last week and last month are the useful defaults**, not today — an analytics screen opened on a Monday is asking about a period.",
+   "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
+  },
+  "apis": [
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAlert",
+    "contract": "reporting",
+    "purpose": "Take responsibility for it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
    },
    {
     "operationId": "listOrders",
@@ -1313,204 +2094,172 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onLoad"
    },
    {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   },
+   {
+    "operationId": "setAlertRule",
+    "contract": "reporting",
+    "purpose": "Raise an alert when a number leaves a range",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "What the assistant has proposed and nobody has decided",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Approve or reject a proposal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "orderId",
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "domain",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "alertId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    },
+    {
+     "name": "actionId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A proposed action opened from the queue or an alert.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.raisedAt",
+    "Alert.severity",
+    "Alert.status"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-009",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn as POS-6E in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
+   "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6e"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P16",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P08",
+     "P12",
+     "P13"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
+  "id": "ANL-010",
+  "name": "Suggestions & Advice",
+  "module": "Analytics",
+  "requiresModule": "ai",
+  "wave": 3,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "app": "venue-management-web",
+   "route": "/analytics/suggestions",
+   "component": "apps/venue-management-web/src/routes/analytics/SuggestionsDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ANL-001"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "ANL-001"
    ],
+   "inferred": false,
+   "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "dashboardId",
+      "domain",
+      "reportId",
+      "venueId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "notes": "**Built 24 August.** The client F&B boards drew six suggestion endpoints — price, requisition, replenishment, scenario, SLA, demand plan. **One screen and one operation answer all six**, because a suggestion surface that differs per domain is six screens to change when the model changes. **Owns POS board frame(s) POS-6F** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6f` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "boardFrames": [
+   "POS Board 6.dc.html#pos-6f"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`requestSuggestion`, `recordSuggestionOutcome`) and no read of a population — it is settings, not a list",
+  "purpose": "Every open suggestion, what it is based on, and whether the venue took it.",
+  "gaps": [
+   {
+    "operation": "requestSuggestion",
+    "why": "**`requestSuggestion` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract ai.yaml POST /ai/suggestions"
+   }
+  ],
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
      "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "publish",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
        "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+       "operation": "recordSuggestionOutcome",
+       "provenance": "contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome"
       }
      ]
     },
@@ -1519,25 +2268,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
+       "kind": "multiSelect",
+       "label": "Kind",
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "kind": "cardList",
+       "bindsTo": "Suggestion[]",
+       "notes": "**The basis is on the card, not behind a tap.** A manager must see that today’s answer is a margin rule and next quarter’s is a model — the same screen, a different basis.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "notes": "The explanation in plain words and the inputs it used. **Advice computed from data the manager cannot see is advice they will not trust.**",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Take it",
        "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
+       "label": "Do something else",
+       "notes": "**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -1545,109 +2299,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "Open suggestions, newest first, grouped by kind.",
+   "error": "Could not load. **Trading is unaffected** — this advises and does not act.",
+   "emptyFirstRun": "**A venue with no history has nothing to suggest from**, and the screen says so rather than showing a rule dressed as advice. Names when there will be enough data.",
+   "emptyNoAccess": "You do not have AI permission at this venue."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
-    "trigger": "onLoad"
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Ask for an answer",
+    "trigger": "onAction"
    },
    {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
+    "operationId": "recordSuggestionOutcome",
+    "contract": "ai",
+    "purpose": "What the venue did",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "subjectId",
+     "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "suggestionId",
+     "from": "deepLink",
+     "optional": true
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
-   ]
+   "coldEntry": "A bookmarked view opened weekly, or **a link from an alert naming one suggestion** — an alert that cannot take a manager to the thing it is about is a notification."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-010",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn as POS-6F in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
+   "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6f"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P16",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P08",
+     "P12",
+     "P13"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1661,15 +2373,53 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "addToWishlist": {
+ "acknowledgeAlert": {
   "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
+  "path": "/alerts/{alertId}/acknowledge",
+  "contract": "reporting",
+  "summary": "Mark it seen",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "createSegment": {
+  "method": "POST",
+  "path": "/segments",
   "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
+  "summary": "Create a segment",
+  "permission": "MARKETING_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -1677,15 +2427,15 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "Wishlist"
+  "requestBody": "CreateSegmentRequest",
+  "responds": "Segment"
  },
- "claimCart": {
+ "decideProposedAction": {
   "method": "POST",
-  "path": "/carts/{cartId}/claim",
-  "contract": "orders",
-  "summary": "Attach an anonymous cart to a guest",
-  "permission": null,
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_APPROVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1697,396 +2447,100 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "CartMergeResult"
+  "responds": "ProposedAction"
  },
- "completeSsoAuthorization": {
-  "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
-  "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoginResponse"
- },
- "createMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "createRefundRequest": {
-  "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "enrolMfaMethod": {
-  "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaEnrolment"
- },
- "getEntitlement": {
+ "getCountVariance": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}",
-  "contract": "access",
-  "summary": "One entitlement, with what remains on it",
-  "permission": "ORDER_VIEW",
+  "path": "/stock-counts/{countId}/variance",
+  "contract": "inventory",
+  "summary": "Variance between counted and expected",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "CountVariance"
  },
- "getEntitlementCredential": {
+ "getDashboard": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}/credential",
-  "contract": "access",
-  "summary": "The thing that gets scanned",
-  "permission": "ORDER_VIEW",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "rotate",
+    "name": "refresh",
     "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "DashboardData"
  },
- "getEntitlementHistory": {
+ "getStockValuation": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}/history",
-  "contract": "access",
-  "summary": "Every scan, freeze, share and reissue against it",
-  "permission": "ORDER_VIEW",
+  "path": "/stock/valuation",
+  "contract": "inventory",
+  "summary": "Stock value by location and category",
+  "permission": "LEDGER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
- },
- "getGuestProfile": {
-  "method": "GET",
-  "path": "/guests/{subjectId}",
-  "contract": "marketing-crm",
-  "summary": "Read a guest profile",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestProfileDetail"
- },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "getMyChallenges": {
-  "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ChallengeProgress"
- },
- "getOrder": {
-  "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Order"
- },
- "getWishlist": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
- "guestLogout": {
-  "method": "DELETE",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "End a guest session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "allDevices",
+    "name": "asAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
     "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "StockValuation"
  },
- "guestSocialLogin": {
-  "method": "POST",
-  "path": "/auth/guest/social",
-  "contract": "identity",
-  "summary": "Sign in with Apple or Google",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "guestUaePassLogin": {
-  "method": "POST",
-  "path": "/auth/guest/uae-pass",
-  "contract": "identity",
-  "summary": "Sign in with a national identity provider",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "issueWalletPass": {
-  "method": "POST",
-  "path": "/wallet-passes",
-  "contract": "orders",
-  "summary": "Generate an Apple or Google wallet pass",
-  "permission": "ORDER_VIEW",
+ "listAlerts": {
+  "method": "GET",
+  "path": "/alerts",
+  "contract": "reporting",
+  "summary": "What is currently wrong",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletPass"
- },
- "linkGuestCheckout": {
-  "method": "POST",
-  "path": "/auth/guest/link-checkout",
-  "contract": "identity",
-  "summary": "Attach a guest checkout to an account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "listConsentPurposes": {
-  "method": "GET",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configured consent purposes",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
- "listEntitlements": {
-  "method": "GET",
-  "path": "/my/entitlements/all",
-  "contract": "access",
-  "summary": "Every entitlement this guest holds, including expired",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "includeExpired",
+    "name": "status",
     "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "Alert"
  },
- "listGuestDevices": {
+ "listDevices": {
   "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
- },
- "listMyEntitlements": {
-  "method": "GET",
-  "path": "/guests/me/entitlements",
-  "contract": "access",
-  "summary": "Every ticket, pass and membership this guest holds",
-  "permission": "ORDER_VIEW",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "List registered devices",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "state",
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
    {
-    "name": "includeShared",
+    "name": "kind",
     "in": "query",
     "required": null
    },
@@ -2102,22 +2556,22 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "Page"
  },
- "listMyOrders": {
+ "listExpiringBatches": {
   "method": "GET",
-  "path": "/my/orders",
-  "contract": "orders",
-  "summary": "The orders this guest placed",
-  "permission": null,
-  "offlineCapable": false,
+  "path": "/stock-batches/expiring",
+  "contract": "inventory",
+  "summary": "What is about to go out of date",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "since",
+    "name": "withinDays",
     "in": "query",
-    "required": false
+    "required": null
    },
    {
     "name": null,
@@ -2131,7 +2585,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "StockBatch"
  },
  "listOrders": {
   "method": "GET",
@@ -2187,253 +2641,122 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listPrincipals": {
   "method": "GET",
-  "path": "/auth/sso/providers",
+  "path": "/principals",
   "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
+  "summary": "List principals",
+  "permission": "USER_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProposedActions": {
+  "method": "GET",
+  "path": "/proposed-actions",
+  "contract": "ai",
+  "summary": "What the assistant has proposed and nobody has decided",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "SsoProvider"
+  "responds": "ProposedAction"
  },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
- },
- "recordConsent": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/consents",
-  "contract": "marketing-crm",
-  "summary": "Record a consent decision",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordConsentRequest",
-  "responds": "ConsentState"
- },
- "refreshToken": {
-  "method": "POST",
-  "path": "/auth/refresh",
-  "contract": "identity",
-  "summary": "Rotate the access token",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TokenPair"
- },
- "registerGuest": {
-  "method": "POST",
-  "path": "/auth/guest/register",
-  "contract": "identity",
-  "summary": "Create a guest account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RegisterGuestRequest",
-  "responds": "GuestSession"
- },
- "registerGuestDevice": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "Register a device for push",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp",
-  "contract": "identity",
-  "summary": "Request a one-time code",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "respondToInvitation": {
-  "method": "POST",
-  "path": "/invitations/{token}/respond",
-  "contract": "marketing-crm",
-  "summary": "Accept or decline",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Invitation"
- },
- "revokeGuestDevice": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/devices/{deviceId}",
-  "contract": "marketing-crm",
-  "summary": "Revoke a device registration",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "shareEntitlement": {
-  "method": "POST",
-  "path": "/entitlements/{entitlementId}/share",
-  "contract": "orders",
-  "summary": "Let somebody else use this, without giving it away",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Problem"
- },
- "startSsoAuthorization": {
+ "listSegments": {
   "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
- "transferOrderTickets": {
+ "previewSegment": {
   "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
+  "path": "/segments/{segmentId}/preview",
+  "contract": "marketing-crm",
+  "summary": "Estimate segment size and reachability",
+  "permission": "MARKETING_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -2445,55 +2768,74 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "SegmentPreview"
  },
- "updateGuestPreferences": {
+ "recordSuggestionOutcome": {
+  "method": "POST",
+  "path": "/ai/suggestions/{suggestionId}/outcome",
+  "contract": "ai",
+  "summary": "What the venue actually did",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SuggestionOutcome",
+  "responds": "SuggestionOutcome"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "setAlertRule": {
   "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "updateMyProfile": {
-  "method": "PATCH",
-  "path": "/guests/me/profile",
-  "contract": "marketing-crm",
-  "summary": "A guest correcting their own details",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestProfile"
- },
- "verifyGuestEmail": {
-  "method": "POST",
-  "path": "/auth/guest/verify-email",
-  "contract": "identity",
-  "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "path": "/alert-rules",
+  "contract": "reporting",
+  "summary": "Watch a metric and tell somebody",
+  "permission": "REPORT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -2501,65 +2843,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp/verify",
-  "contract": "identity",
-  "summary": "Verify a one-time code and issue a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "verifyMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a step-up challenge",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "requestBody": "AlertRule",
+  "responds": "AlertRule"
  }
 }
 ```
@@ -2570,719 +2855,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "Cart": {
+ "Alert": {
   "type": "object",
-  "x-ticvai-persistence": "orders.cart",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
   "required": [
    "id",
-   "venueId",
-   "channel",
-   "status",
-   "lines"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "token": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null while anonymous. Set by `claimCart`."
-   },
-   "status": {
-    "$ref": "#/components/schemas/CartStatus"
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartLine"
-    }
-   },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartConflict"
-    }
-   },
-   "subtotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "discountTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPromotionIds": {
-    "type": "array",
-    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
-   },
-   "extensionsUsed": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "maxExtensions": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "locale": {
-    "type": "string"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CartMergeResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "cart"
-  ],
-  "properties": {
-   "cart": {
-    "$ref": "#/components/schemas/Cart"
-   },
-   "mergedLineCount": {
-    "type": "integer"
-   },
-   "droppedLines": {
-    "type": "array",
-    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "productName": {
-       "type": "string"
-      },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "noCapacity",
-        "expired",
-        "notSellableOnChannel",
-        "duplicate"
-       ]
-      }
-     }
-    }
-   }
-  }
- },
- "ChallengeProgress": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.challenge_progress",
-  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
-  "required": [
-   "id",
-   "challengeId",
-   "subjectId",
-   "current",
-   "target"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "portfolioId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a family or group challenge — where the shared progress accrues."
-   },
-   "current": {
-    "type": "number"
-   },
-   "target": {
-    "type": "number"
-   },
-   "streakCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rewardIssuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "ConsentDecision": {
-  "type": "string",
-  "enum": [
-   "granted",
-   "withdrawn",
-   "notAsked"
-  ]
- },
- "ConsentPurpose": {
-  "type": "string",
-  "enum": [
-   "marketing",
-   "personalisation",
-   "profiling",
-   "thirdPartySharing",
-   "aiProcessing",
-   "transactional"
-  ]
- },
- "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
-  "type": "object",
-  "required": [
-   "purpose",
-   "channels",
-   "noticeVersion",
-   "isRequiredForService"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string",
-    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
-   },
-   "isRequiredForService": {
-    "type": "boolean",
-    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
-   },
-   "expiresAfterMonths": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
- "ConsentSource": {
-  "type": "string",
-  "enum": [
-   "guestApp",
-   "website",
-   "kiosk",
-   "pos",
-   "callCentre",
-   "import",
-   "agentRecorded"
-  ]
- },
- "ConsentState": {
-  "x-ticvai-persistence": "none — projection over consent_record",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "purposes"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "purpose",
-      "decision",
-      "requiresRenewal"
-     ],
-     "properties": {
-      "purpose": {
-       "$ref": "#/components/schemas/ConsentPurpose"
-      },
-      "decision": {
-       "$ref": "#/components/schemas/ConsentDecision"
-      },
-      "channels": {
-       "type": "array",
-       "items": {
-        "$ref": "#/components/schemas/MessageChannel"
-       }
-      },
-      "noticeVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "requiresRenewal": {
-       "type": "boolean",
-       "description": "True where the notice has been superseded since consent was given."
-      },
-      "decidedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
- },
- "Entitlement": {
-  "type": "object",
-  "x-ticvai-persistence": "access.entitlement",
-  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
-  "required": [
-   "id",
-   "templateId",
-   "productId",
-   "orderId",
-   "subjectId",
-   "status",
-   "validFrom",
-   "validTo"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
-   },
-   "templateId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderLineId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "mediaCode": {
-    "type": "string",
-    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
-   },
-   "status": {
-    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
-   },
-   "statusNote": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
-   },
-   "entriesUsed": {
-    "type": "integer",
-    "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
-   },
-   "entriesAllowed": {
-    "type": "integer",
-    "nullable": true
-   },
-   "lastEntryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "frozenDays": {
-    "type": "integer",
-    "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
-   },
-   "suspendedReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "isNameBound": {
-    "type": "boolean",
-    "default": false
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "sharedWithSubjectIds": {
-    "type": "array",
-    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "issuedVia": {
-    "type": "string",
-    "enum": [
-     "sale",
-     "invitation",
-     "reissue",
-     "transfer",
-     "resale",
-     "membership",
-     "groupBooking"
-    ],
-    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
-   },
-   "supersedesEntitlementId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
-   },
-   "walletValueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
-   }
-  }
- },
- "GuestDevice": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
-  "required": [
-   "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
-   },
-   "tokenFingerprint": {
-    "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
-   },
-   "appVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "osVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceModel": {
-    "type": "string",
-    "nullable": true
-   },
-   "locale": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
-   },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "GuestProfile": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "isActive"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "email": {
-    "type": "string",
-    "nullable": true
-   },
-   "phone": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredChannel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells. Marketing acts locally."
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "engagementScore": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100,
-    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
-   },
-   "engagementTier": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "new",
-     "active",
-     "occasional",
-     "lapsing",
-     "lapsed",
-     "dormant"
-    ],
-    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
-   },
-   "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "visitCount": {
-    "type": "integer"
-   },
-   "lastVisitAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
- },
- "GuestProfileDetail": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/GuestProfile"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid",
-      "readOnly": true,
-      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-     },
-     "consents": {
-      "$ref": "#/components/schemas/ConsentState"
-     },
-     "loyalty": {
-      "$ref": "#/components/schemas/LoyaltyPosition"
-     },
-     "openCaseCount": {
-      "type": "integer"
-     },
-     "recentOrderIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "membershipIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "notes": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
- },
- "Invitation": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
-  "required": [
-   "id",
-   "campaignId",
-   "token",
+   "ruleId",
+   "raisedAt",
+   "severity",
    "status"
   ],
   "properties": {
@@ -3290,50 +2871,150 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
-   "campaignId": {
+   "ruleId": {
     "type": "string",
     "format": "uuid"
    },
-   "subjectId": {
+   "raisedAt": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
+    "format": "date-time"
    },
-   "recipientEmail": {
+   "severity": {
     "type": "string",
-    "format": "email",
-    "nullable": true
-   },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
    },
    "status": {
     "type": "string",
     "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
+     "raised",
+     "acknowledged",
+     "resolved",
+     "expired"
     ]
    },
-   "entitlementIds": {
+   "observedValue": {
+    "type": "number"
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "AlertRule": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert_rule",
+  "description": "BL-152, CF-134. **Six contracts detect their own trouble and none told a person.**\nFive sections ask for this and it is the same gap as `MessageTrigger`, seen from the operational side — **that one tells a guest something happened; this one tells an operator something is wrong.**\n**A threshold that nobody is watching is a threshold nobody set.** 6.1.57 wants an exception when a KPI leaves range, and an exception that arrives in a nightly report is an exception nobody acted on.\n",
+  "required": [
+   "id",
+   "name",
+   "metric",
+   "comparator",
+   "threshold",
+   "severity",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "**From the closed set**, so a rule cannot watch something nothing produces — the same discipline `MetricSource` exists for.\n"
+   },
+   "comparator": {
+    "type": "string",
+    "enum": [
+     "above",
+     "below",
+     "outsideRange",
+     "changesBy",
+     "equals"
+    ]
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "thresholdUpper": {
+    "type": "number",
+    "nullable": true
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "default": 15,
+    "description": "**The window is what stops an alert firing on noise.** A queue that spikes for ninety seconds is not a queue that needs a manager, and a rule with no window is a rule somebody mutes within a week.\n"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "deliverTo": {
+    "type": "array",
+    "description": "CF-134. **The dashboard panel is the default and the only one that always applies.** Email or WhatsApp where the matrix names them — an operational alert arriving by email is an alert nobody sees in time.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dashboardPanel",
+      "email",
+      "whatsapp",
+      "sms"
+     ]
+    }
+   },
+   "recipientRoleIds": {
     "type": "array",
     "items": {
      "type": "string",
      "format": "uuid"
     }
    },
-   "respondedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   "cooldownMinutes": {
+    "type": "integer",
+    "default": 30,
+    "description": "**How long before the same rule may fire again.** Without it, a metric hovering on a threshold produces forty alerts an hour and the panel becomes something people close.\n"
+   },
+   "isActive": {
+    "type": "boolean"
    },
    "scopePath": {
     "type": "string",
@@ -3341,118 +3022,250 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "LoginRequest": {
+ "CountVariance": {
+  "x-ticvai-persistence": "none — computed at close",
   "type": "object",
   "required": [
-   "username",
-   "credential",
-   "workstationId"
+   "countId",
+   "totalVarianceValue",
+   "lines"
   ],
   "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
+   "countId": {
+    "type": "string"
    },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+   "totalVarianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
+   "exceptionCount": {
+    "type": "integer",
+    "description": "Lines beyond tolerance, requiring review before posting."
    },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "expectedQuantity",
+      "countedQuantity",
+      "variance",
+      "isException"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "sku": {
+       "type": "string"
+      },
+      "expectedQuantity": {
+       "type": "number"
+      },
+      "countedQuantity": {
+       "type": "number"
+      },
+      "variance": {
+       "type": "number"
+      },
+      "variancePercentage": {
+       "type": "number"
+      },
+      "varianceValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isException": {
+       "type": "boolean"
+      },
+      "recountCount": {
+       "type": "integer",
+       "description": "A line counted several times is itself a finding."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
+ "CreateSegmentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "criteria"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "criteria": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   },
+   "excludeSegmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
   "allOf": [
    {
-    "$ref": "#/components/schemas/TokenPair"
+    "$ref": "#/components/schemas/CreateDashboardRequest"
    },
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
     ],
     "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
+     "id": {
+      "type": "string",
+      "format": "uuid"
      },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
      },
-     "session": {
-      "$ref": "#/components/schemas/Session"
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
      }
     }
    }
   ]
  },
- "LoyaltyPosition": {
-  "x-ticvai-persistence": "marketing.loyalty_position",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "programmeId",
-   "pointsBalance",
-   "tierCode"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
    },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "lifetimePoints": {
-    "type": "integer"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "pointsToNextTier": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryPoints": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
    }
-  }
+  ]
+ },
+ "DataSource": {
+  "type": "string",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "enum": [
+   "orders",
+   "orderLines",
+   "payments",
+   "refunds",
+   "shifts",
+   "scanEvents",
+   "entitlements",
+   "products",
+   "inventory",
+   "stockMovements",
+   "stockCounts",
+   "waste",
+   "workstations",
+   "devices",
+   "principals",
+   "loyalty",
+   "reviews",
+   "queueEntries",
+   "guests",
+   "campaigns",
+   "cases",
+   "ledgerEntries",
+   "workOrders",
+   "approvals",
+   "purchaseOrders",
+   "receipts",
+   "requisitions",
+   "stockBatches",
+   "resourceBookings",
+   "delegations",
+   "forms",
+   "challenges",
+   "wallets",
+   "resaleListings"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
  },
  "MessageChannel": {
   "type": "string",
@@ -3465,307 +3278,112 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "post"
   ]
  },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
+ "MetricSource": {
   "type": "string",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that CL-01 covers, and naming a metric with no source is the defect this enum exists to prevent.\n",
   "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
-  ]
+   "occupancy",
+   "capacityUtilisation",
+   "admissionRate",
+   "noShowRate",
+   "conversion",
+   "salesByOperator",
+   "salesByWorkstation",
+   "waitTime",
+   "throughput",
+   "abandonmentRate",
+   "inventoryValuation",
+   "stockTurnover",
+   "stockAgeing",
+   "wastageRate",
+   "resaleVolume",
+   "resaleCommission",
+   "salesByInstructor",
+   "resourceUtilisation",
+   "allocationUtilisation",
+   "channelAllocationBurn",
+   "membershipChurn",
+   "membershipRenewalRate",
+   "supplierDeliveryPerformance",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "assetDowntime",
+   "meanTimeToRepair",
+   "challengeCompletionRate",
+   "attributedRevenue"
+  ],
+  "x-ticvai-extended": "18 August 2026",
+  "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
  },
- "MfaMethod": {
-  "x-ticvai-persistence": "identity.mfa_method",
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
   "type": "object",
   "required": [
-   "id",
-   "kind",
-   "isActive",
-   "enrolledAt"
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "confidence"
   ],
   "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "label": {
-    "type": "string",
-    "nullable": true
-   },
-   "maskedTarget": {
-    "type": "string",
-    "nullable": true,
-    "description": "Partially masked destination, so a person can tell two methods apart."
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   },
-   "enrolledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastUsedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
+   "conversationId": {
     "type": "string"
    },
-   "orderNumber": {
+   "question": {
     "type": "string"
    },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
+   "interpretation": {
     "type": "string",
-    "format": "uuid"
+    "description": "What the question was understood to mean, in plain language."
    },
-   "scopePath": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "OrderChannel": {
-  "type": "string",
-  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice"
-  ]
- },
- "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderLine"
-   },
-   {
+   "generatedQuery": {
     "type": "object",
-    "required": [
-     "serverUnitPrice",
-     "taxAmount",
-     "netAmount",
-     "grossAmount"
-    ],
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
     "properties": {
-     "serverUnitPrice": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "What the server computed on ingest."
+     "dataSource": {
+      "$ref": "#/components/schemas/DataSource"
      },
-     "priceVariance": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     "columns": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportColumn"
+      }
      },
-     "taxAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     "filters": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportFilter"
+      }
      },
-     "netAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "grossAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "entitlementIds": {
+     "groupBy": {
       "type": "array",
       "items": {
        "type": "string"
       }
-     },
-     "crossRegionRightIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Redemption rights propagated to other cells for this line."
      }
     }
+   },
+   "result": {
+    "$ref": "#/components/schemas/ReportResult"
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
    }
-  ]
- },
- "OrderStatus": {
-  "type": "string",
-  "enum": [
-   "pending",
-   "held",
-   "paid",
-   "partiallyPaid",
-   "completed",
-   "voided",
-   "refunded",
-   "partiallyRefunded",
-   "failed"
-  ],
-  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+  }
  },
  "Page": {
   "type": "object",
@@ -3786,525 +3404,641 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "Payment": {
-  "x-ticvai-persistence": "orders.payment",
+ "ProposedAction": {
   "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
   "required": [
    "id",
-   "orderId",
-   "tender",
-   "amount",
-   "status",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
-   },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
-   },
-   "fxRateSource": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "manual",
-     "feed",
-     "cardScheme"
-    ],
-    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
-   },
-   "changeCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "changeAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "authorised",
-     "captured",
-     "pendingConfirmation",
-     "declined",
-     "failed",
-     "voided",
-     "refunded"
-    ]
-   },
-   "providerName": {
-    "type": "string",
-    "nullable": true
-   },
-   "providerReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastInquiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Problem": {
-  "type": "object",
-  "description": "RFC 9457 problem details. Every error response uses this shape.",
-  "required": [
-   "type",
-   "title",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
    "status"
   ],
   "properties": {
-   "type": {
+   "id": {
     "type": "string",
-    "format": "uri"
+    "format": "uuid"
    },
-   "title": {
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration"
+    ]
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review."
+   },
+   "summary": {
     "type": "string"
    },
    "status": {
-    "type": "integer"
+    "type": "string",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
    },
-   "detail": {
-    "type": "string"
+   "approvalLevel": {
+    "type": "integer",
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
    },
-   "instance": {
-    "type": "string"
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "traceId": {
-    "type": "string"
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
    },
-   "errors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "field",
-      "code"
-     ],
-     "properties": {
-      "field": {
-       "type": "string"
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
- "RecordConsentRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "ReportColumn": {
+  "x-ticvai-persistence": "reporting.report_column",
   "type": "object",
   "required": [
-   "purpose",
-   "decision",
-   "noticeVersion",
-   "source",
-   "recordedAt"
+   "field"
   ],
   "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "decision": {
-    "$ref": "#/components/schemas/ConsentDecision"
-   },
-   "channels": {
-    "type": "array",
-    "description": "Omit to apply to every channel the purpose covers.",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
+   "field": {
     "type": "string"
    },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
+   "label": {
+    "type": "string"
    },
-   "recordedAt": {
+   "aggregation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Aggregation"
+     }
+    ],
+    "default": "none"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "sortDirection": {
+    "type": "string",
+    "enum": [
+     "asc",
+     "desc"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "ReportFilter": {
+  "x-ticvai-persistence": "reporting.report_filter",
+  "type": "object",
+  "required": [
+   "field",
+   "operator"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "contains",
+     "isNull",
+     "isNotNull"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   },
+   "isParameter": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
+   }
+  }
+ },
+ "Segment": {
+  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateSegmentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "lastEvaluatedSize": {
+      "type": "integer",
+      "nullable": true
+     },
+     "lastEvaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "SegmentCriterion": {
+  "x-ticvai-persistence": "marketing.segment_criterion",
+  "type": "object",
+  "required": [
+   "attribute",
+   "operator"
+  ],
+  "properties": {
+   "attribute": {
+    "type": "string",
+    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "exists",
+     "notExists",
+     "withinDays"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   }
+  }
+ },
+ "SegmentPreview": {
+  "x-ticvai-persistence": "none — evaluated live",
+  "type": "object",
+  "required": [
+   "segmentId",
+   "matchingCount",
+   "reachable"
+  ],
+  "properties": {
+   "segmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matchingCount": {
+    "type": "integer"
+   },
+   "reachable": {
+    "type": "array",
+    "description": "Per channel, after consent and suppression. A segment of 50,000 with 3,000 email consents is a 3,000-person campaign.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "reachableCount": {
+       "type": "integer"
+      },
+      "excludedNoConsent": {
+       "type": "integer"
+      },
+      "excludedSuppressed": {
+       "type": "integer"
+      },
+      "excludedNoAddress": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "evaluatedAt": {
     "type": "string",
     "format": "date-time"
    }
   }
  },
- "RegisterGuestRequest": {
+ "StockBatch": {
   "type": "object",
-  "required": [
-   "identifier",
-   "channel"
-  ],
-  "properties": {
-   "identifier": {
-    "type": "string",
-    "maxLength": 256,
-    "description": "Email address or mobile number in E.164."
-   },
-   "channel": {
-    "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp"
-    ]
-   },
-   "displayName": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "password": {
-    "type": "string",
-    "minLength": 8,
-    "maxLength": 256,
-    "description": "Optional. OTP-only accounts are supported and are the default."
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "pattern": "^[a-z]{2}$"
-   },
-   "consents": {
-    "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "purpose": {
-       "type": "string"
-      },
-      "granted": {
-       "type": "boolean"
-      },
-      "noticeVersion": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_batch",
+  "description": "BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n",
   "required": [
    "id",
-   "code",
-   "name"
+   "itemId",
+   "locationId",
+   "quantity",
+   "receivedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   }
-  }
- },
- "Session": {
-  "type": "object",
-  "required": [
-   "sessionId",
-   "principalId",
-   "roleId",
-   "scope",
-   "effectivePermissions",
-   "saleBoardId"
-  ],
-  "properties": {
-   "sessionId": {
+   "itemId": {
     "type": "string",
     "format": "uuid"
    },
-   "principalId": {
+   "locationId": {
     "type": "string",
     "format": "uuid"
    },
-   "roleId": {
+   "batchCode": {
     "type": "string",
-    "format": "uuid"
+    "nullable": true
    },
-   "displayName": {
-    "type": "string"
-   },
-   "scope": {
-    "type": "array",
-    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
-    "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
-    }
-   },
-   "effectivePermissions": {
-    "allOf": [
-     {
-      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
-     }
-    ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
-   },
-   "permissionsByScope": {
-    "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
-    "items": {
-     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
-    }
-   },
-   "saleBoardId": {
+   "lotNumber": {
     "type": "string",
-    "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "nullable": true,
+    "description": "The supplier's own reference. **A recall names a lot number**, and an inventory that cannot resolve one has to discard everything.\n"
    },
-   "workstation": {
-    "$ref": "#/components/schemas/WorkstationContext"
+   "quantity": {
+    "type": "number"
    },
-   "openedAt": {
+   "receivedAt": {
     "type": "string",
     "format": "date-time"
    },
    "expiresAt": {
     "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
+    "format": "date",
     "nullable": true
    },
-   "isEnforced": {
-    "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
+   "supplierId": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "TokenPair": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "accessToken",
-   "refreshToken",
-   "expiresIn"
-  ],
-  "properties": {
-   "accessToken": {
-    "type": "string",
-    "description": "JWT carrying `sid`, validated per request against the session registry."
-   },
-   "refreshToken": {
-    "type": "string"
-   },
-   "expiresIn": {
-    "type": "integer",
-    "description": "Seconds"
-   }
-  }
- },
- "WalletPass": {
-  "type": "object",
-  "x-ticvai-persistence": "orders.wallet_pass",
-  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
-  "required": [
-   "id",
-   "entitlementId",
-   "platform",
-   "serialNumber",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "entitlementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "apple",
-     "google"
-    ]
-   },
-   "serialNumber": {
-    "type": "string"
-   },
-   "authenticationToken": {
-    "type": "string",
-    "format": "password",
-    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+    "format": "uuid",
+    "nullable": true
    },
    "status": {
     "type": "string",
     "enum": [
-     "issued",
-     "updated",
-     "voided",
-     "expired"
+     "available",
+     "quarantined",
+     "expired",
+     "recalled",
+     "consumed",
+     "written-off"
     ]
-   },
-   "lastPushedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "deviceRegistrations": {
-    "type": "integer",
-    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
- "Wishlist": {
+ "StockValuation": {
+  "x-ticvai-persistence": "none — computed",
   "type": "object",
   "required": [
-   "subjectId",
-   "items"
+   "asAt",
+   "total",
+   "byLocation"
   ],
-  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
   "properties": {
-   "subjectId": {
+   "asAt": {
     "type": "string",
-    "format": "uuid"
+    "format": "date"
    },
-   "items": {
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "byLocation": {
     "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
     "items": {
      "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
      "properties": {
-      "id": {
+      "locationId": {
        "type": "string",
        "format": "uuid"
       },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
+      "locationName": {
        "type": "string"
       },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
+      "value": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
+      "itemCount": {
+       "type": "integer"
       }
      }
     }
+   },
+   "byCategory": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "categoryName": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario"
+  ]
+ },
+ "SuggestionOutcome": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion_outcome",
+  "description": "**What actually happened, and this is the table that makes the swap possible at all.**\nA model needs labelled data and **the only source of labels is whether the venue took the advice and whether it worked.** A platform that suggests and never records the outcome has no training set a year later, and the swap he is planning for never happens.\n**Captured whether or not the suggestion was taken.** A rejected suggestion is a stronger signal than an accepted one — it is the case the rule got wrong.\n",
+  "required": [
+   "id",
+   "suggestionId",
+   "decision"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "suggestionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accepted",
+     "modified",
+     "rejected",
+     "ignored",
+     "expired"
+    ]
+   },
+   "actualValue": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "What the venue did instead. **The label.** A suggestion of 400 units, an order of 250, and a stockout on Saturday is one training example worth more than a hundred accepted ones.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "realisedOutcome": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "**Filled in later by a job, not by a person.** Whether the stockout happened, whether the covers arrived, whether the margin held — nobody comes back to record this by hand, so nothing that depends on them doing so should be designed.\n"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
    }
   }
  }

@@ -4,9 +4,9 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**1628 operations · 28 contracts · 388 tables · 2427 screens · 125 state models · 96 flows · 46 ADRs**
+**1974 operations · 32 contracts · 556 tables · 2427 screens · 125 state models · 96 flows · 46 ADRs**
 
-**Design 84% · Build 33%.**
+**Design 91% · Build 33%.**
 
 ---
 
@@ -33,12 +33,12 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **2,647** of 3,184 | **95% of what is in scope** |
-| Operations reaching a screen | 1392 of 1635 | 85% |
+| Operations reaching a screen | 1786 of 1981 | 90% |
 | Screens reachable from an entry point | 2426 of 2427 | 100% |
 | Screens drawn on a board | 2427 of 2427 | 100% |
 | Screens in a journey | 2126 of 2427 | 88% |
 | Conflicts | 149 closed | 17 open, none blocking |
-| **Tables written** | **0** of 388 | **build has not started** |
+| **Tables written** | **0** of 556 | **build has not started** |
 
 ---
 
@@ -105,9 +105,9 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 388 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 95% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 556 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 95% of in-scope requirements and the gap to build is the entire remaining risk.**
 
-**96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 1628 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
+**96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 1974 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 
 **2427 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 

@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 30
+  "operationsWithNoScreen": 29
  },
  "waves": {
   "wave2": 10
@@ -252,52 +252,10 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "updateReportSchedule",
@@ -306,16 +264,52 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "getRegionSettings",
+    "operation": "issueDeviceCredential",
     "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read region settings"
+    "verb": "POST",
+    "summary": "Give the device an identity it can prove"
    },
    {
-    "operation": "updateRegionSettings",
+    "operation": "listDeviceAuditRecords",
     "contract": "tenancy",
-    "verb": "PUT",
-    "summary": "Update region settings"
+    "verb": "GET",
+    "summary": "What was done to this device, and what it did"
+   },
+   {
+    "operation": "listDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Firmware and software versions, and what is running where"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
+   },
+   {
+    "operation": "revokeDeviceCredential",
+    "contract": "tenancy",
+    "verb": "DELETE",
+    "summary": "Cut a device off now"
+   },
+   {
+    "operation": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Put the fleet back on the previous version"
+   },
+   {
+    "operation": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Push an update to a fleet, in waves"
    }
   ],
   "modulesSplitAcrossWaves": [],

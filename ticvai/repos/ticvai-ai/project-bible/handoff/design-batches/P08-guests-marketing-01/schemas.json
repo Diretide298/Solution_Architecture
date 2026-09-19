@@ -1,193 +1,418 @@
 {
- "Cart": {
+ "AiPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "orders.cart",
+  "x-ticvai-persistence": "ai.policy",
   "required": [
-   "id",
-   "venueId",
-   "channel",
-   "status",
-   "lines"
+   "scopeLevel",
+   "enabledCapabilities"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
-   },
-   "token": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-   },
-   "subjectId": {
-    "type": "string",
     "format": "uuid",
-    "nullable": true,
-    "description": "Null while anonymous. Set by `claimCart`."
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "status": {
-    "$ref": "#/components/schemas/CartStatus"
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "venue"
+    ],
+    "description": "Tenant sets the default; a venue may narrow it and never widen it."
    },
-   "lines": {
+   "enabledCapabilities": {
     "type": "array",
     "items": {
-     "$ref": "#/components/schemas/CartLine"
+     "type": "string",
+     "enum": [
+      "assist",
+      "search",
+      "generateConfiguration",
+      "generateLayout",
+      "summarise",
+      "explain"
+     ]
     }
    },
-   "conflicts": {
+   "allowedRoleIds": {
     "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartConflict"
-    }
-   },
-   "subtotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "discountTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPromotionIds": {
-    "type": "array",
-    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
     "items": {
      "type": "string",
      "format": "uuid"
     }
    },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+   "maskedFields": {
+    "type": "array",
+    "description": "Redacted before a prompt leaves the platform (8.3.73). **Defaults to every field in the pii schema** — a masking list nobody filled in should send nothing rather than everything.\n",
+    "items": {
+     "type": "string"
+    }
    },
-   "extensionsUsed": {
+   "requiresApprovalFor": {
+    "type": "array",
+    "description": "8.3.61–8.3.64. Nothing in this list executes without a decision.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "pricing",
+      "promotion",
+      "operational",
+      "financial",
+      "configuration"
+     ]
+    }
+   },
+   "monthlyTokenCeiling": {
     "type": "integer",
-    "readOnly": true
+    "nullable": true
    },
-   "maxExtensions": {
+   "ceilingBehaviour": {
+    "type": "string",
+    "enum": [
+     "warn",
+     "warnThenDisable",
+     "block"
+    ],
+    "default": "warn",
+    "description": "**Decided 17 August: warn, and let the venue manager choose.** A cap that stops the assistant mid-visit turns a cost control into a guest-facing outage, and the venue has no warning it is about to happen.\nAt the ceiling a notification reaches the venue manager with the spend and the remaining period, and **the assistant keeps answering until somebody decides otherwise**. `warnThenDisable` and `block` exist for a tenant who asks for a hard limit; neither is the default.\n"
+   },
+   "ceilingWarningPercent": {
     "type": "integer",
-    "readOnly": true
+    "default": 80,
+    "description": "**Warn before the ceiling, not at it.** A manager told at 100% has already spent it; one told at 80% can decide with a week left.\n"
    },
-   "locale": {
-    "type": "string"
+   "guestCapabilityScope": {
+    "type": "array",
+    "description": "**What a guest-facing assistant may help with, and nothing else** (2.1.28). Bounding the capability is what makes the cost predictable and the safety posture tractable — an assistant that answers anything is one that can be asked anything.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketSelection",
+      "promotions",
+      "faq",
+      "recommendations",
+      "checkout",
+      "waitTimes",
+      "wayfinding"
+     ]
+    }
    },
-   "createdAt": {
+   "retrieveTopK": {
+    "type": "integer",
+    "default": 30,
+    "description": "How many chunks retrieval returns before reranking."
+   },
+   "rerankTopK": {
+    "type": "integer",
+    "nullable": true,
+    "default": 5,
+    "description": "How many survive the rerank and reach the model. **Reranking reduces cost as well as improving quality**, which is unusual — retrieval is cheap and the tokens sent to the model are not.\nNull disables reranking, and a venue with no rerank provider configured runs without it rather than failing.\n"
+   },
+   "cacheAnswers": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The largest cost lever available at a kiosk.** Guest questions are extraordinarily repetitive — forty questions, thousands of times a day — where staff questions are diverse.\n**Invalidation runs on the same events that invalidate the index.** A cached answer that outlives a price change has misled a guest on the venue's behalf, which is worse than a slow one.\n"
+   },
+   "cacheTtlMinutes": {
+    "type": "integer",
+    "default": 60,
+    "description": "An upper bound on top of event invalidation, not instead of it. **The key carries `scope_path`** — a cache keyed on the question alone is a cross-venue leak wearing a performance hat.\n"
+   },
+   "retainInteractionsDays": {
+    "type": "integer",
+    "description": "How long prompts and responses are kept. **Unresolved — CF-64.** Prompts may carry personal data, so this is a retention decision nobody has made.\n"
+   },
+   "semanticCacheThreshold": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "default": 0.95,
+    "description": "**Similarity above which a cached answer serves a new question.** `cache:answer` is exact-match on question, scope and locale — *what time do you close* and *when do you shut* are two misses and two provider calls.\n\n**Per capability, not global.** A factual venue question tolerates 0.95; a recommendation tolerates nothing. **A tenant who finds it wrong can move it**, which is why it is policy rather than a constant."
+   },
+   "negativeCacheTtlSeconds": {
+    "type": "integer",
+    "default": 300,
+    "description": "**How long *no answer found* is remembered.** A miss costs a full retrieval and a completion.\n\n**Shorter than a hit deliberately** — the answer may exist tomorrow because somebody indexed it."
+   },
+   "cascade": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A small model answers and escalates only below a confidence threshold.** `ai.suggestion.confidence` exists and nothing routes on it.",
+    "properties": {
+     "smallModel": {
+      "type": "string"
+     },
+     "largeModel": {
+      "type": "string"
+     },
+     "escalateBelow": {
+      "type": "number",
+      "default": 0.7
+     }
+    }
+   },
+   "chunking": {
+    "type": "object",
+    "description": "**The single biggest lever on retrieval quality**, and currently nowhere. **A venue FAQ and a maintenance manual do not chunk the same way.** Per collection, not global.",
+    "properties": {
+     "sizeTokens": {
+      "type": "integer",
+      "default": 512
+     },
+     "overlapTokens": {
+      "type": "integer",
+      "default": 64
+     },
+     "strategy": {
+      "type": "string",
+      "enum": [
+       "fixed",
+       "sentence",
+       "semantic"
+      ],
+      "default": "sentence"
+     }
+    }
+   },
+   "quantisation": {
     "type": "string",
-    "format": "date-time"
+    "enum": [
+     "none",
+     "scalar",
+     "binary"
+    ],
+    "default": "none",
+    "description": "**A decision, never a default.** `scalar` int8 is roughly four times smaller — 49 GB becomes 12 — **and it costs recall**. `binary` is smaller again and needs rescoring against full vectors to be usable.\n\n**A creation decision**: changing it means a rebuild, which is what `shadow_collection` is for. **A tenant whose search quality drops after an infrastructure change should be able to find the line that did it.**"
    },
-   "updatedAt": {
+   "hnsw": {
+    "type": "object",
+    "nullable": true,
+    "description": "**Defaults are tuned for neither our recall nor our latency.** A collection built with the wrong ones needs a rebuild, which is why this is a creation decision like the sparse index.",
+    "properties": {
+     "m": {
+      "type": "integer",
+      "default": 16
+     },
+     "efConstruct": {
+      "type": "integer",
+      "default": 128
+     },
+     "efSearch": {
+      "type": "integer",
+      "default": 64
+     }
+    }
+   },
+   "perRequestTokenCeiling": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**One runaway conversation can spend a tenant's month.** `monthlyTokenCeiling` discovers that after it has happened."
+   },
+   "streamsByCapability": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Time to first token and total latency are separate targets.** A concierge that starts answering in 300 ms and finishes in 4 seconds is better than one silent for 2.\n\n**`chat` streams; `generateConfiguration` does not** — nobody watches a config draft assemble."
+   },
+   "fallbackProviderId": {
     "type": "string",
-    "format": "date-time"
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-151: **a provider outage with no fallback is every AI surface going dark at once.**\n\n**`residencyRefused` is never failed over.** It is a correct answer, and moving the call elsewhere would defeat the refusal."
+   },
+   "guardrailShortCircuit": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A refusal a rule can decide never reaches a model.** Cheaper, faster and more consistent than asking a model to refuse."
    }
   }
  },
- "CartMergeResult": {
+ "AiUsageReport": {
   "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "cart"
-  ],
+  "x-ticvai-persistence": "none — aggregated from ai.interaction",
   "properties": {
-   "cart": {
-    "$ref": "#/components/schemas/Cart"
+   "from": {
+    "type": "string",
+    "format": "date"
    },
-   "mergedLineCount": {
-    "type": "integer"
+   "to": {
+    "type": "string",
+    "format": "date"
    },
-   "droppedLines": {
+   "groupBy": {
+    "type": "string"
+   },
+   "rows": {
     "type": "array",
-    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
     "items": {
      "type": "object",
      "properties": {
-      "productName": {
+      "key": {
        "type": "string"
       },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "noCapacity",
-        "expired",
-        "notSellableOnChannel",
-        "duplicate"
-       ]
+      "interactions": {
+       "type": "integer"
+      },
+      "promptTokens": {
+       "type": "integer"
+      },
+      "completionTokens": {
+       "type": "integer"
+      },
+      "costMinor": {
+       "type": "integer"
+      },
+      "p95LatencyMs": {
+       "type": "integer"
+      },
+      "refusalRate": {
+       "type": "number"
+      },
+      "rejectionRate": {
+       "type": "number",
+       "description": "Proposals a person refused. **The number that says whether the assistant is worth having**, and the one nobody thinks to measure.\n"
       }
      }
     }
    }
   }
  },
- "ChallengeProgress": {
+ "Campaign": {
+  "x-ticvai-persistence": "marketing.campaign",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateCampaignRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "budgetCap": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "budgetSpent": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "readOnly": true,
+      "description": "BL-169. **A campaign could spend without limit** — following the promotions `budgetCap` precedent. **Sending stops at the cap rather than overspending and reporting it**, because a marketing budget discovered after it was exceeded is a budget nobody set.\n"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CampaignStatus"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "createdByPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "launchedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "CampaignContent": {
+  "x-ticvai-persistence": "none — embedded in campaign",
   "type": "object",
-  "x-ticvai-persistence": "marketing.challenge_progress",
-  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
   "required": [
-   "id",
-   "challengeId",
-   "subjectId",
-   "current",
-   "target"
+   "templateId"
   ],
   "properties": {
-   "id": {
+   "templateId": {
     "type": "string",
     "format": "uuid"
    },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid"
+   "subjectOverride": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
    },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
+   "mergeDefaults": {
+    "type": "object",
+    "additionalProperties": true
    },
-   "portfolioId": {
+   "promotionId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For a family or group challenge — where the shared progress accrues."
-   },
-   "current": {
-    "type": "number"
-   },
-   "target": {
-    "type": "number"
-   },
-   "streakCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rewardIssuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+    "description": "Offer carried by the campaign. Coupon codes are issued from it."
    }
   }
  },
- "ConsentDecision": {
+ "CampaignKind": {
   "type": "string",
   "enum": [
-   "granted",
-   "withdrawn",
-   "notAsked"
+   "oneOff",
+   "scheduled",
+   "triggered",
+   "recurring"
   ]
+ },
+ "CampaignStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "scheduled",
+   "sending",
+   "paused",
+   "completed",
+   "stopped",
+   "failed"
+  ]
+ },
+ "CampaignTrigger": {
+  "x-ticvai-persistence": "none — embedded in campaign",
+  "type": "object",
+  "properties": {
+   "event": {
+    "type": "string",
+    "enum": [
+     "bookingConfirmed",
+     "visitCompleted",
+     "membershipExpiring",
+     "birthday",
+     "abandonedCart",
+     "firstVisit",
+     "inactivity"
+    ]
+   },
+   "delayHours": {
+    "type": "integer"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   }
+  }
  },
  "ConsentPurpose": {
   "type": "string",
@@ -200,686 +425,212 @@
    "transactional"
   ]
  },
- "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
+ "CreateCampaignRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
   "required": [
-   "purpose",
-   "channels",
-   "noticeVersion",
-   "isRequiredForService"
+   "name",
+   "kind",
+   "channel",
+   "segmentId",
+   "content"
   ],
   "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
+   "name": {
     "type": "string",
-    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+    "maxLength": 200
    },
-   "isRequiredForService": {
-    "type": "boolean",
-    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   "kind": {
+    "$ref": "#/components/schemas/CampaignKind"
    },
-   "expiresAfterMonths": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
- "ConsentSource": {
-  "type": "string",
-  "enum": [
-   "guestApp",
-   "website",
-   "kiosk",
-   "pos",
-   "callCentre",
-   "import",
-   "agentRecorded"
-  ]
- },
- "ConsentState": {
-  "x-ticvai-persistence": "none — projection over consent_record",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "purposes"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "purpose",
-      "decision",
-      "requiresRenewal"
-     ],
-     "properties": {
-      "purpose": {
-       "$ref": "#/components/schemas/ConsentPurpose"
-      },
-      "decision": {
-       "$ref": "#/components/schemas/ConsentDecision"
-      },
-      "channels": {
-       "type": "array",
-       "items": {
-        "$ref": "#/components/schemas/MessageChannel"
-       }
-      },
-      "noticeVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "requiresRenewal": {
-       "type": "boolean",
-       "description": "True where the notice has been superseded since consent was given."
-      },
-      "decidedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
- },
- "Entitlement": {
-  "type": "object",
-  "x-ticvai-persistence": "access.entitlement",
-  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
-  "required": [
-   "id",
-   "templateId",
-   "productId",
-   "orderId",
-   "subjectId",
-   "status",
-   "validFrom",
-   "validTo"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
-   },
-   "templateId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderLineId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
    },
-   "scopePath": {
-    "type": "string"
-   },
-   "mediaCode": {
-    "type": "string",
-    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
-   },
-   "status": {
-    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
-   },
-   "statusNote": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
-   },
-   "entriesUsed": {
-    "type": "integer",
-    "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
-   },
-   "entriesAllowed": {
-    "type": "integer",
-    "nullable": true
-   },
-   "lastEntryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "frozenDays": {
-    "type": "integer",
-    "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
-   },
-   "suspendedReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "isNameBound": {
-    "type": "boolean",
-    "default": false
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "sharedWithSubjectIds": {
-    "type": "array",
-    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "issuedVia": {
-    "type": "string",
-    "enum": [
-     "sale",
-     "invitation",
-     "reissue",
-     "transfer",
-     "resale",
-     "membership",
-     "groupBooking"
-    ],
-    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
-   },
-   "supersedesEntitlementId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
-   },
-   "walletValueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
-   }
-  }
- },
- "GuestDevice": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
-  "required": [
-   "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
-  ],
-  "properties": {
-   "id": {
+   "segmentId": {
     "type": "string",
     "format": "uuid"
    },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
+   "content": {
+    "$ref": "#/components/schemas/CampaignContent"
    },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
+   "trigger": {
+    "$ref": "#/components/schemas/CampaignTrigger"
    },
-   "tokenFingerprint": {
-    "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
-   },
-   "appVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "osVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceModel": {
-    "type": "string",
-    "nullable": true
-   },
-   "locale": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
-   },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
+   "scheduledFor": {
     "type": "string",
     "format": "date-time"
    },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "GuestProfile": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "isActive"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "email": {
-    "type": "string",
-    "nullable": true
-   },
-   "phone": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredChannel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells. Marketing acts locally."
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "engagementScore": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100,
-    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
-   },
-   "engagementTier": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "new",
-     "active",
-     "occasional",
-     "lapsing",
-     "lapsed",
-     "dormant"
+   "consentPurpose": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ConsentPurpose"
+     }
     ],
-    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+    "default": "marketing"
    },
-   "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "visitCount": {
-    "type": "integer"
-   },
-   "lastVisitAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
- },
- "GuestProfileDetail": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/GuestProfile"
-   },
-   {
+   "sendWindow": {
     "type": "object",
+    "description": "Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen.\n",
     "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid",
-      "readOnly": true,
-      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     "startTime": {
+      "type": "string"
      },
-     "consents": {
-      "$ref": "#/components/schemas/ConsentState"
+     "endTime": {
+      "type": "string"
      },
-     "loyalty": {
-      "$ref": "#/components/schemas/LoyaltyPosition"
-     },
-     "openCaseCount": {
-      "type": "integer"
-     },
-     "recentOrderIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "membershipIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "notes": {
-      "type": "string",
-      "nullable": true
+     "timeZone": {
+      "type": "string"
      }
     }
    }
-  ]
- },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
   }
  },
- "Invitation": {
+ "IndexFailure": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "x-ticvai-persistence": "ai.index_failure",
+  "description": "ADR-0033. **Failure is a row somebody works, not a log line.**\n\n`ai.index_job` already counts `records_failed` and holds a `failure_sample`; **this is where the other 4,999 go.**",
   "required": [
-   "id",
-   "campaignId",
-   "token",
-   "status"
+   "id"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "campaignId": {
+   "jobId": {
     "type": "string",
     "format": "uuid"
    },
-   "subjectId": {
+   "sourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentRef": {
+    "type": "string",
+    "description": "What would not index."
+   },
+   "stage": {
+    "type": "string",
+    "enum": [
+     "fetch",
+     "parse",
+     "chunk",
+     "embed",
+     "upsert"
+    ],
+    "description": "**Where it failed decides who fixes it.** A parse failure is a document problem; an embed failure is a provider one."
+   },
+   "error": {
+    "type": "string"
+   },
+   "attempts": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "LostItem": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.lost_item",
+  "description": "BL-021. **Screens existed on three platforms and `lostAndFound` is a `ModuleKey`, and there was no item, no claim and no match between them** — which is the whole capability.\nGeneric case management holds a conversation about a lost bag. **It cannot tell you that the bag somebody handed in on Tuesday is the one somebody asked about on Monday**, and that match is the only thing the module is for.\n",
+  "required": [
+   "id",
+   "kind",
+   "foundOrLost",
+   "venueId",
+   "reportedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "foundOrLost": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "found"
+    ],
+    "description": "**One entity, two directions.** A guest reports a loss and a steward reports a find, and modelling them separately means matching across two tables that drift.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "bag",
+     "phone",
+     "wallet",
+     "keys",
+     "clothing",
+     "jewellery",
+     "documents",
+     "toy",
+     "buggy",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "colour": {
+    "type": "string",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lastSeenPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A point on the venue map. **Where a guest thinks they lost it is the strongest signal for a match**, and it is also the thing they are least sure about.\n"
+   },
+   "reportedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "reportedBySubjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "recipientEmail": {
+   "storageLocation": {
     "type": "string",
-    "format": "email",
     "nullable": true
-   },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
    },
    "status": {
     "type": "string",
     "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
+     "open",
+     "matched",
+     "claimed",
+     "disposed",
+     "returned"
     ]
    },
-   "entitlementIds": {
+   "photoAssetIds": {
     "type": "array",
     "items": {
      "type": "string",
      "format": "uuid"
     }
    },
-   "respondedAt": {
+   "disposeAfter": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "LoginRequest": {
-  "type": "object",
-  "required": [
-   "username",
-   "credential",
-   "workstationId"
-  ],
-  "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
-   },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
-   },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
-   }
-  }
- },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   {
-    "type": "object",
-    "required": [
-     "requiresRoleSelection"
-    ],
-    "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
-     },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
-     },
-     "session": {
-      "$ref": "#/components/schemas/Session"
-     }
-    }
-   }
-  ]
- },
- "LoyaltyPosition": {
-  "x-ticvai-persistence": "marketing.loyalty_position",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "programmeId",
-   "pointsBalance",
-   "tierCode"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "lifetimePoints": {
-    "type": "integer"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "pointsToNextTier": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryPoints": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
+    "format": "date",
+    "nullable": true,
+    "description": "**A retention date, because unclaimed property has one.** A storeroom with no disposal date is a storeroom that fills, and the date is a venue policy rather than a default.\n"
    }
   }
  },
@@ -893,308 +644,6 @@
    "inApp",
    "post"
   ]
- },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
-  "type": "string",
-  "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
-  ]
- },
- "MfaMethod": {
-  "x-ticvai-persistence": "identity.mfa_method",
-  "type": "object",
-  "required": [
-   "id",
-   "kind",
-   "isActive",
-   "enrolledAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "label": {
-    "type": "string",
-    "nullable": true
-   },
-   "maskedTarget": {
-    "type": "string",
-    "nullable": true,
-    "description": "Partially masked destination, so a person can tell two methods apart."
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   },
-   "enrolledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastUsedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "OrderChannel": {
-  "type": "string",
-  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice"
-  ]
- },
- "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderLine"
-   },
-   {
-    "type": "object",
-    "required": [
-     "serverUnitPrice",
-     "taxAmount",
-     "netAmount",
-     "grossAmount"
-    ],
-    "properties": {
-     "serverUnitPrice": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "What the server computed on ingest."
-     },
-     "priceVariance": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
-     },
-     "taxAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "netAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "grossAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "entitlementIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "crossRegionRightIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Redemption rights propagated to other cells for this line."
-     }
-    }
-   }
-  ]
- },
- "OrderStatus": {
-  "type": "string",
-  "enum": [
-   "pending",
-   "held",
-   "paid",
-   "partiallyPaid",
-   "completed",
-   "voided",
-   "refunded",
-   "partiallyRefunded",
-   "failed"
-  ],
-  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -1215,523 +664,168 @@
    }
   }
  },
- "Payment": {
-  "x-ticvai-persistence": "orders.payment",
+ "VenueSettings": {
   "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "status",
-   "recordedAt"
-  ],
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
   "properties": {
    "id": {
-    "type": "string"
-   },
-   "orderId": {
-    "type": "string"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
-   },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
-   },
-   "fxRateSource": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "manual",
-     "feed",
-     "cardScheme"
-    ],
-    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
-   },
-   "changeCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "changeAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "authorised",
-     "captured",
-     "pendingConfirmation",
-     "declined",
-     "failed",
-     "voided",
-     "refunded"
-    ]
-   },
-   "providerName": {
-    "type": "string",
-    "nullable": true
-   },
-   "providerReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastInquiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Problem": {
-  "type": "object",
-  "description": "RFC 9457 problem details. Every error response uses this shape.",
-  "required": [
-   "type",
-   "title",
-   "status"
-  ],
-  "properties": {
-   "type": {
-    "type": "string",
-    "format": "uri"
-   },
-   "title": {
-    "type": "string"
-   },
-   "status": {
-    "type": "integer"
-   },
-   "detail": {
-    "type": "string"
-   },
-   "instance": {
-    "type": "string"
-   },
-   "traceId": {
-    "type": "string"
-   },
-   "errors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "field",
-      "code"
-     ],
-     "properties": {
-      "field": {
-       "type": "string"
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RecordConsentRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "purpose",
-   "decision",
-   "noticeVersion",
-   "source",
-   "recordedAt"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "decision": {
-    "$ref": "#/components/schemas/ConsentDecision"
-   },
-   "channels": {
-    "type": "array",
-    "description": "Omit to apply to every channel the purpose covers.",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "RegisterGuestRequest": {
-  "type": "object",
-  "required": [
-   "identifier",
-   "channel"
-  ],
-  "properties": {
-   "identifier": {
-    "type": "string",
-    "maxLength": 256,
-    "description": "Email address or mobile number in E.164."
-   },
-   "channel": {
-    "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp"
-    ]
-   },
-   "displayName": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "password": {
-    "type": "string",
-    "minLength": 8,
-    "maxLength": 256,
-    "description": "Optional. OTP-only accounts are supported and are the default."
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "pattern": "^[a-z]{2}$"
-   },
-   "consents": {
-    "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "purpose": {
-       "type": "string"
-      },
-      "granted": {
-       "type": "boolean"
-      },
-      "noticeVersion": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   }
-  }
- },
- "Session": {
-  "type": "object",
-  "required": [
-   "sessionId",
-   "principalId",
-   "roleId",
-   "scope",
-   "effectivePermissions",
-   "saleBoardId"
-  ],
-  "properties": {
-   "sessionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "scope": {
-    "type": "array",
-    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
-    "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
-    }
-   },
-   "effectivePermissions": {
-    "allOf": [
-     {
-      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
-     }
-    ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
-   },
-   "permissionsByScope": {
-    "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
-    "items": {
-     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
-    }
-   },
-   "saleBoardId": {
     "type": "string",
     "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "workstation": {
-    "$ref": "#/components/schemas/WorkstationContext"
-   },
-   "openedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
+   "venueId": {
     "type": "string",
     "format": "uuid"
    },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "isEnforced": {
-    "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "TokenPair": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "accessToken",
-   "refreshToken",
-   "expiresIn"
-  ],
-  "properties": {
-   "accessToken": {
-    "type": "string",
-    "description": "JWT carrying `sid`, validated per request against the session registry."
-   },
-   "refreshToken": {
-    "type": "string"
-   },
-   "expiresIn": {
-    "type": "integer",
-    "description": "Seconds"
-   }
-  }
- },
- "WalletPass": {
-  "type": "object",
-  "x-ticvai-persistence": "orders.wallet_pass",
-  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
-  "required": [
-   "id",
-   "entitlementId",
-   "platform",
-   "serialNumber",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "entitlementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "apple",
-     "google"
-    ]
-   },
-   "serialNumber": {
-    "type": "string"
-   },
-   "authenticationToken": {
-    "type": "string",
-    "format": "password",
-    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "updated",
-     "voided",
-     "expired"
-    ]
-   },
-   "lastPushedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "deviceRegistrations": {
-    "type": "integer",
-    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "Wishlist": {
-  "type": "object",
-  "required": [
-   "subjectId",
-   "items"
-  ],
-  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "items": {
-    "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
       }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
      }
     }
    }

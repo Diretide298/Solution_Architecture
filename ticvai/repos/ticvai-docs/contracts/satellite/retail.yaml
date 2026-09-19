@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 21
+  x-ticvai-screen-count: 25
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -114,6 +114,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+        - "P08 BO-1116 Parent–Child Stored Value Distribution"
+        - "P08 BO-1121 Shared Wallet Transfers & Balance Reallocation"
       summary: Send balance to another guest
       description: >
         BL-121. **Peer-to-peer transfer was declared on the wallet and unreachable** — a field with
@@ -170,6 +172,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: activateGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Activate a card at the point of sale
       description: >
@@ -991,6 +995,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
+        - "P08 BO-1086 Wallet Ownership & Account Association"
+        - "P08 BO-414 Wallet & Credit Management Dashboard"
+        - "P08 BO-416 Wallet Account & Balance View"
+        - "P08 BO-448 Redemption Wallet & Balance View"
+        - "P08 BO-487 Customer Wallet & Balance Summary"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
       summary: Read a guest wallet
@@ -1018,6 +1027,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: topUpWallet
+      x-ticvai-consumed-by:
+        - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-audience: [staff]
       summary: Add value to a wallet
       description: >
@@ -1071,6 +1082,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
+        - "P08 BO-1093 Funding Command Center"
+        - "P08 BO-1102 Funding Transaction Audit & Reconciliation"
+        - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
+        - "P08 BO-1143 Wallet Operations Command Center"
+        - "P08 BO-414 Wallet & Credit Management Dashboard"
+        - "P08 BO-423 Wallet Credit Transaction Ledger & Audit"
         - "P08 BO-469 Wallet & Deduction Transaction Monitor"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # reconciling a disputed balance needs the current one
@@ -1105,6 +1122,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: adjustWallet
+      x-ticvai-consumed-by:
+        - "P08 BO-1149 Administrative Balance Adjustment Studio"
+        - "P08 BO-1167 Reconciliation Exception & Resolution Workbench"
+        - "P08 BO-422 Refund, Adjustment & Manual Bonus Control"
       x-ticvai-audience: [staff]
       summary: Manually adjust a wallet balance
       description: >
@@ -1143,6 +1164,8 @@ paths:
   /gift-cards:
     post:
       operationId: issueGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Issue or activate a gift card
       description: >

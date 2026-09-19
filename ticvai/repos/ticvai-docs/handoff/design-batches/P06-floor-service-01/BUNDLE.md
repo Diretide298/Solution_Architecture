@@ -1,14 +1,14 @@
-# P01-account-self-service-01 — P01 · Account & Self-Service
+# P06-floor-service-01 — P06 · Floor Service
 
-**5 screens · 46 operations · 37 schemas · 5 permissions**
+**10 screens · 31 operations · 26 schemas · 6 permissions**
 
-Platform P01 Guest Web · ships as **guest** ·
-guest audience · web ·
-online only
+Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
+staff audience · mobileApp ·
+offline-capable
 
 ## Who this is for
 
-**guest on web.** Everything below is how you know what is
+**staff on mobileApp.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
-- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
+- **19 of these operations work offline**: compItem, createFnbOrder, createPayment, fireCourse, getBill, getTableMap, holdCourse, joinRestaurantWaitlist
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
-| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
-| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
-| `WEB-019` | Order History | listDetail | 5 | 0 | — |
-| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
-
-## Thin screens in this batch
-
-**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `EMP-051` | Restaurant Service Command Center | listDetail | 3 | 0 | — |
+| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 0 | — |
+| `EMP-053` | Table & Seating Configuration | configEditor | 1 | 0 | — |
+| `EMP-054` | Reservation Calendar & Timeline | listDetail | 1 | 0 | — |
+| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 0 | — |
+| `EMP-056` | Walk-In & Waitlist Management | configEditor | 1 | 0 | — |
+| `EMP-057` | Guest Profile & Dining History | listDetail | 4 | 0 | — |
+| `EMP-058` | Live Table & Service Management | configEditor | 16 | 1 | — |
+| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 7 | 1 | — |
+| `EMP-060` | Reservation & Table Performance | listDetail | 2 | 0 | — |
 
 ---
 
@@ -80,849 +81,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
+  "id": "EMP-051",
+  "name": "Restaurant Service Command Center",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/restaurant-service-command-center",
+   "component": "apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "EMP-003"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
+    "EMP-003"
    ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "incidentId",
+      "shiftId"
      ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4a`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Restaurant Service Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
   "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
+   "FnB Board 4.dc.html#fnb-4a"
   ],
   "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "patternReason": "`listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act",
+  "purpose": "Restaurant Service Command Center — from the client design board, 20 August.",
   "gaps": [
    {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listFnbOrders",
+    "why": "**1 declared operation reach no component on this screen**: listFnbOrders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -935,24 +137,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
+       "label": "Every restaurant service",
+       "bindsTo": "TableReservation",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tableIds",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes"
        ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
       }
      ]
     },
@@ -962,40 +164,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
+       "label": "The selected restaurant service",
+       "bindsTo": "TableMap",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
+        "TableMap.outletId",
+        "TableMap.zones",
+        "TableMap.tables"
        ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "operation": "getTableMap",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
       }
      ]
     },
@@ -1004,10 +181,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "kind": "searchField",
+       "label": "Search restaurant service command center",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -1015,250 +200,138 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "loading": "The restaurant service list.",
+   "error": "Could not load. Names which read failed and leaves the restaurant service untouched.",
+   "emptyFirstRun": "No restaurant service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the restaurant service are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
+    "operationId": "getTableMap",
+    "contract": "fnb",
+    "purpose": "Table map with live state",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
+    "operationId": "listTableReservations",
+    "contract": "fnb",
+    "purpose": "Bookings for a service period",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
+    "operationId": "listFnbOrders",
+    "contract": "fnb",
+    "purpose": "List F&B orders",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "entitlementId",
-     "from": "deepLink"
+     "name": "venueId",
+     "from": "session"
     },
     {
-     "name": "orderId",
-     "from": "deepLink"
+     "name": "outletId",
+     "from": "EMP-003"
     }
    ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
+    "TableMap.outletId",
+    "TableMap.zones",
+    "TableMap.tables"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-051",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "id": "EMP-052",
+  "name": "Floor Plan & Table Map",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/floor-plan-table-map",
+   "component": "apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "EMP-003"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "EMP-003"
    ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "incidentId",
+      "shiftId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Floor Plan &amp; Table Map* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4b"
   ],
+  "pattern": "statusTracker",
+  "patternReason": "`getTableMap` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Floor Plan & Table Map — from the client design board, 20 August.",
   "layout": {
-   "template": "split",
+   "template": "detail",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
+     "slot": "record",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
+       "label": "The selected floor plan table",
+       "bindsTo": "TableMap",
        "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "TableMap.outletId",
+        "TableMap.zones",
+        "TableMap.tables"
        ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
+       "operation": "getTableMap",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
       }
      ]
     },
@@ -1268,172 +341,316 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Save changes",
+       "operation": "setTableLayout",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search floor plan",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "loading": "The floor plan table list.",
+   "error": "Could not load. Names which read failed and leaves the floor plan table untouched.",
+   "emptyFirstRun": "No floor plan table yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the floor plan table are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
+    "operationId": "getTableMap",
+    "contract": "fnb",
+    "purpose": "Table map with live state",
     "trigger": "onLoad"
    },
    {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
+    "operationId": "setTableLayout",
+    "contract": "fnb",
+    "purpose": "Configure the table layout",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "orderId",
-     "from": "deepLink"
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "EMP-003"
     }
    ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-052",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
+  "id": "EMP-053",
+  "name": "Table & Seating Configuration",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "app": "venue-staff-app",
+   "route": "/operations/table-seating-configuration",
+   "component": "apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "EMP-003"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "EMP-003"
    ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "incidentId",
+      "shiftId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4c`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Table &amp; Seating Configuration* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4c"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`setTableLayout`) and no read of a population — it is settings, not a list",
+  "purpose": "Table & Seating Configuration — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "TableDefinition.id",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "textField",
+       "label": "label",
+       "bindsTo": "TableDefinition.label",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "textField",
+       "label": "capacity",
+       "bindsTo": "TableDefinition.capacity",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "textField",
+       "label": "zone",
+       "bindsTo": "TableDefinition.zone",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "textField",
+       "label": "position",
+       "bindsTo": "TableDefinition.position",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "textField",
+       "label": "shape",
+       "bindsTo": "TableDefinition.shape",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setTableLayout",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search table",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved table seating.",
+   "error": "Could not load. Names which read failed and leaves the table seating untouched.",
+   "emptyFirstRun": "No table seating configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "setTableLayout",
+    "contract": "fnb",
+    "purpose": "Configure the table layout",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-053",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-054",
+  "name": "Reservation Calendar & Timeline",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/reservation-calendar-timeline",
+   "component": "apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4d`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation Calendar &amp; Timeline* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4d"
+  ],
   "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "patternReason": "`listTableReservations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Reservation Calendar & Timeline — from the client design board, 20 August.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1443,19 +660,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
+       "label": "Every reservation calendar timeline",
+       "bindsTo": "TableReservation",
        "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tableIds",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes"
        ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
       }
      ]
     },
@@ -1465,7 +687,630 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected profile preferences",
+       "label": "The selected reservation calendar timeline",
+       "bindsTo": "TableReservation",
+       "columns": [
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tableIds",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes",
+        "TableReservation.actualPartySize",
+        "TableReservation.tableVisitId"
+       ],
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search reservation calendar",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reservation calendar timeline list.",
+   "error": "Could not load. Names which read failed and leaves the reservation calendar timeline untouched.",
+   "emptyFirstRun": "No reservation calendar timeline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reservation calendar timeline are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "listTableReservations",
+    "contract": "fnb",
+    "purpose": "Bookings for a service period",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "TableReservation.id",
+    "TableReservation.outletId",
+    "TableReservation.subjectId",
+    "TableReservation.guestName",
+    "TableReservation.contactPoint"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-054",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-055",
+  "name": "Create / Edit Reservation",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/create-edit-reservation",
+   "component": "apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4e`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Create / Edit Reservation* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4e"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`createTableReservation`) and no read of a population — it is settings, not a list",
+  "purpose": "Create / Edit Reservation — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "TableReservation.id",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "outletId",
+       "bindsTo": "TableReservation.outletId",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "subjectId",
+       "bindsTo": "TableReservation.subjectId",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "guestName",
+       "bindsTo": "TableReservation.guestName",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "contactPoint",
+       "bindsTo": "TableReservation.contactPoint",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "partySize",
+       "bindsTo": "TableReservation.partySize",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "startsAt",
+       "bindsTo": "TableReservation.startsAt",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "durationMinutes",
+       "bindsTo": "TableReservation.durationMinutes",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "tableIds",
+       "bindsTo": "TableReservation.tableIds",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "status",
+       "bindsTo": "TableReservation.status",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "groupId",
+       "bindsTo": "TableReservation.groupId",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "notes",
+       "bindsTo": "TableReservation.notes",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "actualPartySize",
+       "bindsTo": "TableReservation.actualPartySize",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "textField",
+       "label": "tableVisitId",
+       "bindsTo": "TableReservation.tableVisitId",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible existing guest",
+       "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createTableReservation",
+       "provenance": "contract fnb.yaml POST /table-reservations"
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible existing guest",
+       "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search create / edit reservation",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible existing guest",
+       "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved create edit reservation.",
+   "error": "Could not load. Names which read failed and leaves the create edit reservation untouched.",
+   "emptyFirstRun": "No create edit reservation configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "createTableReservation",
+    "contract": "fnb",
+    "purpose": "Book a table in advance",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "matchGuest",
+    "contract": "marketing-crm",
+    "purpose": "Propose existing guests who may be the same person, before a second record is created",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-055",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-056",
+  "name": "Walk-In & Waitlist Management",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/walk-in-waitlist-management",
+   "component": "apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Walk-In &amp; Waitlist Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4f"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population — it is settings, not a list",
+  "purpose": "Walk-In & Waitlist Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "RestaurantWaitlist.id",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "outletId",
+       "bindsTo": "RestaurantWaitlist.outletId",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "subjectId",
+       "bindsTo": "RestaurantWaitlist.subjectId",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "partySize",
+       "bindsTo": "RestaurantWaitlist.partySize",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "quotedWaitMinutes",
+       "bindsTo": "RestaurantWaitlist.quotedWaitMinutes",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "seatingPreference",
+       "bindsTo": "RestaurantWaitlist.seatingPreference",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "status",
+       "bindsTo": "RestaurantWaitlist.status",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "notifiedAt",
+       "bindsTo": "RestaurantWaitlist.notifiedAt",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "textField",
+       "label": "holdExpiresAt",
+       "bindsTo": "RestaurantWaitlist.holdExpiresAt",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Join",
+       "operation": "joinRestaurantWaitlist",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search walk-in",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved walk-in waitlist.",
+   "error": "Could not load. Names which read failed and leaves the walk-in waitlist untouched.",
+   "emptyFirstRun": "No walk-in waitlist configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "joinRestaurantWaitlist",
+    "contract": "fnb",
+    "purpose": "Add a party to an outlet's waitlist",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-056",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-057",
+  "name": "Guest Profile & Dining History",
+  "module": "Floor Service",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/guest-profile-dining-history",
+   "component": "apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4g`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Guest Profile &amp; Dining History* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4g"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Guest Profile & Dining History — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every guest profile dining",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible duplicates of this guest",
+       "permission": "GUEST_MANAGE",
+       "notes": "Candidates from `matchGuest`, each with the rule that matched it."
+      },
+      {
+       "kind": "confirmDialog",
+       "label": "Merge these two records",
+       "permission": "GUEST_MANAGE",
+       "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guest profile dining",
        "bindsTo": "GuestProfileDetail",
        "columns": [
         "GuestProfileDetail.id",
@@ -1487,30 +1332,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getGuestProfile",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "kind": "duplicateMatch",
+       "label": "Possible duplicates of this guest",
+       "permission": "GUEST_MANAGE",
+       "notes": "Candidates from `matchGuest`, each with the rule that matched it."
       },
       {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+       "kind": "confirmDialog",
+       "label": "Merge these two records",
+       "permission": "GUEST_MANAGE",
+       "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
       }
      ]
     },
@@ -1519,38 +1352,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search guest profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
+       "label": "Confirm",
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "duplicateMatch",
+       "label": "Possible duplicates of this guest",
+       "permission": "GUEST_MANAGE",
+       "notes": "Candidates from `matchGuest`, each with the rule that matched it."
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "kind": "confirmDialog",
+       "label": "Merge these two records",
+       "permission": "GUEST_MANAGE",
+       "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "loading": "The guest profile dining list.",
+   "error": "Could not load. Names which read failed and leaves the guest profile dining untouched.",
+   "emptyFirstRun": "No guest profile dining yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest profile dining are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
    {
@@ -1560,53 +1398,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onLoad"
    },
    {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
     "trigger": "onLoad"
    },
    {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
+    "operationId": "matchGuest",
+    "contract": "marketing-crm",
+    "purpose": "Find other records that may be this same person",
+    "trigger": "onAction"
    },
    {
-    "operationId": "updateGuestPreferences",
+    "operationId": "mergeGuests",
     "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
+    "purpose": "Merge a proposed duplicate into this profile, once a person has decided",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "subjectId",
+     "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "subjectId",
+     "from": "EMP-003"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
     "GuestProfileDetail.id",
     "GuestProfileDetail.subjectId",
@@ -1618,36 +1439,848 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-057",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
     "siblings": [
-     "P02",
-     "P05"
+     "P07"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-058",
+  "name": "Live Table & Service Management",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/live-table-service-management",
+   "component": "apps/venue-staff-app/src/routes/operations/LiveTableServiceManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-059",
+    "EMP-060"
+   ],
+   "transitions": [
+    {
+     "to": "EMP-059",
+     "trigger": "Food is ordered with courses",
+     "provenance": "flow F29 step 2→3"
+    },
+    {
+     "to": "EMP-060",
+     "trigger": "Reservation & Table Performance",
+     "provenance": "flow F80 step 2→3, F94 step 1→2"
+    },
+    {
+     "to": "KIT-002",
+     "trigger": "One main comes back wrong",
+     "provenance": "flow F29 step 5→6",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Cross-platform navigation removed 24 August**: KIT-002. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4a",
+   "FnB Board 4.dc.html#fnb-4b",
+   "FnB Board 4.dc.html#fnb-4h"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`) and no read of a population — it is settings, not a list",
+  "purpose": "Live Table & Service Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "OpenTableVisitRequest.id",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "textField",
+       "label": "tableId",
+       "bindsTo": "OpenTableVisitRequest.tableId",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "textField",
+       "label": "covers",
+       "bindsTo": "OpenTableVisitRequest.covers",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "textField",
+       "label": "serverPrincipalId",
+       "bindsTo": "OpenTableVisitRequest.serverPrincipalId",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "textField",
+       "label": "subjectId",
+       "bindsTo": "OpenTableVisitRequest.subjectId",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "OpenTableVisitRequest.recordedAt",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Open",
+       "operation": "openTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateTableVisit",
+       "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge",
+       "operation": "mergeTableVisits",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/merge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer",
+       "operation": "transferTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Seat",
+       "operation": "seatTableReservation",
+       "provenance": "contract fnb.yaml POST /table-reservations/{reservationId}/seat"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setServiceStage",
+       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/stage"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Move",
+       "operation": "moveTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reassign",
+       "operation": "reassignServer",
+       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Notify",
+       "operation": "notifyServer",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fire",
+       "operation": "fireCourse",
+       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdCourse",
+       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setTableCombinations",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quote",
+       "operation": "quoteWaitTime",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/quote"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Join",
+       "operation": "joinRestaurantWaitlist",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Notify",
+       "operation": "notifyWaitlistParty",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search live table",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmMergeTableVisits",
+    "component": "confirmDialog",
+    "trigger": "Merge",
+    "body": "**Names what `mergeTableVisits` changes and what it leaves alone**, in the consequence rather than the verb. A live table service this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/merge"
+   }
+  ],
+  "states": {
+   "loading": "The saved live table service.",
+   "error": "Could not load. Names which read failed and leaves the live table service untouched.",
+   "emptyFirstRun": "No live table service configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "openTableVisit",
+    "contract": "fnb",
+    "purpose": "Seat a party and open a visit",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "updateTableVisit",
+    "contract": "fnb",
+    "purpose": "Amend covers, move table, or reassign server",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "mergeTableVisits",
+    "contract": "fnb",
+    "purpose": "Merge another visit into this one",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "transferTableVisit",
+    "contract": "fnb",
+    "purpose": "Move a check to another server",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "seatTableReservation",
+    "contract": "fnb",
+    "purpose": "The party arrived and has been sat down",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setServiceStage",
+    "contract": "fnb",
+    "purpose": "Where this table is in its meal",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "moveTableVisit",
+    "contract": "fnb",
+    "purpose": "Move a party to a different table, mid-service",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "reassignServer",
+    "contract": "fnb",
+    "purpose": "Hand a table to another server",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "notifyServer",
+    "contract": "fnb",
+    "purpose": "The kitchen calls the server to the pass",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createFnbOrder",
+    "contract": "fnb",
+    "purpose": "Place an F&B order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "fireCourse",
+    "contract": "fnb",
+    "purpose": "Send a held course to the pass",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "holdCourse",
+    "contract": "fnb",
+    "purpose": "Stop a course going out",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setTableCombinations",
+    "contract": "fnb",
+    "purpose": "Which tables can be pushed together, and to what capacity",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "quoteWaitTime",
+    "contract": "fnb",
+    "purpose": "Tell a party how long, and mean it",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "joinRestaurantWaitlist",
+    "contract": "fnb",
+    "purpose": "Add a party to an outlet's waitlist",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "notifyWaitlistParty",
+    "contract": "fnb",
+    "purpose": "Their table is ready",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "visitId",
+     "from": "EMP-003"
+    },
+    {
+     "name": "reservationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "entryId",
+     "from": "deepLink",
+     "optional": true
+    },
+    {
+     "name": "outletId",
+     "from": "session",
+     "optional": true
+    },
+    {
+     "name": "ticketId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. A booking opened from the timeline. **The host taps a reservation to seat it** — that is the only way in. A waitlist party tapped on the list. Resolves from the shift assignment. A ticket tapped on the rail."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-058",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-059",
+  "name": "Table Order, Bill & Payment Management",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/table-order-bill-payment-management",
+   "component": "apps/venue-staff-app/src/routes/operations/TableOrderBillPaymentManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-058"
+   ],
+   "transitions": [
+    {
+     "to": "EMP-058",
+     "trigger": "Live Table & Service Management",
+     "provenance": "flow F80 step 1→2",
+     "operation": "transferOrderItems"
+    },
+    {
+     "to": "KIT-002",
+     "trigger": "The kitchen makes the starters and bumps them",
+     "provenance": "flow F29 step 3→4",
+     "operation": "createFnbOrder",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4j"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getBill` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Table Order, Bill & Payment Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected table order bill",
+       "bindsTo": "Bill",
+       "columns": [
+        "Bill.visitId",
+        "Bill.covers",
+        "Bill.lines",
+        "Bill.subtotal",
+        "Bill.serviceCharge",
+        "Bill.taxAmount",
+        "Bill.discountAmount",
+        "Bill.total"
+       ],
+       "operation": "getBill",
+       "provenance": "contract fnb.yaml GET /table-visits/{visitId}/bill"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Split",
+       "operation": "splitBill",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/bill/split"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Comp",
+       "operation": "compItem",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/comp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderItems",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer-items"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search table order, bill",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseTableVisit",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeTableVisit` changes and what it leaves alone**, in the consequence rather than the verb. A table order bill this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/close"
+   }
+  ],
+  "states": {
+   "loading": "The table order bill list.",
+   "error": "Could not load. Names which read failed and leaves the table order bill untouched.",
+   "emptyFirstRun": "No table order bill yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the table order bill are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "closeTableVisit",
+    "contract": "fnb",
+    "purpose": "Settle and close a visit",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Take a payment against an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createFnbOrder",
+    "contract": "fnb",
+    "purpose": "Place an F&B order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "splitBill",
+    "contract": "fnb",
+    "purpose": "Split a bill",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getBill",
+    "contract": "fnb",
+    "purpose": "Bill for a visit",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "compItem",
+    "contract": "fnb",
+    "purpose": "Take a line off the bill, with a reason and a name",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "transferOrderItems",
+    "contract": "fnb",
+    "purpose": "Move items to another table's bill",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "visitId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-059",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-060",
+  "name": "Reservation & Table Performance",
+  "module": "Floor Service",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/reservation-table-performance",
+   "component": "apps/venue-staff-app/src/routes/operations/ReservationTablePerformanceDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003",
+    "EMP-058"
+   ],
+   "exitTo": [
+    "EMP-003",
+    "EMP-061"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-061",
+     "trigger": "Retail Inventory Command Center",
+     "provenance": "flow F80 step 3→4, F94 step 2→3"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.**",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act",
+  "purpose": "Reservation & Table Performance — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every reservation table performance",
+       "bindsTo": "TableReservation",
+       "columns": [
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tableIds",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes"
+       ],
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected reservation table performance",
+       "bindsTo": "TableMap",
+       "columns": [
+        "TableMap.outletId",
+        "TableMap.zones",
+        "TableMap.tables"
+       ],
+       "operation": "getTableMap",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search reservation",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reservation table performance list.",
+   "error": "Could not load. Names which read failed and leaves the reservation table performance untouched.",
+   "emptyFirstRun": "No reservation table performance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reservation table performance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "listTableReservations",
+    "contract": "fnb",
+    "purpose": "Bookings for a service period",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTableMap",
+    "contract": "fnb",
+    "purpose": "Table map with live state",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "TableMap.outletId",
+    "TableMap.zones",
+    "TableMap.tables"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-060",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
     "decided": "10 September 2026"
    }
   }
@@ -1661,15 +2294,15 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "addToWishlist": {
+ "closeTableVisit": {
   "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
+  "path": "/table-visits/{visitId}/close",
+  "contract": "fnb",
+  "summary": "Settle and close a visit",
+  "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "workstation",
   "parameters": [
    {
     "name": null,
@@ -1678,13 +2311,70 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Wishlist"
+  "responds": null
  },
- "claimCart": {
+ "compItem": {
   "method": "POST",
-  "path": "/carts/{cartId}/claim",
+  "path": "/table-visits/{visitId}/comp",
+  "contract": "fnb",
+  "summary": "Take a line off the bill, with a reason and a name",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "createFnbOrder": {
+  "method": "POST",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "Place an F&B order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateFnbOrderRequest",
+  "responds": "FnbOrder"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
   "contract": "orders",
-  "summary": "Attach an anonymous cart to a guest",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "createTableReservation": {
+  "method": "POST",
+  "path": "/table-reservations",
+  "contract": "fnb",
+  "summary": "Book a table in advance",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1696,55 +2386,17 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "CartMergeResult"
+  "requestBody": "TableReservation",
+  "responds": "TableReservation"
  },
- "completeSsoAuthorization": {
+ "fireCourse": {
   "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
-  "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LoginResponse"
- },
- "createMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "createRefundRequest": {
-  "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "path": "/kitchen-tickets/{ticketId}/fire",
+  "contract": "fnb",
+  "summary": "Send a held course to the pass",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1754,71 +2406,20 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "KitchenTicket"
  },
- "enrolMfaMethod": {
-  "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaEnrolment"
- },
- "getEntitlement": {
+ "getBill": {
   "method": "GET",
-  "path": "/entitlements/{entitlementId}",
-  "contract": "access",
-  "summary": "One entitlement, with what remains on it",
+  "path": "/table-visits/{visitId}/bill",
+  "contract": "fnb",
+  "summary": "Bill for a visit",
   "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Entitlement"
- },
- "getEntitlementCredential": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}/credential",
-  "contract": "access",
-  "summary": "The thing that gets scanned",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "rotate",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "getEntitlementHistory": {
-  "method": "GET",
-  "path": "/entitlements/{entitlementId}/history",
-  "contract": "access",
-  "summary": "Every scan, freeze, share and reissue against it",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
+  "responds": "Bill"
  },
  "getGuestProfile": {
   "method": "GET",
@@ -1833,260 +2434,79 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "GuestProfileDetail"
  },
- "getGuestSession": {
+ "getTableMap": {
   "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "getMyChallenges": {
-  "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ChallengeProgress"
- },
- "getOrder": {
-  "method": "GET",
-  "path": "/orders/{orderId}",
-  "contract": "orders",
-  "summary": "Read an order",
+  "path": "/outlets/{outletId}/tables",
+  "contract": "fnb",
+  "summary": "Table map with live state",
   "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "TableMap"
  },
- "getWishlist": {
+ "holdCourse": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/hold",
+  "contract": "fnb",
+  "summary": "Stop a course going out",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "joinRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist",
+  "contract": "fnb",
+  "summary": "Add a party to an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RestaurantWaitlist",
+  "responds": "RestaurantWaitlist"
+ },
+ "listFnbOrders": {
   "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
- "guestLogout": {
-  "method": "DELETE",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "End a guest session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "allDevices",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "guestSocialLogin": {
-  "method": "POST",
-  "path": "/auth/guest/social",
-  "contract": "identity",
-  "summary": "Sign in with Apple or Google",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "guestUaePassLogin": {
-  "method": "POST",
-  "path": "/auth/guest/uae-pass",
-  "contract": "identity",
-  "summary": "Sign in with a national identity provider",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "issueWalletPass": {
-  "method": "POST",
-  "path": "/wallet-passes",
-  "contract": "orders",
-  "summary": "Generate an Apple or Google wallet pass",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "List F&B orders",
   "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletPass"
- },
- "linkGuestCheckout": {
-  "method": "POST",
-  "path": "/auth/guest/link-checkout",
-  "contract": "identity",
-  "summary": "Attach a guest checkout to an account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "listConsentPurposes": {
-  "method": "GET",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configured consent purposes",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
- "listEntitlements": {
-  "method": "GET",
-  "path": "/my/entitlements/all",
-  "contract": "access",
-  "summary": "Every entitlement this guest holds, including expired",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "includeExpired",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Entitlement"
- },
- "listGuestDevices": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
- },
- "listMyEntitlements": {
-  "method": "GET",
-  "path": "/guests/me/entitlements",
-  "contract": "access",
-  "summary": "Every ticket, pass and membership this guest holds",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "state",
+    "name": "outletId",
     "in": "query",
     "required": null
    },
    {
-    "name": "includeShared",
+    "name": "tableVisitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
     "in": "query",
     "required": null
    },
@@ -2102,36 +2522,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
- },
- "listMyOrders": {
-  "method": "GET",
-  "path": "/my/orders",
-  "contract": "orders",
-  "summary": "The orders this guest placed",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "since",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -2187,176 +2578,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listTableReservations": {
   "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
+  "path": "/table-reservations",
+  "contract": "fnb",
+  "summary": "Bookings for a service period",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProvider"
- },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
+  "requestBody": null,
+  "responds": "TableReservation"
  },
- "recordConsent": {
+ "matchGuest": {
   "method": "POST",
-  "path": "/guests/{subjectId}/consents",
+  "path": "/guests/match",
   "contract": "marketing-crm",
-  "summary": "Record a consent decision",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordConsentRequest",
-  "responds": "ConsentState"
- },
- "refreshToken": {
-  "method": "POST",
-  "path": "/auth/refresh",
-  "contract": "identity",
-  "summary": "Rotate the access token",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TokenPair"
- },
- "registerGuest": {
-  "method": "POST",
-  "path": "/auth/guest/register",
-  "contract": "identity",
-  "summary": "Create a guest account",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RegisterGuestRequest",
-  "responds": "GuestSession"
- },
- "registerGuestDevice": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "Register a device for push",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp",
-  "contract": "identity",
-  "summary": "Request a one-time code",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "respondToInvitation": {
-  "method": "POST",
-  "path": "/invitations/{token}/respond",
-  "contract": "marketing-crm",
-  "summary": "Accept or decline",
+  "summary": "Is this the same person we already have?",
   "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2369,17 +2629,17 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Invitation"
+  "responds": null
  },
- "revokeGuestDevice": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/devices/{deviceId}",
+ "mergeGuests": {
+  "method": "POST",
+  "path": "/guests/merge",
   "contract": "marketing-crm",
-  "summary": "Revoke a device registration",
-  "permission": null,
+  "summary": "Two records, one person",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -2390,11 +2650,11 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "shareEntitlement": {
+ "mergeTableVisits": {
   "method": "POST",
-  "path": "/entitlements/{entitlementId}/share",
-  "contract": "orders",
-  "summary": "Let somebody else use this, without giving it away",
+  "path": "/table-visits/{visitId}/merge",
+  "contract": "fnb",
+  "summary": "Merge another visit into this one",
   "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2407,33 +2667,33 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Problem"
+  "responds": "TableVisit"
  },
- "startSsoAuthorization": {
-  "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+ "moveTableVisit": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/move",
+  "contract": "fnb",
+  "summary": "Move a party to a different table, mid-service",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "TableVisit"
  },
- "transferOrderTickets": {
+ "notifyServer": {
   "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
+  "path": "/table-visits/{visitId}/notify-server",
+  "contract": "fnb",
+  "summary": "The kitchen calls the server to the pass",
+  "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -2447,15 +2707,129 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "updateGuestPreferences": {
+ "notifyWaitlistParty": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/notify",
+  "contract": "fnb",
+  "summary": "Their table is ready",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RestaurantWaitlist"
+ },
+ "openTableVisit": {
+  "method": "POST",
+  "path": "/table-visits",
+  "contract": "fnb",
+  "summary": "Seat a party and open a visit",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OpenTableVisitRequest",
+  "responds": "TableVisit"
+ },
+ "quoteWaitTime": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/quote",
+  "contract": "fnb",
+  "summary": "Tell a party how long, and mean it",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reassignServer": {
   "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
+  "path": "/table-visits/{visitId}/server",
+  "contract": "fnb",
+  "summary": "Hand a table to another server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
   "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "seatTableReservation": {
+  "method": "POST",
+  "path": "/table-reservations/{reservationId}/seat",
+  "contract": "fnb",
+  "summary": "The party arrived and has been sat down",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableReservation"
+ },
+ "setServiceStage": {
+  "method": "PUT",
+  "path": "/table-visits/{visitId}/stage",
+  "contract": "fnb",
+  "summary": "Where this table is in its meal",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "setTableCombinations": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/table-combinations",
+  "contract": "fnb",
+  "summary": "Which tables can be pushed together, and to what capacity",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -2466,15 +2840,91 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "updateMyProfile": {
+ "setTableLayout": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/tables",
+  "contract": "fnb",
+  "summary": "Configure the table layout",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableMap"
+ },
+ "splitBill": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/bill/split",
+  "contract": "fnb",
+  "summary": "Split a bill",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SplitBillRequest",
+  "responds": "BillSplit"
+ },
+ "transferOrderItems": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/transfer-items",
+  "contract": "fnb",
+  "summary": "Move items to another table's bill",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "transferTableVisit": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/transfer",
+  "contract": "fnb",
+  "summary": "Move a check to another server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateTableVisit": {
   "method": "PATCH",
-  "path": "/guests/me/profile",
-  "contract": "marketing-crm",
-  "summary": "A guest correcting their own details",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
+  "path": "/table-visits/{visitId}",
+  "contract": "fnb",
+  "summary": "Amend covers, move table, or reassign server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -2483,83 +2933,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "GuestProfile"
- },
- "verifyGuestEmail": {
-  "method": "POST",
-  "path": "/auth/guest/verify-email",
-  "contract": "identity",
-  "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyGuestOtp": {
-  "method": "POST",
-  "path": "/auth/guest/otp/verify",
-  "contract": "identity",
-  "summary": "Verify a one-time code and issue a session",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
- "verifyMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a step-up challenge",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "TableVisit"
  }
 }
 ```
@@ -2570,257 +2944,140 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "Cart": {
+ "Bill": {
+  "x-ticvai-persistence": "none — computed from visit orders",
   "type": "object",
-  "x-ticvai-persistence": "orders.cart",
   "required": [
-   "id",
-   "venueId",
-   "channel",
-   "status",
-   "lines"
+   "visitId",
+   "lines",
+   "subtotal",
+   "taxAmount",
+   "total"
   ],
   "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
+   "visitId": {
+    "type": "string"
    },
-   "token": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null while anonymous. Set by `claimCart`."
-   },
-   "status": {
-    "$ref": "#/components/schemas/CartStatus"
+   "covers": {
+    "type": "integer"
    },
    "lines": {
     "type": "array",
     "items": {
-     "$ref": "#/components/schemas/CartLine"
-    }
-   },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CartConflict"
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "lineTotal"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "orderId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "categoryCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "seatNumber": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
     }
    },
    "subtotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "discountTotal": {
+   "serviceCharge": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "taxTotal": {
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPromotionIds": {
-    "type": "array",
-    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
-   },
-   "extensionsUsed": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "maxExtensions": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "locale": {
-    "type": "string"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
    }
   }
  },
- "CartMergeResult": {
+ "BillSplit": {
+  "x-ticvai-persistence": "fnb.bill_split + fnb.sub_bill",
   "type": "object",
-  "x-ticvai-persistence": "none — computed",
   "required": [
-   "cart"
+   "visitId",
+   "method",
+   "subBills"
   ],
   "properties": {
-   "cart": {
-    "$ref": "#/components/schemas/Cart"
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "mergedLineCount": {
-    "type": "integer"
+   "visitId": {
+    "type": "string"
    },
-   "droppedLines": {
+   "method": {
+    "$ref": "#/components/schemas/SplitMethod"
+   },
+   "subBills": {
     "type": "array",
-    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
     "items": {
      "type": "object",
+     "required": [
+      "subBillId",
+      "total",
+      "status"
+     ],
      "properties": {
-      "productName": {
+      "subBillId": {
        "type": "string"
       },
-      "reason": {
+      "lineIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "subtotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "status": {
        "type": "string",
        "enum": [
-        "noCapacity",
-        "expired",
-        "notSellableOnChannel",
-        "duplicate"
+        "unpaid",
+        "paid"
        ]
       }
      }
     }
    }
   }
- },
- "ChallengeProgress": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.challenge_progress",
-  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
-  "required": [
-   "id",
-   "challengeId",
-   "subjectId",
-   "current",
-   "target"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "portfolioId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a family or group challenge — where the shared progress accrues."
-   },
-   "current": {
-    "type": "number"
-   },
-   "target": {
-    "type": "number"
-   },
-   "streakCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rewardIssuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "ConsentDecision": {
-  "type": "string",
-  "enum": [
-   "granted",
-   "withdrawn",
-   "notAsked"
-  ]
- },
- "ConsentPurpose": {
-  "type": "string",
-  "enum": [
-   "marketing",
-   "personalisation",
-   "profiling",
-   "thirdPartySharing",
-   "aiProcessing",
-   "transactional"
-  ]
- },
- "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
-  "type": "object",
-  "required": [
-   "purpose",
-   "channels",
-   "noticeVersion",
-   "isRequiredForService"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string",
-    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
-   },
-   "isRequiredForService": {
-    "type": "boolean",
-    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
-   },
-   "expiresAfterMonths": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
- "ConsentSource": {
-  "type": "string",
-  "enum": [
-   "guestApp",
-   "website",
-   "kiosk",
-   "pos",
-   "callCentre",
-   "import",
-   "agentRecorded"
-  ]
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -2874,217 +3131,240 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "Entitlement": {
+ "CreateFnbOrderLine": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-persistence": "access.entitlement",
-  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
   "required": [
    "id",
-   "templateId",
-   "productId",
-   "orderId",
-   "subjectId",
-   "status",
-   "validFrom",
-   "validTo"
+   "menuItemId",
+   "quantity"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "templateId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
-   },
-   "productId": {
+   "menuItemId": {
     "type": "string",
     "format": "uuid"
    },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderLineId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "mediaCode": {
-    "type": "string",
-    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
-   },
-   "status": {
-    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
-   },
-   "statusNote": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
-   },
-   "entriesUsed": {
+   "quantity": {
     "type": "integer",
-    "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+    "minimum": 1
    },
-   "entriesAllowed": {
-    "type": "integer",
-    "nullable": true
-   },
-   "lastEntryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "frozenDays": {
-    "type": "integer",
-    "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
-   },
-   "suspendedReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "isNameBound": {
-    "type": "boolean",
-    "default": false
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "sharedWithSubjectIds": {
+   "modifierOptionIds": {
     "type": "array",
-    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
     "items": {
      "type": "string",
      "format": "uuid"
     }
    },
-   "issuedVia": {
+   "note": {
     "type": "string",
-    "enum": [
-     "sale",
-     "invitation",
-     "reissue",
-     "transfer",
-     "resale",
-     "membership",
-     "groupBooking"
-    ],
-    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
+    "maxLength": 200,
+    "description": "Free text to the kitchen. Allergy notes belong here and are surfaced prominently."
    },
-   "supersedesEntitlementId": {
-    "type": "string",
-    "format": "uuid",
+   "seatNumber": {
+    "type": "integer",
     "nullable": true,
-    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
+    "description": "Which cover ordered it. Drives split-by-covers accurately."
    },
-   "walletValueId": {
-    "type": "string",
-    "format": "uuid",
+   "course": {
+    "type": "integer",
     "nullable": true,
-    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+    "description": "Course grouping, so the kitchen fires in sequence."
    }
   }
  },
- "GuestDevice": {
+ "CreateFnbOrderRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
   "required": [
    "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
+   "outletId",
+   "serviceMode",
+   "lines",
+   "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "subjectId": {
+   "outletId": {
     "type": "string",
     "format": "uuid"
    },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
    },
-   "tokenFingerprint": {
+   "tableVisitId": {
     "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+    "nullable": true,
+    "description": "Required for table service. Absent for quick service."
    },
-   "appVersion": {
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateFnbOrderLine"
+    }
+   },
+   "recordedAt": {
     "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderedAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cash only. Change is the difference."
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
     "nullable": true
    },
-   "osVersion": {
+   "recordedAt": {
     "type": "string",
-    "nullable": true
+    "format": "date-time"
+   }
+  }
+ },
+ "FnbOrder": {
+  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "outletId",
+   "serviceMode",
+   "status",
+   "lines",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
    },
-   "deviceModel": {
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
     "type": "string",
-    "nullable": true
+    "format": "uuid"
    },
-   "locale": {
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "tableVisitId": {
     "type": "string",
     "nullable": true
    },
    "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/CreateFnbOrderLine"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "status": {
+         "$ref": "#/components/schemas/FnbOrderStatus"
+        },
+        "unitPrice": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        },
+        "lineTotal": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "kitchenTicketId": {
     "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
+    "nullable": true
    },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
+   "estimatedReadyAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
-   "revokedAt": {
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    }
   }
+ },
+ "FnbOrderStatus": {
+  "type": "string",
+  "description": "The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n",
+  "enum": [
+   "ordered",
+   "accepted",
+   "inPreparation",
+   "ready",
+   "served",
+   "collected",
+   "delivered",
+   "cancelled",
+   "refunded"
+  ]
  },
  "GuestProfile": {
   "x-ticvai-persistence": "marketing.guest_profile",
@@ -3216,197 +3496,145 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
+ "KitchenTicket": {
+  "x-ticvai-persistence": "fnb.kitchen_ticket + fnb.kitchen_ticket_line",
   "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
- },
- "Invitation": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
   "required": [
    "id",
-   "campaignId",
-   "token",
-   "status"
+   "orderId",
+   "outletId",
+   "status",
+   "lines",
+   "createdAt"
   ],
   "properties": {
    "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
     "type": "string",
     "format": "uuid"
    },
-   "campaignId": {
+   "tableLabel": {
     "type": "string",
-    "format": "uuid"
+    "nullable": true
    },
-   "subjectId": {
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "coursing": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "fireAndForget",
+     "holdAndFire",
+     "phased",
+     "timed",
+     "delayed"
+    ],
+    "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/KitchenTicketStatus"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Higher fires sooner. Raised by Fast Pass or supervisor override."
+   },
+   "prioritisedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "recipientEmail": {
+   "prioritiseReason": {
     "type": "string",
-    "format": "email",
     "nullable": true
    },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
-    ]
-   },
-   "entitlementIds": {
+   "lines": {
     "type": "array",
     "items": {
-     "type": "string",
-     "format": "uuid"
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "status"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "course": {
+       "type": "integer",
+       "nullable": true
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
     }
    },
-   "respondedAt": {
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetReadyAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   "elapsedSeconds": {
+    "type": "integer"
    }
   }
  },
- "LoginRequest": {
-  "type": "object",
-  "required": [
-   "username",
-   "credential",
-   "workstationId"
-  ],
-  "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
-   },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
-   },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
-   }
-  }
- },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   {
-    "type": "object",
-    "required": [
-     "requiresRoleSelection"
-    ],
-    "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
-     },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
-     },
-     "session": {
-      "$ref": "#/components/schemas/Session"
-     }
-    }
-   }
+ "KitchenTicketStatus": {
+  "type": "string",
+  "enum": [
+   "received",
+   "preparing",
+   "ready",
+   "served",
+   "recalled",
+   "cancelled"
   ]
  },
  "LoyaltyPosition": {
@@ -3454,318 +3682,42 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "MessageChannel": {
-  "type": "string",
-  "enum": [
-   "email",
-   "sms",
-   "whatsapp",
-   "push",
-   "inApp",
-   "post"
-  ]
- },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
-  "type": "string",
-  "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
-  ]
- },
- "MfaMethod": {
-  "x-ticvai-persistence": "identity.mfa_method",
+ "OpenTableVisitRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
   "required": [
    "id",
-   "kind",
-   "isActive",
-   "enrolledAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "label": {
-    "type": "string",
-    "nullable": true
-   },
-   "maskedTarget": {
-    "type": "string",
-    "nullable": true,
-    "description": "Partially masked destination, so a person can tell two methods apart."
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   },
-   "enrolledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastUsedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
+   "tableId",
+   "covers",
    "recordedAt"
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
-   "orderNumber": {
-    "type": "string"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
+   "tableId": {
     "type": "string",
     "format": "uuid"
    },
-   "scopePath": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
+   "covers": {
     "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+    "minimum": 1,
+    "description": "Captured at seating because it drives split-by-covers at close."
    },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
+   "serverPrincipalId": {
     "type": "string",
     "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "nullable": true
    },
    "subjectId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
+    "format": "uuid"
    },
    "recordedAt": {
     "type": "string",
     "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
- },
- "OrderChannel": {
-  "type": "string",
-  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice"
-  ]
- },
- "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderLine"
-   },
-   {
-    "type": "object",
-    "required": [
-     "serverUnitPrice",
-     "taxAmount",
-     "netAmount",
-     "grossAmount"
-    ],
-    "properties": {
-     "serverUnitPrice": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "What the server computed on ingest."
-     },
-     "priceVariance": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
-     },
-     "taxAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "netAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "grossAmount": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "entitlementIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "crossRegionRightIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Redemption rights propagated to other cells for this line."
-     }
-    }
-   }
-  ]
- },
- "OrderStatus": {
-  "type": "string",
-  "enum": [
-   "pending",
-   "held",
-   "paid",
-   "partiallyPaid",
-   "completed",
-   "voided",
-   "refunded",
-   "partiallyRefunded",
-   "failed"
-  ],
-  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -3883,430 +3835,409 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "Problem": {
+ "RestaurantWaitlist": {
   "type": "object",
-  "description": "RFC 9457 problem details. Every error response uses this shape.",
-  "required": [
-   "type",
-   "title",
-   "status"
-  ],
-  "properties": {
-   "type": {
-    "type": "string",
-    "format": "uri"
-   },
-   "title": {
-    "type": "string"
-   },
-   "status": {
-    "type": "integer"
-   },
-   "detail": {
-    "type": "string"
-   },
-   "instance": {
-    "type": "string"
-   },
-   "traceId": {
-    "type": "string"
-   },
-   "errors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "field",
-      "code"
-     ],
-     "properties": {
-      "field": {
-       "type": "string"
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RecordConsentRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "purpose",
-   "decision",
-   "noticeVersion",
-   "source",
-   "recordedAt"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "decision": {
-    "$ref": "#/components/schemas/ConsentDecision"
-   },
-   "channels": {
-    "type": "array",
-    "description": "Omit to apply to every channel the purpose covers.",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "RegisterGuestRequest": {
-  "type": "object",
-  "required": [
-   "identifier",
-   "channel"
-  ],
-  "properties": {
-   "identifier": {
-    "type": "string",
-    "maxLength": 256,
-    "description": "Email address or mobile number in E.164."
-   },
-   "channel": {
-    "type": "string",
-    "enum": [
-     "email",
-     "sms",
-     "whatsapp"
-    ]
-   },
-   "displayName": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "password": {
-    "type": "string",
-    "minLength": 8,
-    "maxLength": 256,
-    "description": "Optional. OTP-only accounts are supported and are the default."
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "pattern": "^[a-z]{2}$"
-   },
-   "consents": {
-    "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "purpose": {
-       "type": "string"
-      },
-      "granted": {
-       "type": "boolean"
-      },
-      "noticeVersion": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
+  "x-ticvai-persistence": "fnb.waitlist_entry",
+  "description": "BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a party size, a table preference and a walk-away point, and a guest who leaves is not the same as a guest who was served.\n",
   "required": [
    "id",
-   "code",
-   "name"
+   "outletId",
+   "partySize",
+   "status"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "code": {
-    "type": "string"
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
    },
-   "name": {
-    "type": "string"
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "isPrimary": {
-    "type": "boolean"
+   "partySize": {
+    "type": "integer"
+   },
+   "quotedWaitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "enum": [
+     "any",
+     "indoor",
+     "outdoor",
+     "bar",
+     "booth",
+     "highChair"
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "waiting",
+     "notified",
+     "seated",
+     "walkedAway",
+     "noShow",
+     "cancelled"
+    ]
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
    }
   }
  },
- "Session": {
+ "ServiceMode": {
+  "type": "string",
+  "enum": [
+   "quickService",
+   "tableService",
+   "roomService",
+   "collection",
+   "delivery"
+  ]
+ },
+ "SplitBillRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
   "required": [
-   "sessionId",
-   "principalId",
-   "roleId",
-   "scope",
-   "effectivePermissions",
-   "saleBoardId"
+   "method"
   ],
   "properties": {
-   "sessionId": {
-    "type": "string",
-    "format": "uuid"
+   "method": {
+    "$ref": "#/components/schemas/SplitMethod"
    },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
+   "parts": {
+    "type": "integer",
+    "minimum": 2,
+    "description": "For `byCovers` — defaults to the visit's cover count."
    },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "scope": {
+   "amounts": {
     "type": "array",
-    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "description": "For `byAmount`. Must sum to the bill total.",
     "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
     }
    },
-   "effectivePermissions": {
-    "allOf": [
-     {
-      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+   "lineAssignments": {
+    "type": "array",
+    "description": "For `byLine` or `bySeat`. Every line must be assigned exactly once.",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "partIndex"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "partIndex": {
+       "type": "integer",
+       "minimum": 0
+      }
      }
-    ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
-   },
-   "permissionsByScope": {
-    "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
-    "items": {
-     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }
    },
-   "saleBoardId": {
+   "categoryAssignments": {
+    "type": "array",
+    "description": "For `byCategory` — food to one part, beverage to another.",
+    "items": {
+     "type": "object",
+     "required": [
+      "categoryCode",
+      "partIndex"
+     ],
+     "properties": {
+      "categoryCode": {
+       "type": "string"
+      },
+      "partIndex": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   }
+  }
+ },
+ "SplitMethod": {
+  "type": "string",
+  "enum": [
+   "byAmount",
+   "byCovers",
+   "byCategory",
+   "byLine",
+   "bySeat"
+  ]
+ },
+ "TableMap": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "outletId",
+   "tables"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "zones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "tables": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/TableState"
+    }
+   }
+  }
+ },
+ "TableReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "required": [
+   "outletId",
+   "startsAt",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
     "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "readOnly": true
    },
-   "workstation": {
-    "$ref": "#/components/schemas/WorkstationContext"
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string"
+   },
+   "contactPoint": {
+    "type": "string"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
+   },
+   "tableIds": {
+    "type": "array",
+    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/TableReservationStatus"
+   },
+   "groupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "5.1.2. Several bookings managed as one party across adjacent tables."
+   },
+   "notes": {
+    "type": "string",
+    "description": "Allergies",
+    "occasion": null,
+    "accessibility.": null
+   },
+   "actualPartySize": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "tableVisitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "TableReservationStatus": {
+  "type": "string",
+  "enum": [
+   "booked",
+   "confirmed",
+   "seated",
+   "completed",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "TableState": {
+  "x-ticvai-persistence": "none — projection over table and visit",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TableDefinition"
+   },
+   {
+    "type": "object",
+    "required": [
+     "status"
+    ],
+    "properties": {
+     "status": {
+      "$ref": "#/components/schemas/TableStatus"
+     },
+     "visitId": {
+      "type": "string",
+      "nullable": true
+     },
+     "covers": {
+      "type": "integer",
+      "nullable": true
+     },
+     "seatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "serverPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "billTotal": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   }
+  ]
+ },
+ "TableVisit": {
+  "x-ticvai-persistence": "fnb.table_visit",
+  "type": "object",
+  "required": [
+   "id",
+   "tableId",
+   "outletId",
+   "covers",
+   "status",
+   "orders",
+   "openedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "covers": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "billRequested",
+     "settled",
+     "merged",
+     "cancelled"
+    ]
+   },
+   "serverPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orders": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FnbOrder"
+    }
+   },
+   "mergedIntoVisitId": {
+    "type": "string",
+    "nullable": true
+   },
+   "mergedFromVisitIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "runningTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "openedAt": {
     "type": "string",
     "format": "date-time"
    },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "isEnforced": {
-    "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "TokenPair": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "accessToken",
-   "refreshToken",
-   "expiresIn"
-  ],
-  "properties": {
-   "accessToken": {
-    "type": "string",
-    "description": "JWT carrying `sid`, validated per request against the session registry."
-   },
-   "refreshToken": {
-    "type": "string"
-   },
-   "expiresIn": {
-    "type": "integer",
-    "description": "Seconds"
-   }
-  }
- },
- "WalletPass": {
-  "type": "object",
-  "x-ticvai-persistence": "orders.wallet_pass",
-  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
-  "required": [
-   "id",
-   "entitlementId",
-   "platform",
-   "serialNumber",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "entitlementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "apple",
-     "google"
-    ]
-   },
-   "serialNumber": {
-    "type": "string"
-   },
-   "authenticationToken": {
-    "type": "string",
-    "format": "password",
-    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "updated",
-     "voided",
-     "expired"
-    ]
-   },
-   "lastPushedAt": {
+   "closedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
-   },
-   "deviceRegistrations": {
-    "type": "integer",
-    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
- "Wishlist": {
-  "type": "object",
-  "required": [
-   "subjectId",
-   "items"
-  ],
-  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "items": {
-    "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   }
-  }
+ "TenderKind": {
+  "type": "string",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
  }
 }
 ```

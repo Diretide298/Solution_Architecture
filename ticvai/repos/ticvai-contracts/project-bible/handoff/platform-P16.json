@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 22,
-  "contracts": 10,
+  "operations": 52,
+  "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 98
+  "operationsWithNoScreen": 87
  },
  "waves": {
   "wave3": 69
@@ -32,7 +32,7 @@
  "contracts": [
   {
    "contract": "reporting",
-   "operations": 6
+   "operations": 34
   },
   {
    "contract": "ai",
@@ -47,15 +47,11 @@
    "operations": 3
   },
   {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
    "contract": "identity",
-   "operations": 1
+   "operations": 2
   },
   {
-   "contract": "catalogue",
+   "contract": "orders",
    "operations": 1
   },
   {
@@ -63,11 +59,19 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "approvals",
    "operations": 1
   },
   {
    "contract": "promotions",
+   "operations": 1
+  },
+  {
+   "contract": "catalogue",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -168,7 +172,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/live-operations-dashboard-anl-012",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -177,7 +181,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/revenue-pulse-anl-013",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -186,7 +190,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/attendance-footfall-intelligence-anl-014",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -195,7 +199,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/capacity-utilization-monitor-anl-015",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -204,7 +208,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/sales-channel-performance-anl-016",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -213,7 +217,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/customer-membership-loyalty-pulse-anl-017",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -231,7 +235,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-management-insights-anl-019",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -240,7 +244,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/multi-site-performance-comparison-anl-020",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -249,7 +253,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-library-anl-021",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -258,7 +262,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-creation-wizard-anl-022",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -267,7 +271,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/drag-and-drop-dashboard-canvas-anl-023",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -276,7 +280,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/widget-visualization-library-anl-024",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -285,7 +289,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/kpi-builder-anl-025",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -294,7 +298,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/targets-thresholds-kpi-status-rules-anl-026",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -303,7 +307,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/data-filter-configuration-anl-027",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -312,7 +316,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/drill-down-interaction-designer-anl-028",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -321,7 +325,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-access-publishing-versioning-anl-029",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -330,7 +334,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-preview-validation-health-anl-030",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -339,7 +343,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-catalogue-library-anl-031",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -348,7 +352,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-creation-wizard-anl-032",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -357,7 +361,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/data-domain-dataset-selector-anl-033",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -366,7 +370,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/field-column-selector-anl-034",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -375,7 +379,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/filter-parameter-builder-anl-035",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -384,7 +388,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/grouping-aggregation-calculation-builder-anl-036",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -393,7 +397,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/cross-domain-report-composer-anl-037",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -402,7 +406,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-layout-formatting-designer-anl-038",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -411,7 +415,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-preview-test-validation-anl-039",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -420,7 +424,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/save-run-report-results-viewer-anl-040",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -429,7 +433,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/reporting-governance-command-center-anl-041",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -438,7 +442,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-scheduler-anl-042",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -447,7 +451,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/subscription-manager-anl-043",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -456,7 +460,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/distribution-delivery-configuration-anl-044",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -465,7 +469,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/export-download-center-anl-045",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -474,7 +478,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-api-data-delivery-manager-anl-046",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -483,7 +487,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-access-sharing-control-anl-047",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -492,7 +496,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/delivery-monitoring-failure-management-anl-048",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -501,7 +505,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-audit-trail-compliance-anl-049",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -510,7 +514,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/retention-archive-governance-policy-anl-050",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -519,7 +523,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-analytics-command-center-anl-051",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -528,7 +532,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ask-ticvai-natural-language-analytics-anl-052",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -537,7 +541,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-generated-dashboard-studio-anl-053",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -546,7 +550,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-report-generator-anl-054",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -555,7 +559,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/anomaly-detection-center-anl-055",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -564,7 +568,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/root-cause-analysis-explorer-anl-056",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -573,7 +577,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/forecasting-predictive-analytics-studio-anl-057",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -582,7 +586,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-recommendation-next-best-action-center-anl-058",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -591,7 +595,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-insight-history-evidence-explainability-anl-059",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -609,7 +613,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/bi-analytics-administration-command-center-anl-061",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -618,7 +622,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/enterprise-kpi-library-anl-062",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -627,7 +631,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/kpi-targets-thresholds-scorecards-anl-063",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -636,7 +640,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/benchmark-comparative-analytics-configuration-anl-064",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -645,7 +649,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/data-source-integration-registry-anl-065",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -654,7 +658,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/semantic-model-business-data-catalogue-anl-066",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -663,7 +667,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/data-refresh-pipeline-data-health-monitor-anl-067",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -672,7 +676,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/embedded-bi-workspace-tenant-administration-anl-068",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -681,7 +685,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/analytics-performance-usage-cost-monitor-anl-069",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -847,28 +851,70 @@
     "summary": "Amend or close a campaign"
    },
    {
-    "operation": "setPasswordPolicy",
+    "operation": "createEmergencyAccessOverride",
     "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
+    "verb": "POST",
+    "summary": "Bypass the policy, loudly"
    },
    {
-    "operation": "setSegregationRules",
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
     "contract": "identity",
     "verb": "PUT",
-    "summary": "Which permissions may not be held together"
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "submitCountLines",
     "contract": "inventory",
     "verb": "POST",
     "summary": "Submit counted quantities"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Start it, or stop it"
    },
    {
     "operation": "addGuestNote",
@@ -883,40 +929,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -931,18 +947,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -955,34 +959,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -1021,12 +1001,6 @@
     "summary": "Start a cart"
    },
    {
-    "operation": "createPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Send a guest a link to pay later"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -1043,12 +1017,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listChargebacks",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Open disputes, by deadline"
    },
    {
     "operation": "listFraudRules",
@@ -1087,28 +1055,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
     "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
     "summary": "Give a hold back"
-   },
-   {
-    "operation": "resendPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
-    "operation": "respondToChargeback",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Submit evidence, or accept the loss"
    },
    {
     "operation": "setFraudRules",
@@ -1117,22 +1067,10 @@
     "summary": ""
    },
    {
-    "operation": "setPaymentProvider",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Configure a gateway and its routing"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "voidPayment",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Release an authorisation before it is captured"
    },
    {
     "operation": "assignCoupon",
@@ -1183,6 +1121,12 @@
     "summary": "Preview how an amount divides"
    },
    {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   },
+   {
     "operation": "redeemVoucher",
     "contract": "promotions",
     "verb": "POST",
@@ -1219,52 +1163,10 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "updateReportSchedule",
@@ -1273,16 +1175,52 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "getRegionSettings",
+    "operation": "issueDeviceCredential",
     "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read region settings"
+    "verb": "POST",
+    "summary": "Give the device an identity it can prove"
    },
    {
-    "operation": "updateRegionSettings",
+    "operation": "listDeviceAuditRecords",
     "contract": "tenancy",
-    "verb": "PUT",
-    "summary": "Update region settings"
+    "verb": "GET",
+    "summary": "What was done to this device, and what it did"
+   },
+   {
+    "operation": "listDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Firmware and software versions, and what is running where"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
+   },
+   {
+    "operation": "revokeDeviceCredential",
+    "contract": "tenancy",
+    "verb": "DELETE",
+    "summary": "Cut a device off now"
+   },
+   {
+    "operation": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Put the fleet back on the previous version"
+   },
+   {
+    "operation": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Push an update to a fleet, in waves"
    }
   ],
   "modulesSplitAcrossWaves": [],

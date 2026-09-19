@@ -52,6 +52,11 @@ components:
         - ROLE_MANAGE                 # create roles and attach grants
         - PERMISSION_GRANT            # assign grants to a principal
         - PERMISSION_VIEW             # view the grant set of others
+        - PERMISSION_MANAGE           # author, approve and retire access policies
+        # **Separate from `PERMISSION_GRANT` on purpose.** Granting a role to a person is a
+        # daily act a duty manager performs; writing the policy that decides what any role
+        # can do at three in the morning is not. 3.3.26 asks for approval on the second and
+        # says nothing about the first.
 
         # --- Control Plane ---
         # Held by platform staff, never by tenant users. These operate outside any cell.
@@ -107,6 +112,24 @@ components:
         - CREDIT_MANAGE               # partner credit limits and terms
         - CREDIT_OVERRIDE             # authorise one order beyond the limit. 2.7.39
 
+        # --- Wallet and stored value ------------------------------------------
+        - WALLET_VIEW                 # balances, lots, liability, disputes
+        - WALLET_OPERATE              # adjust, reverse, freeze, relink a credential
+        - WALLET_CONFIGURE            # wallet types, credit types, funding and risk rules
+
+        # --- Payment orchestration --------------------------------------------
+        - PAYMENT_VIEW                # methods, providers, routing, health, economics
+        - PAYMENT_CONFIGURE           # methods, routing, failover, terminals, tender rules
+        - PAYMENT_PROVIDER_MANAGE     # connect a gateway and hold its credentials
+        - PAYMENT_DISPUTE             # assemble and submit chargeback evidence
+        # **`PROVIDER_MANAGE` is separate from `CONFIGURE` because it holds keys.** Changing
+        # which acquirer a venue routes to is an operational decision; possessing the
+        # credentials that can move the money is not the same thing.
+        # **`OPERATE` touches one guest's money; `CONFIGURE` decides the rules for
+        # everybody's.** A duty manager reverses a mistaken top-up several times a week;
+        # changing the consumption order decides, for every guest at once, whether their
+        # bonus credit expires unused. Those are not the same authority.
+
         # --- Shift and cash ---------------------------------------------------
         - SHIFT_OPEN
         - SHIFT_CLOSE
@@ -127,6 +150,18 @@ components:
         - ACCESS_POINT_CONFIGURE
         - TURNSTILE_MODE_SET          # entry, re-entry, crossover, exit, free, closed
         - TICKET_LOOKUP               # read-only validity check, no admission
+
+        # --- Accreditation ----------------------------------------------------
+        - ACCREDITATION_VIEW
+        - ACCREDITATION_APPLY         # submit an application or a document
+        - ACCREDITATION_APPROVE       # decide an application, verify a document
+        - ACCREDITATION_ISSUE         # produce, encode and replace a credential
+        - ACCREDITATION_MANAGE        # amend a holder, assign access, suspend, revoke
+        - ACCREDITATION_CONFIGURE     # programmes, requirements, access profiles, badges
+        # **Six, because accreditation separates duties more sharply than anything else in
+        # the platform.** The person who prints a badge must not be the person who decided
+        # what it opens, and neither should be the person who wrote the access profile.
+        # 3.3.31 asks for segregation of duties; this is where it is most load-bearing.
 
         # --- Reporting --------------------------------------------------------
         - REPORT_VIEW_OWN             # self-scoped. Not resolved against the tree
@@ -162,6 +197,25 @@ components:
         - RESOURCE_VIEW
         - RESOURCE_BOOK                # reserve, check out, check in
         - RESOURCE_MANAGE              # define resources, set qualifications
+        - RESOURCE_CONFIGURE           # types, categories, attributes, packages, policies
+        # **`CONFIGURE` is separate from `MANAGE` because the blast radius differs.**
+        # Managing a resource changes one cabana; configuring a resource type changes what
+        # every resource of that class can do, and board 1.02 asks for approval on exactly
+        # that boundary. One permission for both would give every duty manager the ability
+        # to turn off check-in for the whole estate.
+        - RENTAL_VIEW
+        - RENTAL_BOOK                  # reserve a rental, sign the agreement
+        - RENTAL_OPERATE               # check out, assign equipment, inspect, return
+        - RENTAL_MANAGE                # blackouts, closures, capacity blocking
+        - RENTAL_CONFIGURE             # products, categories, rules, durations, agreements
+        - RENTAL_PRICE                 # pricing profiles, deposit and fee policies
+        - RENTAL_APPROVE               # publish a product through maker/checker
+        - RENTAL_OVERRIDE              # waive a deposit, a late fee or a damage charge
+        # **`PRICE`, `APPROVE` and `OVERRIDE` are deliberately three.** Board 1.10 wants
+        # maker/checker on publication, board 4.9 wants manager approval on a waiver, and
+        # the person who sets the price list is rarely the person who forgives a charge at
+        # the counter. Collapsing them would make the segregation of duties the boards ask
+        # for unexpressible.
         # A developer is not a partner and not a tenant. **A partner resells tickets; a developer
         # writes software**, and one organisation may be both (CF-135, CF-135a).
         - DEVELOPER_VIEW
@@ -182,6 +236,11 @@ components:
         # --- Digital assets ---
         - ASSET_LIBRARY_VIEW
         - ASSET_LIBRARY_MANAGE        # upload, replace, delete, amend rights
+        - ASSET_LIBRARY_APPROVE       # approve and publish an asset for use
+        - ASSET_LIBRARY_SHARE         # issue an external share link
+        # **Publishing and external sharing are the two acts that leave the building.**
+        # Board 3.7 makes a share a licence grant with an expiry; the person who uploads
+        # a photograph is not automatically the person who may send it to an agency.
 
         # --- Queue ---
         - QUEUE_VIEW
@@ -206,6 +265,10 @@ components:
         - KIOSK_ATTEND                # attendant access on an unattended device
         - DEVICE_VIEW
         - DEVICE_CONFIGURE
+        - DEVICE_MANAGE               # enrol, assign, re-key, roll out firmware, retire
+        # **`CONFIGURE` sets a device's settings; `MANAGE` decides whether it exists and
+        # whether it is trusted.** 16.7.35 gives devices credentials, and the ability to
+        # issue one has to be rarer than the ability to change a printer's paper size.
         - APPROVAL_ACT                # approve, reject, return, request info
         - APPROVAL_DELEGATE
         - AI_USE

@@ -20,7 +20,7 @@ schemas:
   tables: 18
   stores:
   - postgres
-  largestTable: ledger.journal_entry
+  largestTable: ledger.settlement
 operationsByContract:
 - contract: finance
   count: 56
@@ -644,6 +644,17 @@ screens:
 - P08:BO-089 Journal Entries
 - P08:BO-090 Period Close
 - P08:BO-101 Orders & Money
+- P08:BO-1029 Quote, Deposit & Payment
+- P08:BO-1081 Finance Dashboard
+- P08:BO-1170 Wallet Financial Period & Closing Controls
+- P09:ADM-411 Billing & Legal Entity Information
+- P09:ADM-619 Reconciliation & Settlement Command Center\t139
+- P09:ADM-620 Reconciliation Source & Import Manager\t141
+- P09:ADM-622 Reconciliation Exception & Investigation Center\t143
+- P09:ADM-623 Settlement & Payout Manager\t144
+- P09:ADM-626 Settlement Posting, Finance Handoff & Close Manager\t148
+- P09:ADM-627 Reconciliation Audit, Trace & Evidence Center\t149
+- P09:ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150
 - P10:PTR-014 Settlement & Payment History
 - P10:PTR-018 Reports & Sales Performance
 - P12:SUP-008 Agent Performance & SLA View

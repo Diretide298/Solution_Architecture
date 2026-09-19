@@ -1,100 +1,252 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
+  "id": "ADM-048",
+  "name": "Commercial Pricing Command Center",
+  "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.1",
+   "page": 6
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "ticvai-web",
+   "route": "/commercial/commercial-pricing-command-center-adm-048",
+   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-002"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
+    "ADM-002",
+    "ADM-049",
+    "ADM-050",
+    "ADM-051",
+    "ADM-052",
+    "ADM-053",
+    "ADM-054",
+    "ADM-055",
+    "ADM-056",
+    "ADM-057"
    ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "tenantId"
      ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ADM-049",
+     "trigger": "Works in Price List Master Configuration",
+     "provenance": "flow F143 step 1→2",
+     "operation": "listCommercialPricing"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "ADM-050",
+     "trigger": "Works in Price Category & Rate Type Library",
+     "provenance": "flow F143 step 3→4",
+     "operation": "listCommercialPricing"
     },
     {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "to": "ADM-051",
+     "trigger": "Works in Rate Structure Builder",
+     "provenance": "flow F143 step 5→6",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-052",
+     "trigger": "Works in Product & Service Price Assignment",
+     "provenance": "flow F143 step 7→8",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-053",
+     "trigger": "Works in Package, Bundle & Add-On Pricing",
+     "provenance": "flow F143 step 9→10",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-054",
+     "trigger": "Works in Market, Venue & Currency Pricing Structure",
+     "provenance": "flow F143 step 11→12",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-055",
+     "trigger": "Works in Price Hierarchy & Inheritance Configuration",
+     "provenance": "flow F143 step 13→14",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-056",
+     "trigger": "Works in Price List Templates, Clone & Reuse",
+     "provenance": "flow F143 step 15→16",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-057",
+     "trigger": "Works in Commercial Pricing Structure Validation",
+     "provenance": "flow F143 step 17→18",
+     "operation": "listCommercialPricing"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each price list should show) — counts over a population, then the population",
+  "purpose": "Provide the central administrative workspace for all commercial pricing structures across This is the first page a Revenue/Pricing Administrator sees when entering the module.",
+  "purposeNote": "Authorized administrators can view and manage TICVAI's complete commercial pricing portfolio from one centralized workspace.",
   "gaps": [
    {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
    }
   ],
   "layout": {
-   "template": "split",
+   "template": "dashboard",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search commercial pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.market",
+        "Country",
+        "CommercialPricingCommandCenterView.currency",
+        "Product Type",
+        "Price List Type",
+        "CommercialPricingCommandCenterView.owner",
+        "CommercialPricingCommandCenterView.status"
+       ],
+       "notes": "The pack filters this screen by venue, brand, market, country, currency, product type and 3 more — which are present is a decision the pack already made.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.totalPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.activePriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.draftPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Price Categories",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.priceCategories"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configured Rates",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.configuredRates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with Pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.productsWithPricing"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products Missing Pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.productsMissingPricing"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Markets",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.markets"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.currencies"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pricing Validation Issues",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.pricingValidationIssues"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently Modified Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.recentlyModifiedPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Price Structures",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.upcomingPriceStructures"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
+       "label": "Every commercial pricing",
        "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
+        "CommercialPricingCommandCenterView.priceListId",
+        "CommercialPricingCommandCenterView.name",
+        "CommercialPricingCommandCenterView.code",
+        "CommercialPricingCommandCenterView.type",
+        "CommercialPricingCommandCenterView.currency",
+        "CommercialPricingCommandCenterView.market",
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.productCount",
+        "CommercialPricingCommandCenterView.rateCount",
+        "CommercialPricingCommandCenterView.effectivePeriod",
+        "CommercialPricingCommandCenterView.version",
+        "CommercialPricingCommandCenterView.status",
+        "CommercialPricingCommandCenterView.owner"
        ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+       "bindsTo": "CommercialPricingCommandCenterView",
+       "operation": "listCommercialPricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Each price list should show"
       }
      ]
     },
@@ -104,21 +256,26 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
+       "label": "The selected commercial pricing",
+       "bindsTo": "CommercialPricingCommandCenterView",
        "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
+        "CommercialPricingCommandCenterView.priceListId",
+        "CommercialPricingCommandCenterView.name",
+        "CommercialPricingCommandCenterView.code",
+        "CommercialPricingCommandCenterView.type",
+        "CommercialPricingCommandCenterView.currency",
+        "CommercialPricingCommandCenterView.market",
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.productCount",
+        "CommercialPricingCommandCenterView.rateCount",
+        "CommercialPricingCommandCenterView.effectivePeriod",
+        "CommercialPricingCommandCenterView.version",
+        "CommercialPricingCommandCenterView.status",
+        "CommercialPricingCommandCenterView.owner"
        ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
+       "notes": null,
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Each price list should show"
       }
      ]
     },
@@ -128,99 +285,53 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
+       "label": "Create Price List",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Create Price Lists"
       },
       {
        "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+       "label": "Duplicate",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Duplicate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+       "label": "Open",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+       "label": "Compare",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
+       "label": "Validate",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+       "label": "View Dependencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
+       "label": "Export",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Export"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+       "label": "Archive",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Archive"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** View Pricing, Modify Pricing Structure. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Separate permissions for"
       }
      ]
     }
@@ -228,1346 +339,1426 @@
   },
   "overlays": [
    {
-    "id": "confirmRemoveMfaMethod",
+    "id": "confirmArchive",
     "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+    "trigger": "Archive",
+    "body": "**Archive on a commercial pricing is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
    }
   ],
   "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
+   "loading": "The commercial pricing list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the commercial pricing untouched.",
+   "emptyFirstRun": "No commercial pricing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
+    "operationId": "listCommercialPricing",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-048"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 6. 32 of 35 labels bound to a contract property; 49 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
-       ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
-       ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
-  },
-  "apis": [
-   {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
-   "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
+  "id": "ADM-049",
+  "name": "Price List Master Configuration",
+  "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.2",
+   "page": 8
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "ticvai-web",
+   "route": "/commercial/price-list-master-configuration-adm-049",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceListMasterConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "ADM-048"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "ADM-048"
    ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 2→3",
+     "operation": "setPriceListMaster"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Create the master container that holds commercial rates. A Price List should be reusable across products and channels.",
+  "purposeNote": "Administrators can create reusable commercial price-list masters with clearly defined ownership, scope, currency, market, and business applicability.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "fields",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "selectField",
+       "label": "Price List Name",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
+       "kind": "selectField",
+       "label": "Price List Code",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Price List Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Unit",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Market",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tags",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Rate Category",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Rounding Profile",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Price Hierarchy",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Overrides",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Inheritance",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Multiple Currencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Product-Specific Rates",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "publish",
      "components": [
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "provenance": "contract operation setPriceListMaster"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The price list master configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price list master untouched.",
+   "emptyFirstRun": "No price list master configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "setPriceListMaster",
+    "contract": "catalogue",
+    "purpose": "Price List Master Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPriceListMaster"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-049"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-050",
+  "name": "Price Category & Rate Type Library",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.3",
+   "page": 9
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-category-rate-type-library-adm-050",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceCategoryRateTypeLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 4→5",
+     "operation": "listPriceCategoryRate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define standardized commercial rate categories used across TICVAI. This avoids different venues independently creating categories such as: “Adult,” “Adult Standard,” “Normal Adult,” and “Full Adult.”",
+  "purposeNote": "types across all tenants, venues, and products.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 9"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 9"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPriceCategoryRate",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price category rate list.",
+   "error": "Could not load. Names which read failed and leaves the price category rate untouched.",
+   "emptyFirstRun": "No price category rate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the price category rate are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPriceCategoryRate",
+    "contract": "catalogue",
+    "purpose": "Price Category & Rate Type Library",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "PriceCategoryRateTypeLibraryView.adult",
+    "PriceCategoryRateTypeLibraryView.child",
+    "PriceCategoryRateTypeLibraryView.junior",
+    "PriceCategoryRateTypeLibraryView.senior",
+    "PriceCategoryRateTypeLibraryView.student"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-050"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P09",
+   "audience": "platformAdmin",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "ticvai-web",
+   "operator": "ticvai",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P10",
+     "P11",
+     "P14",
+     "P17"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-051",
+  "name": "Rate Structure Builder",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.4",
+   "page": 11
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/rate-structure-builder-adm-051",
+   "component": "apps/ticvai-web/src/routes/commercial/RateStructureBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 6→7",
+     "operation": "setRateStructure"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.",
+  "purposeNote": "Administrators can define monetary rate structures for all TICVAI commercial product types through configurable rate matrices.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Per Ticket, Per Membership Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every rate structure",
+       "columns": [
+        "Duplicate Rates",
+        "RateStructureBuilderView.missingAmounts",
+        "RateStructureBuilderView.unsupportedCurrency",
+        "RateStructureBuilderView.invalidDerivedRate",
+        "RateStructureBuilderView.circularRateRelationship"
+       ],
+       "bindsTo": "RateStructureBuilderView",
+       "operation": "setRateStructure",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected rate structure",
+       "bindsTo": "RateStructureBuilderView",
+       "columns": [
+        "Duplicate Rates",
+        "RateStructureBuilderView.missingAmounts",
+        "RateStructureBuilderView.unsupportedCurrency",
+        "RateStructureBuilderView.invalidDerivedRate",
+        "RateStructureBuilderView.circularRateRelationship"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Adult”, “Child Reduced”, “Senior Reduced”, “Resident Reduced”, “Group Group”, “Each rate should contain”.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Per Ticket",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Per Membership Period",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rate structure list.",
+   "error": "Could not load. Names which read failed and leaves the rate structure untouched.",
+   "emptyFirstRun": "No rate structure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rate structure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRateStructure",
+    "contract": "catalogue",
+    "purpose": "Rate Structure Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setRateStructure"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Duplicate Rates",
+    "RateStructureBuilderView.missingAmounts",
+    "RateStructureBuilderView.unsupportedCurrency",
+    "RateStructureBuilderView.invalidDerivedRate",
+    "RateStructureBuilderView.circularRateRelationship"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-051"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 7 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-052",
+  "name": "Product & Service Price Assignment",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.5",
+   "page": 13
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/product-service-price-assignment-adm-052",
+   "component": "apps/ticvai-web/src/routes/commercial/ProductServicePriceAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 8→9",
+     "operation": "setProductServicePrice"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Product configuration should display) and no metric row",
+  "purpose": "Connect commercial rates to the actual products and services being sold.",
+  "purposeNote": "All sellable TICVAI objects can reference centrally managed price lists and rates without maintaining duplicate price definitions inside business modules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product service price",
+       "columns": [
+        "Pricing Source: UAE Standard Admission 2027"
+       ],
+       "bindsTo": "ProductServicePriceAssignmentView",
+       "operation": "setProductServicePrice",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Product configuration should display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product service price",
+       "bindsTo": "ProductServicePriceAssignmentView",
+       "columns": [
+        "Pricing Source: UAE Standard Admission 2027"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Pricing can be assigned to”, “Dependency View”.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Product configuration should display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ticket Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product service price list.",
+   "error": "Could not load. Names which read failed and leaves the product service price untouched.",
+   "emptyFirstRun": "No product service price yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product service price are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setProductServicePrice",
+    "contract": "catalogue",
+    "purpose": "Product & Service Price Assignment",
+    "trigger": "onAction",
+    "invalidates": [
+     "setProductServicePrice"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Pricing Source: UAE Standard Admission 2027"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-052"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 13. 0 of 1 labels bound to a contract property; 3 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-053",
+  "name": "Package, Bundle & Add-On Pricing",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.6",
+   "page": 14
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/package-bundle-add-on-pricing-adm-053",
+   "component": "apps/ticvai-web/src/routes/commercial/PackageBundleAddOnPricing.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 10→11",
+     "operation": "listPackageBundleAdd"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population",
+  "purpose": "Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced.",
+  "purposeNote": "Packages, bundles, and add-ons can use centralized commercial pricing while their product composition remains owned by the Product Catalogue.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Component Override. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fast Track",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Parking",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Meal",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Photo",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Equipment",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Upgrade",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Additional Session",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Premium Access",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Package Total Only",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      },
+      {
+       "kind": "selectField",
+       "label": "Individual Components",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      },
+      {
+       "kind": "textField",
+       "label": "Component + Package Saving",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Component Override",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The package bundle add-on configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the package bundle add-on untouched.",
+   "emptyFirstRun": "No package bundle add-on configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPackageBundleAdd",
+    "contract": "catalogue",
+    "purpose": "Package, Bundle & Add-On Pricing",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-053"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-054",
+  "name": "Market, Venue & Currency Pricing Structure",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.7",
+   "page": 15
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/market-venue-currency-pricing-structure-adm-054",
+   "component": "apps/ticvai-web/src/routes/commercial/MarketVenueCurrencyPricingStructure.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 12→13",
+     "operation": "listMarketVenueCurrency"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; FX-Assisted Setup) and no display directory — it is settings, not a population",
+  "purpose": "Support TICVAI's multi-country, multi-market, multi-venue and multi-currency commercial model.",
+  "purposeNote": "entities, and currencies.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Market",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Region",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "AED 250 ≈ SAR 255",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §FX-Assisted Setup"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The market venue currency configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the market venue currency untouched.",
+   "emptyFirstRun": "No market venue currency configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMarketVenueCurrency",
+    "contract": "catalogue",
+    "purpose": "Market, Venue & Currency Pricing Structure",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-054"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-055",
+  "name": "Price Hierarchy & Inheritance Configuration",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.8",
+   "page": 17
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-hierarchy-inheritance-configuration-adm-055",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceHierarchyInheritanceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 14→15",
+     "operation": "setPriceHierarchyInheritance"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators configure; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This is essential to prevent conflicting prices.",
+  "purposeNote": "The platform deterministically resolves the correct commercial price source across global, market, venue, and product hierarchies.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Hierarchy Level",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Inheritance",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Permission",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fallback Behavior",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Allowed",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Requires Reason",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum Override Range",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Expiry",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Return to Parent Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setPriceHierarchyInheritance"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price hierarchy inheritance configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price hierarchy inheritance untouched.",
+   "emptyFirstRun": "No price hierarchy inheritance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPriceHierarchyInheritance",
+    "contract": "catalogue",
+    "purpose": "Price Hierarchy & Inheritance Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPriceHierarchyInheritance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-055"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-056",
+  "name": "Price List Templates, Clone & Reuse",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.9",
+   "page": 18
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-list-templates-clone-reuse-adm-056",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceListTemplatesCloneReuse.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 16→17",
+     "operation": "listPriceListTemplate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Options) and no display directory — it is settings, not a population",
+  "purpose": "Accelerate commercial setup across new venues, events, seasons and markets.",
+  "purposeNote": "Administrators can rapidly create consistent commercial pricing structures by cloning and reusing approved templates instead of rebuilding pricing manually.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Complete Price List. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "☑ Copy categories",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Copy rate structure",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Copy product mapping",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☐ Copy monetary values",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Increase values by 5%",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Complete Price List",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price list templates configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price list templates untouched.",
+   "emptyFirstRun": "No price list templates configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPriceListTemplate",
+    "contract": "catalogue",
+    "purpose": "Price List Templates, Clone & Reuse",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-056"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-057",
+  "name": "Commercial Pricing Structure Validation",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.10",
+   "page": 19
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/commercial-pricing-structure-validation-adm-057",
+   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingStructureValidation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Validate that the commercial pricing foundation is structurally complete before it proceeds to rule configuration, governance, or publication. This is not the final publication screen. Board 4 owns approval and publication. Board 1 defined what the commercial prices are and how they are structured.",
+  "purposeNote": "from progressing downstream without clearly identifying the issue. Board 1 — Final Screen Register # Screen Responsibility 10.1. Commercial Pricing Command",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 19"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 19"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCommercialPricingStructure",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The commercial pricing structure list.",
+   "error": "Could not load. Names which read failed and leaves the commercial pricing structure untouched.",
+   "emptyFirstRun": "No commercial pricing structure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial pricing structure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCommercialPricingStructure",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Structure Validation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CommercialPricingStructureValidationView.requiredFieldsComplete",
+    "CommercialPricingStructureValidationView.currencyDefined",
+    "CommercialPricingStructureValidationView.ownershipAssigned",
+    "CommercialPricingStructureValidationView.categoriesConfigured",
+    "CommercialPricingStructureValidationView.monetaryValuesValid"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-057"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
     "decided": "10 September 2026"
    }
   }

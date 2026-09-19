@@ -946,6 +946,8 @@ paths:
       operationId: generateConfiguration
       x-ticvai-consumed-by:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
+        - "P08 BO-597 AI Configuration Workspace"
+        - "P08 BO-598 AI Draft Review & Approval"
       x-ticvai-audience:
       - staff
       summary: Draft a configuration from a description

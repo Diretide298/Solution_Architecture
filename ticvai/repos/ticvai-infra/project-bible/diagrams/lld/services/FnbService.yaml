@@ -1146,6 +1146,9 @@ screens:
 - P08:BO-138 Production Execution & Batch Management
 - P08:BO-139 Wastage, Spoilage, Returns & Write-Off
 - P08:BO-140 Product Availability, 86 & Operational Food Safety
+- P08:BO-729 Create / Edit Outlet
+- P08:BO-730 Outlet Types & Templates
+- P08:BO-731 Operating Hours & Service Periods
 - P13:CMS-009 Navigation & Menus
 - P15:KIT-001 Kitchen Operations Command Center
 - P15:KIT-002 Kitchen Display System (KDS)

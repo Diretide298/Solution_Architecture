@@ -12289,7 +12289,12 @@ screens:
     loading: The rental checkout list; the counts above it resolve separately.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
       a connection, and no minute has decided it.
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listRentalBookings
+    provenance: board reading, 19 September 2026
+    purpose: Awaiting arrival
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 64. 0 of 7 labels bound to a
     contract property; 15 of 23 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12388,7 +12393,11 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: getRentalBooking
+        kind: detailPanel
+        notes: One record, read-only.
       name: contentBody
     template: split
   states:
@@ -12413,7 +12422,12 @@ screens:
     source: pack Rental_Management.pdf, page 65
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalBooking
+    provenance: board reading, 19 September 2026
+    purpose: Retrieve by voucher scan
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 65. 0 of 0 labels bound to a
     contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12431,6 +12445,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-072
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-073
   name: Checkout Readiness Validation
   module: Rentals
@@ -12458,7 +12476,11 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: getRentalBooking
+        kind: detailPanel
+        notes: One record, read-only.
       name: contentBody
     template: split
   states:
@@ -12483,7 +12505,12 @@ screens:
     source: pack Rental_Management.pdf, page 66
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalBooking
+    provenance: board reading, 19 September 2026
+    purpose: What is still outstanding
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 66. 0 of 0 labels bound to a
     contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12501,6 +12528,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-073
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-074
   name: Equipment Assignment Workspace
   module: Rentals
@@ -12528,7 +12559,17 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: primaryButton
+        label: Assign rental equipment
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -12552,7 +12593,14 @@ screens:
     source: pack Rental_Management.pdf, page 67
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: assignRentalEquipment
+    provenance: board reading, 19 September 2026
+    purpose: Bind the assets
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a
     contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12570,6 +12618,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-074
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-075
   name: Equipment Scan & Validation
   module: Rentals
@@ -12597,7 +12649,22 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: primaryButton
+        label: Assign rental equipment
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: lookupAsset
+        kind: searchField
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -12622,7 +12689,19 @@ screens:
     source: pack Rental_Management.pdf, page 68
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: assignRentalEquipment
+    provenance: board reading, 19 September 2026
+    purpose: Scan to assign
+    trigger: onAction
+  - contract: maintenance
+    operationId: lookupAsset
+    provenance: board reading, 19 September 2026
+    purpose: Resolve the scanned code
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 68. 0 of 0 labels bound to a
     contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12640,6 +12719,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-075
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-076
   name: Pre-Rental Condition Inspection
   module: Rentals
@@ -12710,7 +12793,14 @@ screens:
     source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: recordRentalInspection
+    provenance: board reading, 19 September 2026
+    purpose: Condition before it goes out
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a
     contract property; 3 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12728,6 +12818,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-076
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-077
   name: Safety & Handover Checklist
   module: Rentals
@@ -12759,7 +12853,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: checkOutRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: checkOutRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -12784,7 +12887,16 @@ screens:
     source: pack Rental_Management.pdf, page 70
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    operationId: checkOutRental
+    provenance: board reading, 19 September 2026
+    purpose: Safety briefing and handover
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a
     contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12802,6 +12914,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-077
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-078
   name: Deposit & Financial Handover Validation
   module: Rentals
@@ -12830,7 +12946,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: checkOutRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: checkOutRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -12855,7 +12980,16 @@ screens:
     source: pack Rental_Management.pdf, page 70
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    operationId: checkOutRental
+    provenance: board reading, 19 September 2026
+    purpose: Hold the deposit
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a
     contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12873,6 +13007,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-078
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-079
   name: Group & Multi-Item Checkout
   module: Rentals
@@ -12901,7 +13039,17 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: primaryButton
+        label: Assign rental equipment
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: assignRentalEquipment
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -12926,7 +13074,14 @@ screens:
     source: pack Rental_Management.pdf, page 71
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: assignRentalEquipment
+    provenance: board reading, 19 September 2026
+    purpose: Several items at once
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 71. 0 of 0 labels bound to a
     contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -12944,6 +13099,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-079
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-080
   name: Checkout Confirmation & Rental Activation
   module: Rentals
@@ -12991,7 +13150,16 @@ screens:
     loading: The checkout confirmation rental configuration as saved.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
       a connection, and no minute has decided it.
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    operationId: checkOutRental
+    provenance: board reading, 19 September 2026
+    purpose: Activate the rental
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 72. 0 of 0 labels bound to a
     contract property; 2 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13009,6 +13177,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-080
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-081
   name: Active Rental Operations Command Center
   module: Rentals
@@ -13095,7 +13267,17 @@ screens:
     loading: The active rental operations list; the counts above it resolve separately.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
       a connection, and no minute has decided it.
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listRentalBookings
+    provenance: board reading, 19 September 2026
+    purpose: Rentals out right now
+    trigger: onLoad
+  - contract: rental
+    operationId: listOverdueRentals
+    provenance: board reading, 19 September 2026
+    purpose: Due soon and late
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 78. 0 of 8 labels bound to a
     contract property; 16 of 23 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13193,7 +13375,11 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: getRentalBooking
+        kind: detailPanel
+        notes: One record, read-only.
       name: contentBody
     template: split
   states:
@@ -13218,7 +13404,12 @@ screens:
     source: pack Rental_Management.pdf, page 79
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalBooking
+    provenance: board reading, 19 September 2026
+    purpose: The live rental
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 79. 0 of 0 labels bound to a
     contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13236,6 +13427,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-082
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-083
   name: Rental Extension Request
   module: Rentals
@@ -13289,7 +13484,12 @@ screens:
     source: pack Rental_Management.pdf, page 81
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalAvailability
+    provenance: board reading, 19 September 2026
+    purpose: Can it be extended
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a
     contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13335,7 +13535,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: quoteRentalPrice
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: quoteRentalPrice
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -13360,7 +13569,20 @@ screens:
     source: pack Rental_Management.pdf, page 82
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: quoteRentalPrice
+    provenance: board reading, 19 September 2026
+    purpose: Price the extension
+    trigger: onAction
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - getRentalAvailability
+    operationId: extendRental
+    provenance: board reading, 19 September 2026
+    purpose: Extend it
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 82. 0 of 0 labels bound to a
     contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13378,6 +13600,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-084
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-085
   name: Equipment Swap / Replacement
   module: Rentals
@@ -13406,7 +13632,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: swapRentalEquipment
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: swapRentalEquipment
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -13431,7 +13666,14 @@ screens:
     source: pack Rental_Management.pdf, page 83
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: swapRentalEquipment
+    provenance: board reading, 19 September 2026
+    purpose: Replace a faulty item
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 83. 0 of 0 labels bound to a
     contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13449,6 +13691,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-085
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-086
   name: Rental Incident & Operational Exception
   module: Rentals
@@ -13476,7 +13722,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: reportRentalIncident
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: reportRentalIncident
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -13501,7 +13756,14 @@ screens:
     source: pack Rental_Management.pdf, page 84
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: reportRentalIncident
+    provenance: board reading, 19 September 2026
+    purpose: Record what happened
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 84. 0 of 0 labels bound to a
     contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13547,7 +13809,12 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: listOverdueRentals
+        kind: dataTable
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
       name: contentBody
     template: split
   states:
@@ -13572,7 +13839,12 @@ screens:
     source: pack Rental_Management.pdf, page 85
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listOverdueRentals
+    provenance: board reading, 19 September 2026
+    purpose: Due soon
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a
     contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13619,7 +13891,12 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: listOverdueRentals
+        kind: dataTable
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
       name: contentBody
     template: split
   states:
@@ -13644,7 +13921,12 @@ screens:
     source: pack Rental_Management.pdf, page 85
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listOverdueRentals
+    provenance: board reading, 19 September 2026
+    purpose: Late, and what it is accruing
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a
     contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13689,7 +13971,11 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: getRentalBooking
+        kind: detailPanel
+        notes: One record, read-only.
       name: contentBody
     template: split
   states:
@@ -13714,7 +14000,12 @@ screens:
     source: pack Rental_Management.pdf, page 86
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalBooking
+    provenance: board reading, 19 September 2026
+    purpose: The group rental
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 86. 0 of 0 labels bound to a
     contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13732,6 +14023,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-089
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-090
   name: Active Rental Intelligence & Operational Alerts
   module: Rentals
@@ -13808,7 +14103,12 @@ screens:
     why: '**This screen''s operations return no schema with described properties**, so not one of its
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listOverdueRentals
+    provenance: board reading, 19 September 2026
+    purpose: Operational alerts
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 87. 0 of 7 labels bound to a
     contract property; 7 of 74 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -13927,7 +14227,12 @@ screens:
     loading: The rental return list; the counts above it resolve separately.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
       a connection, and no minute has decided it.
-  apis: []
+  apis:
+  - contract: rental
+    operationId: listRentalBookings
+    provenance: board reading, 19 September 2026
+    purpose: Expected back
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 92. 0 of 8 labels bound to a
     contract property; 18 of 24 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14026,7 +14331,11 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: getRentalBooking
+        kind: detailPanel
+        notes: One record, read-only.
       name: contentBody
     template: split
   states:
@@ -14051,7 +14360,12 @@ screens:
     source: pack Rental_Management.pdf, page 93
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    operationId: getRentalBooking
+    provenance: board reading, 19 September 2026
+    purpose: Retrieve by scan
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 93. 0 of 0 labels bound to a
     contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14069,6 +14383,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-092
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-093
   name: Return Summary & Actual Return Time
   module: Rentals
@@ -14096,7 +14414,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: returnRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: returnRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14121,7 +14448,17 @@ screens:
     source: pack Rental_Management.pdf, page 94
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    - listOverdueRentals
+    operationId: returnRental
+    provenance: board reading, 19 September 2026
+    purpose: Record the actual return time
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 94. 0 of 0 labels bound to a
     contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14139,6 +14476,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-093
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-094
   name: Post-Rental Condition Inspection
   module: Rentals
@@ -14166,7 +14507,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: recordRentalInspection
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: recordRentalInspection
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14191,7 +14541,14 @@ screens:
     source: pack Rental_Management.pdf, page 95
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: recordRentalInspection
+    provenance: board reading, 19 September 2026
+    purpose: Condition on the way back
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 95. 0 of 0 labels bound to a
     contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14209,6 +14566,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-094
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-095
   name: Before vs After Condition Comparison
   module: Rentals
@@ -14237,7 +14598,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: recordRentalInspection
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: recordRentalInspection
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14262,7 +14632,14 @@ screens:
     source: pack Rental_Management.pdf, page 96
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: recordRentalInspection
+    provenance: board reading, 19 September 2026
+    purpose: Before against after
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 96. 0 of 0 labels bound to a
     contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14280,6 +14657,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-095
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-096
   name: Damage Assessment & Charge Workflow
   module: Rentals
@@ -14308,7 +14689,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: assessRentalDamage
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: assessRentalDamage
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14333,7 +14723,14 @@ screens:
     source: pack Rental_Management.pdf, page 97
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    operationId: assessRentalDamage
+    provenance: board reading, 19 September 2026
+    purpose: Price the damage
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 97. 0 of 0 labels bound to a
     contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14351,6 +14748,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-096
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-097
   name: Partial Return & Missing Equipment
   module: Rentals
@@ -14379,7 +14780,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: returnRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: returnRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14404,7 +14814,17 @@ screens:
     source: pack Rental_Management.pdf, page 98
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    - listOverdueRentals
+    operationId: returnRental
+    provenance: board reading, 19 September 2026
+    purpose: Partial return, with what is missing
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 98. 0 of 0 labels bound to a
     contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14422,6 +14842,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-097
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-098
   name: Late Fees, Damage Fees & Final Settlement
   module: Rentals
@@ -14450,7 +14874,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: returnRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: returnRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14475,7 +14908,17 @@ screens:
     source: pack Rental_Management.pdf, page 99
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    - listOverdueRentals
+    operationId: returnRental
+    provenance: board reading, 19 September 2026
+    purpose: Late fee, damage and settlement
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 99. 0 of 0 labels bound to a
     contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14493,6 +14936,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-098
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-099
   name: Deposit Release, Capture & Customer Confirmation
   module: Rentals
@@ -14522,7 +14969,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: returnRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: returnRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14547,7 +15003,17 @@ screens:
     source: pack Rental_Management.pdf, page 100
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    - listOverdueRentals
+    operationId: returnRental
+    provenance: board reading, 19 September 2026
+    purpose: Capture or release the deposit
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a
     contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14565,6 +15031,10 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-099
+  entryState:
+    params:
+    - from: navigation
+      name: bookingId
 - id: EMP-100
   name: Return Completion & Equipment Disposition
   module: Rentals
@@ -14594,7 +15064,16 @@ screens:
     rather than passed off as a decision'
   layout:
     regions:
-    - components: []
+    - components:
+      - derived: true
+        impliedBy: returnRental
+        kind: primaryButton
+        notes: The act the screen exists for.
+      - derived: true
+        impliedBy: returnRental
+        kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
       name: contentBody
     template: split
   states:
@@ -14619,7 +15098,25 @@ screens:
     source: pack Rental_Management.pdf, page 101
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-  apis: []
+  apis:
+  - contract: rental
+    invalidates:
+    - getRentalBooking
+    - listRentalBookings
+    - getRentalAvailability
+    - listOverdueRentals
+    operationId: returnRental
+    provenance: board reading, 19 September 2026
+    purpose: Complete, and dispose of the equipment
+    trigger: onAction
+  - contract: maintenance
+    invalidates:
+    - getAsset
+    - listAssets
+    operationId: setAssetStatus
+    provenance: board reading, 19 September 2026
+    purpose: Back into the pool, or not
+    trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 101. 0 of 0 labels bound to a
     contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14637,3 +15134,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-100
+  entryState:
+    params:
+    - from: navigation
+      name: assetId
+    - from: navigation
+      name: bookingId

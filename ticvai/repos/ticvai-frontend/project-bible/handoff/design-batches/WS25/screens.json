@@ -1,540 +1,117 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
+  "id": "SUP-009",
+  "name": "Customer Service Command Center",
+  "module": "Support",
   "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.1",
+   "page": 3
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "app": "venue-support-web",
+   "route": "/support/customer-service-command-center-sup-009",
+   "component": "apps/venue-support-web/src/routes/support/CustomerServiceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "SUP-001"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
+    "SUP-001",
+    "SUP-010",
+    "SUP-011",
+    "SUP-012",
+    "SUP-013",
+    "SUP-014",
+    "SUP-015",
+    "SUP-016",
+    "SUP-017",
+    "SUP-018"
    ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "SUP-001",
+     "trigger": "Agent Login",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "sessionId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "SUP-010",
+     "trigger": "Works in Customer 360° Service Profile",
+     "provenance": "flow F134 step 1→2",
+     "operation": "listCustomerService"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "SUP-011",
+     "trigger": "Works in Unified Interaction & Communication History",
+     "provenance": "flow F134 step 3→4",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-012",
+     "trigger": "Works in Case Creation, Classification & Intelligent Routing",
+     "provenance": "flow F134 step 5→6",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-013",
+     "trigger": "Works in Case Investigation & Resolution Workspace",
+     "provenance": "flow F134 step 7→8",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-014",
+     "trigger": "Works in Order, Booking & Ticket Service Workspace",
+     "provenance": "flow F134 step 9→10",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-015",
+     "trigger": "Works in Refund, Compensation & Service Exception Workspace",
+     "provenance": "flow F134 step 11→12",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-016",
+     "trigger": "Works in Escalation, Collaboration & Internal Resolution",
+     "provenance": "flow F134 step 13→14",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-017",
+     "trigger": "Works in Case Resolution, Closure & Customer Feedback",
+     "provenance": "flow F134 step 15→16",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-018",
+     "trigger": "Works in AI Customer Service Copilot & Knowledge Workspace",
+     "provenance": "flow F134 step 17→18",
+     "operation": "listCustomerService"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
   "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
+  "purpose": "Provide every customer-service agent with a personalized operational workspace showing customers, cases, tasks, SLAs, alerts and workload.",
+  "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -544,24 +121,39 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
+       "label": "Every customer service",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
+        "CustomerServiceCommandCenterView.myOpenCases",
+        "CustomerServiceCommandCenterView.newCases",
+        "CustomerServiceCommandCenterView.casesDueToday",
+        "CustomerServiceCommandCenterView.slaAtRisk",
+        "CustomerServiceCommandCenterView.slaBreached",
+        "CustomerServiceCommandCenterView.awaitingCustomer",
+        "CustomerServiceCommandCenterView.awaitingInternalTeam",
+        "CustomerServiceCommandCenterView.escalatedCases",
+        "CustomerServiceCommandCenterView.resolvedToday",
+        "CustomerServiceCommandCenterView.averageResolutionTime",
+        "CustomerServiceCommandCenterView.caseId",
+        "CustomerServiceCommandCenterView.customer",
+        "CustomerServiceCommandCenterView.subject",
+        "CustomerServiceCommandCenterView.category",
+        "CustomerServiceCommandCenterView.channel",
+        "CustomerServiceCommandCenterView.priority",
+        "CustomerServiceCommandCenterView.status",
+        "CustomerServiceCommandCenterView.assignedAgent",
+        "CustomerServiceCommandCenterView.slaRemaining",
+        "CustomerServiceCommandCenterView.lastInteraction",
+        "CustomerServiceCommandCenterView.nextAction",
+        "CustomerServiceCommandCenterView.callCustomer",
+        "Review refund request",
+        "CustomerServiceCommandCenterView.followUpFinance",
+        "Reissue ticket",
+        "CustomerServiceCommandCenterView.respondToComplaint",
+        "CustomerServiceCommandCenterView.requestSupervisorApproval"
        ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "bindsTo": "CustomerServiceCommandCenterView",
+       "operation": "listCustomerService",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
       }
      ]
     },
@@ -571,14 +163,39 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
+       "label": "The selected customer service",
+       "bindsTo": "CustomerServiceCommandCenterView",
        "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
+        "CustomerServiceCommandCenterView.myOpenCases",
+        "CustomerServiceCommandCenterView.newCases",
+        "CustomerServiceCommandCenterView.casesDueToday",
+        "CustomerServiceCommandCenterView.slaAtRisk",
+        "CustomerServiceCommandCenterView.slaBreached",
+        "CustomerServiceCommandCenterView.awaitingCustomer",
+        "CustomerServiceCommandCenterView.awaitingInternalTeam",
+        "CustomerServiceCommandCenterView.escalatedCases",
+        "CustomerServiceCommandCenterView.resolvedToday",
+        "CustomerServiceCommandCenterView.averageResolutionTime",
+        "CustomerServiceCommandCenterView.caseId",
+        "CustomerServiceCommandCenterView.customer",
+        "CustomerServiceCommandCenterView.subject",
+        "CustomerServiceCommandCenterView.category",
+        "CustomerServiceCommandCenterView.channel",
+        "CustomerServiceCommandCenterView.priority",
+        "CustomerServiceCommandCenterView.status",
+        "CustomerServiceCommandCenterView.assignedAgent",
+        "CustomerServiceCommandCenterView.slaRemaining",
+        "CustomerServiceCommandCenterView.lastInteraction",
+        "CustomerServiceCommandCenterView.nextAction",
+        "CustomerServiceCommandCenterView.callCustomer",
+        "Review refund request",
+        "CustomerServiceCommandCenterView.followUpFinance",
+        "Reissue ticket",
+        "CustomerServiceCommandCenterView.respondToComplaint",
+        "CustomerServiceCommandCenterView.requestSupervisorApproval"
        ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+       "notes": "The pack groups this record's detail under its own headings: “Use”, “Customer Waiting”.",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
       }
      ]
     },
@@ -588,772 +205,143 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "label": "New Case",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "label": "Find Customer",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+       "label": "Find Order",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+       "kind": "secondaryButton",
+       "label": "Find Ticket",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Find Booking",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
+      },
       {
-       "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
-       ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Assign Case",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
-       ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
+      },
       {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Open AI Assistant",
+       "provenance": "pack Customer Service_Reference.pdf, page 3 §Quick Actions"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "loading": "The customer service list.",
+   "error": "Could not load. Names which read failed and leaves the customer service untouched.",
+   "emptyFirstRun": "No customer service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
+    "operationId": "listCustomerService",
+    "contract": "marketing-crm",
+    "purpose": "Customer Service Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
+    "CustomerServiceCommandCenterView.myOpenCases",
+    "CustomerServiceCommandCenterView.newCases",
+    "CustomerServiceCommandCenterView.casesDueToday",
+    "CustomerServiceCommandCenterView.slaAtRisk",
+    "CustomerServiceCommandCenterView.slaBreached",
+    "CustomerServiceCommandCenterView.awaitingCustomer"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-009"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels bound to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P12",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-support-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P08",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
+  "id": "SUP-010",
+  "name": "Customer 360° Service Profile",
+  "module": "Support",
   "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.2",
+   "page": 5
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "app": "venue-support-web",
+   "route": "/support/customer-360-service-profile-sup-010",
+   "component": "apps/venue-support-web/src/routes/support/Customer360ServiceProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "SUP-009"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "SUP-009"
    ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 2→3",
+     "operation": "listCustomerServiceProfile"
     }
    ]
   },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
+  "purpose": "Provide the agent with a complete customer-service view of the customer. This should be one of the most important screens in the entire Customer Service module.",
+  "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1363,19 +351,31 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
+       "label": "Every customer 360° service",
        "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
+        "Customer360ServiceProfileView.customerName",
+        "Customer360ServiceProfileView.customerId",
+        "Customer360ServiceProfileView.customerType",
+        "Customer360ServiceProfileView.membershipStatus",
+        "Customer360ServiceProfileView.loyaltyTier",
+        "Customer360ServiceProfileView.preferredLanguage",
+        "Customer360ServiceProfileView.country",
+        "Customer360ServiceProfileView.contactDetails",
+        "Customer360ServiceProfileView.customerSince",
+        "Customer360ServiceProfileView.customerValue",
+        "Open Cases",
+        "Customer360ServiceProfileView.riskAttentionIndicator",
+        "360° Navigation",
+        "Customer360ServiceProfileView.upcomingTickets",
+        "Customer360ServiceProfileView.activeMembership",
+        "Customer360ServiceProfileView.walletBalance",
+        "Customer360ServiceProfileView.activeReservations",
+        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Open Orders"
        ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+       "bindsTo": "Customer360ServiceProfileView",
+       "operation": "listCustomerServiceProfile",
+       "provenance": "pack Customer Service_Reference.pdf, page 5 §Display"
       }
      ]
     },
@@ -1385,28 +385,512 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
+       "label": "The selected customer 360° service",
+       "bindsTo": "Customer360ServiceProfileView",
        "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
+        "Customer360ServiceProfileView.customerName",
+        "Customer360ServiceProfileView.customerId",
+        "Customer360ServiceProfileView.customerType",
+        "Customer360ServiceProfileView.membershipStatus",
+        "Customer360ServiceProfileView.loyaltyTier",
+        "Customer360ServiceProfileView.preferredLanguage",
+        "Customer360ServiceProfileView.country",
+        "Customer360ServiceProfileView.contactDetails",
+        "Customer360ServiceProfileView.customerSince",
+        "Customer360ServiceProfileView.customerValue",
+        "Open Cases",
+        "Customer360ServiceProfileView.riskAttentionIndicator",
+        "360° Navigation",
+        "Customer360ServiceProfileView.upcomingTickets",
+        "Customer360ServiceProfileView.activeMembership",
+        "Customer360ServiceProfileView.walletBalance",
+        "Customer360ServiceProfileView.activeReservations",
+        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Open Orders"
        ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+       "notes": "The pack groups this record's detail under its own headings: “Today”, “Yesterday”, “Last Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer Summary”.",
+       "provenance": "pack Customer Service_Reference.pdf, page 5 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer 360° service list.",
+   "error": "Could not load. Names which read failed and leaves the customer 360° service untouched.",
+   "emptyFirstRun": "No customer 360° service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer 360° service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCustomerServiceProfile",
+    "contract": "marketing-crm",
+    "purpose": "Customer 360° Service Profile",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Customer360ServiceProfileView.customerName",
+    "Customer360ServiceProfileView.customerId",
+    "Customer360ServiceProfileView.customerType",
+    "Customer360ServiceProfileView.membershipStatus",
+    "Customer360ServiceProfileView.loyaltyTier",
+    "Customer360ServiceProfileView.preferredLanguage"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-010"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-011",
+  "name": "Unified Interaction & Communication History",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.3",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/unified-interaction-communication-history-sup-011",
+   "component": "apps/venue-support-web/src/routes/support/UnifiedInteractionCommunicationHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 4→5",
+     "operation": "listUnifiedInteractionCommunication"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Provide one chronological timeline of customer interactions across supported service channels.",
+  "purposeNote": "Agents can see the complete relevant conversation history without searching separate communication systems.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Date/Time",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Agent/System",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Direction",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Subject",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Case",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Order",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Ticket",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attachments",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sentiment where enabled",
+       "provenance": "pack Customer Service_Reference.pdf, page 7 §Capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The unified interaction communication configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the unified interaction communication untouched.",
+   "emptyFirstRun": "No unified interaction communication configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listUnifiedInteractionCommunication",
+    "contract": "marketing-crm",
+    "purpose": "Unified Interaction & Communication History",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-011"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-012",
+  "name": "Case Creation, Classification & Intelligent Routing",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.4",
+   "page": 9
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/case-creation-classification-intelligent-routing-sup-012",
+   "component": "apps/venue-support-web/src/routes/support/CaseCreationClassificationIntelligentRouting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 6→7",
+     "operation": "createCaseClassificationIntelligent"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Create structured customer-service cases and ensure they reach the correct team.",
+  "purposeNote": "Every service request becomes a properly categorized, prioritized and routed case with the appropriate business context attached.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Subject",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Subcategory",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Order",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Ticket",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Payment",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Membership",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attachments",
+       "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "provenance": "contract operation createCaseClassificationIntelligent"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case creation classification configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the case creation classification untouched.",
+   "emptyFirstRun": "No case creation classification configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createCaseClassificationIntelligent",
+    "contract": "marketing-crm",
+    "purpose": "Case Creation, Classification & Intelligent Routing",
+    "trigger": "onAction",
+    "invalidates": [
+     "createCaseClassificationIntelligent"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-012"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-013",
+  "name": "Case Investigation & Resolution Workspace",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.5",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/case-investigation-resolution-workspace-sup-013",
+   "component": "apps/venue-support-web/src/routes/support/CaseInvestigationResolutionWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 8→9",
+     "operation": "setCaseInvestigationResolution"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide the primary workspace in which an agent investigates and resolves a case.",
+  "purposeNote": "An agent can investigate and progress a customer case from one workspace with all required customer, transaction, policy and communication context visible.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every case investigation resolution",
+       "columns": [
+        "CaseInvestigationResolutionWorkspaceView.caseId",
+        "CaseInvestigationResolutionWorkspaceView.customer",
+        "CaseInvestigationResolutionWorkspaceView.subject",
+        "CaseInvestigationResolutionWorkspaceView.category",
+        "CaseInvestigationResolutionWorkspaceView.priority",
+        "CaseInvestigationResolutionWorkspaceView.status",
+        "CaseInvestigationResolutionWorkspaceView.sla",
+        "CaseInvestigationResolutionWorkspaceView.owner",
+        "CaseInvestigationResolutionWorkspaceView.queue",
+        "CaseInvestigationResolutionWorkspaceView.created",
+        "CaseInvestigationResolutionWorkspaceView.lastUpdated"
+       ],
+       "bindsTo": "CaseInvestigationResolutionWorkspaceView",
+       "operation": "setCaseInvestigationResolution",
+       "provenance": "pack Customer Service_Reference.pdf, page 11 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected case investigation resolution",
+       "bindsTo": "CaseInvestigationResolutionWorkspaceView",
+       "columns": [
+        "CaseInvestigationResolutionWorkspaceView.caseId",
+        "CaseInvestigationResolutionWorkspaceView.customer",
+        "CaseInvestigationResolutionWorkspaceView.subject",
+        "CaseInvestigationResolutionWorkspaceView.category",
+        "CaseInvestigationResolutionWorkspaceView.priority",
+        "CaseInvestigationResolutionWorkspaceView.status",
+        "CaseInvestigationResolutionWorkspaceView.sla",
+        "CaseInvestigationResolutionWorkspaceView.owner",
+        "CaseInvestigationResolutionWorkspaceView.queue",
+        "CaseInvestigationResolutionWorkspaceView.created",
+        "CaseInvestigationResolutionWorkspaceView.lastUpdated"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Agents can attach”, “Case Actions”.",
+       "provenance": "pack Customer Service_Reference.pdf, page 11 §Display"
       }
      ]
     },
@@ -1417,157 +901,903 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "provenance": "contract operation setCaseInvestigationResolution"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The case investigation resolution list.",
+   "error": "Could not load. Names which read failed and leaves the case investigation resolution untouched.",
+   "emptyFirstRun": "No case investigation resolution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the case investigation resolution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
+    "operationId": "setCaseInvestigationResolution",
     "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
+    "purpose": "Case Investigation & Resolution Workspace",
     "trigger": "onAction",
     "invalidates": [
-     "listConsentPurposes"
+     "setCaseInvestigationResolution"
     ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "CaseInvestigationResolutionWorkspaceView.caseId",
+    "CaseInvestigationResolutionWorkspaceView.customer",
+    "CaseInvestigationResolutionWorkspaceView.subject",
+    "CaseInvestigationResolutionWorkspaceView.category",
+    "CaseInvestigationResolutionWorkspaceView.priority",
+    "CaseInvestigationResolutionWorkspaceView.status"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-013"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 11 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P12",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-support-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P08",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-014",
+  "name": "Order, Booking & Ticket Service Workspace",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.6",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/order-booking-ticket-service-workspace-sup-014",
+   "component": "apps/venue-support-web/src/routes/support/OrderBookingTicketServiceWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 10→11",
+     "operation": "setOrderBookingTicket"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allow customer-service agents to perform permitted ticket/order servicing without entering the underlying technical modules.",
+  "purposeNote": "Agents can perform authorized ticket and booking service actions through one customer-service interface while underlying TICVAI services remain authoritative.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search order booking ticket",
+       "provenance": "pack Customer Service_Reference.pdf, page 13 §Search by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Order Number",
+        "Ticket Number",
+        "Booking Reference",
+        "Customer",
+        "Email",
+        "Mobile",
+        "QR Reference",
+        "Event",
+        "Payment Reference"
+       ],
+       "notes": "The pack filters this screen by order number, ticket number, booking reference, customer, email, mobile and 3 more — which are present is a decision the pack already made.",
+       "provenance": "pack Customer Service_Reference.pdf, page 13 §Search by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order booking ticket",
+       "columns": [
+        "OrderBookingTicketServiceWorkspaceView.order",
+        "Customer",
+        "OrderBookingTicketServiceWorkspaceView.purchaseDate",
+        "OrderBookingTicketServiceWorkspaceView.channel",
+        "OrderBookingTicketServiceWorkspaceView.products",
+        "OrderBookingTicketServiceWorkspaceView.tickets",
+        "Event",
+        "OrderBookingTicketServiceWorkspaceView.dateTime",
+        "OrderBookingTicketServiceWorkspaceView.amount",
+        "OrderBookingTicketServiceWorkspaceView.payment",
+        "OrderBookingTicketServiceWorkspaceView.fulfillment",
+        "OrderBookingTicketServiceWorkspaceView.ticketStatus"
+       ],
+       "bindsTo": "OrderBookingTicketServiceWorkspaceView",
+       "operation": "setOrderBookingTicket",
+       "provenance": "pack Customer Service_Reference.pdf, page 13 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order booking ticket",
+       "bindsTo": "OrderBookingTicketServiceWorkspaceView",
+       "columns": [
+        "OrderBookingTicketServiceWorkspaceView.order",
+        "Customer",
+        "OrderBookingTicketServiceWorkspaceView.purchaseDate",
+        "OrderBookingTicketServiceWorkspaceView.channel",
+        "OrderBookingTicketServiceWorkspaceView.products",
+        "OrderBookingTicketServiceWorkspaceView.tickets",
+        "Event",
+        "OrderBookingTicketServiceWorkspaceView.dateTime",
+        "OrderBookingTicketServiceWorkspaceView.amount",
+        "OrderBookingTicketServiceWorkspaceView.payment",
+        "OrderBookingTicketServiceWorkspaceView.fulfillment",
+        "OrderBookingTicketServiceWorkspaceView.ticketStatus"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Customer Entitlement”, “Current”, “Available”.",
+       "provenance": "pack Customer Service_Reference.pdf, page 13 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setOrderBookingTicket"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order booking ticket list.",
+   "error": "Could not load. Names which read failed and leaves the order booking ticket untouched.",
+   "emptyFirstRun": "No order booking ticket yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order booking ticket are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setOrderBookingTicket",
+    "contract": "marketing-crm",
+    "purpose": "Order, Booking & Ticket Service Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setOrderBookingTicket"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OrderBookingTicketServiceWorkspaceView.order",
+    "Customer",
+    "OrderBookingTicketServiceWorkspaceView.purchaseDate",
+    "OrderBookingTicketServiceWorkspaceView.channel",
+    "OrderBookingTicketServiceWorkspaceView.products",
+    "OrderBookingTicketServiceWorkspaceView.tickets"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-014"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 13. 10 of 21 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-015",
+  "name": "Refund, Compensation & Service Exception Workspace",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.7",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/refund-compensation-service-exception-workspace-sup-015",
+   "component": "apps/venue-support-web/src/routes/support/RefundCompensationServiceExceptionWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 12→13",
+     "operation": "setRefundCompensationService"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Manage cases requiring money, compensation, goodwill or policy exceptions.",
+  "purposeNote": "Refunds, compensation and service exceptions are governed by applicable policies, financial limits and approval authorities.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Complimentary Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 15 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every refund compensation service",
+       "columns": [
+        "RefundCompensationServiceExceptionWorkspaceView.originalTransaction",
+        "RefundCompensationServiceExceptionWorkspaceView.amountPaid",
+        "RefundCompensationServiceExceptionWorkspaceView.amountUsed",
+        "RefundCompensationServiceExceptionWorkspaceView.refundableAmount",
+        "RefundCompensationServiceExceptionWorkspaceView.previousRefund",
+        "RefundCompensationServiceExceptionWorkspaceView.fees",
+        "RefundCompensationServiceExceptionWorkspaceView.proposedRefund",
+        "RefundCompensationServiceExceptionWorkspaceView.proposedCompensation"
+       ],
+       "bindsTo": "RefundCompensationServiceExceptionWorkspaceView",
+       "operation": "setRefundCompensationService",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected refund compensation service",
+       "bindsTo": "RefundCompensationServiceExceptionWorkspaceView",
+       "columns": [
+        "RefundCompensationServiceExceptionWorkspaceView.originalTransaction",
+        "RefundCompensationServiceExceptionWorkspaceView.amountPaid",
+        "RefundCompensationServiceExceptionWorkspaceView.amountUsed",
+        "RefundCompensationServiceExceptionWorkspaceView.refundableAmount",
+        "RefundCompensationServiceExceptionWorkspaceView.previousRefund",
+        "RefundCompensationServiceExceptionWorkspaceView.fees",
+        "RefundCompensationServiceExceptionWorkspaceView.proposedRefund",
+        "RefundCompensationServiceExceptionWorkspaceView.proposedCompensation"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Requested Exception”, “Up to AED 200”, “Above AED 1,000”, “Compensation Budget”.",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Complimentary Ticket",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fee Waiver",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Policy Exception",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund compensation service list.",
+   "error": "Could not load. Names which read failed and leaves the refund compensation service untouched.",
+   "emptyFirstRun": "No refund compensation service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund compensation service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRefundCompensationService",
+    "contract": "marketing-crm",
+    "purpose": "Refund, Compensation & Service Exception Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setRefundCompensationService"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "RefundCompensationServiceExceptionWorkspaceView.originalTransaction",
+    "RefundCompensationServiceExceptionWorkspaceView.amountPaid",
+    "RefundCompensationServiceExceptionWorkspaceView.amountUsed",
+    "RefundCompensationServiceExceptionWorkspaceView.refundableAmount",
+    "RefundCompensationServiceExceptionWorkspaceView.previousRefund",
+    "RefundCompensationServiceExceptionWorkspaceView.fees"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-015"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound to a contract property; 11 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-016",
+  "name": "Escalation, Collaboration & Internal Resolution",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.8",
+   "page": 16
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/escalation-collaboration-internal-resolution-sup-016",
+   "component": "apps/venue-support-web/src/routes/support/EscalationCollaborationInternalResolution.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 14→15",
+     "operation": "listEscalationCollaborationInternal"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Allow Customer Service to collaborate with other TICVAI departments without losing ownership of the customer case.",
+  "purposeNote": "Agents can obtain assistance from internal departments while retaining one customer-facing case, owner and audit trail.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Assignee",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Request",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Due Date",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Case",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related Transaction",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attachments",
+       "provenance": "pack Customer Service_Reference.pdf, page 16 §Capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The escalation collaboration internal configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the escalation collaboration internal untouched.",
+   "emptyFirstRun": "No escalation collaboration internal configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listEscalationCollaborationInternal",
+    "contract": "marketing-crm",
+    "purpose": "Escalation, Collaboration & Internal Resolution",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-016"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-017",
+  "name": "Case Resolution, Closure & Customer Feedback",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.9",
+   "page": 17
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/case-resolution-closure-customer-feedback-sup-017",
+   "component": "apps/venue-support-web/src/routes/support/CaseResolutionClosureCustomerFeedback.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "SUP-009",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F134 step 16→17",
+     "operation": "listCaseResolutionClosure"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture; Where configured, send) and no display directory — it is settings, not a population",
+  "purpose": "Govern how cases are resolved and formally closed.",
+  "purposeNote": "Every closed case has a clear resolution, root cause, customer communication and auditable outcome.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Resolution Category",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resolution Summary",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Action Taken",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Financial Impact",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Compensation",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Root Cause",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resolved By",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resolution Date",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Notification",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "System",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Integration",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operational",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Content",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policy",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unknown",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "CSAT survey",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Where configured, send"
+      },
+      {
+       "kind": "selectField",
+       "label": "Service rating",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Where configured, send"
+      },
+      {
+       "kind": "selectField",
+       "label": "Feedback request",
+       "provenance": "pack Customer Service_Reference.pdf, page 17 §Where configured, send"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The case resolution closure configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the case resolution closure untouched.",
+   "emptyFirstRun": "No case resolution closure configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCaseResolutionClosure",
+    "contract": "marketing-crm",
+    "purpose": "Case Resolution, Closure & Customer Feedback",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-017"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-018",
+  "name": "AI Customer Service Copilot & Knowledge Workspace",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Customer Service_Reference.pdf",
+   "board": "1",
+   "number": "10.1.10",
+   "page": 19
+  },
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/support/ai-customer-service-copilot-knowledge-workspace-sup-018",
+   "component": "apps/venue-support-web/src/routes/support/AiCustomerServiceCopilotKnowledgeWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-009"
+   ],
+   "exitTo": [
+    "SUP-009"
+   ],
+   "inferred": false,
+   "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create the AI intelligence layer assisting agents throughout the service journey. This should not be a simple chatbot added to the side of the screen. It should understand the customer + transaction + policy + case context. Board 1 focused on the individual customer-service agent and individual customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations manager and service leadership layer.",
+  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 19 §Actions"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Customer Service_Reference.pdf, page 19"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Customer Service_Reference.pdf, page 19"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Review → Execute",
+       "provenance": "pack Customer Service_Reference.pdf, page 19 §Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCustomerServiceCopilot"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer service copilot list.",
+   "error": "Could not load. Names which read failed and leaves the customer service copilot untouched.",
+   "emptyFirstRun": "No customer service copilot yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer service copilot are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCustomerServiceCopilot",
+    "contract": "marketing-crm",
+    "purpose": "AI Customer Service Copilot & Knowledge Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCustomerServiceCopilot"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-018"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

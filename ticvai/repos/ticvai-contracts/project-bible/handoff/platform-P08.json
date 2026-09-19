@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1182,
-  "operations": 691,
-  "contracts": 27,
+  "operations": 1075,
+  "contracts": 31,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 223
+  "operationsWithNoScreen": 175
  },
  "waves": {
   "wave1": 60,
@@ -134,11 +134,19 @@
    "operations": 167
   },
   {
+   "contract": "marketing-crm",
+   "operations": 121
+  },
+  {
    "contract": "orders",
    "operations": 79
   },
   {
    "contract": "catalogue",
+   "operations": 71
+  },
+  {
+   "contract": "seating",
    "operations": 52
   },
   {
@@ -146,36 +154,64 @@
    "operations": 48
   },
   {
+   "contract": "resources",
+   "operations": 48
+  },
+  {
+   "contract": "finance",
+   "operations": 45
+  },
+  {
    "contract": "fnb",
    "operations": 43
   },
   {
-   "contract": "finance",
-   "operations": 43
+   "contract": "rental",
+   "operations": 39
   },
   {
-   "contract": "marketing-crm",
-   "operations": 30
+   "contract": "wallet",
+   "operations": 33
+  },
+  {
+   "contract": "games",
+   "operations": 32
+  },
+  {
+   "contract": "maintenance",
+   "operations": 31
+  },
+  {
+   "contract": "tenancy",
+   "operations": 29
+  },
+  {
+   "contract": "accreditation",
+   "operations": 28
   },
   {
    "contract": "promotions",
    "operations": 27
   },
   {
-   "contract": "tenancy",
+   "contract": "subscription",
    "operations": 25
   },
   {
-   "contract": "maintenance",
-   "operations": 24
+   "contract": "approvals",
+   "operations": 23
   },
   {
-   "contract": "subscription",
+   "contract": "workforce",
    "operations": 22
   },
   {
    "contract": "reporting",
-   "operations": 15
+   "operations": 19
+  },
+  {
+   "contract": "retail",
+   "operations": 17
   },
   {
    "contract": "shift",
@@ -186,23 +222,15 @@
    "operations": 13
   },
   {
-   "contract": "approvals",
-   "operations": 12
-  },
-  {
-   "contract": "retail",
-   "operations": 11
-  },
-  {
-   "contract": "workforce",
-   "operations": 11
-  },
-  {
    "contract": "venue-map",
    "operations": 10
   },
   {
-   "contract": "resources",
+   "contract": "identity",
+   "operations": 10
+  },
+  {
+   "contract": "white-label",
    "operations": 9
   },
   {
@@ -210,27 +238,15 @@
    "operations": 8
   },
   {
-   "contract": "identity",
-   "operations": 8
-  },
-  {
-   "contract": "seating",
-   "operations": 6
-  },
-  {
    "contract": "public-api",
-   "operations": 5
-  },
-  {
-   "contract": "games",
-   "operations": 5
+   "operations": 7
   },
   {
    "contract": "assets",
-   "operations": 2
+   "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "payments",
    "operations": 1
   },
   {
@@ -1145,7 +1161,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/mobile-accessible-selection-bo-1000",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1154,7 +1170,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/view-preview-compare-heat-map-bo-1001",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1163,7 +1179,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-conversational-seat-assistant-bo-1002",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1172,7 +1188,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-command-center-bo-1003",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1181,7 +1197,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-type-master-bo-1004",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1190,7 +1206,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-pool-creation-bo-1005",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1199,7 +1215,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-rule-assignment-bo-1006",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1208,7 +1224,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/expiration-rules-bo-1007",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1217,7 +1233,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/automatic-hold-release-bo-1008",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1226,7 +1242,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/release-convert-reassign-bo-1009",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1244,7 +1260,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-approval-workflow-bo-1010",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1253,7 +1269,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/priority-conflict-resolution-bo-1011",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1262,7 +1278,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-utilization-audit-bo-1012",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1271,7 +1287,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/rules-command-center-bo-1013",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1280,7 +1296,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-kill-rules-bo-1014",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1289,7 +1305,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/buffer-seat-rules-bo-1015",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1298,7 +1314,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/companion-seat-rules-bo-1016",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1307,7 +1323,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/wheelchair-companion-rules-bo-1017",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1316,7 +1332,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accessible-seating-master-bo-1018",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1325,7 +1341,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accessible-route-mapping-bo-1019",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1343,7 +1359,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accessible-filters-eligibility-bo-1020",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1352,7 +1368,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/flexible-spacing-rules-bo-1021",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1361,7 +1377,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/compliance-validation-audit-bo-1022",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1370,7 +1386,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/group-reservation-center-bo-1023",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1379,7 +1395,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/group-type-configuration-bo-1024",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1388,7 +1404,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/group-request-intake-bo-1025",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1397,7 +1413,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/availability-best-fit-search-bo-1026",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1406,7 +1422,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/bulk-seat-allocation-bo-1027",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1415,7 +1431,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/roster-participant-assignment-bo-1028",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1424,7 +1440,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/quote-deposit-payment-bo-1029",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1442,7 +1458,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/modify-release-cancel-bo-1030",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1451,7 +1467,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/contracts-approval-workflow-bo-1031",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1460,7 +1476,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/group-reporting-audit-bo-1032",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1469,7 +1485,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/recommendation-command-center-bo-1033",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1478,7 +1494,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/best-seat-recommendations-bo-1034",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1487,7 +1503,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/best-value-recommendations-bo-1035",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1496,7 +1512,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/closest-to-stage-recommendations-bo-1036",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1505,7 +1521,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/family-seating-recommendations-bo-1037",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1514,7 +1530,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accessibility-recommendations-bo-1038",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1523,7 +1539,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-upgrade-recommendations-bo-1039",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1541,7 +1557,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/alternatives-reseating-bo-1040",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1550,7 +1566,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/scoring-rules-model-governance-bo-1041",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1559,7 +1575,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/performance-feedback-audit-bo-1042",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1577,7 +1593,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/dynamic-seat-pricing-bo-1044",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1586,7 +1602,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/price-bands-categories-bo-1045",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1595,7 +1611,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/inventory-forecasting-bo-1046",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1604,7 +1620,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/section-revenue-forecast-bo-1047",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1613,7 +1629,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-upsell-recommendations-bo-1048",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1622,7 +1638,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/scenario-what-if-planning-bo-1049",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1658,7 +1674,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/occupancy-reporting-bo-1052",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1667,7 +1683,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/zone-performance-reporting-bo-1053",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1676,7 +1692,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/revenue-by-section-bo-1054",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1694,7 +1710,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-utilization-analytics-bo-1056",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1712,7 +1728,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/sales-pace-pick-curves-bo-1058",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1721,7 +1737,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/heat-maps-drill-down-bo-1059",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1739,7 +1755,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/report-builder-export-audit-bo-1060",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1748,7 +1764,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/platform-command-center-bo-1061",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1757,7 +1773,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/tenant-brand-context-bo-1062",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1766,7 +1782,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-specific-configuration-bo-1063",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1775,7 +1791,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/naming-numbering-localization-bo-1064",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1784,7 +1800,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/currency-timezone-channels-bo-1065",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1793,7 +1809,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/roles-permissions-masking-bo-1066",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1802,7 +1818,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-approval-workflows-bo-1067",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1811,7 +1827,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/lifecycle-environment-promotion-bo-1068",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1820,7 +1836,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/platform-health-observability-bo-1069",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1838,7 +1854,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/setup-clone-inheritance-bo-1070",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1847,7 +1863,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/integration-command-center-bo-1071",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1856,7 +1872,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-management-apis-bo-1072",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1865,7 +1881,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/api-access-oauth-bo-1073",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1874,7 +1890,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/webhook-configuration-bo-1074",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1883,7 +1899,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/seat-event-catalog-bo-1075",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1892,7 +1908,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/concurrency-idempotency-limits-bo-1076",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1901,7 +1917,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/mapping-transformation-bo-1077",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1910,7 +1926,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/monitoring-retry-reconciliation-bo-1078",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1919,7 +1935,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/immutable-seat-audit-logs-bo-1079",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1937,7 +1953,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/integration-approval-compliance-bo-1080",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1946,7 +1962,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/finance-dashboard-bo-1081",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1955,7 +1971,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/admissions-revenue-bo-1082",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1964,7 +1980,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-command-center-bo-1083",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1973,7 +1989,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-type-library-bo-1084",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1982,7 +1998,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-creation-provisioning-rules-bo-1085",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1991,7 +2007,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-ownership-account-association-bo-1086",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2000,7 +2016,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-currency-monetary-configuration-bo-1087",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2009,7 +2025,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/credit-balance-type-configuration-bo-1088",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2018,7 +2034,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-feature-profile-bo-1089",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2036,7 +2052,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-lifecycle-configuration-bo-1090",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2045,7 +2061,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-numbering-identity-digital-credentials-bo-1091",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2054,7 +2070,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-configuration-preview-validation-publication-bo-1092",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2063,7 +2079,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-command-center-bo-1093",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2072,7 +2088,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-method-configuration-bo-1094",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2081,7 +2097,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/top-up-rule-configuration-bo-1095",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2090,7 +2106,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/channel-funding-source-mapping-bo-1096",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2099,7 +2115,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/auto-reload-configuration-bo-1097",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2108,7 +2124,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/recurring-funding-schedule-bo-1098",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2117,7 +2133,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-authorization-approval-rules-bo-1099",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2135,7 +2151,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-reversal-correction-management-bo-1100",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2144,7 +2160,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-limits-velocity-controls-bo-1101",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2153,7 +2169,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-transaction-audit-reconciliation-bo-1102",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2162,7 +2178,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/stored-value-credit-command-center-bo-1103",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2171,7 +2187,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/credit-type-definition-studio-bo-1104",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2180,7 +2196,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/credit-issuance-rule-configuration-bo-1105",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2189,7 +2205,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/credit-usage-eligibility-rules-bo-1106",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2198,7 +2214,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/consumption-priority-engine-bo-1107",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2207,7 +2223,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/expiry-validity-policy-configuration-bo-1108",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2216,7 +2232,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/fefo-credit-lot-management-bo-1109",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2234,7 +2250,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/split-tender-multi-credit-consumption-bo-1110",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2243,7 +2259,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/credit-expiry-extension-forfeiture-operations-bo-1111",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2252,7 +2268,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/consumption-simulator-validation-rule-publication-bo-1112",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2261,7 +2277,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/shared-wallet-command-center-bo-1113",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2270,7 +2286,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/shared-wallet-model-configuration-bo-1114",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2279,7 +2295,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/family-household-structure-configuration-bo-1115",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2288,7 +2304,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/parent-child-stored-value-distribution-bo-1116",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2297,7 +2313,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/allowance-budget-allocation-engine-bo-1117",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2306,7 +2322,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/member-spending-controls-permissions-bo-1118",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2315,7 +2331,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/corporate-wallet-organizational-hierarchy-bo-1119",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2333,7 +2349,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/corporate-budget-policy-approval-rules-bo-1120",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2342,7 +2358,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/shared-wallet-transfers-balance-reallocation-bo-1121",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2351,7 +2367,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/shared-wallet-simulator-monitoring-audit-bo-1122",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2360,7 +2376,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-digital-benefit-command-center-bo-1123",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2369,7 +2385,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-product-configuration-bo-1124",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2378,7 +2394,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-issuance-activation-distribution-bo-1125",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2387,7 +2403,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/voucher-coupon-type-configuration-bo-1126",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2396,7 +2412,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/voucher-eligibility-redemption-rule-studio-bo-1127",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2405,7 +2421,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/membership-benefits-entitlement-mapping-bo-1128",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2414,7 +2430,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/benefit-packaging-digital-wallet-presentation-bo-1129",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2432,7 +2448,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-voucher-expiry-management-bo-1130",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2441,7 +2457,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-balance-liability-breakage-control-bo-1131",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2450,7 +2466,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-voucher-simulator-validation-publication-bo-1132",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2459,7 +2475,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-usage-channel-command-center-bo-1133",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2468,7 +2484,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-channel-configuration-bo-1134",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2477,7 +2493,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-payment-redemption-policy-bo-1135",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2486,7 +2502,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wearable-credential-type-configuration-bo-1136",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2495,7 +2511,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wearable-linking-wallet-association-rules-bo-1137",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2504,7 +2520,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/nfc-rfid-qr-interaction-rules-bo-1138",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2513,7 +2529,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/digital-key-wallet-authentication-policy-bo-1139",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2531,7 +2547,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/offline-wallet-degraded-mode-configuration-bo-1140",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2540,7 +2556,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/device-terminal-acceptance-point-mapping-bo-1141",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2549,7 +2565,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-transaction-simulator-monitoring-channel-audit-bo-1142",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2558,7 +2574,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-operations-command-center-bo-1143",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2567,7 +2583,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2576,7 +2592,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/transfer-eligibility-limits-approval-rules-bo-1145",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2585,7 +2601,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/refund-to-wallet-policy-configuration-bo-1146",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2594,7 +2610,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/refund-routing-credit-restoration-engine-bo-1147",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2603,7 +2619,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/reversal-transaction-correction-management-bo-1148",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2612,7 +2628,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/administrative-balance-adjustment-studio-bo-1149",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2630,7 +2646,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-block-freeze-restriction-management-bo-1150",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2639,7 +2655,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-disputes-operational-exception-queue-bo-1151",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2648,7 +2664,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/operations-simulator-approval-audit-trail-bo-1152",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2657,7 +2673,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-security-risk-command-center-bo-1153",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2666,7 +2682,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-risk-policy-configuration-bo-1154",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2675,7 +2691,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/transaction-risk-scoring-engine-bo-1155",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2684,7 +2700,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/velocity-behavioral-rule-configuration-bo-1156",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2693,7 +2709,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/device-credential-account-security-bo-1157",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2702,7 +2718,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/ai-fraud-anomaly-detection-studio-bo-1158",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2711,7 +2727,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/automated-security-action-orchestration-bo-1159",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2729,7 +2745,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/fraud-alert-investigation-case-management-bo-1160",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2738,7 +2754,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/security-rules-testing-simulation-ai-sandbox-bo-1161",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2747,7 +2763,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/security-governance-audit-rule-publication-bo-1162",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2756,7 +2772,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-finance-liability-command-center-bo-1163",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2765,7 +2781,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-financial-classification-accounting-mapping-bo-1164",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2774,7 +2790,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-sub-ledger-balance-control-bo-1165",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2783,7 +2799,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/multi-source-reconciliation-configuration-bo-1166",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2792,7 +2808,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/reconciliation-exception-resolution-workbench-bo-1167",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2801,7 +2817,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/gift-card-liability-management-bo-1168",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2810,7 +2826,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/breakage-revenue-recognition-policy-bo-1169",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2828,7 +2844,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-financial-period-closing-controls-bo-1170",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2837,7 +2853,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-analytics-management-reporting-bo-1171",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2846,7 +2862,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/finance-validation-reporting-audit-center-bo-1172",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2855,7 +2871,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-integration-command-center-bo-1173",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2864,7 +2880,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-api-catalogue-endpoint-configuration-bo-1174",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2873,7 +2889,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/integration-profile-system-mapping-bo-1175",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2882,7 +2898,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-events-webhooks-notification-orchestration-bo-1176",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2891,7 +2907,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/api-security-access-integration-permissions-bo-1177",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2900,7 +2916,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/synchronization-retry-resilience-configuration-bo-1178",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2909,7 +2925,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/integration-monitoring-exception-workbench-bo-1179",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2927,7 +2943,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-configuration-governance-version-control-bo-1180",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2936,7 +2952,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/approval-publication-change-management-bo-1181",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2945,7 +2961,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-platform-health-audit-administration-center-bo-1182",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5159,7 +5175,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-command-center-dashboard-bo-364",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5168,7 +5184,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/my-approval-inbox-bo-365",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5177,7 +5193,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/team-shared-approval-queue-bo-366",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5186,7 +5202,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-request-detail-bo-367",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5195,7 +5211,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/ai-decision-support-bo-368",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5204,7 +5220,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/high-priority-risk-queue-bo-369",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5213,7 +5229,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/escalated-approval-center-bo-370",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5222,7 +5238,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/completed-approval-history-bo-371",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5231,7 +5247,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-sla-workload-monitor-bo-372",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5240,7 +5256,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-activity-notification-center-bo-373",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5258,7 +5274,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/business-context-evidence-viewer-bo-375",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5267,7 +5283,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-timeline-decision-chain-bo-376",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5276,7 +5292,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approve-sensitive-action-confirmation-bo-377",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -5285,7 +5301,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/reject-return-request-information-bo-378",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5294,7 +5310,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/requester-modification-resubmission-bo-379",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5303,7 +5319,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/withdrawal-cancellation-expiration-reopening-bo-380",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5312,7 +5328,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/segregation-of-duties-four-eyes-control-bo-381",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5321,7 +5337,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approved-action-execution-status-bo-382",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5330,7 +5346,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/decision-record-immutable-audit-view-bo-383",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5339,7 +5355,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/delegation-escalation-command-center-bo-384",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5357,7 +5373,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/temporary-delegation-availability-calendar-bo-386",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5366,7 +5382,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/out-of-office-substitute-routing-bo-387",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5375,7 +5391,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/approval-sla-policy-configuration-bo-388",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5384,7 +5400,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/reminder-breach-notification-rules-bo-389",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5393,7 +5409,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/escalation-policy-builder-bo-390",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5402,7 +5418,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/live-escalation-operations-center-bo-391",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5411,7 +5427,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/sla-escalation-performance-analytics-bo-392",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5420,7 +5436,7 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/ai-sla-escalation-advisor-bo-393",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5429,7 +5445,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-operations-dashboard-bo-394",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5438,7 +5454,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-directory-bo-395",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5447,7 +5463,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/attraction-profile-bo-396",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5456,7 +5472,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/attraction-type-configuration-bo-397",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5465,7 +5481,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-operational-configuration-bo-398",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5474,7 +5490,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/wallet-credit-acceptance-mapping-bo-399",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5483,7 +5499,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/attraction-reader-mapping-bo-400",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5492,7 +5508,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-package-entitlement-association-bo-401",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5501,7 +5517,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/configuration-health-validation-bo-402",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5510,7 +5526,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/attraction-audit-dependencies-governed-actions-bo-403",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5519,7 +5535,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-management-dashboard-bo-404",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5528,7 +5544,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-directory-bo-405",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5546,7 +5562,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-credit-payment-configuration-bo-407",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5555,7 +5571,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-attraction-assignment-bo-408",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5564,7 +5580,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/retap-delay-transaction-protection-bo-409",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5573,7 +5589,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/free-game-glow-reader-display-rules-bo-410",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5582,7 +5598,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-theme-experience-configuration-bo-411",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5591,7 +5607,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/real-time-tap-validation-reader-response-bo-412",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5600,7 +5616,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/balance-check-reader-device-test-console-bo-413",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5609,7 +5625,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/wallet-credit-management-dashboard-bo-414",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5618,7 +5634,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/wallet-credit-type-configuration-bo-415",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5627,7 +5643,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/wallet-account-balance-view-bo-416",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5636,7 +5652,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/top-up-configuration-bo-417",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5645,7 +5661,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/top-up-bonus-rule-configuration-bo-418",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5654,7 +5670,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/bonus-usage-restrictions-bo-419",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5663,7 +5679,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/bonus-validity-expiry-configuration-bo-420",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5672,7 +5688,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/free-game-ride-credit-management-bo-421",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5681,7 +5697,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/refund-adjustment-manual-bonus-control-bo-422",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5690,7 +5706,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/wallet-credit-transaction-ledger-audit-bo-423",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5699,7 +5715,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/gameplay-validation-command-center-bo-424",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5708,7 +5724,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/gameplay-validation-rule-configuration-bo-425",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5717,7 +5733,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/deduction-priority-funding-source-rules-bo-426",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5726,7 +5742,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/all-games-rides-pass-configuration-bo-427",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5735,7 +5751,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/specific-game-ride-unlimited-entitlement-bo-428",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5744,7 +5760,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/specific-game-ride-limited-entitlement-bo-429",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5753,7 +5769,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-package-builder-bo-430",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5762,7 +5778,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/entitlement-validity-activation-rules-bo-431",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5771,7 +5787,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/real-time-gameplay-authorization-bo-432",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5780,7 +5796,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/validation-simulator-exception-analysis-bo-433",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5789,7 +5805,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-pricing-command-center-bo-434",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5798,7 +5814,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/standard-game-ride-price-configuration-bo-435",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5807,7 +5823,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/group-pricing-configuration-bo-436",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5816,7 +5832,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/peak-non-peak-dynamic-pricing-bo-437",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5825,7 +5841,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/pricing-calendar-exception-dates-bo-438",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5834,7 +5850,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/normal-vip-pricing-configuration-bo-439",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5843,7 +5859,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/retry-price-configuration-bo-440",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5861,7 +5877,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/effective-pricing-reader-price-preview-bo-442",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5888,7 +5904,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/redemption-credit-rule-configuration-bo-445",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5897,7 +5913,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/ticket-based-redemption-ticket-eater-integration-bo-446",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5906,7 +5922,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/ticketless-redemption-game-integration-bo-447",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5915,7 +5931,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/redemption-wallet-balance-view-bo-448",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5924,7 +5940,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/redemption-counter-prize-checkout-bo-449",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5933,7 +5949,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/prize-catalogue-credit-cost-configuration-bo-450",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5942,7 +5958,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/prize-inventory-integration-bo-451",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5951,7 +5967,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/direct-pay-crane-prize-machine-configuration-bo-452",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5960,7 +5976,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/redemption-transaction-ledger-reconciliation-audit-bo-453",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5969,7 +5985,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-lifecycle-command-center-bo-454",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5978,7 +5994,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-credential-profile-bo-455",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5987,7 +6003,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-expiry-rule-configuration-bo-456",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5996,7 +6012,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/last-recharge-last-activity-tracking-bo-457",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6005,7 +6021,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/expiry-monitoring-upcoming-expiration-bo-458",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6014,7 +6030,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-expiry-runtime-validation-bo-459",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6023,7 +6039,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-block-suspend-reactivation-control-bo-460",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6032,7 +6048,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-replacement-wallet-relinking-bo-461",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6041,7 +6057,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/customer-balance-credential-status-view-bo-462",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6050,7 +6066,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/card-lifecycle-audit-history-bo-463",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6059,7 +6075,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-operations-control-center-bo-464",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6068,7 +6084,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/live-gameplay-transaction-monitor-bo-465",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6077,7 +6093,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-device-health-monitor-bo-466",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6086,7 +6102,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/tap-validation-decision-trace-bo-467",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6095,7 +6111,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/rejected-transaction-reason-analysis-bo-468",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6113,7 +6129,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/entitlement-free-play-consumption-monitor-bo-470",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6122,7 +6138,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/offline-synchronization-recovery-monitor-bo-471",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6131,7 +6147,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/operational-alerts-exception-center-bo-472",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6140,7 +6156,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/operational-analytics-reconciliation-dashboard-bo-473",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6149,7 +6165,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-integration-command-center-bo-474",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6158,7 +6174,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-manufacturer-model-profile-bo-475",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6167,7 +6183,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/communication-protocol-configuration-bo-476",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6176,7 +6192,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-command-event-mapping-bo-477",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6185,7 +6201,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-configuration-deployment-synchronization-bo-478",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6194,7 +6210,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-trigger-i-o-control-mapping-bo-479",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6203,7 +6219,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/reader-screen-led-sound-output-mapping-bo-480",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6212,7 +6228,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/edge-cache-offline-rule-package-bo-481",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6221,7 +6237,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/device-diagnostics-integration-logs-bo-482",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6230,7 +6246,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/integration-certification-test-console-bo-483",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6239,7 +6255,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/self-service-experience-command-center-bo-484",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6248,7 +6264,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6257,7 +6273,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/customer-card-wallet-identification-bo-486",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6266,7 +6282,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/customer-wallet-balance-summary-bo-487",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6275,7 +6291,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/self-service-wallet-top-up-bo-488",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6284,7 +6300,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/bonus-free-game-benefit-view-bo-489",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6293,7 +6309,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/game-ride-eligibility-what-can-i-play-bo-490",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6302,7 +6318,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/redemption-balance-prize-discovery-bo-491",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6311,7 +6327,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/customer-game-wallet-transaction-history-bo-492",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6320,7 +6336,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/self-service-ui-theme-language-journey-configuration-bo-493",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6329,7 +6345,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-product-command-center-bo-494",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6338,7 +6354,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/create-rental-product-wizard-bo-495",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6347,7 +6363,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-product-profile-bo-496",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6356,7 +6372,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-category-classification-setup-bo-497",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6365,7 +6381,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-tracking-model-bo-498",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6374,7 +6390,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-location-assignment-bo-499",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6383,7 +6399,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-duration-turnaround-configuration-bo-500",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6392,7 +6408,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-rules-operational-policy-bo-501",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6401,7 +6417,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/customer-requirements-agreement-waiver-bo-502",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6410,7 +6426,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/product-validation-approval-publication-bo-503",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6419,7 +6435,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-inventory-command-center-bo-504",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6428,7 +6444,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/serialized-equipment-registry-bo-505",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6437,7 +6453,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-asset-profile-bo-506",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6446,7 +6462,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/pooled-inventory-management-bo-507",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6455,7 +6471,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-status-condition-management-bo-508",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6464,7 +6480,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/qr-barcode-equipment-identification-bo-509",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6473,7 +6489,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-location-allocation-bo-510",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6482,7 +6498,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-transfer-management-bo-511",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6491,7 +6507,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-adjustment-exception-management-bo-512",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6500,7 +6516,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-intelligence-rebalancing-bo-513",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6509,7 +6525,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/availability-command-center-bo-514",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6518,7 +6534,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/availability-rule-configuration-bo-515",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6527,7 +6543,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/operating-hours-rental-windows-bo-516",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6536,7 +6552,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/timeslot-duration-availability-setup-bo-517",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6545,7 +6561,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/real-time-availability-calendar-bo-518",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6554,7 +6570,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-equipment-calendar-bo-519",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6563,7 +6579,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/blackout-closure-capacity-blocking-bo-520",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6572,7 +6588,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/overlap-conflict-engine-bo-521",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6581,7 +6597,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-holds-buffers-release-rules-bo-522",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6590,7 +6606,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/availability-intelligence-ai-forecasting-bo-523",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6599,7 +6615,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-pricing-command-center-bo-524",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6608,7 +6624,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/pricing-profile-builder-bo-525",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6617,7 +6633,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/duration-tiered-pricing-configuration-bo-526",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6626,7 +6642,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/calendar-peak-seasonal-pricing-bo-527",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6635,7 +6651,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6644,7 +6660,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-security-hold-policy-bo-529",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6653,7 +6669,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-lifecycle-settlement-rules-bo-530",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6662,7 +6678,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/late-fee-grace-period-extension-pricing-bo-531",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6671,7 +6687,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/commercial-exceptions-waivers-overrides-bo-532",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6680,7 +6696,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/pricing-simulation-validation-ai-commercial-intelligence-bo-533",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6689,7 +6705,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-booking-command-center-bo-534",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6698,7 +6714,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/new-rental-booking-wizard-bo-535",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6707,7 +6723,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/availability-selection-alternative-options-bo-536",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6716,7 +6732,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/customer-participant-information-bo-537",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6725,7 +6741,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/group-rental-participant-management-bo-538",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6734,7 +6750,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-agreement-waiver-completion-bo-539",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6743,7 +6759,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/booking-commercial-summary-payment-bo-540",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6752,7 +6768,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/reservation-confirmation-qr-voucher-bo-541",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6761,7 +6777,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/reservation-modification-cancellation-no-show-bo-542",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6770,7 +6786,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/reservation-detail-timeline-readiness-bo-543",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6779,7 +6795,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-checkout-command-center-bo-544",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6788,7 +6804,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/voucher-scan-reservation-retrieval-bo-545",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6797,7 +6813,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/checkout-readiness-validation-bo-546",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6806,7 +6822,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-assignment-workspace-bo-547",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6815,7 +6831,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-scan-validation-bo-548",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6824,7 +6840,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/pre-rental-condition-inspection-bo-549",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6833,7 +6849,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/safety-handover-checklist-bo-550",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6842,7 +6858,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-financial-handover-validation-bo-551",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6851,7 +6867,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/group-multi-item-checkout-bo-552",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6860,7 +6876,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/checkout-confirmation-rental-activation-bo-553",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6869,7 +6885,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-operations-command-center-bo-554",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6878,7 +6894,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-detail-live-timeline-bo-555",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6887,7 +6903,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-extension-request-bo-556",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6896,7 +6912,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/extension-pricing-confirmation-bo-557",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6905,7 +6921,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-swap-replacement-bo-558",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6914,7 +6930,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-incident-operational-exception-bo-559",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6923,7 +6939,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/due-soon-customer-notification-management-bo-560",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6932,7 +6948,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/overdue-rental-management-bo-561",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6941,7 +6957,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-group-rental-management-bo-562",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6950,7 +6966,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-intelligence-operational-alerts-bo-563",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6959,7 +6975,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-return-command-center-bo-564",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6968,7 +6984,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-scan-rental-retrieval-bo-565",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6977,7 +6993,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-summary-actual-return-time-bo-566",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6986,7 +7002,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/post-rental-condition-inspection-bo-567",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6995,7 +7011,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/before-vs-after-condition-comparison-bo-568",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7004,7 +7020,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/damage-assessment-charge-workflow-bo-569",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7013,7 +7029,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/partial-return-missing-equipment-bo-570",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7022,7 +7038,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/late-fees-damage-fees-final-settlement-bo-571",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7031,7 +7047,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-release-capture-customer-confirmation-bo-572",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7040,7 +7056,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-completion-equipment-disposition-bo-573",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7049,7 +7065,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-command-center-bo-574",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7058,7 +7074,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-rule-service-plan-configuration-bo-575",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -7067,7 +7083,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-calendar-scheduling-bo-576",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7076,7 +7092,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-work-order-bo-577",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -7085,7 +7101,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/technician-repair-workspace-bo-578",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -7094,7 +7110,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/parts-cost-maintenance-expense-tracking-bo-579",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7103,7 +7119,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/asset-maintenance-history-lifecycle-bo-580",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7112,7 +7128,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-to-service-inspection-approval-bo-581",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7121,7 +7137,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/asset-retirement-write-off-replacement-recommendation-bo-582",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7130,7 +7146,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-intelligence-predictive-ai-bo-583",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7139,7 +7155,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-executive-command-center-bo-584",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7148,7 +7164,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-revenue-commercial-analytics-bo-585",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7157,7 +7173,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/utilization-capacity-analytics-bo-586",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7166,7 +7182,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inventory-equipment-performance-analytics-bo-587",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7175,7 +7191,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-duration-extension-return-analytics-bo-588",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7184,7 +7200,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/damage-loss-deposit-exception-analytics-bo-589",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7193,7 +7209,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/location-channel-performance-bo-590",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7202,7 +7218,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-forecasting-demand-intelligence-bo-591",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7211,7 +7227,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/audit-governance-operational-control-bo-592",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7220,7 +7236,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/ai-rental-management-copilot-action-center-bo-593",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7229,7 +7245,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/environment-ready-handoff-to-ai-setup-bo-594",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7238,7 +7254,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ai-setup-command-center-bo-595",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7247,7 +7263,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/guided-setup-plan-bo-596",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7256,7 +7272,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ai-configuration-workspace-bo-597",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7265,7 +7281,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ai-draft-review-approval-bo-598",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7274,7 +7290,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/manual-configuration-center-bo-599",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7283,7 +7299,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/venue-calendar-operational-setup-bo-600",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7292,7 +7308,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/product-pricing-sales-channel-setup-bo-601",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7301,7 +7317,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/pos-payment-access-setup-bo-602",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7310,7 +7326,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/configuration-health-ai-review-bo-603",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7319,7 +7335,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/setup-completion-handoff-to-go-live-bo-604",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7328,7 +7344,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/go-live-readiness-command-center-bo-605",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7337,7 +7353,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/automated-validation-plan-bo-606",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7346,7 +7362,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ticketing-product-validation-bo-607",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7355,7 +7371,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/end-to-end-sales-channel-testing-bo-608",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7364,7 +7380,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/payment-financial-validation-bo-609",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7373,7 +7389,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ticket-qr-access-validation-bo-610",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7382,7 +7398,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/user-security-integration-validation-bo-611",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7391,7 +7407,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/communication-customer-journey-validation-bo-612",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7400,7 +7416,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/blocker-warning-ai-resolution-center-bo-613",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7409,7 +7425,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/final-go-live-approval-production-launch-bo-614",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7418,7 +7434,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-command-center-bo-615",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7427,7 +7443,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-application-directory-bo-616",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7436,7 +7452,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/new-accreditation-application-bo-617",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7445,7 +7461,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-form-builder-bo-618",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7454,7 +7470,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-category-management-bo-619",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7463,7 +7479,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-program-setup-bo-620",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7472,7 +7488,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/applicant-type-configuration-bo-621",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7481,7 +7497,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/application-requirements-matrix-bo-622",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7490,7 +7506,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-intake-monitor-bo-623",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7499,7 +7515,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/registration-rules-publication-bo-624",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7508,7 +7524,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-holder-directory-bo-625",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7517,7 +7533,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-holder-profile-bo-626",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7526,7 +7542,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/identity-details-verification-bo-627",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7535,7 +7551,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/photo-management-bo-628",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7544,7 +7560,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/document-repository-bo-629",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7553,7 +7569,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/document-verification-queue-bo-630",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7562,7 +7578,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/duplicate-identity-conflict-detection-bo-631",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7571,7 +7587,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/organization-affiliation-management-bo-632",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7580,7 +7596,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/profile-completeness-compliance-monitor-bo-633",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7589,7 +7605,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/profile-history-audit-timeline-bo-634",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7598,7 +7614,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-review-queue-bo-635",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7607,7 +7623,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/application-review-workspace-bo-636",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7625,7 +7641,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/approval-rules-conditions-bo-638",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7634,7 +7650,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/reviewer-assignment-delegation-bo-639",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7643,7 +7659,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/rejection-resubmission-management-bo-640",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7652,7 +7668,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/escalation-exception-management-bo-641",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7670,7 +7686,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/approval-policy-validation-publication-bo-643",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7688,7 +7704,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-generation-workspace-bo-645",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7697,7 +7713,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-media-configuration-bo-646",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7706,7 +7722,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/badge-template-designer-bo-647",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7715,7 +7731,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/badge-printing-print-queue-bo-648",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7724,7 +7740,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/digital-mobile-credential-management-bo-649",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7733,7 +7749,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/nfc-rfid-credential-encoding-bo-650",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7742,7 +7758,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/credential-activation-delivery-bo-651",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7769,7 +7785,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-access-command-center-bo-654",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7778,7 +7794,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-profile-management-bo-655",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7787,7 +7803,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-zone-access-matrix-bo-656",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7796,7 +7812,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/operational-area-permission-management-bo-657",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7805,7 +7821,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/date-time-access-rules-bo-658",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7814,7 +7830,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-schedule-management-bo-659",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7823,7 +7839,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/holder-access-assignment-bo-660",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7832,7 +7848,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/temporary-access-exception-management-bo-661",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7841,7 +7857,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-revocation-suspension-bo-662",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7850,7 +7866,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/access-rights-preview-impact-synchronization-bo-663",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7859,7 +7875,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-lifecycle-command-center-bo-664",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7868,7 +7884,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-status-workflow-bo-665",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7877,7 +7893,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/validity-period-configuration-bo-666",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7886,7 +7902,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/event-venue-accreditation-assignment-bo-667",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7895,7 +7911,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/multi-venue-accreditation-management-bo-668",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7904,7 +7920,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/temporary-seasonal-accreditation-bo-669",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7913,7 +7929,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/suspension-reactivation-management-bo-670",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7922,7 +7938,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-revocation-management-bo-671",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7931,7 +7947,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/expiry-monitor-expiration-rules-bo-672",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7940,7 +7956,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-renewal-workspace-bo-673",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7949,7 +7965,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-communications-command-center-bo-674",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7958,7 +7974,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/notification-rule-management-bo-675",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7967,7 +7983,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/expiry-renewal-notification-scheduler-bo-676",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7976,7 +7992,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/communication-template-library-bo-677",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7985,7 +8001,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/channel-language-branding-configuration-bo-678",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -7994,7 +8010,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/manual-bulk-communication-center-bo-679",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8003,7 +8019,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-bulk-import-bo-680",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8012,7 +8028,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/import-validation-processing-monitor-bo-681",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8021,7 +8037,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-export-data-extract-center-bo-682",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8030,7 +8046,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/delivery-batch-operational-history-bo-683",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8039,7 +8055,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-executive-dashboard-bo-684",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8048,7 +8064,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-status-portfolio-reporting-bo-685",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8057,7 +8073,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-utilization-analytics-bo-686",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8066,7 +8082,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-access-activity-reporting-bo-687",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8075,7 +8091,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-trend-comparative-analysis-bo-688",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8084,7 +8100,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-audit-reporting-bo-689",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8093,7 +8109,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/immutable-accreditation-audit-log-bo-690",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8102,7 +8118,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-api-management-bo-691",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8111,7 +8127,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/accreditation-webhook-management-bo-692",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8120,7 +8136,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/integration-data-exchange-monitor-bo-693",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8129,7 +8145,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-catalogue-command-center-bo-694",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8138,7 +8154,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-type-behaviour-configuration-bo-695",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8147,7 +8163,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-duplication-clone-configuration-bo-696",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8156,7 +8172,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-schedule-command-center-bo-697",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8165,7 +8181,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/dynamic-performance-duration-configuration-bo-698",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8174,7 +8190,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/schedule-change-rescheduling-configuration-bo-699",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8183,7 +8199,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/venue-space-command-center-bo-700",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8192,7 +8208,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/venue-master-configuration-bo-701",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8201,7 +8217,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/space-access-rules-configuration-bo-702",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8210,7 +8226,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/seating-capacity-command-center-bo-703",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8219,7 +8235,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-capacity-profile-configuration-bo-704",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8228,7 +8244,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/seating-mode-reservation-configuration-bo-705",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8237,7 +8253,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/registration-attendance-command-center-bo-706",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8246,7 +8262,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/attendee-data-registration-form-configuration-bo-707",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8255,7 +8271,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/accreditation-participant-category-configuration-bo-708",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8264,7 +8280,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-admission-entry-policy-configuration-bo-709",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8273,7 +8289,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-resource-command-center-bo-710",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8282,7 +8298,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-resource-requirement-configuration-bo-711",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8291,7 +8307,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/staff-role-assignment-configuration-bo-712",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8300,7 +8316,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/contractor-external-workforce-configuration-bo-713",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8309,7 +8325,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-shift-roster-configuration-bo-714",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8318,7 +8334,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/resource-location-deployment-configuration-bo-715",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8327,7 +8343,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-lifecycle-change-command-center-bo-716",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8336,7 +8352,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/lifecycle-transition-configuration-bo-717",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8345,7 +8361,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-change-request-configuration-bo-718",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8354,7 +8370,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/event-cancellation-workflow-configuration-bo-719",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8363,7 +8379,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/ticket-reservation-customer-treatment-configuration-bo-720",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8372,7 +8388,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/activity-session-slot-template-configuration-bo-721",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8381,7 +8397,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/prepaid-minute-package-customer-balance-configuration-bo-722",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8390,7 +8406,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/peak-off-peak-super-prime-time-configuration-bo-723",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8399,7 +8415,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/walk-in-there-and-then-booking-configuration-bo-724",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8408,7 +8424,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/session-operations-command-center-bo-725",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8417,7 +8433,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/participant-photo-video-assignment-bo-726",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8426,7 +8442,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/f-b-command-center-bo-727",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8444,7 +8460,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/create-edit-outlet-bo-729",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8453,7 +8469,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/outlet-types-templates-bo-730",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8462,7 +8478,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/operating-hours-service-periods-bo-731",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8471,7 +8487,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/pos-device-assignment-bo-732",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8480,7 +8496,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/service-channel-configuration-bo-733",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8489,7 +8505,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/crm-command-center-bo-734",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8498,7 +8514,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guest-directory-bo-735",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8507,7 +8523,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guest-master-configuration-bo-736",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8525,7 +8541,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/activity-timeline-bo-738",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -8534,7 +8550,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/contact-preferences-bo-739",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8543,7 +8559,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/family-guardians-bo-740",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8552,7 +8568,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/corporate-groups-bo-741",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8561,7 +8577,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/commerce-documents-bo-742",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8570,7 +8586,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-guest-intelligence-bo-743",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8579,7 +8595,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/data-governance-center-bo-744",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8588,7 +8604,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/identity-resolution-rules-bo-745",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8597,7 +8613,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/duplicate-review-merge-bo-746",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -8606,7 +8622,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/consent-policy-configuration-bo-747",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8615,7 +8631,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/consent-capture-versions-bo-748",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8624,7 +8640,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guest-preference-center-bo-749",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8633,7 +8649,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/data-subject-requests-bo-750",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8642,7 +8658,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/retention-anonymization-bo-751",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8651,7 +8667,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/privacy-ai-governance-bo-752",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8660,7 +8676,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/compliance-audit-dashboard-bo-753",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8669,7 +8685,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/audience-intelligence-bo-754",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8678,7 +8694,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/dynamic-segment-builder-bo-755",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8687,7 +8703,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/static-lists-imports-bo-756",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8696,7 +8712,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/behavioral-segmentation-bo-757",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8705,7 +8721,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/membership-loyalty-segments-bo-758",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8714,7 +8730,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/demographic-geographic-bo-759",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8723,7 +8739,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/revenue-engagement-segments-bo-760",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8741,7 +8757,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/predictive-audiences-bo-762",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8750,7 +8766,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/activation-governance-bo-763",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8777,7 +8793,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/campaign-builder-bo-766",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8786,7 +8802,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/audience-offer-selection-bo-767",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8795,7 +8811,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/multichannel-composer-bo-768",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8804,7 +8820,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/schedule-trigger-rules-bo-769",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8822,7 +8838,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/budget-goals-forecast-bo-771",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8831,7 +8847,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/a-b-ai-optimization-bo-772",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8840,7 +8856,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/attribution-audit-bo-773",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8849,7 +8865,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/journey-automation-center-bo-774",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8858,7 +8874,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/visual-journey-builder-bo-775",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8867,7 +8883,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/trigger-event-catalog-bo-776",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8876,7 +8892,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/decision-logic-timing-bo-777",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8894,7 +8910,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/lifecycle-journeys-bo-779",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8912,7 +8928,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/cross-sell-service-recovery-bo-781",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8939,7 +8955,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/communications-center-bo-784",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8948,7 +8964,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/template-library-bo-785",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8957,7 +8973,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/newsletter-builder-bo-786",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8966,7 +8982,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/content-blocks-product-feed-bo-787",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -8975,7 +8991,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/subscriptions-preferences-bo-788",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8984,7 +9000,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/transactional-notification-rules-bo-789",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -8993,7 +9009,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/scheduling-priority-approval-bo-790",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9002,7 +9018,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/delivery-retry-failover-bo-791",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9011,7 +9027,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/deliverability-analytics-bo-792",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9020,7 +9036,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-content-translation-audit-bo-793",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9029,7 +9045,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/omnichannel-command-center-bo-794",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9038,7 +9054,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/unified-inbox-bo-795",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9047,7 +9063,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guest-conversation-360-bo-796",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9056,7 +9072,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-chatbot-configuration-bo-797",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9065,7 +9081,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/intent-knowledge-management-bo-798",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9074,7 +9090,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/agent-workspace-bo-799",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9083,7 +9099,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/routing-queue-management-bo-800",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9092,7 +9108,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/sales-service-actions-bo-801",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9101,7 +9117,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/sentiment-quality-escalation-bo-802",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9110,7 +9126,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/chat-analytics-audit-bo-803",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9128,7 +9144,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/case-queue-search-bo-805",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9146,7 +9162,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/classification-workflow-bo-807",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9155,7 +9171,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/assignment-workload-bo-808",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9164,7 +9180,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/sla-policy-configuration-bo-809",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9173,7 +9189,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/escalation-rules-bo-810",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9182,7 +9198,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/case-workspace-bo-811",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9191,7 +9207,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/service-recovery-bo-812",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9209,7 +9225,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/voice-of-customer-center-bo-814",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9218,7 +9234,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/survey-builder-bo-815",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9227,7 +9243,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/survey-triggers-distribution-bo-816",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9236,7 +9252,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/nps-csat-ces-configuration-bo-817",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9245,7 +9261,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/survey-responses-insights-bo-818",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9254,7 +9270,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/review-collection-rating-rules-bo-819",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9263,7 +9279,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/moderation-publishing-bo-820",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9272,7 +9288,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-sentiment-topic-analysis-bo-821",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9281,7 +9297,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/service-recovery-automation-bo-822",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9290,7 +9306,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/voc-analytics-audit-bo-823",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9299,7 +9315,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/gamification-command-center-bo-824",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9308,7 +9324,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/challenge-builder-bo-825",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9317,7 +9333,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/achievement-badge-engine-bo-826",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9326,7 +9342,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/points-activity-rules-bo-827",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9335,7 +9351,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/milestones-reward-rules-bo-828",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9344,7 +9360,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/family-team-event-challenges-bo-829",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9353,7 +9369,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/referral-streak-management-bo-830",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9362,7 +9378,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/progress-leaderboards-hub-bo-831",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9371,7 +9387,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-engagement-optimization-bo-832",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9380,7 +9396,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/gamification-analytics-audit-bo-833",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9389,7 +9405,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/digital-experience-center-bo-834",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9398,7 +9414,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/site-brand-domain-setup-bo-835",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9407,7 +9423,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/design-system-components-bo-836",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9416,7 +9432,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/page-landing-builder-bo-837",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9425,7 +9441,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/content-media-forms-bo-838",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9434,7 +9450,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/dynamic-product-pages-bo-839",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9443,7 +9459,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/mobile-app-cms-bo-840",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9452,7 +9468,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/personalization-localization-bo-841",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9461,7 +9477,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/seo-management-bo-842",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9470,7 +9486,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/publishing-analytics-audit-bo-843",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9488,7 +9504,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/waiver-template-builder-bo-845",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9497,7 +9513,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/assignment-rules-bo-846",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9506,7 +9522,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/version-expiry-renewal-bo-847",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9515,7 +9531,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/signature-experience-setup-bo-848",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9524,7 +9540,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guardian-group-signing-bo-849",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9533,7 +9549,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/pre-arrival-completion-bo-850",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9542,7 +9558,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/verification-access-control-bo-851",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9551,7 +9567,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/documents-search-retention-bo-852",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9560,7 +9576,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/legal-evidence-audit-bo-853",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9569,7 +9585,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-management-command-center-bo-854",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9578,7 +9594,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-type-configuration-bo-855",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9587,7 +9603,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-category-management-bo-856",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9596,7 +9612,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-creation-profile-bo-857",
-   "operations": 0,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -9605,7 +9621,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/configurable-attribute-builder-bo-858",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9614,7 +9630,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-hierarchy-parent-child-relationships-bo-859",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9623,7 +9639,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-dependency-rules-bo-860",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9632,7 +9648,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-package-bundle-configuration-bo-861",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9641,7 +9657,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/multi-venue-resource-assignment-bo-862",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9650,7 +9666,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-lifecycle-governance-audit-bo-863",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9659,7 +9675,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-calendar-command-center-bo-864",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9668,7 +9684,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/calendar-filters-search-smart-discovery-bo-865",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9677,7 +9693,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-availability-schedule-configuration-bo-866",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9686,7 +9702,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-time-slot-configuration-bo-867",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9695,7 +9711,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/advance-reservation-management-bo-868",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9704,7 +9720,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/recurring-reservation-configuration-bo-869",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9713,7 +9729,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/operational-time-resource-blocking-bo-870",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -9722,7 +9738,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/multi-event-resource-planning-bo-871",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9731,7 +9747,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/smart-assignment-drag-and-drop-reallocation-bo-872",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9740,7 +9756,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staff-resource-directory-bo-873",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9749,7 +9765,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staff-resource-profile-bo-874",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9758,7 +9774,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/skills-competency-management-bo-875",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9767,7 +9783,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/certification-expiry-management-bo-876",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9776,7 +9792,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/qualification-assignment-rule-engine-bo-877",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9785,7 +9801,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staff-availability-working-pattern-bo-878",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9794,7 +9810,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/shift-template-assignment-configuration-bo-879",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9803,7 +9819,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/break-leave-absence-configuration-bo-880",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9812,7 +9828,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/overtime-working-hour-rules-bo-881",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9821,7 +9837,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/workforce-integration-synchronization-center-bo-882",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9830,7 +9846,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/workforce-roster-command-center-bo-883",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9839,7 +9855,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/attraction-operational-staffing-roster-bo-884",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9848,7 +9864,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/minimum-staffing-coverage-rule-configuration-bo-885",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9857,7 +9873,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staffing-gap-coverage-control-center-bo-886",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9866,7 +9882,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/shift-marketplace-workforce-requests-bo-887",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9875,7 +9891,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/attendance-live-workforce-command-center-bo-888",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9884,7 +9900,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staff-check-in-check-out-attendance-exceptions-bo-889",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9893,7 +9909,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/workforce-compliance-validation-center-bo-890",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9902,7 +9918,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/labor-cost-staffing-budget-control-bo-891",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9911,7 +9927,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/ai-workforce-planner-roster-optimization-bo-892",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9920,7 +9936,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/experience-resource-requirement-builder-bo-893",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9929,7 +9945,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/staff-to-experience-qualification-mapping-bo-894",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9938,7 +9954,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-combination-builder-bo-895",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9947,7 +9963,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/ticket-demand-resource-capacity-mapping-bo-896",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9956,7 +9972,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/customer-resource-selection-configuration-bo-897",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9965,7 +9981,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/skill-based-smart-resource-selection-bo-898",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9974,7 +9990,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/customer-cashier-resource-assignment-experience-bo-899",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9983,7 +9999,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/dynamic-resource-allocation-engine-bo-900",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9992,7 +10008,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/priority-scoring-allocation-policy-bo-901",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10001,7 +10017,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/automatic-replacement-assignment-recovery-bo-902",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10010,7 +10026,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-asset-command-center-bo-903",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10019,7 +10035,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-resource-configuration-bo-904",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10028,7 +10044,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-inventory-availability-control-bo-905",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10037,7 +10053,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-checkout-workspace-bo-906",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10046,7 +10062,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/guest-resource-assignment-bo-907",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10055,7 +10071,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-duration-extension-return-management-bo-908",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10064,7 +10080,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-rental-financial-control-bo-909",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10073,7 +10089,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-resource-blocking-bo-910",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -10082,7 +10098,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/inspection-condition-compliance-management-bo-911",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -10091,7 +10107,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/asset-lifecycle-depreciation-retirement-bo-912",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10100,7 +10116,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-resource-planning-command-center-bo-913",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10109,7 +10125,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-resource-requirement-builder-bo-914",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10118,7 +10134,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/venue-space-allocation-bo-915",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10127,7 +10143,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-asset-allocation-bo-916",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10136,7 +10152,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-staff-personnel-allocation-bo-917",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10145,7 +10161,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-resource-template-library-bo-918",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10163,7 +10179,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-resource-cost-estimator-bo-920",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10172,7 +10188,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/multi-event-allocation-conflict-optimizer-bo-921",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10181,7 +10197,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-resource-approval-readiness-gate-bo-922",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10280,7 +10296,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/my-resource-operations-home-bo-933",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10289,7 +10305,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/my-schedule-assignment-calendar-bo-934",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10298,7 +10314,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/assignment-detail-operational-brief-bo-935",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10307,7 +10323,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/mobile-staff-check-in-check-out-bo-936",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10316,7 +10332,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-collection-handover-return-bo-937",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10325,7 +10341,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/employee-requests-resource-support-bo-938",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10334,7 +10350,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/shift-change-swap-pickup-release-bo-939",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10343,7 +10359,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/manager-mobile-approval-center-bo-940",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10352,7 +10368,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/operational-notifications-live-alerts-bo-941",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10361,7 +10377,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/mobile-operations-control-offline-sync-bo-942",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10370,7 +10386,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-analytics-command-center-bo-943",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10379,7 +10395,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-utilization-capacity-analytics-bo-944",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10388,7 +10404,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-cost-revenue-efficiency-analytics-bo-945",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10397,7 +10413,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/demand-forecast-accuracy-planning-performance-bo-946",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10406,7 +10422,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-kpi-sla-performance-framework-bo-947",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10415,7 +10431,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-governance-policy-center-bo-948",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10433,7 +10449,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/audit-trail-resource-decision-history-bo-950",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10442,7 +10458,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-integration-system-health-center-bo-951",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10451,7 +10467,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/executive-resource-intelligence-ai-improvement-center-bo-952",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10469,7 +10485,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-canvas-bo-954",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -10478,7 +10494,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/sections-zones-bo-955",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10487,7 +10503,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/rows-seats-bo-956",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10496,7 +10512,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/standing-zones-bo-957",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10505,7 +10521,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/suites-boxes-bo-958",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10514,7 +10530,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/stage-focal-point-bo-959",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10523,7 +10539,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/entrances-exits-aisles-bo-960",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10532,7 +10548,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/amenities-obstructions-bo-961",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10541,7 +10557,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/templates-validation-publish-bo-962",
-   "operations": 0,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -10550,7 +10566,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/import-command-center-bo-963",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10559,7 +10575,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/pdf-image-import-bo-964",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10568,7 +10584,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/svg-cad-import-bo-965",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10577,7 +10593,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/csv-excel-import-bo-966",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10586,7 +10602,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-section-recognition-bo-967",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10595,7 +10611,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-row-seat-recognition-bo-968",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10604,7 +10620,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-aisle-vip-accessibility-bo-969",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10613,7 +10629,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-numbering-labeling-bo-970",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10622,7 +10638,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/validation-correction-bo-971",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10631,7 +10647,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/ai-venue-designer-publish-bo-972",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10640,7 +10656,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/layout-command-center-bo-973",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10649,7 +10665,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/template-library-bo-974",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10658,7 +10674,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/event-specific-layout-bo-975",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10667,7 +10683,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/clone-inheritance-bo-976",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10676,7 +10692,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/version-compare-bo-977",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10685,7 +10701,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/multi-performance-assignment-bo-978",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10694,7 +10710,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/temporary-seat-blocking-bo-979",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10703,7 +10719,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/scheduled-seat-release-bo-980",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10721,7 +10737,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/approval-publish-rollback-bo-982",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10730,7 +10746,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/inventory-command-center-bo-983",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10739,7 +10755,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/real-time-seat-map-bo-984",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10748,7 +10764,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/status-model-configuration-bo-985",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10757,7 +10773,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/availability-tracker-bo-986",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10766,7 +10782,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/hold-tracker-bo-987",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10775,7 +10791,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/reservation-tracker-bo-988",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10784,7 +10800,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/sales-allocation-tracker-bo-989",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10793,7 +10809,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/maintenance-out-of-service-bo-990",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10811,7 +10827,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/audit-reconciliation-bo-992",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10820,7 +10836,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/experience-command-center-bo-993",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10829,7 +10845,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/choose-my-seats-bo-994",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10838,7 +10854,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/find-seats-for-me-bo-995",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10847,7 +10863,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/filters-interactive-legend-bo-996",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -10865,7 +10881,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/lock-timeout-concurrency-bo-998",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -10874,12 +10890,18 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/cart-multi-seat-management-bo-999",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "replaceAccreditationCredential",
+    "contract": "accreditation",
+    "verb": "POST",
+    "summary": "Reissue after loss, damage or a name change"
+   },
    {
     "operation": "createKnowledgeCollection",
     "contract": "ai",
@@ -11049,12 +11071,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "getUnifiedReconciliation",
-    "contract": "finance",
-    "verb": "GET",
-    "summary": "Every money source against the ledger, in one view"
-   },
-   {
     "operation": "ingestFxRates",
     "contract": "finance",
     "verb": "POST",
@@ -11065,18 +11081,6 @@
     "contract": "finance",
     "verb": "GET",
     "summary": "What one entity owes another"
-   },
-   {
-    "operation": "recordDeposit",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Money taken before the sale is complete"
-   },
-   {
-    "operation": "recordSettlement",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "One entity paid another"
    },
    {
     "operation": "recordWriteOff",
@@ -11223,58 +11227,76 @@
     "summary": "Register a game"
    },
    {
-    "operation": "createPrize",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Add a prize"
-   },
-   {
-    "operation": "listPrizes",
-    "contract": "games",
-    "verb": "GET",
-    "summary": "The prize catalogue"
-   },
-   {
-    "operation": "redeemPrize",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Redeem points for a prize"
-   },
-   {
     "operation": "transferGameCard",
     "contract": "games",
     "verb": "POST",
     "summary": "Move balances to another card"
    },
    {
-    "operation": "setPasswordPolicy",
+    "operation": "createEmergencyAccessOverride",
     "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
+    "verb": "POST",
+    "summary": "Bypass the policy, loudly"
    },
    {
-    "operation": "setSegregationRules",
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
     "contract": "identity",
     "verb": "PUT",
-    "summary": "Which permissions may not be held together"
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "submitCountLines",
     "contract": "inventory",
     "verb": "POST",
     "summary": "Submit counted quantities"
-   },
-   {
-    "operation": "updateMaintenancePlan",
-    "contract": "maintenance",
-    "verb": "PATCH",
-    "summary": "Amend or suspend a plan"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Start it, or stop it"
    },
    {
     "operation": "addGuestNote",
@@ -11289,40 +11311,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -11337,18 +11329,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -11361,34 +11341,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -11427,12 +11383,6 @@
     "summary": "Start a cart"
    },
    {
-    "operation": "createPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Send a guest a link to pay later"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -11449,12 +11399,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listChargebacks",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Open disputes, by deadline"
    },
    {
     "operation": "listFraudRules",
@@ -11493,28 +11437,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
     "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
     "summary": "Give a hold back"
-   },
-   {
-    "operation": "resendPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
-    "operation": "respondToChargeback",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Submit evidence, or accept the loss"
    },
    {
     "operation": "setFraudRules",
@@ -11523,22 +11449,10 @@
     "summary": ""
    },
    {
-    "operation": "setPaymentProvider",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Configure a gateway and its routing"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "voidPayment",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Release an authorisation before it is captured"
    },
    {
     "operation": "skipRolloutCell",
@@ -11595,6 +11509,12 @@
     "summary": "Preview how an amount divides"
    },
    {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   },
+   {
     "operation": "redeemVoucher",
     "contract": "promotions",
     "verb": "POST",
@@ -11631,6 +11551,12 @@
     "summary": "Admit a party at the ride"
    },
    {
+    "operation": "importRentalCatalogue",
+    "contract": "rental",
+    "verb": "POST",
+    "summary": "Load a client's rental items and inventory at onboarding"
+   },
+   {
     "operation": "cancelReportExecution",
     "contract": "reporting",
     "verb": "DELETE",
@@ -11643,70 +11569,16 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
    },
    {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "updateReportSchedule",
     "contract": "reporting",
     "verb": "PATCH",
     "summary": "Amend, pause or resume a schedule"
-   },
-   {
-    "operation": "activateGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Activate a card at the point of sale"
-   },
-   {
-    "operation": "adjustWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Manually adjust a wallet balance"
    },
    {
     "operation": "blockGiftCard",
@@ -11757,12 +11629,6 @@
     "summary": "Dispose of an uncollected item"
    },
    {
-    "operation": "issueGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Issue or activate a gift card"
-   },
-   {
     "operation": "listRetailReturns",
     "contract": "retail",
     "verb": "GET",
@@ -11787,108 +11653,6 @@
     "summary": "Freeze a wallet"
    },
    {
-    "operation": "topUpWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Add value to a wallet"
-   },
-   {
-    "operation": "assignSeats",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Pick and hold the best available seats"
-   },
-   {
-    "operation": "cloneSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Clone a map, optionally into another venue"
-   },
-   {
-    "operation": "commitImportJob",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Apply a parsed import"
-   },
-   {
-    "operation": "copySeatMapSection",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Copy one section into another map"
-   },
-   {
-    "operation": "createSeatCategory",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Create a seat category"
-   },
-   {
-    "operation": "createSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Create a seat map"
-   },
-   {
-    "operation": "createSeatMapTemplate",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Save a map as a reusable template"
-   },
-   {
-    "operation": "diffSeatMapVersions",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Compare two versions of a layout"
-   },
-   {
-    "operation": "getImportJob",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Import progress and findings"
-   },
-   {
-    "operation": "getSeatMap",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Read a seat map with its structure"
-   },
-   {
-    "operation": "getSeatMapImport",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "How the import went"
-   },
-   {
-    "operation": "getSeatingRules",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "Read seating rules"
-   },
-   {
-    "operation": "importSeatGeometry",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import seat geometry from a plan"
-   },
-   {
-    "operation": "importSeatManifest",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import the logical seat structure"
-   },
-   {
-    "operation": "importSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Import a seat map from a plan or a manifest"
-   },
-   {
-    "operation": "publishSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Validate and publish a seat map"
-   },
-   {
     "operation": "releaseSeatBlock",
     "contract": "seating",
     "verb": "DELETE",
@@ -11899,42 +11663,6 @@
     "contract": "seating",
     "verb": "DELETE",
     "summary": "Release a hold"
-   },
-   {
-    "operation": "setMapZones",
-    "contract": "seating",
-    "verb": "PUT",
-    "summary": "Standing areas, suites, stages and obstructions"
-   },
-   {
-    "operation": "setSeatingRules",
-    "contract": "seating",
-    "verb": "PUT",
-    "summary": "Set seating rules"
-   },
-   {
-    "operation": "updateSeatMap",
-    "contract": "seating",
-    "verb": "PATCH",
-    "summary": "Rename or amend a seat map"
-   },
-   {
-    "operation": "updateSeats",
-    "contract": "seating",
-    "verb": "PATCH",
-    "summary": "Bulk-amend seats"
-   },
-   {
-    "operation": "validateSeatMap",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Run validation without publishing"
-   },
-   {
-    "operation": "cancelInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Cancel or credit an invoice"
    },
    {
     "operation": "cancelSubscription",
@@ -11953,12 +11681,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Tear it down"
-   },
-   {
-    "operation": "disputeInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Raise a dispute"
    },
    {
     "operation": "drainBurstEnvironment",
@@ -12009,12 +11731,6 @@
     "summary": "Tenant moves between cells"
    },
    {
-    "operation": "listVenueTypeTemplates",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Starting configurations by venue kind"
-   },
-   {
     "operation": "planTenantMigration",
     "contract": "subscription",
     "verb": "POST",
@@ -12025,12 +11741,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Move the orders into the permanent platform"
-   },
-   {
-    "operation": "recordInvoicePayment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Record payment against an invoice"
    },
    {
     "operation": "registerPartner",
@@ -12063,22 +11773,52 @@
     "summary": "Turn metered AI interactions into a billable usage record"
    },
    {
-    "operation": "submitOnboardingApplication",
-    "contract": "subscription",
+    "operation": "issueDeviceCredential",
+    "contract": "tenancy",
     "verb": "POST",
-    "summary": "A prospect signs themselves up"
+    "summary": "Give the device an identity it can prove"
    },
    {
-    "operation": "getRegionSettings",
+    "operation": "listDeviceAuditRecords",
     "contract": "tenancy",
     "verb": "GET",
-    "summary": "Read region settings"
+    "summary": "What was done to this device, and what it did"
    },
    {
-    "operation": "updateRegionSettings",
+    "operation": "listDeviceFirmware",
     "contract": "tenancy",
-    "verb": "PUT",
-    "summary": "Update region settings"
+    "verb": "GET",
+    "summary": "Firmware and software versions, and what is running where"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
+   },
+   {
+    "operation": "revokeDeviceCredential",
+    "contract": "tenancy",
+    "verb": "DELETE",
+    "summary": "Cut a device off now"
+   },
+   {
+    "operation": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Put the fleet back on the previous version"
+   },
+   {
+    "operation": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Push an update to a fleet, in waves"
    },
    {
     "operation": "acceptWalkwayProposals",
@@ -12091,18 +11831,6 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Create a banner"
-   },
-   {
-    "operation": "createContentBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Author a block of content"
-   },
-   {
-    "operation": "createContentPage",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a content page"
    },
    {
     "operation": "createPromoBlock",

@@ -32,18 +32,18 @@ modulesUsed:
 - module: marketing
   screens: 1
 servicesCalled:
+- service: VenueOpsService
+  operationCalls: 77
 - service: MarketingService
   operationCalls: 54
 - service: WhiteLabelService
   operationCalls: 32
-- service: VenueOpsService
-  operationCalls: 20
 - service: PlatformService
   operationCalls: 19
+- service: IdentityService
+  operationCalls: 6
 - service: FnbService
   operationCalls: 5
-- service: IdentityService
-  operationCalls: 4
 - service: OrderService
   operationCalls: 2
 coverage:
@@ -1542,7 +1542,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
+  - searchMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1572,7 +1574,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listCollections
+  - searchMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1593,7 +1597,10 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - analyseMediaAsset
+  - completeUpload
+  - createUpload
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1614,7 +1621,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createCollection
+  - listCollections
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1635,7 +1644,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaTaxonomy
+  - setMediaTaxonomy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1656,7 +1667,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaTaxonomy
+  - setMediaAssetTags
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1677,7 +1690,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - searchMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1698,7 +1712,10 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaAsset
+  - getMediaDistribution
+  - listMediaAssetVersions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1719,7 +1736,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - bulkUpdateMediaAssets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1740,7 +1758,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1762,6 +1781,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getMediaUsageAnalytics
   - listAssets
   states:
   - emptyFirstRun
@@ -1792,7 +1812,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - analyseMediaAsset
+  - setMediaAssetTags
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1813,7 +1835,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - searchMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1834,7 +1857,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - findSimilarMediaAssets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1855,7 +1879,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - deleteMediaAsset
+  - findSimilarMediaAssets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1876,7 +1902,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaAssetVersions
+  - replaceMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1897,7 +1925,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaAssetVersions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1918,7 +1947,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaRenditions
+  - requestMediaRendition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1939,7 +1970,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaRenditions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1960,7 +1992,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1981,7 +2014,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getExpiringRights
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2011,7 +2046,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaAsset
+  - updateMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2032,7 +2069,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMediaAssetRights
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2053,7 +2091,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMediaAssetApproval
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2074,7 +2113,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMediaAssetApproval
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2095,7 +2135,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAccessPolicy
+  - listAccessPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2116,7 +2158,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createMediaShare
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2137,7 +2180,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getExpiringRights
+  - setMediaAssetRights
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2158,7 +2203,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaAssetAudit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2179,7 +2225,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getExpiringRights
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2200,7 +2247,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaDistribution
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2230,7 +2278,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaDistribution
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2251,7 +2300,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMediaDistributionChannels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2272,7 +2322,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMediaRenditions
+  - setMediaDistributionChannels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2293,7 +2345,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaDistribution
+  - replaceMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2314,7 +2368,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setMediaDistributionChannels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2335,7 +2390,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaDistribution
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2356,7 +2412,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2377,7 +2434,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2398,7 +2456,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess

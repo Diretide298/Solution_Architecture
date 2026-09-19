@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 187 operations, 34 tables
+title: OrderService — 218 operations, 34 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 187
+  operations: 218
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -1379,6 +1379,257 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+- contract: payments
+  count: 31
+  operations:
+  - operation: createB2bCreditAccount
+    verb: POST
+    path: /b2b-credit-accounts
+    scope: tenant
+    permission: CREDIT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createPaymentMethod
+    verb: POST
+    path: /payment-methods
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createPaymentProviderConnection
+    verb: POST
+    path: /payment-providers
+    scope: tenant
+    permission: PAYMENT_PROVIDER_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: getMixedTenderRules
+    verb: GET
+    path: /mixed-tender-rules
+    scope: venue
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getPaymentPerformance
+    verb: GET
+    path: /payment-performance
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getPaymentProviderEconomics
+    verb: GET
+    path: /payment-providers/economics
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getPaymentProviderHealth
+    verb: GET
+    path: /payment-providers/health
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listB2bCreditAccounts
+    verb: GET
+    path: /b2b-credit-accounts
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMerchantAccounts
+    verb: GET
+    path: /merchant-accounts
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPaymentMethods
+    verb: GET
+    path: /payment-methods
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPaymentProviderConnections
+    verb: GET
+    path: /payment-providers
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPaymentRoutingRules
+    verb: GET
+    path: /payment-routing-rules
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPaymentTerminals
+    verb: GET
+    path: /payment-terminals
+    scope: venue
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReconciliationSources
+    verb: GET
+    path: /reconciliation-sources
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listStoredForwardTransactions
+    verb: GET
+    path: /payment-terminals/{terminalId}/forwarded
+    scope: venue
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setB2bPaymentTerms
+    verb: PUT
+    path: /b2b-credit-accounts/{accountId}/terms
+    scope: tenant
+    permission: CREDIT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setHostedCheckoutConfiguration
+    verb: PUT
+    path: /hosted-checkout-config
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setMerchantAccount
+    verb: PUT
+    path: /merchant-accounts
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setMixedTenderRules
+    verb: PUT
+    path: /mixed-tender-rules
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPaymentAuthenticationPolicy
+    verb: PUT
+    path: /payment-authentication-policy
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPaymentFailoverPolicy
+    verb: PUT
+    path: /payment-failover-policy
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPaymentRiskRules
+    verb: PUT
+    path: /payment-risk-rules
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPaymentRoutingRules
+    verb: PUT
+    path: /payment-routing-rules
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPaymentTerminalConfiguration
+    verb: PUT
+    path: /payment-terminals
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReconciliationMatchingRules
+    verb: PUT
+    path: /reconciliation-rules
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReconciliationSource
+    verb: PUT
+    path: /reconciliation-sources
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: simulatePaymentConfiguration
+    verb: POST
+    path: /payment-configuration/simulate
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulatePaymentRouting
+    verb: POST
+    path: /payment-routing/simulate
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: submitChargebackEvidence
+    verb: POST
+    path: /chargebacks/{chargebackId}/evidence
+    scope: tenant
+    permission: PAYMENT_DISPUTE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: testPaymentProviderConnection
+    verb: POST
+    path: /payment-providers/{connectionId}/test
+    scope: tenant
+    permission: PAYMENT_PROVIDER_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: updatePaymentMethod
+    verb: PUT
+    path: /payment-methods/{methodId}
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
 - contract: shift
   count: 19
   operations:
@@ -1921,7 +2172,9 @@ screens:
 - P08:BO-097 Check Out & Check In
 - P08:BO-100 Venue Home
 - P08:BO-101 Orders & Money
+- P08:BO-1141 Device, Terminal & Acceptance Point Mapping
 - P08:BO-1146 Refund-to-Wallet Policy Configuration
+- P08:BO-1147 Refund Routing & Credit Restoration Engine
 - P08:BO-130 Offline Policy & Rules Configuration
 - P08:BO-132 Offline Transaction Monitor & Sync Queue
 - P08:BO-133 Offline Alerts, Limits & Audit
@@ -2017,7 +2270,81 @@ screens:
 - P09:ADM-315 Bulk, Group & Assisted Upgrade Operations
 - P09:ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
 - P09:ADM-317 Upgrade History, Exception Management & Audit Explorer
+- P09:ADM-412 Payment Method & Settlement Setup
+- P09:ADM-559 Payment Command Center\t7
+- P09:ADM-560 Payment Method Catalogue\t8
+- P09:ADM-561 Payment Method Configuration\t9
+- P09:ADM-562 Channel & Touchpoint Payment Configuration\t10
+- P09:ADM-563 Venue, Location & Business Unit Payment Assignment\t11
+- P09:ADM-564 Currency & Payment Currency Configuration\t12
+- P09:ADM-565 Payment Eligibility & Availability Rule Builder\t13
+- P09:ADM-566 Payment Fees, Surcharges & Commercial Rules\t14
+- P09:ADM-567 Payment Policy, Governance & Approval Manager\t15
+- P09:ADM-568 Payment Configuration Simulator & Validation Center\t16
+- P09:ADM-569 Payment Orchestration Command Center\t27
+- P09:ADM-570 Gateway, PSP & Acquirer Directory\t28
+- P09:ADM-571 Provider Connection & Adapter Configuration\t29
+- P09:ADM-572 Gateway Capability & Payment Method Mapping\t30
+- P09:ADM-573 Payment Routing Rule Builder\t31
+- P09:ADM-574 Routing Strategy, Priority & Load Distribution\t33
+- P09:ADM-575 Failover, Retry & Resilience Manager\t34
+- P09:ADM-576 Provider Health, SLA & Performance Monitor\t35
+- P09:ADM-577 Provider Cost, Commercial & Routing Economics\t36
+- P09:ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor\t37
+- P09:ADM-579 Terminal & Card-Present Command Center\t48
+- P09:ADM-580 Payment Terminal & Device Inventory\t49
+- P09:ADM-581 Terminal Provisioning & Device Configuration\t51
+- P09:ADM-583 EMV & Card-Present Processing Configuration\t53
+- P09:ADM-585 Card-Present Transaction Monitor & Operations\t55
+- P09:ADM-586 Degraded, Offline & Store-and-Forward Manager\t56
+- P09:ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59
+- P09:ADM-589 Digital Payments Command Center\t71
+- P09:ADM-590 Digital & Alternative Payment Method Manager\t71
+- P09:ADM-591 Digital Wallet & Mobile Payment Configuration\t72
+- P09:ADM-592 Payment Link Builder & Configuration\t73
+- P09:ADM-593 Payment Link Distribution & Customer Journey Manager\t74
+- P09:ADM-594 Hosted Checkout, Redirect & Return Flow Configuration\t75
+- P09:ADM-595 Digital Payment Session & Transaction Monitor\t76
+- P09:ADM-596 Authentication, Tokenization & Recurring Payment Controls\t78
+- P09:ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79
+- P09:ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80
+- P09:ADM-599 Mixed Tender & Credit Command Center\t93
+- P09:ADM-600 Mixed Tender Rule & Combination Builder\t93
+- P09:ADM-601 Split Payment & Tender Allocation Manager\t94
+- P09:ADM-602 B2B Credit Account & Limit Manager\t95
+- P09:ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96
+- P09:ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97
+- P09:ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules\t98
+- P09:ADM-606 Partial Payment, Failure & Recovery Manager\t100
+- P09:ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100
+- P09:ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor\t102
+- P09:ADM-609 Refund & Payment Adjustment Command Center\t116
+- P09:ADM-610 Refund Request & Eligibility Workspace\t117
 - P09:ADM-611 Refund Policy & Rule Configuration\t118
+- P09:ADM-613 Void, Reversal & Cancellation Manager\t120
+- P09:ADM-614 Refund Approval & Exception Workflow\t121
+- P09:ADM-615 Refund Processing, Provider Status & Recovery Center\t122
+- P09:ADM-616 Payment Adjustment & Financial Correction Manager\t123
+- P09:ADM-617 Refund Transaction Trace & Audit Investigation\t124
+- P09:ADM-619 Reconciliation & Settlement Command Center\t139
+- P09:ADM-620 Reconciliation Source & Import Manager\t141
+- P09:ADM-621 Transaction Matching & Reconciliation Engine\t142
+- P09:ADM-624 Fees, Commission, FX & Settlement Economics\t145
+- P09:ADM-625 Merchant Account & Settlement Calendar Manager\t146
+- P09:ADM-629 Payment Risk & Fraud Command Center\t166
+- P09:ADM-630 Payment Risk Rule & Decision Engine\t167
+- P09:ADM-631 Velocity, Behavioral & Transaction Risk Controls\t168
+- P09:ADM-632 Risk Lists, Signals & Payment Control Center\t169
+- P09:ADM-633 Fraud Alert, Investigation & Case Management\t170
+- P09:ADM-634 Chargeback & Dispute Command Center\t172
+- P09:ADM-635 Chargeback Evidence & Representment Workspace\t173
+- P09:ADM-636 Payment Performance & Conversion Analytics\t174
+- P09:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175
+- P09:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
+- P09:ADM-652 Upgrade Price Difference & Value Proposition Manager
+- P09:ADM-653 Ticket, Experience & Bundle Upgrade Manager
+- P09:ADM-654 Membership & Pass Upgrade Engine
+- P09:ADM-656 Post-Purchase & In-Journey Upgrade Manager
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-002 Partner Dashboard
 - P10:PTR-005 Inventory & Allocation View

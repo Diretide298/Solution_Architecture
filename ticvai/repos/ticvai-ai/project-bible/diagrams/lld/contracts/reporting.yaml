@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 29 operations
+title: reporting — 42 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -70,6 +70,18 @@ operations:
   - cache:idempotency
   - reporting.dashboard
   - reporting.dashboard_tile
+- operation: createKpi
+  verb: POST
+  path: /kpis
+  scope: tenant
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.kpi_definition
+  writes:
+  - reporting.kpi_definition
 - operation: createReport
   verb: POST
   path: /reports
@@ -107,6 +119,18 @@ operations:
   - cache:idempotency
   - reporting.schedule
   - reporting.schedule_recipient
+- operation: createReportSubscription
+  verb: POST
+  path: /report-subscriptions
+  scope: venue
+  permission: REPORT_SCHEDULE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.subscription
+  writes:
+  - reporting.subscription
 - operation: deleteReport
   verb: DELETE
   path: /reports/{reportId}
@@ -150,6 +174,26 @@ operations:
   writes:
   - cache:idempotency
   - reporting.export
+- operation: getAnalyticsBenchmark
+  verb: GET
+  path: /analytics-benchmarks
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getAnalyticsUsage
+  verb: GET
+  path: /analytics-usage
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getDashboard
   verb: GET
   path: /dashboards/{dashboardId}
@@ -161,6 +205,16 @@ operations:
   reads:
   - reporting.dashboard
   - reporting.dashboard_tile
+  writes: []
+- operation: getKpiValues
+  verb: GET
+  path: /kpi-values
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getReport
   verb: GET
@@ -210,6 +264,17 @@ operations:
   reads:
   - reporting.execution
   writes: []
+- operation: getSemanticModel
+  verb: GET
+  path: /semantic-model
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.semantic_model
+  writes: []
 - operation: getSupplierPerformance
   verb: GET
   path: /suppliers/{supplierId}/performance
@@ -247,6 +312,28 @@ operations:
   - reporting.alert
   - reporting.alert_rule
   writes: []
+- operation: listAnalyticsAnomalies
+  verb: GET
+  path: /analytics-anomalies
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.anomaly
+  writes: []
+- operation: listAnalyticsPipelines
+  verb: GET
+  path: /analytics-pipelines
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.pipeline
+  writes: []
 - operation: listDashboards
   verb: GET
   path: /dashboards
@@ -258,6 +345,28 @@ operations:
   reads:
   - reporting.dashboard
   - reporting.dashboard_tile
+  writes: []
+- operation: listKpis
+  verb: GET
+  path: /kpis
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.kpi_definition
+  writes: []
+- operation: listReportDeliveries
+  verb: GET
+  path: /report-deliveries
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.delivery
   writes: []
 - operation: listReportExecutions
   verb: GET
@@ -291,6 +400,17 @@ operations:
   offline: false
   reads:
   - reporting.schedule
+  writes: []
+- operation: listReportSubscriptions
+  verb: GET
+  path: /report-subscriptions
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.subscription
   writes: []
 - operation: listReports
   verb: GET
@@ -371,6 +491,30 @@ operations:
   writes:
   - cache:idempotency
   - reporting.alert_rule
+- operation: setKpiTargets
+  verb: PUT
+  path: /kpis/{kpiId}/targets
+  scope: venue
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.kpi_target
+  writes:
+  - reporting.kpi_target
+- operation: setSemanticModel
+  verb: PUT
+  path: /semantic-model
+  scope: tenant
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.semantic_model
+  writes:
+  - reporting.semantic_model
 - operation: updateDashboard
   verb: PUT
   path: /dashboards/{dashboardId}

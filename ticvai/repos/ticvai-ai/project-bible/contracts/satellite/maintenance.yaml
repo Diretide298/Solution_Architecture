@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
   version: 0.1.0
-  x-ticvai-screen-count: 35
+  x-ticvai-screen-count: 36
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Maintenance & Safety Management"
   x-ticvai-requirements: 50
@@ -108,6 +108,8 @@ paths:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-108 Venue Operations"
+        - "P08 BO-505 Serialized Equipment Registry"
+        - "P08 BO-903 Equipment & Asset Command Center"
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-071 AI Asset Intelligence Command Center"
       x-ticvai-audience: [staff]
@@ -196,6 +198,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-506 Equipment / Asset Profile"
+        - "P08 BO-508 Equipment Status & Condition Management"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -221,6 +225,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-506 Equipment / Asset Profile"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       summary: Amend an asset
@@ -260,6 +265,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-509 QR / Barcode Equipment Identification"
+        - "P08 BO-548 Equipment Scan & Validation"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -298,6 +305,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-508 Equipment Status & Condition Management"
+        - "P08 BO-573 Return Completion & Equipment Disposition"
+        - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
@@ -344,6 +354,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-580 Asset Maintenance History & Lifecycle"
+        - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
+        - "P08 BO-587 Inventory & Equipment Performance Analytics"
+        - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
@@ -383,6 +397,7 @@ paths:
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
         - "P08 BO-108 Venue Operations"
+        - "P08 BO-574 Maintenance Command Center"
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -431,6 +446,11 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-576 Maintenance Calendar & Scheduling"
+        - "P08 BO-577 Maintenance Work Order"
+        - "P08 BO-910 Maintenance & Resource Blocking"
+        - "P08 BO-990 Maintenance & Out of Service"
+        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       x-ticvai-audience: [staff]
       summary: Raise a work order
       description: >
@@ -474,6 +494,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a work order
@@ -496,6 +517,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       summary: Assign, reprioritise or amend
       tags: [workOrder]
@@ -537,6 +559,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Start, pause or stop work
       description: >
@@ -594,6 +617,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
       x-ticvai-audience: [staff]
       summary: Record parts consumed
       description: >
@@ -705,6 +729,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Complete a work order
       description: >
@@ -761,6 +786,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-581 Return-to-Service Inspection & Approval"
       x-ticvai-audience: [staff]
       summary: Supervisor verification
       description: >
@@ -897,6 +923,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Work has begun
       description: >
@@ -1076,6 +1103,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       summary: Photo, video, document, note or signature
       description: >
@@ -1118,6 +1146,7 @@ paths:
       operationId: listMaintenancePlans
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+        - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List planned maintenance schedules
@@ -1147,6 +1176,7 @@ paths:
       operationId: createMaintenancePlan
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+        - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
       x-ticvai-audience: [staff]
       summary: Create a planned maintenance schedule
       description: >
@@ -1187,6 +1217,8 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateMaintenancePlan
+      x-ticvai-consumed-by:
+        - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
       x-ticvai-audience: [staff]
       summary: Amend or suspend a plan
       tags: [planned]
@@ -1220,6 +1252,10 @@ paths:
       operationId: getDueMaintenance
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
+        - "P08 BO-574 Maintenance Command Center"
+        - "P08 BO-576 Maintenance Calendar & Scheduling"
+        - "P08 BO-583 Maintenance Intelligence & Predictive AI"
+        - "P08 BO-910 Maintenance & Resource Blocking"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Planned tasks due or overdue
@@ -1306,6 +1342,7 @@ paths:
       operationId: listInspections
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+        - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List completed inspections
@@ -1353,6 +1390,8 @@ paths:
       operationId: submitInspection
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+        - "P08 BO-581 Return-to-Service Inspection & Approval"
+        - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-audience: [staff]
       summary: Submit a completed inspection
       description: >

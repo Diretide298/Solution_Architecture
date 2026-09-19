@@ -116,7 +116,12 @@ screens:
       it.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Begin the assessment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 21. 0 of
     0 labels bound to a contract property; 4 of 16 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -163,7 +168,17 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: submitOnboardingApplication
+        label: Submit
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: submitOnboardingApplication
   states:
     loading: The customer organization registration list.
     error: Could not load. Names which read failed and leaves the customer organization registration untouched.
@@ -186,7 +201,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 22
-  apis: []
+  apis:
+  - operationId: submitOnboardingApplication
+    contract: subscription
+    purpose: Register the organisation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -294,7 +314,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Venue type and business profile
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of
     12 labels bound to a contract property; 19 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -354,7 +379,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: scoreVsiAssessment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: scoreVsiAssessment
   states:
     loading: The visitor capacity operational list.
     error: Could not load. Names which read failed and leaves the visitor capacity operational untouched.
@@ -377,7 +411,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 23
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Visitors, capacity and scale
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of
     0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -474,7 +513,11 @@ screens:
       it.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listSaleChannel
+    contract: catalogue
+    purpose: Sales Channel Command Center
+    trigger: onLoad
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 24. 0 of
     0 labels bound to a contract property; 11 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -583,7 +626,12 @@ screens:
       it.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Ticketing and product needs
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 25. 0 of
     0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -635,7 +683,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: scoreVsiAssessment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: scoreVsiAssessment
   states:
     loading: The access queue visitor list.
     error: Could not load. Names which read failed and leaves the access queue visitor untouched.
@@ -658,7 +715,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 26
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Access, queue and experience
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 26. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -710,7 +772,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listModuleCatalogue
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: scoreVsiAssessment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: scoreVsiAssessment
   states:
     loading: The additional business module list.
     error: Could not load. Names which read failed and leaves the additional business module untouched.
@@ -733,7 +809,17 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 27
-  apis: []
+  apis:
+  - operationId: listModuleCatalogue
+    contract: subscription
+    purpose: Additional modules
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Record the answers
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 27. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -786,7 +872,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: scoreVsiAssessment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: scoreVsiAssessment
   states:
     loading: The integration payment technical list.
     error: Could not load. Names which read failed and leaves the integration payment technical untouched.
@@ -809,7 +904,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 28
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Integration and technical needs
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 28. 0 of
     0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -862,7 +962,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: scoreVsiAssessment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: scoreVsiAssessment
   states:
     loading: The assessment summary handoff list.
     error: Could not load. Names which read failed and leaves the assessment summary handoff untouched.
@@ -885,7 +994,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 29
-  apis: []
+  apis:
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Score and recommend
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 29. 0 of
     0 labels bound to a contract property; 0 of 63 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -939,7 +1053,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: simulateCommercialPackage
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: simulateCommercialPackage
   states:
     loading: The recommended package overview list.
     error: Could not load. Names which read failed and leaves the recommended package overview untouched.
@@ -962,7 +1085,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 44
-  apis: []
+  apis:
+  - operationId: simulateCommercialPackage
+    contract: subscription
+    purpose: The recommended package
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 44. 0 of
     0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1046,7 +1174,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listPlans
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: simulateCommercialPackage
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: simulateCommercialPackage
   states:
     loading: The commercial model tier list.
     error: Could not load. Names which read failed and leaves the commercial model tier untouched.
@@ -1069,7 +1211,17 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 45
-  apis: []
+  apis:
+  - operationId: listPlans
+    contract: subscription
+    purpose: Tiers to choose from
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: simulateCommercialPackage
+    contract: subscription
+    purpose: Price the choice
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 45. 0 of
     0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1168,7 +1320,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays
-  apis: []
+  apis:
+  - operationId: listModuleCatalogue
+    contract: subscription
+    purpose: The marketplace
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 46. 0 of
     9 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1272,7 +1429,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows
-  apis: []
+  apis:
+  - operationId: listModuleCatalogue
+    contract: subscription
+    purpose: Recommended modules
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 48. 0 of
     7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1327,7 +1489,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listModuleCatalogue
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The module detail commercial list.
     error: Could not load. Names which read failed and leaves the module detail commercial untouched.
@@ -1350,7 +1517,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 49
-  apis: []
+  apis:
+  - operationId: listModuleCatalogue
+    contract: subscription
+    purpose: One module in detail
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of
     0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1397,7 +1569,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: setModuleListing
+        label: Save module listing
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listModuleCatalogue
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setModuleListing
   states:
     loading: The module dependency compatibility list.
     error: Could not load. Names which read failed and leaves the module dependency compatibility untouched.
@@ -1426,7 +1613,19 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 49
-  apis: []
+  apis:
+  - operationId: setModuleListing
+    contract: subscription
+    purpose: Dependencies and compatibility
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listModuleCatalogue
+  - operationId: listModuleCatalogue
+    contract: subscription
+    purpose: What depends on what
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of
     0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1474,7 +1673,17 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCapacityPack
+        label: Add capacity pack
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCapacityPack
   states:
     loading: The add-ons capacity commercial list.
     error: Could not load. Names which read failed and leaves the add-ons capacity commercial untouched.
@@ -1497,7 +1706,15 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 50
-  apis: []
+  apis:
+  - operationId: addCapacityPack
+    contract: subscription
+    purpose: Add-ons and capacity
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getLicenceEnforcement
+    - getEntitlementUsage
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 50. 0 of
     0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1544,7 +1761,17 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: setTrialConfiguration
+        label: Save trial configuration
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTrialConfiguration
   states:
     loading: The purchase trial journey list.
     error: Could not load. Names which read failed and leaves the purchase trial journey untouched.
@@ -1567,7 +1794,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 58
-  apis: []
+  apis:
+  - operationId: setTrialConfiguration
+    contract: subscription
+    purpose: Purchase or trial
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 58. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1625,7 +1857,12 @@ screens:
         label: Custom Term
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 59 §Support
     - name: contentBody
-      components: []
+      components:
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setSubscription
   states:
     loading: The contract billing cycle list.
     error: Could not load. Names which read failed and leaves the contract billing cycle untouched.
@@ -1653,7 +1890,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 59
-  apis: []
+  apis:
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Contract and billing cycle
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 59. 0 of
     0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1673,6 +1915,10 @@ screens:
     - to: SGN-020
       trigger: Billing & Legal Entity Information
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  entryState:
+    params:
+    - name: tenantId
+      from: session
 - id: SGN-020
   name: Billing & Legal Entity Information
   module: Purchase & Activation
@@ -1743,7 +1989,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60
-  apis: []
+  apis:
+  - operationId: createLegalEntity
+    contract: finance
+    purpose: Billing and legal entity
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 60. 0 of
     0 labels bound to a contract property; 2 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1841,7 +2092,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 61
-  apis: []
+  apis:
+  - operationId: setPaymentProvider
+    contract: orders
+    purpose: Payment and settlement setup
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 61. 0 of
     0 labels bound to a contract property; 3 of 24 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1937,7 +2193,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 64 §Show
-  apis: []
+  apis:
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Order and pricing review
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 64. 0 of
     5 labels bound to a contract property; 5 of 30 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1949,6 +2210,9 @@ screens:
     - Period
     - Approved By
     - Expiry
+    params:
+    - name: tenantId
+      from: session
   navigation:
     entryFrom:
     - SGN-021
@@ -2046,7 +2310,12 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 65 §Display
-  apis: []
+  apis:
+  - operationId: setAgreementContractTerm
+    contract: subscription
+    purpose: Agreement and acceptance
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 65. 0 of
     8 labels bound to a contract property; 14 of 27 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2105,7 +2374,17 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: setSubscription
+        label: Save subscription
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setSubscription
   states:
     loading: The subscription confirmation commercial list.
     error: Could not load. Names which read failed and leaves the subscription confirmation commercial
@@ -2129,7 +2408,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 67
-  apis: []
+  apis:
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Create the subscription
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 67. 0 of
     0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2144,3 +2428,7 @@ screens:
         7", 11 September 2026
       crossesDevice: true
       back: false
+  entryState:
+    params:
+    - name: tenantId
+      from: session

@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 81
+  "operationsWithNoScreen": 65
  },
  "waves": {
   "wave2": 2,
@@ -72,19 +72,19 @@
    "operations": 7
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
-   "contract": "queue",
-   "operations": 1
-  },
-  {
    "contract": "white-label",
    "operations": 1
   },
   {
    "contract": "ai",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "queue",
    "operations": 1
   }
  ],
@@ -423,12 +423,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "getUnifiedReconciliation",
-    "contract": "finance",
-    "verb": "GET",
-    "summary": "Every money source against the ledger, in one view"
-   },
-   {
     "operation": "ingestFxRates",
     "contract": "finance",
     "verb": "POST",
@@ -439,18 +433,6 @@
     "contract": "finance",
     "verb": "GET",
     "summary": "What one entity owes another"
-   },
-   {
-    "operation": "recordDeposit",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Money taken before the sale is complete"
-   },
-   {
-    "operation": "recordSettlement",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "One entity paid another"
    },
    {
     "operation": "recordWriteOff",
@@ -483,22 +465,64 @@
     "summary": "Find product kinds claimed by more than one schedule"
    },
    {
-    "operation": "setPasswordPolicy",
+    "operation": "createEmergencyAccessOverride",
     "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
-   },
-   {
-    "operation": "setSegregationRules",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Which permissions may not be held together"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Start it, or stop it"
+    "summary": "Bypass the policy, loudly"
+   },
+   {
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "addGuestNote",
@@ -513,40 +537,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -561,18 +555,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -585,34 +567,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -651,52 +609,10 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "updateReportSchedule",
@@ -709,18 +625,6 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Create a banner"
-   },
-   {
-    "operation": "createContentBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Author a block of content"
-   },
-   {
-    "operation": "createContentPage",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a content page"
    },
    {
     "operation": "createPromoBlock",

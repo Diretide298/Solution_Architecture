@@ -1,5 +1,5 @@
 id: LLD-seating
-title: seating — 37 operations
+title: seating — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -20,6 +20,16 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_hold
+- operation: allocateGroupSeats
+  verb: POST
+  path: /group-seat-requests/{requestId}/allocate
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: assignSeats
   verb: POST
   path: /performances/{performanceId}/assign-seats
@@ -82,6 +92,18 @@ operations:
   writes:
   - cache:idempotency
   - seating.section
+- operation: createGroupSeatRequest
+  verb: POST
+  path: /group-seat-requests
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.group_request
+  writes:
+  - seating.group_request
 - operation: createSeatBlock
   verb: POST
   path: /seat-blocks
@@ -126,6 +148,18 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_hold
+- operation: createSeatHoldPool
+  verb: POST
+  path: /seat-hold-pools
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.hold_pool
+  writes:
+  - seating.hold_pool
 - operation: createSeatMap
   verb: POST
   path: /seat-maps
@@ -182,6 +216,17 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_hold
+- operation: getAccessibleSeating
+  verb: GET
+  path: /accessible-seating
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.accessible
+  writes: []
 - operation: getImportJob
   verb: GET
   path: /seat-maps/{seatMapId}/import/{jobId}
@@ -218,6 +263,16 @@ operations:
   reads:
   - seating.seat_hold
   writes: []
+- operation: getSeatInventory
+  verb: GET
+  path: /seat-inventory
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getSeatMap
   verb: GET
   path: /seat-maps/{seatMapId}
@@ -240,6 +295,38 @@ operations:
   offline: false
   reads:
   - seating.seat_map
+  writes: []
+- operation: getSeatRecommendationRules
+  verb: GET
+  path: /seat-recommendation-rules
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.recommendation_rules
+  writes: []
+- operation: getSeatReconciliation
+  verb: GET
+  path: /seat-reconciliation
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getSeatRules
+  verb: GET
+  path: /seat-rules
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_rules
   writes: []
 - operation: getSeatingRules
   verb: GET
@@ -295,6 +382,17 @@ operations:
   - cache:idempotency
   - seating.seat_map
   - seating.section
+- operation: listGroupSeatRequests
+  verb: GET
+  path: /group-seat-requests
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.group_request
+  writes: []
 - operation: listSeatBlocks
   verb: GET
   path: /seat-blocks
@@ -317,6 +415,28 @@ operations:
   offline: true
   reads:
   - seating.seat_category
+  writes: []
+- operation: listSeatHoldPools
+  verb: GET
+  path: /seat-hold-pools
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.hold_pool
+  writes: []
+- operation: listSeatHoldTypes
+  verb: GET
+  path: /seat-hold-types
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.hold_type
   writes: []
 - operation: listSeatMapTemplates
   verb: GET
@@ -367,6 +487,17 @@ operations:
   - cache:idempotency
   - seating.seat_map
   - seating.section
+- operation: reassignSeats
+  verb: POST
+  path: /seat-reassignment
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.reassignment
+  writes: []
 - operation: recommendSeats
   verb: POST
   path: /performances/{performanceId}/seat-recommendations
@@ -408,6 +539,17 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_hold
+- operation: releaseSeatHoldPool
+  verb: POST
+  path: /seat-hold-pools/{poolId}/release
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.hold_pool
+  writes: []
 - operation: relinquishSeatBlock
   verb: DELETE
   path: /seat-blocks/{blockId}
@@ -429,6 +571,28 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setAccessibleSeating
+  verb: PUT
+  path: /accessible-seating
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.accessible
+  writes:
+  - seating.accessible
+- operation: setGroupSeatRoster
+  verb: PUT
+  path: /group-seat-requests/{requestId}/roster
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setMapZones
   verb: PUT
   path: /seat-maps/{seatMapId}/zones
@@ -444,6 +608,42 @@ operations:
   writes:
   - cache:idempotency
   - seating.zone
+- operation: setSeatHoldType
+  verb: PUT
+  path: /seat-hold-types
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.hold_type
+  writes:
+  - seating.hold_type
+- operation: setSeatRecommendationRules
+  verb: PUT
+  path: /seat-recommendation-rules
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.recommendation_rules
+  writes:
+  - seating.recommendation_rules
+- operation: setSeatRules
+  verb: PUT
+  path: /seat-rules
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_rules
+  writes:
+  - seating.seat_rules
 - operation: setSeatingRules
   verb: PUT
   path: /seat-maps/{seatMapId}/rules
@@ -488,6 +688,16 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_map
+- operation: validateSeatCompliance
+  verb: GET
+  path: /seat-compliance
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: validateSeatMap
   verb: POST
   path: /seat-maps/{seatMapId}/validate

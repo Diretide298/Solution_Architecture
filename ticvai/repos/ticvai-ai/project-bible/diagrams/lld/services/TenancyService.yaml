@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 78 operations, 39 tables
+title: TenancyService — 107 operations, 50 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 78
+  operations: 107
   inAFlow: 32
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,18 +32,18 @@ schemas:
   - postgres
   largestTable: platform.wallet_authorisation
 - schema: workforce
-  tables: 6
+  tables: 10
   stores:
   - postgres
   largestTable: workforce.rota_assignment
 - schema: approvals
-  tables: 8
+  tables: 15
   stores:
   - postgres
   largestTable: approvals.request
 operationsByContract:
 - contract: approvals
-  count: 37
+  count: 45
   operations:
   - operation: approveMatrixMultiLevel
     verb: PUT
@@ -85,6 +85,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: createApprovalEvidencePackage
+    verb: POST
+    path: /approval-evidence-packages
+    scope: tenant
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createApprovalRequest
     verb: POST
     path: /approval-requests
@@ -133,6 +141,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getApprovalRecord
+    verb: GET
+    path: /approval-requests/{requestId}/record
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: issueAccreditationBadge
     verb: POST
     path: /accreditation-badges
@@ -145,6 +161,14 @@ operationsByContract:
     verb: GET
     path: /accreditation-badges
     scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalControlPolicies
+    verb: GET
+    path: /approval-control-policies
+    scope: tenant
     permission: APPROVAL_VIEW
     offline: false
     reads: 1
@@ -285,6 +309,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setApprovalControlPolicy
+    verb: PUT
+    path: /approval-control-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setApprovalMatrix
     verb: PUT
     path: /approval-matrices
@@ -293,6 +325,30 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setApprovalRetentionPolicy
+    verb: PUT
+    path: /approval-retention
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setApprovalSlaPolicy
+    verb: PUT
+    path: /approval-sla-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setApproverAvailability
+    verb: PUT
+    path: /approval-delegations/availability
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setStepUpPolicy
     verb: PUT
     path: /step-up-policies
@@ -325,6 +381,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: signApprovalDecision
+    verb: POST
+    path: /approval-requests/{requestId}/signature
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: simulateWorkflowTestingImpact
     verb: PUT
     path: /workflow-testing-impact
@@ -342,7 +406,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: tenancy
-  count: 27
+  count: 38
   operations:
   - operation: configureWorkstation
     verb: PUT
@@ -384,6 +448,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: enrolDevice
+    verb: POST
+    path: /devices/{deviceId}/enrolment
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDeviceTelemetry
+    verb: GET
+    path: /devices/{deviceId}/telemetry
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getOrgUnit
     verb: GET
     path: /org-units/{orgUnitId}
@@ -424,6 +504,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: issueDeviceCredential
+    verb: POST
+    path: /devices/{deviceId}/credentials
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listAuditRecords
     verb: GET
     path: /audit-records
@@ -432,6 +520,30 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 1
+  - operation: listDeviceAuditRecords
+    verb: GET
+    path: /devices/{deviceId}/audit
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeviceFirmware
+    verb: GET
+    path: /device-firmware
+    scope: tenant
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeviceTamperEvents
+    verb: GET
+    path: /device-tamper-events
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDevices
     verb: GET
     path: /devices
@@ -480,6 +592,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: recordDeviceTamperEvent
+    verb: POST
+    path: /device-tamper-events
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: true
+    reads: 1
+    writes: 1
   - operation: registerDevice
     verb: POST
     path: /devices
@@ -488,6 +608,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: revokeDeviceCredential
+    verb: DELETE
+    path: /devices/{deviceId}/credentials
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: rollbackDeviceFirmware
+    verb: POST
+    path: /device-firmware/rollouts/{rolloutId}/rollback
+    scope: tenant
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setConfigurationProfile
     verb: PUT
     path: /configuration-profiles
@@ -504,6 +640,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setDeviceAssignment
+    verb: PUT
+    path: /devices/{deviceId}/assignment
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setOfflinePolicy
     verb: PUT
     path: /offline-policy
@@ -528,6 +672,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: startDeviceFirmwareRollout
+    verb: POST
+    path: /device-firmware/rollouts
+    scope: tenant
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updateOrgUnit
     verb: PATCH
     path: /org-units/{orgUnitId}
@@ -561,7 +713,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: workforce
-  count: 14
+  count: 24
   operations:
   - operation: acknowledgeAnnouncement
     verb: POST
@@ -587,6 +739,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 3
+  - operation: claimOpenShift
+    verb: POST
+    path: /shift-marketplace
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createRotaAssignment
     verb: POST
     path: /rota-assignments
@@ -602,6 +762,22 @@ operationsByContract:
     permission: WORKFORCE_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getLabourCost
+    verb: GET
+    path: /labour-cost
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getStaffingCoverage
+    verb: GET
+    path: /staffing-coverage
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listAnnouncements
     verb: GET
@@ -619,6 +795,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listLeaveRequests
+    verb: GET
+    path: /leave-requests
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOpenShifts
+    verb: GET
+    path: /shift-marketplace
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
   - operation: listRotaAssignments
     verb: GET
     path: /rota-assignments
@@ -630,6 +822,14 @@ operationsByContract:
   - operation: listShiftSwapRequests
     verb: GET
     path: /shift-swaps
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listShiftTemplates
+    verb: GET
+    path: /shift-templates
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
@@ -659,6 +859,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 2
+  - operation: requestLeave
+    verb: POST
+    path: /leave-requests
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 1
   - operation: requestShiftSwap
     verb: POST
     path: /rota-assignments/{assignmentId}/swap
@@ -667,6 +875,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setShiftTemplate
+    verb: PUT
+    path: /shift-templates
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setStaffingRules
+    verb: PUT
+    path: /staffing-rules
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updateRotaAssignment
     verb: PATCH
     path: /rota-assignments/{assignmentId}
@@ -675,6 +899,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: validateWorkforceCompliance
+    verb: GET
+    path: /workforce-compliance
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -697,12 +929,32 @@ tables:
   writtenBy:
   - approvals
   foreignWriters: null
+- table: approvals.approver_availability
+  columns: 9
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.control_policy
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: approvals.decision
   columns: 13
   store: postgres
   parent: null
   writtenBy:
   - approvals
+  foreignWriters: null
+- table: approvals.decision_record
+  columns: 12
+  store: postgres
+  parent: approvals.request
+  writtenBy: []
   foreignWriters: null
 - table: approvals.delegation
   columns: 9
@@ -717,6 +969,12 @@ tables:
   parent: null
   writtenBy:
   - approvals
+  foreignWriters: null
+- table: approvals.evidence_package
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: approvals.matrix
   columns: 6
@@ -735,8 +993,28 @@ tables:
   - workforce
   foreignWriters:
   - subscription
+- table: approvals.retention_policy
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: approvals.rule
   columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.signature
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: approvals.sla_policy
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -974,6 +1252,19 @@ tables:
   writtenBy:
   - workforce
   foreignWriters: null
+- table: workforce.leave_request
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.open_shift
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: workforce.rota_assignment
   columns: 17
   store: postgres
@@ -982,6 +1273,20 @@ tables:
   - workforce
   foreignWriters: null
 - table: workforce.shift_swap
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.shift_template
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.staffing_rules
   columns: 8
   store: postgres
   parent: null
@@ -1053,18 +1358,30 @@ screens:
 - P08:BO-088 Approval Analytics
 - P08:BO-100 Venue Home
 - P08:BO-101 Orders & Money
+- P08:BO-1010 Hold Approval Workflow
 - P08:BO-102 Sell
 - P08:BO-103 Access & Venue
+- P08:BO-1031 Contracts & Approval Workflow
 - P08:BO-104 Food & Beverage
 - P08:BO-105 Stock & Supply
 - P08:BO-106 People & Access Rights
+- P08:BO-1062 Tenant & Brand Context
+- P08:BO-1063 Venue-Specific Configuration
+- P08:BO-1064 Naming, Numbering & Localization
+- P08:BO-1065 Currency, Timezone & Channels
+- P08:BO-1067 Seat Approval Workflows
+- P08:BO-1068 Lifecycle & Environment Promotion
+- P08:BO-1069 Platform Health & Observability
 - P08:BO-107 Guests & Marketing
+- P08:BO-1070 Setup, Clone & Inheritance
 - P08:BO-108 Venue Operations
+- P08:BO-1080 Integration Approval & Compliance
 - P08:BO-109 Menu Builder & POS Layout Designer
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-116 Merchandising & Product Presentation
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-118 Campaign & Audience Management
+- P08:BO-1181 Approval, Publication & Change Management
 - P08:BO-122 POS Experience Dashboard
 - P08:BO-123 POS Profile Management
 - P08:BO-124 Layout & Journey Builder
@@ -1081,7 +1398,70 @@ screens:
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-143 Retail Global Settings & Controls
 - P08:BO-206 Offline Validation Policy Builder
+- P08:BO-364 Approval Command Center Dashboard
+- P08:BO-365 My Approval Inbox
+- P08:BO-366 Team / Shared Approval Queue
+- P08:BO-367 Approval Request Detail
+- P08:BO-368 AI Decision Support
+- P08:BO-369 High Priority & Risk Queue
+- P08:BO-370 Escalated Approval Center
+- P08:BO-371 Completed Approval History
+- P08:BO-372 Approval SLA & Workload Monitor
+- P08:BO-373 Approval Activity & Notification Center
+- P08:BO-375 Business Context & Evidence Viewer
+- P08:BO-376 Approval Timeline & Decision Chain
+- P08:BO-377 Approve & Sensitive Action Confirmation
+- P08:BO-378 Reject / Return / Request Information
+- P08:BO-379 Requester Modification & Resubmission
+- P08:BO-380 Withdrawal, Cancellation, Expiration & Reopening
+- P08:BO-381 Segregation of Duties & Four-Eyes Control
+- P08:BO-382 Approved Action Execution & Status
+- P08:BO-383 Decision Record & Immutable Audit View
+- P08:BO-384 Delegation & Escalation Command Center
+- P08:BO-386 Temporary Delegation & Availability Calendar
+- P08:BO-387 Out-of-Office & Substitute Routing
+- P08:BO-388 Approval SLA Policy Configuration
+- P08:BO-389 Reminder & Breach Notification Rules
+- P08:BO-390 Escalation Policy Builder
+- P08:BO-391 Live Escalation Operations Center
+- P08:BO-392 SLA & Escalation Performance Analytics
+- P08:BO-393 AI SLA & Escalation Advisor
+- P08:BO-407 Reader Credit & Payment Configuration
+- P08:BO-466 Reader & Device Health Monitor
+- P08:BO-600 Venue, Calendar & Operational Setup
+- P08:BO-602 POS, Payment & Access Setup
+- P08:BO-638 Approval Rules & Conditions
+- P08:BO-639 Reviewer Assignment & Delegation
+- P08:BO-641 Escalation & Exception Management
+- P08:BO-712 Staff & Role Assignment Configuration
+- P08:BO-714 Event Shift & Roster Configuration
+- P08:BO-718 Event Change Request Configuration
+- P08:BO-727 F&B Command Center
 - P08:BO-728 Outlet Management
+- P08:BO-732 POS & Device Assignment
+- P08:BO-771 Budget, Goals & Forecast
+- P08:BO-809 SLA Policy Configuration
+- P08:BO-876 Certification & Expiry Management
+- P08:BO-879 Shift Template & Assignment Configuration
+- P08:BO-880 Break, Leave & Absence Configuration
+- P08:BO-881 Overtime & Working-Hour Rules
+- P08:BO-882 Workforce Integration & Synchronization Center
+- P08:BO-883 Workforce Roster Command Center
+- P08:BO-884 Attraction & Operational Staffing Roster
+- P08:BO-885 Minimum Staffing & Coverage Rule Configuration
+- P08:BO-886 Staffing Gap & Coverage Control Center
+- P08:BO-887 Shift Marketplace & Workforce Requests
+- P08:BO-888 Attendance & Live Workforce Command Center
+- P08:BO-889 Staff Check-In, Check-Out & Attendance Exceptions
+- P08:BO-890 Workforce Compliance Validation Center
+- P08:BO-891 Labor Cost & Staffing Budget Control
+- P08:BO-892 AI Workforce Planner & Roster Optimization
+- P08:BO-917 Event Staff & Personnel Allocation
+- P08:BO-922 Event Resource Approval & Readiness Gate
+- P08:BO-936 Mobile Staff Check-In & Check-Out
+- P08:BO-939 Shift Change, Swap, Pickup & Release
+- P08:BO-940 Manager Mobile Approval Center
+- P08:BO-941 Operational Notifications & Live Alerts
 - P09:ADM-006 Tenant Hierarchy Explorer
 - P09:ADM-036 Platform Notification Broadcast
 - P09:ADM-145 Promotion Approval Inbox
@@ -1106,13 +1486,64 @@ screens:
 - P09:ADM-256 Process Optimization & Automation Opportunity Center
 - P09:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
 - P09:ADM-319 Approval Workflow Library
+- P09:ADM-320 Create Approval Workflow
+- P09:ADM-322 Approval Stage Configuration
+- P09:ADM-323 Condition & Decision Rule Builder
+- P09:ADM-324 Approval Sequence & Parallel Routing
+- P09:ADM-325 Workflow Outcome & Action Configuration
+- P09:ADM-326 Workflow Validation & Simulation
+- P09:ADM-327 Workflow Publication & Lifecycle
+- P09:ADM-328 Workflow Versioning & Change History
+- P09:ADM-329 Approval Matrix Command Center
+- P09:ADM-330 Approval Authority Matrix
+- P09:ADM-331 Organizational Hierarchy Routing
+- P09:ADM-332 Department-Based Approval Matrix
+- P09:ADM-333 Venue & Tenant Approval Matrix
+- P09:ADM-334 Value & Threshold Routing
+- P09:ADM-335 Risk-Based & Conditional Routing
+- P09:ADM-336 Approver Group & Decision Policy
+- P09:ADM-337 Routing Simulator & Conflict Detection
+- P09:ADM-338 AI Routing Advisor & Matrix Optimization
+- P09:ADM-339 Governance & Compliance Command Center
+- P09:ADM-341 Four-Eyes & Dual-Control Policy
 - P09:ADM-342 Authentication & MFA Policy Manager
+- P09:ADM-343 Sensitive Action Confirmation
+- P09:ADM-344 Digital Signature Management
+- P09:ADM-345 Immutable Approval Record & Tamper Detection
+- P09:ADM-346 Approval Record Retention Policy
+- P09:ADM-347 Regulatory Audit & Evidence Center
+- P09:ADM-348 Governance Risk & AI Compliance Advisor
+- P09:ADM-349 Approval Integration Command Center
+- P09:ADM-350 Module Integration Registry
+- P09:ADM-351 Approval API Management
+- P09:ADM-352 Workflow Event Framework
+- P09:ADM-355 Data & Workflow Mapping Studio
+- P09:ADM-357 Integration Monitoring, Error & Retry Center
+- P09:ADM-358 Integration Analytics & AI Health Advisor
+- P09:ADM-359 Approval Executive KPI Dashboard
+- P09:ADM-360 Approval Volume & Outcome Analytics
+- P09:ADM-361 Approval Processing Time Analytics
+- P09:ADM-362 Bottleneck Analysis & Heatmap
+- P09:ADM-363 Approval Trend & Comparative Analytics
+- P09:ADM-364 Approver & Team Performance Analytics
+- P09:ADM-366 AI Approval Intelligence Center
+- P09:ADM-367 AI Optimization & What-If Simulator
+- P09:ADM-368 AI Governance Executive Advisor
+- P09:ADM-420 Tenant & Organization Provisioning
+- P09:ADM-425 Venue Template Application
+- P09:ADM-567 Payment Policy, Governance & Approval Manager\t15
+- P09:ADM-580 Payment Terminal & Device Inventory\t49
+- P09:ADM-581 Terminal Provisioning & Device Configuration\t51
+- P09:ADM-582 POS, Kiosk & Terminal Assignment Manager\t52
+- P09:ADM-584 Payment Server & Terminal Connectivity Manager\t54
+- P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
 - P11:ACC-005 Accreditation Badge
 - P11:ACC-006 Reviewer Queue
 - P11:ACC-007 Reviewer Application Detail
 - P11:ACC-008 Credential Register
 - P15:KIT-009 SLA, Priority & Service Rules
 - P16:ANL-003 Operational Performance
+- P16:ANL-050 Retention, Archive & Governance Policy
 flows:
 - F08 Steward works a shift on the employee app
 - F106 A security dashboard surfaces something and it is investigated

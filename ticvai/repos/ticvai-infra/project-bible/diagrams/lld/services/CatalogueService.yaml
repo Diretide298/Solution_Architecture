@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 344 operations, 40 tables
+title: CatalogueService — 393 operations, 61 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,30 +9,30 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 344
+  operations: 393
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 18
+  tables: 27
   stores:
   - postgres
   largestTable: catalogue.entitlement_template
 - schema: promotions
-  tables: 11
+  tables: 16
   stores:
   - postgres
   largestTable: promotions.promotion
 - schema: seating
-  tables: 11
+  tables: 18
   stores:
   - postgres
-  largestTable: seating.seat_hold
+  largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 176
+  count: 192
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -74,6 +74,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: assignSessionMedia
+    verb: POST
+    path: /sessions/{sessionId}/media
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: bulkChangePrices
     verb: POST
     path: /products/bulk-price
@@ -90,6 +98,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: cloneEvent
+    verb: POST
+    path: /events/{eventId}/clone
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: cloneProduct
     verb: POST
     path: /products/{productId}/clone
@@ -231,6 +247,14 @@ operationsByContract:
     path: /events/{eventId}
     scope: venue
     permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getEventResourcePlan
+    verb: GET
+    path: /events/{eventId}/resource-plan
+    scope: venue
+    permission: EVENT_CONFIGURE
     offline: false
     reads: 1
     writes: 0
@@ -576,6 +600,14 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: listEventTypes
+    verb: GET
+    path: /event-types
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
     reads: 1
     writes: 0
   - operation: listEvents
@@ -1010,6 +1042,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listSessionTemplates
+    verb: GET
+    path: /session-templates
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listSignalDataQuality
     verb: GET
     path: /signal-data-quality
@@ -1017,6 +1057,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listSpaces
+    verb: GET
+    path: /spaces
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 1
     writes: 0
   - operation: listTaxFeeCalculation
     verb: GET
@@ -1154,6 +1202,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: rescheduleEvent
+    verb: POST
+    path: /events/{eventId}/reschedule
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: resolveProductByCode
     verb: GET
     path: /products/resolve
@@ -1242,6 +1298,54 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setEventCapacityProfile
+    verb: PUT
+    path: /events/{eventId}/capacity-profile
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setEventLifecycleState
+    verb: POST
+    path: /events/{eventId}/lifecycle
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setEventRegistration
+    verb: PUT
+    path: /events/{eventId}/registration
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setEventResourcePlan
+    verb: PUT
+    path: /events/{eventId}/resource-plan
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setEventSchedule
+    verb: PUT
+    path: /events/{eventId}/schedule
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setEventType
+    verb: PUT
+    path: /event-types
+    scope: tenant
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setFeeApplicabilityCharging
     verb: PUT
     path: /fee-applicability-charging
@@ -1258,6 +1362,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setPrepaidMinutePackage
+    verb: PUT
+    path: /prepaid-minute-packages
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPriceHierarchyInheritance
     verb: PUT
     path: /price-hierarchy-inheritance
@@ -1354,6 +1466,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setSessionTemplate
+    verb: PUT
+    path: /session-templates
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setSpace
+    verb: PUT
+    path: /spaces
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setTaxProfileJurisdiction
     verb: PUT
     path: /tax-profile-jurisdiction
@@ -1443,7 +1571,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: promotions
-  count: 131
+  count: 145
   operations:
   - operation: analysePromotionConflicts
     verb: GET
@@ -1477,6 +1605,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: concludeRecommendationExperiment
+    verb: POST
+    path: /recommendation-experiments/{experimentId}/conclude
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createBundle
     verb: POST
     path: /bundles
@@ -1501,6 +1637,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createRecommendationExperiment
+    verb: POST
+    path: /recommendation-experiments
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createRecommendationStrategy
+    verb: POST
+    path: /recommendation-strategies
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createUpsellRule
     verb: POST
     path: /upsell-rules
@@ -1541,6 +1693,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 1
+  - operation: explainRecommendation
+    verb: POST
+    path: /recommendations/explain
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: generateCouponCodes
     verb: POST
     path: /coupon-campaigns/{campaignId}/codes
@@ -1565,6 +1725,14 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: getProductAffinity
+    verb: GET
+    path: /product-affinity
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getPromotion
     verb: GET
     path: /promotions/{promotionId}
@@ -1580,6 +1748,14 @@ operationsByContract:
     permission: PRICE_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: getRecommendationPerformance
+    verb: GET
+    path: /recommendation-performance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getRecommendations
     verb: POST
@@ -2037,6 +2213,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listProductRelationships
+    verb: GET
+    path: /product-relationships
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listPromotionActivityVersion
     verb: GET
     path: /promotion-activity-version
@@ -2132,6 +2316,22 @@ operationsByContract:
     permission: PRICE_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listRecommendationExperiments
+    verb: GET
+    path: /recommendation-experiments
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRecommendationStrategies
+    verb: GET
+    path: /recommendation-strategies
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listRedemption
     verb: GET
@@ -2309,6 +2509,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: recordRecommendationOutcome
+    verb: POST
+    path: /recommendations/outcomes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 0
+    writes: 1
   - operation: redeemVoucher
     verb: POST
     path: /vouchers/{voucherCode}/redeem
@@ -2405,6 +2613,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setProductRelationships
+    verb: PUT
+    path: /product-relationships
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPromotionRule
     verb: PUT
     path: /promotion-rule
@@ -2429,6 +2645,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setRecommendationSuppression
+    verb: PUT
+    path: /recommendation-suppressions
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setRuleTestRecommendation
     verb: PUT
     path: /rule-test-recommendation
@@ -2453,6 +2677,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: simulateRecommendationStrategy
+    verb: POST
+    path: /recommendation-simulations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 1
   - operation: unschedulePromotion
     verb: POST
     path: /promotions/{promotionId}/unschedule
@@ -2477,6 +2709,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: updateRecommendationStrategy
+    verb: PUT
+    path: /recommendation-strategies/{strategyId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: voidCouponCode
     verb: POST
     path: /coupon-codes/{code}/void
@@ -2494,7 +2734,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: seating
-  count: 37
+  count: 56
   operations:
   - operation: allocateBlockedSeats
     verb: POST
@@ -2504,6 +2744,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: allocateGroupSeats
+    verb: POST
+    path: /group-seat-requests/{requestId}/allocate
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: assignSeats
     verb: POST
     path: /performances/{performanceId}/assign-seats
@@ -2536,6 +2784,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createGroupSeatRequest
+    verb: POST
+    path: /group-seat-requests
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createSeatBlock
     verb: POST
     path: /seat-blocks
@@ -2560,6 +2816,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createSeatHoldPool
+    verb: POST
+    path: /seat-hold-pools
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createSeatMap
     verb: POST
     path: /seat-maps
@@ -2592,6 +2856,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getAccessibleSeating
+    verb: GET
+    path: /accessible-seating
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getImportJob
     verb: GET
     path: /seat-maps/{seatMapId}/import/{jobId}
@@ -2616,6 +2888,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getSeatInventory
+    verb: GET
+    path: /seat-inventory
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getSeatMap
     verb: GET
     path: /seat-maps/{seatMapId}
@@ -2629,6 +2909,30 @@ operationsByContract:
     path: /seat-map-imports/{importId}
     scope: venue
     permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSeatRecommendationRules
+    verb: GET
+    path: /seat-recommendation-rules
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSeatReconciliation
+    verb: GET
+    path: /seat-reconciliation
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getSeatRules
+    verb: GET
+    path: /seat-rules
+    scope: venue
+    permission: CAPACITY_CONFIGURE
     offline: false
     reads: 1
     writes: 0
@@ -2664,6 +2968,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: listGroupSeatRequests
+    verb: GET
+    path: /group-seat-requests
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listSeatBlocks
     verb: GET
     path: /seat-blocks
@@ -2678,6 +2990,22 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: listSeatHoldPools
+    verb: GET
+    path: /seat-hold-pools
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSeatHoldTypes
+    verb: GET
+    path: /seat-hold-types
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
     reads: 1
     writes: 0
   - operation: listSeatMapTemplates
@@ -2712,6 +3040,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: reassignSeats
+    verb: POST
+    path: /seat-reassignment
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: recommendSeats
     verb: POST
     path: /performances/{performanceId}/seat-recommendations
@@ -2736,6 +3072,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: releaseSeatHoldPool
+    verb: POST
+    path: /seat-hold-pools/{poolId}/release
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: relinquishSeatBlock
     verb: DELETE
     path: /seat-blocks/{blockId}
@@ -2752,6 +3096,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setAccessibleSeating
+    verb: PUT
+    path: /accessible-seating
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGroupSeatRoster
+    verb: PUT
+    path: /group-seat-requests/{requestId}/roster
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setMapZones
     verb: PUT
     path: /seat-maps/{seatMapId}/zones
@@ -2760,6 +3120,30 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: setSeatHoldType
+    verb: PUT
+    path: /seat-hold-types
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setSeatRecommendationRules
+    verb: PUT
+    path: /seat-recommendation-rules
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setSeatRules
+    verb: PUT
+    path: /seat-rules
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setSeatingRules
     verb: PUT
     path: /seat-maps/{seatMapId}/rules
@@ -2784,6 +3168,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: validateSeatCompliance
+    verb: GET
+    path: /seat-compliance
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: validateSeatMap
     verb: POST
     path: /seat-maps/{seatMapId}/validate
@@ -2849,6 +3241,48 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.event_capacity_profile
+  columns: 12
+  store: postgres
+  parent: catalogue.event
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_registration
+  columns: 7
+  store: postgres
+  parent: catalogue.event
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_reschedule
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_resource_plan
+  columns: 4
+  store: postgres
+  parent: catalogue.event
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_schedule
+  columns: 6
+  store: postgres
+  parent: catalogue.event
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_type
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
 - table: catalogue.import_job
   columns: 7
   store: postgres
@@ -2867,6 +3301,13 @@ tables:
   - orders
 - table: catalogue.performance
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.prepaid_minutes
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2916,6 +3357,20 @@ tables:
   - fnb
 - table: catalogue.published_bundle
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.session_template
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.space
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2989,8 +3444,43 @@ tables:
   writtenBy:
   - promotions
   foreignWriters: null
+- table: promotions.product_relationship
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
 - table: promotions.promotion
   columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.recommendation_experiment
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.recommendation_outcome
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.recommendation_strategy
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.recommendation_suppression
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -3017,10 +3507,51 @@ tables:
   writtenBy:
   - promotions
   foreignWriters: null
+- table: seating.accessible
+  columns: 5
+  store: postgres
+  parent: seating.seat_map
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.group_request
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.hold_pool
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.hold_type
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
 - table: seating.import_job
   columns: 11
   store: postgres
   parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.reassignment
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: seating.recommendation_rules
+  columns: 6
+  store: postgres
+  parent: seating.seat_map
   writtenBy:
   - seating
   foreignWriters: null
@@ -3063,6 +3594,13 @@ tables:
   columns: 8
   store: postgres
   parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_rules
+  columns: 8
+  store: postgres
+  parent: seating.seat_map
   writtenBy:
   - seating
   foreignWriters: null
@@ -3181,12 +3719,67 @@ screens:
 - P08:BO-019 Closures & Blackouts
 - P08:BO-037 Offline Package Status
 - P08:BO-063 Opening Hours & Calendar
+- P08:BO-1000 Mobile & Accessible Selection
+- P08:BO-1001 View Preview, Compare & Heat Map
+- P08:BO-1002 AI Conversational Seat Assistant
+- P08:BO-1003 Hold Command Center
+- P08:BO-1004 Hold Type Master
+- P08:BO-1005 Hold Pool Creation
+- P08:BO-1006 Hold Rule Assignment
+- P08:BO-1007 Expiration Rules
+- P08:BO-1008 Automatic Hold Release
+- P08:BO-1009 Release, Convert & Reassign
+- P08:BO-1010 Hold Approval Workflow
+- P08:BO-1011 Priority & Conflict Resolution
+- P08:BO-1012 Hold Utilization & Audit
+- P08:BO-1013 Rules Command Center
+- P08:BO-1014 Seat Kill Rules
+- P08:BO-1015 Buffer Seat Rules
+- P08:BO-1016 Companion Seat Rules
+- P08:BO-1017 Wheelchair Companion Rules
+- P08:BO-1018 Accessible Seating Master
+- P08:BO-1019 Accessible Route Mapping
 - P08:BO-102 Sell
+- P08:BO-1020 Accessible Filters & Eligibility
+- P08:BO-1021 Flexible Spacing Rules
+- P08:BO-1022 Compliance Validation & Audit
+- P08:BO-1023 Group Reservation Center
+- P08:BO-1024 Group Type Configuration
+- P08:BO-1025 Group Request Intake
+- P08:BO-1026 Availability & Best-Fit Search
+- P08:BO-1027 Bulk Seat Allocation
+- P08:BO-1028 Roster & Participant Assignment
+- P08:BO-1029 Quote, Deposit & Payment
+- P08:BO-1030 Modify, Release & Cancel
+- P08:BO-1032 Group Reporting & Audit
+- P08:BO-1033 Recommendation Command Center
+- P08:BO-1034 Best Seat Recommendations
+- P08:BO-1035 Best Value Recommendations
+- P08:BO-1036 Closest-to-Stage Recommendations
+- P08:BO-1037 Family Seating Recommendations
+- P08:BO-1038 Accessibility Recommendations
+- P08:BO-1039 Seat Upgrade Recommendations
+- P08:BO-1040 Alternatives & Reseating
+- P08:BO-1041 Scoring Rules & Model Governance
+- P08:BO-1042 Performance, Feedback & Audit
 - P08:BO-1043 Revenue Command Center
+- P08:BO-1044 Dynamic Seat Pricing
+- P08:BO-1045 Price Bands & Categories
+- P08:BO-1046 Inventory Forecasting
+- P08:BO-1047 Section Revenue Forecast
+- P08:BO-1048 Seat Upsell Recommendations
+- P08:BO-1049 Scenario & What-If Planning
 - P08:BO-1050 Revenue Analytics & Audit
 - P08:BO-1051 Seat Analytics Command Center
 - P08:BO-1055 Revenue by Seat Category
 - P08:BO-1057 Hold Inventory Reporting
+- P08:BO-1058 Sales Pace & Pick Curves
+- P08:BO-1059 Heat Maps & Drill-Down
+- P08:BO-1061 Platform Command Center
+- P08:BO-1064 Naming, Numbering & Localization
+- P08:BO-1070 Setup, Clone & Inheritance
+- P08:BO-1072 Seat Management APIs
+- P08:BO-1079 Immutable Seat Audit Logs
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
@@ -3196,16 +3789,99 @@ screens:
 - P08:BO-443 Pricing Audit, Approval & Publication
 - P08:BO-444 Redemption Operations Dashboard
 - P08:BO-518 Real-Time Availability Calendar
+- P08:BO-528 Dynamic Pricing & AI Recommendation
 - P08:BO-533 Pricing Simulation, Validation & AI Commercial Intelligence
+- P08:BO-591 Rental Forecasting & Demand Intelligence
+- P08:BO-601 Product, Pricing & Sales Channel Setup
 - P08:BO-637 Approval Workflow Builder
 - P08:BO-642 Approval Decision History
+- P08:BO-694 Event Catalogue Command Center
+- P08:BO-695 Event Type & Behaviour Configuration
+- P08:BO-696 Event Duplication & Clone Configuration
+- P08:BO-697 Event Schedule Command Center
+- P08:BO-698 Dynamic Performance Duration Configuration
+- P08:BO-699 Schedule Change & Rescheduling Configuration
+- P08:BO-700 Venue & Space Command Center
+- P08:BO-701 Venue Master Configuration
+- P08:BO-702 Space Access Rules Configuration
+- P08:BO-703 Seating & Capacity Command Center
+- P08:BO-704 Event Capacity Profile Configuration
+- P08:BO-705 Seating Mode & Reservation Configuration
+- P08:BO-706 Registration & Attendance Command Center
+- P08:BO-707 Attendee Data & Registration Form Configuration
+- P08:BO-708 Accreditation & Participant Category Configuration
+- P08:BO-709 Event Admission & Entry Policy Configuration
+- P08:BO-710 Event Resource Command Center
+- P08:BO-711 Event Resource Requirement Configuration
+- P08:BO-712 Staff & Role Assignment Configuration
+- P08:BO-713 Contractor & External Workforce Configuration
+- P08:BO-715 Resource Location & Deployment Configuration
+- P08:BO-716 Event Lifecycle & Change Command Center
+- P08:BO-717 Lifecycle Transition Configuration
+- P08:BO-719 Event Cancellation Workflow Configuration
+- P08:BO-720 Ticket, Reservation & Customer Treatment Configuration
+- P08:BO-721 Activity Session & Slot Template Configuration
+- P08:BO-722 Prepaid Minute Package & Customer Balance Configuration
+- P08:BO-723 Peak, Off-Peak & Super Prime Time Configuration
+- P08:BO-724 Walk-In / There-and-Then Booking Configuration
+- P08:BO-725 Session Operations Command Center
+- P08:BO-726 Participant Photo & Video Assignment
 - P08:BO-737 Customer 360 Profile
 - P08:BO-761 AI Audience Discovery
 - P08:BO-765 Campaign Library & Calendar
 - P08:BO-770 Campaign Approval Workflow
+- P08:BO-913 Event Resource Planning Command Center
+- P08:BO-914 Event Resource Requirement Builder
+- P08:BO-915 Venue & Space Allocation
+- P08:BO-920 Event Resource Cost Estimator
+- P08:BO-922 Event Resource Approval & Readiness Gate
+- P08:BO-946 Demand Forecast Accuracy & Planning Performance
 - P08:BO-953 Seat Map Command Center
+- P08:BO-954 Venue Canvas
+- P08:BO-955 Sections & Zones
+- P08:BO-956 Rows & Seats
+- P08:BO-957 Standing Zones
+- P08:BO-958 Suites & Boxes
+- P08:BO-959 Stage & Focal Point
+- P08:BO-960 Entrances, Exits & Aisles
+- P08:BO-961 Amenities & Obstructions
+- P08:BO-962 Templates, Validation & Publish
+- P08:BO-963 Import Command Center
+- P08:BO-964 PDF & Image Import
+- P08:BO-965 SVG & CAD Import
+- P08:BO-966 CSV & Excel Import
+- P08:BO-967 AI Section Recognition
+- P08:BO-968 AI Row & Seat Recognition
+- P08:BO-969 AI Aisle, VIP & Accessibility
+- P08:BO-970 AI Numbering & Labeling
+- P08:BO-971 Validation & Correction
+- P08:BO-972 AI Venue Designer & Publish
+- P08:BO-973 Layout Command Center
+- P08:BO-974 Template Library
+- P08:BO-975 Event-Specific Layout
+- P08:BO-976 Clone & Inheritance
+- P08:BO-977 Version Compare
+- P08:BO-978 Multi-Performance Assignment
+- P08:BO-979 Temporary Seat Blocking
+- P08:BO-980 Scheduled Seat Release
+- P08:BO-982 Approval, Publish & Rollback
+- P08:BO-983 Inventory Command Center
+- P08:BO-984 Real-Time Seat Map
+- P08:BO-985 Status Model Configuration
+- P08:BO-986 Availability Tracker
+- P08:BO-987 Hold Tracker
+- P08:BO-988 Reservation Tracker
+- P08:BO-989 Sales & Allocation Tracker
+- P08:BO-990 Maintenance & Out of Service
 - P08:BO-991 Seat History
+- P08:BO-992 Audit & Reconciliation
+- P08:BO-993 Experience Command Center
+- P08:BO-994 Choose My Seats
+- P08:BO-995 Find Seats For Me
+- P08:BO-996 Filters & Interactive Legend
 - P08:BO-997 Real-Time Availability & Locking
+- P08:BO-998 Lock Timeout & Concurrency
+- P08:BO-999 Cart & Multi-Seat Management
 - P09:ADM-048 Commercial Pricing Command Center
 - P09:ADM-049 Price List Master Configuration
 - P09:ADM-050 Price Category & Rate Type Library
@@ -3423,7 +4099,63 @@ screens:
 - P09:ADM-483 Pricing & Commercial Configuration
 - P09:ADM-492 Configuration Approval Workflow
 - P09:ADM-549 AI Governance Monitoring Command Center
+- P09:ADM-639 Recommendation Command Center
+- P09:ADM-640 Recommendation Strategy Manager
+- P09:ADM-641 Recommendation Objective & KPI Configuration
+- P09:ADM-642 Recommendation Type & Product Relationship Manager
+- P09:ADM-643 Recommendation Placement & Touchpoint Manager
+- P09:ADM-644 Channel & Journey Strategy Manager
+- P09:ADM-645 Recommendation Priority, Ranking & Suppression Manager17
+- P09:ADM-646 Recommendation Guardrails & Business Controls
+- P09:ADM-647 Recommendation Policy, AI Control & Governance
+- P09:ADM-648 Recommendation Strategy Simulator & AI Advisor
+- P09:ADM-649 Upsell & Upgrade Command Center
+- P09:ADM-650 Upgrade Path & Product Ladder Builder
+- P09:ADM-651 Upsell Eligibility & Qualification Rules
+- P09:ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager
+- P09:ADM-656 Post-Purchase & In-Journey Upgrade Manager
+- P09:ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine
+- P09:ADM-658 Upgrade Simulator, Comparison & AI Advisor
 - P09:ADM-659 Cross-Sell Command Center
+- P09:ADM-660 Cross-Sell Relationship Builder
+- P09:ADM-661 Product Affinity Matrix & Relationship Map
+- P09:ADM-662 Frequently Bought Together & Basket Pattern Engine
+- P09:ADM-663 Cross-Category Recommendation Manager
+- P09:ADM-664 Multi-Attraction, Destination & Partner Cross-Sell
+- P09:ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention
+- P09:ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell
+- P09:ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine
+- P09:ADM-668 Cross-Sell Simulator & AI Opportunity Advisor
+- P09:ADM-669 Journey & Context Command Center
+- P09:ADM-670 Customer Journey Map & Touchpoint Designer
+- P09:ADM-671 Real-Time Context Rule Engine
+- P09:ADM-672 Pre-Purchase & Booking Journey Recommendation Manager
+- P09:ADM-673 Post-Purchase & Pre-Visit Recommendation Manager
+- P09:ADM-674 In-Venue & Location-Aware Recommendation Engine
+- P09:ADM-675 Visit State, Itinerary & Time-Aware Recommendation
+- P09:ADM-676 Omnichannel Recommendation Synchronization
+- P09:ADM-677 Contextual Trigger, Frequency & Experience Controls
+- P09:ADM-678 Journey Simulator, Decision Trace & AI Optimization
+- P09:ADM-679 Personalization & NBO Command Center
+- P09:ADM-680 Customer Recommendation Profile
+- P09:ADM-681 Customer Feature & Signal Configuration
+- P09:ADM-682 Propensity Model & Customer Intent Manager
+- P09:ADM-683 Next-Best-Offer Decision Studio
+- P09:ADM-684 Personalized Ranking & Decision Policy Builder
+- P09:ADM-685 Customer Preference, Fatigue & Suppression Intelligence
+- P09:ADM-686 Anonymous, Known & Identity-Transition Personalization.123
+- P09:ADM-687 AI Explainability, Confidence & Model Governance
+- P09:ADM-688 Personalization Simulator & Next-Best-Offer Lab
+- P09:ADM-689 Recommendation Performance Command Center
+- P09:ADM-690 Recommendation Strategy & Placement Analytics
+- P09:ADM-691 Recommendation Experiment & A/B Test Studio
+- P09:ADM-692 Experiment Results & Winner Decision Workspace
+- P09:ADM-693 Recommendation Attribution & Incrementality Analytics
+- P09:ADM-694 AI Model Performance & Drift Monitor
+- P09:ADM-695 Recommendation Governance & Deployment Control
+- P09:ADM-696 AI Risk, Fairness, Explainability & Safety Center
+- P09:ADM-697 Recommendation Audit, Decision Trace & Investigation
+- P09:ADM-698 AI Optimization & Recommendation Intelligence Lab
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-006 Product Catalog (B2B Pricing)
 - P10:PTR-007 Availability Search

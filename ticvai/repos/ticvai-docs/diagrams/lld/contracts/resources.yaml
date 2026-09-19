@@ -1,10 +1,22 @@
 id: LLD-resources
-title: resources — 9 operations
+title: resources — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: VenueOpsService
 operations:
+- operation: allocateResources
+  verb: POST
+  path: /resource-allocations
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.booking
+  writes:
+  - resources.resource_requirement
 - operation: bookResource
   verb: POST
   path: /resource-bookings
@@ -21,6 +33,17 @@ operations:
   writes:
   - cache:idempotency
   - resources.booking
+- operation: cancelResourceBooking
+  verb: DELETE
+  path: /resource-bookings/{bookingId}
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.booking
+  writes: []
 - operation: checkInResource
   verb: POST
   path: /resource-bookings/{bookingId}/check-in
@@ -56,6 +79,17 @@ operations:
   - orders.stored_value_authorisation
   - resources.booking
   - resources.resource
+- operation: cloneResource
+  verb: POST
+  path: /resources/{resourceId}/clone
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes: []
 - operation: createResource
   verb: POST
   path: /resources
@@ -71,6 +105,110 @@ operations:
   writes:
   - cache:idempotency
   - resources.resource
+- operation: createResourceAttribute
+  verb: POST
+  path: /resource-attributes
+  scope: tenant
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.attribute_definition
+  writes:
+  - resources.attribute_definition
+- operation: createResourceBlock
+  verb: POST
+  path: /resource-blocks
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_block
+  writes:
+  - resources.resource_block
+- operation: createResourceCategory
+  verb: POST
+  path: /resource-categories
+  scope: tenant
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_category
+  writes:
+  - resources.resource_category
+- operation: createResourcePackage
+  verb: POST
+  path: /resource-packages
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_package
+  writes:
+  - resources.resource_package
+- operation: createResourceType
+  verb: POST
+  path: /resource-types
+  scope: tenant
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_type
+  writes:
+  - resources.resource_type
+- operation: getExperienceResourceRequirements
+  verb: GET
+  path: /experiences/{experienceId}/resource-requirements
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_requirement
+  writes: []
+- operation: getResource
+  verb: GET
+  path: /resources/{resourceId}
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes: []
+- operation: getResourceAllocationPolicy
+  verb: GET
+  path: /resource-allocation-policy
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.allocation_policy
+  writes: []
+- operation: getResourceAuditTrail
+  verb: GET
+  path: /resources/{resourceId}/audit
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_audit
+  writes: []
 - operation: getResourceAvailability
   verb: GET
   path: /resources/{resourceId}/availability
@@ -85,6 +223,58 @@ operations:
   - resources.booking
   - resources.resource
   writes: []
+- operation: getResourceCalendar
+  verb: GET
+  path: /resource-calendar
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getResourceDependencies
+  verb: GET
+  path: /resources/{resourceId}/dependencies
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_dependency
+  writes: []
+- operation: getResourceHierarchy
+  verb: GET
+  path: /resources/{resourceId}/hierarchy
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getResourceSchedule
+  verb: GET
+  path: /resources/{resourceId}/schedule
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_schedule
+  writes: []
+- operation: getResourceUtilisation
+  verb: GET
+  path: /resource-utilisation
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getSessionManifest
   verb: GET
   path: /sessions/{sessionId}/manifest
@@ -98,6 +288,72 @@ operations:
   - pii.subject
   - resources.session_participant
   writes: []
+- operation: listResourceAttributes
+  verb: GET
+  path: /resource-attributes
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.attribute_definition
+  writes: []
+- operation: listResourceBlocks
+  verb: GET
+  path: /resource-blocks
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_block
+  writes: []
+- operation: listResourceBookings
+  verb: GET
+  path: /resource-bookings
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.booking
+  writes: []
+- operation: listResourceCategories
+  verb: GET
+  path: /resource-categories
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_category
+  writes: []
+- operation: listResourcePackages
+  verb: GET
+  path: /resource-packages
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_package
+  writes: []
+- operation: listResourceTypes
+  verb: GET
+  path: /resource-types
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_type
+  writes: []
 - operation: listResources
   verb: GET
   path: /resources
@@ -108,6 +364,16 @@ operations:
   offline: false
   reads:
   - resources.resource
+  writes: []
+- operation: releaseResourceBlock
+  verb: DELETE
+  path: /resource-blocks/{blockId}
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: reorderSessionManifest
   verb: PUT
@@ -123,6 +389,74 @@ operations:
   writes:
   - cache:idempotency
   - resources.session_participant
+- operation: replaceResourceAllocation
+  verb: POST
+  path: /resource-allocations/{bookingId}/replace
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.booking
+  writes: []
+- operation: setExperienceResourceRequirements
+  verb: PUT
+  path: /experiences/{experienceId}/resource-requirements
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_requirement
+  writes:
+  - resources.resource_requirement
+- operation: setResourceAllocationPolicy
+  verb: PUT
+  path: /resource-allocation-policy
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.allocation_policy
+  writes:
+  - resources.allocation_policy
+- operation: setResourceDependencies
+  verb: PUT
+  path: /resources/{resourceId}/dependencies
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_dependency
+  writes:
+  - resources.resource_dependency
+- operation: setResourceHierarchy
+  verb: PUT
+  path: /resources/{resourceId}/hierarchy
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setResourceLifecycleState
+  verb: POST
+  path: /resources/{resourceId}/state
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes: []
 - operation: setResourceQualifications
   verb: PUT
   path: /resources/{resourceId}/qualifications
@@ -138,3 +472,107 @@ operations:
   writes:
   - cache:idempotency
   - resources.qualification
+- operation: setResourceSchedule
+  verb: PUT
+  path: /resources/{resourceId}/schedule
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_schedule
+  writes:
+  - resources.resource_schedule
+- operation: setResourceSelectionPolicy
+  verb: PUT
+  path: /resource-selection-policy
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setResourceVenueAssignment
+  verb: PUT
+  path: /resources/{resourceId}/venues
+  scope: tenant
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.venue_assignment
+  writes:
+  - resources.venue_assignment
+- operation: suggestResources
+  verb: GET
+  path: /resource-suggestions
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes: []
+- operation: updateResource
+  verb: PUT
+  path: /resources/{resourceId}
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes:
+  - resources.resource
+- operation: updateResourceBooking
+  verb: PATCH
+  path: /resource-bookings/{bookingId}
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.booking
+  writes: []
+- operation: updateResourceCategory
+  verb: PUT
+  path: /resource-categories/{categoryId}
+  scope: tenant
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_category
+  writes:
+  - resources.resource_category
+- operation: updateResourcePackage
+  verb: PUT
+  path: /resource-packages/{packageId}
+  scope: venue
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_package
+  writes:
+  - resources.resource_package
+- operation: updateResourceType
+  verb: PUT
+  path: /resource-types/{resourceTypeId}
+  scope: tenant
+  permission: RESOURCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource_type
+  writes:
+  - resources.resource_type

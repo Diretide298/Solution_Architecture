@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 14 operations
+title: workforce — 24 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -51,6 +51,17 @@ operations:
   - cache:idempotency
   - marketing.message_dispatch
   - workforce.announcement
+- operation: claimOpenShift
+  verb: POST
+  path: /shift-marketplace
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.open_shift
+  writes: []
 - operation: createRotaAssignment
   verb: POST
   path: /rota-assignments
@@ -80,6 +91,26 @@ operations:
   - workforce.announcement_receipt
   - workforce.rota_assignment
   writes: []
+- operation: getLabourCost
+  verb: GET
+  path: /labour-cost
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getStaffingCoverage
+  verb: GET
+  path: /staffing-coverage
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listAnnouncements
   verb: GET
   path: /announcements
@@ -104,6 +135,28 @@ operations:
   - workforce.attendance
   - workforce.rota_assignment
   writes: []
+- operation: listLeaveRequests
+  verb: GET
+  path: /leave-requests
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.leave_request
+  writes: []
+- operation: listOpenShifts
+  verb: GET
+  path: /shift-marketplace
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - workforce.open_shift
+  writes: []
 - operation: listRotaAssignments
   verb: GET
   path: /rota-assignments
@@ -126,6 +179,17 @@ operations:
   offline: false
   reads:
   - workforce.shift_swap
+  writes: []
+- operation: listShiftTemplates
+  verb: GET
+  path: /shift-templates
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift_template
   writes: []
 - operation: listTrainingRecords
   verb: GET
@@ -169,6 +233,18 @@ operations:
   writes:
   - cache:idempotency
   - workforce.attendance
+- operation: requestLeave
+  verb: POST
+  path: /leave-requests
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.leave_request
+  writes:
+  - workforce.leave_request
 - operation: requestShiftSwap
   verb: POST
   path: /rota-assignments/{assignmentId}/swap
@@ -185,6 +261,30 @@ operations:
   - approvals.request
   - cache:idempotency
   - workforce.shift_swap
+- operation: setShiftTemplate
+  verb: PUT
+  path: /shift-templates
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift_template
+  writes:
+  - workforce.shift_template
+- operation: setStaffingRules
+  verb: PUT
+  path: /staffing-rules
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.staffing_rules
+  writes:
+  - workforce.staffing_rules
 - operation: updateRotaAssignment
   verb: PATCH
   path: /rota-assignments/{assignmentId}
@@ -199,3 +299,13 @@ operations:
   writes:
   - cache:idempotency
   - workforce.rota_assignment
+- operation: validateWorkforceCompliance
+  verb: GET
+  path: /workforce-compliance
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []

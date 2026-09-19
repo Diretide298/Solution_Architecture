@@ -1,878 +1,240 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
+  "id": "BO-344",
+  "name": "Media Design Studio Command Center",
+  "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.1",
+   "page": 23
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "app": "venue-management-web",
+   "route": "/access-venue/media-design-studio-command-center-bo-344",
+   "component": "apps/venue-management-web/src/routes/access-venue/MediaDesignStudioCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "BO-100"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
+    "BO-100",
+    "BO-345",
+    "BO-346",
+    "BO-347",
+    "BO-348",
+    "BO-349",
+    "BO-350",
+    "BO-351",
+    "BO-352",
+    "BO-353"
    ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
+     "to": "BO-100",
+     "trigger": "Venue Home",
      "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
+      "venueId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "to": "BO-345",
+     "trigger": "Works in Digital QR & Barcode Ticket Designer",
+     "provenance": "flow F169 step 1→2",
+     "operation": "listMediaDesign"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "BO-346",
+     "trigger": "Works in PDF, Printable & POS Ticket Designer",
+     "provenance": "flow F169 step 3→4",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-347",
+     "trigger": "Works in Apple Wallet Pass Designer",
+     "provenance": "flow F169 step 5→6",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-348",
+     "trigger": "Works in Google Wallet Pass Designer",
+     "provenance": "flow F169 step 7→8",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-349",
+     "trigger": "Works in RFID, NFC, Card & Wristband Media Designer",
+     "provenance": "flow F169 step 9→10",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-350",
+     "trigger": "Works in Digital Card, Membership & Wearable Designer",
+     "provenance": "flow F169 step 11→12",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-351",
+     "trigger": "Works in Dynamic Fields, Data Mapping & Content Builder",
+     "provenance": "flow F169 step 13→14",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-352",
+     "trigger": "Works in Branding, Localization & Template Inheritance",
+     "provenance": "flow F169 step 15→16",
+     "operation": "listMediaDesign"
+    },
+    {
+     "to": "BO-353",
+     "trigger": "Works in Multi-Media Preview, Testing, Approval & Publication",
+     "provenance": "flow F169 step 17→18",
+     "operation": "listMediaDesign"
     }
    ]
   },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population",
+  "purpose": "Provide administrators with the central workspace for creating and managing all ticket and credential media templates. This should be the entry point for the entire no-code Media Design Studio.",
+  "purposeNote": "Administrators can locate, create and manage every ticket-media template from one centralized Media Design Studio.",
   "gaps": [
    {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Duplicate Existing, Import supported template definition. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+   },
+   {
+    "operation": null,
+    "why": "**Media Design Studio Command Center declares no operation that writes anything** — its only declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {
-   "template": "split",
+   "template": "dashboard",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Media Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.totalMediaTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Published",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.published"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.draft"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approval",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.pendingApproval"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.scheduled"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Archived",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.archived"
+      },
+      {
+       "kind": "metricTile",
+       "label": "QR / Digital Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.qrDigitalTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "PDF / Print Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.pdfPrintTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Apple Wallet Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.appleWalletTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Google Wallet Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.googleWalletTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "RFID / NFC Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.rfidNfcTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Card / Wristband Templates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.cardWristbandTemplates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Templates Requiring Review",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.templatesRequiringReview"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Templates with Validation Errors",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Display",
+       "bindsTo": "MediaDesignStudioCommandCenterView.templatesWithValidationErrors"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
+       "label": "Every media design",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "MediaDesignStudioCommandCenterView.templateId",
+        "MediaDesignStudioCommandCenterView.templateName",
+        "MediaDesignStudioCommandCenterView.mediaType",
+        "MediaDesignStudioCommandCenterView.brand",
+        "MediaDesignStudioCommandCenterView.venue",
+        "MediaDesignStudioCommandCenterView.productEventAssociation",
+        "MediaDesignStudioCommandCenterView.language",
+        "MediaDesignStudioCommandCenterView.version",
+        "MediaDesignStudioCommandCenterView.effectiveFrom",
+        "MediaDesignStudioCommandCenterView.effectiveTo",
+        "MediaDesignStudioCommandCenterView.status",
+        "MediaDesignStudioCommandCenterView.owner",
+        "MediaDesignStudioCommandCenterView.lastModified"
        ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "bindsTo": "MediaDesignStudioCommandCenterView",
+       "operation": "listMediaDesign",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Each template should show"
       }
      ]
     },
@@ -882,28 +244,25 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
+       "label": "The selected media design",
+       "bindsTo": "MediaDesignStudioCommandCenterView",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
+        "MediaDesignStudioCommandCenterView.templateId",
+        "MediaDesignStudioCommandCenterView.templateName",
+        "MediaDesignStudioCommandCenterView.mediaType",
+        "MediaDesignStudioCommandCenterView.brand",
+        "MediaDesignStudioCommandCenterView.venue",
+        "MediaDesignStudioCommandCenterView.productEventAssociation",
+        "MediaDesignStudioCommandCenterView.language",
+        "MediaDesignStudioCommandCenterView.version",
+        "MediaDesignStudioCommandCenterView.effectiveFrom",
+        "MediaDesignStudioCommandCenterView.effectiveTo",
+        "MediaDesignStudioCommandCenterView.status",
+        "MediaDesignStudioCommandCenterView.owner",
+        "MediaDesignStudioCommandCenterView.lastModified"
        ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+       "notes": "The pack groups this record's detail under its own headings: “Primary action”, “Digital”, “Print”, “Wallet”, “Physical”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Each template should show"
       }
      ]
     },
@@ -913,661 +272,1709 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "label": "Duplicate Existing",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Import supported template definition",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "loading": "The media design list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the media design untouched.",
+   "emptyFirstRun": "No media design yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the media design are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
+    "operationId": "listMediaDesign",
     "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
+    "purpose": "Media Design Studio Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
-   "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
-   ]
-  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-344"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 23. 27 of 27 labels bound to a contract property; 29 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "id": "BO-345",
+  "name": "Digital QR & Barcode Ticket Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.2",
+   "page": 24
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "venue-management-web",
+   "route": "/access-venue/digital-qr-barcode-ticket-designer-bo-345",
+   "component": "apps/venue-management-web/src/routes/access-venue/DigitalQrBarcodeTicketDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "BO-344"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "BO-344"
    ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 2→3",
+     "operation": "setDigitalBarcodeTicket"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Barcode Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide a visual no-code designer specifically for digital QR and barcode tickets.",
+  "purposeNote": "Authorized administrators can visually design and configure customer-facing QR/barcode tickets without development.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "fields",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "selectField",
+       "label": "Static QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
+       "kind": "selectField",
+       "label": "Dynamic QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Signed QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tokenized QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Rotation behavior where supported",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Size",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Position",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quiet zone",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Error correction",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refresh behavior",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Barcode type",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Orientation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Human-readable value",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Hide/show encoded reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 24 §Configure"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "publish",
      "components": [
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "provenance": "contract operation setDigitalBarcodeTicket"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The digital barcode ticket configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the digital barcode ticket untouched.",
+   "emptyFirstRun": "No digital barcode ticket configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "setDigitalBarcodeTicket",
+    "contract": "access",
+    "purpose": "Digital QR & Barcode Ticket Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setDigitalBarcodeTicket"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-345"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-346",
+  "name": "PDF, Printable & POS Ticket Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.3",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
+   "component": "apps/venue-management-web/src/routes/access-venue/PdfPrintablePosTicketDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 4→5",
+     "operation": "setPdfPrintablePos"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Design tickets intended for printing, PDF generation, POS, box office and other physical/document outputs.",
+  "purposeNote": "and operational environments.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Thermal ticket. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Orientation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Margins",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Header",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Footer",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Background",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Logo",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Images",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Text",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dynamic fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR/barcode",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terms",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Perforation indicators where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Print-safe zones",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Printer profile",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "DPI",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Paper/stock type",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Thermal layout",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cut behavior",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Print margins",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supported printer integration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Configure/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Thermal ticket",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 26 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pdf printable pos configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the pdf printable pos untouched.",
+   "emptyFirstRun": "No pdf printable pos configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPdfPrintablePos",
+    "contract": "access",
+    "purpose": "PDF, Printable & POS Ticket Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPdfPrintablePos"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-346"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-347",
+  "name": "Apple Wallet Pass Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.4",
+   "page": 27
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/apple-wallet-pass-designer-bo-347",
+   "component": "apps/venue-management-web/src/routes/access-venue/AppleWalletPassDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 6→7",
+     "operation": "setAppleWalletPass"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Pass Configuration; Configure the appropriate; Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Provide an Apple Wallet-specific configuration experience for eligible TICVAI credentials. This should not simply be a PDF ticket rendered inside a wallet.",
+  "purposeNote": "Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI Virtual Tickets using supported wallet capabilities.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Pass identity",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Organization",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Logo",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Icon",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Images where supported",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Background appearance",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Foreground appearance",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Label appearance",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Primary fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Secondary fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Auxiliary fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Header fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Back fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Pass Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure the appropriate"
+      },
+      {
+       "kind": "selectField",
+       "label": "Barcode",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure the appropriate"
+      },
+      {
+       "kind": "selectField",
+       "label": "Token/reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure the appropriate"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dynamic updates",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event changes",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seat changes",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket status changes",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Relevant notification/update behavior",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      },
+      {
+       "kind": "textField",
+       "label": "Revocation/invalidation behavior where supported",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 27 §Configure/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setAppleWalletPass"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The apple wallet pass configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the apple wallet pass untouched.",
+   "emptyFirstRun": "No apple wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAppleWalletPass",
+    "contract": "access",
+    "purpose": "Apple Wallet Pass Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setAppleWalletPass"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-347"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 24 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-348",
+  "name": "Google Wallet Pass Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.5",
+   "page": 29
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/google-wallet-pass-designer-bo-348",
+   "component": "apps/venue-management-web/src/routes/access-venue/GoogleWalletPassDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 8→9",
+     "operation": "setGoogleWalletPass"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure supported; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Provide a dedicated Google Wallet configuration environment.",
+  "purposeNote": "Administrators can independently configure and govern Google Wallet ticket presentations while retaining the same underlying Virtual Ticket architecture.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Venue change, Ticket status change, Relevant ticket information changes. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Pass class/template",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issuer",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Title",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Logo",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "textField",
+       "label": "Hero/image assets where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event information",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date/time",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket holder",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seat",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket type",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Custom fields",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Links",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "Additional information",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure supported"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Barcode",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Credential/token reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue change",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ticket status change",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Relevant ticket information changes",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 29 §Support/reference updates such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The google wallet pass configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the google wallet pass untouched.",
+   "emptyFirstRun": "No google wallet pass configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setGoogleWalletPass",
+    "contract": "access",
+    "purpose": "Google Wallet Pass Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setGoogleWalletPass"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-348"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 21 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-349",
+  "name": "RFID, NFC, Card & Wristband Media Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.6",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/rfid-nfc-card-wristband-media-designer-bo-349",
+   "component": "apps/venue-management-web/src/routes/access-venue/RfidNfcCardWristbandMediaDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 10→11",
+     "operation": "setRfidNfcCard"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Configure both the visual and technical profile of physical electronic credentials. This is important because RFID/NFC media are not merely artwork.",
+  "purposeNote": "cards, wristbands and supported wearable media.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Membership Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Media dimensions",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Front",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Back",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Printable area",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Logo",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer name",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Photo",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership tier",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Serial number",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR/barcode if combined",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Custom artwork",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sponsor/venue branding",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "RFID/NFC technology",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Chip/profile",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "UID/reference handling",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Encoding profile",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reader compatibility",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Printer/encoder integration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Configure/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Membership Card",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 30 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rfid nfc card configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the rfid nfc card untouched.",
+   "emptyFirstRun": "No rfid nfc card configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRfidNfcCard",
+    "contract": "access",
+    "purpose": "RFID, NFC, Card & Wristband Media Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setRfidNfcCard"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-349"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 21 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-350",
+  "name": "Digital Card, Membership & Wearable Designer",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.7",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/digital-card-membership-wearable-designer-bo-350",
+   "component": "apps/venue-management-web/src/routes/access-venue/DigitalCardMembershipWearableDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 12→13",
+     "operation": "setDigitalCardMembership"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Provide specialized configuration for persistent credentials that may represent longer-lived relationships rather than a single event ticket.",
+  "purposeNote": "templates linked to persistent Virtual Tickets or applicable entitlement identities.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Card artwork",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Member photograph",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Member name",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership number",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tier",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "QR/barcode",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Benefits summary",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dynamic messaging",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Membership types",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 31 §Support different"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital card membership configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the digital card membership untouched.",
+   "emptyFirstRun": "No digital card membership configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setDigitalCardMembership",
+    "contract": "access",
+    "purpose": "Digital Card, Membership & Wearable Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setDigitalCardMembership"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-350"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-351",
+  "name": "Dynamic Fields, Data Mapping & Content Builder",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.8",
+   "page": 32
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/dynamic-fields-data-mapping-content-builder-bo-351",
+   "component": "apps/venue-management-web/src/routes/access-venue/DynamicFieldsDataMappingContentBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 14→15",
+     "operation": "setDynamicFieldData"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Custom Fields; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Create a centralized reusable field library so development team does not hard-code ticket fields separately into every media designer. This is another important architecture screen.",
+  "purposeNote": "All media designers consume a governed reusable field/data-mapping framework rather than independently hard-coding ticket information.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Date formats",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time formats",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Number formatting",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Text transformation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Character limit",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Conditional visibility",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 32 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setDynamicFieldData"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The dynamic fields data configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the dynamic fields data untouched.",
+   "emptyFirstRun": "No dynamic fields data configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setDynamicFieldData",
+    "contract": "access",
+    "purpose": "Dynamic Fields, Data Mapping & Content Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setDynamicFieldData"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-351"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 7 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-352",
+  "name": "Branding, Localization & Template Inheritance",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.9",
+   "page": 34
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/branding-localization-template-inheritance-bo-352",
+   "component": "apps/venue-management-web/src/routes/access-venue/BrandingLocalizationTemplateInheritance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-344",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F169 step 16→17",
+     "operation": "listBrandingLocalizationTemplate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Allow TICVAI's multi-tenant clients to control branding and localization without rebuilding every ticket template.",
+  "purposeNote": "controlled inheritance and media-specific overrides.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every branding localization template",
+       "columns": [
+        "BrandingLocalizationTemplateInheritanceView.sourceLanguage",
+        "BrandingLocalizationTemplateInheritanceView.translation",
+        "BrandingLocalizationTemplateInheritanceView.translationStatus",
+        "BrandingLocalizationTemplateInheritanceView.reviewer",
+        "BrandingLocalizationTemplateInheritanceView.approval",
+        "BrandingLocalizationTemplateInheritanceView.version"
+       ],
+       "bindsTo": "BrandingLocalizationTemplateInheritanceView",
+       "operation": "listBrandingLocalizationTemplate",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected branding localization template",
+       "bindsTo": "BrandingLocalizationTemplateInheritanceView",
+       "columns": [
+        "BrandingLocalizationTemplateInheritanceView.sourceLanguage",
+        "BrandingLocalizationTemplateInheritanceView.translation",
+        "BrandingLocalizationTemplateInheritanceView.translationStatus",
+        "BrandingLocalizationTemplateInheritanceView.reviewer",
+        "BrandingLocalizationTemplateInheritanceView.approval",
+        "BrandingLocalizationTemplateInheritanceView.version"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Tenant / Corporate”, “Brand”, “Venue”, “Event”, “Product”, “Inheritance Example”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Track"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Additional configured languages",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 34 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The branding localization template list.",
+   "error": "Could not load. Names which read failed and leaves the branding localization template untouched.",
+   "emptyFirstRun": "No branding localization template yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the branding localization template are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBrandingLocalizationTemplate",
+    "contract": "access",
+    "purpose": "Branding, Localization & Template Inheritance",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "BrandingLocalizationTemplateInheritanceView.sourceLanguage",
+    "BrandingLocalizationTemplateInheritanceView.translation",
+    "BrandingLocalizationTemplateInheritanceView.translationStatus",
+    "BrandingLocalizationTemplateInheritanceView.reviewer",
+    "BrandingLocalizationTemplateInheritanceView.approval",
+    "BrandingLocalizationTemplateInheritanceView.version"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-352"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 16 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-353",
+  "name": "Multi-Media Preview, Testing, Approval & Publication",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "2",
+   "number": "15.2.10",
+   "page": 36
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/multi-media-preview-testing-approval-publication-bo-353",
+   "component": "apps/venue-management-web/src/routes/access-venue/MultiMediaPreviewTestingApprovalPublication.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-344"
+   ],
+   "exitTo": [
+    "BO-344"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-344, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the final quality and governance gate before any media template becomes operational. This should be a particularly visual screen. Board 1 established the Virtual Ticket as the authoritative ticket identity and the one- Virtual-Ticket-to-many-media architecture. Board 2 established how administrators design and configure each media type. Board 3 manages what happens to the actual credential instances in production after a Virtual Ticket has been created.",
+  "purposeNote": "Administrators can preview, test, approve, version and publish every supported ticket-media configuration before it becomes available for production issuance. Board 2 — Final Screen Register",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish Now",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-media preview testing list.",
+   "error": "Could not load. Names which read failed and leaves the multi-media preview testing untouched.",
+   "emptyFirstRun": "No multi-media preview testing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the multi-media preview testing are still there. The pack's own statuses are if Required → Expire → Audit — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveMultiMediaPreview",
+    "contract": "access",
+    "purpose": "Multi-Media Preview, Testing, Approval & Publication",
+    "trigger": "onAction",
+    "invalidates": [
+     "approveMultiMediaPreview"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-353"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 3 of 126 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

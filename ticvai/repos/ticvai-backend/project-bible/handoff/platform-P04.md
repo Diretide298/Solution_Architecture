@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 166 |
+| Operations with no screen | 124 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 166 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -38,11 +38,8 @@
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `getUnifiedReconciliation` | finance | GET | Every money source against the ledger, in one view |
 | `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
-| `recordDeposit` | finance | POST | Money taken before the sale is complete |
-| `recordSettlement` | finance | POST | One entity paid another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
@@ -60,7 +57,10 @@
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| … | | | 126 more |
+| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
+| `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
+| … | | | 84 more |
 
 ### 2 modules split across waves
 

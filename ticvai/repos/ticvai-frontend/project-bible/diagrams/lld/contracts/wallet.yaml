@@ -1,0 +1,386 @@
+id: LLD-wallet
+title: wallet — 33 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: RetailService
+operations:
+- operation: createCreditType
+  verb: POST
+  path: /credit-types
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.credit_type
+  writes:
+  - wallet.credit_type
+- operation: createSharedWallet
+  verb: POST
+  path: /shared-wallets
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.shared_wallet
+  writes:
+  - wallet.shared_wallet
+- operation: createVoucherType
+  verb: POST
+  path: /voucher-types
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.voucher_type
+  writes:
+  - wallet.voucher_type
+- operation: createWalletType
+  verb: POST
+  path: /wallet-types
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.wallet_type
+  writes:
+  - wallet.wallet_type
+- operation: expireCreditLots
+  verb: POST
+  path: /credit-lots/expire
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getCreditConsumptionPolicy
+  verb: GET
+  path: /credit-consumption-policy
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.consumption_policy
+  writes: []
+- operation: getWalletFundingRules
+  verb: GET
+  path: /wallet-funding-rules
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.funding_rules
+  writes: []
+- operation: getWalletLiability
+  verb: GET
+  path: /wallet-liability
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getWalletReconciliation
+  verb: GET
+  path: /wallet-reconciliation
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: linkWalletCredential
+  verb: POST
+  path: /wallet-credentials
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - wallet.credential
+  writes:
+  - wallet.credential
+- operation: listCreditLots
+  verb: GET
+  path: /credit-lots
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.credit_lot
+  writes: []
+- operation: listCreditTypes
+  verb: GET
+  path: /credit-types
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.credit_type
+  writes: []
+- operation: listSharedWallets
+  verb: GET
+  path: /shared-wallets
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.shared_wallet
+  writes: []
+- operation: listVoucherTypes
+  verb: GET
+  path: /voucher-types
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.voucher_type
+  writes: []
+- operation: listWalletDisputes
+  verb: GET
+  path: /wallet-disputes
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.dispute
+  writes: []
+- operation: listWalletTypes
+  verb: GET
+  path: /wallet-types
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.wallet_type
+  writes: []
+- operation: publishWalletConfiguration
+  verb: POST
+  path: /wallet-configuration/publish
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.configuration_version
+  writes: []
+- operation: raiseWalletDispute
+  verb: POST
+  path: /wallet-disputes
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.dispute
+  writes:
+  - wallet.dispute
+- operation: reverseWalletFunding
+  verb: POST
+  path: /wallet-funding/reversals
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.adjustment
+  writes: []
+- operation: setCreditConsumptionPolicy
+  verb: PUT
+  path: /credit-consumption-policy
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.consumption_policy
+  writes:
+  - wallet.consumption_policy
+- operation: setCreditEligibilityRules
+  verb: PUT
+  path: /credit-types/{creditTypeId}/eligibility
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.credit_eligibility
+  writes:
+  - wallet.credit_eligibility
+- operation: setGiftCardProduct
+  verb: PUT
+  path: /gift-card-products
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.gift_card_product
+  writes:
+  - wallet.gift_card_product
+- operation: setSharedWalletMembers
+  verb: PUT
+  path: /shared-wallets/{sharedWalletId}/members
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.shared_wallet_member
+  writes:
+  - wallet.shared_wallet_member
+- operation: setWalletAccountingMapping
+  verb: PUT
+  path: /wallet-accounting
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.accounting_mapping
+  writes:
+  - wallet.accounting_mapping
+- operation: setWalletChannelRules
+  verb: PUT
+  path: /wallet-channel-rules
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.channel_rules
+  writes:
+  - wallet.channel_rules
+- operation: setWalletFundingRules
+  verb: PUT
+  path: /wallet-funding-rules
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.funding_rules
+  writes:
+  - wallet.funding_rules
+- operation: setWalletRefundPolicy
+  verb: PUT
+  path: /wallet-refund-policy
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.refund_policy
+  writes:
+  - wallet.refund_policy
+- operation: setWalletRestriction
+  verb: POST
+  path: /wallet-restrictions
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.restriction
+  writes:
+  - wallet.restriction
+- operation: setWalletRiskRules
+  verb: PUT
+  path: /wallet-risk-rules
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.risk_rules
+  writes:
+  - wallet.risk_rules
+- operation: setWalletTransferRules
+  verb: PUT
+  path: /wallet-transfer-rules
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.transfer_rules
+  writes:
+  - wallet.transfer_rules
+- operation: simulateCreditConsumption
+  verb: POST
+  path: /credit-consumption/simulate
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: updateCreditType
+  verb: PUT
+  path: /credit-types/{creditTypeId}
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.credit_type
+  writes:
+  - wallet.credit_type
+- operation: updateWalletType
+  verb: PUT
+  path: /wallet-types/{walletTypeId}
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.wallet_type
+  writes:
+  - wallet.wallet_type

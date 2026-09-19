@@ -9,10 +9,18 @@
 | Contracts | 16 |
 | Modules | 16 |
 | Undrawn | 0 |
-| Operations with no screen | 0 |
+| Operations with no screen | 1 |
 | Waves | wave1 20 · wave2 35 · wave3 16 |
 
 ## Gaps
+
+### 1 operations with no screen here
+
+**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
+
+| Operation | Contract | | |
+|---|---|---|---|
+| `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ### 6 modules split across waves
 

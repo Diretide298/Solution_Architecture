@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 27 operations
+title: tenancy — 38 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -80,6 +80,28 @@ operations:
   - cache:idempotency
   - platform.profile_deployment
   - platform.workstation
+- operation: enrolDevice
+  verb: POST
+  path: /devices/{deviceId}/enrolment
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  writes: []
+- operation: getDeviceTelemetry
+  verb: GET
+  path: /devices/{deviceId}/telemetry
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_telemetry
+  writes: []
 - operation: getOrgUnit
   verb: GET
   path: /org-units/{orgUnitId}
@@ -143,6 +165,17 @@ operations:
   - platform.device_heartbeat
   - platform.workstation
   writes: []
+- operation: issueDeviceCredential
+  verb: POST
+  path: /devices/{deviceId}/credentials
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_credential
+  writes: []
 - operation: listAuditRecords
   verb: GET
   path: /audit-records
@@ -158,6 +191,39 @@ operations:
   - platform.org_unit
   writes:
   - platform.audit_read
+- operation: listDeviceAuditRecords
+  verb: GET
+  path: /devices/{deviceId}/audit
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_audit
+  writes: []
+- operation: listDeviceFirmware
+  verb: GET
+  path: /device-firmware
+  scope: tenant
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_firmware
+  writes: []
+- operation: listDeviceTamperEvents
+  verb: GET
+  path: /device-tamper-events
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_tamper_event
+  writes: []
 - operation: listDevices
   verb: GET
   path: /devices
@@ -228,6 +294,18 @@ operations:
   - platform.device
   writes:
   - platform.device
+- operation: recordDeviceTamperEvent
+  verb: POST
+  path: /device-tamper-events
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - tenancy.device_tamper_event
+  writes:
+  - tenancy.device_tamper_event
 - operation: registerDevice
   verb: POST
   path: /devices
@@ -242,6 +320,27 @@ operations:
   writes:
   - cache:idempotency
   - platform.device
+- operation: revokeDeviceCredential
+  verb: DELETE
+  path: /devices/{deviceId}/credentials
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: rollbackDeviceFirmware
+  verb: POST
+  path: /device-firmware/rollouts/{rolloutId}/rollback
+  scope: tenant
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_rollout
+  writes: []
 - operation: setConfigurationProfile
   verb: PUT
   path: /configuration-profiles
@@ -272,6 +371,18 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.connectivity_policy
+- operation: setDeviceAssignment
+  verb: PUT
+  path: /devices/{deviceId}/assignment
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_assignment
+  writes:
+  - tenancy.device_assignment
 - operation: setOfflinePolicy
   verb: PUT
   path: /offline-policy
@@ -321,6 +432,18 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.venue_settings
+- operation: startDeviceFirmwareRollout
+  verb: POST
+  path: /device-firmware/rollouts
+  scope: tenant
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.device_rollout
+  writes:
+  - tenancy.device_rollout
 - operation: updateOrgUnit
   verb: PATCH
   path: /org-units/{orgUnitId}

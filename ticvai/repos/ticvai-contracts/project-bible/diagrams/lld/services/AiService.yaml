@@ -459,6 +459,8 @@ screens:
 - P08:BO-093 Map Import & Labelling
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P08:BO-597 AI Configuration Workspace
+- P08:BO-598 AI Draft Review & Approval
 - P09:ADM-004 Platform Audit Log
 - P09:ADM-037 AI Provider & Credentials
 - P12:SUP-006 Knowledge Base Search

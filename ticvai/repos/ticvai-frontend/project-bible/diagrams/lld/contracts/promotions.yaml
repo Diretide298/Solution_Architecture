@@ -1,5 +1,5 @@
 id: LLD-promotions
-title: promotions — 131 operations
+title: promotions — 145 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -51,6 +51,17 @@ operations:
   writes:
   - cache:idempotency
   - promotions.coupon_code
+- operation: concludeRecommendationExperiment
+  verb: POST
+  path: /recommendation-experiments/{experimentId}/conclude
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_experiment
+  writes: []
 - operation: createBundle
   verb: POST
   path: /bundles
@@ -98,6 +109,30 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+- operation: createRecommendationExperiment
+  verb: POST
+  path: /recommendation-experiments
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_experiment
+  writes:
+  - promotions.recommendation_experiment
+- operation: createRecommendationStrategy
+  verb: POST
+  path: /recommendation-strategies
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_strategy
+  writes:
+  - promotions.recommendation_strategy
 - operation: createUpsellRule
   verb: POST
   path: /upsell-rules
@@ -171,6 +206,16 @@ operations:
   - promotions.promotion
   writes:
   - cache:idempotency
+- operation: explainRecommendation
+  verb: POST
+  path: /recommendations/explain
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: generateCouponCodes
   verb: POST
   path: /coupon-campaigns/{campaignId}/codes
@@ -211,6 +256,16 @@ operations:
   reads:
   - promotions.coupon_code
   writes: []
+- operation: getProductAffinity
+  verb: GET
+  path: /product-affinity
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getPromotion
   verb: GET
   path: /promotions/{promotionId}
@@ -235,6 +290,16 @@ operations:
   offline: false
   reads:
   - promotions.promotion
+  writes: []
+- operation: getRecommendationPerformance
+  verb: GET
+  path: /recommendation-performance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getRecommendations
   verb: POST
@@ -821,6 +886,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listProductRelationships
+  verb: GET
+  path: /product-relationships
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.product_relationship
+  writes: []
 - operation: listPromotionActivityVersion
   verb: GET
   path: /promotion-activity-version
@@ -943,6 +1019,28 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listRecommendationExperiments
+  verb: GET
+  path: /recommendation-experiments
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_experiment
+  writes: []
+- operation: listRecommendationStrategies
+  verb: GET
+  path: /recommendation-strategies
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_strategy
   writes: []
 - operation: listRedemption
   verb: GET
@@ -1180,6 +1278,18 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+- operation: recordRecommendationOutcome
+  verb: POST
+  path: /recommendations/outcomes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads: []
+  writes:
+  - promotions.recommendation_outcome
 - operation: redeemVoucher
   verb: POST
   path: /vouchers/{voucherCode}/redeem
@@ -1304,6 +1414,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setProductRelationships
+  verb: PUT
+  path: /product-relationships
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.product_relationship
+  writes:
+  - promotions.product_relationship
 - operation: setPromotionRule
   verb: PUT
   path: /promotion-rule
@@ -1338,6 +1460,18 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+- operation: setRecommendationSuppression
+  verb: PUT
+  path: /recommendation-suppressions
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_suppression
+  writes:
+  - promotions.recommendation_suppression
 - operation: setRuleTestRecommendation
   verb: PUT
   path: /rule-test-recommendation
@@ -1372,6 +1506,17 @@ operations:
   - orders.sales_order
   - promotions.promotion
   writes: []
+- operation: simulateRecommendationStrategy
+  verb: POST
+  path: /recommendation-simulations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - promotions.recommendation_strategy
 - operation: unschedulePromotion
   verb: POST
   path: /promotions/{promotionId}/unschedule
@@ -1420,6 +1565,18 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+- operation: updateRecommendationStrategy
+  verb: PUT
+  path: /recommendation-strategies/{strategyId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.recommendation_strategy
+  writes:
+  - promotions.recommendation_strategy
 - operation: voidCouponCode
   verb: POST
   path: /coupon-codes/{code}/void

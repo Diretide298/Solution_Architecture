@@ -1,77 +1,110 @@
 [
  {
-  "id": "WEB-016",
-  "name": "Login / Register",
-  "module": "Account & Self-Service",
+  "id": "BO-274",
+  "name": "Group Booking Operations Command Center",
+  "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C36",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.1",
+   "page": 20
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "app": "venue-management-web",
+   "route": "/sell/group-booking-operations-command-center-bo-274",
+   "component": "apps/venue-management-web/src/routes/sell/GroupBookingOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "BO-100"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-017",
-    "WEB-018",
-    "WEB-019"
+    "BO-100",
+    "BO-275",
+    "BO-276",
+    "BO-277",
+    "BO-278",
+    "BO-279",
+    "BO-280",
+    "BO-281",
+    "BO-282",
+    "BO-283"
    ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
+     "to": "BO-100",
+     "trigger": "Venue Home",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "venueId"
      ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
     },
     {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "BO-275",
+     "trigger": "Works in Group Operational Planning & Task Workspace",
+     "provenance": "flow F137 step 1→2",
+     "operation": "listGroupBooking"
     },
     {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+     "to": "BO-276",
+     "trigger": "Works in Participants, Guest Lists & Group Structure",
+     "provenance": "flow F137 step 3→4",
+     "operation": "listGroupBooking"
     },
     {
-     "to": "GST-039",
-     "trigger": "They set a profile",
-     "provenance": "flow F56 step 3→4",
-     "crossesDevice": true,
-     "back": false
+     "to": "BO-277",
+     "trigger": "Works in Group Payment, Deposit & Balance Management",
+     "provenance": "flow F137 step 5→6",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-278",
+     "trigger": "Works in Group Ticket, Seat & Entitlement Allocation",
+     "provenance": "flow F137 step 7→8",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-279",
+     "trigger": "Works in Group Ticket Fulfillment & Distribution",
+     "provenance": "flow F137 step 9→10",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-280",
+     "trigger": "Works in Group Arrival, Check-In & Admission Operations",
+     "provenance": "flow F137 step 11→12",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-281",
+     "trigger": "Works in Group Amendments, Cancellation & Refund Operations",
+     "provenance": "flow F137 step 13→14",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-282",
+     "trigger": "Works in Group Booking Reconciliation, Closure & Performance",
+     "provenance": "flow F137 step 15→16",
+     "operation": "listGroupBooking"
+    },
+    {
+     "to": "BO-283",
+     "trigger": "Works in Group Sales Analytics & AI Intelligence Center",
+     "provenance": "flow F137 step 17→18",
+     "operation": "listGroupBooking"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide Operations with a real-time command center for all confirmed and upcoming group bookings.",
+  "purposeNote": "Operations can identify every upcoming group, its readiness and outstanding actions from one centralized workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -81,20 +114,38 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every login register",
-       "bindsTo": "MfaMethod",
+       "label": "Every group booking operations",
        "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
+        "GroupBookingOperationsCommandCenterView.upcomingGroups",
+        "GroupBookingOperationsCommandCenterView.groupsToday",
+        "GroupBookingOperationsCommandCenterView.expectedGuestsToday",
+        "GroupBookingOperationsCommandCenterView.groupsAwaitingDeposit",
+        "GroupBookingOperationsCommandCenterView.guestListsPending",
+        "GroupBookingOperationsCommandCenterView.ticketsPending",
+        "GroupBookingOperationsCommandCenterView.resourcesPending",
+        "GroupBookingOperationsCommandCenterView.groupsReady",
+        "GroupBookingOperationsCommandCenterView.groupsWithIssues",
+        "GroupBookingOperationsCommandCenterView.outstandingPayments",
+        "GroupBookingOperationsCommandCenterView.checkInsToday",
+        "GroupBookingOperationsCommandCenterView.completedGroups",
+        "GroupBookingOperationsCommandCenterView.groupBookingId",
+        "GroupBookingOperationsCommandCenterView.organization",
+        "GroupBookingOperationsCommandCenterView.groupType",
+        "GroupBookingOperationsCommandCenterView.venueEvent",
+        "GroupBookingOperationsCommandCenterView.visitDate",
+        "GroupBookingOperationsCommandCenterView.arrivalTime",
+        "GroupBookingOperationsCommandCenterView.guests",
+        "GroupBookingOperationsCommandCenterView.bookingValue",
+        "GroupBookingOperationsCommandCenterView.paymentStatus",
+        "GroupBookingOperationsCommandCenterView.guestListStatus",
+        "GroupBookingOperationsCommandCenterView.ticketStatus",
+        "GroupBookingOperationsCommandCenterView.resourceStatus",
+        "GroupBookingOperationsCommandCenterView.readiness",
+        "GroupBookingOperationsCommandCenterView.operationalOwner"
        ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+       "bindsTo": "GroupBookingOperationsCommandCenterView",
+       "operation": "listGroupBooking",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 20 §Display"
       }
      ]
     },
@@ -104,1470 +155,1607 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected login register",
-       "bindsTo": "GuestSession",
+       "label": "The selected group booking operations",
+       "bindsTo": "GroupBookingOperationsCommandCenterView",
        "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
+        "GroupBookingOperationsCommandCenterView.upcomingGroups",
+        "GroupBookingOperationsCommandCenterView.groupsToday",
+        "GroupBookingOperationsCommandCenterView.expectedGuestsToday",
+        "GroupBookingOperationsCommandCenterView.groupsAwaitingDeposit",
+        "GroupBookingOperationsCommandCenterView.guestListsPending",
+        "GroupBookingOperationsCommandCenterView.ticketsPending",
+        "GroupBookingOperationsCommandCenterView.resourcesPending",
+        "GroupBookingOperationsCommandCenterView.groupsReady",
+        "GroupBookingOperationsCommandCenterView.groupsWithIssues",
+        "GroupBookingOperationsCommandCenterView.outstandingPayments",
+        "GroupBookingOperationsCommandCenterView.checkInsToday",
+        "GroupBookingOperationsCommandCenterView.completedGroups",
+        "GroupBookingOperationsCommandCenterView.groupBookingId",
+        "GroupBookingOperationsCommandCenterView.organization",
+        "GroupBookingOperationsCommandCenterView.groupType",
+        "GroupBookingOperationsCommandCenterView.venueEvent",
+        "GroupBookingOperationsCommandCenterView.visitDate",
+        "GroupBookingOperationsCommandCenterView.arrivalTime",
+        "GroupBookingOperationsCommandCenterView.guests",
+        "GroupBookingOperationsCommandCenterView.bookingValue",
+        "GroupBookingOperationsCommandCenterView.paymentStatus",
+        "GroupBookingOperationsCommandCenterView.guestListStatus",
+        "GroupBookingOperationsCommandCenterView.ticketStatus",
+        "GroupBookingOperationsCommandCenterView.resourceStatus",
+        "GroupBookingOperationsCommandCenterView.readiness",
+        "GroupBookingOperationsCommandCenterView.operationalOwner"
        ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestSocialLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/social"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestUaePassLogin",
-       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Link",
-       "operation": "linkGuestCheckout",
-       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
-       "operation": "refreshToken",
-       "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim",
-       "operation": "claimCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   }
-  ],
-  "states": {
-   "loading": "The login register list.",
-   "error": "Could not load. Names which read failed and leaves the login register untouched.",
-   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
-  },
-  "apis": [
-   {
-    "operationId": "registerGuest",
-    "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "guestLogout",
-    "contract": "identity",
-    "purpose": "End a guest session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestSocialLogin",
-    "contract": "identity",
-    "purpose": "Sign in with Apple or Google",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "guestUaePassLogin",
-    "contract": "identity",
-    "purpose": "Sign in with a national identity provider",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "linkGuestCheckout",
-    "contract": "identity",
-    "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "refreshToken",
-    "contract": "identity",
-    "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "requestGuestOtp",
-    "contract": "identity",
-    "purpose": "Request a one-time code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestOtp",
-    "contract": "identity",
-    "purpose": "Verify a one-time code and issue a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Complete a step-up challenge",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "claimCart",
-    "contract": "orders",
-    "purpose": "Attach an anonymous cart to a guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Second factor at sign-in",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "cartId",
-     "from": "session"
-    },
-    {
-     "name": "challengeId",
-     "from": "deepLink"
-    },
-    {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-016"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-017",
-  "name": "My Account Dashboard",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-018",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
-  "density": "compact",
-  "boardFrames": [
-   "Dashboards Board.dc.html#web-017"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected account",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-   }
-  ],
-  "states": {
-   "loading": "Tiles skeleton",
-   "error": "Partial. Each tile fails independently",
-   "emptyFirstRun": "A new account with no orders — offers what to do next",
-   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Outstanding security challenges",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "respondToInvitation",
-    "contract": "marketing-crm",
-    "purpose": "Accept or decline an invitation",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
-     "name": "subjectId",
-     "from": "session"
-    },
-    {
-     "name": "token",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
-   "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-017",
-   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-018",
-  "name": "My Tickets",
-  "module": "Account & Self-Service",
-  "requiresModule": "access",
-  "wave": 1,
-  "capability": "C09",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-019"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-019",
-     "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
-       ],
-       "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected tickets",
-       "bindsTo": "Entitlement",
-       "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
-        "Entitlement.lastEntryAt"
-       ],
-       "operation": "getEntitlement",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMyEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "notes": "The pack groups this record's detail under its own headings: “Use”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 20 §Display"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Tickets load",
-   "error": "Could not load",
-   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "loading": "The group booking operations list.",
+   "error": "Could not load. Names which read failed and leaves the group booking operations untouched.",
+   "emptyFirstRun": "No group booking operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group booking operations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listMyEntitlements",
-    "contract": "access",
-    "purpose": "Every ticket, pass and membership this guest holds",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlement",
-    "contract": "access",
-    "purpose": "One entitlement, with what remains on it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementCredential",
-    "contract": "access",
-    "purpose": "The thing that gets scanned",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getEntitlementHistory",
-    "contract": "access",
-    "purpose": "Every scan, freeze, share and reissue against it",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEntitlements",
-    "contract": "access",
-    "purpose": "Every entitlement this guest holds, including expired",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "transferOrderTickets",
+    "operationId": "listGroupBooking",
     "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyEntitlements"
-    ]
-   },
-   {
-    "operationId": "issueWalletPass",
-    "contract": "orders",
-    "purpose": "Add the ticket to a phone wallet from the desktop",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "shareEntitlement",
-    "contract": "orders",
-    "purpose": "Send a ticket to somebody",
-    "trigger": "onAction"
+    "purpose": "Group Booking Operations Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "entitlementId",
-     "from": "deepLink"
-    },
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "Entitlement.id",
-    "Entitlement.templateId",
-    "Entitlement.productId",
-    "Entitlement.orderId",
-    "Entitlement.orderLineId"
+    "GroupBookingOperationsCommandCenterView.upcomingGroups",
+    "GroupBookingOperationsCommandCenterView.groupsToday",
+    "GroupBookingOperationsCommandCenterView.expectedGuestsToday",
+    "GroupBookingOperationsCommandCenterView.groupsAwaitingDeposit",
+    "GroupBookingOperationsCommandCenterView.guestListsPending",
+    "GroupBookingOperationsCommandCenterView.ticketsPending"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-274"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 20. 26 of 26 labels bound to a contract property; 26 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "WEB-019",
-  "name": "Order History",
-  "module": "Account & Self-Service",
+  "id": "BO-275",
+  "name": "Group Operational Planning & Task Workspace",
+  "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C34",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.2",
+   "page": 22
+  },
   "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "app": "venue-management-web",
+   "route": "/sell/group-operational-planning-task-workspace-bo-275",
+   "component": "apps/venue-management-web/src/routes/sell/GroupOperationalPlanningTaskWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "BO-274"
    ],
-   "inferred": true,
    "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
+    "BO-274"
    ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 2→3",
+     "operation": "setGroupOperationalPlanning"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Convert the commercial booking into a detailed operational execution plan.",
+  "purposeNote": "Every confirmed group can be translated into a structured operational plan with owners, deadlines and dependencies.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "fields",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
-       ],
-       "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "selectField",
+       "label": "Arrival Date",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected order history",
-       "bindsTo": "Order",
-       "columns": [
-        "Order.id",
-        "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
-        "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
-       ],
-       "operation": "getOrder",
-       "provenance": "contract orders.yaml GET /orders/{orderId}"
+       "kind": "selectField",
+       "label": "Arrival Time",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Arrival Location",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Group Meeting Point",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Entry Gate",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Departure Time",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Group Size",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Group Leaders",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Contact Person",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticketing Method",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seating",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guides",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Catering",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transportation",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Parking",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Accessibility",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Equipment",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Special Requirements",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 22 §Configure/reference"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The order history list.",
-   "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
-  },
-  "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
-    "operationId": "listMyOrders",
-    "contract": "orders",
-    "purpose": "The orders this guest placed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getOrder",
-    "contract": "orders",
-    "purpose": "Read an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRefundRequest",
-    "contract": "orders",
-    "purpose": "Ask for a refund",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "orderId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
-   "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-019"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P01",
-   "audience": "guest",
-   "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
-   "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
-   "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
-    "shell": "web",
-    "siblings": [
-     "P02",
-     "P05"
-    ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "WEB-020",
-  "name": "Profile & Preferences",
-  "module": "Account & Self-Service",
-  "requiresModule": "marketing",
-  "wave": 1,
-  "capability": "C36",
-  "implementation": {
-   "app": "guest-web",
-   "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "WEB-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "WEB-001",
-    "WEB-016",
-    "WEB-017",
-    "WEB-018"
-   ],
-   "transitions": [
-    {
-     "to": "WEB-016",
-     "trigger": "Login / Register",
-     "carries": [
-      "cartId",
-      "challengeId",
-      "methodId",
-      "providerId"
-     ],
-     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-017",
-     "trigger": "My Account Dashboard",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-018",
-     "trigger": "My Tickets",
-     "carries": [
-      "entitlementId",
-      "orderId"
-     ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every profile preferences",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected profile preferences",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "publish",
      "components": [
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestEmail",
-       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "label": "Save my profile",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateMyProfile",
-       "provenance": "carried from the previous definition"
+       "provenance": "contract operation setGroupOperationalPlanning"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Profile and consents",
-   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
-   "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The group operational planning configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the group operational planning untouched.",
+   "emptyFirstRun": "No group operational planning configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
+    "operationId": "setGroupOperationalPlanning",
+    "contract": "orders",
+    "purpose": "Group Operational Planning & Task Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setGroupOperationalPlanning"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-275"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-276",
+  "name": "Participants, Guest Lists & Group Structure",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.3",
+   "page": 23
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/participants-guest-lists-group-structure-bo-276",
+   "component": "apps/venue-management-web/src/routes/sell/ParticipantsGuestListsGroupStructure.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 4→5",
+     "operation": "listParticipantGuestList"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Manage the people participating in the group where individual information is required.",
+  "purposeNote": "confirmed group quantity.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: CSV/Excel Import, Customer Upload. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every participants guest lists",
+       "columns": [
+        "Duplicate guest",
+        "ParticipantsGuestListsGroupStructureView.missingRequiredField",
+        "ParticipantsGuestListsGroupStructureView.invalidCategory",
+        "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
+        "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+        "Duplicate ticket assignment"
+       ],
+       "bindsTo": "ParticipantsGuestListsGroupStructureView",
+       "operation": "listParticipantGuestList",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected participants guest lists",
+       "bindsTo": "ParticipantsGuestListsGroupStructureView",
+       "columns": [
+        "Duplicate guest",
+        "ParticipantsGuestListsGroupStructureView.missingRequiredField",
+        "ParticipantsGuestListsGroupStructureView.invalidCategory",
+        "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
+        "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+        "Duplicate ticket assignment"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Named Guests”, “Quantity-Based”, “Hybrid”, “Where required”, “Privacy”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "CSV/Excel Import",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Customer Upload",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 23 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The participants guest lists list.",
+   "error": "Could not load. Names which read failed and leaves the participants guest lists untouched.",
+   "emptyFirstRun": "No participants guest lists yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the participants guest lists are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listParticipantGuestList",
+    "contract": "orders",
+    "purpose": "Participants, Guest Lists & Group Structure",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateMyProfile",
-    "contract": "marketing-crm",
-    "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "listConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "verifyGuestEmail",
-    "contract": "identity",
-    "purpose": "Send a verification link, or consume one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConsentPurposes"
-    ]
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "Change contact and consent preferences",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "subjectId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "Duplicate guest",
+    "ParticipantsGuestListsGroupStructureView.missingRequiredField",
+    "ParticipantsGuestListsGroupStructureView.invalidCategory",
+    "ParticipantsGuestListsGroupStructureView.guestCountMismatch",
+    "ParticipantsGuestListsGroupStructureView.ageTicketMismatch",
+    "Duplicate ticket assignment"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+   "board": "wireframes/P08 Venue Management.dc.html#bo-276"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 23. 4 of 6 labels bound to a contract property; 8 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P01",
-   "audience": "guest",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "Guest Web",
-   "name": "Guest Web — Storefront",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "offlineBanner": {
-    "kind": "banner",
-    "state": "warning",
-    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
-    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
-    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
-    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
-    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
-   },
-   "app": "guest-web",
-   "operator": "guest",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "guest",
-    "name": "TICVAI Guest",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P02",
-     "P05"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-277",
+  "name": "Group Payment, Deposit & Balance Management",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.4",
+   "page": 25
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-payment-deposit-balance-management-bo-277",
+   "component": "apps/venue-management-web/src/routes/sell/GroupPaymentDepositBalanceManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 6→7",
+     "operation": "listGroupPaymentDeposit"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Track the complete payment lifecycle of a group booking.",
+  "purposeNote": "Sales, Finance and Operations can understand exactly what has been paid, what remains due and whether payment conditions permit fulfillment.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Custom Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group payment deposit",
+       "columns": [
+        "GroupPaymentDepositBalanceManagementView.bookingValue",
+        "GroupPaymentDepositBalanceManagementView.depositRequired",
+        "GroupPaymentDepositBalanceManagementView.depositPaid",
+        "GroupPaymentDepositBalanceManagementView.balance",
+        "GroupPaymentDepositBalanceManagementView.amountPaid",
+        "GroupPaymentDepositBalanceManagementView.amountOutstanding",
+        "GroupPaymentDepositBalanceManagementView.nextDueDate",
+        "GroupPaymentDepositBalanceManagementView.paymentStatus"
+       ],
+       "bindsTo": "GroupPaymentDepositBalanceManagementView",
+       "operation": "listGroupPaymentDeposit",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group payment deposit",
+       "bindsTo": "GroupPaymentDepositBalanceManagementView",
+       "columns": [
+        "GroupPaymentDepositBalanceManagementView.bookingValue",
+        "GroupPaymentDepositBalanceManagementView.depositRequired",
+        "GroupPaymentDepositBalanceManagementView.depositPaid",
+        "GroupPaymentDepositBalanceManagementView.balance",
+        "GroupPaymentDepositBalanceManagementView.amountPaid",
+        "GroupPaymentDepositBalanceManagementView.amountOutstanding",
+        "GroupPaymentDepositBalanceManagementView.nextDueDate",
+        "GroupPaymentDepositBalanceManagementView.paymentStatus"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Payment Methods”, “Architecture”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Custom Schedule",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 25 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group payment deposit list.",
+   "error": "Could not load. Names which read failed and leaves the group payment deposit untouched.",
+   "emptyFirstRun": "No group payment deposit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group payment deposit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupPaymentDeposit",
+    "contract": "orders",
+    "purpose": "Group Payment, Deposit & Balance Management",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupPaymentDepositBalanceManagementView.bookingValue",
+    "GroupPaymentDepositBalanceManagementView.depositRequired",
+    "GroupPaymentDepositBalanceManagementView.depositPaid",
+    "GroupPaymentDepositBalanceManagementView.balance",
+    "GroupPaymentDepositBalanceManagementView.amountPaid",
+    "GroupPaymentDepositBalanceManagementView.amountOutstanding"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-277"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 25. 8 of 8 labels bound to a contract property; 9 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-278",
+  "name": "Group Ticket, Seat & Entitlement Allocation",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.5",
+   "page": 26
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-ticket-seat-entitlement-allocation-bo-278",
+   "component": "apps/venue-management-web/src/routes/sell/GroupTicketSeatEntitlementAllocation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 8→9",
+     "operation": "listGroupTicketSeat"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allocate the confirmed group inventory to individual guests, subgroups or quantity blocks.",
+  "purposeNote": "Every confirmed group entitlement can be correctly allocated without creating duplicate capacity or conflicting seat assignments.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Individual Ticket, Bulk Ticket, Named Ticket, Quantity-Based Ticket, Zone Allocation, VIP allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group ticket seat",
+       "columns": [
+        "GroupTicketSeatEntitlementAllocationView.product",
+        "GroupTicketSeatEntitlementAllocationView.quantityBooked",
+        "GroupTicketSeatEntitlementAllocationView.quantityAllocated",
+        "GroupTicketSeatEntitlementAllocationView.remaining",
+        "GroupTicketSeatEntitlementAllocationView.ticketType",
+        "GroupTicketSeatEntitlementAllocationView.seatZone",
+        "GroupTicketSeatEntitlementAllocationView.guestSubgroup",
+        "GroupTicketSeatEntitlementAllocationView.credentialStatus"
+       ],
+       "bindsTo": "GroupTicketSeatEntitlementAllocationView",
+       "operation": "listGroupTicketSeat",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group ticket seat",
+       "bindsTo": "GroupTicketSeatEntitlementAllocationView",
+       "columns": [
+        "GroupTicketSeatEntitlementAllocationView.product",
+        "GroupTicketSeatEntitlementAllocationView.quantityBooked",
+        "GroupTicketSeatEntitlementAllocationView.quantityAllocated",
+        "GroupTicketSeatEntitlementAllocationView.remaining",
+        "GroupTicketSeatEntitlementAllocationView.ticketType",
+        "GroupTicketSeatEntitlementAllocationView.seatZone",
+        "GroupTicketSeatEntitlementAllocationView.guestSubgroup",
+        "GroupTicketSeatEntitlementAllocationView.credentialStatus"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Reserved Seating”, “Assigned”, “Allocate associated”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Individual Ticket",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bulk Ticket",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Named Ticket",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity-Based Ticket",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zone Allocation",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "VIP allocation",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 26 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group ticket seat list.",
+   "error": "Could not load. Names which read failed and leaves the group ticket seat untouched.",
+   "emptyFirstRun": "No group ticket seat yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group ticket seat are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupTicketSeat",
+    "contract": "orders",
+    "purpose": "Group Ticket, Seat & Entitlement Allocation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupTicketSeatEntitlementAllocationView.product",
+    "GroupTicketSeatEntitlementAllocationView.quantityBooked",
+    "GroupTicketSeatEntitlementAllocationView.quantityAllocated",
+    "GroupTicketSeatEntitlementAllocationView.remaining",
+    "GroupTicketSeatEntitlementAllocationView.ticketType",
+    "GroupTicketSeatEntitlementAllocationView.seatZone"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-278"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 26. 8 of 8 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-279",
+  "name": "Group Ticket Fulfillment & Distribution",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.6",
+   "page": 27
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-ticket-fulfillment-distribution-bo-279",
+   "component": "apps/venue-management-web/src/routes/sell/GroupTicketFulfillmentDistribution.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 10→11",
+     "operation": "listGroupTicketFulfillment"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Control how tickets and other credentials are delivered to the group.",
+  "purposeNote": "maintaining complete ticket-to-guest traceability.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group ticket fulfillment",
+       "columns": [
+        "GroupTicketFulfillmentDistributionView.ticketsRequired",
+        "GroupTicketFulfillmentDistributionView.generated",
+        "GroupTicketFulfillmentDistributionView.sent",
+        "GroupTicketFulfillmentDistributionView.delivered",
+        "GroupTicketFulfillmentDistributionView.opened",
+        "GroupTicketFulfillmentDistributionView.downloaded",
+        "GroupTicketFulfillmentDistributionView.failed",
+        "GroupTicketFulfillmentDistributionView.reissued"
+       ],
+       "bindsTo": "GroupTicketFulfillmentDistributionView",
+       "operation": "listGroupTicketFulfillment",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group ticket fulfillment",
+       "bindsTo": "GroupTicketFulfillmentDistributionView",
+       "columns": [
+        "GroupTicketFulfillmentDistributionView.ticketsRequired",
+        "GroupTicketFulfillmentDistributionView.generated",
+        "GroupTicketFulfillmentDistributionView.sent",
+        "GroupTicketFulfillmentDistributionView.delivered",
+        "GroupTicketFulfillmentDistributionView.opened",
+        "GroupTicketFulfillmentDistributionView.downloaded",
+        "GroupTicketFulfillmentDistributionView.failed",
+        "GroupTicketFulfillmentDistributionView.reissued"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Central Distribution”, “Individual Distribution”, “Subgroup Distribution”, “Generate an operational manifest showing”, “Important Architecture”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Generate Tickets, Send, Resend, Print, Reissue, Change Delivery Method, Revoke where permitted. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Authorized users can"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group ticket fulfillment list.",
+   "error": "Could not load. Names which read failed and leaves the group ticket fulfillment untouched.",
+   "emptyFirstRun": "No group ticket fulfillment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group ticket fulfillment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupTicketFulfillment",
+    "contract": "orders",
+    "purpose": "Group Ticket Fulfillment & Distribution",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupTicketFulfillmentDistributionView.ticketsRequired",
+    "GroupTicketFulfillmentDistributionView.generated",
+    "GroupTicketFulfillmentDistributionView.sent",
+    "GroupTicketFulfillmentDistributionView.delivered",
+    "GroupTicketFulfillmentDistributionView.opened",
+    "GroupTicketFulfillmentDistributionView.downloaded"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-279"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 27. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-280",
+  "name": "Group Arrival, Check-In & Admission Operations",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.7",
+   "page": 29
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-arrival-check-in-admission-operations-bo-280",
+   "component": "apps/venue-management-web/src/routes/sell/GroupArrivalCheckInAdmissionOperations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 12→13",
+     "operation": "listGroupArrivalCheck"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Manage the physical arrival and admission of large groups efficiently.",
+  "purposeNote": "Operations can process large group arrivals efficiently while preserving accurate admission and headcount records.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group arrival check-in",
+       "columns": [
+        "GroupArrivalCheckInAdmissionOperationsView.groupsExpectedToday",
+        "GroupArrivalCheckInAdmissionOperationsView.arrivalTime",
+        "GroupArrivalCheckInAdmissionOperationsView.actualArrival",
+        "GroupArrivalCheckInAdmissionOperationsView.groupSize",
+        "GroupArrivalCheckInAdmissionOperationsView.checkedIn",
+        "GroupArrivalCheckInAdmissionOperationsView.remaining",
+        "GroupArrivalCheckInAdmissionOperationsView.gate",
+        "GroupArrivalCheckInAdmissionOperationsView.groupLeader",
+        "GroupArrivalCheckInAdmissionOperationsView.readiness",
+        "GroupArrivalCheckInAdmissionOperationsView.issues"
+       ],
+       "bindsTo": "GroupArrivalCheckInAdmissionOperationsView",
+       "operation": "listGroupArrivalCheck",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 29 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group arrival check-in",
+       "bindsTo": "GroupArrivalCheckInAdmissionOperationsView",
+       "columns": [
+        "GroupArrivalCheckInAdmissionOperationsView.groupsExpectedToday",
+        "GroupArrivalCheckInAdmissionOperationsView.arrivalTime",
+        "GroupArrivalCheckInAdmissionOperationsView.actualArrival",
+        "GroupArrivalCheckInAdmissionOperationsView.groupSize",
+        "GroupArrivalCheckInAdmissionOperationsView.checkedIn",
+        "GroupArrivalCheckInAdmissionOperationsView.remaining",
+        "GroupArrivalCheckInAdmissionOperationsView.gate",
+        "GroupArrivalCheckInAdmissionOperationsView.groupLeader",
+        "GroupArrivalCheckInAdmissionOperationsView.readiness",
+        "GroupArrivalCheckInAdmissionOperationsView.issues"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Single Group Check-In”, “Batch Check-In”, “Individual Check-In”, “Group Arrives”, “Handle”, “Integration”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 29 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group arrival check-in list.",
+   "error": "Could not load. Names which read failed and leaves the group arrival check-in untouched.",
+   "emptyFirstRun": "No group arrival check-in yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group arrival check-in are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupArrivalCheck",
+    "contract": "orders",
+    "purpose": "Group Arrival, Check-In & Admission Operations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupArrivalCheckInAdmissionOperationsView.groupsExpectedToday",
+    "GroupArrivalCheckInAdmissionOperationsView.arrivalTime",
+    "GroupArrivalCheckInAdmissionOperationsView.actualArrival",
+    "GroupArrivalCheckInAdmissionOperationsView.groupSize",
+    "GroupArrivalCheckInAdmissionOperationsView.checkedIn",
+    "GroupArrivalCheckInAdmissionOperationsView.remaining"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-280"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 29. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-281",
+  "name": "Group Amendments, Cancellation & Refund Operations",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.8",
+   "page": 30
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-amendments-cancellation-refund-operations-bo-281",
+   "component": "apps/venue-management-web/src/routes/sell/GroupAmendmentsCancellationRefundOperations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 14→15",
+     "operation": "listGroupAmendmentCancellation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage changes occurring after group confirmation.",
+  "purposeNote": "Post-confirmation changes update all affected commercial, capacity, resource, ticketing and operational records through one governed amendment process.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Increase Guest Count, Reduce Guest Count, Date Change, Time Change, Product Change, Package Change, Seat Change, Catering Change …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Increase Guest Count",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reduce Guest Count",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Date Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Time Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Package Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Seat Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Catering Change",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group amendments cancellation list.",
+   "error": "Could not load. Names which read failed and leaves the group amendments cancellation untouched.",
+   "emptyFirstRun": "No group amendments cancellation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group amendments cancellation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupAmendmentCancellation",
+    "contract": "orders",
+    "purpose": "Group Amendments, Cancellation & Refund Operations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupAmendmentsCancellationRefundOperationsView.increaseGuestCount",
+    "GroupAmendmentsCancellationRefundOperationsView.reduceGuestCount",
+    "GroupAmendmentsCancellationRefundOperationsView.dateChange",
+    "GroupAmendmentsCancellationRefundOperationsView.timeChange",
+    "GroupAmendmentsCancellationRefundOperationsView.productChange"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-281"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 9 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-282",
+  "name": "Group Booking Reconciliation, Closure & Performance",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.9",
+   "page": 31
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-booking-reconciliation-closure-performance-bo-282",
+   "component": "apps/venue-management-web/src/routes/sell/GroupBookingReconciliationClosurePerformance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-274",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F137 step 16→17",
+     "operation": "listGroupBookingReconciliation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Measure; Display) and no metric row",
+  "purpose": "Close the group booking after the visit and reconcile what was sold against what actually occurred.",
+  "purposeNote": "A group booking cannot be considered fully closed until operational and financial activity has been reconciled.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group booking reconciliation",
+       "columns": [
+        "GroupBookingReconciliationClosurePerformanceView.ty",
+        "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
+        "GroupBookingReconciliationClosurePerformanceView.amountPaid",
+        "GroupBookingReconciliationClosurePerformanceView.refunds",
+        "GroupBookingReconciliationClosurePerformanceView.additionalCharges",
+        "GroupBookingReconciliationClosurePerformanceView.outstandingBalance",
+        "GroupBookingReconciliationClosurePerformanceView.finalRevenue"
+       ],
+       "bindsTo": "GroupBookingReconciliationClosurePerformanceView",
+       "operation": "listGroupBookingReconciliation",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 31 §Measure"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group booking reconciliation",
+       "bindsTo": "GroupBookingReconciliationClosurePerformanceView",
+       "columns": [
+        "GroupBookingReconciliationClosurePerformanceView.ty",
+        "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
+        "GroupBookingReconciliationClosurePerformanceView.amountPaid",
+        "GroupBookingReconciliationClosurePerformanceView.refunds",
+        "GroupBookingReconciliationClosurePerformanceView.additionalCharges",
+        "GroupBookingReconciliationClosurePerformanceView.outstandingBalance",
+        "GroupBookingReconciliationClosurePerformanceView.finalRevenue"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Quoted”, “Booked”, “Paid”, “Allocated”, “Issued”, “Attended”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 31 §Measure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group booking reconciliation list.",
+   "error": "Could not load. Names which read failed and leaves the group booking reconciliation untouched.",
+   "emptyFirstRun": "No group booking reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group booking reconciliation are still there. The pack's own statuses are Operationally Complete → Financially Complete → Closed — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupBookingReconciliation",
+    "contract": "orders",
+    "purpose": "Group Booking Reconciliation, Closure & Performance",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupBookingReconciliationClosurePerformanceView.ty",
+    "GroupBookingReconciliationClosurePerformanceView.finalBookingValue",
+    "GroupBookingReconciliationClosurePerformanceView.amountPaid",
+    "GroupBookingReconciliationClosurePerformanceView.refunds",
+    "GroupBookingReconciliationClosurePerformanceView.additionalCharges",
+    "GroupBookingReconciliationClosurePerformanceView.outstandingBalance"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-282"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 31. 7 of 7 labels bound to a contract property; 14 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-283",
+  "name": "Group Sales Analytics & AI Intelligence Center",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "board": "2",
+   "number": "9.2.10",
+   "page": 33
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/group-sales-analytics-ai-intelligence-center-bo-283",
+   "component": "apps/venue-management-web/src/routes/sell/GroupSalesAnalyticsAiIntelligenceCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-274"
+   ],
+   "exitTo": [
+    "BO-274"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-274, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
+  "purpose": "Provide management with intelligence across the complete group-sales lifecycle. This should combine data from Board 1 + Board 2.",
+  "purposeNote": "Management can analyze group-sales performance and use explainable AI recommendations to improve conversion, utilization, revenue and operational planning. Board 2 — Final Screen Register",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search group sales analytics",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 33 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Customer Type",
+        "Organization",
+        "Venue",
+        "Event",
+        "Sales Owner",
+        "Group Type",
+        "Product",
+        "Date",
+        "Campaign",
+        "Market"
+       ],
+       "notes": "The pack filters this screen by customer type, organization, venue, event, sales owner, group type and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 33 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group sales analytics",
+       "columns": [
+        "GroupSalesAnalyticsAiIntelligenceCenterView.enquiries",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.quotes",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.conversionRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.groupBookings",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.guests",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.revenue",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.averageGroupSize",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.averageBookingValue",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.discount",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.revenuePerGuest",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.cancellationRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.noShowRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.outstandingReceivables",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.repeatCustomerRate"
+       ],
+       "bindsTo": "GroupSalesAnalyticsAiIntelligenceCenterView",
+       "operation": "listGroupSale2",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 33 §Analyze"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group sales analytics",
+       "bindsTo": "GroupSalesAnalyticsAiIntelligenceCenterView",
+       "columns": [
+        "GroupSalesAnalyticsAiIntelligenceCenterView.enquiries",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.quotes",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.conversionRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.groupBookings",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.guests",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.revenue",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.averageGroupSize",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.averageBookingValue",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.discount",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.revenuePerGuest",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.cancellationRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.noShowRate",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.outstandingReceivables",
+        "GroupSalesAnalyticsAiIntelligenceCenterView.repeatCustomerRate"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Visualize”, “Conversion Insight”, “Pricing Insight”, “Capacity Insight”, “Operational Insight”, “Natural-Language Copilot”.",
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 33 §Analyze"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group sales analytics list.",
+   "error": "Could not load. Names which read failed and leaves the group sales analytics untouched.",
+   "emptyFirstRun": "No group sales analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group sales analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGroupSale2",
+    "contract": "orders",
+    "purpose": "Group Sales Analytics & AI Intelligence Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GroupSalesAnalyticsAiIntelligenceCenterView.enquiries",
+    "GroupSalesAnalyticsAiIntelligenceCenterView.quotes",
+    "GroupSalesAnalyticsAiIntelligenceCenterView.conversionRate",
+    "GroupSalesAnalyticsAiIntelligenceCenterView.groupBookings",
+    "GroupSalesAnalyticsAiIntelligenceCenterView.guests",
+    "GroupSalesAnalyticsAiIntelligenceCenterView.revenue"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-283"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 33. 14 of 24 labels bound to a contract property; 24 of 99 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

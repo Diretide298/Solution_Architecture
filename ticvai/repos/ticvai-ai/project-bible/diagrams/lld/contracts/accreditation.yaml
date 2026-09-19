@@ -1,0 +1,337 @@
+id: LLD-accreditation
+title: accreditation — 29 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: AccessService
+operations:
+- operation: createAccreditationApplication
+  verb: POST
+  path: /accreditation-applications
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  writes:
+  - accreditation.application
+- operation: createAccreditationProgramme
+  verb: POST
+  path: /accreditation-programmes
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.programme
+  writes:
+  - accreditation.programme
+- operation: createBadgePrintJob
+  verb: POST
+  path: /badge-print-jobs
+  scope: venue
+  permission: ACCREDITATION_ISSUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.print_job
+  writes:
+  - accreditation.print_job
+- operation: decideAccreditationApplication
+  verb: POST
+  path: /accreditation-applications/{applicationId}/decide
+  scope: venue
+  permission: ACCREDITATION_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.application
+  writes: []
+- operation: getAccreditationHolder
+  verb: GET
+  path: /accreditation-holders/{holderId}
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.holder
+  writes: []
+- operation: importAccreditationHolders
+  verb: POST
+  path: /accreditation-imports
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: issueAccreditationCredential
+  verb: POST
+  path: /accreditation-credentials
+  scope: venue
+  permission: ACCREDITATION_ISSUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.credential
+  writes:
+  - accreditation.credential
+- operation: listAccessProfiles
+  verb: GET
+  path: /accreditation-access-profiles
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.access_profile
+  writes: []
+- operation: listAccreditationAccessActivity
+  verb: GET
+  path: /accreditation-access-activity
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccreditationApplications
+  verb: GET
+  path: /accreditation-applications
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.application
+  writes: []
+- operation: listAccreditationAudit
+  verb: GET
+  path: /accreditation-audit
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.audit
+  writes: []
+- operation: listAccreditationCredentials
+  verb: GET
+  path: /accreditation-credentials
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.credential
+  writes: []
+- operation: listAccreditationHolders
+  verb: GET
+  path: /accreditation-holders
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.holder
+  writes: []
+- operation: listAccreditationIdentityConflicts
+  verb: GET
+  path: /accreditation-identity-conflicts
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccreditationProgrammes
+  verb: GET
+  path: /accreditation-programmes
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.programme
+  writes: []
+- operation: listBadgePrintJobs
+  verb: GET
+  path: /badge-print-jobs
+  scope: venue
+  permission: ACCREDITATION_ISSUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.print_job
+  writes: []
+- operation: listBadgeTemplates
+  verb: GET
+  path: /badge-templates
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.badge_template
+  writes: []
+- operation: previewAccessImpact
+  verb: POST
+  path: /accreditation-access-profiles/preview
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - accreditation.access_profile
+- operation: replaceAccreditationCredential
+  verb: POST
+  path: /accreditation-credentials/{credentialId}/replace
+  scope: venue
+  permission: ACCREDITATION_ISSUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.credential
+  writes: []
+- operation: setAccessProfile
+  verb: PUT
+  path: /accreditation-access-profiles
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.access_profile
+  writes:
+  - accreditation.access_profile
+- operation: setAccreditationNotificationRules
+  verb: PUT
+  path: /accreditation-notifications
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.notification_rules
+  writes:
+  - accreditation.notification_rules
+- operation: setAccreditationRequirements
+  verb: PUT
+  path: /accreditation-requirements
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.requirements
+  writes:
+  - accreditation.requirements
+- operation: setAccreditationStatus
+  verb: POST
+  path: /accreditation-holders/{holderId}/status
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.holder
+  writes: []
+- operation: setAccreditationValidity
+  verb: PUT
+  path: /accreditation-validity
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.validity
+  writes:
+  - accreditation.validity
+- operation: setBadgeTemplate
+  verb: PUT
+  path: /badge-templates
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.badge_template
+  writes:
+  - accreditation.badge_template
+- operation: setHolderAccess
+  verb: PUT
+  path: /accreditation-holders/{holderId}/access
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.holder_access
+  writes:
+  - accreditation.holder_access
+- operation: submitAccreditationDocument
+  verb: POST
+  path: /accreditation-documents
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.document
+  writes:
+  - accreditation.document
+- operation: updateAccreditationHolder
+  verb: PUT
+  path: /accreditation-holders/{holderId}
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.holder
+  writes:
+  - accreditation.holder
+- operation: verifyAccreditationDocument
+  verb: POST
+  path: /accreditation-documents/{documentId}/verify
+  scope: venue
+  permission: ACCREDITATION_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.document
+  writes: []

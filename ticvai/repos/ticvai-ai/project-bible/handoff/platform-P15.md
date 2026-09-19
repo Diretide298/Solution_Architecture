@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 30 |
+| Operations with no screen | 29 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 30 operations with no screen here
+### 29 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -39,17 +39,16 @@
 | `updateTable` | fnb | PUT | Change what a table is |
 | `cancelReportExecution` | reporting | DELETE | Cancel a running execution |
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
-| `exportReportResult` | reporting | POST | Export a completed result |
-| `getReportExecution` | reporting | GET | Execution status and result |
-| `getReportExport` | reporting | GET | Export status and download link |
-| `getReportResult` | reporting | GET | Paged result rows |
 | `listAlertRules` | reporting | GET | What raises an alert, and when |
-| `listReportFields` | reporting | GET | Fields available for a data source |
-| `listReportSchedules` | reporting | GET | List scheduled reports |
-| `listSeededReports` | reporting | GET |  |
 | `updateReportSchedule` | reporting | PATCH | Amend, pause or resume a schedule |
-| `getRegionSettings` | tenancy | GET | Read region settings |
-| `updateRegionSettings` | tenancy | PUT | Update region settings |
+| `issueDeviceCredential` | tenancy | POST | Give the device an identity it can prove |
+| `listDeviceAuditRecords` | tenancy | GET | What was done to this device, and what it did |
+| `listDeviceFirmware` | tenancy | GET | Firmware and software versions, and what is running where |
+| `listDeviceTamperEvents` | tenancy | GET | Devices that report having been interfered with |
+| `recordDeviceTamperEvent` | tenancy | POST | A device reports interference |
+| `revokeDeviceCredential` | tenancy | DELETE | Cut a device off now |
+| `rollbackDeviceFirmware` | tenancy | POST | Put the fleet back on the previous version |
+| `startDeviceFirmwareRollout` | tenancy | POST | Push an update to a fleet, in waves |
 
 ## Modules
 

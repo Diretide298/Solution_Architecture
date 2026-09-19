@@ -169,10 +169,25 @@ notes: '**This flow is why a resource is not a product.** A product with an avai
   step 3 and the rental is still out at step 5.
 
   '
-openQuestions:
-- '**Whether a guest may book a cabana themselves from `GST-021`, or only through an attendant.** The
-  contract allows both — `bookResource` is guest-callable — and the venue has not said which it wants.
-  Self-service raises the no-show rate and cuts the queue at the desk, and that is a commercial trade
-  rather than a design one.
+answeredQuestions:
+- question: '**Whether a guest may book a cabana themselves from `GST-021`, or only through an
+    attendant.** The contract allowed both — `bookResource` was guest-callable — and the venue had not
+    said which it wants. Self-service raises the no-show rate and cuts the queue at the desk, and that
+    is a commercial trade rather than a design one.
 
-  '
+    '
+  answer: '**Neither, as posed — the guest books a product and never the cabana.** 26 August:
+    *"a guest always books a product or package — never a resource directly, and never a specific
+    room/vehicle/instructor by itself — across all sales channels. The product''s configuration
+    determines which resources are associated and get booked behind the scenes."*
+
+    So self-service is allowed and it is self-service **of a product**. `bookResource` is staff-only
+    from 19 September; the guest path is a purchase, and `allocateResources` picks the cabana — rotating
+    across the pool, per the same minute, rather than filling cabana one every time.
+
+    **The question was open because nothing read the minutes**, not because the venue had not decided.
+    It had, on 26 August, three weeks before this flow was written.
+
+    '
+  source: TICVAI MoM 2026-08-26
+  answeredOn: '2026-09-19'

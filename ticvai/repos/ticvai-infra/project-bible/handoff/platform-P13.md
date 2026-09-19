@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 100 |
-| Operations | 122 |
+| Operations | 140 |
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 109 |
+| Operations with no screen | 90 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 109 operations with no screen here
+### 90 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -37,30 +37,30 @@
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
 | `updateTable` | fnb | PUT | Change what a table is |
-| `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
-| `setSegregationRules` | identity | PUT | Which permissions may not be held together |
-| `updateMaintenancePlan` | maintenance | PATCH | Amend or suspend a plan |
-| `activateJourney` | marketing-crm | POST | Start it, or stop it |
+| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
+| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
+| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
+| `simulateAccessPolicy` | identity | POST | What this policy would decide, before it decides anything |
+| `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
-| `createChallenge` | marketing-crm | POST | Define a challenge, mission or streak |
-| `createForm` | marketing-crm | POST | Define a waiver, survey or capture form |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
-| `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
-| `createUrlRedirect` | marketing-crm | POST | 301, 302 and custom redirects |
-| `getJourneyPerformance` | marketing-crm | GET | Entrants, completions, goals reached |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| `listMessageTriggers` | marketing-crm | GET | What fires a message, and when |
-| `listReviews` | marketing-crm | GET | List guest reviews and ratings |
 | `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
 | `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `recordPrivacyIncident` | marketing-crm | POST | Log a personal-data breach and start the clock |
-| `respondToReview` | marketing-crm | POST | Respond to a review |
-| `retryMessageDispatch` | marketing-crm | POST | Send it again, or by another channel |
 | `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
-| `setMessageTrigger` | marketing-crm | POST | Fire a message from a platform event |
-| … | | | 69 more |
+| `startKioskAssist` | marketing-crm | POST | A staff member helps a guest at a kiosk, remotely |
+| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
+| `captureStoredValue` | orders | POST | Take some or all of a held balance |
+| `convertReservation` | orders | POST | Convert a reservation into an order |
+| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
+| … | | | 50 more |
 
 ## Modules
 
@@ -134,44 +134,44 @@
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | Policy | 3 | 1 | yes |
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | Policy | 3 | 1 | yes |
 | `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | Policy | 3 | 1 | yes |
-| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 0 | yes |
-| `CMS-062` | Central Digital Asset Library | Media Library | 3 | 0 | yes |
-| `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 0 | yes |
-| `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 0 | yes |
-| `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 0 | yes |
-| `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 0 | yes |
-| `CMS-067` | Advanced Search & Discovery | Media Library | 3 | 0 | yes |
-| `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 0 | yes |
-| `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 0 | yes |
-| `CMS-070` | Asset Activity, Recent Assets & Library Health | Media Library | 3 | 0 | yes |
-| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 1 | yes |
-| `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 0 | yes |
-| `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 0 | yes |
-| `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 0 | yes |
-| `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 0 | yes |
-| `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 0 | yes |
-| `CMS-077` | Version Comparison & Replacement Impact | Media Library | 3 | 0 | yes |
-| `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 0 | yes |
-| `CMS-079` | Rendition Processing & Delivery Readiness | Media Library | 3 | 0 | yes |
-| `CMS-080` | AI Quality, Intelligence Review & Recommendations | Media Library | 3 | 0 | yes |
-| `CMS-081` | DAM Governance & Rights Command Center | Media Library | 3 | 0 | yes |
-| `CMS-082` | Asset Ownership & Responsibility Management | Media Library | 3 | 0 | yes |
-| `CMS-083` | Rights, License & Usage Policy Management | Media Library | 3 | 0 | yes |
-| `CMS-084` | Asset Approval Workflow Management | Media Library | 3 | 0 | yes |
-| `CMS-085` | Publication Eligibility & Governance Validation | Media Library | 3 | 0 | yes |
-| `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 0 | yes |
-| `CMS-087` | Secure Internal & External Sharing | Media Library | 3 | 0 | yes |
-| `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 0 | yes |
-| `CMS-089` | Governance Audit Trail & Compliance Evidence | Media Library | 3 | 0 | yes |
-| `CMS-090` | Governance Risk, Compliance & AI Recommendations | Media Library | 3 | 0 | yes |
-| `CMS-091` | Asset Distribution & Delivery Command Center | Media Library | 3 | 0 | yes |
-| `CMS-092` | Asset Usage & Distribution Map | Media Library | 3 | 0 | yes |
-| `CMS-093` | Channel & Distribution Configuration | Media Library | 3 | 0 | yes |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | Media Library | 3 | 0 | yes |
-| `CMS-095` | Asset Replacement & Propagation Management | Media Library | 3 | 0 | yes |
-| `CMS-096` | Fallback, Expiry & Distribution Continuity | Media Library | 3 | 0 | yes |
-| `CMS-097` | DAM API & Integration Hub | Media Library | 3 | 0 | yes |
-| `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 0 | yes |
-| `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 0 | yes |
-| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 0 | yes |
+| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 2 | yes |
+| `CMS-062` | Central Digital Asset Library | Media Library | 3 | 2 | yes |
+| `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 3 | yes |
+| `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 2 | yes |
+| `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 2 | yes |
+| `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 2 | yes |
+| `CMS-067` | Advanced Search & Discovery | Media Library | 3 | 1 | yes |
+| `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 3 | yes |
+| `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 1 | yes |
+| `CMS-070` | Asset Activity, Recent Assets & Library Health | Media Library | 3 | 1 | yes |
+| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 2 | yes |
+| `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 2 | yes |
+| `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 1 | yes |
+| `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 1 | yes |
+| `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 2 | yes |
+| `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 2 | yes |
+| `CMS-077` | Version Comparison & Replacement Impact | Media Library | 3 | 1 | yes |
+| `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 2 | yes |
+| `CMS-079` | Rendition Processing & Delivery Readiness | Media Library | 3 | 1 | yes |
+| `CMS-080` | AI Quality, Intelligence Review & Recommendations | Media Library | 3 | 1 | yes |
+| `CMS-081` | DAM Governance & Rights Command Center | Media Library | 3 | 2 | yes |
+| `CMS-082` | Asset Ownership & Responsibility Management | Media Library | 3 | 2 | yes |
+| `CMS-083` | Rights, License & Usage Policy Management | Media Library | 3 | 1 | yes |
+| `CMS-084` | Asset Approval Workflow Management | Media Library | 3 | 1 | yes |
+| `CMS-085` | Publication Eligibility & Governance Validation | Media Library | 3 | 1 | yes |
+| `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 2 | yes |
+| `CMS-087` | Secure Internal & External Sharing | Media Library | 3 | 1 | yes |
+| `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 2 | yes |
+| `CMS-089` | Governance Audit Trail & Compliance Evidence | Media Library | 3 | 1 | yes |
+| `CMS-090` | Governance Risk, Compliance & AI Recommendations | Media Library | 3 | 1 | yes |
+| `CMS-091` | Asset Distribution & Delivery Command Center | Media Library | 3 | 1 | yes |
+| `CMS-092` | Asset Usage & Distribution Map | Media Library | 3 | 1 | yes |
+| `CMS-093` | Channel & Distribution Configuration | Media Library | 3 | 1 | yes |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | Media Library | 3 | 2 | yes |
+| `CMS-095` | Asset Replacement & Propagation Management | Media Library | 3 | 2 | yes |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | Media Library | 3 | 1 | yes |
+| `CMS-097` | DAM API & Integration Hub | Media Library | 3 | 1 | yes |
+| `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 1 | yes |
+| `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 1 | yes |
+| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 1 | yes |
 

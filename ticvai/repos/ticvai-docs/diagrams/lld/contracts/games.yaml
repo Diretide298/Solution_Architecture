@@ -1,5 +1,5 @@
 id: LLD-games
-title: games — 14 operations
+title: games — 37 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -19,6 +19,17 @@ operations:
   writes:
   - cache:idempotency
   - games.card
+- operation: authoriseGameplay
+  verb: POST
+  path: /gameplay-authorisations
+  scope: venue
+  permission: ACCESS_VALIDATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - games.authorisation
+  writes: []
 - operation: createGame
   verb: POST
   path: /games
@@ -33,6 +44,18 @@ operations:
   writes:
   - cache:idempotency
   - games.game
+- operation: createGameEntitlement
+  verb: POST
+  path: /game-entitlements
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.entitlement
+  writes:
+  - games.entitlement
 - operation: createPrize
   verb: POST
   path: /prizes
@@ -47,6 +70,17 @@ operations:
   writes:
   - cache:idempotency
   - games.prize
+- operation: deployReaderConfiguration
+  verb: POST
+  path: /readers/{readerId}/deploy
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.reader_deployment
+  writes: []
 - operation: getGameCard
   verb: GET
   path: /game-cards/{cardCode}
@@ -58,6 +92,48 @@ operations:
   reads:
   - games.card
   - games.credit_ledger
+  writes: []
+- operation: getGameEligibility
+  verb: GET
+  path: /game-eligibility
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes: []
+- operation: getGamePricing
+  verb: GET
+  path: /game-pricing
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getGameplaySyncStatus
+  verb: GET
+  path: /gameplay-sync-status
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getGameplayValidationRules
+  verb: GET
+  path: /gameplay-validation-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.validation_rules
   writes: []
 - operation: issueGameCard
   verb: POST
@@ -73,6 +149,39 @@ operations:
   writes:
   - cache:idempotency
   - games.card
+- operation: listAttractionTypes
+  verb: GET
+  path: /attraction-types
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.attraction_type
+  writes: []
+- operation: listGameEntitlements
+  verb: GET
+  path: /game-entitlements
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.entitlement
+  writes: []
+- operation: listGameplayTransactions
+  verb: GET
+  path: /gameplay-transactions
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.gameplay_transaction
+  writes: []
 - operation: listGames
   verb: GET
   path: /games
@@ -94,6 +203,17 @@ operations:
   offline: true
   reads:
   - games.prize
+  writes: []
+- operation: listReaders
+  verb: GET
+  path: /readers
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.reader
   writes: []
 - operation: loadGameCredits
   verb: POST
@@ -137,6 +257,113 @@ operations:
   writes:
   - cache:idempotency
   - games.redemption
+- operation: setAttractionType
+  verb: PUT
+  path: /attraction-types
+  scope: tenant
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.attraction_type
+  writes:
+  - games.attraction_type
+- operation: setGameCardExpiryRules
+  verb: PUT
+  path: /game-card-expiry-rules
+  scope: tenant
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.card_expiry_rules
+  writes:
+  - games.card_expiry_rules
+- operation: setGameCardLifecycle
+  verb: POST
+  path: /game-cards/{cardId}/lifecycle
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.card
+  writes: []
+- operation: setGameKioskConfiguration
+  verb: PUT
+  path: /game-kiosk-config
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.kiosk_config
+  writes:
+  - games.kiosk_config
+- operation: setGameOperationalConfiguration
+  verb: PUT
+  path: /games/{gameId}/operations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.operational_config
+  writes:
+  - games.operational_config
+- operation: setGamePricing
+  verb: PUT
+  path: /game-pricing
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.pricing
+  writes:
+  - games.pricing
+- operation: setGameplayValidationRules
+  verb: PUT
+  path: /gameplay-validation-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.validation_rules
+  writes:
+  - games.validation_rules
+- operation: setPrizeCost
+  verb: PUT
+  path: /prizes/{prizeId}/cost
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.prize_cost
+  writes:
+  - games.prize_cost
+- operation: setReaderConfiguration
+  verb: PUT
+  path: /readers/{readerId}
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.reader
+  writes:
+  - games.reader
 - operation: setReaderProfile
   verb: PUT
   path: /reader-profiles
@@ -152,6 +379,29 @@ operations:
   writes:
   - cache:idempotency
   - games.reader_profile
+- operation: setRedemptionRules
+  verb: PUT
+  path: /redemption-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.redemption_rules
+  writes:
+  - games.redemption_rules
+- operation: simulateGameplayAuthorisation
+  verb: POST
+  path: /gameplay-authorisations/simulate
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.authorisation
+  writes: []
 - operation: syncGamePlays
   verb: POST
   path: /game-plays/sync
@@ -167,6 +417,16 @@ operations:
   - games.credit_ledger
   - games.play
   - sync.rejection
+- operation: testReader
+  verb: POST
+  path: /readers/{readerId}/test
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: transferGameCard
   verb: POST
   path: /game-cards/{cardCode}/transfer

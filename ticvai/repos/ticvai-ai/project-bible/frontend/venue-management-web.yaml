@@ -23,6 +23,7 @@ packages:
 - api-client
 contracts:
 - access
+- accreditation
 - ai
 - approvals
 - assets
@@ -35,10 +36,12 @@ contracts:
 - maintenance
 - marketing-crm
 - orders
+- payments
 - platform-ops
 - promotions
 - public-api
 - queue
+- rental
 - reporting
 - resources
 - retail
@@ -47,6 +50,7 @@ contracts:
 - subscription
 - tenancy
 - venue-map
+- wallet
 - white-label
 - workforce
 deployment:

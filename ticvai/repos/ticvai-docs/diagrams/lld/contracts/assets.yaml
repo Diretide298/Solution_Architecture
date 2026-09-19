@@ -1,10 +1,31 @@
 id: LLD-assets
-title: assets — 10 operations
+title: assets — 26 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: VenueOpsService
 operations:
+- operation: analyseMediaAsset
+  verb: POST
+  path: /media-assets/{assetId}/analyse
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.tag
+  writes: []
+- operation: bulkUpdateMediaAssets
+  verb: POST
+  path: /media-assets/bulk
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: completeUpload
   verb: POST
   path: /media/uploads/{uploadId}/complete
@@ -33,6 +54,18 @@ operations:
   writes:
   - assets.media_collection
   - cache:idempotency
+- operation: createMediaShare
+  verb: POST
+  path: /media-shares
+  scope: venue
+  permission: ASSET_LIBRARY_SHARE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.share
+  writes:
+  - assets.share
 - operation: createUpload
   verb: POST
   path: /media/uploads
@@ -61,6 +94,16 @@ operations:
   writes:
   - assets.media_usage
   - cache:idempotency
+- operation: findSimilarMediaAssets
+  verb: GET
+  path: /media-assets/similar
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getExpiringRights
   verb: GET
   path: /media/rights-expiring
@@ -84,6 +127,37 @@ operations:
   - assets.media_asset
   - assets.media_usage
   writes: []
+- operation: getMediaDistribution
+  verb: GET
+  path: /media-distribution
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getMediaTaxonomy
+  verb: GET
+  path: /media-taxonomy
+  scope: tenant
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.taxonomy
+  writes: []
+- operation: getMediaUsageAnalytics
+  verb: GET
+  path: /media-usage
+  scope: tenant
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listCollections
   verb: GET
   path: /media/collections
@@ -94,6 +168,39 @@ operations:
   offline: false
   reads:
   - assets.media_collection
+  writes: []
+- operation: listMediaAssetAudit
+  verb: GET
+  path: /media-assets/{assetId}/audit
+  scope: tenant
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.audit
+  writes: []
+- operation: listMediaAssetVersions
+  verb: GET
+  path: /media-assets/{assetId}/versions
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.asset_version
+  writes: []
+- operation: listMediaRenditions
+  verb: GET
+  path: /media-assets/{assetId}/renditions
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.rendition
   writes: []
 - operation: replaceMediaAsset
   verb: POST
@@ -109,6 +216,18 @@ operations:
   writes:
   - assets.media_asset
   - cache:idempotency
+- operation: requestMediaRendition
+  verb: POST
+  path: /media-assets/{assetId}/renditions
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.rendition
+  writes:
+  - assets.rendition
 - operation: searchMedia
   verb: GET
   path: /media
@@ -120,6 +239,63 @@ operations:
   reads:
   - assets.media_asset
   writes: []
+- operation: setMediaAssetApproval
+  verb: POST
+  path: /media-assets/{assetId}/approval
+  scope: tenant
+  permission: ASSET_LIBRARY_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.approval
+  writes: []
+- operation: setMediaAssetRights
+  verb: PUT
+  path: /media-assets/{assetId}/rights
+  scope: tenant
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMediaAssetTags
+  verb: PUT
+  path: /media-assets/{assetId}/tags
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.tag
+  writes:
+  - assets.tag
+- operation: setMediaDistributionChannels
+  verb: PUT
+  path: /media-distribution/channels
+  scope: tenant
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.distribution_channel
+  writes:
+  - assets.distribution_channel
+- operation: setMediaTaxonomy
+  verb: PUT
+  path: /media-taxonomy
+  scope: tenant
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.taxonomy
+  writes:
+  - assets.taxonomy
 - operation: updateMediaAsset
   verb: PATCH
   path: /media/{mediaId}

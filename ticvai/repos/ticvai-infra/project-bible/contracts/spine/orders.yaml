@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 145
+  x-ticvai-screen-count: 152
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -299,6 +299,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
       summary: What a guest holding a link is being asked to pay for
       description: 'BL-072. **The operation the link needed and did not have.** `createPaymentLink` was
         contracted and nothing could open one.
@@ -446,6 +447,8 @@ paths:
         format: uuid
     post:
       operationId: resendPaymentLink
+      x-ticvai-consumed-by:
+        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -946,6 +949,11 @@ paths:
         format: uuid
     post:
       operationId: quoteUpgrade
+      x-ticvai-consumed-by:
+        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P09 ADM-654 Membership & Pass Upgrade Engine"
+        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
       summary: What an upgrade costs, pro-rata
       description: 'BL-092. **`proRataListPrice` splits a bundle''s discount across components and `prorate`
         on a subscription is time-based against a plan** — neither computes the price of moving a ticket
@@ -1065,6 +1073,9 @@ paths:
   /chargebacks:
     get:
       operationId: listChargebacks
+      x-ticvai-consumed-by:
+        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
       summary: Open disputes, by deadline
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
@@ -1101,6 +1112,8 @@ paths:
         format: uuid
     post:
       operationId: respondToChargeback
+      x-ticvai-consumed-by:
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
       summary: Submit evidence, or accept the loss
       description: '**Accepting is a legitimate outcome and is recorded as a decision.** A 40 AED case
         with a 30 AED fee and two hours of work is one a venue should be able to concede deliberately
@@ -1180,6 +1193,8 @@ paths:
                   $ref: '#/components/schemas/PaymentProvider'
     put:
       operationId: setPaymentProvider
+      x-ticvai-consumed-by:
+        - "P09 ADM-412 Payment Method & Settlement Setup"
       summary: Configure a gateway and its routing
       description: 'CF-131. **Network International and Stripe for Phase 1** — two gateways, which is
         the number that makes routing a real question rather than a future one.
@@ -1308,6 +1323,8 @@ paths:
   /payment-links:
     post:
       operationId: createPaymentLink
+      x-ticvai-consumed-by:
+        - "P09 ADM-592 Payment Link Builder & Configuration\t73"
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -2128,6 +2145,8 @@ paths:
         format: uuid
     post:
       operationId: voidPayment
+      x-ticvai-consumed-by:
+        - "P09 ADM-613 Void, Reversal & Cancellation Manager\t120"
       x-ticvai-audience:
       - staff
       summary: Release an authorisation before it is captured
@@ -2716,6 +2735,7 @@ paths:
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
+        - "P09 ADM-609 Refund & Payment Adjustment Command Center\t116"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -2756,6 +2776,8 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
+        - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
       x-ticvai-audience:
@@ -2823,6 +2845,7 @@ paths:
       operationId: approveRefund
       x-ticvai-consumed-by:
         - "P08 BO-004 Manual Wait Time Entry"
+        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
@@ -2954,6 +2977,7 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-067 Refunds & Resale"
         - "P08 BO-028 Refund Approval Queue"
+        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
       x-ticvai-audience:
       - guest
       security:
@@ -3032,6 +3056,7 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
+        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3163,6 +3188,9 @@ paths:
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
+        - "P09 ADM-595 Digital Payment Session & Transaction Monitor\t76"
+        - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
+        - "P09 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-audience:
       - staff
@@ -6646,6 +6674,8 @@ paths:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
+        - "P09 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
+        - "P09 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -6684,6 +6714,7 @@ paths:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
+        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true

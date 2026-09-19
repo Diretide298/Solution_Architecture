@@ -143,7 +143,12 @@ paths:
       operationId: listApiClients
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
+        - "P08 BO-1071 Integration Command Center"
+        - "P08 BO-1073 API Access & OAuth"
+        - "P08 BO-1076 Concurrency, Idempotency & Limits"
+        - "P08 BO-691 Accreditation API Management"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-354 External Workflow System Integration"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Registered clients for this developer
@@ -166,6 +171,7 @@ paths:
       operationId: createApiClient
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
+        - "P08 BO-1073 API Access & OAuth"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Create a client with scopes and an environment
@@ -409,6 +415,9 @@ paths:
       operationId: listWebhookSubscriptions
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
+        - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1077 Mapping & Transformation"
+        - "P08 BO-692 Accreditation Webhook Management"
         - "P14 DEV-005 Webhooks"
       summary: What this client is subscribed to
       tags: [publicApi]
@@ -430,6 +439,8 @@ paths:
       operationId: createWebhookSubscription
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
+        - "P08 BO-1074 Webhook Configuration"
+        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: Subscribe to business events
       description: >
@@ -471,6 +482,7 @@ paths:
       operationId: listWebhookDeliveries
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
+        - "P08 BO-1078 Monitoring, Retry & Reconciliation"
         - "P14 DEV-005 Webhooks"
       summary: What was sent, what failed, and why
       description: >
@@ -616,6 +628,7 @@ paths:
     get:
       operationId: listApiVersions
       x-ticvai-consumed-by:
+        - "P08 BO-1075 Seat Event Catalog"
         - "P14 DEV-001 API Reference"
       summary: Versions, their status and their sunset dates
       description: >
@@ -751,6 +764,7 @@ paths:
     post:
       operationId: certifyIntegration
       x-ticvai-consumed-by:
+        - "P08 BO-483 Integration Certification & Test Console"
         - "P14 DEV-008 Programme Administration"
       summary: Approve, reject or revoke a certification
       description: >

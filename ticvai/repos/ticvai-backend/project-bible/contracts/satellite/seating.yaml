@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 14
+  x-ticvai-screen-count: 54
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -84,6 +84,8 @@ paths:
         format: uuid
     post:
       operationId: assignSeats
+      x-ticvai-consumed-by:
+        - "P08 BO-995 Find Seats For Me"
       summary: Pick and hold the best available seats
       description: 'BL-168. **`recommendSeats` returned a set and nothing applied it**, so automatic assignment
         was left to the caller — and every caller wrote the same loop.
@@ -181,6 +183,14 @@ paths:
         format: uuid
     put:
       operationId: setMapZones
+      x-ticvai-consumed-by:
+        - "P08 BO-955 Sections & Zones"
+        - "P08 BO-957 Standing Zones"
+        - "P08 BO-958 Suites & Boxes"
+        - "P08 BO-959 Stage & Focal Point"
+        - "P08 BO-960 Entrances, Exits & Aisles"
+        - "P08 BO-961 Amenities & Obstructions"
+        - "P08 BO-969 AI Aisle, VIP & Accessibility"
       summary: Standing areas, suites, stages and obstructions
       description: 'BL-166. **A standing zone is a capacity without individual seats**, and modelling
         it as seats means inventing seat numbers nobody prints and a guest cannot find.
@@ -227,7 +237,11 @@ paths:
     get:
       operationId: listSeatMaps
       x-ticvai-consumed-by:
+        - "P08 BO-1061 Platform Command Center"
+        - "P08 BO-1072 Seat Management APIs"
         - "P08 BO-953 Seat Map Command Center"
+        - "P08 BO-973 Layout Command Center"
+        - "P08 BO-978 Multi-Performance Assignment"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -268,6 +282,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
     post:
       operationId: createSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-954 Venue Canvas"
       x-ticvai-audience:
       - staff
       summary: Create a seat map
@@ -308,6 +324,10 @@ paths:
         format: uuid
     get:
       operationId: getSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-954 Venue Canvas"
+        - "P08 BO-955 Sections & Zones"
+        - "P08 BO-975 Event-Specific Layout"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -333,6 +353,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
     patch:
       operationId: updateSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-954 Venue Canvas"
       x-ticvai-audience:
       - staff
       summary: Rename or amend a seat map
@@ -387,6 +409,12 @@ paths:
         format: uuid
     post:
       operationId: publishSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-962 Templates, Validation & Publish"
+        - "P08 BO-972 AI Venue Designer & Publish"
+        - "P08 BO-975 Event-Specific Layout"
+        - "P08 BO-978 Multi-Performance Assignment"
+        - "P08 BO-982 Approval, Publish & Rollback"
       x-ticvai-audience:
       - staff
       summary: Validate and publish a seat map
@@ -426,6 +454,9 @@ paths:
         format: uuid
     post:
       operationId: cloneSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-1070 Setup, Clone & Inheritance"
+        - "P08 BO-976 Clone & Inheritance"
       x-ticvai-audience:
       - staff
       summary: Clone a map, optionally into another venue
@@ -481,6 +512,7 @@ paths:
       operationId: listSeats
       x-ticvai-consumed-by:
         - "P08 BO-1051 Seat Analytics Command Center"
+        - "P08 BO-956 Rows & Seats"
         - "P08 BO-991 Seat History"
       x-ticvai-audience:
       - staff
@@ -528,6 +560,11 @@ paths:
                         $ref: '#/components/schemas/Seat'
     patch:
       operationId: updateSeats
+      x-ticvai-consumed-by:
+        - "P08 BO-1064 Naming, Numbering & Localization"
+        - "P08 BO-956 Rows & Seats"
+        - "P08 BO-968 AI Row & Seat Recognition"
+        - "P08 BO-970 AI Numbering & Labeling"
       x-ticvai-audience:
       - staff
       summary: Bulk-amend seats
@@ -578,6 +615,11 @@ paths:
         format: uuid
     post:
       operationId: validateSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-962 Templates, Validation & Publish"
+        - "P08 BO-967 AI Section Recognition"
+        - "P08 BO-971 Validation & Correction"
+        - "P08 BO-982 Approval, Publish & Rollback"
       x-ticvai-audience:
       - staff
       summary: Run validation without publishing
@@ -610,6 +652,8 @@ paths:
         format: uuid
     post:
       operationId: importSeatManifest
+      x-ticvai-consumed-by:
+        - "P08 BO-966 CSV & Excel Import"
       x-ticvai-audience:
       - staff
       summary: Import the logical seat structure
@@ -653,6 +697,8 @@ paths:
         format: uuid
     post:
       operationId: importSeatGeometry
+      x-ticvai-consumed-by:
+        - "P08 BO-965 SVG & CAD Import"
       x-ticvai-audience:
       - staff
       summary: Import seat geometry from a plan
@@ -702,6 +748,11 @@ paths:
         format: uuid
     get:
       operationId: getImportJob
+      x-ticvai-consumed-by:
+        - "P08 BO-963 Import Command Center"
+        - "P08 BO-964 PDF & Image Import"
+        - "P08 BO-965 SVG & CAD Import"
+        - "P08 BO-966 CSV & Excel Import"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -723,6 +774,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
     post:
       operationId: commitImportJob
+      x-ticvai-consumed-by:
+        - "P08 BO-972 AI Venue Designer & Publish"
       x-ticvai-audience:
       - staff
       summary: Apply a parsed import
@@ -767,6 +820,8 @@ paths:
       operationId: listSeatMapTemplates
       x-ticvai-consumed-by:
         - "P08 BO-953 Seat Map Command Center"
+        - "P08 BO-962 Templates, Validation & Publish"
+        - "P08 BO-974 Template Library"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -788,6 +843,9 @@ paths:
                   $ref: '#/components/schemas/SeatMapTemplate'
     post:
       operationId: createSeatMapTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-962 Templates, Validation & Publish"
+        - "P08 BO-974 Template Library"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region
@@ -830,7 +888,9 @@ paths:
     get:
       operationId: listSeatCategories
       x-ticvai-consumed-by:
+        - "P08 BO-1045 Price Bands & Categories"
         - "P08 BO-1055 Revenue by Seat Category"
+        - "P08 BO-985 Status Model Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -862,6 +922,9 @@ paths:
                   $ref: '#/components/schemas/SeatCategory'
     post:
       operationId: createSeatCategory
+      x-ticvai-consumed-by:
+        - "P08 BO-1045 Price Bands & Categories"
+        - "P08 BO-985 Status Model Configuration"
       x-ticvai-audience:
       - staff
       summary: Create a seat category
@@ -925,6 +988,10 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-1000 Mobile & Accessible Selection"
+        - "P08 BO-986 Availability Tracker"
+        - "P08 BO-994 Choose My Seats"
+        - "P08 BO-996 Filters & Interactive Legend"
       x-ticvai-audience:
       - staff
       - guest
@@ -987,6 +1054,7 @@ paths:
         - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-994 Choose My Seats"
       x-ticvai-audience:
       - staff
       - guest
@@ -1055,6 +1123,8 @@ paths:
       operationId: getSeatHold
       x-ticvai-consumed-by:
         - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-987 Hold Tracker"
+        - "P08 BO-999 Cart & Multi-Seat Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -1078,6 +1148,8 @@ paths:
       operationId: relinquishSeatHold
       x-ticvai-consumed-by:
         - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-998 Lock Timeout & Concurrency"
+        - "P08 BO-999 Cart & Multi-Seat Management"
       x-ticvai-audience:
       - staff
       summary: Release a hold
@@ -1107,6 +1179,7 @@ paths:
       operationId: extendSeatHold
       x-ticvai-consumed-by:
         - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-998 Lock Timeout & Concurrency"
       x-ticvai-audience:
       - staff
       summary: Extend a hold
@@ -1139,6 +1212,7 @@ paths:
     get:
       operationId: listSeatBlocks
       x-ticvai-consumed-by:
+        - "P08 BO-987 Hold Tracker"
         - "P10 PTR-009 Group / Bulk Booking"
       x-ticvai-audience:
       - staff
@@ -1184,6 +1258,7 @@ paths:
     post:
       operationId: createSeatBlock
       x-ticvai-consumed-by:
+        - "P08 BO-990 Maintenance & Out of Service"
         - "P10 PTR-009 Group / Bulk Booking"
       x-ticvai-audience:
       - staff
@@ -1323,6 +1398,8 @@ paths:
         format: uuid
     get:
       operationId: getSeatingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-993 Experience Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1342,6 +1419,8 @@ paths:
                 $ref: '#/components/schemas/SeatingRules'
     put:
       operationId: setSeatingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-993 Experience Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -1392,6 +1471,9 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-1001 View Preview, Compare & Heat Map"
+        - "P08 BO-1002 AI Conversational Seat Assistant"
+        - "P08 BO-1039 Seat Upgrade Recommendations"
       x-ticvai-audience:
       - staff
       - guest
@@ -1444,6 +1526,8 @@ paths:
         format: uuid
     post:
       operationId: copySeatMapSection
+      x-ticvai-consumed-by:
+        - "P08 BO-976 Clone & Inheritance"
       summary: Copy one section into another map
       description: '**Section-level copy, decided 21 August.** `cloneSeatMap` copies a whole map; this
         copies one section into a different one — the case a venue actually has, where an amphitheatre
@@ -1496,6 +1580,8 @@ paths:
     parameters: *id001
     get:
       operationId: diffSeatMapVersions
+      x-ticvai-consumed-by:
+        - "P08 BO-977 Version Compare"
       summary: Compare two versions of a layout
       description: '**The layout version-comparison view, decided 21 August.** Seat counts and configuration
         differences between two saved layouts.
@@ -1538,6 +1624,8 @@ paths:
   /seat-map-imports:
     post:
       operationId: importSeatMap
+      x-ticvai-consumed-by:
+        - "P08 BO-964 PDF & Image Import"
       summary: Import a seat map from a plan or a manifest
       description: '**AI-assisted import, decided 21 August** — PDF, image, Excel or CSV alongside manual
         building.
@@ -1602,6 +1690,12 @@ paths:
         format: uuid
     get:
       operationId: getSeatMapImport
+      x-ticvai-consumed-by:
+        - "P08 BO-963 Import Command Center"
+        - "P08 BO-967 AI Section Recognition"
+        - "P08 BO-968 AI Row & Seat Recognition"
+        - "P08 BO-969 AI Aisle, VIP & Accessibility"
+        - "P08 BO-971 Validation & Correction"
       summary: How the import went
       description: '**What it detected, how sure it is, and what it could not read.** A blank unreadable
         list with low confidence is a different problem from a named one.'
@@ -1621,8 +1715,1323 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatMapImportJob'
+  /seat-hold-types:
+    get:
+      operationId: listSeatHoldTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-1004 Hold Type Master"
+        - "P08 BO-980 Scheduled Seat Release"
+      summary: The kinds of hold a venue places, and who may release them
+      description: 'Boards 6.2 and 6.4. **`createSeatBlock` existed and nothing said what a block
+        means.** A production hold, a house hold, an accessibility hold, a press allocation and a
+        sponsor allocation are all seats taken out of sale, and they have entirely different release
+        rules, owners and deadlines.
+
+        **A hold with no release rule becomes a permanent hole in the map.** Every venue has a block of
+        seats nobody can explain, and it is always a hold somebody placed for one show and never took
+        back.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Hold types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatHoldType'
+    put:
+      operationId: setSeatHoldType
+      x-ticvai-consumed-by:
+        - "P08 BO-1004 Hold Type Master"
+        - "P08 BO-1006 Hold Rule Assignment"
+        - "P08 BO-1007 Expiration Rules"
+        - "P08 BO-1011 Priority & Conflict Resolution"
+      summary: Define a hold kind, its owner and its release rule
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatHoldType'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatHoldType'
+  /seat-hold-pools:
+    get:
+      operationId: listSeatHoldPools
+      x-ticvai-consumed-by:
+        - "P08 BO-1003 Hold Command Center"
+        - "P08 BO-1010 Hold Approval Workflow"
+        - "P08 BO-1011 Priority & Conflict Resolution"
+        - "P08 BO-1012 Hold Utilization & Audit"
+        - "P08 BO-979 Temporary Seat Blocking"
+        - "P08 BO-989 Sales & Allocation Tracker"
+      summary: Held seats, by pool, with what is left and when it releases
+      description: 'Boards 6.3 and 6.10. **Utilisation of a hold pool is the number that decides next
+        season''s allocation.** A sponsor pool that is never drawn down is seats the venue could have
+        sold; one exhausted every night is a negotiation.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: performanceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatHoldPool'
+    post:
+      operationId: createSeatHoldPool
+      x-ticvai-consumed-by:
+        - "P08 BO-1005 Hold Pool Creation"
+        - "P08 BO-979 Temporary Seat Blocking"
+      summary: Take a set of seats out of sale, for a reason, until a date
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatHoldPool'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatHoldPool'
+  /seat-hold-pools/{poolId}/release:
+    parameters:
+    - name: poolId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: releaseSeatHoldPool
+      x-ticvai-consumed-by:
+        - "P08 BO-1008 Automatic Hold Release"
+        - "P08 BO-1009 Release, Convert & Reassign"
+        - "P08 BO-1030 Modify, Release & Cancel"
+        - "P08 BO-980 Scheduled Seat Release"
+      summary: Put held seats back on sale, convert them, or reassign them
+      description: 'Board 6.9. **Three different endings and only one of them is a release.** Seats can
+        go back into general sale, be converted into a sold order for the holder, or be moved to another
+        pool. A system offering only *release* forces a house seat given to a guest to be sold to
+        nobody and then reissued by hand.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - releaseToSale
+                  - convertToOrder
+                  - reassignToPool
+                seatIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                targetPoolId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                orderId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatHoldPool'
+  /seat-rules:
+    get:
+      operationId: getSeatRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1013 Rules Command Center"
+      summary: Kill, buffer, companion and accessibility rules
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: seatMapId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatRules'
+    put:
+      operationId: setSeatRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1014 Seat Kill Rules"
+        - "P08 BO-1015 Buffer Seat Rules"
+        - "P08 BO-1016 Companion Seat Rules"
+        - "P08 BO-1017 Wheelchair Companion Rules"
+        - "P08 BO-1021 Flexible Spacing Rules"
+      summary: Which seats are killed, buffered, paired or reserved for access
+      description: 'Board 7. **Four rules that all move the same seats and are decided by different
+        people.**
+
+        **Kill** takes a seat out permanently — a sightline nobody should pay for.
+        **Buffer** leaves gaps around a sold seat, which was a distancing rule and is now a comfort
+        product.
+        **Companion** keeps a wheelchair space and the seat beside it together, and this is the one with
+        legal weight: selling the companion seat separately strands a carer.
+        **Flexible spacing** lets a venue trade density against comfort per performance.
+
+        **Single-seat gaps are the commercial case for buffers.** A map that leaves one empty seat
+        between every party has lost those seats without anybody deciding to.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatRules'
+  /accessible-seating:
+    get:
+      operationId: getAccessibleSeating
+      x-ticvai-consumed-by:
+        - "P08 BO-1000 Mobile & Accessible Selection"
+        - "P08 BO-1017 Wheelchair Companion Rules"
+        - "P08 BO-1018 Accessible Seating Master"
+        - "P08 BO-1038 Accessibility Recommendations"
+      summary: Accessible seats, their routes and who may buy them
+      description: 'Boards 7.6, 7.7 and 7.8. **An accessible seat with no accessible route to it is not
+        an accessible seat**, and a map that records the first without the second will sell somebody a
+        place they cannot reach.
+
+        Eligibility is here because it is contested: venues that sell accessible seats to anyone find
+        they have none left for the guests who need them, and venues that gate them too hard turn people
+        away at the door.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: seatMapId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Accessible seating
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessibleSeating'
+    put:
+      operationId: setAccessibleSeating
+      x-ticvai-consumed-by:
+        - "P08 BO-1018 Accessible Seating Master"
+        - "P08 BO-1019 Accessible Route Mapping"
+        - "P08 BO-1020 Accessible Filters & Eligibility"
+      summary: Define accessible seats, routes and eligibility
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessibleSeating'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessibleSeating'
+  /seat-compliance:
+    get:
+      operationId: validateSeatCompliance
+      x-ticvai-consumed-by:
+        - "P08 BO-1022 Compliance Validation & Audit"
+      summary: Whether the map still meets its obligations
+      description: 'Board 7.10. **Accessible provision is usually a legal minimum expressed as a ratio**,
+        and a map edited over a season drifts below it one kill rule at a time. This computes the
+        current position against the configured obligation and names the shortfall.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: seatMapId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Compliance findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatComplianceFinding'
+  /group-seat-requests:
+    get:
+      operationId: listGroupSeatRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-1023 Group Reservation Center"
+        - "P08 BO-1024 Group Type Configuration"
+        - "P08 BO-1029 Quote, Deposit & Payment"
+        - "P08 BO-1030 Modify, Release & Cancel"
+        - "P08 BO-1032 Group Reporting & Audit"
+      summary: Group bookings, their status and their deposits
+      tags:
+      - seating
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Group requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupSeatRequest'
+    post:
+      operationId: createGroupSeatRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-1025 Group Request Intake"
+      summary: Take a group enquiry before any seat is held
+      description: 'Board 8.3. **A group enquiry is not a booking and must not hold seats.** Sixty
+        seats held for a school that never confirms is a sold-out show with sixty empty places.
+
+        So the request is recorded first, priced and quoted, and seats are allocated only when it is
+        accepted — which is what `allocateGroupSeats` is for.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupSeatRequest'
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupSeatRequest'
+  /group-seat-requests/{requestId}/allocate:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: allocateGroupSeats
+      x-ticvai-consumed-by:
+        - "P08 BO-1026 Availability & Best-Fit Search"
+        - "P08 BO-1027 Bulk Seat Allocation"
+      summary: Find and hold the best contiguous block for a group
+      description: 'Boards 8.6 and 8.7. **Best-fit for a group is not best-seat for one guest.** Sixty
+        people want to sit together; splitting them across two tiers is worse than a poorer view, and
+        `recommendSeats` optimising each seat individually will do exactly that.
+
+        **Refuses rather than splitting below the stated minimum.** A group that says *no fewer than
+        twenty together* means it, and a booking that quietly gives them four blocks of fifteen is a
+        complaint on the night.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                minimumContiguous:
+                  type: integer
+                  nullable: true
+                preferredSectionIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Allocated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupSeatAllocation'
+        '409':
+          description: '**Cannot be seated within the stated constraints.** The best available shape is
+            returned so the desk can offer it rather than guess.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /group-seat-requests/{requestId}/roster:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setGroupSeatRoster
+      x-ticvai-consumed-by:
+        - "P08 BO-1028 Roster & Participant Assignment"
+      summary: Who sits where, when the names arrive
+      description: 'Board 8.5. **Names arrive after the booking, and often on the morning.** A school
+        books sixty in March and sends a list in June, and the platform has to accept the second without
+        re-doing the first.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - participants
+              properties:
+                participants:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      seatId:
+                        type: string
+                        format: uuid
+                        nullable: true
+                      notes:
+                        type: string
+                        nullable: true
+      responses:
+        '200':
+          description: Set
+  /seat-recommendation-rules:
+    get:
+      operationId: getSeatRecommendationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1033 Recommendation Command Center"
+        - "P08 BO-1042 Performance, Feedback & Audit"
+      summary: What "best" means at this venue
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatRecommendationRules'
+    put:
+      operationId: setSeatRecommendationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1034 Best Seat Recommendations"
+        - "P08 BO-1035 Best Value Recommendations"
+        - "P08 BO-1036 Closest-to-Stage Recommendations"
+        - "P08 BO-1037 Family Seating Recommendations"
+        - "P08 BO-1038 Accessibility Recommendations"
+        - "P08 BO-1041 Scoring Rules & Model Governance"
+      summary: Scoring for best seat, best value, closest, family and accessible
+      description: 'Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (e.g.
+        last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per
+        seat map/event."*
+
+        **Five recommendation kinds, one scoring model.** *Best seat*, *best value*, *closest to stage*,
+        *family together* and *accessible* are the same weighted score with different weights — and
+        writing them as five algorithms guarantees they eventually contradict each other.
+
+        `recommendSeats` already exists and consumes this; it had no rules to consume.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatRecommendationRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatRecommendationRules'
+  /seat-reassignment:
+    post:
+      operationId: reassignSeats
+      x-ticvai-consumed-by:
+        - "P08 BO-1040 Alternatives & Reseating"
+      summary: Move a booked party, and tell them
+      description: 'Board 9.8. **A venue moves people: a broken seat, a changed stage, a production
+        requirement, a guest who asks.** The move has to keep the party together, respect companion
+        pairing, honour the price they paid, and notify them — and a reseating done by cancelling and
+        rebooking does none of those.
+
+        **Never silently downgrades.** A move to a lower-value seat returns the difference or refuses,
+        because the alternative is a guest discovering it on the night.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - fromSeatIds
+              - reason
+              properties:
+                fromSeatIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                toSeatIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                reason:
+                  type: string
+                notifyGuest:
+                  type: boolean
+                  default: true
+                refundDifference:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Reassigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatReassignment'
+  /seat-inventory:
+    get:
+      operationId: getSeatInventory
+      x-ticvai-consumed-by:
+        - "P08 BO-1059 Heat Maps & Drill-Down"
+        - "P08 BO-983 Inventory Command Center"
+        - "P08 BO-984 Real-Time Seat Map"
+        - "P08 BO-988 Reservation Tracker"
+        - "P08 BO-989 Sales & Allocation Tracker"
+      summary: Every seat's state for a performance, in one read
+      description: 'Board 4. **Available, held, reserved, sold, blocked, out of service, in a hold pool
+        — and the difference matters to whoever is looking.** A house manager needs held-versus-sold; a
+        commercial manager needs sold-versus-available; a duty manager needs out-of-service.
+
+        One read, because a real-time seat map assembling this from four endpoints will render three
+        states correctly and one late.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: performanceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: sectionId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Seat states
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatInventory'
+  /seat-reconciliation:
+    get:
+      operationId: getSeatReconciliation
+      x-ticvai-consumed-by:
+        - "P08 BO-1079 Immutable Seat Audit Logs"
+        - "P08 BO-992 Audit & Reconciliation"
+      summary: The map against the orders, seat by seat
+      description: 'Board 4.8. **A seat sold twice and a seat sold to nobody are both invisible until
+        somebody counts.** Compares the seat map''s own state against what `orders` holds and names
+        every seat where they disagree.
+
+        Run before doors, because that is when it can still be fixed.
+
+        '
+      tags:
+      - seating
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: performanceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Discrepancies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatDiscrepancy'
+
 components:
   schemas:
+    SeatHoldType:
+      type: object
+      x-ticvai-persistence: seating.hold_type
+      description: 'Board 6.2. **A hold with no release rule becomes a permanent hole in the map.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        purpose:
+          type: string
+          enum:
+          - production
+          - house
+          - accessibility
+          - press
+          - sponsor
+          - contractual
+          - maintenance
+          - distancing
+        ownerRole:
+          type: string
+          nullable: true
+        releaseRule:
+          type: string
+          enum:
+          - manual
+          - hoursBeforePerformance
+          - onDate
+          - onSelloutThreshold
+          default: hoursBeforePerformance
+        releaseHoursBefore:
+          type: integer
+          nullable: true
+        releaseTo:
+          type: string
+          enum:
+          - generalSale
+          - anotherPool
+          - remainsHeld
+          default: generalSale
+        countsAgainstCapacity:
+          type: boolean
+          default: true
+          description: '**Whether held seats are still "sold out".** A production hold that reads as
+            availability puts a show on sale it cannot honour.
+
+            '
+        visibleToGuest:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    SeatHoldPool:
+      type: object
+      x-ticvai-persistence: seating.hold_pool
+      description: 'Board 6.3. **Utilisation decides next season''s allocation.**'
+      required:
+      - holdTypeId
+      - performanceId
+      properties:
+        id:
+          type: string
+          format: uuid
+        holdTypeId:
+          type: string
+          format: uuid
+        performanceId:
+          type: string
+          format: uuid
+        seatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        seatCount:
+          type: integer
+          readOnly: true
+        usedCount:
+          type: integer
+          readOnly: true
+        releasedCount:
+          type: integer
+          readOnly: true
+        holderName:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        releaseAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - active
+          - partiallyReleased
+          - released
+          - expired
+        createdBy:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+    SeatRules:
+      type: object
+      x-ticvai-persistence: seating.seat_rules
+      description: 'Board 7. **Four rules that move the same seats and are decided by different
+        people.**
+
+        '
+      properties:
+        seatMapId:
+          type: string
+          format: uuid
+        killedSeatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        killReasons:
+          type: object
+          additionalProperties:
+            type: string
+        bufferRule:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            seatsEitherSide:
+              type: integer
+              default: 1
+            rowsEitherSide:
+              type: integer
+              default: 0
+            avoidSingleGaps:
+              type: boolean
+              default: true
+              description: '**The commercial case for buffers.** A map leaving one empty seat between
+                every party has lost those seats without anybody deciding to.
+
+                '
+        companionRule:
+          type: object
+          description: '**The one with legal weight.** Selling the companion seat separately strands a
+            carer.
+
+            '
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            pairs:
+              type: array
+              items:
+                type: object
+                properties:
+                  wheelchairSpaceId:
+                    type: string
+                    format: uuid
+                  companionSeatIds:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+            releaseCompanionHoursBefore:
+              type: integer
+              nullable: true
+        flexibleSpacing:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            densityPercent:
+              type: integer
+              nullable: true
+            perPerformanceOverride:
+              type: boolean
+              default: true
+        scopePath:
+          type: string
+    AccessibleSeating:
+      type: object
+      x-ticvai-persistence: seating.accessible
+      description: 'Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an
+        accessible seat.**
+
+        '
+      properties:
+        seatMapId:
+          type: string
+          format: uuid
+        spaces:
+          type: array
+          items:
+            type: object
+            properties:
+              seatId:
+                type: string
+                format: uuid
+              kind:
+                type: string
+                enum:
+                - wheelchairSpace
+                - transferSeat
+                - ambulant
+                - easyAccess
+                - assistanceDog
+                - hearingLoop
+                - visuallyImpaired
+              routeDescription:
+                type: string
+                nullable: true
+              stepFree:
+                type: boolean
+                default: true
+              nearestAccessibleWc:
+                type: string
+                nullable: true
+        eligibility:
+          type: string
+          enum:
+          - open
+          - selfDeclared
+          - verifiedOnce
+          - verifiedEachTime
+          default: selfDeclared
+          description: '**Contested in both directions.** Open sale leaves none for the guests who need
+            them; hard gating turns people away at the door.
+
+            '
+        minimumProvisionPercent:
+          type: number
+          nullable: true
+        scopePath:
+          type: string
+    SeatComplianceFinding:
+      type: object
+      description: 'Board 7.10. **A map drifts below its obligation one kill rule at a time.**'
+      properties:
+        code:
+          type: string
+        severity:
+          type: string
+          enum:
+          - breach
+          - warning
+          - advisory
+        message:
+          type: string
+        required:
+          type: number
+          nullable: true
+        actual:
+          type: number
+          nullable: true
+        affectedSeatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    GroupSeatRequest:
+      type: object
+      x-ticvai-persistence: seating.group_request
+      description: 'Board 8.3. **An enquiry is not a booking and must not hold seats.**'
+      required:
+      - performanceId
+      - partySize
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+        performanceId:
+          type: string
+          format: uuid
+        organisationId:
+          type: string
+          format: uuid
+          nullable: true
+        contactName:
+          type: string
+        partySize:
+          type: integer
+        minimumContiguous:
+          type: integer
+          nullable: true
+        accessibleSpacesNeeded:
+          type: integer
+          default: 0
+        preferredSectionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        budgetPerHead:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        status:
+          type: string
+          enum:
+          - enquiry
+          - quoted
+          - accepted
+          - allocated
+          - deposited
+          - confirmed
+          - cancelled
+          - lapsed
+        quoteExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        depositAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    GroupSeatAllocation:
+      type: object
+      description: 'Board 8.6. **Best-fit for a group is not best-seat for one guest.**'
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        blocks:
+          type: array
+          items:
+            type: object
+            properties:
+              sectionId:
+                type: string
+                format: uuid
+              sectionName:
+                type: string
+              row:
+                type: string
+              seatIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              contiguous:
+                type: integer
+        totalSeats:
+          type: integer
+        largestBlock:
+          type: integer
+        meetsMinimumContiguous:
+          type: boolean
+        totalPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        holdExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+    SeatRecommendationRules:
+      type: object
+      x-ticvai-persistence: seating.recommendation_rules
+      description: 'Board 9, and the 21 August minute: *"best-seat ranking… must be configurable per
+        seat map/event."* **Five kinds, one scoring model** — five algorithms would eventually
+        contradict each other.
+
+        '
+      properties:
+        seatMapId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        profiles:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - bestSeat
+                - bestValue
+                - closestToStage
+                - familyTogether
+                - accessible
+                - upgrade
+              weights:
+                type: object
+                additionalProperties:
+                  type: number
+                description: 'Sightline, distance, centrality, row, price, availability, aisle
+                  proximity, legroom.
+
+                  '
+              preferredSectionIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              avoidSectionIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              contiguityWeight:
+                type: number
+                nullable: true
+        reverseRowOrder:
+          type: boolean
+          default: false
+          description: '**Last-row-is-best against first-row-is-best**, which the minute names as the
+            worked example and which differs by venue sightline.
+
+            '
+        explainToGuest:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+    SeatReassignment:
+      type: object
+      x-ticvai-persistence: seating.reassignment
+      description: 'Board 9.8. **Never silently downgrades.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        fromSeatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        toSeatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reason:
+          type: string
+        priceDifference:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundIssued:
+          type: boolean
+          default: false
+        guestNotifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        performedBy:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    SeatInventory:
+      type: object
+      description: 'Board 4. **One read, because a real-time map assembling four endpoints renders one
+        state late.**
+
+        '
+      properties:
+        performanceId:
+          type: string
+          format: uuid
+        asOf:
+          type: string
+          format: date-time
+        totals:
+          type: object
+          properties:
+            capacity:
+              type: integer
+            available:
+              type: integer
+            held:
+              type: integer
+            reserved:
+              type: integer
+            sold:
+              type: integer
+            blocked:
+              type: integer
+            outOfService:
+              type: integer
+        seats:
+          type: array
+          items:
+            type: object
+            properties:
+              seatId:
+                type: string
+                format: uuid
+              label:
+                type: string
+              state:
+                type: string
+                enum:
+                - available
+                - held
+                - reserved
+                - sold
+                - blocked
+                - outOfService
+                - killed
+              holdPoolId:
+                type: string
+                format: uuid
+                nullable: true
+              orderId:
+                type: string
+                format: uuid
+                nullable: true
+              expiresAt:
+                type: string
+                format: date-time
+                nullable: true
+    SeatDiscrepancy:
+      type: object
+      description: 'Board 4.8. **A seat sold twice and a seat sold to nobody are both invisible until
+        somebody counts.**
+
+        '
+      properties:
+        seatId:
+          type: string
+          format: uuid
+        label:
+          type: string
+        mapState:
+          type: string
+        orderState:
+          type: string
+        orderIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        kind:
+          type: string
+          enum:
+          - soldTwice
+          - soldNotMarked
+          - markedNotSold
+          - heldAndSold
+          - orphanedHold
+        detectedAt:
+          type: string
+          format: date-time
     SeatMapStatus:
       type: string
       enum:

@@ -1,14 +1,14 @@
-# P01-account-self-service-01 — P01 · Account & Self-Service
+# WS36 — Pricing   Revenue Management board 3
 
-**5 screens · 46 operations · 37 schemas · 5 permissions**
+**10 screens · 10 operations · 14 schemas · 2 permissions**
 
-Platform P01 Guest Web · ships as **guest** ·
-guest audience · web ·
+Platform P09 TICVAI Web · ships as **ticvai-control** ·
+platformAdmin audience · web ·
 online only
 
 ## Who this is for
 
-**guest on web.** Everything below is how you know what is
+**platformAdmin on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
-- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
+- **0 of these operations work offline**
+  
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +61,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
-| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
-| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
-| `WEB-019` | Order History | listDetail | 5 | 0 | — |
-| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
+| `ADM-068` | Tax, Fee & Calculation Command Center | listDetail | 1 | 0 | — |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | configEditor | 1 | 0 | — |
+| `ADM-070` | Tax Rule & Treatment Builder | listDetail | 1 | 0 | — |
+| `ADM-071` | Fee & Surcharge Library | configEditor | 1 | 0 | — |
+| `ADM-072` | Fee Applicability & Charging Rule Builder | configEditor | 1 | 1 | — |
+| `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | configEditor | 1 | 0 | — |
+| `ADM-074` | Price Calculation Sequence & Formula Engine | configEditor | 1 | 0 | — |
+| `ADM-075` | Currency Precision, Rounding & Monetary Rules | listDetail | 1 | 0 | — |
+| `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | configEditor | 1 | 0 | — |
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-075, ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

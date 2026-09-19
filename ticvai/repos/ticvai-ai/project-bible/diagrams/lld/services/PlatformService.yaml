@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 167 operations, 51 tables
+title: PlatformService — 182 operations, 51 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -13,7 +13,7 @@ why: '**Three contracts, one schema, 41 tables.** Subscription, platform operati
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 167
+  operations: 182
   inAFlow: 40
   percent: 39%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -26,8 +26,16 @@ schemas:
   largestTable: control.partner_agreement
 operationsByContract:
 - contract: subscription
-  count: 112
+  count: 127
   operations:
+  - operation: addCapacityPack
+    verb: POST
+    path: /capacity-packs
+    scope: platform
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: addLicenceAddOn
     verb: POST
     path: /tenants/{tenantId}/licences/add-ons
@@ -188,6 +196,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getBillingReconciliation
+    verb: GET
+    path: /billing-reconciliation
+    scope: platform
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getCell
     verb: GET
     path: /cells/{cellId}
@@ -228,6 +244,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getGoLiveReadiness
+    verb: GET
+    path: /go-live-readiness
+    scope: platform
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getLicenceEnforcement
+    verb: GET
+    path: /licence-enforcement
+    scope: platform
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getPlan
     verb: GET
     path: /plans/{planId}
@@ -267,6 +299,14 @@ operationsByContract:
     permission: PLATFORM_TENANT_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: getVsiModel
+    verb: GET
+    path: /vsi-models
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
     writes: 0
   - operation: launchCellCluster
     verb: POST
@@ -364,6 +404,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listLicensingModels
+    verb: GET
+    path: /licensing-models
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listMember
     verb: GET
     path: /member
@@ -443,6 +491,14 @@ operationsByContract:
     permission: PLATFORM_TENANT_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listModuleCatalogue
+    verb: GET
+    path: /module-catalogue
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
     writes: 0
   - operation: listPartner
     verb: GET
@@ -756,6 +812,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: runGoLiveValidation
+    verb: POST
+    path: /go-live-readiness/run
+    scope: platform
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: scoreVsiAssessment
+    verb: POST
+    path: /vsi-assessments
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 0
+    writes: 1
   - operation: setAgreementContractTerm
     verb: PUT
     path: /agreement-contract-term
@@ -780,6 +852,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setLicenceEnforcementPolicy
+    verb: PUT
+    path: /licence-enforcement
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setLicensingModel
+    verb: PUT
+    path: /licensing-models
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setMemberMembershipAccount
     verb: PUT
     path: /member-membership-account
@@ -812,6 +900,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setModuleListing
+    verb: PUT
+    path: /module-catalogue
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPartnerBrandVenue
     verb: PUT
     path: /partner-brand-venue
@@ -860,6 +956,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setTrialConfiguration
+    verb: PUT
+    path: /trial-configurations
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setValidityActivationExpiry
     verb: PUT
     path: /validity-activation-expiry
@@ -868,6 +972,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setVsiModel
+    verb: PUT
+    path: /vsi-models
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: settleAiUsage
     verb: POST
     path: /ai-usage/settle
@@ -876,6 +988,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 2
+  - operation: simulateCommercialPackage
+    verb: POST
+    path: /package-simulations
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: submitOnboardingApplication
     verb: POST
     path: /onboarding-applications
@@ -1759,6 +1879,13 @@ writesOutside:
 screens:
 - P08:BO-013 Channel & Distribution
 - P08:BO-067 Integrations
+- P08:BO-1071 Integration Command Center
+- P08:BO-1073 API Access & OAuth
+- P08:BO-1074 Webhook Configuration
+- P08:BO-1075 Seat Event Catalog
+- P08:BO-1076 Concurrency, Idempotency & Limits
+- P08:BO-1077 Mapping & Transformation
+- P08:BO-1078 Monitoring, Retry & Reconciliation
 - P08:BO-126 Deployment, Preview & Audit
 - P08:BO-284 Membership & Annual Pass Command Center
 - P08:BO-285 Membership Product & Tier Builder
@@ -1780,7 +1907,26 @@ screens:
 - P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-302 Member Lifecycle History, Audit & Case Timeline
 - P08:BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center
+- P08:BO-483 Integration Certification & Test Console
 - P08:BO-503 Product Validation, Approval & Publication
+- P08:BO-594 Environment Ready & Handoff to AI Setup
+- P08:BO-595 AI Setup Command Center
+- P08:BO-596 Guided Setup Plan
+- P08:BO-601 Product, Pricing & Sales Channel Setup
+- P08:BO-603 Configuration Health & AI Review
+- P08:BO-604 Setup Completion & Handoff to Go-Live
+- P08:BO-605 Go-Live Readiness Command Center
+- P08:BO-606 Automated Validation Plan
+- P08:BO-607 Ticketing & Product Validation
+- P08:BO-608 End-to-End Sales Channel Testing
+- P08:BO-609 Payment & Financial Validation
+- P08:BO-610 Ticket, QR & Access Validation
+- P08:BO-611 User, Security & Integration Validation
+- P08:BO-612 Communication & Customer Journey Validation
+- P08:BO-613 Blocker, Warning & AI Resolution Center
+- P08:BO-614 Final Go-Live Approval & Production Launch
+- P08:BO-691 Accreditation API Management
+- P08:BO-692 Accreditation Webhook Management
 - P08:BO-949 Approval, Exception & Override Control Center
 - P09:ADM-002 Platform Dashboard
 - P09:ADM-003 Cross-Tenant Health Dashboard
@@ -1812,7 +1958,81 @@ screens:
 - P09:ADM-036 Platform Notification Broadcast
 - P09:ADM-048 Commercial Pricing Command Center
 - P09:ADM-318 Dead Letters
+- P09:ADM-353 Webhook Configuration & Subscription Manager
+- P09:ADM-354 External Workflow System Integration
+- P09:ADM-369 Commercial Command Center
+- P09:ADM-370 Customer Subscription & Commercial Portfolio
+- P09:ADM-371 Customer Commercial 360°
+- P09:ADM-372 Operational Profile, VSI & Commercial Model Intelligence
+- P09:ADM-373 Revenue & Commercial Model Analytics
+- P09:ADM-374 Trial & Conversion Monitor
 - P09:ADM-375 Renewal & Retention Center
+- P09:ADM-376 Commercial Optimization & Expansion Opportunities
+- P09:ADM-377 Subscription Exceptions & Commercial Alerts
+- P09:ADM-378 Executive AI Commercial Intelligence
+- P09:ADM-379 Welcome & Start Your TICVAI Journey
+- P09:ADM-380 Customer & Organization Registration
+- P09:ADM-381 Venue Type & Business Profile
+- P09:ADM-382 Visitor, Capacity & Operational Scale
+- P09:ADM-384 Ticketing & Product Requirements
+- P09:ADM-385 Access, Queue & Visitor Experience Assessment
+- P09:ADM-386 Additional Business Module Assessment
+- P09:ADM-387 Integration, Payment & Technical Readiness
+- P09:ADM-388 AI Assessment Summary & Handoff
+- P09:ADM-389 Commercial Rules Engine Overview
+- P09:ADM-390 VSI Model Builder
+- P09:ADM-391 VSI Scoring & Tier Threshold Configuration
+- P09:ADM-392 Subscription Tier Configuration
+- P09:ADM-393 Tier Included Allowances
+- P09:ADM-394 Commercial & Licensing Model Configuration
+- P09:ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules
+- P09:ADM-396 Overage Pricing & Capacity Packs
+- P09:ADM-397 Commercial Model & Rule Simulation
+- P09:ADM-398 Rule Versioning, Approval & Publication
+- P09:ADM-399 Recommended Package Overview
+- P09:ADM-400 Commercial Model & Tier Selection
+- P09:ADM-401 Module Marketplace
+- P09:ADM-402 AI Module & Package Recommendations
+- P09:ADM-403 Module Detail & Commercial Treatment
+- P09:ADM-404 Module Dependency & Compatibility Manager
+- P09:ADM-405 Add-Ons, Capacity & Commercial Options
+- P09:ADM-406 Commercial Package Simulator
+- P09:ADM-407 Package Review & Commercial Summary
+- P09:ADM-408 Final Package Approval & Handoff
+- P09:ADM-409 Purchase / Trial Journey Selection
+- P09:ADM-410 Contract & Billing Cycle Selection
+- P09:ADM-413 Trial Configuration & Conversion Rules
+- P09:ADM-414 Order & Commercial Pricing Review
+- P09:ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance
+- P09:ADM-416 Payment, Contract & Commercial Validation
+- P09:ADM-417 Subscription Confirmation & Commercial Activation
+- P09:ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff
+- P09:ADM-419 Provisioning Command Center
+- P09:ADM-422 Administrator & Security Initialization
+- P09:ADM-423 License & Entitlement Activation
+- P09:ADM-424 Module Activation & Dependency Validation
+- P09:ADM-426 Initial Configuration & Regional Defaults
+- P09:ADM-427 Provisioning Validation & Exception Management
+- P09:ADM-449 Usage & License Command Center
+- P09:ADM-450 Entitlement & License Inventory
+- P09:ADM-451 Commercial Consumption & Billable Event Metering
+- P09:ADM-452 Operational Usage & Threshold Monitor
+- P09:ADM-453 License Enforcement & Decision Engine
+- P09:ADM-454 Minimum Guarantee & Variable Consumption Monitor
+- P09:ADM-455 Overage, Capacity & Temporary Exception Management
+- P09:ADM-456 Usage Alerts, Reconciliation & Exception Center
+- P09:ADM-457 AI Usage Forecast & Commercial Optimization
+- P09:ADM-458 License, Metering & Commercial Synchronization Audit
+- P09:ADM-459 Billing & Commercial Command Center
+- P09:ADM-460 Billing Calculation & Charge Breakdown
+- P09:ADM-461 Consumption Reconciliation & Billing Approval
+- P09:ADM-462 Invoice & Payment Management
+- P09:ADM-463 Subscription & Commercial Change Management
+- P09:ADM-464 Renewal Management Center
+- P09:ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing
+- P09:ADM-466 Commercial Scenario Simulator
+- P09:ADM-467 Discount, Credit & Commercial Override Management
+- P09:ADM-468 Renewal Approval, Activation & Commercial Handoff
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-011 Quote Management
 - P10:PTR-017 Commission Statement

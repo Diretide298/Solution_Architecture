@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 102 operations, 32 tables
+title: VenueOpsService — 220 operations, 65 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -10,7 +10,7 @@ why: '**Six small domains, 102 operations, one team.** Queue, maintenance, booka
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 102
+  operations: 220
   inAFlow: 48
   percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -27,26 +27,1035 @@ schemas:
   - postgres
   largestTable: maintenance.work_order
 - schema: resources
-  tables: 4
+  tables: 16
   stores:
   - postgres
-  largestTable: resources.resource
+  largestTable: resources.resource_type
 - schema: venuemap
   tables: 4
   stores:
   - postgres
   largestTable: venuemap.point
 - schema: assets
-  tables: 4
+  tables: 12
   stores:
   - postgres
   largestTable: assets.media_asset
 - schema: games
-  tables: 8
+  tables: 21
   stores:
   - postgres
   largestTable: games.game
 operationsByContract:
+- contract: resources
+  count: 48
+  operations:
+  - operation: allocateResources
+    verb: POST
+    path: /resource-allocations
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: bookResource
+    verb: POST
+    path: /resource-bookings
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: cancelResourceBooking
+    verb: DELETE
+    path: /resource-bookings/{bookingId}
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: checkInResource
+    verb: POST
+    path: /resource-bookings/{bookingId}/check-in
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 3
+    writes: 4
+  - operation: checkOutResource
+    verb: POST
+    path: /resource-bookings/{bookingId}/check-out
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: cloneResource
+    verb: POST
+    path: /resources/{resourceId}/clone
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createResource
+    verb: POST
+    path: /resources
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createResourceAttribute
+    verb: POST
+    path: /resource-attributes
+    scope: tenant
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createResourceBlock
+    verb: POST
+    path: /resource-blocks
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createResourceCategory
+    verb: POST
+    path: /resource-categories
+    scope: tenant
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createResourcePackage
+    verb: POST
+    path: /resource-packages
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createResourceType
+    verb: POST
+    path: /resource-types
+    scope: tenant
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: getExperienceResourceRequirements
+    verb: GET
+    path: /experiences/{experienceId}/resource-requirements
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResource
+    verb: GET
+    path: /resources/{resourceId}
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceAllocationPolicy
+    verb: GET
+    path: /resource-allocation-policy
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceAuditTrail
+    verb: GET
+    path: /resources/{resourceId}/audit
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceAvailability
+    verb: GET
+    path: /resources/{resourceId}/availability
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getResourceCalendar
+    verb: GET
+    path: /resource-calendar
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getResourceDependencies
+    verb: GET
+    path: /resources/{resourceId}/dependencies
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceHierarchy
+    verb: GET
+    path: /resources/{resourceId}/hierarchy
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getResourceSchedule
+    verb: GET
+    path: /resources/{resourceId}/schedule
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceUtilisation
+    verb: GET
+    path: /resource-utilisation
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getSessionManifest
+    verb: GET
+    path: /sessions/{sessionId}/manifest
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listResourceAttributes
+    verb: GET
+    path: /resource-attributes
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResourceBlocks
+    verb: GET
+    path: /resource-blocks
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResourceBookings
+    verb: GET
+    path: /resource-bookings
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResourceCategories
+    verb: GET
+    path: /resource-categories
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResourcePackages
+    verb: GET
+    path: /resource-packages
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResourceTypes
+    verb: GET
+    path: /resource-types
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listResources
+    verb: GET
+    path: /resources
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: releaseResourceBlock
+    verb: DELETE
+    path: /resource-blocks/{blockId}
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: reorderSessionManifest
+    verb: PUT
+    path: /sessions/{sessionId}/manifest
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: replaceResourceAllocation
+    verb: POST
+    path: /resource-allocations/{bookingId}/replace
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setExperienceResourceRequirements
+    verb: PUT
+    path: /experiences/{experienceId}/resource-requirements
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setResourceAllocationPolicy
+    verb: PUT
+    path: /resource-allocation-policy
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setResourceDependencies
+    verb: PUT
+    path: /resources/{resourceId}/dependencies
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setResourceHierarchy
+    verb: PUT
+    path: /resources/{resourceId}/hierarchy
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setResourceLifecycleState
+    verb: POST
+    path: /resources/{resourceId}/state
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setResourceQualifications
+    verb: PUT
+    path: /resources/{resourceId}/qualifications
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setResourceSchedule
+    verb: PUT
+    path: /resources/{resourceId}/schedule
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setResourceSelectionPolicy
+    verb: PUT
+    path: /resource-selection-policy
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setResourceVenueAssignment
+    verb: PUT
+    path: /resources/{resourceId}/venues
+    scope: tenant
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: suggestResources
+    verb: GET
+    path: /resource-suggestions
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateResource
+    verb: PUT
+    path: /resources/{resourceId}
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateResourceBooking
+    verb: PATCH
+    path: /resource-bookings/{bookingId}
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateResourceCategory
+    verb: PUT
+    path: /resource-categories/{categoryId}
+    scope: tenant
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateResourcePackage
+    verb: PUT
+    path: /resource-packages/{packageId}
+    scope: venue
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateResourceType
+    verb: PUT
+    path: /resource-types/{resourceTypeId}
+    scope: tenant
+    permission: RESOURCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+- contract: rental
+  count: 40
+  operations:
+  - operation: assessRentalDamage
+    verb: POST
+    path: /rental-bookings/{bookingId}/damage
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: assignRentalEquipment
+    verb: POST
+    path: /rental-bookings/{bookingId}/equipment
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: true
+    reads: 1
+    writes: 1
+  - operation: checkOutRental
+    verb: POST
+    path: /rental-bookings/{bookingId}/check-out
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: createRentalBlackout
+    verb: POST
+    path: /rental-blackouts
+    scope: venue
+    permission: RENTAL_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createRentalBooking
+    verb: POST
+    path: /rental-bookings
+    scope: venue
+    permission: RENTAL_BOOK
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createRentalCategory
+    verb: POST
+    path: /rental-categories
+    scope: tenant
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createRentalPricingProfile
+    verb: POST
+    path: /rental-pricing-profiles
+    scope: venue
+    permission: RENTAL_PRICE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createRentalProduct
+    verb: POST
+    path: /rental-products
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: explainRentalPrice
+    verb: POST
+    path: /rental-price/explain
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: extendRental
+    verb: POST
+    path: /rental-bookings/{bookingId}/extend
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRentalAvailability
+    verb: GET
+    path: /rental-availability
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getRentalBooking
+    verb: GET
+    path: /rental-bookings/{bookingId}
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRentalProduct
+    verb: GET
+    path: /rental-products/{productId}
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: importRentalCatalogue
+    verb: POST
+    path: /rental-products/import
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOverdueRentals
+    verb: GET
+    path: /rental-bookings/overdue
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRentalBookings
+    verb: GET
+    path: /rental-bookings
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRentalCategories
+    verb: GET
+    path: /rental-categories
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRentalPricingProfiles
+    verb: GET
+    path: /rental-pricing-profiles
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRentalProducts
+    verb: GET
+    path: /rental-products
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: publishRentalProduct
+    verb: POST
+    path: /rental-products/{productId}/publish
+    scope: venue
+    permission: RENTAL_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: quoteRentalPrice
+    verb: POST
+    path: /rental-price
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: recordRentalInspection
+    verb: POST
+    path: /rental-bookings/{bookingId}/inspection
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: true
+    reads: 1
+    writes: 1
+  - operation: reportRentalIncident
+    verb: POST
+    path: /rental-incidents
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: true
+    reads: 1
+    writes: 1
+  - operation: requestRentalCommercialOverride
+    verb: POST
+    path: /rental-overrides
+    scope: venue
+    permission: RENTAL_OVERRIDE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: returnRental
+    verb: POST
+    path: /rental-bookings/{bookingId}/return
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: setRentalAgreementRequirements
+    verb: PUT
+    path: /rental-products/{productId}/agreement
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalAvailabilityRules
+    verb: PUT
+    path: /rental-products/{productId}/availability-rules
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalDepositPolicy
+    verb: PUT
+    path: /rental-deposit-policies
+    scope: venue
+    permission: RENTAL_PRICE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalDurationRules
+    verb: PUT
+    path: /rental-products/{productId}/duration
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalFeePolicy
+    verb: PUT
+    path: /rental-fee-policies
+    scope: venue
+    permission: RENTAL_PRICE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalInventoryModel
+    verb: PUT
+    path: /rental-products/{productId}/inventory-model
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalOperationalRules
+    verb: PUT
+    path: /rental-products/{productId}/rules
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setRentalProductLocations
+    verb: PUT
+    path: /rental-products/{productId}/locations
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: signRentalAgreement
+    verb: POST
+    path: /rental-bookings/{bookingId}/agreement
+    scope: venue
+    permission: RENTAL_BOOK
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: simulateRentalPricing
+    verb: POST
+    path: /rental-price/simulate
+    scope: venue
+    permission: RENTAL_PRICE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: swapRentalEquipment
+    verb: POST
+    path: /rental-bookings/{bookingId}/swap
+    scope: venue
+    permission: RENTAL_OPERATE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateRentalBooking
+    verb: PATCH
+    path: /rental-bookings/{bookingId}
+    scope: venue
+    permission: RENTAL_BOOK
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateRentalPricingProfile
+    verb: PUT
+    path: /rental-pricing-profiles/{profileId}
+    scope: venue
+    permission: RENTAL_PRICE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateRentalProduct
+    verb: PUT
+    path: /rental-products/{productId}
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: validateRentalProduct
+    verb: POST
+    path: /rental-products/{productId}/validate
+    scope: venue
+    permission: RENTAL_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+- contract: games
+  count: 37
+  operations:
+  - operation: adjustGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: authoriseGameplay
+    verb: POST
+    path: /gameplay-authorisations
+    scope: venue
+    permission: ACCESS_VALIDATE
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: createGame
+    verb: POST
+    path: /games
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createGameEntitlement
+    verb: POST
+    path: /game-entitlements
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createPrize
+    verb: POST
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deployReaderConfiguration
+    verb: POST
+    path: /readers/{readerId}/deploy
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGameCard
+    verb: GET
+    path: /game-cards/{cardCode}
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getGameEligibility
+    verb: GET
+    path: /game-eligibility
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGamePricing
+    verb: GET
+    path: /game-pricing
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGameplaySyncStatus
+    verb: GET
+    path: /gameplay-sync-status
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGameplayValidationRules
+    verb: GET
+    path: /gameplay-validation-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: issueGameCard
+    verb: POST
+    path: /game-cards
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listAttractionTypes
+    verb: GET
+    path: /attraction-types
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGameEntitlements
+    verb: GET
+    path: /game-entitlements
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGameplayTransactions
+    verb: GET
+    path: /gameplay-transactions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGames
+    verb: GET
+    path: /games
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listPrizes
+    verb: GET
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listReaders
+    verb: GET
+    path: /readers
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: loadGameCredits
+    verb: POST
+    path: /game-cards/{cardCode}/load
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordGamePlay
+    verb: POST
+    path: /game-plays
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: redeemPrize
+    verb: POST
+    path: /prize-redemptions
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setAttractionType
+    verb: PUT
+    path: /attraction-types
+    scope: tenant
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameCardExpiryRules
+    verb: PUT
+    path: /game-card-expiry-rules
+    scope: tenant
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameCardLifecycle
+    verb: POST
+    path: /game-cards/{cardId}/lifecycle
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setGameKioskConfiguration
+    verb: PUT
+    path: /game-kiosk-config
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameOperationalConfiguration
+    verb: PUT
+    path: /games/{gameId}/operations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGamePricing
+    verb: PUT
+    path: /game-pricing
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameplayValidationRules
+    verb: PUT
+    path: /gameplay-validation-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPrizeCost
+    verb: PUT
+    path: /prizes/{prizeId}/cost
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReaderConfiguration
+    verb: PUT
+    path: /readers/{readerId}
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReaderProfile
+    verb: PUT
+    path: /reader-profiles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setRedemptionRules
+    verb: PUT
+    path: /redemption-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: simulateGameplayAuthorisation
+    verb: POST
+    path: /gameplay-authorisations/simulate
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: syncGamePlays
+    verb: POST
+    path: /game-plays/sync
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: testReader
+    verb: POST
+    path: /readers/{readerId}/test
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: transferGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/transfer
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateGame
+    verb: PATCH
+    path: /games/{gameId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
 - contract: maintenance
   count: 36
   operations:
@@ -338,6 +1347,217 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+- contract: assets
+  count: 26
+  operations:
+  - operation: analyseMediaAsset
+    verb: POST
+    path: /media-assets/{assetId}/analyse
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: bulkUpdateMediaAssets
+    verb: POST
+    path: /media-assets/bulk
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: completeUpload
+    verb: POST
+    path: /media/uploads/{uploadId}/complete
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createCollection
+    verb: POST
+    path: /media/collections
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createMediaShare
+    verb: POST
+    path: /media-shares
+    scope: venue
+    permission: ASSET_LIBRARY_SHARE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createUpload
+    verb: POST
+    path: /media/uploads
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteMediaAsset
+    verb: DELETE
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: findSimilarMediaAssets
+    verb: GET
+    path: /media-assets/similar
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getExpiringRights
+    verb: GET
+    path: /media/rights-expiring
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMediaAsset
+    verb: GET
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getMediaDistribution
+    verb: GET
+    path: /media-distribution
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getMediaTaxonomy
+    verb: GET
+    path: /media-taxonomy
+    scope: tenant
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMediaUsageAnalytics
+    verb: GET
+    path: /media-usage
+    scope: tenant
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCollections
+    verb: GET
+    path: /media/collections
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMediaAssetAudit
+    verb: GET
+    path: /media-assets/{assetId}/audit
+    scope: tenant
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMediaAssetVersions
+    verb: GET
+    path: /media-assets/{assetId}/versions
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMediaRenditions
+    verb: GET
+    path: /media-assets/{assetId}/renditions
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: replaceMediaAsset
+    verb: POST
+    path: /media/{mediaId}/replace
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: requestMediaRendition
+    verb: POST
+    path: /media-assets/{assetId}/renditions
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: searchMedia
+    verb: GET
+    path: /media
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setMediaAssetApproval
+    verb: POST
+    path: /media-assets/{assetId}/approval
+    scope: tenant
+    permission: ASSET_LIBRARY_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setMediaAssetRights
+    verb: PUT
+    path: /media-assets/{assetId}/rights
+    scope: tenant
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMediaAssetTags
+    verb: PUT
+    path: /media-assets/{assetId}/tags
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setMediaDistributionChannels
+    verb: PUT
+    path: /media-distribution/channels
+    scope: tenant
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setMediaTaxonomy
+    verb: PUT
+    path: /media-taxonomy
+    scope: tenant
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateMediaAsset
+    verb: PATCH
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
 - contract: queue
   count: 21
   operations:
@@ -509,121 +1729,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-- contract: games
-  count: 14
-  operations:
-  - operation: adjustGameCard
-    verb: POST
-    path: /game-cards/{cardCode}/adjust
-    scope: venue
-    permission: LEDGER_POST
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createGame
-    verb: POST
-    path: /games
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createPrize
-    verb: POST
-    path: /prizes
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: getGameCard
-    verb: GET
-    path: /game-cards/{cardCode}
-    scope: venue
-    permission: null
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: issueGameCard
-    verb: POST
-    path: /game-cards
-    scope: workstation
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: listGames
-    verb: GET
-    path: /games
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listPrizes
-    verb: GET
-    path: /prizes
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: loadGameCredits
-    verb: POST
-    path: /game-cards/{cardCode}/load
-    scope: workstation
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: recordGamePlay
-    verb: POST
-    path: /game-plays
-    scope: venue
-    permission: null
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: redeemPrize
-    verb: POST
-    path: /prize-redemptions
-    scope: workstation
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setReaderProfile
-    verb: PUT
-    path: /reader-profiles
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: syncGamePlays
-    verb: POST
-    path: /game-plays/sync
-    scope: venue
-    permission: null
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: transferGameCard
-    verb: POST
-    path: /game-cards/{cardCode}/transfer
-    scope: venue
-    permission: ORDER_MODIFY
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateGame
-    verb: PATCH
-    path: /games/{gameId}
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
 - contract: venue-map
   count: 12
   operations:
@@ -723,164 +1828,6 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
-- contract: assets
-  count: 10
-  operations:
-  - operation: completeUpload
-    verb: POST
-    path: /media/uploads/{uploadId}/complete
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createCollection
-    verb: POST
-    path: /media/collections
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createUpload
-    verb: POST
-    path: /media/uploads
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: deleteMediaAsset
-    verb: DELETE
-    path: /media/{mediaId}
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: getExpiringRights
-    verb: GET
-    path: /media/rights-expiring
-    scope: venue
-    permission: ASSET_LIBRARY_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: getMediaAsset
-    verb: GET
-    path: /media/{mediaId}
-    scope: venue
-    permission: ASSET_LIBRARY_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: listCollections
-    verb: GET
-    path: /media/collections
-    scope: venue
-    permission: ASSET_LIBRARY_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: replaceMediaAsset
-    verb: POST
-    path: /media/{mediaId}/replace
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: searchMedia
-    verb: GET
-    path: /media
-    scope: venue
-    permission: ASSET_LIBRARY_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: updateMediaAsset
-    verb: PATCH
-    path: /media/{mediaId}
-    scope: venue
-    permission: ASSET_LIBRARY_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-- contract: resources
-  count: 9
-  operations:
-  - operation: bookResource
-    verb: POST
-    path: /resource-bookings
-    scope: venue
-    permission: RESOURCE_BOOK
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: checkInResource
-    verb: POST
-    path: /resource-bookings/{bookingId}/check-in
-    scope: venue
-    permission: RESOURCE_BOOK
-    offline: true
-    reads: 3
-    writes: 4
-  - operation: checkOutResource
-    verb: POST
-    path: /resource-bookings/{bookingId}/check-out
-    scope: venue
-    permission: RESOURCE_BOOK
-    offline: true
-    reads: 4
-    writes: 4
-  - operation: createResource
-    verb: POST
-    path: /resources
-    scope: venue
-    permission: RESOURCE_MANAGE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: getResourceAvailability
-    verb: GET
-    path: /resources/{resourceId}/availability
-    scope: venue
-    permission: RESOURCE_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: getSessionManifest
-    verb: GET
-    path: /sessions/{sessionId}/manifest
-    scope: venue
-    permission: RESOURCE_VIEW
-    offline: true
-    reads: 3
-    writes: 0
-  - operation: listResources
-    verb: GET
-    path: /resources
-    scope: venue
-    permission: RESOURCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: reorderSessionManifest
-    verb: PUT
-    path: /sessions/{sessionId}/manifest
-    scope: venue
-    permission: RESOURCE_BOOK
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: setResourceQualifications
-    verb: PUT
-    path: /resources/{resourceId}/qualifications
-    scope: venue
-    permission: RESOURCE_MANAGE
-    offline: false
-    reads: 3
-    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -896,6 +1843,31 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: assets.approval
+  columns: 7
+  store: postgres
+  parent: maintenance.asset
+  writtenBy: []
+  foreignWriters: null
+- table: assets.asset_version
+  columns: 11
+  store: postgres
+  parent: maintenance.asset
+  writtenBy: []
+  foreignWriters: null
+- table: assets.audit
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: assets.distribution_channel
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
 - table: assets.media_asset
   columns: 23
   store: postgres
@@ -924,8 +1896,56 @@ tables:
   writtenBy:
   - assets
   foreignWriters: null
+- table: assets.rendition
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.share
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.tag
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.taxonomy
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: games.attraction_type
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.authorisation
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: games.card
   columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.card_expiry_rules
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -938,10 +1958,37 @@ tables:
   writtenBy:
   - games
   foreignWriters: null
+- table: games.entitlement
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
 - table: games.game
   columns: 15
   store: postgres
   parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.gameplay_transaction
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: games.kiosk_config
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.operational_config
+  columns: 13
+  store: postgres
+  parent: games.game
   writtenBy:
   - games
   foreignWriters: null
@@ -952,12 +1999,39 @@ tables:
   writtenBy:
   - games
   foreignWriters: null
+- table: games.pricing
+  columns: 8
+  store: postgres
+  parent: games.game
+  writtenBy:
+  - games
+  foreignWriters: null
 - table: games.prize
   columns: 11
   store: postgres
   parent: null
   writtenBy:
   - games
+  foreignWriters: null
+- table: games.prize_cost
+  columns: 9
+  store: postgres
+  parent: games.prize
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.reader
+  columns: 11
+  store: postgres
+  parent: platform.device
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.reader_deployment
+  columns: 8
+  store: postgres
+  parent: games.reader
+  writtenBy: []
   foreignWriters: null
 - table: games.reader_profile
   columns: 7
@@ -978,6 +2052,20 @@ tables:
   store: postgres
   parent: games.redemption
   writtenBy: []
+  foreignWriters: null
+- table: games.redemption_rules
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.validation_rules
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
   foreignWriters: null
 - table: maintenance.asset
   columns: 30
@@ -1062,6 +2150,20 @@ tables:
   writtenBy:
   - queue
   foreignWriters: null
+- table: resources.allocation_policy
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.attribute_definition
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
 - table: resources.booking
   columns: 14
   store: postgres
@@ -1083,8 +2185,76 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: resources.resource_audit
+  columns: 13
+  store: postgres
+  parent: resources.resource
+  writtenBy: []
+  foreignWriters: null
+- table: resources.resource_block
+  columns: 8
+  store: postgres
+  parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_category
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_dependency
+  columns: 12
+  store: postgres
+  parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_package
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_relation
+  columns: 6
+  store: postgres
+  parent: resources.resource
+  writtenBy: []
+  foreignWriters: null
+- table: resources.resource_requirement
+  columns: 10
+  store: postgres
+  parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_schedule
+  columns: 8
+  store: postgres
+  parent: resources.resource
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource_type
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
 - table: resources.session_participant
   columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.venue_assignment
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1199,18 +2369,285 @@ screens:
 - P08:BO-097 Check Out & Check In
 - P08:BO-098 Qualifications
 - P08:BO-099 Session Manifest
+- P08:BO-1061 Platform Command Center
 - P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
+- P08:BO-394 Game & Ride Operations Dashboard
+- P08:BO-395 Game & Ride Directory
+- P08:BO-396 Attraction Profile
+- P08:BO-397 Attraction Type Configuration
+- P08:BO-398 Game & Ride Operational Configuration
+- P08:BO-400 Attraction / Reader Mapping
+- P08:BO-401 Game Package & Entitlement Association
+- P08:BO-402 Configuration Health & Validation
+- P08:BO-403 Attraction Audit, Dependencies & Governed Actions
+- P08:BO-404 Reader Management Dashboard
+- P08:BO-405 Reader Directory
 - P08:BO-406 Reader Profile & Device Setup
+- P08:BO-407 Reader Credit & Payment Configuration
+- P08:BO-408 Reader / Attraction Assignment
+- P08:BO-409 Retap Delay & Transaction Protection
+- P08:BO-410 Free Game Glow & Reader Display Rules
+- P08:BO-411 Reader Theme & Experience Configuration
+- P08:BO-412 Real-Time Tap Validation & Reader Response
+- P08:BO-413 Balance Check Reader & Device Test Console
+- P08:BO-421 Free Game & Ride Credit Management
+- P08:BO-424 Gameplay Validation Command Center
+- P08:BO-425 Gameplay Validation Rule Configuration
+- P08:BO-426 Deduction Priority & Funding Source Rules
+- P08:BO-427 All Games & Rides Pass Configuration
+- P08:BO-428 Specific Game/Ride Unlimited Entitlement
+- P08:BO-429 Specific Game/Ride Limited Entitlement
+- P08:BO-430 Game Package Builder
+- P08:BO-431 Entitlement Validity & Activation Rules
+- P08:BO-432 Real-Time Gameplay Authorization
+- P08:BO-433 Validation Simulator & Exception Analysis
+- P08:BO-434 Game & Ride Pricing Command Center
+- P08:BO-435 Standard Game & Ride Price Configuration
+- P08:BO-436 Group Pricing Configuration
+- P08:BO-437 Peak / Non-Peak Dynamic Pricing
+- P08:BO-438 Pricing Calendar & Exception Dates
+- P08:BO-439 Normal & VIP Pricing Configuration
+- P08:BO-440 Retry Price Configuration
+- P08:BO-442 Effective Pricing & Reader Price Preview
+- P08:BO-445 Redemption Credit Rule Configuration
+- P08:BO-446 Ticket-Based Redemption / Ticket-Eater Integration
+- P08:BO-447 Ticketless Redemption Game Integration
+- P08:BO-449 Redemption Counter / Prize Checkout
+- P08:BO-450 Prize Catalogue & Credit Cost Configuration
+- P08:BO-451 Prize Inventory Integration
+- P08:BO-453 Redemption Transaction Ledger, Reconciliation & Audit
+- P08:BO-454 Card Lifecycle Command Center
+- P08:BO-455 Card / Credential Profile
+- P08:BO-456 Card Expiry Rule Configuration
+- P08:BO-457 Last Recharge & Last Activity Tracking
+- P08:BO-458 Expiry Monitoring & Upcoming Expiration
+- P08:BO-459 Card Expiry Runtime Validation
+- P08:BO-460 Card Block, Suspend & Reactivation Control
+- P08:BO-461 Card Replacement & Wallet Relinking
+- P08:BO-462 Customer Balance & Credential Status View
+- P08:BO-463 Card Lifecycle Audit & History
+- P08:BO-464 Game & Ride Operations Control Center
+- P08:BO-465 Live Gameplay Transaction Monitor
+- P08:BO-466 Reader & Device Health Monitor
+- P08:BO-467 Tap Validation & Decision Trace
+- P08:BO-468 Rejected Transaction & Reason Analysis
+- P08:BO-470 Entitlement & Free-Play Consumption Monitor
+- P08:BO-471 Offline, Synchronization & Recovery Monitor
+- P08:BO-473 Operational Analytics & Reconciliation Dashboard
+- P08:BO-474 Reader Integration Command Center
+- P08:BO-475 Reader Manufacturer & Model Profile
+- P08:BO-476 Communication Protocol Configuration
+- P08:BO-477 Reader Command & Event Mapping
+- P08:BO-478 Reader Configuration Deployment & Synchronization
+- P08:BO-479 Game Trigger & I/O Control Mapping
+- P08:BO-480 Reader Screen, LED & Sound Output Mapping
+- P08:BO-481 Edge Cache & Offline Rule Package
+- P08:BO-482 Device Diagnostics & Integration Logs
+- P08:BO-484 Self-Service Experience Command Center
+- P08:BO-485 Self-Service Kiosk Profile & Channel Configuration
+- P08:BO-486 Customer Card / Wallet Identification
+- P08:BO-489 Bonus, Free Game & Benefit View
+- P08:BO-490 Game & Ride Eligibility / “What Can I Play?”
+- P08:BO-491 Redemption Balance & Prize Discovery
+- P08:BO-492 Customer Game & Wallet Transaction History
+- P08:BO-493 Self-Service UI Theme, Language & Journey Configuration
+- P08:BO-494 Rental Product Command Center
+- P08:BO-495 Create Rental Product Wizard
+- P08:BO-496 Rental Product Profile
+- P08:BO-497 Rental Category & Classification Setup
+- P08:BO-498 Inventory Tracking Model
+- P08:BO-499 Rental Location Assignment
+- P08:BO-500 Rental Duration & Turnaround Configuration
+- P08:BO-501 Rental Rules & Operational Policy
+- P08:BO-502 Customer Requirements, Agreement & Waiver
+- P08:BO-503 Product Validation, Approval & Publication
+- P08:BO-505 Serialized Equipment Registry
+- P08:BO-506 Equipment / Asset Profile
+- P08:BO-508 Equipment Status & Condition Management
+- P08:BO-509 QR / Barcode Equipment Identification
+- P08:BO-514 Availability Command Center
+- P08:BO-515 Availability Rule Configuration
+- P08:BO-516 Operating Hours & Rental Windows
+- P08:BO-517 Timeslot & Duration Availability Setup
+- P08:BO-518 Real-Time Availability Calendar
+- P08:BO-519 Resource / Equipment Calendar
+- P08:BO-520 Blackout, Closure & Capacity Blocking
+- P08:BO-521 Overlap & Conflict Engine
+- P08:BO-522 Inventory Holds, Buffers & Release Rules
+- P08:BO-523 Availability Intelligence & AI Forecasting
+- P08:BO-524 Rental Pricing Command Center
+- P08:BO-525 Pricing Profile Builder
+- P08:BO-526 Duration & Tiered Pricing Configuration
+- P08:BO-527 Calendar, Peak & Seasonal Pricing
+- P08:BO-529 Deposit & Security Hold Policy
+- P08:BO-530 Deposit Lifecycle & Settlement Rules
+- P08:BO-531 Late Fee, Grace Period & Extension Pricing
+- P08:BO-532 Commercial Exceptions, Waivers & Overrides
+- P08:BO-533 Pricing Simulation, Validation & AI Commercial Intelligence
+- P08:BO-534 Rental Booking Command Center
+- P08:BO-535 New Rental Booking Wizard
+- P08:BO-536 Availability Selection & Alternative Options
+- P08:BO-537 Customer & Participant Information
+- P08:BO-538 Group Rental & Participant Management
+- P08:BO-539 Rental Agreement & Waiver Completion
+- P08:BO-540 Booking Commercial Summary & Payment
+- P08:BO-541 Reservation Confirmation & QR Voucher
+- P08:BO-542 Reservation Modification, Cancellation & No-Show
+- P08:BO-543 Reservation Detail, Timeline & Readiness
+- P08:BO-544 Rental Checkout Command Center
+- P08:BO-545 Voucher Scan & Reservation Retrieval
+- P08:BO-546 Checkout Readiness Validation
+- P08:BO-547 Equipment Assignment Workspace
+- P08:BO-548 Equipment Scan & Validation
+- P08:BO-549 Pre-Rental Condition Inspection
+- P08:BO-550 Safety & Handover Checklist
+- P08:BO-551 Deposit & Financial Handover Validation
+- P08:BO-552 Group & Multi-Item Checkout
+- P08:BO-553 Checkout Confirmation & Rental Activation
+- P08:BO-554 Active Rental Operations Command Center
+- P08:BO-555 Active Rental Detail & Live Timeline
+- P08:BO-556 Rental Extension Request
+- P08:BO-557 Extension Pricing & Confirmation
+- P08:BO-558 Equipment Swap / Replacement
+- P08:BO-559 Rental Incident & Operational Exception
+- P08:BO-560 Due Soon & Customer Notification Management
+- P08:BO-561 Overdue Rental Management
+- P08:BO-562 Active Group Rental Management
+- P08:BO-563 Active Rental Intelligence & Operational Alerts
+- P08:BO-564 Rental Return Command Center
+- P08:BO-565 Return Scan & Rental Retrieval
+- P08:BO-566 Return Summary & Actual Return Time
+- P08:BO-567 Post-Rental Condition Inspection
+- P08:BO-568 Before vs After Condition Comparison
+- P08:BO-569 Damage Assessment & Charge Workflow
+- P08:BO-570 Partial Return & Missing Equipment
+- P08:BO-571 Late Fees, Damage Fees & Final Settlement
+- P08:BO-572 Deposit Release, Capture & Customer Confirmation
+- P08:BO-573 Return Completion & Equipment Disposition
+- P08:BO-574 Maintenance Command Center
+- P08:BO-575 Maintenance Rule & Service Plan Configuration
+- P08:BO-576 Maintenance Calendar & Scheduling
 - P08:BO-577 Maintenance Work Order
+- P08:BO-578 Technician Repair Workspace
+- P08:BO-579 Parts, Cost & Maintenance Expense Tracking
+- P08:BO-580 Asset Maintenance History & Lifecycle
+- P08:BO-581 Return-to-Service Inspection & Approval
+- P08:BO-582 Asset Retirement, Write-Off & Replacement Recommendation
+- P08:BO-583 Maintenance Intelligence & Predictive AI
+- P08:BO-584 Rental Executive Command Center
+- P08:BO-586 Utilization & Capacity Analytics
+- P08:BO-587 Inventory & Equipment Performance Analytics
+- P08:BO-588 Rental Duration, Extension & Return Analytics
+- P08:BO-589 Damage, Loss, Deposit & Exception Analytics
+- P08:BO-592 Audit, Governance & Operational Control
+- P08:BO-838 Content, Media & Forms
 - P08:BO-854 Resource Management Command Center
+- P08:BO-855 Resource Type Configuration
+- P08:BO-856 Resource Category Management
+- P08:BO-857 Resource Creation & Profile
+- P08:BO-858 Configurable Attribute Builder
+- P08:BO-859 Resource Hierarchy & Parent–Child Relationships
+- P08:BO-860 Resource Dependency Rules
+- P08:BO-861 Resource Package & Bundle Configuration
+- P08:BO-862 Multi-Venue Resource Assignment
+- P08:BO-863 Resource Lifecycle, Governance & Audit
+- P08:BO-864 Resource Calendar Command Center
+- P08:BO-865 Calendar Filters, Search & Smart Discovery
+- P08:BO-866 Resource Availability Schedule Configuration
+- P08:BO-867 Resource Time-Slot Configuration
+- P08:BO-868 Advance Reservation Management
+- P08:BO-869 Recurring Reservation Configuration
+- P08:BO-870 Operational Time & Resource Blocking
+- P08:BO-871 Multi-Event Resource Planning
+- P08:BO-872 Smart Assignment & Drag-and-Drop Reallocation
+- P08:BO-874 Staff Resource Profile
+- P08:BO-875 Skills & Competency Management
+- P08:BO-876 Certification & Expiry Management
+- P08:BO-877 Qualification & Assignment Rule Engine
+- P08:BO-878 Staff Availability & Working Pattern
+- P08:BO-893 Experience Resource Requirement Builder
+- P08:BO-894 Staff-to-Experience Qualification Mapping
+- P08:BO-895 Resource Combination Builder
+- P08:BO-896 Ticket Demand & Resource Capacity Mapping
+- P08:BO-897 Customer Resource Selection Configuration
+- P08:BO-898 Skill-Based & Smart Resource Selection
+- P08:BO-899 Customer / Cashier Resource Assignment Experience
+- P08:BO-900 Dynamic Resource Allocation Engine
+- P08:BO-901 Priority, Scoring & Allocation Policy
+- P08:BO-902 Automatic Replacement & Assignment Recovery
+- P08:BO-903 Equipment & Asset Command Center
+- P08:BO-904 Rental Resource Configuration
+- P08:BO-905 Rental Inventory & Availability Control
+- P08:BO-906 Resource Checkout Workspace
+- P08:BO-907 Guest & Resource Assignment
+- P08:BO-908 Rental Duration, Extension & Return Management
+- P08:BO-909 Deposit & Rental Financial Control
+- P08:BO-910 Maintenance & Resource Blocking
+- P08:BO-911 Inspection, Condition & Compliance Management
+- P08:BO-912 Asset Lifecycle, Depreciation & Retirement
+- P08:BO-915 Venue & Space Allocation
+- P08:BO-916 Equipment & Asset Allocation
+- P08:BO-918 Event Resource Template Library
+- P08:BO-921 Multi-Event Allocation & Conflict Optimizer
 - P08:BO-923 AI Resource Intelligence Command Center
+- P08:BO-933 My Resource Operations Home
+- P08:BO-934 My Schedule & Assignment Calendar
+- P08:BO-935 Assignment Detail & Operational Brief
+- P08:BO-937 Resource Collection, Handover & Return
+- P08:BO-942 Mobile Operations Control & Offline Sync
 - P08:BO-943 Resource Analytics Command Center
+- P08:BO-944 Resource Utilization & Capacity Analytics
+- P08:BO-945 Resource Cost, Revenue & Efficiency Analytics
+- P08:BO-947 Resource KPI, SLA & Performance Framework
+- P08:BO-948 Resource Governance & Policy Center
+- P08:BO-950 Audit Trail & Resource Decision History
+- P08:BO-952 Executive Resource Intelligence & AI Improvement Center
+- P08:BO-990 Maintenance & Out of Service
+- P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
 - P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
 - P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library
+- P13:CMS-061 Digital Asset Management Command Center
+- P13:CMS-062 Central Digital Asset Library
+- P13:CMS-063 Upload & Asset Ingestion Workspace
+- P13:CMS-064 Folder, Collection & Workspace Management
+- P13:CMS-065 Metadata & Taxonomy Management
+- P13:CMS-066 Tags, Keywords & Classification
+- P13:CMS-067 Advanced Search & Discovery
+- P13:CMS-068 Digital Asset 360° Profile
+- P13:CMS-069 Bulk Asset Management Workspace
+- P13:CMS-070 Asset Activity, Recent Assets & Library Health
 - P13:CMS-071 AI Asset Intelligence Command Center
+- P13:CMS-072 AI Auto-Tagging & Content Understanding
+- P13:CMS-073 Semantic & Natural-Language Asset Search
+- P13:CMS-074 Visual Similarity & Related Asset Discovery
+- P13:CMS-075 Duplicate & Near-Duplicate Management
+- P13:CMS-076 Asset Version Control & Revision History
+- P13:CMS-077 Version Comparison & Replacement Impact
+- P13:CMS-078 Transformation & Rendition Management
+- P13:CMS-079 Rendition Processing & Delivery Readiness
+- P13:CMS-080 AI Quality, Intelligence Review & Recommendations
+- P13:CMS-081 DAM Governance & Rights Command Center
+- P13:CMS-082 Asset Ownership & Responsibility Management
+- P13:CMS-083 Rights, License & Usage Policy Management
+- P13:CMS-084 Asset Approval Workflow Management
+- P13:CMS-085 Publication Eligibility & Governance Validation
+- P13:CMS-087 Secure Internal & External Sharing
+- P13:CMS-088 Rights Expiry, Renewal & Usage Impact
+- P13:CMS-089 Governance Audit Trail & Compliance Evidence
+- P13:CMS-090 Governance Risk, Compliance & AI Recommendations
+- P13:CMS-091 Asset Distribution & Delivery Command Center
+- P13:CMS-092 Asset Usage & Distribution Map
+- P13:CMS-093 Channel & Distribution Configuration
+- P13:CMS-094 Secure Delivery URL, CDN & Rendition Delivery
+- P13:CMS-095 Asset Replacement & Propagation Management
+- P13:CMS-096 Fallback, Expiry & Distribution Continuity
+- P13:CMS-097 DAM API & Integration Hub
+- P13:CMS-098 Delivery Monitoring & Integration Health
+- P13:CMS-099 Asset Usage & Performance Analytics
+- P13:CMS-100 Distribution Intelligence, AI Insights & Optimization
 flows:
 - F08 Steward works a shift on the employee app
 - F12 Asset fails and closes a queue

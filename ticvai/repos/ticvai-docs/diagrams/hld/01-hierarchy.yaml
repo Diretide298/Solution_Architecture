@@ -34,17 +34,17 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 310
-  configurations: 29
+  operations: 399
+  configurations: 40
   configuredBy:
   - claimCustomDomain
+  - createAccessPolicy
+  - createCreditType
   - createDashboard
   - createInspectionTemplate
   - createKnowledgeCollection
+  - createKpi
   - createLoyaltyProgramme
-  - createMessageTemplate
-  - getAiPolicy
-  - listIndexSources
   owns:
   - Plans and licences
   - Roles and permissions
@@ -91,17 +91,17 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1219
-  configurations: 43
+  operations: 1461
+  configurations: 46
   configuredBy:
   - configureQueueFeed
   - configureWorkstation
+  - createAccreditationProgramme
   - createAdmissionRules
   - createDonationCampaign
   - createEntitlementTemplate
-  - createResource
-  - createSaleBoard
-  - createVenueMap
+  - createRecommendationStrategy
+  - createRentalProduct
   owns:
   - Almost everything operational
   - Kitchen SLA and section layout

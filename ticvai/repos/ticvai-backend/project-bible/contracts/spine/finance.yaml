@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Finance & Ledger
   version: 0.1.0
-  x-ticvai-screen-count: 43
+  x-ticvai-screen-count: 46
   x-ticvai-tier: spine
   x-ticvai-module: 5 — F&B & Guest Management (accounting and revenue recognition)
   x-ticvai-requirements: 327
@@ -188,6 +188,8 @@ paths:
   /deposits:
     post:
       operationId: recordDeposit
+      x-ticvai-consumed-by:
+        - "P08 BO-1029 Quote, Deposit & Payment"
       summary: Money taken before the sale is complete
       description: '**A deposit is not deferred revenue and the distinction is a balance-sheet one.**
         `deferredRevenue` covers a sold entitlement not yet consumed — the sale happened. A deposit is
@@ -319,6 +321,10 @@ paths:
   /reconciliation/unified:
     get:
       operationId: getUnifiedReconciliation
+      x-ticvai-consumed-by:
+        - "P08 BO-1081 Finance Dashboard"
+        - "P09 ADM-627 Reconciliation Audit, Trace & Evidence Center\t149"
+        - "P09 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150"
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -369,6 +375,8 @@ paths:
         format: uuid
     post:
       operationId: recordSettlement
+      x-ticvai-consumed-by:
+        - "P09 ADM-626 Settlement Posting, Finance Handoff & Close Manager\t148"
       x-ticvai-audience:
       - staff
       summary: One entity paid another
@@ -1969,6 +1977,8 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-101 Orders & Money"
+        - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
+        - "P09 ADM-623 Settlement & Payout Manager\t144"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-audience:
       - staff
@@ -2011,6 +2021,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
+        - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-audience:
       - staff
@@ -2112,6 +2123,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
+        - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-audience:
       - staff
@@ -2150,6 +2162,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
+        - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-audience:
       - staff
@@ -2232,6 +2245,7 @@ paths:
       operationId: createLegalEntity
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
+        - "P09 ADM-411 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity
@@ -2261,6 +2275,7 @@ paths:
       operationId: listFiscalPeriods
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

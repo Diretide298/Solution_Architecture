@@ -612,6 +612,14 @@ screens:
 - P08:BO-138 Production Execution & Batch Management
 - P08:BO-140 Product Availability, 86 & Operational Food Safety
 - P08:BO-141 Operational Alerts, AI Replenishment & Action Center
+- P08:BO-452 Direct-Pay / Crane & Prize Machine Configuration
+- P08:BO-504 Rental Inventory Command Center
+- P08:BO-505 Serialized Equipment Registry
+- P08:BO-507 Pooled Inventory Management
+- P08:BO-510 Inventory Location Allocation
+- P08:BO-511 Inventory Transfer Management
+- P08:BO-512 Inventory Adjustment & Exception Management
+- P08:BO-513 Inventory Intelligence & Rebalancing
 - P16:ANL-005 Cost, Margin & Profitability
 - P16:ANL-006 Inventory & Waste Intelligence
 flows:

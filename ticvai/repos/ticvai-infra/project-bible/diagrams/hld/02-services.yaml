@@ -16,8 +16,8 @@ tiers:
     Identity and 289 tables anchor on `platform.org_unit`.
   services:
   - service: TenancyService
-    operations: 78
-    tables: 39
+    operations: 107
+    tables: 50
     schemas:
     - platform
     - workforce
@@ -31,8 +31,8 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 44
-    tables: 20
+    operations: 56
+    tables: 24
     schemas:
     - identity
     - pii
@@ -46,8 +46,8 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 344
-    tables: 40
+    operations: 393
+    tables: 61
     schemas:
     - catalogue
     - promotions
@@ -62,7 +62,7 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 187
+    operations: 218
     tables: 34
     schemas:
     - orders
@@ -74,7 +74,7 @@ tiers:
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
-    operations: 177
+    operations: 206
     tables: 8
     schemas:
     - access
@@ -102,8 +102,8 @@ tiers:
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 102
-    tables: 32
+    operations: 220
+    tables: 65
     schemas:
     - queue
     - maintenance
@@ -133,6 +133,17 @@ tiers:
     scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
     ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
     ref: diagrams/lld/services/FnbService.yaml
+  - service: RetailService
+    operations: 70
+    tables: 15
+    schemas:
+    - retail
+    contracts:
+    - retail
+    flowCoverage: 43%
+    scale: Follows the sale. Nothing unusual.
+    ifDown: Down means the shop stops; the gates and the restaurant do not.
+    ref: diagrams/lld/services/RetailService.yaml
   - service: InventoryService
     operations: 50
     tables: 19
@@ -144,24 +155,13 @@ tiers:
     scale: Mixed. Counting is bursty; procurement is not.
     ifDown: Down blocks receiving and counting; selling continues from the till's cache.
     ref: diagrams/lld/services/InventoryService.yaml
-  - service: RetailService
-    operations: 37
-    tables: 15
-    schemas:
-    - retail
-    contracts:
-    - retail
-    flowCoverage: 43%
-    scale: Follows the sale. Nothing unusual.
-    ifDown: Down means the shop stops; the gates and the restaurant do not.
-    ref: diagrams/lld/services/RetailService.yaml
 - tier: engagement
   meaning: Guests and intelligence. **Nothing that takes money depends on these**, which is a deliberate
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 166
-    tables: 38
+    operations: 183
+    tables: 45
     schemas:
     - marketing
     contracts:
@@ -186,7 +186,7 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 167
+    operations: 182
     tables: 51
     schemas:
     - control
@@ -210,8 +210,8 @@ tiers:
     ifDown: Down freezes the current published config. Guests see the last good version.
     ref: diagrams/lld/services/WhiteLabelService.yaml
   - service: ReportingService
-    operations: 29
-    tables: 13
+    operations: 42
+    tables: 20
     schemas:
     - reporting
     contracts:

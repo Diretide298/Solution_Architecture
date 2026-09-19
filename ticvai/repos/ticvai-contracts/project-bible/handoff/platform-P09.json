@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
-  "operations": 406,
-  "contracts": 15,
+  "operations": 522,
+  "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 149
+  "operationsWithNoScreen": 141
  },
  "waves": {
   "wave1": 12,
@@ -130,19 +130,23 @@
  ],
  "contracts": [
   {
+   "contract": "promotions",
+   "operations": 112
+  },
+  {
    "contract": "catalogue",
    "operations": 110
   },
   {
-   "contract": "promotions",
-   "operations": 99
+   "contract": "subscription",
+   "operations": 59
   },
   {
    "contract": "orders",
-   "operations": 41
+   "operations": 57
   },
   {
-   "contract": "subscription",
+   "contract": "approvals",
    "operations": 35
   },
   {
@@ -150,8 +154,8 @@
    "operations": 32
   },
   {
-   "contract": "approvals",
-   "operations": 24
+   "contract": "payments",
+   "operations": 31
   },
   {
    "contract": "white-label",
@@ -159,11 +163,23 @@
   },
   {
    "contract": "identity",
-   "operations": 15
+   "operations": 18
   },
   {
    "contract": "marketing-crm",
-   "operations": 10
+   "operations": 12
+  },
+  {
+   "contract": "finance",
+   "operations": 7
+  },
+  {
+   "contract": "tenancy",
+   "operations": 7
+  },
+  {
+   "contract": "public-api",
+   "operations": 5
   },
   {
    "contract": "ai",
@@ -174,20 +190,20 @@
    "operations": 4
   },
   {
-   "contract": "public-api",
-   "operations": 4
-  },
-  {
    "contract": "cross-region",
    "operations": 3
   },
   {
-   "contract": "tenancy",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
+  },
+  {
+   "contract": "maintenance",
+   "operations": 1
   }
  ],
  "screens": [
@@ -3068,7 +3084,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/create-approval-workflow-adm-320",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3077,7 +3093,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-stage-configuration-adm-322",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3086,7 +3102,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/condition-decision-rule-builder-adm-323",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3095,7 +3111,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-sequence-parallel-routing-adm-324",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3104,7 +3120,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-outcome-action-configuration-adm-325",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3113,7 +3129,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-validation-simulation-adm-326",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3122,7 +3138,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-publication-lifecycle-adm-327",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3131,7 +3147,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-versioning-change-history-adm-328",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3140,7 +3156,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-matrix-command-center-adm-329",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3149,7 +3165,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-authority-matrix-adm-330",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3158,7 +3174,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/organizational-hierarchy-routing-adm-331",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3167,7 +3183,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/department-based-approval-matrix-adm-332",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3176,7 +3192,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/venue-tenant-approval-matrix-adm-333",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3185,7 +3201,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/value-threshold-routing-adm-334",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3194,7 +3210,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/risk-based-conditional-routing-adm-335",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3203,7 +3219,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approver-group-decision-policy-adm-336",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3212,7 +3228,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/routing-simulator-conflict-detection-adm-337",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3221,7 +3237,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-routing-advisor-matrix-optimization-adm-338",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3230,7 +3246,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/governance-compliance-command-center-adm-339",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3239,7 +3255,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/segregation-of-duties-policy-manager-adm-340",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3248,7 +3264,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/four-eyes-dual-control-policy-adm-341",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3266,7 +3282,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/sensitive-action-confirmation-adm-343",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3275,7 +3291,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/digital-signature-management-adm-344",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3284,7 +3300,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/immutable-approval-record-tamper-detection-adm-345",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3293,7 +3309,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-record-retention-policy-adm-346",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3302,7 +3318,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/regulatory-audit-evidence-center-adm-347",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3311,7 +3327,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/governance-risk-ai-compliance-advisor-adm-348",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3320,7 +3336,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-integration-command-center-adm-349",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3329,7 +3345,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/module-integration-registry-adm-350",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3338,7 +3354,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-api-management-adm-351",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3347,7 +3363,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/workflow-event-framework-adm-352",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3356,7 +3372,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/webhook-configuration-subscription-manager-adm-353",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3365,7 +3381,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/external-workflow-system-integration-adm-354",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3374,7 +3390,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/data-workflow-mapping-studio-adm-355",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3383,7 +3399,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/integration-security-access-control-adm-356",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3392,7 +3408,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/integration-monitoring-error-retry-center-adm-357",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3401,7 +3417,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/integration-analytics-ai-health-advisor-adm-358",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3410,7 +3426,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-executive-kpi-dashboard-adm-359",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3419,7 +3435,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-volume-outcome-analytics-adm-360",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3428,7 +3444,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-processing-time-analytics-adm-361",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3437,7 +3453,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/bottleneck-analysis-heatmap-adm-362",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3446,7 +3462,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-trend-comparative-analytics-adm-363",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3455,7 +3471,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approver-team-performance-analytics-adm-364",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3473,7 +3489,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-approval-intelligence-center-adm-366",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3482,7 +3498,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-optimization-what-if-simulator-adm-367",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3491,7 +3507,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-governance-executive-advisor-adm-368",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3500,7 +3516,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-command-center-adm-369",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3509,7 +3525,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/customer-subscription-commercial-portfolio-adm-370",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3518,7 +3534,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/customer-commercial-360-adm-371",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3527,7 +3543,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3536,7 +3552,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/revenue-commercial-model-analytics-adm-373",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3545,7 +3561,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/trial-conversion-monitor-adm-374",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3563,7 +3579,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3572,7 +3588,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/subscription-exceptions-commercial-alerts-adm-377",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3581,7 +3597,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/executive-ai-commercial-intelligence-adm-378",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3590,7 +3606,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/welcome-start-your-ticvai-journey-adm-379",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3599,7 +3615,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/customer-organization-registration-adm-380",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3608,7 +3624,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/venue-type-business-profile-adm-381",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3617,7 +3633,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/visitor-capacity-operational-scale-adm-382",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3635,7 +3651,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/ticketing-product-requirements-adm-384",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3644,7 +3660,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/access-queue-visitor-experience-assessment-adm-385",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3653,7 +3669,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/additional-business-module-assessment-adm-386",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3662,7 +3678,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/integration-payment-technical-readiness-adm-387",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3671,7 +3687,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/ai-assessment-summary-handoff-adm-388",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3680,7 +3696,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-rules-engine-overview-adm-389",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3689,7 +3705,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/vsi-model-builder-adm-390",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3698,7 +3714,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3707,7 +3723,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/subscription-tier-configuration-adm-392",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3716,7 +3732,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/tier-included-allowances-adm-393",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3725,7 +3741,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-licensing-model-configuration-adm-394",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3734,7 +3750,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3743,7 +3759,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/overage-pricing-capacity-packs-adm-396",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3752,7 +3768,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-model-rule-simulation-adm-397",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3761,7 +3777,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/rule-versioning-approval-publication-adm-398",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3770,7 +3786,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/recommended-package-overview-adm-399",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3779,7 +3795,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-model-tier-selection-adm-400",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3788,7 +3804,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/module-marketplace-adm-401",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3797,7 +3813,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/ai-module-package-recommendations-adm-402",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3806,7 +3822,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/module-detail-commercial-treatment-adm-403",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3815,7 +3831,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/module-dependency-compatibility-manager-adm-404",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3824,7 +3840,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/add-ons-capacity-commercial-options-adm-405",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3833,7 +3849,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-package-simulator-adm-406",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3842,7 +3858,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/package-review-commercial-summary-adm-407",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3851,7 +3867,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/final-package-approval-handoff-adm-408",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3860,7 +3876,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/purchase-trial-journey-selection-adm-409",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3869,7 +3885,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/contract-billing-cycle-selection-adm-410",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3878,7 +3894,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/billing-legal-entity-information-adm-411",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3887,7 +3903,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/payment-method-settlement-setup-adm-412",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3896,7 +3912,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/trial-configuration-conversion-rules-adm-413",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3905,7 +3921,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/order-commercial-pricing-review-adm-414",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3914,7 +3930,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-agreement-billable-definition-customer-accept-adm-415",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3923,7 +3939,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/payment-contract-commercial-validation-adm-416",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3932,7 +3948,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/subscription-confirmation-commercial-activation-adm-417",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3941,7 +3957,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/subscription-lifecycle-trial-to-paid-handoff-adm-418",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3950,7 +3966,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/provisioning-command-center-adm-419",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3959,7 +3975,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/tenant-organization-provisioning-adm-420",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3968,7 +3984,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3977,7 +3993,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/administrator-security-initialization-adm-422",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3986,7 +4002,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/license-entitlement-activation-adm-423",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3995,7 +4011,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/module-activation-dependency-validation-adm-424",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4004,7 +4020,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/venue-template-application-adm-425",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4013,7 +4029,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/initial-configuration-regional-defaults-adm-426",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4022,7 +4038,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/provisioning-validation-exception-management-adm-427",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4031,7 +4047,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/usage-license-command-center-adm-449",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4040,7 +4056,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/entitlement-license-inventory-adm-450",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4049,7 +4065,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-consumption-billable-event-metering-adm-451",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4058,7 +4074,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/operational-usage-threshold-monitor-adm-452",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4067,7 +4083,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/license-enforcement-decision-engine-adm-453",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4076,7 +4092,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/minimum-guarantee-variable-consumption-monitor-adm-454",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4085,7 +4101,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/overage-capacity-temporary-exception-management-adm-455",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4094,7 +4110,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/usage-alerts-reconciliation-exception-center-adm-456",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4103,7 +4119,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/ai-usage-forecast-commercial-optimization-adm-457",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4112,7 +4128,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/license-metering-commercial-synchronization-audit-adm-458",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4121,7 +4137,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/billing-commercial-command-center-adm-459",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4130,7 +4146,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/billing-calculation-charge-breakdown-adm-460",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4139,7 +4155,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/consumption-reconciliation-billing-approval-adm-461",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4148,7 +4164,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/invoice-payment-management-adm-462",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4157,7 +4173,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/subscription-commercial-change-management-adm-463",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4166,7 +4182,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/renewal-management-center-adm-464",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4175,7 +4191,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/ai-upgrade-downgrade-commercial-right-sizing-adm-465",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4184,7 +4200,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/commercial-scenario-simulator-adm-466",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4193,7 +4209,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/discount-credit-commercial-override-management-adm-467",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -4202,7 +4218,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5021,7 +5037,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-command-center-t7-adm-559",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5030,7 +5046,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-method-catalogue-t8-adm-560",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5039,7 +5055,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-method-configuration-t9-adm-561",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5048,7 +5064,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-touchpoint-payment-configuration-t10-adm-562",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5057,7 +5073,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/venue-location-business-unit-payment-assignment-t11-adm-563",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5066,7 +5082,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/currency-payment-currency-configuration-t12-adm-564",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5075,7 +5091,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-eligibility-availability-rule-builder-t13-adm-565",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5084,7 +5100,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-fees-surcharges-commercial-rules-t14-adm-566",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5093,7 +5109,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-policy-governance-approval-manager-t15-adm-567",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5102,7 +5118,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-configuration-simulator-validation-center-t16-adm-568",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5111,7 +5127,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-orchestration-command-center-t27-adm-569",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5120,7 +5136,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/gateway-psp-acquirer-directory-t28-adm-570",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5129,7 +5145,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/provider-connection-adapter-configuration-t29-adm-571",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5138,7 +5154,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/gateway-capability-payment-method-mapping-t30-adm-572",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5147,7 +5163,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-routing-rule-builder-t31-adm-573",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5156,7 +5172,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/routing-strategy-priority-load-distribution-t33-adm-574",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5165,7 +5181,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/failover-retry-resilience-manager-t34-adm-575",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5174,7 +5190,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/provider-health-sla-performance-monitor-t35-adm-576",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5183,7 +5199,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/provider-cost-commercial-routing-economics-t36-adm-577",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5192,7 +5208,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-routing-simulator-decision-trace-ai-advisor-t37-adm-578",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5201,7 +5217,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/terminal-card-present-command-center-t48-adm-579",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5210,7 +5226,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5219,7 +5235,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/terminal-provisioning-device-configuration-t51-adm-581",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5228,7 +5244,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5237,7 +5253,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/emv-card-present-processing-configuration-t53-adm-583",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5246,7 +5262,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-server-terminal-connectivity-manager-t54-adm-584",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5255,7 +5271,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/card-present-transaction-monitor-operations-t55-adm-585",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5264,7 +5280,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/degraded-offline-store-and-forward-manager-t56-adm-586",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5273,7 +5289,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5282,7 +5298,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/terminal-simulator-certification-ai-operations-advisor-t-adm-588",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5291,7 +5307,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-payments-command-center-t71-adm-589",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5300,7 +5316,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-alternative-payment-method-manager-t71-adm-590",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5309,7 +5325,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-wallet-mobile-payment-configuration-t72-adm-591",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5318,7 +5334,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-link-builder-configuration-t73-adm-592",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5327,7 +5343,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5336,7 +5352,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/hosted-checkout-redirect-return-flow-configuration-t75-adm-594",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5345,7 +5361,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-payment-session-transaction-monitor-t76-adm-595",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5354,7 +5370,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/authentication-tokenization-recurring-payment-controls-t-adm-596",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5363,7 +5379,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-payment-exception-recovery-expiry-center-t79-adm-597",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5372,7 +5388,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/digital-payment-simulator-conversion-ai-advisor-t80-adm-598",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5381,7 +5397,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/mixed-tender-credit-command-center-t93-adm-599",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5390,7 +5406,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/mixed-tender-rule-combination-builder-t93-adm-600",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5399,7 +5415,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/split-payment-tender-allocation-manager-t94-adm-601",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5408,7 +5424,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5417,7 +5433,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5426,7 +5442,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/stored-value-gift-card-voucher-tender-controls-t97-adm-604",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5435,7 +5451,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/advanced-payment-eligibility-sequence-restriction-rules--adm-605",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5444,7 +5460,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5453,7 +5469,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/mixed-tender-transaction-trace-allocation-audit-t100-adm-607",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5462,7 +5478,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/mixed-tender-simulator-credit-exposure-ai-advisor-t102-adm-608",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5471,7 +5487,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-payment-adjustment-command-center-t116-adm-609",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5480,7 +5496,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-request-eligibility-workspace-t117-adm-610",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5498,7 +5514,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5507,7 +5523,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/void-reversal-cancellation-manager-t120-adm-613",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5516,7 +5532,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-approval-exception-workflow-t121-adm-614",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5525,7 +5541,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-processing-provider-status-recovery-center-t122-adm-615",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5534,7 +5550,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-adjustment-financial-correction-manager-t123-adm-616",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5543,7 +5559,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-transaction-trace-audit-investigation-t124-adm-617",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5561,7 +5577,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-settlement-command-center-t139-adm-619",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5570,7 +5586,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-source-import-manager-t141-adm-620",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5579,7 +5595,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/transaction-matching-reconciliation-engine-t142-adm-621",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5588,7 +5604,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-exception-investigation-center-t143-adm-622",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5597,7 +5613,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/settlement-payout-manager-t144-adm-623",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5606,7 +5622,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/fees-commission-fx-settlement-economics-t145-adm-624",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5615,7 +5631,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/merchant-account-settlement-calendar-manager-t146-adm-625",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5624,7 +5640,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/settlement-posting-finance-handoff-close-manager-t148-adm-626",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5633,7 +5649,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-audit-trace-evidence-center-t149-adm-627",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5642,7 +5658,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5651,7 +5667,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-risk-fraud-command-center-t166-adm-629",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5660,7 +5676,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-risk-rule-decision-engine-t167-adm-630",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5669,7 +5685,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/velocity-behavioral-transaction-risk-controls-t168-adm-631",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5678,7 +5694,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/risk-lists-signals-payment-control-center-t169-adm-632",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5687,7 +5703,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/fraud-alert-investigation-case-management-t170-adm-633",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5696,7 +5712,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/chargeback-dispute-command-center-t172-adm-634",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5705,7 +5721,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/chargeback-evidence-representment-workspace-t173-adm-635",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5714,7 +5730,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-performance-conversion-analytics-t174-adm-636",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5723,7 +5739,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-fraud-anomaly-payment-intelligence-center-t175-adm-637",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5732,7 +5748,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-executive-intelligence-risk-simulator-ai-advisor-adm-638",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5741,7 +5757,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-command-center-adm-639",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5750,7 +5766,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-strategy-manager-adm-640",
-   "operations": 0,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -5759,7 +5775,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-objective-kpi-configuration-adm-641",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5768,7 +5784,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-type-product-relationship-manager-adm-642",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5777,7 +5793,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-placement-touchpoint-manager-adm-643",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5786,7 +5802,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-journey-strategy-manager-adm-644",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5795,7 +5811,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-priority-ranking-suppression-manager17-adm-645",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5804,7 +5820,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-guardrails-business-controls-adm-646",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5813,7 +5829,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-policy-ai-control-governance-adm-647",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5822,7 +5838,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-strategy-simulator-ai-advisor-adm-648",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5831,7 +5847,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upsell-upgrade-command-center-adm-649",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5840,7 +5856,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upgrade-path-product-ladder-builder-adm-650",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5849,7 +5865,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upsell-eligibility-qualification-rules-adm-651",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5858,7 +5874,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upgrade-price-difference-value-proposition-manager-adm-652",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5867,7 +5883,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ticket-experience-bundle-upgrade-manager-adm-653",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5876,7 +5892,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/membership-pass-upgrade-engine-adm-654",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5885,7 +5901,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pre-purchase-cart-checkout-upsell-manager-adm-655",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5894,7 +5910,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/post-purchase-in-journey-upgrade-manager-adm-656",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5903,7 +5919,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upsell-ranking-propensity-ai-opportunity-engine-adm-657",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5912,7 +5928,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/upgrade-simulator-comparison-ai-advisor-adm-658",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5921,7 +5937,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/cross-sell-command-center-adm-659",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5930,7 +5946,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/cross-sell-relationship-builder-adm-660",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5939,7 +5955,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/product-affinity-matrix-relationship-map-adm-661",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5948,7 +5964,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/frequently-bought-together-basket-pattern-engine-adm-662",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5957,7 +5973,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/cross-category-recommendation-manager-adm-663",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5966,7 +5982,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/multi-attraction-destination-partner-cross-sell-adm-664",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5975,7 +5991,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/basket-aware-cross-sell-duplicate-prevention-adm-665",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5984,7 +6000,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/availability-inventory-capacity-aware-cross-sell-adm-666",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -5993,7 +6009,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-cross-sell-discovery-scoring-ranking-engine-adm-667",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6002,7 +6018,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/cross-sell-simulator-ai-opportunity-advisor-adm-668",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6011,7 +6027,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/journey-context-command-center-adm-669",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6020,7 +6036,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-journey-map-touchpoint-designer-adm-670",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6029,7 +6045,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/real-time-context-rule-engine-adm-671",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6038,7 +6054,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pre-purchase-booking-journey-recommendation-manager-adm-672",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6047,7 +6063,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/post-purchase-pre-visit-recommendation-manager-adm-673",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6056,7 +6072,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/in-venue-location-aware-recommendation-engine-adm-674",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6065,7 +6081,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/visit-state-itinerary-time-aware-recommendation-adm-675",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6074,7 +6090,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/omnichannel-recommendation-synchronization-adm-676",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6083,7 +6099,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/contextual-trigger-frequency-experience-controls-adm-677",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6092,7 +6108,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/journey-simulator-decision-trace-ai-optimization-adm-678",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6101,7 +6117,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/personalization-nbo-command-center-adm-679",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6110,7 +6126,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-recommendation-profile-adm-680",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6119,7 +6135,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-feature-signal-configuration-adm-681",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6128,7 +6144,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/propensity-model-customer-intent-manager-adm-682",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6137,7 +6153,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/next-best-offer-decision-studio-adm-683",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6146,7 +6162,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/personalized-ranking-decision-policy-builder-adm-684",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6155,7 +6171,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-preference-fatigue-suppression-intelligence-adm-685",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6164,7 +6180,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/anonymous-known-identity-transition-personalization-123-adm-686",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6173,7 +6189,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-explainability-confidence-model-governance-adm-687",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6182,7 +6198,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/personalization-simulator-next-best-offer-lab-adm-688",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6191,7 +6207,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-performance-command-center-adm-689",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6200,7 +6216,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-strategy-placement-analytics-adm-690",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6209,7 +6225,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-experiment-a-b-test-studio-adm-691",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6218,7 +6234,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/experiment-results-winner-decision-workspace-adm-692",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6227,7 +6243,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-attribution-incrementality-analytics-adm-693",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6236,7 +6252,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-model-performance-drift-monitor-adm-694",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6245,7 +6261,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-governance-deployment-control-adm-695",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -6254,7 +6270,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-risk-fairness-explainability-safety-center-adm-696",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6263,7 +6279,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/recommendation-audit-decision-trace-investigation-adm-697",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6272,7 +6288,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-optimization-recommendation-intelligence-lab-adm-698",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   }
  ],
@@ -6465,22 +6481,124 @@
     "summary": "Set the allocation cap policy"
    },
    {
-    "operation": "setPasswordPolicy",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Length, breach check, lockout and step-up"
-   },
-   {
-    "operation": "setSegregationRules",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Which permissions may not be held together"
-   },
-   {
-    "operation": "activateJourney",
-    "contract": "marketing-crm",
+    "operation": "calculateTax",
+    "contract": "finance",
     "verb": "POST",
-    "summary": "Start it, or stop it"
+    "summary": "Compute tax for a set of lines"
+   },
+   {
+    "operation": "disputeObligation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity disagrees with the amount"
+   },
+   {
+    "operation": "getForeignTenderReport",
+    "contract": "finance",
+    "verb": "GET",
+    "summary": "What was taken in which currency"
+   },
+   {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
+   },
+   {
+    "operation": "listInterEntityObligations",
+    "contract": "finance",
+    "verb": "GET",
+    "summary": "What one entity owes another"
+   },
+   {
+    "operation": "recordWriteOff",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Write off an uncollectable balance"
+   },
+   {
+    "operation": "resolveObligationDispute",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Agree what is actually owed"
+   },
+   {
+    "operation": "runFxRevaluation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Revalue monetary balances at close"
+   },
+   {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
+   },
+   {
+    "operation": "validateRecognitionSchedules",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Find product kinds claimed by more than one schedule"
+   },
+   {
+    "operation": "createEmergencyAccessOverride",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Bypass the policy, loudly"
+   },
+   {
+    "operation": "evaluateAccess",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Decide, now, and say why"
+   },
+   {
+    "operation": "getAccessPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "One policy, at a version"
+   },
+   {
+    "operation": "getAccessPolicyBundle",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The policies a device needs to decide for itself"
+   },
+   {
+    "operation": "listAccessDecisions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What was decided, for whom, where and why"
+   },
+   {
+    "operation": "listAccessPolicyHistory",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every version, who changed it and why"
+   },
+   {
+    "operation": "listAccessPolicyTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "setAccessPolicyState",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "simulateAccessPolicy",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "What this policy would decide, before it decides anything"
+   },
+   {
+    "operation": "updateAccessPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "addGuestNote",
@@ -6495,40 +6613,10 @@
     "summary": "Suppress an address"
    },
    {
-    "operation": "createChallenge",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a challenge, mission or streak"
-   },
-   {
-    "operation": "createForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Define a waiver, survey or capture form"
-   },
-   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
-   },
-   {
-    "operation": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Create a loyalty programme"
-   },
-   {
-    "operation": "createUrlRedirect",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "301, 302 and custom redirects"
-   },
-   {
-    "operation": "getJourneyPerformance",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Entrants, completions, goals reached"
    },
    {
     "operation": "getLostItemMatches",
@@ -6543,18 +6631,6 @@
     "summary": "Addresses suppressed from all sending"
    },
    {
-    "operation": "listMessageTriggers",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What fires a message, and when"
-   },
-   {
-    "operation": "listReviews",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "List guest reviews and ratings"
-   },
-   {
     "operation": "listSegmentMembers",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -6567,34 +6643,10 @@
     "summary": "Report something lost, or hand something in"
    },
    {
-    "operation": "recordPrivacyIncident",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Log a personal-data breach and start the clock"
-   },
-   {
-    "operation": "respondToReview",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Respond to a review"
-   },
-   {
-    "operation": "retryMessageDispatch",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Send it again, or by another channel"
-   },
-   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setMessageTrigger",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Fire a message from a platform event"
    },
    {
     "operation": "startKioskAssist",
@@ -6633,12 +6685,6 @@
     "summary": "Start a cart"
    },
    {
-    "operation": "createPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Send a guest a link to pay later"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -6655,12 +6701,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listChargebacks",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Open disputes, by deadline"
    },
    {
     "operation": "listFraudRules",
@@ -6699,28 +6739,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
     "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
     "summary": "Give a hold back"
-   },
-   {
-    "operation": "resendPaymentLink",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
-    "operation": "respondToChargeback",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Submit evidence, or accept the loss"
    },
    {
     "operation": "setFraudRules",
@@ -6729,22 +6751,10 @@
     "summary": ""
    },
    {
-    "operation": "setPaymentProvider",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Configure a gateway and its routing"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "voidPayment",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Release an authorisation before it is captured"
    },
    {
     "operation": "skipRolloutCell",
@@ -6801,6 +6811,12 @@
     "summary": "Preview how an amount divides"
    },
    {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   },
+   {
     "operation": "redeemVoucher",
     "contract": "promotions",
     "verb": "POST",
@@ -6837,64 +6853,16 @@
     "summary": "Delete a schedule"
    },
    {
-    "operation": "exportReportResult",
-    "contract": "reporting",
-    "verb": "POST",
-    "summary": "Export a completed result"
-   },
-   {
-    "operation": "getReportExecution",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Execution status and result"
-   },
-   {
-    "operation": "getReportExport",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Export status and download link"
-   },
-   {
-    "operation": "getReportResult",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Paged result rows"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
    },
    {
-    "operation": "listReportFields",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "Fields available for a data source"
-   },
-   {
-    "operation": "listReportSchedules",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": "List scheduled reports"
-   },
-   {
-    "operation": "listSeededReports",
-    "contract": "reporting",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "updateReportSchedule",
     "contract": "reporting",
     "verb": "PATCH",
     "summary": "Amend, pause or resume a schedule"
-   },
-   {
-    "operation": "cancelInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Cancel or credit an invoice"
    },
    {
     "operation": "cancelSubscription",
@@ -6913,12 +6881,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Tear it down"
-   },
-   {
-    "operation": "disputeInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Raise a dispute"
    },
    {
     "operation": "drainBurstEnvironment",
@@ -6969,12 +6931,6 @@
     "summary": "Tenant moves between cells"
    },
    {
-    "operation": "listVenueTypeTemplates",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Starting configurations by venue kind"
-   },
-   {
     "operation": "planTenantMigration",
     "contract": "subscription",
     "verb": "POST",
@@ -6985,12 +6941,6 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Move the orders into the permanent platform"
-   },
-   {
-    "operation": "recordInvoicePayment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Record payment against an invoice"
    },
    {
     "operation": "registerPartner",
@@ -7023,40 +6973,58 @@
     "summary": "Turn metered AI interactions into a billable usage record"
    },
    {
-    "operation": "submitOnboardingApplication",
-    "contract": "subscription",
+    "operation": "issueDeviceCredential",
+    "contract": "tenancy",
     "verb": "POST",
-    "summary": "A prospect signs themselves up"
+    "summary": "Give the device an identity it can prove"
    },
    {
-    "operation": "getRegionSettings",
+    "operation": "listDeviceAuditRecords",
     "contract": "tenancy",
     "verb": "GET",
-    "summary": "Read region settings"
+    "summary": "What was done to this device, and what it did"
    },
    {
-    "operation": "updateRegionSettings",
+    "operation": "listDeviceFirmware",
     "contract": "tenancy",
-    "verb": "PUT",
-    "summary": "Update region settings"
+    "verb": "GET",
+    "summary": "Firmware and software versions, and what is running where"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
+   },
+   {
+    "operation": "revokeDeviceCredential",
+    "contract": "tenancy",
+    "verb": "DELETE",
+    "summary": "Cut a device off now"
+   },
+   {
+    "operation": "rollbackDeviceFirmware",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Put the fleet back on the previous version"
+   },
+   {
+    "operation": "startDeviceFirmwareRollout",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "Push an update to a fleet, in waves"
    },
    {
     "operation": "createBanner",
     "contract": "white-label",
     "verb": "POST",
     "summary": "Create a banner"
-   },
-   {
-    "operation": "createContentBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Author a block of content"
-   },
-   {
-    "operation": "createContentPage",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a content page"
    },
    {
     "operation": "createPromoBlock",

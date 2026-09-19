@@ -8669,7 +8669,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchMedia
+    contract: assets
+    purpose: The estate, counted and charted
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Storage, uploads and library health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Total Digital Assets
@@ -8824,7 +8834,17 @@ screens:
       own statuses are 🟢 Active — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchMedia
+    contract: assets
+    purpose: Browse and filter the library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listCollections
+    contract: assets
+    purpose: Collections to file into
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Thumbnail
@@ -8915,7 +8935,29 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createUpload
+    contract: assets
+    purpose: Start an upload
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - searchMedia
+  - operationId: completeUpload
+    contract: assets
+    purpose: Finish it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - searchMedia
+    - getMediaUsageAnalytics
+  - operationId: analyseMediaAsset
+    contract: assets
+    purpose: Auto-tag on ingest
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id001
+    - getMediaAsset
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-063
@@ -8924,6 +8966,12 @@ screens:
     bound to a contract property; 3 of 31 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
+    - name: uploadId
+      from: navigation
 - id: CMS-064
   name: Folder, Collection & Workspace Management
   module: Media Library
@@ -9014,7 +9062,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listCollections
+    contract: assets
+    purpose: Folders and collections
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createCollection
+    contract: assets
+    purpose: Create one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listCollections
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-064
@@ -9112,7 +9172,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaTaxonomy
+    contract: assets
+    purpose: Categories and metadata fields
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setMediaTaxonomy
+    contract: assets
+    purpose: Define them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getMediaTaxonomy
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-065
@@ -9178,7 +9250,20 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setMediaAssetTags
+    contract: assets
+    purpose: Tags and keywords, with their origin
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id002
+    - searchMedia
+    - getMediaAsset
+  - operationId: getMediaTaxonomy
+    contract: assets
+    purpose: The controlled vocabularies
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-066
@@ -9187,6 +9272,10 @@ screens:
     bound to a contract property; 4 of 10 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-067
   name: Advanced Search & Discovery
   module: Media Library
@@ -9268,7 +9357,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchMedia
+    contract: assets
+    purpose: Advanced search
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-067
@@ -9379,7 +9473,22 @@ screens:
       statuses are 🟢 Active — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaAsset
+    contract: assets
+    purpose: The asset, in full
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listMediaAssetVersions
+    contract: assets
+    purpose: Its revisions
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: Where it is used
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Asset ID
@@ -9388,6 +9497,11 @@ screens:
     - type
     - format
     - category
+    params:
+    - name: assetId
+      from: navigation
+    - name: mediaId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-068
@@ -9470,7 +9584,15 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: bulkUpdateMediaAssets
+    contract: assets
+    purpose: Retag, reclassify or archive many
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - searchMedia
+    - getMediaUsageAnalytics
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-069
@@ -9595,7 +9717,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Activity and library health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets Added
@@ -9777,6 +9904,11 @@ screens:
     contract: maintenance
     purpose: List assets
     trigger: onLoad
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: What the library looks like to AI
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - AI-Processed Assets
@@ -9879,7 +10011,19 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: analyseMediaAsset
+    contract: assets
+    purpose: Auto-tag and describe
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
+  - operationId: setMediaAssetTags
+    contract: assets
+    purpose: Promote the proposals
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-072
@@ -9888,6 +10032,10 @@ screens:
     bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-073
   name: Semantic & Natural-Language Asset Search
   module: Media Library
@@ -9970,7 +10118,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchMedia
+    contract: assets
+    purpose: Semantic search
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Thumbnail
@@ -10043,7 +10196,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: findSimilarMediaAssets
+    contract: assets
+    purpose: Visually similar and related
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-074
@@ -10147,7 +10305,19 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: findSimilarMediaAssets
+    contract: assets
+    purpose: Duplicates above the threshold
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: deleteMediaAsset
+    contract: assets
+    purpose: Retire the copy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - searchMedia
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-075
@@ -10156,6 +10326,10 @@ screens:
     bound to a contract property; 7 of 23 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: mediaId
+      from: navigation
 - id: CMS-076
   name: Asset Version Control & Revision History
   module: Media Library
@@ -10203,7 +10377,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listMediaAssetVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: replaceMediaAsset
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: replaceMediaAsset
   states:
     loading: The asset version revision list.
     error: Could not load. Names which read failed and leaves the asset version revision untouched.
@@ -10213,7 +10401,20 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMediaAssetVersions
+    contract: assets
+    purpose: Revision history
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: replaceMediaAsset
+    contract: assets
+    purpose: Replace the current version
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id006
+    - listMediaAssetVersions
+    - getMediaDistribution
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-076
@@ -10222,6 +10423,12 @@ screens:
     bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
+    - name: mediaId
+      from: navigation
 - id: CMS-077
   name: Version Comparison & Replacement Impact
   module: Media Library
@@ -10268,7 +10475,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listMediaAssetVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The version comparison replacement list.
     error: Could not load. Names which read failed and leaves the version comparison replacement untouched.
@@ -10278,7 +10490,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMediaAssetVersions
+    contract: assets
+    purpose: Two versions, and what replacing breaks
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-077
@@ -10287,6 +10504,10 @@ screens:
     bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-078
   name: Transformation & Rendition Management
   module: Media Library
@@ -10327,6 +10548,20 @@ screens:
       - kind: selectField
         label: Rendition Presets
         provenance: pack Digital Asset Management DAM.pdf, page 33 §Administrators should configure
+      - kind: dataTable
+        derived: true
+        impliedBy: listMediaRenditions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestMediaRendition
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestMediaRendition
   states:
     loading: The transformation rendition configuration as saved.
     error: Could not load. Names which read failed and leaves the transformation rendition untouched.
@@ -10336,7 +10571,19 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listMediaRenditions
+    contract: assets
+    purpose: The derived sizes
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: requestMediaRendition
+    contract: assets
+    purpose: Generate one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listMediaRenditions
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-078
@@ -10345,6 +10592,10 @@ screens:
     bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-079
   name: Rendition Processing & Delivery Readiness
   module: Media Library
@@ -10429,7 +10680,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMediaRenditions
+    contract: assets
+    purpose: Processing state and readiness
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-079
@@ -10438,6 +10694,10 @@ screens:
     bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-080
   name: AI Quality, Intelligence Review & Recommendations
   module: Media Library
@@ -10565,7 +10825,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Quality and coverage
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets processed
@@ -10724,7 +10989,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getExpiringRights
+    contract: assets
+    purpose: Rights about to lapse
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Governance coverage
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Assets
@@ -10799,7 +11074,16 @@ screens:
         label: Partner
         provenance: pack Digital Asset Management DAM.pdf, page 45 §Support
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getMediaAsset
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateMediaAsset
   states:
     loading: The asset ownership responsibility list.
     error: Could not load. Names which read failed and leaves the asset ownership responsibility untouched.
@@ -10809,7 +11093,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateMediaAsset
+    contract: assets
+    purpose: Set owner and responsibility
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getMediaAsset
+    contract: assets
+    purpose: The asset being assigned
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-082
@@ -10818,6 +11112,10 @@ screens:
     bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: mediaId
+      from: navigation
 - id: CMS-083
   name: Rights, License & Usage Policy Management
   module: Media Library
@@ -10889,7 +11187,15 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMediaAssetRights
+    contract: assets
+    purpose: Licence, territory, channel and expiry
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id004
+    - getMediaAsset
+    - getExpiringRights
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-083
@@ -10898,6 +11204,10 @@ screens:
     bound to a contract property; 2 of 31 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-084
   name: Asset Approval Workflow Management
   module: Media Library
@@ -10986,7 +11296,15 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMediaAssetApproval
+    contract: assets
+    purpose: Submit, approve or reject
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id003
+    - getMediaAsset
+    - searchMedia
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-084
@@ -10995,6 +11313,10 @@ screens:
     bound to a contract property; 6 of 21 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-085
   name: Publication Eligibility & Governance Validation
   module: Media Library
@@ -11050,7 +11372,17 @@ screens:
           🟢 B2C Allowed. Each needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Digital Asset Management DAM.pdf, page 48 §Channel Permission
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: setMediaAssetApproval
+        label: Save media asset approval
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setMediaAssetApproval
   states:
     loading: The publication eligibility governance list.
     error: Could not load. Names which read failed and leaves the publication eligibility governance
@@ -11061,7 +11393,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMediaAssetApproval
+    contract: assets
+    purpose: Publication eligibility, computed
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-085
@@ -11070,6 +11408,10 @@ screens:
     bound to a contract property; 1 of 16 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-086
   name: Role-Based Asset Access & Permission Management
   module: Media Library
@@ -11116,7 +11458,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAccessPolicies
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAccessPolicy
+        label: Create access policy
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAccessPolicy
   states:
     loading: The role-based asset access list.
     error: Could not load. Names which read failed and leaves the role-based asset access untouched.
@@ -11126,7 +11483,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccessPolicies
+    contract: identity
+    purpose: Who may see which assets
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createAccessPolicy
+    contract: identity
+    purpose: Write an asset access policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-086
@@ -11230,7 +11597,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createMediaShare
+    contract: assets
+    purpose: Share externally, on terms
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listMediaAssetAudit
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-087
@@ -11344,7 +11718,18 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getExpiringRights
+    contract: assets
+    purpose: What lapses, and what it would break
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setMediaAssetRights
+    contract: assets
+    purpose: Renew
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id004
   entryState:
     preloaded:
     - Expires in 7 Days
@@ -11353,6 +11738,9 @@ screens:
     - Expired
     - Example
     - DAM-IMG-008421
+    params:
+    - name: assetId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-088
@@ -11421,7 +11809,12 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listMediaAssetAudit
+    contract: assets
+    purpose: Edits and distribution together
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-089
@@ -11430,6 +11823,10 @@ screens:
     bound to a contract property; 2 of 31 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-090
   name: Governance Risk, Compliance & AI Recommendations
   module: Media Library
@@ -11525,7 +11922,12 @@ screens:
       own statuses are 🟢 Valid — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getExpiringRights
+    contract: assets
+    purpose: Risk from lapsing rights
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets Without Rights
@@ -11720,7 +12122,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: Delivery across channels
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets in Active Use
@@ -11820,7 +12227,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: Where each asset appears
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - TICVAI DAM Asset
@@ -11921,7 +12333,14 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setMediaDistributionChannels
+    contract: assets
+    purpose: CDN, signing and defaults
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id005
+    - getMediaDistribution
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-093
@@ -12012,7 +12431,18 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMediaDistributionChannels
+    contract: assets
+    purpose: Signed URLs and rendition delivery
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
+  - operationId: listMediaRenditions
+    contract: assets
+    purpose: What can be delivered
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-094
@@ -12021,6 +12451,10 @@ screens:
     bound to a contract property; 5 of 18 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: assetId
+      from: navigation
 - id: CMS-095
   name: Asset Replacement & Propagation Management
   module: Media Library
@@ -12102,7 +12536,18 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: replaceMediaAsset
+    contract: assets
+    purpose: Replace and propagate
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id006
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: Everywhere it would propagate to
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-095
@@ -12111,6 +12556,10 @@ screens:
     bound to a contract property; 5 of 18 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: mediaId
+      from: navigation
 - id: CMS-096
   name: Fallback, Expiry & Distribution Continuity
   module: Media Library
@@ -12195,7 +12644,13 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setMediaDistributionChannels
+    contract: assets
+    purpose: Fallback and expiry behaviour
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-096
@@ -12275,7 +12730,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: What the API exposes
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-097
@@ -12379,7 +12839,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Delivery health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-098
@@ -12479,7 +12944,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
       no data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Usage and performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets Used
@@ -12546,7 +13016,12 @@ screens:
       no data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what
       stops somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getMediaUsageAnalytics
+    contract: assets
+    purpose: Distribution intelligence
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-100

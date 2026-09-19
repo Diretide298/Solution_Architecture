@@ -9,12 +9,12 @@
 | Contracts | 17 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 124 |
+| Operations with no screen | 107 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 124 operations with no screen here
+### 107 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| … | | | 84 more |
+| … | | | 67 more |
 
 ### 1 modules split across waves
 

@@ -9,12 +9,18 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 0 |
+| Operations with no screen | 1 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-**None derivable.** Every operation this platform's contracts expose to its audience reaches a screen, every module spans one wave, everything is drawn, and no flow names a screen that does not exist.
+### 1 operations with no screen here
+
+**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
+
+| Operation | Contract | | |
+|---|---|---|---|
+| `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ## Modules
 

@@ -24,15 +24,19 @@ contracts:
 - approvals
 - catalogue
 - cross-region
+- finance
 - identity
+- maintenance
 - marketing-crm
 - orders
+- payments
 - platform-ops
 - promotions
 - public-api
 - reporting
 - subscription
 - tenancy
+- wallet
 - white-label
 - workforce
 deployment:

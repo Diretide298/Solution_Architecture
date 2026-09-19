@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 44 operations, 20 tables
+title: IdentityService — 56 operations, 24 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,14 +9,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 44
+  operations: 56
   inAFlow: 21
   percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 16
+  tables: 20
   stores:
   - postgres
   - redis
@@ -28,7 +28,7 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 44
+  count: 56
   operations:
   - operation: completeSsoAuthorization
     verb: POST
@@ -38,6 +38,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: createAccessPolicy
+    verb: POST
+    path: /access-policies
+    scope: tenant
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: createDelegatedAccess
     verb: POST
     path: /delegated-access
@@ -46,6 +54,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: createEmergencyAccessOverride
+    verb: POST
+    path: /access-overrides
+    scope: venue
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createMfaChallenge
     verb: POST
     path: /auth/mfa/challenge
@@ -94,6 +110,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: evaluateAccess
+    verb: POST
+    path: /access-decisions
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: exportSubjectData
     verb: POST
     path: /guests/{subjectId}/data-export
@@ -110,6 +134,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getAccessPolicy
+    verb: GET
+    path: /access-policies/{policyId}
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAccessPolicyBundle
+    verb: GET
+    path: /access-policies/bundle
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: true
+    reads: 0
+    writes: 0
   - operation: getCurrentSession
     verb: GET
     path: /auth/session
@@ -182,6 +222,38 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: listAccessDecisions
+    verb: GET
+    path: /access-decisions/audit
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccessPolicies
+    verb: GET
+    path: /access-policies
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccessPolicyHistory
+    verb: GET
+    path: /access-policies/{policyId}/history
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccessPolicyTemplates
+    verb: GET
+    path: /access-policy-templates
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listActiveSessions
     verb: GET
     path: /auth/sessions
@@ -310,6 +382,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: setAccessPolicyState
+    verb: POST
+    path: /access-policies/{policyId}/state
+    scope: tenant
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setPasswordPolicy
     verb: PUT
     path: /password-policy
@@ -334,6 +414,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: simulateAccessPolicy
+    verb: POST
+    path: /access-policies/simulate
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 1
   - operation: startSsoAuthorization
     verb: GET
     path: /auth/sso/{providerId}/authorize
@@ -342,6 +430,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: updateAccessPolicy
+    verb: PUT
+    path: /access-policies/{policyId}
+    scope: tenant
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updatePrincipal
     verb: PATCH
     path: /principals/{principalId}
@@ -397,6 +493,31 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: identity.access_decision
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: identity.access_override
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: identity.access_policy
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.access_policy_version
+  columns: 10
+  store: postgres
+  parent: identity.access_policy
+  writtenBy: []
+  foreignWriters: null
 - table: identity.authz_audit
   columns: 3
   store: postgres
@@ -583,8 +704,12 @@ screens:
 - P08:BO-057 Training & Certification
 - P08:BO-068 Audit Log
 - P08:BO-106 People & Access Rights
+- P08:BO-1066 Roles, Permissions & Masking
+- P08:BO-1177 API Security, Access & Integration Permissions
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-385 Delegation Management
+- P08:BO-873 Staff Resource Directory
+- P08:BO-874 Staff Resource Profile
 - P09:ADM-001 Platform Login / MFA
 - P09:ADM-002 Platform Dashboard
 - P09:ADM-005 Tenant Directory
@@ -598,14 +723,19 @@ screens:
 - P09:ADM-015 API Rate Limit & Quota Management
 - P09:ADM-020 Platform User Directory
 - P09:ADM-021 Platform Role Management
+- P09:ADM-340 Segregation of Duties Policy Manager
 - P09:ADM-342 Authentication & MFA Policy Manager
+- P09:ADM-356 Integration Security & Access Control
+- P09:ADM-421 Venue & Operational Structure Creation
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-003 Profile & Company Details
 - P10:PTR-020 Sub-Agent Management
 - P12:SUP-001 Venue Management Sign In
 - P13:CMS-001 Tenant Workspace
 - P13:CMS-019 User Access
+- P13:CMS-086 Role-Based Asset Access & Permission Management
 - P16:ANL-003 Operational Performance
+- P16:ANL-047 Report Access & Sharing Control
 flows:
 - F06 Guest enters the venue
 - F08 Steward works a shift on the employee app

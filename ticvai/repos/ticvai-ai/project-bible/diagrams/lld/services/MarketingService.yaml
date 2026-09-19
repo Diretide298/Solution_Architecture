@@ -1,5 +1,5 @@
 id: LLD-MarketingService
-title: MarketingService — 166 operations, 38 tables
+title: MarketingService — 183 operations, 45 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -12,20 +12,20 @@ why: '**93 operations and 37 tables — the biggest thing in the package, and pr
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 166
+  operations: 183
   inAFlow: 39
   percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 38
+  tables: 45
   stores:
   - postgres
   largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
-  count: 166
+  count: 183
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -35,6 +35,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: activateAudience
+    verb: POST
+    path: /audience-activations
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: activateJourney
     verb: POST
     path: /journeys/{journeyId}/activate
@@ -211,6 +219,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: decideDuplicateCandidate
+    verb: POST
+    path: /duplicate-candidates/{candidateId}/decide
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: endKioskAssist
     verb: POST
     path: /kiosk-assists/{sessionId}/end
@@ -227,6 +243,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getAudienceOverlap
+    verb: GET
+    path: /audience-overlap
+    scope: tenant
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getCampaign
     verb: GET
     path: /campaigns/{campaignId}
@@ -267,6 +291,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getGuestAttributeModel
+    verb: GET
+    path: /guest-attribute-model
+    scope: tenant
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getGuestConsents
     verb: GET
     path: /guests/{subjectId}/consents
@@ -274,6 +306,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getGuestIntelligence
+    verb: GET
+    path: /guests/{guestId}/intelligence
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getGuestLoyalty
     verb: GET
@@ -290,6 +330,30 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 5
+    writes: 0
+  - operation: getGuestRelationships
+    verb: GET
+    path: /guests/{guestId}/relationships
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuestTimeline
+    verb: GET
+    path: /guests/{guestId}/timeline
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getIdentityResolutionRules
+    verb: GET
+    path: /identity-resolution-rules
+    scope: tenant
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getJourneyPerformance
     verb: GET
@@ -379,6 +443,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 0
+  - operation: importAudienceList
+    verb: POST
+    path: /audience-lists
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: launchCampaign
     verb: POST
     path: /campaigns/{campaignId}/launch
@@ -394,6 +466,22 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listAudienceActivations
+    verb: GET
+    path: /audience-activations
+    scope: tenant
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAudienceLists
+    verb: GET
+    path: /audience-lists
+    scope: tenant
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listBusinessEventNotification
     verb: GET
@@ -594,6 +682,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listDuplicateCandidates
+    verb: GET
+    path: /duplicate-candidates
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
     writes: 0
   - operation: listDynamicFieldQuestion
     verb: GET
@@ -1051,6 +1147,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: runDataRetention
+    verb: POST
+    path: /retention-runs
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: searchGuests
     verb: GET
     path: /guests
@@ -1147,6 +1251,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setDataRetentionPolicy
+    verb: PUT
+    path: /retention-policies
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setDigitalWaiverForm
     verb: PUT
     path: /digital-waiver-form
@@ -1155,6 +1267,30 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setGuestAttributeModel
+    verb: PUT
+    path: /guest-attribute-model
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGuestRelationships
+    verb: PUT
+    path: /guests/{guestId}/relationships
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setIdentityResolutionRules
+    verb: PUT
+    path: /identity-resolution-rules
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setIntelligentRoutingSkill
     verb: PUT
     path: /intelligent-routing-skill
@@ -1383,6 +1519,20 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: marketing.audience_activation
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.audience_list
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.campaign
   columns: 20
   store: postgres
@@ -1449,6 +1599,12 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.duplicate_candidate
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.form_definition
   columns: 15
   store: postgres
@@ -1458,6 +1614,13 @@ tables:
   foreignWriters: null
 - table: marketing.form_submission
   columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_attribute_model
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
@@ -1479,6 +1642,20 @@ tables:
   foreignWriters: null
 - table: marketing.guest_profile
   columns: 22
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_relationship
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.identity_rules
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1591,6 +1768,13 @@ tables:
   foreignWriters: null
 - table: marketing.referral
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.retention_policy
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1713,14 +1897,119 @@ screens:
 - P08:BO-120 Omnichannel Commerce & Journey Configuration
 - P08:BO-121 Personalized Offers & Guest Engagement
 - P08:BO-223 Journey Simulation, Audit & Publication
+- P08:BO-618 Accreditation Form Builder
+- P08:BO-677 Communication Template Library
+- P08:BO-678 Channel, Language & Branding Configuration
+- P08:BO-679 Manual & Bulk Communication Center
+- P08:BO-734 CRM Command Center
+- P08:BO-735 Guest Directory
+- P08:BO-736 Guest Master Configuration
 - P08:BO-737 Customer 360 Profile
+- P08:BO-738 Activity Timeline
+- P08:BO-739 Contact & Preferences
+- P08:BO-740 Family & Guardians
+- P08:BO-741 Corporate & Groups
+- P08:BO-742 Commerce & Documents
+- P08:BO-743 AI Guest Intelligence
+- P08:BO-744 Data Governance Center
+- P08:BO-745 Identity Resolution Rules
+- P08:BO-746 Duplicate Review & Merge
+- P08:BO-747 Consent Policy Configuration
+- P08:BO-748 Consent Capture & Versions
+- P08:BO-749 Guest Preference Center
+- P08:BO-750 Data Subject Requests
+- P08:BO-751 Retention & Anonymization
+- P08:BO-752 Privacy & AI Governance
+- P08:BO-753 Compliance Audit Dashboard
+- P08:BO-754 Audience Intelligence
+- P08:BO-755 Dynamic Segment Builder
+- P08:BO-756 Static Lists & Imports
+- P08:BO-757 Behavioral Segmentation
+- P08:BO-758 Membership & Loyalty Segments
+- P08:BO-759 Demographic & Geographic
+- P08:BO-760 Revenue & Engagement Segments
+- P08:BO-762 Predictive Audiences
+- P08:BO-763 Activation & Governance
 - P08:BO-764 Campaign Command Center
+- P08:BO-766 Campaign Builder
+- P08:BO-767 Audience & Offer Selection
+- P08:BO-768 Multichannel Composer
+- P08:BO-769 Schedule & Trigger Rules
+- P08:BO-771 Budget, Goals & Forecast
+- P08:BO-772 A/B & AI Optimization
+- P08:BO-773 Attribution & Audit
+- P08:BO-774 Journey Automation Center
+- P08:BO-775 Visual Journey Builder
+- P08:BO-776 Trigger Event Catalog
+- P08:BO-777 Decision Logic & Timing
+- P08:BO-779 Lifecycle Journeys
+- P08:BO-781 Cross-Sell & Service Recovery
 - P08:BO-782 AI Journey Optimization
 - P08:BO-783 Journey Analytics & Audit
+- P08:BO-784 Communications Center
+- P08:BO-785 Template Library
+- P08:BO-786 Newsletter Builder
+- P08:BO-787 Content Blocks & Product Feed
+- P08:BO-788 Subscriptions & Preferences
+- P08:BO-789 Transactional Notification Rules
+- P08:BO-790 Scheduling, Priority & Approval
+- P08:BO-791 Delivery, Retry & Failover
+- P08:BO-792 Deliverability & Analytics
+- P08:BO-793 AI Content, Translation & Audit
+- P08:BO-794 Omnichannel Command Center
+- P08:BO-795 Unified Inbox
+- P08:BO-796 Guest Conversation 360
+- P08:BO-797 AI Chatbot Configuration
+- P08:BO-798 Intent & Knowledge Management
+- P08:BO-799 Agent Workspace
+- P08:BO-800 Routing & Queue Management
+- P08:BO-801 Sales & Service Actions
+- P08:BO-802 Sentiment, Quality & Escalation
+- P08:BO-803 Chat Analytics & Audit
 - P08:BO-804 Case Command Center
+- P08:BO-805 Case Queue & Search
 - P08:BO-806 Case Creation
+- P08:BO-807 Classification & Workflow
+- P08:BO-808 Assignment & Workload
+- P08:BO-809 SLA Policy Configuration
+- P08:BO-810 Escalation Rules
+- P08:BO-811 Case Workspace
+- P08:BO-812 Service Recovery
 - P08:BO-813 Case Analytics & Audit
+- P08:BO-814 Voice of Customer Center
+- P08:BO-815 Survey Builder
+- P08:BO-816 Survey Triggers & Distribution
+- P08:BO-817 NPS, CSAT & CES Configuration
+- P08:BO-818 Survey Responses & Insights
+- P08:BO-819 Review Collection & Rating Rules
+- P08:BO-820 Moderation & Publishing
+- P08:BO-821 AI Sentiment & Topic Analysis
+- P08:BO-822 Service Recovery Automation
+- P08:BO-823 VOC Analytics & Audit
+- P08:BO-824 Gamification Command Center
+- P08:BO-825 Challenge Builder
+- P08:BO-826 Achievement & Badge Engine
+- P08:BO-827 Points & Activity Rules
+- P08:BO-828 Milestones & Reward Rules
+- P08:BO-829 Family, Team & Event Challenges
+- P08:BO-830 Referral & Streak Management
+- P08:BO-831 Progress, Leaderboards & Hub
+- P08:BO-832 AI Engagement Optimization
+- P08:BO-833 Gamification Analytics & Audit
+- P08:BO-838 Content, Media & Forms
+- P08:BO-841 Personalization & Localization
+- P08:BO-842 SEO Management
 - P08:BO-844 Waiver Command Center
+- P08:BO-845 Waiver Template Builder
+- P08:BO-846 Assignment Rules
+- P08:BO-847 Version, Expiry & Renewal
+- P08:BO-848 Signature Experience Setup
+- P08:BO-849 Guardian & Group Signing
+- P08:BO-850 Pre-Arrival Completion
+- P08:BO-851 Verification & Access Control
+- P08:BO-852 Documents, Search & Retention
+- P08:BO-853 Legal Evidence & Audit
+- P08:BO-938 Employee Requests & Resource Support
 - P09:ADM-038 Communication Service Command Center
 - P09:ADM-039 Channel & Provider Configuration
 - P09:ADM-040 Sender Identity, Domain & Brand Configuration
@@ -1731,6 +2020,8 @@ screens:
 - P09:ADM-045 Delivery Queue, Failure & Retry Management
 - P09:ADM-046 Provider Health, Usage & Cost Monitoring
 - P09:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
+- P09:ADM-328 Workflow Versioning & Change History
+- P09:ADM-680 Customer Recommendation Profile
 - P10:PTR-004 Notifications
 - P10:PTR-021 Support & Contact
 - P12:SUP-002 Agent Dashboard

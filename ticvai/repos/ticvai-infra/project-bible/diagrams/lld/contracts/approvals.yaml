@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 37 operations
+title: approvals — 45 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -60,6 +60,17 @@ operations:
   writes:
   - approvals.delegation
   - cache:idempotency
+- operation: createApprovalEvidencePackage
+  verb: POST
+  path: /approval-evidence-packages
+  scope: tenant
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.evidence_package
+  writes: []
 - operation: createApprovalRequest
   verb: POST
   path: /approval-requests
@@ -151,6 +162,17 @@ operations:
   - approvals.escalation
   - approvals.request
   writes: []
+- operation: getApprovalRecord
+  verb: GET
+  path: /approval-requests/{requestId}/record
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision_record
+  writes: []
 - operation: issueAccreditationBadge
   verb: POST
   path: /accreditation-badges
@@ -173,6 +195,17 @@ operations:
   offline: false
   reads:
   - approvals.accreditation_badge
+  writes: []
+- operation: listApprovalControlPolicies
+  verb: GET
+  path: /approval-control-policies
+  scope: tenant
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.control_policy
   writes: []
 - operation: listApprovalDelegations
   verb: GET
@@ -359,6 +392,18 @@ operations:
   writes:
   - approvals.delegation
   - cache:idempotency
+- operation: setApprovalControlPolicy
+  verb: PUT
+  path: /approval-control-policies
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.control_policy
+  writes:
+  - approvals.control_policy
 - operation: setApprovalMatrix
   verb: PUT
   path: /approval-matrices
@@ -374,6 +419,42 @@ operations:
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
+- operation: setApprovalRetentionPolicy
+  verb: PUT
+  path: /approval-retention
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.retention_policy
+  writes:
+  - approvals.retention_policy
+- operation: setApprovalSlaPolicy
+  verb: PUT
+  path: /approval-sla-policies
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.sla_policy
+  writes:
+  - approvals.sla_policy
+- operation: setApproverAvailability
+  verb: PUT
+  path: /approval-delegations/availability
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.approver_availability
+  writes:
+  - approvals.approver_availability
 - operation: setStepUpPolicy
   verb: PUT
   path: /step-up-policies
@@ -415,6 +496,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: signApprovalDecision
+  verb: POST
+  path: /approval-requests/{requestId}/signature
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.signature
   writes: []
 - operation: simulateWorkflowTestingImpact
   verb: PUT

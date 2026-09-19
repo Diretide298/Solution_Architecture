@@ -410,6 +410,7 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+        - "P08 BO-505 Serialized Equipment Registry"
       summary: Where each individual item is
       description: 'Retail Board 4. **A lot number answers which delivery; a serial answers which one.**
 
@@ -493,6 +494,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
         - "P08 BO-105 Stock & Supply"
+        - "P08 BO-504 Rental Inventory Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -721,6 +723,10 @@ paths:
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
         - "P08 BO-049 Stock Levels"
         - "P08 BO-050 Stock Position & Valuation"
+        - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
+        - "P08 BO-504 Rental Inventory Command Center"
+        - "P08 BO-507 Pooled Inventory Management"
+        - "P08 BO-513 Inventory Intelligence & Rebalancing"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -771,6 +777,7 @@ paths:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-078 Requisitions"
         - "P08 BO-081 Inventory Items"
+        - "P08 BO-510 Inventory Location Allocation"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -798,6 +805,7 @@ paths:
       operationId: createStockLocation
       x-ticvai-consumed-by:
         - "P08 BO-081 Inventory Items"
+        - "P08 BO-510 Inventory Location Allocation"
       x-ticvai-audience:
       - staff
       summary: Create a stock location
@@ -887,6 +895,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P08 BO-082 Stock Movements"
+        - "P08 BO-512 Inventory Adjustment & Exception Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -948,6 +957,8 @@ paths:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-049 Stock Levels"
         - "P08 BO-082 Stock Movements"
+        - "P08 BO-507 Pooled Inventory Management"
+        - "P08 BO-512 Inventory Adjustment & Exception Management"
       x-ticvai-audience:
       - staff
       summary: Record an issue, return or adjustment
@@ -1339,6 +1350,7 @@ paths:
       operationId: listStockTransfers
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+        - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1377,6 +1389,7 @@ paths:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-080 Stock Transfers"
         - "P08 BO-082 Stock Movements"
+        - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
       - staff
       summary: Send stock to another location
@@ -1472,6 +1485,7 @@ paths:
       operationId: receiveStockTransfer
       x-ticvai-consumed-by:
         - "P08 BO-080 Stock Transfers"
+        - "P08 BO-511 Inventory Transfer Management"
       x-ticvai-audience:
       - staff
       summary: Receive a transfer
@@ -1609,6 +1623,7 @@ paths:
       operationId: getSuggestedRequisitions
       x-ticvai-consumed-by:
         - "P08 BO-078 Requisitions"
+        - "P08 BO-513 Inventory Intelligence & Rebalancing"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
