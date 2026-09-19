@@ -35,7 +35,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 311
 - service: PlatformService
-  operationCalls: 287
+  operationCalls: 288
 - service: OrderService
   operationCalls: 139
 - service: TenancyService
@@ -8223,7 +8223,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requestId<-navigation
   goesTo:
   - ADM-339
   boardFrames: null
@@ -8245,7 +8246,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requestId<-navigation
   goesTo:
   - ADM-339
   boardFrames: null
@@ -8789,7 +8791,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-002
   - ADM-370
@@ -8843,7 +8846,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-369
   boardFrames: null
@@ -9110,6 +9114,7 @@ screens:
   density: compact
   operations:
   - listSaleChannel
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -9460,7 +9465,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-389
   boardFrames: null
@@ -9744,7 +9750,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-409
   boardFrames: null
@@ -9832,7 +9839,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-409
   boardFrames: null
@@ -9898,7 +9906,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-409
   boardFrames: null
@@ -9920,7 +9929,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-409
   boardFrames: null
@@ -10018,7 +10028,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-419
   boardFrames: null
@@ -10084,7 +10095,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - regionId<-navigation
   goesTo:
   - ADM-419
   boardFrames: null
@@ -10150,7 +10162,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-002
   - ADM-450
@@ -10181,7 +10194,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-449
   boardFrames: null
@@ -10203,7 +10217,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-449
   boardFrames: null
@@ -10335,7 +10350,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-449
   boardFrames: null
@@ -10357,7 +10373,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-449
   boardFrames: null
@@ -10379,7 +10396,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-002
   - ADM-460
@@ -10410,7 +10428,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-459
   boardFrames: null
@@ -10455,7 +10474,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - invoiceId<-navigation
+  - tenantId<-session
   goesTo:
   - ADM-459
   boardFrames: null
@@ -10478,7 +10499,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - ADM-459
   boardFrames: null
@@ -10568,7 +10590,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - invoiceId<-navigation
   goesTo:
   - ADM-459
   boardFrames: null
@@ -12641,7 +12664,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12663,7 +12687,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12685,7 +12710,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12707,7 +12733,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12729,7 +12756,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12751,7 +12779,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-559
   boardFrames: null
@@ -12874,7 +12903,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - connectionId<-navigation
   goesTo:
   - ADM-569
   boardFrames: null
@@ -13106,7 +13136,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13128,7 +13159,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13172,7 +13204,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13217,7 +13250,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - terminalId<-session
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13240,7 +13274,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13262,7 +13297,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - connectionId<-navigation
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13316,7 +13352,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-589
   boardFrames: null
@@ -13338,7 +13375,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - methodId<-navigation
   goesTo:
   - ADM-589
   boardFrames: null
@@ -13383,7 +13421,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - linkId<-navigation
+  - token<-deepLink
   goesTo:
   - ADM-589
   boardFrames: null
@@ -13427,7 +13467,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - paymentId<-navigation
   goesTo:
   - ADM-589
   boardFrames: null
@@ -13472,7 +13513,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - paymentId<-navigation
   goesTo:
   - ADM-589
   boardFrames: null
@@ -13615,7 +13657,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - accountId<-navigation
   goesTo:
   - ADM-599
   boardFrames: null
@@ -13749,7 +13792,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - ADM-002
   - ADM-610
@@ -13781,7 +13825,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - ADM-609
   boardFrames: null
@@ -13848,7 +13893,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - paymentId<-navigation
   goesTo:
   - ADM-609
   boardFrames: null
@@ -13870,7 +13916,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - refundId<-navigation
   goesTo:
   - ADM-609
   boardFrames: null
@@ -13892,7 +13939,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - paymentId<-navigation
   goesTo:
   - ADM-609
   boardFrames: null
@@ -13914,7 +13962,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - ADM-609
   boardFrames: null
@@ -14057,7 +14106,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - settlementId<-navigation
   goesTo:
   - ADM-619
   boardFrames: null
@@ -14146,7 +14196,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - obligationId<-navigation
   goesTo:
   - ADM-619
   boardFrames: null
@@ -14332,7 +14383,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - chargebackId<-navigation
   goesTo:
   - ADM-629
   boardFrames: null
@@ -14354,7 +14406,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - chargebackId<-navigation
   goesTo:
   - ADM-629
   boardFrames: null
@@ -14476,7 +14529,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14498,7 +14552,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14543,7 +14598,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14565,7 +14621,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14588,7 +14645,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14610,7 +14668,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -14730,7 +14789,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -14752,7 +14812,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -14774,7 +14835,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -14796,7 +14858,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -14818,7 +14881,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -14841,7 +14905,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
+  - strategyId<-navigation
   goesTo:
   - ADM-649
   boardFrames: null
@@ -15049,7 +15115,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-659
   boardFrames: null
@@ -15071,7 +15138,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-659
   boardFrames: null
@@ -15190,7 +15258,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15212,7 +15281,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15234,7 +15304,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15256,7 +15327,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15278,7 +15350,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15399,7 +15472,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - subjectId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15421,7 +15495,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15466,7 +15541,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15488,7 +15564,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15675,7 +15752,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - experimentId<-navigation
   goesTo:
   - ADM-689
   boardFrames: null
@@ -15742,7 +15820,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-689
   boardFrames: null

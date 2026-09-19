@@ -40,7 +40,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 98
+  operationCalls: 100
 - service: AiService
   operationCalls: 5
 - service: InventoryService
@@ -623,6 +623,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createDashboard
+  - getDashboard
   - listDashboards
   states:
   - emptyFirstRun
@@ -684,7 +686,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -751,7 +754,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - kpiId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -774,7 +778,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -795,7 +800,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -817,7 +823,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -840,7 +847,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -959,7 +967,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -981,7 +990,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -1004,7 +1014,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -1025,7 +1036,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -1048,7 +1060,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - executionId<-navigation
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -1071,7 +1085,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - executionId<-navigation
+  - reportId<-navigation
   goesTo:
   - ANL-031
   boardFrames: null
@@ -1192,7 +1208,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - executionId<-navigation
+  - exportId<-navigation
   goesTo:
   - ANL-041
   boardFrames: null
@@ -1354,7 +1372,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - conversationId<-navigation
   goesTo:
   - ANL-051
   boardFrames: null
@@ -1607,7 +1626,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - kpiId<-navigation
   goesTo:
   - ANL-061
   boardFrames: null

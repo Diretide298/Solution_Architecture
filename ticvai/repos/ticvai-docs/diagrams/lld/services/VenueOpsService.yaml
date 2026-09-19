@@ -2348,6 +2348,36 @@ screens:
 - P06:EMP-036 Issue media
 - P06:EMP-048 Opening checklist
 - P06:EMP-050 Post-incident restore
+- P06:EMP-071 Rental Checkout Command Center
+- P06:EMP-072 Voucher Scan & Reservation Retrieval
+- P06:EMP-073 Checkout Readiness Validation
+- P06:EMP-074 Equipment Assignment Workspace
+- P06:EMP-075 Equipment Scan & Validation
+- P06:EMP-076 Pre-Rental Condition Inspection
+- P06:EMP-077 Safety & Handover Checklist
+- P06:EMP-078 Deposit & Financial Handover Validation
+- P06:EMP-079 Group & Multi-Item Checkout
+- P06:EMP-080 Checkout Confirmation & Rental Activation
+- P06:EMP-081 Active Rental Operations Command Center
+- P06:EMP-082 Active Rental Detail & Live Timeline
+- P06:EMP-083 Rental Extension Request
+- P06:EMP-084 Extension Pricing & Confirmation
+- P06:EMP-085 Equipment Swap / Replacement
+- P06:EMP-086 Rental Incident & Operational Exception
+- P06:EMP-087 Due Soon & Customer Notification Management
+- P06:EMP-088 Overdue Rental Management
+- P06:EMP-089 Active Group Rental Management
+- P06:EMP-090 Active Rental Intelligence & Operational Alerts
+- P06:EMP-091 Rental Return Command Center
+- P06:EMP-092 Return Scan & Rental Retrieval
+- P06:EMP-093 Return Summary & Actual Return Time
+- P06:EMP-094 Post-Rental Condition Inspection
+- P06:EMP-095 Before vs After Condition Comparison
+- P06:EMP-096 Damage Assessment & Charge Workflow
+- P06:EMP-097 Partial Return & Missing Equipment
+- P06:EMP-098 Late Fees, Damage Fees & Final Settlement
+- P06:EMP-099 Deposit Release, Capture & Customer Confirmation
+- P06:EMP-100 Return Completion & Equipment Disposition
 - P08:BO-001 Queue Directory
 - P08:BO-002 Queue Configuration
 - P08:BO-003 Queue Integration Setup

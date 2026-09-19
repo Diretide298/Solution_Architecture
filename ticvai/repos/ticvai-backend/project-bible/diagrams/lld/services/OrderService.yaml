@@ -2356,6 +2356,7 @@ screens:
 - P10:PTR-016 Voucher / Ticket Download
 - P13:CMS-010 Media Library
 - P16:ANL-009 AI Assistant & Action Center
+- P17:SGN-021 Payment Method & Settlement Setup
 flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets

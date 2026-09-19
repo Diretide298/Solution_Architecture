@@ -1889,6 +1889,7 @@ screens:
 - P06:EMP-029 Guest assistance
 - P06:EMP-055 Create / Edit Reservation
 - P06:EMP-057 Guest Profile & Dining History
+- P06:EMP-088 Overdue Rental Management
 - P08:BO-005 Queue Monitor
 - P08:BO-036 Device Registry
 - P08:BO-073 Lost & Found Register

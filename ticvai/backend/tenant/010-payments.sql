@@ -88,7 +88,6 @@ CREATE TABLE IF NOT EXISTS payments.merchant_account (
     code                              text NOT NULL,
     legal_entity_id                   uuid,
     venue_ids                         text[],
-    currency                          text,
     settlement_calendar               text,
     settlement_delay_days             integer,
     bank_account_reference            text,

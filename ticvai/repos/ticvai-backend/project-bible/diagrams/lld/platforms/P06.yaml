@@ -43,7 +43,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 87
+  operationCalls: 122
 - service: OrderService
   operationCalls: 69
 - service: FnbService
@@ -53,7 +53,7 @@ servicesCalled:
 - service: AccessService
   operationCalls: 23
 - service: MarketingService
-  operationCalls: 18
+  operationCalls: 19
 - service: InventoryService
   operationCalls: 18
 - service: CatalogueService
@@ -2100,7 +2100,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listRentalBookings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2130,7 +2131,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2139,7 +2141,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2151,7 +2154,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2160,7 +2164,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2172,7 +2177,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - assignRentalEquipment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2181,7 +2187,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2193,7 +2200,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - assignRentalEquipment
+  - lookupAsset
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2202,7 +2211,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2214,7 +2224,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - recordRentalInspection
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2223,7 +2234,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2235,7 +2247,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - checkOutRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2244,7 +2257,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2256,7 +2270,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - checkOutRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2265,7 +2280,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2277,7 +2293,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - assignRentalEquipment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2286,7 +2303,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2298,7 +2316,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - checkOutRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2307,7 +2326,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-071
   boardFrames: null
@@ -2319,7 +2339,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listOverdueRentals
+  - listRentalBookings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2349,7 +2371,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2358,7 +2381,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-081
   boardFrames: null
@@ -2370,7 +2394,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalAvailability
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2391,7 +2416,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - extendRental
+  - quoteRentalPrice
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2400,7 +2427,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-081
   boardFrames: null
@@ -2412,7 +2440,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - swapRentalEquipment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2421,7 +2450,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-081
   boardFrames: null
@@ -2433,7 +2463,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - reportRentalIncident
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2454,7 +2485,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listOverdueRentals
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2475,7 +2507,10 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listOverdueRentals
+  - returnRental
+  - sendTransactionalMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2496,7 +2531,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2505,7 +2541,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-081
   boardFrames: null
@@ -2517,7 +2554,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listOverdueRentals
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2538,7 +2576,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - listRentalBookings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2568,7 +2607,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - getRentalBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2577,7 +2617,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2589,7 +2630,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - returnRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2598,7 +2640,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2610,7 +2653,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - recordRentalInspection
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2619,7 +2663,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2631,7 +2676,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - recordRentalInspection
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2640,7 +2686,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2652,7 +2699,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - assessRentalDamage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2661,7 +2709,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2673,7 +2722,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - returnRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2682,7 +2732,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2694,7 +2745,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - returnRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2703,7 +2755,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2715,7 +2768,8 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - returnRental
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2724,7 +2778,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2736,7 +2791,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: comfortable
-  operations: []
+  operations:
+  - returnRental
+  - setAssetStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2745,7 +2802,9 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
+  - bookingId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null

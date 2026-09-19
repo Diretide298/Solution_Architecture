@@ -29,7 +29,12 @@ FILES = ('screens/P08-venue-back-office.yaml', 'screens/P09-platform-admin-conso
          'screens/P13-white-label-cms.yaml', 'screens/P16-venue-analytics.yaml',
          'screens/P06-staff-app.yaml', 'screens/P17-ticvai-signup.yaml')
 
-PUBLISHES = re.compile(r'^(publish|activate|deactivate|release|retire|archive)[A-Z]')
+# **Copied from `check-screens.py`, because guessing it cost three screens.** The first cut
+# of this tool wrote its own wider-looking regex — publish, activate, deactivate, release,
+# retire, archive — and omitted `deploy` and `promote`, which are the two the seating and
+# reader boards actually use. It fixed 23 screens and left 3, and the 3 read as a different
+# defect until the two regexes were put side by side.
+PUBLISHES = re.compile(r'^(publish|deploy|promote|activate)[A-Z]')
 
 # What goes live, where, and from when — per subject. Matched on the publishing operation
 # the screen declares, because that is what the rule keys off.
@@ -57,6 +62,13 @@ GATE = {
     'publishSite': '**Goes live on the public site.** The previous version stays restorable.',
     'activateJourney': '**Starts enrolling guests who match**, from now. Guests already in the '
                        'journey continue on the version they entered.',
+    'deployReaderConfiguration': '**Pushes prices, entitlements and display rules to the reader, '
+                                 'and its edge package with them.** The reader decides offline from '
+                                 'what it last received, so a change not deployed is a change that '
+                                 'did not happen.',
+    'deployConfigurationProfile': '**Promotes this configuration to the target environment.** What '
+                                  'is running there now is replaced, and the previous version stays '
+                                  'restorable.',
     'launchCampaign': '**Begins sending.** Suppression and consent are applied at send time, so '
                       'the audience that receives it is smaller than the one shown here.',
 }

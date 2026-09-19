@@ -13927,6 +13927,19 @@ screens:
     provenance: board reading, 19 September 2026
     purpose: Late, and what it is accruing
     trigger: onLoad
+  - operationId: sendTransactionalMessage
+    contract: marketing-crm
+    purpose: Contact the guest about an overdue rental
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: returnRental
+    contract: rental
+    purpose: Close it as returned, late or not returned at all
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listOverdueRentals
+    - listRentalBookings
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a
     contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.

@@ -459,7 +459,11 @@ surfaces:
   screens: 24
   modules:
   - core
-  callsServices: []
+  callsServices:
+  - CatalogueService
+  - LedgerService
+  - OrderService
+  - PlatformService
   ref: diagrams/lld/platforms/P17.yaml
 services:
   count: 16

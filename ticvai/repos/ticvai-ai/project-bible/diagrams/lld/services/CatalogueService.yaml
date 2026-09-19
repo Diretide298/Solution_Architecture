@@ -4163,6 +4163,7 @@ screens:
 - P10:PTR-010 Cart & Quote
 - P16:ANL-004 Product Performance
 - P16:ANL-018 Alerts & Exception Center
+- P17:SGN-005 Sales Channel Assessment
 flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets

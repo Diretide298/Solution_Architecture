@@ -1608,7 +1608,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
+  - uploadId<-navigation
   goesTo:
   - CMS-061
   boardFrames: null
@@ -1677,7 +1679,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-061
   boardFrames: null
@@ -1723,7 +1726,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
+  - mediaId<-navigation
   goesTo:
   - CMS-061
   boardFrames: null
@@ -1822,7 +1827,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -1889,7 +1895,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - mediaId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -1912,7 +1919,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
+  - mediaId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -1934,7 +1943,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -1957,7 +1967,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -1979,7 +1990,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-071
   boardFrames: null
@@ -2056,7 +2068,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - mediaId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2078,7 +2091,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2100,7 +2114,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2122,7 +2137,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2190,7 +2206,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2212,7 +2229,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-081
   boardFrames: null
@@ -2332,7 +2350,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - assetId<-navigation
   goesTo:
   - CMS-091
   boardFrames: null
@@ -2355,7 +2374,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - mediaId<-navigation
   goesTo:
   - CMS-091
   boardFrames: null

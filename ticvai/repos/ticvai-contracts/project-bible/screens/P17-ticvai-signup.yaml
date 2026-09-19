@@ -518,6 +518,11 @@ screens:
     contract: catalogue
     purpose: Sales Channel Command Center
     trigger: onLoad
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Record the answers and score them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 24. 0 of
     0 labels bound to a contract property; 11 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather

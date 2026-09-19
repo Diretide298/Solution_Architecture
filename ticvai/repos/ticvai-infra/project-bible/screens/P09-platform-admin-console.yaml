@@ -45553,6 +45553,11 @@ screens:
     contract: catalogue
     purpose: Sales Channel Command Center
     trigger: onLoad
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Record the answers and score them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-383

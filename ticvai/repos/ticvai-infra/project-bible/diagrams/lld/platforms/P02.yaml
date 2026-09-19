@@ -48,10 +48,10 @@ servicesCalled:
   operationCalls: 36
 - service: IdentityService
   operationCalls: 24
-- service: VenueOpsService
-  operationCalls: 22
 - service: FnbService
   operationCalls: 22
+- service: VenueOpsService
+  operationCalls: 21
 - service: AccessService
   operationCalls: 17
 - service: AiService
@@ -1967,7 +1967,6 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - bookResource
   - createTableReservation
   - getResourceAvailability
   - joinRestaurantWaitlist

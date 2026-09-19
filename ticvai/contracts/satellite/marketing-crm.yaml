@@ -8178,6 +8178,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - name: band
         in: query
         schema:
@@ -8347,6 +8349,9 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Lists
@@ -8404,6 +8409,9 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Activations

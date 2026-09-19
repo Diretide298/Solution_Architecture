@@ -49,7 +49,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 18
 - service: VenueOpsService
-  operationCalls: 16
+  operationCalls: 15
 - service: RetailService
   operationCalls: 11
 - service: AccessService
@@ -1024,7 +1024,6 @@ screens:
   wave: 2
   density: compact
   operations:
-  - bookResource
   - cancelReservation
   - getGroupBooking
   - getReservation

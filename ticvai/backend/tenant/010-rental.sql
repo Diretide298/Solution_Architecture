@@ -302,7 +302,6 @@ CREATE TABLE IF NOT EXISTS rental.pricing_profile (
     product_id                        uuid,
     venue_id                          uuid,
     location_ids                      text[],
-    currency                          text,
     sales_channel                     text,
     customer_segment_id               uuid,
     model                             text NOT NULL,

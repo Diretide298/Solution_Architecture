@@ -64511,6 +64511,12 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: deployReaderConfiguration
+      - kind: publishGate
+        label: What publishing changes
+        notes: '**Pushes prices, entitlements and display rules to the reader, and its edge package with
+          them.** The reader decides offline from what it last received, so a change not deployed is a
+          change that did not happen.'
+        provenance: authored — required by check-screens, 19 September 2026
   states:
     loading: The reader deployment synchronization list.
     error: Could not load. Names which read failed and leaves the reader deployment synchronization untouched.
@@ -64787,6 +64793,12 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: deployReaderConfiguration
+      - kind: publishGate
+        label: What publishing changes
+        notes: '**Pushes prices, entitlements and display rules to the reader, and its edge package with
+          them.** The reader decides offline from what it last received, so a change not deployed is a
+          change that did not happen.'
+        provenance: authored — required by check-screens, 19 September 2026
   states:
     loading: The edge cache offline list.
     error: Could not load. Names which read failed and leaves the edge cache offline untouched.
@@ -121166,6 +121178,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: deployConfigurationProfile
+      - kind: publishGate
+        label: What publishing changes
+        notes: '**Promotes this configuration to the target environment.** What is running there now is
+          replaced, and the previous version stays restorable.'
+        provenance: authored — required by check-screens, 19 September 2026
   states:
     loading: The lifecycle environment promotion list.
     error: Could not load. Names which read failed and leaves the lifecycle environment promotion untouched.

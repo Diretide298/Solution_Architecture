@@ -1974,6 +1974,7 @@ screens:
 - P09:ADM-380 Customer & Organization Registration
 - P09:ADM-381 Venue Type & Business Profile
 - P09:ADM-382 Visitor, Capacity & Operational Scale
+- P09:ADM-383 Sales Channel Assessment
 - P09:ADM-384 Ticketing & Product Requirements
 - P09:ADM-385 Access, Queue & Visitor Experience Assessment
 - P09:ADM-386 Additional Business Module Assessment
@@ -2076,6 +2077,28 @@ screens:
 - P14:DEV-006 Usage & Limits
 - P14:DEV-007 Marketplace Listing
 - P14:DEV-008 Programme Administration
+- P17:SGN-001 Welcome & Start Your TICVAI Journey
+- P17:SGN-002 Customer & Organization Registration
+- P17:SGN-003 Venue Type & Business Profile
+- P17:SGN-004 Visitor, Capacity & Operational Scale
+- P17:SGN-005 Sales Channel Assessment
+- P17:SGN-006 Ticketing & Product Requirements
+- P17:SGN-007 Access, Queue & Visitor Experience Assessment
+- P17:SGN-008 Additional Business Module Assessment
+- P17:SGN-009 Integration, Payment & Technical Readiness
+- P17:SGN-010 AI Assessment Summary & Handoff
+- P17:SGN-011 Recommended Package Overview
+- P17:SGN-012 Commercial Model & Tier Selection
+- P17:SGN-013 Module Marketplace
+- P17:SGN-014 AI Module & Package Recommendations
+- P17:SGN-015 Module Detail & Commercial Treatment
+- P17:SGN-016 Module Dependency & Compatibility Manager
+- P17:SGN-017 Add-Ons, Capacity & Commercial Options
+- P17:SGN-018 Purchase / Trial Journey Selection
+- P17:SGN-019 Contract & Billing Cycle Selection
+- P17:SGN-022 Order & Commercial Pricing Review
+- P17:SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance
+- P17:SGN-024 Subscription Confirmation & Commercial Activation
 flows:
 - F04 Platform admin ships a release
 - F102 A brand is set, previewed, published and rolled back

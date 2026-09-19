@@ -658,6 +658,7 @@ screens:
 - P10:PTR-014 Settlement & Payment History
 - P10:PTR-018 Reports & Sales Performance
 - P12:SUP-008 Agent Performance & SLA View
+- P17:SGN-020 Billing & Legal Entity Information
 flows:
 - F13 Month end closes
 - F16 A venue opens for the first time

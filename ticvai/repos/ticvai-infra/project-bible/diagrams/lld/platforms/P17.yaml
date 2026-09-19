@@ -22,7 +22,15 @@ why: null
 modulesUsed:
 - module: core
   screens: 24
-servicesCalled: []
+servicesCalled:
+- service: PlatformService
+  operationCalls: 25
+- service: CatalogueService
+  operationCalls: 1
+- service: LedgerService
+  operationCalls: 1
+- service: OrderService
+  operationCalls: 1
 coverage:
   screens: 24
   inAFlow: 0
@@ -36,7 +44,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -56,7 +65,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - submitOnboardingApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -77,7 +87,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -98,7 +109,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -119,7 +131,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSaleChannel
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -140,7 +154,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -161,7 +176,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -182,7 +198,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -203,7 +221,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -224,7 +243,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - scoreVsiAssessment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -245,7 +265,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -272,7 +293,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPlans
+  - simulateCommercialPackage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -292,7 +315,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -312,7 +336,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -332,7 +357,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -352,7 +378,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listModuleCatalogue
+  - setModuleListing
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -372,7 +400,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - addCapacityPack
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -392,7 +421,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setTrialConfiguration
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -413,7 +443,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -421,7 +452,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - SGN-018
   - SGN-020
@@ -434,7 +466,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createLegalEntity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -455,7 +488,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setPaymentProvider
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -476,7 +510,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - previewSubscriptionChange
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -484,7 +519,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo:
   - SGN-021
   - SGN-023
@@ -497,7 +533,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setAgreementContractTerm
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -518,7 +555,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -526,7 +564,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - tenantId<-session
   goesTo: []
   boardFrames: null
   wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-024
