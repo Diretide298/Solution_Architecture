@@ -258,6 +258,63 @@ went 614 → 1,182 and `P09` 446 → 676, taking the package to **2,427 screens*
 
 **None of this invents operations.** A generated screen declares `apis: []`. The 1,924 pack screens imply roughly three thousand endpoints against the ~1,032 that exist, and *authoring three thousand endpoints from a PDF is not derivation, it is fabricating an API surface.* The gap is written out as named operations instead.
 
+### 9b — Before authoring anything, scope the pack
+
+**The gap list is not a work list.** On 19 September it proposed ~1,300 operations; roughly 260
+were actually needed. The rest existed already, usually under a better name.
+
+```
+tools/check-contract-split.py                 is an unused half a missing join, or drift?
+tools/scope-pack-to-contracts.py <pack>       per board: join, author, or mixed
+```
+
+**The recurring shape is not a missing domain — it is an operation acting without the rule that
+governs it.** `mergeGuests` merged and nothing said which records were duplicates. `createSeatBlock`
+took seats out of sale and nothing said when they come back. `registerDevice` created a row and
+nothing turned it into a device you could trust. Look for the rule before authoring the verb.
+
+**A pack with fewer than five wired screens has no reliable contract attribution.** `audit-contracts`
+assigns a pack to whichever contract its wired screens name most, so one stray reference decides.
+That is how `orders` came to show 178 unserved screens it did not own — Wallet's 99 and Payment's 79,
+one reference each.
+
+**Check every operation you are about to reference actually exists**, before applying:
+
+```
+python - <<'PY'
+import io, glob, re
+have = set()
+for f in glob.glob('contracts/*/*.yaml'):
+    have |= set(re.findall(r'^\s*operationId:\s*(\S+)', io.open(f, encoding='utf8').read(), re.M))
+src = io.open('tools/applied/<your-wiring>.py', encoding='utf8').read()
+print(sorted(set(re.findall(r"\('(\w+)',\s*(?:[A-Z]|')", src)) - have))
+PY
+```
+
+Ten invented references were caught this way across four wiring runs on 19 September — every one a
+plausible guess at a name in a contract nobody had opened.
+
+### 9c — Adding to a contract
+
+```
+tools/splice-contract.py <contract.yaml> <paths.yaml> <schemas.yaml>
+```
+
+**Never append paths by hand, and never by "everything before `schemas:`".** Two failures, both
+silent, both on 19 September:
+
+- A duplicate path key produces valid YAML in which the later mapping **replaces** the earlier one.
+  Splicing `/resource-bookings:` when it already existed took `bookResource` with it. The checker
+  then reported *"screen WEB-031 calls 'bookResource', which does not exist"* — three steps from the
+  cause.
+- `schemas:` is not always the first key under `components:`. `approvals.yaml` opens with
+  `securitySchemes:`, so appending before `schemas:` appends *inside* `components:`. Thirteen
+  operations vanished from `paths`, every reference still resolved, and the tool reported **clean**.
+
+The splice now refuses on a collision and **verifies each new `operationId` is present in the parsed
+`paths`** — presence in the document, not the file looking plausible. Same principle as the intake
+trap: verify by path.
+
 ## 10–12 — Refresh, design, checks
 
 ```
