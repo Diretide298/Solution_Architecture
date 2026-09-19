@@ -648,12 +648,12 @@
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
  "resources.rental_agreement": [
-  "DECLINE",
-  "our rental.booking carries order_id, status, from/to, checked_out_at, due_back_at and returned_at \u2014 planned and actual handover, exactly their purpose line"
+  "TAKE THEIRS",
+  "reversed. We hold rental.agreement_rules and rental.agreement_signature and NO agreement: the signature references participant_id plus an agreement_version string, so it signs a version number rather than a document, and rental.participant carries no booking reference at all. Their rental_agreement is the record both of ours are missing. Take it into rental; rental.booking keeps the commercial reservation and the agreement carries the operational contract, which is the split our own two tables already imply"
  ],
  "resources.rental_agreement_item": [
-  "TAKE BODY",
-  "our rental.equipment_assignment has asset_id, serial_number, assigned_at and returned_at, so partial returns already work. Take their per-item status (missing, damaged) and the quantity path for items that are not serialised"
+  "MERGE",
+  "with the agreement taken, their item is the line on the contract and our rental.equipment_assignment is how a physical asset is attached to a line. Keep both roles, one table: their per-item status and quantity path for non-serialised items, our asset_id, serial_number, scanned_code and returned_at"
  ],
  "resources.rental_inspection": [
   "KEEP OURS",

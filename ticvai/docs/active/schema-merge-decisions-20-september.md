@@ -80,7 +80,11 @@ We still decline it, on the same 91 foreign keys.
 `pricing.dynamic_price_rule`, `_condition`, `_action`.
 
 We hold `catalogue.price`, `catalogue.price_list`, `rental.pricing_profile`, `games.pricing` —
-**and no dynamic pricing engine at all.** These three are a genuine gap, not a rename.
+**and no dynamic pricing engine.** What we do hold is three guardrail columns on
+`rental.pricing_profile` — `dynamic_enabled`, `dynamic_max_increase_percent`,
+`dynamic_max_decrease_percent` — which set a ceiling and a floor with nothing underneath them to
+decide a price, and nothing equivalent on `catalogue.price`, `games.pricing`, F&B or retail.
+These three tables are a genuine gap, not a rename.
 
 **The decision is where they land**, not whether. **Recommend: their schema** — a rules engine
 that prices tickets, F&B, retail and rental cannot sit inside `catalogue` once F&B and Retail

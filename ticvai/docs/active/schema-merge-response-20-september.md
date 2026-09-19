@@ -238,7 +238,7 @@ rewrite to arrive at the same place.
 
 | we concede | what it costs us |
 |---|---|
-| your `pricing` schema for the dynamic-pricing engine | 3 tables and none of ours move — **we have no dynamic pricing at all**, so this is a gap you closed |
+| your `pricing` schema for the dynamic-pricing engine | 3 tables and none of ours move. **What we have is three guardrail columns on `rental.pricing_profile`** — `dynamic_enabled` and a max increase and decrease percent — and no rules, no conditions, no actions, and nothing at all for tickets, F&B or retail. A ceiling with no engine under it |
 | `venue.department` | additive |
 | the 63 tables in §1, including 15 we had already built your way | our workbook grows; nothing of ours breaks |
 | four of your table names over ours | 4 renames, two of them with no references at all |
