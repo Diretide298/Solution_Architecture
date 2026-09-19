@@ -1,4 +1,16 @@
 {
+ "access.access_change": [
+  "ADDITIVE",
+  "audits access replacement during an upgrade"
+ ],
+ "access.accreditation": [
+  "KEEP OURS",
+  "our accreditation.holder"
+ ],
+ "access.accreditation_access": [
+  "KEEP OURS",
+  "our accreditation.holder_access"
+ ],
  "access.accreditation_credential": [
   "KEEP OURS",
   "we give the domain its own schema; same principle they accepted for branding->whitelabel"
@@ -6,6 +18,18 @@
  "access.accreditation_document": [
   "KEEP OURS",
   "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "access.accreditation_status_history": [
+  "KEEP OURS",
+  "our accreditation.audit"
+ ],
+ "access.accreditation_type": [
+  "KEEP OURS",
+  "our accreditation.programme"
+ ],
+ "access.entry_rule_point": [
+  "ADDITIVE",
+  "join between admission_rules and access_point; we imply it and never store it"
  ],
  "ai.knowledge_group": [
   "TAKE EITHER",
@@ -38,6 +62,10 @@
  "approvals.approval_rule": [
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "catalogue.plan_benefit": [
+  "ADDITIVE",
+  "maps benefits to a plan with usage limits"
  ],
  "catalogue.product_recommendation": [
   "NO MATCH",
@@ -75,6 +103,14 @@
   "TAKE THEIRS",
   "dining_ disambiguates; fnb.table alone is vague next to reservation_table"
  ],
+ "fnb.ingredient_substitute": [
+  "ADDITIVE",
+  "approved substitutions for a recipe"
+ ],
+ "fnb.menu_item_modifier": [
+  "ADDITIVE",
+  "join between menu_item and modifier group"
+ ],
  "fnb.price": [
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
@@ -91,6 +127,10 @@
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
  ],
+ "fnb.product_recommendation": [
+  "ADDITIVE",
+  "F&B upsell; ours lives in promotions and not per product"
+ ],
  "fnb.reservation_table": [
   "ADDITIVE",
   "maps tables to a reservation; a join table we do not have"
@@ -99,17 +139,57 @@
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
  ],
+ "identity.benefit_usage": [
+  "ADDITIVE",
+  "use of a membership benefit against its allowance"
+ ],
+ "identity.customer": [
+  "PLACEMENT",
+  "a guest is marketing.guest_profile plus pii.subject; identity holds principals"
+ ],
+ "identity.customer_address": [
+  "PLACEMENT",
+  "pii.subject_contact holds guest contact detail"
+ ],
+ "identity.customer_contact": [
+  "DECLINE",
+  "our pii.subject_contact"
+ ],
  "identity.customer_extra_option": [
   "ADDITIVE",
   "customer extra-field choices; we have no extensible profile fields"
+ ],
+ "identity.customer_membership": [
+  "ADDITIVE",
+  "the membership a customer holds; we have entitlement_template and no holder record"
  ],
  "identity.enabled_module": [
   "PLACEMENT",
   "module enablement per tenant \u2014 ours is whitelabel.module_enablement"
  ],
+ "identity.family": [
+  "PLACEMENT",
+  "our marketing.guest_relationship"
+ ],
+ "identity.family_member": [
+  "PLACEMENT",
+  "our marketing.guest_relationship"
+ ],
+ "identity.membership_history": [
+  "ADDITIVE",
+  "status history for a membership"
+ ],
+ "identity.module": [
+  "ADDITIVE",
+  "a registry of authorisation modules; ours live in contracts/shared/permissions.yaml, not a table"
+ ],
  "identity.otp": [
   "TAKE BODY",
   "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "identity.permission": [
+  "ADDITIVE",
+  "same \u2014 the permission vocabulary is a contract file for us, not data"
  ],
  "identity.refresh_token": [
   "ADDITIVE",
@@ -122,6 +202,10 @@
  "identity.user_account": [
   "DECLINE",
   "principal is ours and covers person, service and device, which their own purpose describes"
+ ],
+ "identity.user_login": [
+  "DECLINE",
+  "our identity.principal_credential"
  ],
  "inventory.stock_count": [
   "DECLINE",
@@ -143,6 +227,10 @@
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
+ "inventory.supplier_contract": [
+  "ADDITIVE",
+  "purchasing agreement and terms with a supplier"
+ ],
  "ledger.journal": [
   "DECLINE",
   "their journal is the header; ours is journal_entry with journal_line beneath it"
@@ -154,6 +242,18 @@
  "maintenance.rental_damage_assessment": [
   "KEEP OURS",
   "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "marketing.campaign_target": [
+  "ADDITIVE",
+  "links a campaign to what it promotes"
+ ],
+ "marketing.case_comment": [
+  "DECLINE",
+  "our marketing.case_message"
+ ],
+ "marketing.customer_badge": [
+  "ADDITIVE",
+  "badges awarded; we have challenge and challenge_progress and no badge"
  ],
  "marketing.customer_challenge_progress": [
   "DECLINE",
@@ -167,6 +267,10 @@
   "DECLINE",
   "segment_criterion is ours and customer_ repeats the schema"
  ],
+ "marketing.data_subject_request": [
+  "PLACEMENT",
+  "duplicates our platform.dsar_request \u2014 flagged 18 September, still true"
+ ],
  "marketing.journey_enrollment": [
   "TAKE THEIRS",
   "enrollment is the clearer word; journey_entrant reads as a person, not a state"
@@ -179,6 +283,14 @@
   "ADDITIVE",
   "links a campaign to loyalty bonuses; a different table, not a rename"
  ],
+ "marketing.loyalty_points": [
+  "ADDITIVE",
+  "the points ledger; we hold loyalty_position and no transaction history"
+ ],
+ "marketing.loyalty_rule": [
+  "SPLIT",
+  "their earning and bonus rules; ours sit inside loyalty_programme"
+ ],
  "marketing.points_earning_rule": [
   "SPLIT",
   "they split earning and redemption; our loyalty_programme holds both"
@@ -187,9 +299,17 @@
   "SPLIT",
   "they split earning and redemption; our loyalty_programme holds both"
  ],
+ "marketing.review_response": [
+  "ADDITIVE",
+  "staff replies to a review; we hold review alone"
+ ],
  "marketing.reward": [
   "ADDITIVE",
   "we hold loyalty_programme, _tier and _position but no reward"
+ ],
+ "marketing.reward_assignment": [
+  "ADDITIVE",
+  "which reward went to whom; pairs with marketing.reward"
  ],
  "marketing.sla_policy": [
   "ADDITIVE",
@@ -199,9 +319,29 @@
   "DECLINE",
   "ours already means support cases only"
  ],
+ "marketing.survey_question": [
+  "DECLINE",
+  "our marketing.form_definition covers surveys and waivers as one shape"
+ ],
+ "marketing.survey_response": [
+  "DECLINE",
+  "our marketing.form_submission"
+ ],
+ "marketing.waiver_signature": [
+  "ADDITIVE",
+  "signature against an immutable waiver version; form_submission does not pin the version"
+ ],
+ "orders.cash_count": [
+  "DECLINE",
+  "ours rolls cash_count_line up to the shift; theirs is the session header"
+ ],
  "orders.deposit": [
   "ADDITIVE",
   "rental security deposit, not a till deposit"
+ ],
+ "orders.membership_renewal": [
+  "ADDITIVE",
+  "renewal attempts and their result"
  ],
  "orders.payment_gateway": [
   "COLLISION",
@@ -214,6 +354,10 @@
  "orders.payment_policy": [
   "COLLISION",
   "payments domain; ours is payments.payment_terms"
+ ],
+ "orders.payment_route": [
+  "COLLISION",
+  "payments domain; ours is payments.routing_rule"
  ],
  "orders.payment_terminal": [
   "COLLISION",
@@ -242,6 +386,22 @@
  "platform.tenant_subscription": [
   "COLLISION",
   "subscription domain; ours is control.subscription"
+ ],
+ "platform.venue_setting": [
+  "DECLINE",
+  "our platform.configuration_profile is scope-addressed"
+ ],
+ "pricing.dynamic_price_action": [
+  "DECIDE",
+  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
+ ],
+ "pricing.dynamic_price_condition": [
+  "DECIDE",
+  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
+ ],
+ "pricing.dynamic_price_rule": [
+  "DECIDE",
+  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
  ],
  "reporting.report_execution": [
   "DECLINE",
@@ -283,21 +443,41 @@
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
  ],
+ "retail.product_recommendation": [
+  "ADDITIVE",
+  "retail upsell, same shape"
+ ],
  "retail.variant": [
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "seating.seat_hold_item": [
+  "ADDITIVE",
+  "the seats inside a hold; we hold seat_hold and hold_pool only"
  ],
  "seating.seat_section_row": [
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
+ "sync.cell_connection": [
+  "ADDITIVE",
+  "which cell may talk to which; we have no permit record"
+ ],
  "sync.cross_cell_rejection": [
   "DECLINE",
   "cross_cell_ repeats the sync schema"
  ],
+ "sync.cross_cell_request": [
+  "ADDITIVE",
+  "the request itself; we hold only sync.rejection"
+ ],
  "sync.guest_link": [
   "DECIDE",
   "which schema owns cross-cell guest linking, sync or platform"
+ ],
+ "venue.department": [
+  "DECIDE",
+  "the venue schema question, with outlet, space and zone"
  ],
  "venue.outlet": [
   "DECIDE",
@@ -307,13 +487,41 @@
   "DECIDE",
   "the venue schema question \u2014 an open blocker"
  ],
+ "venue.venue": [
+  "DECIDE",
+  "the venue schema question, with outlet, space and zone"
+ ],
  "venue.zone": [
   "DECIDE",
   "the venue schema question \u2014 an open blocker"
  ],
+ "venuemap.layout": [
+  "DECLINE",
+  "our venuemap.map"
+ ],
+ "wallet.access": [
+  "DECLINE",
+  "our wallet.shared_wallet_member says who may spend and up to what"
+ ],
  "wallet.account": [
   "RECLASSIFY",
   "their stored-value wallet master = our wallet.wallet, not ledger.account"
+ ],
+ "wallet.balance": [
+  "MERGE",
+  "our wallet.wallet carries the balance; take their available/held split"
+ ],
+ "wallet.hold": [
+  "ADDITIVE",
+  "reserves wallet money mid-order; we authorise and never record the hold"
+ ],
+ "wallet.transaction": [
+  "DECLINE",
+  "our wallet.wallet_transaction, same table"
+ ],
+ "whitelabel.brand_setting": [
+  "DECLINE",
+  "our whitelabel.config_version and the branding fields on it"
  ],
  "whitelabel.brand_version": [
   "EITHER",
@@ -323,8 +531,76 @@
   "RECLASSIFY",
   "branded nav menu, not fnb.menu_item"
  ],
+ "whitelabel.redirect": [
+  "ADDITIVE",
+  "branded URL redirects"
+ ],
+ "whitelabel.seo_setting": [
+  "ADDITIVE",
+  "SEO and social metadata per page"
+ ],
+ "workforce.employee": [
+  "ADDITIVE",
+  "an employee master; we use identity.principal and hold no HR record"
+ ],
+ "workforce.employment": [
+  "ADDITIVE",
+  "employment terms and contract validity"
+ ],
+ "workforce.job_title": [
+  "ADDITIVE",
+  "job definitions such as Cashier or Chef"
+ ],
+ "workforce.leave_balance": [
+  "ADDITIVE",
+  "entitlement, used and remaining per period"
+ ],
+ "workforce.leave_type": [
+  "ADDITIVE",
+  "leave categories"
+ ],
+ "workforce.pay_component": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.payroll_employee": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.payroll_line": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.payroll_run": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.payslip": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.roster": [
+  "DECLINE",
+  "our workforce.rota_assignment"
+ ],
+ "workforce.salary": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
+ "workforce.salary_component": [
+  "DECIDE",
+  "payroll \u2014 seven tables with no requirement behind them, flagged 18 September"
+ ],
  "workforce.shift": [
   "ADDITIVE",
   "a shift pattern (Morning/Evening), not a till session"
+ ],
+ "workforce.work_assignment": [
+  "ADDITIVE",
+  "assigns an employee to a job and a location"
+ ],
+ "workforce.work_time": [
+  "DECLINE",
+  "our workforce.attendance"
  ]
 }
