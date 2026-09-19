@@ -177,70 +177,6 @@ paths:
                 $ref: '#/components/schemas/GameCard'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
-  /game-cards/{cardCode}/load:
-    parameters:
-    - name: cardCode
-      in: path
-      required: true
-      schema:
-        type: string
-    post:
-      operationId: loadGameCredits
-      x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
-      x-ticvai-audience:
-      - staff
-      summary: Load credits onto a card
-      description: 'Creates a liability, not revenue. Recognition happens as credits are played, or as
-        breakage when the card expires.
-
-        Bonus credits from a promotion are tracked separately because they are typically non-refundable
-        and are spent first.
-
-        '
-      tags:
-      - card
-      x-ticvai-permission: ORDER_CREATE
-      x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - id
-              - credits
-              - recordedAt
-              properties:
-                id:
-                  type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                credits:
-                  type: integer
-                  minimum: 1
-                bonusCredits:
-                  type: integer
-                  minimum: 0
-                  default: 0
-                amountPaid:
-                  $ref: ../shared/common.yaml#/components/schemas/Money
-                orderId:
-                  type: string
-                recordedAt:
-                  type: string
-                  format: date-time
-      responses:
-        '200':
-          description: Loaded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GameCard'
   /game-cards/{cardCode}/transfer:
     parameters:
     - name: cardCode
@@ -690,55 +626,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PrizeConflictProblem'
-  /game-cards/{cardCode}/adjust:
-    parameters:
-    - name: cardCode
-      in: path
-      required: true
-      schema:
-        type: string
-    post:
-      operationId: adjustGameCard
-      x-ticvai-audience:
-      - staff
-      summary: Manually adjust credits or points
-      description: 'A machine that swallowed a play, a goodwill gesture, a correction. Requires a reason
-        and is reported separately — manual adjustments to stored value get the same scrutiny here as
-        they do on a wallet.
-
-        '
-      tags:
-      - card
-      x-ticvai-permission: LEDGER_POST
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - reason
-              properties:
-                credits:
-                  type: integer
-                points:
-                  type: integer
-                reason:
-                  type: string
-                  minLength: 3
-                  maxLength: 500
-      responses:
-        '200':
-          description: Adjusted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GameCard'
   /attraction-types:
     get:
       operationId: listAttractionTypes

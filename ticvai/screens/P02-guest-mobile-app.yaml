@@ -1445,11 +1445,11 @@ screens:
       their age, cards masked. Storing a card and transferring value need the server.'
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: Read a guest wallet
     trigger: onLoad
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Wallet transaction history
     trigger: onLoad
   entryState:
@@ -9210,7 +9210,7 @@ screens:
     invalidates:
     - listPaymentTokens
   - operationId: transferWalletBalance
-    contract: retail
+    contract: wallet
     purpose: Send balance to another guest
     trigger: onAction
     invalidates:
@@ -9222,7 +9222,7 @@ screens:
     invalidates:
     - listPaymentTokens
   - operationId: getGiftCard
-    contract: retail
+    contract: wallet
     purpose: Balance on a gift card
     trigger: onLoad
   entryState:

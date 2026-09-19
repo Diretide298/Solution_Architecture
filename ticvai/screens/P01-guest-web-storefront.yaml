@@ -3599,15 +3599,15 @@ screens:
       their age, cards masked. Storing a card and transferring value need the server.'
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: Read a guest wallet
     trigger: onLoad
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Wallet transaction history
     trigger: onLoad
   - operationId: getGiftCard
-    contract: retail
+    contract: wallet
     purpose: Check a gift card balance
     trigger: onLoad
   - operationId: getGameCard
@@ -3623,7 +3623,7 @@ screens:
     purpose: Save a card for next time
     trigger: onAction
   - operationId: transferWalletBalance
-    contract: retail
+    contract: wallet
     purpose: Move value between wallets
     trigger: onAction
   entryState:
