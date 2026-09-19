@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 """The files that look derived, are read like derived, and that nothing derives.
 
-**Nine files in `handoff/` and `wireframes/` are inputs wearing the clothes of outputs.**
+**Seven files in `handoff/` and `wireframes/` are inputs wearing the clothes of
+outputs.** There were nine until 19 September, when `api-list.md` and `wireframes/LINKAGE.md`
+turned out to be pure derivations and became `tools/build-api-list.py` and
+`tools/build-linkage.py`. **That is the preferred fix**: a file that can be generated should
+be, and only what genuinely needs a person stays on this list.
 They sit beside genuinely derived artefacts, they are read by the pipeline and by the
 viewer, and no tool in `tools/` writes any of them. `refresh.sh` cannot help: from its
 point of view they are inputs, so it reads them and says nothing.
@@ -70,9 +74,6 @@ AUTHORED = [
     ("handoff/traceability.json",
      "build-status, check-traceability",
      "matrix rows answered by new operations still read as unanswered"),
-    ("handoff/api-list.md",
-     "viewer lib/consumers.mjs",
-     "new operations have no consuming app in the viewer"),
     ("handoff/artefact-audit.md",
      "viewer lib/decisions.mjs",
      "new handoff artefacts are unclassified"),
@@ -82,9 +83,6 @@ AUTHORED = [
     ("handoff/rag-index-sources.md",
      "check-package",
      "what the RAG index was built from"),
-    ("wireframes/LINKAGE.md",
-     "viewer lib/wireframes.mjs, lib/lineage.mjs",
-     "the board -> screen -> operation chain"),
 ]
 
 VERBS = ("get", "post", "put", "patch", "delete")

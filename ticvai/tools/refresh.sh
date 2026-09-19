@@ -128,6 +128,18 @@ python3 tools/derive-app-roles.py
 # it, and also means a stale register fails the package for a screen that is perfectly fine.
 python3 tools/derive-id-register.py --apply
 python3 tools/link-screens-contracts.py
+# **Both of these were hand-written documents until 19 September, and both had drifted by a
+# factor of three.** `api-list.md` claimed 581 operations against 1,974 and carried a
+# published/specified status key that stopped meaning anything once the contracts became the
+# source of truth; `LINKAGE.md` said 364 screens against 2,427. Every column either of them
+# held is a field the contracts or the screens already carry.
+#
+# **They run here, immediately after `link-screens-contracts`, and not earlier.** That tool
+# back-writes `x-ticvai-consumed-by` into the contracts, which is where api-list's Consumers
+# column comes from — generate it before that and every newly-wired operation shows no
+# consumer for a whole cycle, which is the staleness they are being rescued from.
+python3 tools/build-api-list.py
+python3 tools/build-linkage.py
 # **Four artefacts derived from the finished screens, none of which was ever in this script.**
 # Their dates are the argument for putting them here: the ledger was last built 4 September, the
 # estate audit and the undrawn list on 8 September, the thin-screens workbook on 9 September --
@@ -227,7 +239,12 @@ echo
 # `audit-screen-estate` and `index-sources` were all sitting in tools/ with nothing running them.
 # The last three write a dated report only when passed `--write`; bare, they report and read, so
 # they belong here and produce no file.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-contract-split check-spec-coverage check-rfp-coverage audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
+#
+# **`check-authored-inputs` is the one that reports what this script cannot fix.** Nine
+# files in handoff/ and wireframes/ are inputs wearing the clothes of outputs — read by
+# the pipeline and the viewer, written by nothing. It hashes the contracts' operationIds
+# and schema names and says which of the nine were written against a different set.
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.
