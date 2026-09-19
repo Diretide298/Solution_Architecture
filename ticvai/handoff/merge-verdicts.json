@@ -1,0 +1,214 @@
+{
+ "access.accreditation_credential": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "access.accreditation_document": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "ai.usage_policy": [
+  "DECLINE",
+  "ours is richer, 26 columns against their 17"
+ ],
+ "approvals.approval_decision": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_delegation": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_escalation": [
+  "TAKE BODY",
+  "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "approvals.approval_matrix": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_request": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_rule": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "catalogue.product_variant": [
+  "DECLINE",
+  "pairs with variant_dimension; 11 inbound FKs"
+ ],
+ "fnb.dining_table": [
+  "TAKE THEIRS",
+  "dining_ disambiguates; fnb.table alone is vague next to reservation_table"
+ ],
+ "fnb.price": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.price_list": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.product": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.product_category": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.reservation_table": [
+  "ADDITIVE",
+  "maps tables to a reservation; a join table we do not have"
+ ],
+ "fnb.variant": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "identity.otp": [
+  "TAKE BODY",
+  "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "inventory.stock_count": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_count_line": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_movement": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_transfer": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_transfer_line": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "maintenance.preventive_plan": [
+  "TAKE THEIRS",
+  "our maintenance_plan repeats the schema; theirs is more specific"
+ ],
+ "maintenance.rental_damage_assessment": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "marketing.customer_challenge_progress": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "marketing.customer_segment": [
+  "DECLINE",
+  "customer_ repeats the marketing schema"
+ ],
+ "marketing.loyalty_campaign": [
+  "ADDITIVE",
+  "links a campaign to loyalty bonuses; a different table, not a rename"
+ ],
+ "marketing.sla_policy": [
+  "ADDITIVE",
+  "support-case SLA, not an approvals SLA"
+ ],
+ "marketing.support_case": [
+  "DECLINE",
+  "ours already means support cases only"
+ ],
+ "orders.deposit": [
+  "ADDITIVE",
+  "rental security deposit, not a till deposit"
+ ],
+ "orders.pos_shift": [
+  "TAKE THEIRS",
+  "pos_ disambiguates from workforce.shift, which they also have"
+ ],
+ "platform.cash_denomination": [
+  "EITHER",
+  "cash_ is meaningful but we hold no other denomination; concede if useful"
+ ],
+ "platform.cell": [
+  "DECLINE",
+  "ours is in control with 20 columns and 19 inbound FKs"
+ ],
+ "platform.region_setting": [
+  "EITHER",
+  "singular vs plural only; settle our own convention first"
+ ],
+ "reporting.report_execution": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "reporting.report_schedule": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "resources.rental_inspection": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "resources.resource_booking": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "retail.price": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.price_list": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.product": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.product_category": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.variant": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "seating.seat_section_row": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "sync.cross_cell_rejection": [
+  "DECLINE",
+  "cross_cell_ repeats the sync schema"
+ ],
+ "sync.guest_link": [
+  "DECIDE",
+  "which schema owns cross-cell guest linking, sync or platform"
+ ],
+ "venue.outlet": [
+  "DECIDE",
+  "the venue schema question \u2014 an open blocker"
+ ],
+ "venue.space": [
+  "DECIDE",
+  "the venue schema question \u2014 an open blocker"
+ ],
+ "venue.zone": [
+  "DECIDE",
+  "the venue schema question \u2014 an open blocker"
+ ],
+ "wallet.account": [
+  "RECLASSIFY",
+  "their stored-value wallet master = our wallet.wallet, not ledger.account"
+ ],
+ "whitelabel.menu_item": [
+  "RECLASSIFY",
+  "branded nav menu, not fnb.menu_item"
+ ],
+ "workforce.shift": [
+  "ADDITIVE",
+  "a shift pattern (Morning/Evening), not a till session"
+ ]
+}
