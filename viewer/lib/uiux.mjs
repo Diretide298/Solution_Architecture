@@ -294,7 +294,35 @@ export async function buildUiux(root, screens = []) {
 
   const total = boards.length;
   const wired = boards.filter((b) => b.wired).length;
-  const frames = boards.reduce((n, b) => n + b.frameCount, 0);
+
+  // **A frame drawn on three boards is one frame.** `framesIn` already learned
+  // this a scope down — it de-duplicates the two cases of an anchor within a
+  // board, and the comment there records that counting both made every derived
+  // figure 34% too high. Summing `frameCount` across boards makes the same
+  // mistake one level up, and by more: the five `APP *` boards are per-app
+  // rollups of frames the sixteen `P*` boards already draw, and every anchor in
+  // all 195 client `WS` packs is a frame a `P*` board draws too. 2427 distinct
+  // anchors were reported as 6720, and "36% claimed by a screen" was really
+  // 100% — the package has no unclaimed frame at all.
+  //
+  // So the package-level figures are taken over the union. `board.frameCount`
+  // and `board.unclaimedFrames` stay per-board, because there they are right:
+  // what is left to map *on that board* is still the question the rail answers.
+  const seen = new Map();
+  for (const board of boards) {
+    for (const f of board.frames) {
+      const prev = seen.get(f.anchor);
+      // Claimed on any board is claimed. A screen points at one board's copy;
+      // the other two are the same drawing under a different cover.
+      if (!prev) seen.set(f.anchor, { claimed: f.screens.length > 0, named: !!f.name });
+      else {
+        if (f.screens.length > 0) prev.claimed = true;
+        if (f.name) prev.named = true;
+      }
+    }
+  }
+  const distinct = [...seen.values()];
+  const frames = distinct.length;
   return {
     present: total > 0,
     folders,
@@ -304,8 +332,8 @@ export async function buildUiux(root, screens = []) {
       wired,
       unwired: total - wired,
       frames,
-      framesNamed: boards.reduce((n, b) => n + b.namedFrames, 0),
-      framesClaimed: frames - boards.reduce((n, b) => n + b.unclaimedFrames, 0),
+      framesNamed: distinct.filter((f) => f.named).length,
+      framesClaimed: distinct.filter((f) => f.claimed).length,
       // Screens a *client pack* draws, which is what anybody means by "how much
       // is drawn". Counting every `via: 'board'` claim returns all 492, because
       // the generator draws every screen on every platform and each of them
