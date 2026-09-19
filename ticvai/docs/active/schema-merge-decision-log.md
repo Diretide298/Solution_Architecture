@@ -135,3 +135,70 @@ engine** — there are no rules, no conditions, no actions, and nothing at all f
 retail. The claim "no dynamic pricing at all" is stated in the response document and the shared
 doc and is **overstated**; it has to read "guardrails on one table and no rules engine" before
 decision 5 is argued.
+
+---
+
+## Re-score — what the rubric overturned in the 185 already closed
+
+**The rubric arrived after 185 rows were closed**, so every one of them was re-read against it.
+Most were decided on what the rows actually *are*, which the rubric does not disturb — the 21
+prefix-repeat declines, the purpose-line matches, the stub replacements. **Two classes were
+decided on something the rubric does not count.**
+
+### Class one — decided on change points
+
+Effort is not quality. Six rows carried a cost figure in their reason; five of those were
+arguments about how much work a rename is, which is a thing to plan around, not a thing to
+decide on.
+
+| table | was | now | why it moved |
+|---|---|---|---|
+| `ai.activity` | DECLINE, 57 points | **TAKE THEIRS** | their purpose says *"any AI request, including non-chat calls"*. An `interaction` reads as a conversation and most of these rows are not one |
+| `venuemap.route` | DECLINE, "not worth it" | **EITHER** | a cost dodge. Their purpose is *"a connection between two points"* — an edge. `route` and `path` both oversell it and neither is better |
+| `access.entry_rule` | DECLINE, 37 points | **EITHER** | a coin toss held hostage by our own undecided singular/plural rule. Settle the convention and this answers itself |
+| `platform.scope` | DECLINE, 91 FKs | **DECIDE** | their name is better — `scope` is the word 58 of our config profiles address by, `org_unit` is generic ERP. It is the venue decision in a second place, so it moves **into** §4 rather than being settled on effort |
+
+**Held:** `orders.order` — 223 points, but `sales_order` also distinguishes it from an F&B order,
+a purchase order and a kitchen order, so it wins on readability with the cost removed.
+`inventory.wastage` — the ledger-path argument is optimised access and maintainability, not cost.
+
+### Class two — an array of ours against a join table of theirs
+
+**This is the one worth knowing about, because the inconsistency was ours.**
+
+We had already **accepted four** of their normalisations — `access.entry_rule_point`,
+`fnb.menu_item_modifier`, `seating.seat_block_item`, `catalogue.plan_benefit` — each on the
+grounds that we hold the relationship as an array and an array cannot carry per-row state. **Then
+we declined two identical ones.**
+
+| table | ours | why it flipped |
+|---|---|---|
+| `orders.payment_method_config` | `payments.method.currencies[]`, `channels[]`, `venue_ids[]` | **Access:** *"which methods are live at this venue, in AED, on web"* is an array containment scan, not an index lookup. **Strain:** enabling one method at one venue rewrites the whole row and every array on it. **Maintainability:** adding a venue to 40 methods is 40 row rewrites against 40 inserts |
+| `platform.tier_module` | `subscription.module_listing.included_in_tiers[]` | *"which modules are in PRO"* scans every module row; the join table is one indexed read |
+
+Both are now **TAKE THEIRS**. `payment_method_config` lands in `payments`, `tier_module` in
+`subscription`.
+
+### The larger thing this exposed — **open, not decided**
+
+**140 of our 556 tables carry an array column that encodes a relationship.** Some are legitimate
+value lists — `tags`, `allergens`, `blackout_dates`, `scopes`. Many are not:
+
+    orders.order_line.seat_ids, entitlement_ids, cross_region_right_ids   18 ops, 49 screens
+    access.entitlement.shared_with_subject_ids                            28 ops, 66 screens
+    marketing.guest_profile.recent_order_ids, membership_ids              20 ops, 33 screens
+    approvals.rule.approver_role_ids, escalate_to_role_ids                 6 ops, 34 screens
+    access.admission_rules.allowed_access_point_ids                        7 ops, 18 screens
+    whitelabel.tenant_config.enabled_payment_methods                      19 ops, 22 screens
+    seating.seat.companion_seat_ids                                        5 ops, 26 screens
+
+**Their workbook only happened to normalise six of them.** The rest are the same modelling
+decision, unreviewed, and on this rubric most of them are wrong: an `_ids` array cannot be
+joined, cannot carry per-row state, cannot be indexed for a membership test without a GIN index,
+and is rewritten whole on every change.
+
+**`access.admission_rules.allowed_access_point_ids` is the proof** — their `entry_rule_point` is
+exactly that array as a table, and we accepted it. The same argument applies to the other 139 and
+nobody has made it.
+
+**This is a package-wide review, not a merge decision.** It does not block the eleven.

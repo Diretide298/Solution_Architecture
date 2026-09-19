@@ -28,8 +28,8 @@
   "our accreditation.programme"
  ],
  "access.entry_rule": [
-  "DECLINE",
-  "our access.admission_rules, 37 points. Theirs is singular and ours is plural, which is our convention problem, not a rename. Their accepted entry_rule_point becomes admission_rule_point"
+  "EITHER",
+  "was declined on 37 points. On the rubric it is a coin toss held hostage by our own undecided singular/plural convention: theirs is singular and pairs with the entry_rule_point we accepted, ours carries the domain word. Settle the convention, then this answers itself"
  ],
  "access.entry_rule_point": [
   "ADDITIVE",
@@ -52,8 +52,8 @@
   "our ai.proposed_action; proposed carries that it is AI-originated, which is the fact that matters about the row"
  ],
  "ai.activity": [
-  "DECLINE",
-  "ai.interaction, 57 change points. \"including non-chat calls\" is the argument for activity, but an interaction with a system is not a chat"
+  "TAKE THEIRS",
+  "reversed. 57 change points is an effort argument, not a quality one, and on readability their purpose line settles it: \"any AI request, including non-chat calls\". An interaction reads as a conversation and most of these rows are not one"
  ],
  "ai.indexing_job": [
   "EITHER",
@@ -540,8 +540,8 @@
   "payments domain; ours is payments.method"
  ],
  "orders.payment_method_config": [
-  "DECLINE",
-  "our payments.method already holds currencies[], channels[], venue_ids[], scope_path and min/max. Theirs normalises that into a row per method x scope; ours is the ADR-0018 config-scope pattern used by 58 other scopes. Same information, our shape"
+  "TAKE THEIRS",
+  "reversed on the rubric. Ours is currencies[], channels[], venue_ids[] on payments.method. Optimised access: \"which methods are live at this venue, in AED, on web\" is an array containment scan, not an index lookup. DB strain: enabling one method at one venue rewrites the whole row and every array on it. Maintainability: adding a venue to 40 methods is 40 row rewrites against 40 inserts. We already took entry_rule_point, menu_item_modifier, seat_block_item and plan_benefit for this same reason"
  ],
  "orders.payment_policy": [
   "COLLISION",
@@ -588,8 +588,8 @@
   "singular vs plural only; settle our own convention first"
  ],
  "platform.scope": [
-  "DECLINE",
-  "our platform.org_unit. Their name is arguably better - it matches the scope_path column 58 of our configs address - but org_unit carries 91 declared foreign keys. The same cost that decides the venue schema"
+  "DECIDE",
+  "was declined on 91 foreign keys, which is cost. On the rubric their name is better -- scope is the word 58 of our config profiles already address by, org_unit is generic ERP. It is the venue-schema decision in a second place and belongs inside it, not settled separately on effort"
  ],
  "platform.subscription_tier": [
   "COLLISION",
@@ -604,8 +604,8 @@
   "what a tier includes. Our subscription.capacity_pack is a pack a tenant buys on top, with a price and an invoice; the included allowance is one column, control.subscription_plan.included_ai_tokens. Belongs in subscription"
  ],
  "platform.tier_module": [
-  "DECLINE",
-  "our subscription.module_listing.included_in_tiers[] holds it as an array on the module. Feeds the module-enablement question \u2014 we have three homes for this idea"
+  "TAKE THEIRS",
+  "reversed on the rubric. Ours is subscription.module_listing.included_in_tiers[]. \"Which modules are in PRO\" scans every module row; the join table is one indexed read. Same argument as payment_method_config, and it belongs in subscription"
  ],
  "platform.venue_setting": [
   "DECLINE",
@@ -760,8 +760,8 @@
   "our venuemap.map"
  ],
  "venuemap.route": [
-  "DECLINE",
-  "our venuemap.path. Both oversell it \u2014 their purpose is \"a connection between two points\", which is an edge; not worth a rename to find out"
+  "EITHER",
+  "was declined as not worth the rename, which is a cost dodge. Their purpose is \"a navigable connection between two points\", which is an edge -- route and path both oversell it and neither is better. The right name is probably segment or link; concede theirs if they care"
  ],
  "wallet.access": [
   "DECLINE",
