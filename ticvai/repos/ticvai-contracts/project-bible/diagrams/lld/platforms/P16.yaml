@@ -40,7 +40,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 100
+  operationCalls: 101
 - service: AiService
   operationCalls: 5
 - service: InventoryService
@@ -1052,6 +1052,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cancelReportExecution
   - getReportExecution
   - runReport
   states:

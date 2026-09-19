@@ -53,32 +53,32 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 437
+  operationCalls: 438
 - service: CatalogueService
   operationCalls: 352
 - service: TenancyService
   operationCalls: 272
 - service: OrderService
-  operationCalls: 221
+  operationCalls: 222
 - service: AccessService
   operationCalls: 203
 - service: MarketingService
   operationCalls: 190
 - service: WalletService
-  operationCalls: 143
+  operationCalls: 144
 - service: InventoryService
   operationCalls: 79
 - service: FnbService
   operationCalls: 73
 - service: ReportingService
   operationCalls: 72
+- service: LedgerService
+  operationCalls: 59
 - service: PlatformService
   operationCalls: 58
-- service: LedgerService
-  operationCalls: 57
-- service: RetailService
-  operationCalls: 16
 - service: IdentityService
+  operationCalls: 17
+- service: RetailService
   operationCalls: 16
 - service: AiService
   operationCalls: 11
@@ -2708,6 +2708,7 @@ screens:
   - getDeferredRevenue
   - listRecognitionSchedules
   - runRecognition
+  - validateRecognitionSchedules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2732,6 +2733,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - ingestFxRates
   - listFxRates
   - listPriceVariances
   - reviewPriceVariance
@@ -3325,6 +3327,7 @@ screens:
   density: compact
   operations:
   - authoriseStoredValue
+  - captureStoredValue
   - checkInResource
   - checkOutResource
   - relinquishStoredValue
@@ -10521,6 +10524,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createGame
   - getGameCard
   - updateGame
   states:
@@ -26360,6 +26364,7 @@ screens:
   operations:
   - createAccessPolicy
   - listAccessPolicies
+  - simulateAccessPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27759,6 +27764,7 @@ screens:
   operations:
   - activateGiftCard
   - issueGiftCard
+  - redeemGiftCard
   states:
   - emptyFirstRun
   - emptyNoAccess

@@ -8,9 +8,9 @@
   "tables": 556,
   "stores": 5,
   "foreignKeys": 571,
-  "indexes": 613,
+  "indexes": 644,
   "tablesWritten": 552,
-  "relationships": 1158,
+  "relationships": 1189,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -26,8 +26,8 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1334,
-    "total": 1981,
+    "done": 1327,
+    "total": 1974,
     "percent": 67,
     "note": "Every operation maps to the tables it reads and writes."
    },
@@ -75,7 +75,7 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 491,
+    "done": 493,
     "total": 565,
     "percent": 87,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
@@ -103,9 +103,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 1786,
+    "done": 1798,
     "total": 1974,
-    "percent": 90,
+    "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {

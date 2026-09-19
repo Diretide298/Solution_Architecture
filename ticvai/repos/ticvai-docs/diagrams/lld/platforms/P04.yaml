@@ -46,10 +46,10 @@ servicesCalled:
   operationCalls: 10
 - service: IdentityService
   operationCalls: 7
+- service: VenueOpsService
+  operationCalls: 6
 - service: MarketingService
   operationCalls: 6
-- service: VenueOpsService
-  operationCalls: 5
 - service: AccessService
   operationCalls: 3
 - service: WalletService
@@ -192,6 +192,7 @@ screens:
   - resolveProductByCode
   - resumeOrder
   - syncOrders
+  - transferGameCard
   - voidOrder
   states:
   - denied

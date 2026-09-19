@@ -1388,6 +1388,13 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: transferGameCard
+    contract: games
+    purpose: Move balances to another card
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    invalidates:
+    - getGameCard
   entryState:
     params:
     - name: workstationId

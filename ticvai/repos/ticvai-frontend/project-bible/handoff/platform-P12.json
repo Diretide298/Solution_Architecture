@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 65
+  "operationsWithNoScreen": 60
  },
  "waves": {
   "wave2": 2,
@@ -72,15 +72,15 @@
    "operations": 7
   },
   {
-   "contract": "white-label",
-   "operations": 1
-  },
-  {
    "contract": "finance",
    "operations": 1
   },
   {
    "contract": "ai",
+   "operations": 1
+  },
+  {
+   "contract": "white-label",
    "operations": 1
   },
   {
@@ -423,12 +423,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "ingestFxRates",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Pull rates from the configured provider"
-   },
-   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -457,12 +451,6 @@
     "contract": "finance",
     "verb": "PUT",
     "summary": "Which provider serves which purpose"
-   },
-   {
-    "operation": "validateRecognitionSchedules",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Find product kinds claimed by more than one schedule"
    },
    {
     "operation": "createEmergencyAccessOverride",
@@ -511,12 +499,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
    },
    {
     "operation": "updateAccessPolicy",
@@ -597,12 +579,6 @@
     "summary": "Admit a party at the ride"
    },
    {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
-   },
-   {
     "operation": "deleteReportSchedule",
     "contract": "reporting",
     "verb": "DELETE",
@@ -673,12 +649,6 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Publish now, or schedule it"
-   },
-   {
-    "operation": "releaseCustomDomain",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Give the domain up"
    },
    {
     "operation": "setFeatureToggles",

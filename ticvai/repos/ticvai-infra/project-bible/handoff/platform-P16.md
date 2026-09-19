@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 52 |
+| Operations | 53 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 87 |
+| Operations with no screen | 79 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 87 operations with no screen here
+### 79 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,8 +40,6 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
-| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
@@ -53,14 +51,16 @@
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `simulateAccessPolicy` | identity | POST | What this policy would decide, before it decides anything |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `submitCountLines` | inventory | POST | Submit counted quantities |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
-| … | | | 47 more |
+| `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
+| `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
+| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
+| … | | | 39 more |
 
 ## Modules
 
@@ -109,7 +109,7 @@
 | `ANL-036` | Grouping, Aggregation & Calculation Builder | Analytics | 3 | 1 | yes |
 | `ANL-037` | Cross-Domain Report Composer | Analytics | 3 | 2 | yes |
 | `ANL-038` | Report Layout & Formatting Designer | Analytics | 3 | 1 | yes |
-| `ANL-039` | Report Preview, Test & Validation | Analytics | 3 | 2 | yes |
+| `ANL-039` | Report Preview, Test & Validation | Analytics | 3 | 3 | yes |
 | `ANL-040` | Save, Run & Report Results Viewer | Analytics | 3 | 2 | yes |
 | `ANL-041` | Reporting Governance Command Center | Analytics | 3 | 2 | yes |
 | `ANL-042` | Report Scheduler | Analytics | 3 | 2 | yes |

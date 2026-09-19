@@ -578,11 +578,11 @@ readsFrom:
 - service: FnbService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
 - service: CatalogueService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
-- service: TenancyService
-  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P04:POS-011 Returns, Refunds & Exchanges

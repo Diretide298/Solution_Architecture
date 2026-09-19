@@ -1,5 +1,5 @@
 id: LLD-seating
-title: seating — 56 operations
+title: seating — 54 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -510,35 +510,6 @@ operations:
   reads:
   - catalogue.performance
   writes: []
-- operation: releaseSeatBlock
-  verb: DELETE
-  path: /seat-blocks/{blockId}
-  scope: venue
-  permission: CAPACITY_CONFIGURE
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - cache:idempotency
-  - seating.seat_block
-  writes:
-  - cache:idempotency
-  - seating.seat_block
-- operation: releaseSeatHold
-  verb: DELETE
-  path: /seat-holds/{holdId}
-  scope: venue
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - seating.seat_hold
-  writes:
-  - cache:idempotency
-  - seating.seat_hold
 - operation: releaseSeatHoldPool
   verb: POST
   path: /seat-hold-pools/{poolId}/release

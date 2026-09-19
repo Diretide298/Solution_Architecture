@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 168 operations
+title: orders — 167 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -1633,20 +1633,6 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
-- operation: releaseStoredValue
-  verb: POST
-  path: /stored-value/authorisations/{authorisationId}/release
-  scope: venue
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  - device
-  offline: false
-  reads:
-  - orders.stored_value_authorisation
-  writes:
-  - cache:idempotency
-  - orders.stored_value_authorisation
 - operation: relinquishStoredValue
   verb: POST
   path: /stored-value/authorisations/{authorisationId}/release

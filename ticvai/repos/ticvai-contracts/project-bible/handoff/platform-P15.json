@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 29
+  "operationsWithNoScreen": 26
  },
  "waves": {
   "wave2": 10
@@ -174,12 +174,6 @@
     "summary": "Escalate a finding"
    },
    {
-    "operation": "getTableVisit",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Read a visit with all its orders"
-   },
-   {
     "operation": "rebalanceStationLoad",
     "contract": "fnb",
     "verb": "POST",
@@ -190,12 +184,6 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Record what was done about a finding"
-   },
-   {
-    "operation": "requestBill",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "The party asked to pay"
    },
    {
     "operation": "resolveBookingConflict",
@@ -238,12 +226,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Change what a table is"
-   },
-   {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
    },
    {
     "operation": "deleteReportSchedule",

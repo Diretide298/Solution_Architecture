@@ -492,7 +492,7 @@ The append-only record of everything. Corrections are entries, never edits.
 | POST | `/fiscal-periods/{periodId}/reopen` | `reopenPeriod` | `LEDGER_APPROVE` | — | venue-management-web |
 | GET | `/fx-rates` | `listFxRates` | `LEDGER_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
 | PUT | `/fx-rates` | `setFxRate` | `LEDGER_APPROVE` | — | venue-management-web |
-| POST | `/fx-rates/ingest` | `ingestFxRates` | `LEDGER_APPROVE` | — | — |
+| POST | `/fx-rates/ingest` | `ingestFxRates` | `LEDGER_APPROVE` | — | venue-management-web |
 | PUT | `/fx-rates/providers` | `setFxProvider` | `LEDGER_APPROVE` | — | — |
 | GET | `/fx/foreign-tender` | `getForeignTenderReport` | `LEDGER_VIEW` | — | — |
 | GET | `/fx/inter-entity` | `listInterEntityObligations` | `LEDGER_VIEW` | — | — |
@@ -514,7 +514,7 @@ The append-only record of everything. Corrections are entries, never edits.
 | POST | `/price-variances/{varianceId}/review` | `reviewPriceVariance` | `LEDGER_APPROVE` | — | venue-management-web |
 | GET | `/recognition-schedules` | `listRecognitionSchedules` | `LEDGER_VIEW` | — | venue-management-web |
 | POST | `/recognition-schedules` | `createRecognitionSchedule` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
-| POST | `/recognition-schedules/validate` | `validateRecognitionSchedules` | `LEDGER_VIEW` | — | — |
+| POST | `/recognition-schedules/validate` | `validateRecognitionSchedules` | `LEDGER_VIEW` | — | venue-management-web |
 | POST | `/recognition/run` | `runRecognition` | `LEDGER_POST` | — | venue-management-web |
 | GET | `/reconciliation/unified` | `getUnifiedReconciliation` | `LEDGER_VIEW` | — | ticvai-web, venue-management-web |
 | GET | `/reports/financial` | `getFinancialReport` | `REPORT_VIEW_VENUE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
@@ -543,7 +543,7 @@ Defines who is asking, and what they may do.
 | GET | `/access-policies` | `listAccessPolicies` | `PERMISSION_VIEW` | — | ticvai-web, venue-management-web |
 | POST | `/access-policies` | `createAccessPolicy` | `PERMISSION_MANAGE` | — | venue-management-web |
 | GET | `/access-policies/bundle` | `getAccessPolicyBundle` | `PERMISSION_VIEW` | ✓ | — |
-| POST | `/access-policies/simulate` | `simulateAccessPolicy` | `PERMISSION_VIEW` | — | — |
+| POST | `/access-policies/simulate` | `simulateAccessPolicy` | `PERMISSION_VIEW` | — | venue-management-web |
 | GET | `/access-policies/{policyId}` | `getAccessPolicy` | `PERMISSION_VIEW` | — | — |
 | PUT | `/access-policies/{policyId}` | `updateAccessPolicy` | `PERMISSION_MANAGE` | — | — |
 | GET | `/access-policies/{policyId}/history` | `listAccessPolicyHistory` | `PERMISSION_VIEW` | — | — |
@@ -613,7 +613,7 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | PUT | `/cancellation-partial-policy` | `setCancellationPartialPolicy` | `ORDER_CREATE` | — | venue-management-web |
 | GET | `/capacity-inventory-reconciliation` | `listCapacityInventoryReconciliation` | `ORDER_VIEW` | — | ticvai-web |
 | GET | `/capacity-reservation-inventory` | `listCapacityReservationInventory` | `ORDER_VIEW` | — | venue-management-web |
-| POST | `/carts` | `createCart` | `—` | — | — |
+| POST | `/carts` | `createCart` | `—` | — | guest-web |
 | GET | `/carts/abandoned` | `listAbandonedCarts` | `MARKETING_MANAGE` | — | venue-management-web |
 | DELETE | `/carts/{cartId}` | `abandonCart` | `—` | — | guest-app, guest-web |
 | GET | `/carts/{cartId}` | `getCart` | `—` | — | guest-app, guest-web, partner-web, venue-pos |
@@ -689,7 +689,7 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | POST | `/orders/{orderId}/reprints` | `reprintOrder` | `ORDER_REPRINT` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
 | POST | `/orders/{orderId}/reschedule` | `rescheduleOrder` | `ORDER_RESCHEDULE` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
 | POST | `/orders/{orderId}/resume` | `resumeOrder` | `ORDER_MODIFY` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
-| POST | `/orders/{orderId}/split` | `splitOrder` | `ORDER_MODIFY` | — | — |
+| POST | `/orders/{orderId}/split` | `splitOrder` | `ORDER_MODIFY` | — | venue-staff-app |
 | GET | `/orders/{orderId}/statement` | `getOrderStatement` | `ORDER_VIEW` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
 | POST | `/orders/{orderId}/transfer` | `transferOrderTickets` | `—` | — | guest-app, guest-web |
 | POST | `/orders/{orderId}/upgrade-quote` | `quoteUpgrade` | `ORDER_MODIFY` | — | ticvai-web |
@@ -745,7 +745,7 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | POST | `/reservations/{reservationId}/extend` | `extendReservation` | `ORDER_CREATE` | — | — |
 | GET | `/seller-settlement-payout` | `listSellerSettlementPayout` | `ORDER_VIEW` | — | ticvai-web |
 | POST | `/stored-value/authorisations` | `authoriseStoredValue` | `ORDER_CREATE` | — | venue-management-web |
-| POST | `/stored-value/authorisations/{authorisationId}/capture` | `captureStoredValue` | `ORDER_CREATE` | — | — |
+| POST | `/stored-value/authorisations/{authorisationId}/capture` | `captureStoredValue` | `ORDER_CREATE` | — | venue-management-web |
 | POST | `/stored-value/authorisations/{authorisationId}/release` | `relinquishStoredValue` | `ORDER_CREATE` | — | venue-management-web |
 | POST | `/sync/orders` | `syncOrders` | `ORDER_CREATE` | — | venue-management-web, venue-pos, venue-scanner, venue-staff-app |
 | GET | `/sync/rejections` | `listSyncRejections` | `ORDER_VIEW` | — | venue-management-web, venue-scanner, venue-staff-app |
@@ -1031,7 +1031,7 @@ Menus, table service and kitchen handoff. KDS is an integration point, not a bui
 | POST | `/table-sessions` | `claimTableSession` | `—` | — | guest-app, guest-web |
 | GET | `/table-sessions/{sessionId}/bill` | `getGuestBill` | `—` | — | guest-app, guest-web |
 | POST | `/table-visits` | `openTableVisit` | `ORDER_CREATE` | ✓ | venue-pos, venue-staff-app |
-| GET | `/table-visits/{visitId}` | `getTableVisit` | `ORDER_VIEW` | ✓ | — |
+| GET | `/table-visits/{visitId}` | `getTableVisit` | `ORDER_VIEW` | ✓ | venue-staff-app |
 | PATCH | `/table-visits/{visitId}` | `updateTableVisit` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | GET | `/table-visits/{visitId}/bill` | `getBill` | `ORDER_VIEW` | ✓ | venue-staff-app |
 | POST | `/table-visits/{visitId}/bill/split` | `splitBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
@@ -1040,7 +1040,7 @@ Menus, table service and kitchen handoff. KDS is an integration point, not a bui
 | POST | `/table-visits/{visitId}/merge` | `mergeTableVisits` | `ORDER_MODIFY` | — | venue-pos, venue-staff-app |
 | POST | `/table-visits/{visitId}/move` | `moveTableVisit` | `ORDER_MODIFY` | ✓ | venue-pos, venue-staff-app |
 | POST | `/table-visits/{visitId}/notify-server` | `notifyServer` | `ORDER_MODIFY` | — | kitchen-display, venue-staff-app |
-| POST | `/table-visits/{visitId}/request-bill` | `requestBill` | `ORDER_MODIFY` | ✓ | — |
+| POST | `/table-visits/{visitId}/request-bill` | `requestBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | PUT | `/table-visits/{visitId}/server` | `reassignServer` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | PUT | `/table-visits/{visitId}/stage` | `setServiceStage` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | POST | `/table-visits/{visitId}/transfer` | `transferTableVisit` | `ORDER_MODIFY` | ✓ | venue-staff-app |
@@ -1065,7 +1065,7 @@ Arcade play, game credits and prize redemption.
 | PUT | `/game-card-expiry-rules` | `setGameCardExpiryRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/game-cards` | `issueGameCard` | `ORDER_CREATE` | — | venue-pos |
 | GET | `/game-cards/{cardCode}` | `getGameCard` | `—` | ✓ | guest-app, guest-web, venue-management-web |
-| POST | `/game-cards/{cardCode}/transfer` | `transferGameCard` | `ORDER_MODIFY` | — | — |
+| POST | `/game-cards/{cardCode}/transfer` | `transferGameCard` | `ORDER_MODIFY` | — | venue-pos |
 | POST | `/game-cards/{cardId}/lifecycle` | `setGameCardLifecycle` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | GET | `/game-eligibility` | `getGameEligibility` | `PRODUCT_VIEW` | — | venue-management-web |
 | GET | `/game-entitlements` | `listGameEntitlements` | `PRODUCT_VIEW` | — | venue-management-web |
@@ -1082,7 +1082,7 @@ Arcade play, game credits and prize redemption.
 | GET | `/gameplay-validation-rules` | `getGameplayValidationRules` | `PRODUCT_VIEW` | — | venue-management-web |
 | PUT | `/gameplay-validation-rules` | `setGameplayValidationRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | GET | `/games` | `listGames` | `PRODUCT_VIEW` | ✓ | venue-management-web |
-| POST | `/games` | `createGame` | `PRODUCT_CONFIGURE` | — | — |
+| POST | `/games` | `createGame` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | PATCH | `/games/{gameId}` | `updateGame` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | PUT | `/games/{gameId}/operations` | `setGameOperationalConfiguration` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/prize-redemptions` | `redeemPrize` | `ORDER_CREATE` | — | venue-management-web |
@@ -1744,7 +1744,7 @@ Reads a lag-tolerant replica, never the primary.
 | PUT | `/kpis/{kpiId}/targets` | `setKpiTargets` | `REPORT_MANAGE` | — | venue-management-web |
 | GET | `/report-deliveries` | `listReportDeliveries` | `REPORT_VIEW_TENANT` | — | venue-management-web |
 | GET | `/report-executions` | `listReportExecutions` | `REPORT_VIEW_VENUE` | — | venue-management-web |
-| DELETE | `/report-executions/{executionId}` | `cancelReportExecution` | `REPORT_VIEW_VENUE` | — | — |
+| DELETE | `/report-executions/{executionId}` | `cancelReportExecution` | `REPORT_VIEW_VENUE` | — | venue-management-web |
 | GET | `/report-executions/{executionId}` | `getReportExecution` | `REPORT_VIEW_VENUE` | — | venue-management-web |
 | POST | `/report-executions/{executionId}/export` | `exportReportResult` | `REPORT_EXPORT` | — | venue-management-web |
 | GET | `/report-executions/{executionId}/result` | `getReportResult` | `REPORT_VIEW_VENUE` | — | venue-management-web |
@@ -2091,7 +2091,7 @@ Two vocabularies, and confusing them is why the wallet was built five times.
 | GET | `/gift-cards/{cardCode}` | `getGiftCard` | `WALLET_VIEW` | — | guest-app, guest-web |
 | POST | `/gift-cards/{cardCode}/block` | `blockGiftCard` | `WALLET_OPERATE` | — | — |
 | POST | `/gift-cards/{giftCardId}/activate` | `activateGiftCard` | `WALLET_OPERATE` | — | venue-management-web |
-| POST | `/gift-cards/{giftCardId}/redeem` | `redeemGiftCard` | `WALLET_OPERATE` | — | — |
+| POST | `/gift-cards/{giftCardId}/redeem` | `redeemGiftCard` | `WALLET_OPERATE` | — | venue-management-web |
 | GET | `/shared-wallets` | `listSharedWallets` | `WALLET_VIEW` | — | venue-management-web |
 | POST | `/shared-wallets` | `createSharedWallet` | `WALLET_OPERATE` | — | venue-management-web |
 | PUT | `/shared-wallets/{sharedWalletId}/members` | `setSharedWalletMembers` | `WALLET_OPERATE` | — | venue-management-web |

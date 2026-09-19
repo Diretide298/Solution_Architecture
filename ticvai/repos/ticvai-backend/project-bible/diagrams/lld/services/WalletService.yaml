@@ -584,8 +584,15 @@ tables:
   writtenBy:
   - wallet
   foreignWriters: null
-readsFrom: []
-writesOutside: []
+readsFrom:
+- service: VenueOpsService
+  operations: 2
+- service: IdentityService
+  operations: 1
+writesOutside:
+- service: VenueOpsService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-021 Wallet & Gift Cards
 - P02:GST-011 Wallet Overview

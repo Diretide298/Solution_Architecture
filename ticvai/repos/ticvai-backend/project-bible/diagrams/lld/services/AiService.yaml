@@ -439,6 +439,12 @@ readsFrom:
   operations: 2
 - service: FnbService
   operations: 1
+- service: ReportingService
+  operations: 1
+- service: RetailService
+  operations: 1
+- service: PlatformService
+  operations: 1
 writesOutside: []
 screens:
 - P01:WEB-044 AI Concierge – Home

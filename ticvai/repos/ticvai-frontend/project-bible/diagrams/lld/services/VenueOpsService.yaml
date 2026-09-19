@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 218 operations, 65 tables
+title: VenueOpsService — 218 operations, 86 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -46,6 +46,11 @@ schemas:
   stores:
   - postgres
   largestTable: games.entitlement
+- schema: rental
+  tables: 21
+  stores:
+  - postgres
+  largestTable: rental.pricing_profile
 operationsByContract:
 - contract: resources
   count: 48
@@ -1874,7 +1879,7 @@ tables:
   - assets
   foreignWriters: null
 - table: assets.media_usage
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -2075,7 +2080,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.inspection_template
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2135,6 +2140,150 @@ tables:
   parent: null
   writtenBy:
   - queue
+  foreignWriters: null
+- table: rental.agreement_rules
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.agreement_signature
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.availability_rules
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.blackout
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.booking
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: rental.category
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.damage_assessment
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.deposit_policy
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.duration_rules
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.equipment_assignment
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.fee_policy
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.incident
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.inspection
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.inventory_model
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.location_rule
+  columns: 10
+  store: postgres
+  parent: inventory.location
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.operational_rules
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.override
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.participant
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: rental.pricing_profile
+  columns: 22
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.product
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.settlement
+  columns: 15
+  store: postgres
+  parent: rental.booking
+  writtenBy: []
   foreignWriters: null
 - table: resources.allocation_policy
   columns: 6
@@ -2288,6 +2437,9 @@ readsFrom:
 - service: MarketingService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
 - service: OrderService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'

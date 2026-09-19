@@ -9,20 +9,18 @@
 | Contracts | 10 |
 | Modules | 9 |
 | Undrawn | 0 |
-| Operations with no screen | 5 |
+| Operations with no screen | 3 |
 | Waves | wave2 11 · wave3 40 |
 
 ## Gaps
 
-### 5 operations with no screen here
+### 3 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
 | `issueApiToken` | public-api | POST | Exchange a credential for an access token |
-| `releaseSeatBlock` | seating | DELETE | Release a block back to sale |
 | `createPartnerUser` | subscription | POST | Add a user to a partner branch |
 | `listPartnerUsers` | subscription | GET | Users beneath a partner, by branch |
 

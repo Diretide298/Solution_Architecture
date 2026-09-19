@@ -238,7 +238,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.merchandise
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -313,8 +313,6 @@ tables:
 readsFrom:
 - service: TenancyService
   operations: 3
-- service: IdentityService
-  operations: 1
 writesOutside:
 - service: InventoryService
   operations: 2

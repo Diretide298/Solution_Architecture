@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
     valid_from                        timestamptz,
     valid_to                          timestamptz,
     transferred_to_subject_id         uuid,
+    description                       text,
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,

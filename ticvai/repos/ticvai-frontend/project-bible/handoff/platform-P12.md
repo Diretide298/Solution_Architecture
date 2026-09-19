@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 65 |
+| Operations with no screen | 60 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 65 operations with no screen here
+### 60 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -33,13 +33,11 @@
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
@@ -48,7 +46,6 @@
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `simulateAccessPolicy` | identity | POST | What this policy would decide, before it decides anything |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
@@ -60,7 +57,10 @@
 | `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
 | `startKioskAssist` | marketing-crm | POST | A staff member helps a guest at a kiosk, remotely |
 | `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| … | | | 25 more |
+| `overrideWaitingGuest` | queue | POST | Admit against a failed redemption |
+| `redeemWaitingGuest` | queue | POST | Admit a party at the ride |
+| `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
+| … | | | 20 more |
 
 ## Modules
 

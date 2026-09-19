@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 51 operations, 13 tables
+title: WhiteLabelService — 50 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 51
+  operations: 50
   inAFlow: 22
   percent: 44%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 51
+  count: 50
   operations:
   - operation: claimCustomDomain
     verb: POST
@@ -256,14 +256,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 4
-  - operation: releaseCustomDomain
-    verb: DELETE
-    path: /tenant-domains/{domainId}
-    scope: tenant
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
   - operation: relinquishCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
@@ -517,7 +509,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.policy
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -547,6 +539,9 @@ readsFrom:
 writesOutside:
 - service: PlatformService
   operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-001 Home / Landing

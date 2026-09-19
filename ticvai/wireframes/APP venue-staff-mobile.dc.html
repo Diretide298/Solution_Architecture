@@ -762,7 +762,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createOrder · listProducts · applyManualDiscount · createRefund +18</div>
+          <div><b>OPERATIONS</b> &middot; createOrder · listProducts · applyManualDiscount · createRefund +19</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, productId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i> <span class="car">sessionId</span><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i> <span class="car">sessionId</span><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i> <span class="car">incidentId · shiftId</span><br><a href="#emp-035">EMP-035</a>  &mdash; <i>The guest taps a card on the device</i></div>
@@ -1756,7 +1756,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; openTableVisit · updateTableVisit · mergeTableVisits · transferTableVisit +12</div>
+          <div><b>OPERATIONS</b> &middot; openTableVisit · updateTableVisit · mergeTableVisits · transferTableVisit +13</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, visitId&larr;EMP-003, reservationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-059">EMP-059</a>  &mdash; <i>Food is ordered with courses</i><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i></div>
@@ -1786,7 +1786,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; closeTableVisit · createPayment · createFnbOrder · splitBill +3</div>
+          <div><b>OPERATIONS</b> &middot; closeTableVisit · createPayment · createFnbOrder · splitBill +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, visitId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-058">EMP-058</a>  &mdash; <i>Live Table &amp; Service Management</i></div>
@@ -3107,7 +3107,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +5</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · admitted</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i> <span class="car">sessionId · shiftId</span><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-007">SCN-007</a>  &mdash; <i>A school party of forty arrives on one booki</i><br><a href="#scn-014">SCN-014</a>  &mdash; <i>Syncs the journal when signal returns</i></div>
           

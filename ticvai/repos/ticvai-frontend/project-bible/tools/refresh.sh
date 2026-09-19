@@ -240,11 +240,18 @@ echo
 # The last three write a dated report only when passed `--write`; bare, they report and read, so
 # they belong here and produce no file.
 #
+# **`check-lineage` checks the file this script runs first.** Twenty-plus tools read
+# `api-data-lineage.json` as authoritative and nothing compared it to the contracts.
+# `derive-lineage --apply` adds and never updates, so a renamed or moved operation keeps
+# its old contract, its old service and its old tables — and `derive-schema` rebuilds a
+# dropped table from those entries, through a graph `derive-relationships` rebuilds from
+# the schema. On 19 September that cycle restored three deleted tables three times.
+#
 # **`check-authored-inputs` is the one that reports what this script cannot fix.** Nine
 # files in handoff/ and wireframes/ are inputs wearing the clothes of outputs — read by
 # the pipeline and the viewer, written by nothing. It hashes the contracts' operationIds
 # and schema names and says which of the nine were written against a different set.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.

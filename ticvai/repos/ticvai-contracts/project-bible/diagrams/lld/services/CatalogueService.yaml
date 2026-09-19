@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 393 operations, 61 tables
+title: CatalogueService — 389 operations, 61 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 393
+  operations: 389
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,7 +32,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 192
+  count: 190
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -1153,22 +1153,6 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 2
-  - operation: releaseChannelAllocation
-    verb: POST
-    path: /channel-capacities/{channelCapacityId}/channel-allocations/release
-    scope: venue
-    permission: CAPACITY_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: releaseInventoryHold
-    verb: DELETE
-    path: /inventory-holds/{inventoryHoldId}
-    scope: workstation
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
     writes: 2
   - operation: relinquishChannelAllocation
     verb: POST
@@ -2734,7 +2718,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: seating
-  count: 56
+  count: 54
   operations:
   - operation: allocateBlockedSeats
     verb: POST
@@ -3056,22 +3040,6 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
-  - operation: releaseSeatBlock
-    verb: DELETE
-    path: /seat-blocks/{blockId}
-    scope: venue
-    permission: CAPACITY_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: releaseSeatHold
-    verb: DELETE
-    path: /seat-holds/{holdId}
-    scope: venue
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
   - operation: releaseSeatHoldPool
     verb: POST
     path: /seat-hold-pools/{poolId}/release
@@ -3228,7 +3196,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 34
+  columns: 35
   store: postgres
   parent: access.entitlement
   writtenBy:
@@ -3642,9 +3610,14 @@ readsFrom:
   operations: 1
 - service: LedgerService
   operations: 1
+- service: VenueOpsService
+  operations: 1
 writesOutside:
 - service: AccessService
   operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-001 Home / Landing

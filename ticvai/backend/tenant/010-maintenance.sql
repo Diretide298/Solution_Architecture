@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS maintenance.inspection (
 -- The questions an inspection asks. Versioned, because changing them changes what past answers
 -- meant
 CREATE TABLE IF NOT EXISTS maintenance.inspection_template (
+    instructions                      text,
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,

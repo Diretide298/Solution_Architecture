@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 46,
-  "operations": 153,
+  "operations": 154,
   "contracts": 17,
   "modules": 13,
   "undrawn": 0,
@@ -129,7 +129,7 @@
   },
   {
    "contract": "orders",
-   "operations": 29
+   "operations": 30
   },
   {
    "contract": "identity",
@@ -156,11 +156,11 @@
    "operations": 5
   },
   {
-   "contract": "retail",
+   "contract": "ai",
    "operations": 4
   },
   {
-   "contract": "white-label",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -168,7 +168,7 @@
    "operations": 4
   },
   {
-   "contract": "ai",
+   "contract": "white-label",
    "operations": 4
   },
   {
@@ -180,7 +180,7 @@
    "operations": 2
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -188,7 +188,7 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 1
   }
  ],
@@ -280,7 +280,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/shopping-cart",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {

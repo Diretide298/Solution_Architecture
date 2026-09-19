@@ -2044,6 +2044,11 @@ components:
       type: object
       required: [id, code, name, items]
       properties:
+        instructions:
+          type: string
+          description: '**The procedure itself.** A technician asking how to isolate a chiller is asking a safety question, and the answer has to come from the template rather than from its title.
+
+            '
         id: { type: string, format: uuid }
         code: { type: string, maxLength: 64 }
         name: { type: string, maxLength: 200 }

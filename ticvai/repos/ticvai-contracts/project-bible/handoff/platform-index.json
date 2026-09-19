@@ -5,7 +5,7 @@
   "operator": "guest",
   "counts": {
    "screens": 46,
-   "operations": 153,
+   "operations": 154,
    "contracts": 17,
    "modules": 13,
    "undrawn": 0,
@@ -41,11 +41,11 @@
   "operator": "venue",
   "counts": {
    "screens": 30,
-   "operations": 139,
+   "operations": 140,
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 124
+   "operationsWithNoScreen": 107
   },
   "waves": {
    "wave1": 27,
@@ -74,11 +74,11 @@
   "operator": "venue",
   "counts": {
    "screens": 96,
-   "operations": 199,
+   "operations": 202,
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 103
+   "operationsWithNoScreen": 93
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 32
+   "operationsWithNoScreen": 26
   },
   "waves": {
    "wave1": 11
@@ -108,11 +108,11 @@
   "operator": "venue",
   "counts": {
    "screens": 1182,
-   "operations": 1075,
+   "operations": 1081,
    "contracts": 31,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 175
+   "operationsWithNoScreen": 157
   },
   "waves": {
    "wave1": 60,
@@ -130,7 +130,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 147
+   "operationsWithNoScreen": 134
   },
   "waves": {
    "wave1": 12,
@@ -148,7 +148,7 @@
    "contracts": 10,
    "modules": 9,
    "undrawn": 0,
-   "operationsWithNoScreen": 5
+   "operationsWithNoScreen": 3
   },
   "waves": {
    "wave2": 11,
@@ -181,7 +181,7 @@
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 65
+   "operationsWithNoScreen": 60
   },
   "waves": {
    "wave2": 2,
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 90
+   "operationsWithNoScreen": 82
   },
   "waves": {
    "wave2": 20,
@@ -232,7 +232,7 @@
    "contracts": 3,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 29
+   "operationsWithNoScreen": 26
   },
   "waves": {
    "wave2": 10
@@ -244,11 +244,11 @@
   "operator": "venue",
   "counts": {
    "screens": 69,
-   "operations": 52,
+   "operations": 53,
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 87
+   "operationsWithNoScreen": 79
   },
   "waves": {
    "wave3": 69

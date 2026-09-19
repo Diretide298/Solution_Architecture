@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 152
+  x-ticvai-screen-count: 155
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -78,6 +78,8 @@ paths:
   /carts:
     post:
       operationId: createCart
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
       x-ticvai-audience:
       - guest
       summary: Start a cart
@@ -617,6 +619,8 @@ paths:
         format: uuid
     post:
       operationId: splitOrder
+      x-ticvai-consumed-by:
+        - "P06 EMP-034 Walk-up sale"
       summary: Break one order into independent orders
       description: 'BL-089. **A group that booked together and now pays separately**, or a corporate booking
         being invoiced per department.
@@ -1593,6 +1597,8 @@ paths:
         format: uuid
     post:
       operationId: captureStoredValue
+      x-ticvai-consumed-by:
+        - "P08 BO-097 Check Out & Check In"
       summary: Take some or all of a held balance
       description: 'Partial capture is the normal case, not the exception — **a tab authorised at 200
         and settled at 140**, or an arcade play that cost less than the hold.

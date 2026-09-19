@@ -97,7 +97,8 @@ Patterns assigned: `listDetail` 130, `configEditor` 86, `commandCentre` 13, `app
 modules, waves, `requiresModule`, `source`, `implementation`, `navigation`, every declared
 `operationId`, and the `coldEntry` paragraphs — of which **this module has only 3**, against 417
 across the package. That is itself worth noting: the 417 hand-written entry paragraphs are almost
-entirely elsewhere, and P09 Commercial was never given them.
+entirely elsewhere, and the platform now called **TICVAI Web** — P09, then styled
+"Commercial" — was never given them.
 
 ---
 

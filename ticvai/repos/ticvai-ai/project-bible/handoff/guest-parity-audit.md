@@ -8,8 +8,8 @@
 |---|---|
 | Screens | P01 46 · P02 71 |
 | Capability groups | 53 — appOnly 7 · folded 3 · paired 42 · webOnly 1 |
-| Operations | web 153 · app 154 · shared 153 |
-| Findings | high 26 · medium 116 · low 197 · info 4 |
+| Operations | web 154 · app 154 · shared 153 |
+| Findings | high 28 · medium 116 · low 197 · info 4 |
 
 ## By dimension
 
@@ -17,9 +17,9 @@
 |---|---|---|---|---|
 | licence | 12 |  |  |  |
 | wave | 11 |  |  | 1 |
+| operations | 2 | 44 |  | 1 |
 | frontend manifest | 2 | 1 |  |  |
 | coverage | 1 | 5 | 3 | 2 |
-| operations |  | 44 |  | 1 |
 | entry parameters |  | 22 |  |  |
 | flows |  | 12 |  |  |
 | cross-shell handover |  | 8 |  |  |
@@ -55,7 +55,7 @@
 - **density** — compact on the web, comfortable on the app: the input, not the product
 - **routes and component paths** — each shell's own codebase
 
-## High — 26
+## High — 28
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -74,6 +74,8 @@
 | licence | venue-info (WEB-028 ↔ GST-029) | web requires ['core'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web requires ['queue'], app requires ['queue', 'seating'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
+| operations | cart (WEB-010 ↔ GST-041) | the web calls createCart and the app cannot call it anywhere |  |
+| operations | web only | createCart |  |
 | wave | help-and-cases (WEB-025 ↔ GST-068) | ships in wave 1 on the web and wave 2 on the app | one wave for both, or record why one shell waits |
 | wave | lost-and-found (WEB-034 ↔ GST-034) | ships in wave 3 on the web and wave 2 on the app | one wave for both, or record why one shell waits |
 | wave | newsletter (WEB-027 ↔ GST-065) | ships in wave 2 on the web and wave 3 on the app | one wave for both, or record why one shell waits |

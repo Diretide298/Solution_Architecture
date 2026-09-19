@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 38
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -751,6 +751,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
     delete:
       operationId: cancelReportExecution
+      x-ticvai-consumed-by:
+        - "P16 ANL-039 Report Preview, Test & Validation"
       x-ticvai-audience:
       - staff
       summary: Cancel a running execution

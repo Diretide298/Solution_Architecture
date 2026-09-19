@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 33
+  x-ticvai-screen-count: 35
   x-ticvai-tier: satellite
   x-ticvai-module: 10 — Games & F&B Integration
   x-ticvai-requirements: 25
@@ -186,6 +186,8 @@ paths:
         type: string
     post:
       operationId: transferGameCard
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-audience:
       - staff
       summary: Move balances to another card
@@ -276,6 +278,8 @@ paths:
                   $ref: '#/components/schemas/Game'
     post:
       operationId: createGame
+      x-ticvai-consumed-by:
+        - "P08 BO-396 Attraction Profile"
       x-ticvai-audience:
       - staff
       summary: Register a game

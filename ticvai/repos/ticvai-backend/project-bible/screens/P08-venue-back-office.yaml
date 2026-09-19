@@ -17680,6 +17680,11 @@ screens:
     trigger: onAction
     invalidates:
     - listRecognitionSchedules
+  - operationId: validateRecognitionSchedules
+    contract: finance
+    purpose: Find product kinds claimed by more than one schedule
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
   entryState:
     preloaded:
     - DeferredRevenueReport.asAt
@@ -17825,6 +17830,13 @@ screens:
     contract: finance
     purpose: Record a review decision on an exception variance
     trigger: onAction
+    invalidates:
+    - listFxRates
+  - operationId: ingestFxRates
+    contract: finance
+    purpose: Pull today's rates from the configured provider
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
     invalidates:
     - listFxRates
   entryState:
@@ -21066,6 +21078,13 @@ screens:
     contract: orders
     purpose: Release it
     trigger: onAction
+  - operationId: captureStoredValue
+    contract: orders
+    purpose: Take some or all of the held balance
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    invalidates:
+    - getStoredValueAuthorisation
   entryState:
     params:
     - name: authorisationId
@@ -56567,6 +56586,13 @@ screens:
     purpose: Change it
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: createGame
+    contract: games
+    purpose: Register a game on this attraction
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    invalidates:
+    - listGames
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-396
@@ -121034,6 +121060,11 @@ screens:
     purpose: Write a policy
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: simulateAccessPolicy
+    contract: identity
+    purpose: What this policy would decide, before it decides anything
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1066
@@ -128057,6 +128088,13 @@ screens:
     purpose: Activate
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: redeemGiftCard
+    contract: wallet
+    purpose: Spend against a card
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    invalidates:
+    - getGiftCard
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1125

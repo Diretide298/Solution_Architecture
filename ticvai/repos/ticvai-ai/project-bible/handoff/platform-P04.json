@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
-  "operations": 139,
+  "operations": 140,
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 124
+  "operationsWithNoScreen": 107
  },
  "waves": {
   "wave1": 27,
@@ -83,11 +83,11 @@
    "operations": 7
   },
   {
-   "contract": "identity",
+   "contract": "seating",
    "operations": 6
   },
   {
-   "contract": "seating",
+   "contract": "identity",
    "operations": 6
   },
   {
@@ -99,6 +99,10 @@
    "operations": 4
   },
   {
+   "contract": "access",
+   "operations": 3
+  },
+  {
    "contract": "approvals",
    "operations": 3
   },
@@ -107,23 +111,15 @@
    "operations": 3
   },
   {
-   "contract": "access",
-   "operations": 3
-  },
-  {
    "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
-   "contract": "inventory",
-   "operations": 1
-  },
-  {
    "contract": "games",
+   "operations": 2
+  },
+  {
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -132,6 +128,10 @@
   },
   {
    "contract": "wallet",
+   "operations": 1
+  },
+  {
+   "contract": "inventory",
    "operations": 1
   }
  ],
@@ -160,7 +160,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell-ticket-catalogue",
-   "operations": 41,
+   "operations": 42,
    "drawn": true
   },
   {
@@ -470,18 +470,6 @@
     "summary": "Lift a suspension"
    },
    {
-    "operation": "releaseChannelAllocation",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Return unsold channel allocation to the general pool"
-   },
-   {
-    "operation": "releaseInventoryHold",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Return unsold units"
-   },
-   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -518,12 +506,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "ingestFxRates",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Pull rates from the configured provider"
-   },
-   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -552,12 +534,6 @@
     "contract": "finance",
     "verb": "PUT",
     "summary": "Which provider serves which purpose"
-   },
-   {
-    "operation": "validateRecognitionSchedules",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Find product kinds claimed by more than one schedule"
    },
    {
     "operation": "attachModifierGroup",
@@ -596,12 +572,6 @@
     "summary": "Escalate a finding"
    },
    {
-    "operation": "getTableVisit",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Read a visit with all its orders"
-   },
-   {
     "operation": "rebalanceStationLoad",
     "contract": "fnb",
     "verb": "POST",
@@ -612,12 +582,6 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Record what was done about a finding"
-   },
-   {
-    "operation": "requestBill",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "The party asked to pay"
    },
    {
     "operation": "resolveBookingConflict",
@@ -660,18 +624,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Change what a table is"
-   },
-   {
-    "operation": "createGame",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Register a game"
-   },
-   {
-    "operation": "transferGameCard",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Move balances to another card"
    },
    {
     "operation": "createEmergencyAccessOverride",
@@ -720,12 +672,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
    },
    {
     "operation": "updateAccessPolicy",
@@ -800,12 +746,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "captureStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Take some or all of a held balance"
-   },
-   {
     "operation": "convertReservation",
     "contract": "orders",
     "verb": "POST",
@@ -816,12 +756,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
    },
    {
     "operation": "createReservation",
@@ -878,22 +812,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "releaseStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Give a hold back"
-   },
-   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "splitOrder",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Break one order into independent orders"
    },
    {
     "operation": "assignCoupon",
@@ -986,12 +908,6 @@
     "summary": "Admit a party at the ride"
    },
    {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
-   },
-   {
     "operation": "deleteReportSchedule",
     "contract": "reporting",
     "verb": "DELETE",
@@ -1050,18 +966,6 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
-   },
-   {
-    "operation": "releaseSeatBlock",
-    "contract": "seating",
-    "verb": "DELETE",
-    "summary": "Release a block back to sale"
-   },
-   {
-    "operation": "releaseSeatHold",
-    "contract": "seating",
-    "verb": "DELETE",
-    "summary": "Release a hold"
    },
    {
     "operation": "issueDeviceCredential",
@@ -1128,12 +1032,6 @@
     "contract": "wallet",
     "verb": "POST",
     "summary": "Close a wallet"
-   },
-   {
-    "operation": "redeemGiftCard",
-    "contract": "wallet",
-    "verb": "POST",
-    "summary": "Spend against a card"
    },
    {
     "operation": "reinstateWallet",

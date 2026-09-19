@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS retail.exchange (
 
 -- A product a venue sells as goods, joined to the catalogue rather than duplicating it
 CREATE TABLE IF NOT EXISTS retail.merchandise (
+    description                       text,
     id                                uuid PRIMARY KEY NOT NULL,
     sku                               text NOT NULL,
     barcode                           text,

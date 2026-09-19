@@ -2820,6 +2820,11 @@ components:
       properties:
         kind:
           $ref: '#/components/schemas/PolicyKind'
+        title:
+          type: string
+          description: 'The heading a guest sees, and the field a refund question retrieves against.
+
+            '
         version:
           type: string
           description: 'Immutable. A guest who consented to version 3 consented to version 3, and a policy

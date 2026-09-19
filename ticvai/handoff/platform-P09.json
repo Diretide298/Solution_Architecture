@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 147
+  "operationsWithNoScreen": 134
  },
  "waves": {
   "wave1": 12,
@@ -178,11 +178,11 @@
    "operations": 7
   },
   {
-   "contract": "public-api",
+   "contract": "ai",
    "operations": 5
   },
   {
-   "contract": "ai",
+   "contract": "public-api",
    "operations": 5
   },
   {
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
@@ -6415,18 +6415,6 @@
     "summary": "Lift a suspension"
    },
    {
-    "operation": "releaseChannelAllocation",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Return unsold channel allocation to the general pool"
-   },
-   {
-    "operation": "releaseInventoryHold",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Return unsold units"
-   },
-   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -6463,12 +6451,6 @@
     "summary": "The consuming cell's bounded offline allocation"
    },
    {
-    "operation": "releaseWalletAuthorisation",
-    "contract": "cross-region",
-    "verb": "POST",
-    "summary": "Release a hold without capturing"
-   },
-   {
     "operation": "relinquishWalletAuthorisation",
     "contract": "cross-region",
     "verb": "POST",
@@ -6499,12 +6481,6 @@
     "summary": "What was taken in which currency"
    },
    {
-    "operation": "ingestFxRates",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Pull rates from the configured provider"
-   },
-   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -6533,12 +6509,6 @@
     "contract": "finance",
     "verb": "PUT",
     "summary": "Which provider serves which purpose"
-   },
-   {
-    "operation": "validateRecognitionSchedules",
-    "contract": "finance",
-    "verb": "POST",
-    "summary": "Find product kinds claimed by more than one schedule"
    },
    {
     "operation": "createEmergencyAccessOverride",
@@ -6587,12 +6557,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
    },
    {
     "operation": "updateAccessPolicy",
@@ -6661,12 +6625,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "captureStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Take some or all of a held balance"
-   },
-   {
     "operation": "convertReservation",
     "contract": "orders",
     "verb": "POST",
@@ -6677,12 +6635,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
    },
    {
     "operation": "createReservation",
@@ -6739,22 +6691,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "releaseStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Give a hold back"
-   },
-   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "splitOrder",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Break one order into independent orders"
    },
    {
     "operation": "skipRolloutCell",
@@ -6839,12 +6779,6 @@
     "contract": "promotions",
     "verb": "POST",
     "summary": "Cancel a voucher"
-   },
-   {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
    },
    {
     "operation": "deleteReportSchedule",
@@ -7039,12 +6973,6 @@
     "summary": "Close a wallet"
    },
    {
-    "operation": "redeemGiftCard",
-    "contract": "wallet",
-    "verb": "POST",
-    "summary": "Spend against a card"
-   },
-   {
     "operation": "reinstateWallet",
     "contract": "wallet",
     "verb": "POST",
@@ -7109,12 +7037,6 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Publish now, or schedule it"
-   },
-   {
-    "operation": "releaseCustomDomain",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Give the domain up"
    },
    {
     "operation": "setFeatureToggles",

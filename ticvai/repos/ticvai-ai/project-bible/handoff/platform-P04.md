@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 30 |
-| Operations | 139 |
+| Operations | 140 |
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 124 |
+| Operations with no screen | 107 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 124 operations with no screen here
+### 107 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,37 +30,37 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
-| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| … | | | 84 more |
+| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
+| `updateTable` | fnb | PUT | Change what a table is |
+| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| … | | | 67 more |
 
 ### 2 modules split across waves
 
@@ -84,7 +84,7 @@
 |---|---|---|---|---|---|
 | `POS-000` | Sign In | Shift | 1 | 5 | yes |
 | `POS-001` | Begin Shift | Shift | 1 | 17 | yes |
-| `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 41 | yes |
+| `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 42 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 10 | yes |
 | `POS-004` | Sell — Seat Map | Sell | 2 | 11 | yes |
 | `POS-005` | Payment | Payment | 1 | 11 | yes |

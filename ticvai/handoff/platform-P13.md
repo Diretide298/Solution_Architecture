@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 90 |
+| Operations with no screen | 82 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 90 operations with no screen here
+### 82 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,10 +26,8 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
@@ -45,7 +43,6 @@
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `simulateAccessPolicy` | identity | POST | What this policy would decide, before it decides anything |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
@@ -57,10 +54,13 @@
 | `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
 | `startKioskAssist` | marketing-crm | POST | A staff member helps a guest at a kiosk, remotely |
 | `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `captureStoredValue` | orders | POST | Take some or all of a held balance |
 | `convertReservation` | orders | POST | Convert a reservation into an order |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| … | | | 50 more |
+| `createReservation` | orders | POST | Hold without payment |
+| `extendReservation` | orders | POST | Extend a reservation |
+| `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
+| `listFraudRules` | orders | GET |  |
+| … | | | 42 more |
 
 ## Modules
 

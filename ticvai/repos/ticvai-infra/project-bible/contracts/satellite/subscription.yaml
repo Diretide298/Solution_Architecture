@@ -5336,6 +5336,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: platform
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -5488,6 +5489,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: platform
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -5642,6 +5644,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: platform
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:

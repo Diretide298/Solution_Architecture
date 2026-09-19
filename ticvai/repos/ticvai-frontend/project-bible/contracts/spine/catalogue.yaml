@@ -8561,6 +8561,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -9622,6 +9623,11 @@ components:
       - name
       - validityKind
       properties:
+        description:
+          type: string
+          description: '**Validity, re-entry and transfer rules in prose.** "Can I leave and come back" is answered from here, and a name cannot answer it.
+
+            '
         id:
           type: string
           format: uuid

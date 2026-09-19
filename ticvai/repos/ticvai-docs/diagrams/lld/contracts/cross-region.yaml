@@ -1,5 +1,5 @@
 id: LLD-cross-region
-title: cross-region — 17 operations
+title: cross-region — 16 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -148,20 +148,6 @@ operations:
   writes:
   - cache:idempotency
   - platform.cross_region_entitlement
-- operation: releaseWalletAuthorisation
-  verb: POST
-  path: /wallet-authorisations/{authorisationId}/release
-  scope: workstation
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.wallet_authorisation
-  writes:
-  - cache:idempotency
-  - platform.wallet_authorisation
 - operation: relinquishWalletAuthorisation
   verb: POST
   path: /wallet-authorisations/{authorisationId}/release

@@ -111,6 +111,29 @@ def main():
                 cur.append(c)
                 print("  %-18s += %s" % (name, c))
 
+    # **A contract and a database schema are not the same list, and only one was updated.**
+    # Each service carries `contracts` (what it serves) and `schemas` (what it owns in the
+    # database), and they do not map one to one: `venue-map` lives in `venuemap`, `tenancy` in
+    # `platform`, `subscription` in `control`. The first cut appended to `contracts` alone, so
+    # rental's 21 tables, payments' 16 and accreditation's 13 belonged to no service at all —
+    # 50 of the 71 the viewer reported unowned.
+    #
+    # **Additive, and only where nobody owns the schema.** A schema two services touch is a
+    # boundary decision; this closes the ones with exactly one candidate and leaves the rest.
+    SCHEMA_OWNER = {"rental": "VenueOpsService", "payments": "OrderService",
+                    "accreditation": "TenancyService", "subscription": "PlatformService",
+                    "tenancy": "TenancyService"}
+    claimed = set()
+    for _n, s in svc.items():
+        claimed |= set(s.get("schemas") or [])
+    for sch, owner in SCHEMA_OWNER.items():
+        if sch in claimed:
+            continue
+        cur = svc[owner].setdefault("schemas", [])
+        if sch not in cur:
+            cur.append(sch)
+            print("  %-18s schema += %s" % (owner, sch))
+
     if "WalletService" not in svc:
         svc["WalletService"] = dict(WALLET)
         print("  WalletService       created")

@@ -30,7 +30,7 @@ apps:
     - P02
     - P05
     screens: 134
-    operations: 155
+    operations: 156
     permissions: 24
     tiers:
       read:
@@ -70,6 +70,7 @@ apps:
     - claimTableSession
     - claimTicketTransfer
     - completeSsoAuthorization
+    - createCart
     - createGuestFnbOrder
     - createMfaChallenge
     - createParkingEntitlement
@@ -100,8 +101,7 @@ apps:
     - leaveWaitlist
     - linkGuestCheckout
     - listDeliveryLocations
-    - listDiningOutlets
-    operationsWithNoPermissionCount: 68
+    operationsWithNoPermissionCount: 69
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -217,7 +217,7 @@ apps:
     - P13
     - P16
     screens: 1379
-    operations: 1201
+    operations: 1208
     permissions: 136
     tiers:
       read:
@@ -390,7 +390,7 @@ apps:
     - P04
     - P15
     screens: 40
-    operations: 155
+    operations: 156
     permissions: 45
     tiers:
       read:
@@ -457,7 +457,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 206
+    operations: 209
     permissions: 59
     tiers:
       read:

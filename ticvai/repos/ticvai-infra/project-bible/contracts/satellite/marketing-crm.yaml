@@ -8142,6 +8142,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -8278,6 +8279,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -12180,6 +12182,11 @@ components:
       - authorKind
       - recordedAt
       properties:
+        resolution:
+          type: string
+          description: '**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.
+
+            '
         id:
           type: string
         body:

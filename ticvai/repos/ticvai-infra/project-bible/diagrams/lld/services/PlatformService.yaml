@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 182 operations, 51 tables
+title: PlatformService — 182 operations, 60 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -24,6 +24,11 @@ schemas:
   stores:
   - postgres
   largestTable: control.partner_agreement
+- schema: subscription
+  tables: 9
+  stores:
+  - postgres
+  largestTable: subscription.module_listing
 operationsByContract:
 - contract: subscription
   count: 127
@@ -1853,27 +1858,97 @@ tables:
   writtenBy:
   - public-api
   foreignWriters: null
+- table: subscription.capacity_pack
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.enforcement_policy
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.go_live_readiness
+  columns: 8
+  store: postgres
+  parent: control.tenant
+  writtenBy: []
+  foreignWriters: null
+- table: subscription.licensing_model
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.module_listing
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.partner_quote
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.trial_config
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.vsi_assessment
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.vsi_model
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 readsFrom:
+- service: TenancyService
+  operations: 7
 - service: LedgerService
   operations: 6
-- service: TenancyService
-  operations: 4
 - service: CatalogueService
+  operations: 6
+- service: OrderService
   operations: 4
 - service: AiService
   operations: 3
-- service: OrderService
-  operations: 3
 - service: IdentityService
   operations: 3
+- service: AccessService
+  operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 2
+  operations: 7
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: OrderService
+  operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
 - service: IdentityService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: MarketingService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: CrossRegionService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:

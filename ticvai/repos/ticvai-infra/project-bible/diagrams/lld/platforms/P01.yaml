@@ -41,7 +41,7 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 58
 - service: OrderService
-  operationCalls: 39
+  operationCalls: 40
 - service: CatalogueService
   operationCalls: 36
 - service: IdentityService
@@ -352,6 +352,7 @@ screens:
   - abandonCart
   - addCartLine
   - checkoutCart
+  - createCart
   - evaluatePromotions
   - extendCart
   - getCart

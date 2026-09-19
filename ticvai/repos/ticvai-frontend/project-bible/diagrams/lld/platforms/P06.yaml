@@ -45,9 +45,9 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 121
 - service: OrderService
-  operationCalls: 69
+  operationCalls: 70
 - service: FnbService
-  operationCalls: 44
+  operationCalls: 46
 - service: TenancyService
   operationCalls: 35
 - service: AccessService
@@ -803,6 +803,7 @@ screens:
   - resumeOrder
   - setAlternativeCodes
   - setProductAttributes
+  - splitOrder
   - transitionProductLifecycle
   - voidOrder
   states:
@@ -1717,6 +1718,7 @@ screens:
   operations:
   - createFnbOrder
   - fireCourse
+  - getTableVisit
   - holdCourse
   - joinRestaurantWaitlist
   - mergeTableVisits
@@ -1769,6 +1771,7 @@ screens:
   - createFnbOrder
   - createPayment
   - getBill
+  - requestBill
   - splitBill
   - transferOrderItems
   states:

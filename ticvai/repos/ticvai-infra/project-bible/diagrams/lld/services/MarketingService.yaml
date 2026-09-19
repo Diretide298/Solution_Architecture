@@ -1548,7 +1548,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.case_message
-  columns: 9
+  columns: 10
   store: postgres
   parent: marketing.case
   writtenBy:
@@ -1842,12 +1842,17 @@ readsFrom:
   operations: 2
 - service: TenancyService
   operations: 1
+- service: PlatformService
+  operations: 1
 writesOutside:
 - service: IdentityService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 - service: PlatformService
   operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: OrderService
   operations: 1

@@ -16,7 +16,7 @@ Every number below is counted from the files in this package, not from memory.
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
 | **Tables designed** | **556** | 3,911 columns |
 | **Tables written as DDL** | **556** | `backend/*.sql`, 571 foreign keys. Never executed |
-| Relationships | 1,158 | 362 of 556 tables carry one; the twelve that do not are correct |
+| Relationships | 1,189 | 362 of 556 tables carry one; the twelve that do not are correct |
 | Screens defined | **2,427** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |

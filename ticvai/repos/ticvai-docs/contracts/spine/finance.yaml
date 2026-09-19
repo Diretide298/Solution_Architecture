@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Finance & Ledger
   version: 0.1.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: 5 — F&B & Guest Management (accounting and revenue recognition)
   x-ticvai-requirements: 327
@@ -141,6 +141,8 @@ paths:
   /recognition-schedules/validate:
     post:
       operationId: validateRecognitionSchedules
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       summary: Find product kinds claimed by more than one schedule
       description: '**The defect this exists to catch is silent.** Two schedules claiming one product
         kind means revenue recognised twice, and the numbers look plausible — nothing fails, the period
@@ -2566,6 +2568,8 @@ paths:
   /fx-rates/ingest:
     post:
       operationId: ingestFxRates
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       summary: Pull rates from the configured provider
       description: '**Scheduled ingestion, which had no home.** `setFxRate` is a `PUT` carrying `setByPrincipalId`
         — a person setting a rate — so a daily provider pull had to be modelled as a person doing it,

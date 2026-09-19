@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 47
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -2385,6 +2385,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2422,6 +2423,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2458,6 +2460,8 @@ paths:
   /access-policies/simulate:
     post:
       operationId: simulateAccessPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       summary: What this policy would decide, before it decides anything
       description: '3.3.25. *"System shall support simulation and testing of policies prior to
         deployment."*

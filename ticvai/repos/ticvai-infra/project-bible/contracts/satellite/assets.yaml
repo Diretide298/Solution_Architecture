@@ -1771,6 +1771,11 @@ components:
       type: object
       required: [surface, referenceId]
       properties:
+        extractedText:
+          type: string
+          description: '**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.
+
+            '
         id:
           type: string
           format: uuid

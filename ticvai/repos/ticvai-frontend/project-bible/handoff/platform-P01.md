@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 46 |
-| Operations | 153 |
+| Operations | 154 |
 | Contracts | 17 |
 | Modules | 13 |
 | Undrawn | 0 |
@@ -63,7 +63,7 @@
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 2 | 3 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 4 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 3 | 3 | yes |
-| `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 9 | yes |
+| `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 10 | yes |
 | `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 11 | yes |
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 5 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |

@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 199,
+  "operations": 202,
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 103
+  "operationsWithNoScreen": 93
  },
  "waves": {
   "wave1": 25,
@@ -57,7 +57,7 @@
  "contracts": [
   {
    "contract": "fnb",
-   "operations": 36
+   "operations": 38
   },
   {
    "contract": "maintenance",
@@ -65,7 +65,7 @@
   },
   {
    "contract": "orders",
-   "operations": 22
+   "operations": 23
   },
   {
    "contract": "catalogue",
@@ -76,11 +76,11 @@
    "operations": 15
   },
   {
-   "contract": "shift",
+   "contract": "rental",
    "operations": 13
   },
   {
-   "contract": "rental",
+   "contract": "shift",
    "operations": 13
   },
   {
@@ -92,6 +92,10 @@
    "operations": 11
   },
   {
+   "contract": "access",
+   "operations": 7
+  },
+  {
    "contract": "queue",
    "operations": 7
   },
@@ -100,27 +104,23 @@
    "operations": 7
   },
   {
-   "contract": "access",
-   "operations": 7
-  },
-  {
    "contract": "ai",
    "operations": 4
-  },
-  {
-   "contract": "retail",
-   "operations": 2
   },
   {
    "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "retail",
    "operations": 2
   },
   {
    "contract": "tenancy",
+   "operations": 2
+  },
+  {
+   "contract": "reporting",
    "operations": 2
   },
   {
@@ -396,7 +396,7 @@
    "module": "Operations",
    "wave": 2,
    "route": "/operations/walk-up-sale",
-   "operations": 22,
+   "operations": 23,
    "drawn": true
   },
   {
@@ -612,7 +612,7 @@
    "module": "Floor Service",
    "wave": 2,
    "route": "/operations/live-table-service-management",
-   "operations": 16,
+   "operations": 17,
    "drawn": true
   },
   {
@@ -621,7 +621,7 @@
    "module": "Floor Service",
    "wave": 2,
    "route": "/operations/table-order-bill-payment-management",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -1117,18 +1117,6 @@
     "summary": "Lift a suspension"
    },
    {
-    "operation": "releaseChannelAllocation",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Return unsold channel allocation to the general pool"
-   },
-   {
-    "operation": "releaseInventoryHold",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Return unsold units"
-   },
-   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -1183,12 +1171,6 @@
     "summary": "Escalate a finding"
    },
    {
-    "operation": "getTableVisit",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Read a visit with all its orders"
-   },
-   {
     "operation": "rebalanceStationLoad",
     "contract": "fnb",
     "verb": "POST",
@@ -1199,12 +1181,6 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Record what was done about a finding"
-   },
-   {
-    "operation": "requestBill",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "The party asked to pay"
    },
    {
     "operation": "resolveBookingConflict",
@@ -1297,12 +1273,6 @@
     "summary": "Submit, approve, activate or retire a policy"
    },
    {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
-   },
-   {
     "operation": "updateAccessPolicy",
     "contract": "identity",
     "verb": "PUT",
@@ -1375,12 +1345,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "captureStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Take some or all of a held balance"
-   },
-   {
     "operation": "convertReservation",
     "contract": "orders",
     "verb": "POST",
@@ -1391,12 +1355,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
    },
    {
     "operation": "createReservation",
@@ -1453,22 +1411,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "releaseStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Give a hold back"
-   },
-   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "splitOrder",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Break one order into independent orders"
    },
    {
     "operation": "overrideWaitingGuest",
@@ -1487,12 +1433,6 @@
     "contract": "rental",
     "verb": "POST",
     "summary": "Load a client's rental items and inventory at onboarding"
-   },
-   {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
    },
    {
     "operation": "deleteReportSchedule",

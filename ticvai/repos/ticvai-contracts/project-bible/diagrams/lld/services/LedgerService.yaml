@@ -617,14 +617,17 @@ readsFrom:
 - service: OrderService
   operations: 6
 - service: TenancyService
-  operations: 1
-- service: RetailService
+  operations: 3
+- service: WalletService
   operations: 1
 - service: PlatformService
   operations: 1
 - service: CatalogueService
   operations: 1
-writesOutside: []
+writesOutside:
+- service: TenancyService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-035 Multi-Currency & Pricing
 - P02:GST-044 Multi-Currency & Pricing

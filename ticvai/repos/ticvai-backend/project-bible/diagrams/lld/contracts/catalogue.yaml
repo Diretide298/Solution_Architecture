@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 192 operations
+title: catalogue — 190 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -1565,35 +1565,6 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
-- operation: releaseChannelAllocation
-  verb: POST
-  path: /channel-capacities/{channelCapacityId}/channel-allocations/release
-  scope: venue
-  permission: CAPACITY_CONFIGURE
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.channel_allocation
-  writes:
-  - cache:idempotency
-  - catalogue.channel_allocation
-- operation: releaseInventoryHold
-  verb: DELETE
-  path: /inventory-holds/{inventoryHoldId}
-  scope: workstation
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.inventory_hold
-  writes:
-  - cache:idempotency
-  - catalogue.inventory_hold
 - operation: relinquishChannelAllocation
   verb: POST
   path: /channel-capacities/{channelCapacityId}/channel-allocations/release

@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 32 |
+| Operations with no screen | 26 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 32 operations with no screen here
+### 26 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -23,7 +23,6 @@
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
-| `releaseWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
@@ -34,12 +33,9 @@
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `simulateAccessPolicy` | identity | POST | What this policy would decide, before it decides anything |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
-| `captureStoredValue` | orders | POST | Take some or all of a held balance |
 | `convertReservation` | orders | POST | Convert a reservation into an order |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| `createCart` | orders | POST | Start a cart |
 | `createReservation` | orders | POST | Hold without payment |
 | `extendReservation` | orders | POST | Extend a reservation |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
@@ -49,9 +45,7 @@
 | `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
 | `printTicketProof` | orders | POST | Print a sample without selling anything |
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
-| `releaseStoredValue` | orders | POST | Give a hold back |
 | `setFraudRules` | orders | PUT |  |
-| `splitOrder` | orders | POST | Break one order into independent orders |
 
 ## Modules
 

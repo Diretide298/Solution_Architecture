@@ -5086,6 +5086,13 @@ screens:
     purpose: How the run went
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: cancelReportExecution
+    contract: reporting
+    purpose: Stop a run that is going to be wrong anyway
+    trigger: onAction
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    invalidates:
+    - listReportExecutions
   entryState:
     preloaded:
     - Sample Results

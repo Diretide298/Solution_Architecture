@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS marketing."case" (
 
 -- One exchange in a case, from either side
 CREATE TABLE IF NOT EXISTS marketing.case_message (
+    resolution                        text,
     id                                text PRIMARY KEY NOT NULL,
     body                              text NOT NULL,
     is_internal                       boolean NOT NULL,

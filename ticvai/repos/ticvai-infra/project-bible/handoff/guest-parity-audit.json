@@ -12,7 +12,7 @@
   "appOnly": 7
  },
  "severity": {
-  "high": 26,
+  "high": 28,
   "medium": 116,
   "low": 197,
   "info": 4
@@ -122,6 +122,20 @@
    "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
    "detail": "web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only",
    "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "the web calls createCart and the app cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "web only",
+   "detail": "createCart",
+   "fix": ""
   },
   {
    "severity": "high",

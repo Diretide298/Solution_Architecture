@@ -18,183 +18,183 @@ The highest-frequency operation in a venue. Must work with no network.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/access` | `listAccess` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/access-area-zone` | `setAccessAreaZone` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/access-attribute-catalog` | `listAccessAttributeCatalog` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-executive-insight` | `listAccessExecutiveInsight` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/access-graphical-map` | `setAccessGraphicalMap` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/access-location-grouping` | `listAccessLocationGrouping` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-monitoring` | `listAccessMonitoring` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-points` | `listAccessPoints` | `SCOPE_VIEW` | ✓ | Scanner, Venue Mgmt |
-| POST | `/access-points` | `createAccessPoint` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/access-points/{accessPointId}` | `getAccessPoint` | `SCOPE_VIEW` | ✓ | Scanner, Venue Mgmt |
-| PATCH | `/access-points/{accessPointId}` | `updateAccessPoint` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/access-points/{accessPointId}/geofence` | `setAccessPointGeofence` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/access-points/{accessPointId}/mode` | `setTurnstileMode` | `TURNSTILE_MODE_SET` | ✓ | Scanner, Venue Mgmt |
-| GET | `/access-report-scheduled` | `listAccessReportScheduled` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-risk-scoring` | `listAccessRiskScoring` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-rule` | `listAccessRule` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-security-fraud` | `listAccessSecurityFraud` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/access-validity-time` | `listAccessValidityTime` | `SCOPE_VIEW` | — | Venue Mgmt |
-| POST | `/access/group-validate` | `validateGroupAccess` | `ACCESS_VALIDATE` | ✓ | Scanner, Staff App, Venue Mgmt |
-| GET | `/access/lookup` | `lookupTicket` | `TICKET_LOOKUP` | ✓ | Scanner, Staff App, Venue Mgmt |
-| GET | `/access/offline-package` | `getOfflinePackage` | `ACCESS_VALIDATE` | — | Scanner, Staff App, Venue Mgmt, Venue POS |
-| POST | `/access/override` | `overrideAccess` | `ACCESS_OVERRIDE` | ✓ | Scanner, Staff App, Venue Mgmt |
-| GET | `/access/scans` | `listScans` | `REPORT_VIEW_VENUE` | — | Scanner, Staff App, Venue Mgmt |
-| POST | `/access/scans` | `syncScans` | `ACCESS_VALIDATE` | — | Scanner, Staff App, Venue Mgmt |
-| POST | `/access/validate` | `validateAccess` | `ACCESS_VALIDATE` | ✓ | Scanner, Staff App, Venue Mgmt |
-| GET | `/admission-rules` | `listAdmissionRules` | `SCOPE_VIEW` | ✓ | Venue Mgmt |
-| POST | `/admission-rules` | `createAdmissionRules` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/admission-rules/{profileId}` | `updateAdmissionRules` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/anti-passback-journey` | `listAntiPassbackJourney` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/apple-wallet-pass` | `setAppleWalletPass` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/attendance-admission` | `listAttendanceAdmission` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/attraction-access` | `setAttractionAccess` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/authorization-governance-temporary` | `listAuthorizationGovernanceTemporary` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric` | `listBiometric` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric-access` | `listBiometricAccess` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric-consent-guardian` | `listBiometricConsentGuardian` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric-identity-integrity` | `listBiometricIdentityIntegrity` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric-lifecycle-retention` | `listBiometricLifecycleRetention` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/biometric-validation-gate` | `listBiometricValidationGate` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/biometric-verification-profile` | `setBiometricVerificationProfile` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/blacklist` | `listBlacklist` | `SCOPE_VIEW` | ✓ | Scanner, Venue Mgmt |
-| POST | `/blacklist` | `addBlacklistEntry` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| DELETE | `/blacklist/{mediaCode}` | `removeBlacklistEntry` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/ble-beacon-geofence` | `setBleBeaconGeofence` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/branding-localization-template` | `listBrandingLocalizationTemplate` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/connectivity-failure-degraded` | `listConnectivityFailureDegraded` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/context-time-event` | `setContextTimeEvent` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/credential` | `listCredential` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-activation-display` | `listCredentialActivationDisplay` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-delivery-distribution` | `listCredentialDeliveryDistribution` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-disable-blacklist` | `listCredentialDisableBlacklist` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-generation-issuance` | `listCredentialGenerationIssuance` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-identity-token` | `listCredentialIdentityToken` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-replacement-reissue` | `listCredentialReplacementReissue` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-revocation-lifecycle` | `listCredentialRevocationLifecycle` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-security` | `listCredentialSecurity` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-security-operational` | `listCredentialSecurityOperational` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-sharing-concurrent` | `listCredentialSharingConcurrent` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-transfer-rebinding` | `listCredentialTransferRebinding` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/credential-usage-cross` | `listCredentialUsageCross` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/device-binding-session` | `listDeviceBindingSession` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/device-gate` | `listDeviceGate` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/device-software-content` | `setDeviceSoftwareContent` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/device-type-hardware` | `listDeviceTypeHardware` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/digital-barcode-ticket` | `setDigitalBarcodeTicket` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/digital-card-membership` | `setDigitalCardMembership` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/digital-credential-security` | `listDigitalCredentialSecurity` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/dynamic-access-policy` | `listDynamicAccessPolicy` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/dynamic-field-data` | `setDynamicFieldData` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/dynamic-security-profile` | `setDynamicSecurityProfile` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/edge-node-local` | `setEdgeNodeLocal` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/edge-package-data` | `listEdgePackageData` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/edge-security-deployment` | `listEdgeSecurityDeployment` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/embedded-entitlement-payload` | `setEmbeddedEntitlementPayload` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/entitlement-consumption` | `listEntitlementConsumption` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/entitlement-cross-media` | `listEntitlementCrossMedia` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/entitlements/{entitlementId}` | `getEntitlement` | `ORDER_VIEW` | ✓ | Guest App, Guest Web |
-| GET | `/entitlements/{entitlementId}/credential` | `getEntitlementCredential` | `ORDER_VIEW` | — | Guest App, Guest Web |
-| GET | `/entitlements/{entitlementId}/history` | `getEntitlementHistory` | `ORDER_VIEW` | — | Guest App, Guest Web |
-| GET | `/entry-exit-crossover` | `listEntryExitCrossover` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/entry-exit-rule` | `listEntryExitRule` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/entry-temporary-exit` | `listEntryTemporaryExit` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/external-partner-credential` | `listExternalPartnerCredential` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/face-change-enrollment` | `listFaceChangeEnrollment` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/face-matching-verification` | `listFaceMatchingVerification` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/face-pass-enrollment` | `setFacePassEnrollment` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/face-pass/enrolments` | `enrolFacePass` | `GUEST_MANAGE` | — | Guest App |
-| DELETE | `/face-pass/enrolments/{enrolmentId}` | `revokeFacePass` | `GUEST_MANAGE` | — | Guest App, Guest Web |
-| GET | `/face-pass/enrolments/{enrolmentId}` | `getFacePassEnrolment` | `GUEST_VIEW` | — | Guest App, Guest Web |
-| GET | `/face-tag-temporary` | `listFaceTagTemporary` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/failed-generation-delivery` | `listFailedGenerationDelivery` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/family-child-pod` | `listFamilyChildPod` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/fast-pass-attraction` | `listFastPassAttraction` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/fraud-detection-rule` | `listFraudDetectionRule` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/gate-lane` | `setGateLane` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/gate-mode-free` | `listGateModeFree` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/google-wallet-pass` | `setGoogleWalletPass` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/graphical-access-map` | `listGraphicalAccessMap` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/group-admission-profile` | `setGroupAdmissionProfile` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/group-admission-quantity` | `listGroupAdmissionQuantity` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/group-attendance-partial` | `listGroupAttendancePartial` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/group-leader-fast` | `listGroupLeaderFast` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/guest-companion-eligibility` | `listGuestCompanionEligibility` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/guest-dwell-time` | `listGuestDwellTime` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/guest-journey` | `listGuestJourney` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/guests/me/entitlements` | `listMyEntitlements` | `ORDER_VIEW` | ✓ | Guest App, Guest Web, Venue POS |
-| PUT | `/handheld-mobile-access` | `setHandheldMobileAccess` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/hardware-compatibility-health` | `listHardwareCompatibilityHealth` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/hotel-wallet-external` | `listHotelWalletExternal` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/identity-membership-accreditation` | `listIdentityMembershipAccreditation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/live-access` | `listLiveAccess` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/live-gate-mode` | `listLiveGateMode` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/live-venue-occupancy` | `listLiveVenueOccupancy` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/manual-override-supervisor` | `approveManualOverrideSupervisor` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/media-activation-priority` | `listMediaActivationPriority` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/media-binding-activation` | `setMediaBindingActivation` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/media-compatibility-testing` | `publishMediaCompatibilityTesting` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/media-credential` | `listMediaCredential` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-design` | `listMediaDesign` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-issuance-encoding` | `listMediaIssuanceEncoding` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-replacement-revocation` | `listMediaReplacementRevocation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-swap-replacement` | `listMediaSwapReplacement` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-type-credential` | `listMediaTypeCredential` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/media-type-technology` | `listMediaTypeTechnology` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/multi-media-binding` | `listMultiMediaBinding` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/multi-media-preview` | `approveMultiMediaPreview` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/multi-park-crossover` | `listMultiParkCrossover` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/multi-park-crossover-2` | `listMultiParkCrossover2` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/my/entitlements/all` | `listEntitlements` | `—` | — | Guest App, Guest Web |
-| GET | `/offline-credential-revocation` | `listOfflineCredentialRevocation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/offline-cryptographic-validation` | `listOfflineCryptographicValidation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/offline-edge` | `listOfflineEdge` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/offline-entitlement-usage` | `listOfflineEntitlementUsage` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/offline-resilience-testing` | `simulateOfflineResilienceTesting` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/operating-calendar-special` | `listOperatingCalendarSpecial` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/operational-incident-exception` | `setOperationalIncidentException` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/parking-entitlements` | `createParkingEntitlement` | `—` | — | Guest App, Guest Web |
-| PATCH | `/parking-entitlements/{entitlementId}` | `updateParkingEntitlement` | `—` | — | Guest App, Guest Web |
-| GET | `/parking-facilities` | `listParkingFacilities` | `ACCESS_POINT_CONFIGURE` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| PUT | `/parking-facilities` | `setParkingFacility` | `PARKING_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/pdf-printable-pos` | `setPdfPrintablePos` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/physical-device-registration` | `listPhysicalDeviceRegistration` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/podium-console` | `listPodiumConsole` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/policy-conflict-impact` | `simulatePolicyConflictImpact` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/policy-evaluation-architecture` | `listPolicyEvaluationArchitecture` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/policy-scope-hierarchy` | `listPolicyScopeHierarchy` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/queue-throughput-lane` | `listQueueThroughputLane` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/reader-scanner-peripheral` | `setReaderScannerPeripheral` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt, Venue POS |
-| PUT | `/real-time-security` | `setRealTimeSecurity` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/reconnection-synchronization-conflict` | `listReconnectionSynchronizationConflict` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/relationship-companion-fraud` | `listRelationshipCompanionFraud` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/rfid-nfc` | `setRfidNfc` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rfid-nfc-card` | `setRfidNfcCard` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rule-conflict-check` | `publishRuleConflictCheck` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/security-detection-governance` | `listSecurityDetectionGovernance` | `SCOPE_VIEW` | — | Analytics, Venue Mgmt |
-| PUT | `/security-investigation-evidence` | `setSecurityInvestigationEvidence` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/shift-handover-summary` | `listShiftHandoverSummary` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/special-event-free` | `listSpecialEventFree` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/throughput-queue-validation` | `listThroughputQueueValidation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/ticket-credential-investigation` | `listTicketCredentialInvestigation` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/ticket-media` | `listTicketMedia` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/topology-validation` | `publishTopologyValidation` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/turnstile-lane-behavior` | `setTurnstileLaneBehavior` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/unified-identity-credential` | `listUnifiedIdentityCredential` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/validation-exception-reason` | `listValidationExceptionReason` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/validation-outcome-guest` | `setValidationOutcomeGuest` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/validation-outcome-rejection` | `listValidationOutcomeRejection` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/venue-park-access` | `listVenueParkAccess` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/verification-method-selection` | `listVerificationMethodSelection` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/virtual-credential-media` | `listVirtualCredentialMedia` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/virtual-ticket` | `listVirtualTicket` | `SCOPE_VIEW` | — | Venue Mgmt |
-| GET | `/virtual-ticket-architecture` | `listVirtualTicketArchitecture` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/virtual-ticket-credential` | `setVirtualTicketCredential` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/virtual-ticket-identity` | `setVirtualTicketIdentity` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/virtual-ticket-statu` | `listVirtualTicketStatus` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PUT | `/visual-access-rule` | `setVisualAccessRule` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/visual-dynamic-policy` | `setVisualDynamicPolicy` | `ACCESS_POINT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/access` | `listAccess` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/access-area-zone` | `setAccessAreaZone` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/access-attribute-catalog` | `listAccessAttributeCatalog` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-executive-insight` | `listAccessExecutiveInsight` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/access-graphical-map` | `setAccessGraphicalMap` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/access-location-grouping` | `listAccessLocationGrouping` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-monitoring` | `listAccessMonitoring` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-points` | `listAccessPoints` | `SCOPE_VIEW` | ✓ | venue-management-web, venue-scanner |
+| POST | `/access-points` | `createAccessPoint` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/access-points/{accessPointId}` | `getAccessPoint` | `SCOPE_VIEW` | ✓ | venue-management-web, venue-scanner |
+| PATCH | `/access-points/{accessPointId}` | `updateAccessPoint` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/access-points/{accessPointId}/geofence` | `setAccessPointGeofence` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/access-points/{accessPointId}/mode` | `setTurnstileMode` | `TURNSTILE_MODE_SET` | ✓ | venue-management-web, venue-scanner |
+| GET | `/access-report-scheduled` | `listAccessReportScheduled` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-risk-scoring` | `listAccessRiskScoring` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-rule` | `listAccessRule` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-security-fraud` | `listAccessSecurityFraud` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/access-validity-time` | `listAccessValidityTime` | `SCOPE_VIEW` | — | venue-management-web |
+| POST | `/access/group-validate` | `validateGroupAccess` | `ACCESS_VALIDATE` | ✓ | venue-management-web, venue-scanner, venue-staff-app |
+| GET | `/access/lookup` | `lookupTicket` | `TICKET_LOOKUP` | ✓ | venue-management-web, venue-scanner, venue-staff-app |
+| GET | `/access/offline-package` | `getOfflinePackage` | `ACCESS_VALIDATE` | — | venue-management-web, venue-pos, venue-scanner, venue-staff-app |
+| POST | `/access/override` | `overrideAccess` | `ACCESS_OVERRIDE` | ✓ | venue-management-web, venue-scanner, venue-staff-app |
+| GET | `/access/scans` | `listScans` | `REPORT_VIEW_VENUE` | — | venue-management-web, venue-scanner, venue-staff-app |
+| POST | `/access/scans` | `syncScans` | `ACCESS_VALIDATE` | — | venue-management-web, venue-scanner, venue-staff-app |
+| POST | `/access/validate` | `validateAccess` | `ACCESS_VALIDATE` | ✓ | venue-management-web, venue-scanner, venue-staff-app |
+| GET | `/admission-rules` | `listAdmissionRules` | `SCOPE_VIEW` | ✓ | venue-management-web |
+| POST | `/admission-rules` | `createAdmissionRules` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/admission-rules/{profileId}` | `updateAdmissionRules` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/anti-passback-journey` | `listAntiPassbackJourney` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/apple-wallet-pass` | `setAppleWalletPass` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/attendance-admission` | `listAttendanceAdmission` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/attraction-access` | `setAttractionAccess` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/authorization-governance-temporary` | `listAuthorizationGovernanceTemporary` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric` | `listBiometric` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric-access` | `listBiometricAccess` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric-consent-guardian` | `listBiometricConsentGuardian` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric-identity-integrity` | `listBiometricIdentityIntegrity` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric-lifecycle-retention` | `listBiometricLifecycleRetention` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/biometric-validation-gate` | `listBiometricValidationGate` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/biometric-verification-profile` | `setBiometricVerificationProfile` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/blacklist` | `listBlacklist` | `SCOPE_VIEW` | ✓ | venue-management-web, venue-scanner |
+| POST | `/blacklist` | `addBlacklistEntry` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| DELETE | `/blacklist/{mediaCode}` | `removeBlacklistEntry` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/ble-beacon-geofence` | `setBleBeaconGeofence` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/branding-localization-template` | `listBrandingLocalizationTemplate` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/connectivity-failure-degraded` | `listConnectivityFailureDegraded` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/context-time-event` | `setContextTimeEvent` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/credential` | `listCredential` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-activation-display` | `listCredentialActivationDisplay` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-delivery-distribution` | `listCredentialDeliveryDistribution` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-disable-blacklist` | `listCredentialDisableBlacklist` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-generation-issuance` | `listCredentialGenerationIssuance` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-identity-token` | `listCredentialIdentityToken` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-replacement-reissue` | `listCredentialReplacementReissue` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-revocation-lifecycle` | `listCredentialRevocationLifecycle` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-security` | `listCredentialSecurity` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-security-operational` | `listCredentialSecurityOperational` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-sharing-concurrent` | `listCredentialSharingConcurrent` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-transfer-rebinding` | `listCredentialTransferRebinding` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/credential-usage-cross` | `listCredentialUsageCross` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/device-binding-session` | `listDeviceBindingSession` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/device-gate` | `listDeviceGate` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/device-software-content` | `setDeviceSoftwareContent` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/device-type-hardware` | `listDeviceTypeHardware` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/digital-barcode-ticket` | `setDigitalBarcodeTicket` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/digital-card-membership` | `setDigitalCardMembership` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/digital-credential-security` | `listDigitalCredentialSecurity` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/dynamic-access-policy` | `listDynamicAccessPolicy` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/dynamic-field-data` | `setDynamicFieldData` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/dynamic-security-profile` | `setDynamicSecurityProfile` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/edge-node-local` | `setEdgeNodeLocal` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/edge-package-data` | `listEdgePackageData` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/edge-security-deployment` | `listEdgeSecurityDeployment` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/embedded-entitlement-payload` | `setEmbeddedEntitlementPayload` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/entitlement-consumption` | `listEntitlementConsumption` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/entitlement-cross-media` | `listEntitlementCrossMedia` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/entitlements/{entitlementId}` | `getEntitlement` | `ORDER_VIEW` | ✓ | guest-app, guest-web |
+| GET | `/entitlements/{entitlementId}/credential` | `getEntitlementCredential` | `ORDER_VIEW` | — | guest-app, guest-web |
+| GET | `/entitlements/{entitlementId}/history` | `getEntitlementHistory` | `ORDER_VIEW` | — | guest-app, guest-web |
+| GET | `/entry-exit-crossover` | `listEntryExitCrossover` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/entry-exit-rule` | `listEntryExitRule` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/entry-temporary-exit` | `listEntryTemporaryExit` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/external-partner-credential` | `listExternalPartnerCredential` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/face-change-enrollment` | `listFaceChangeEnrollment` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/face-matching-verification` | `listFaceMatchingVerification` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/face-pass-enrollment` | `setFacePassEnrollment` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| POST | `/face-pass/enrolments` | `enrolFacePass` | `GUEST_MANAGE` | — | guest-app |
+| DELETE | `/face-pass/enrolments/{enrolmentId}` | `revokeFacePass` | `GUEST_MANAGE` | — | guest-app, guest-web |
+| GET | `/face-pass/enrolments/{enrolmentId}` | `getFacePassEnrolment` | `GUEST_VIEW` | — | guest-app, guest-web |
+| GET | `/face-tag-temporary` | `listFaceTagTemporary` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/failed-generation-delivery` | `listFailedGenerationDelivery` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/family-child-pod` | `listFamilyChildPod` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/fast-pass-attraction` | `listFastPassAttraction` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/fraud-detection-rule` | `listFraudDetectionRule` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/gate-lane` | `setGateLane` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/gate-mode-free` | `listGateModeFree` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/google-wallet-pass` | `setGoogleWalletPass` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/graphical-access-map` | `listGraphicalAccessMap` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/group-admission-profile` | `setGroupAdmissionProfile` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/group-admission-quantity` | `listGroupAdmissionQuantity` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/group-attendance-partial` | `listGroupAttendancePartial` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/group-leader-fast` | `listGroupLeaderFast` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/guest-companion-eligibility` | `listGuestCompanionEligibility` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/guest-dwell-time` | `listGuestDwellTime` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/guest-journey` | `listGuestJourney` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/guests/me/entitlements` | `listMyEntitlements` | `ORDER_VIEW` | ✓ | guest-app, guest-web, venue-pos |
+| PUT | `/handheld-mobile-access` | `setHandheldMobileAccess` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/hardware-compatibility-health` | `listHardwareCompatibilityHealth` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/hotel-wallet-external` | `listHotelWalletExternal` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/identity-membership-accreditation` | `listIdentityMembershipAccreditation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/live-access` | `listLiveAccess` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/live-gate-mode` | `listLiveGateMode` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/live-venue-occupancy` | `listLiveVenueOccupancy` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/manual-override-supervisor` | `approveManualOverrideSupervisor` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/media-activation-priority` | `listMediaActivationPriority` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/media-binding-activation` | `setMediaBindingActivation` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/media-compatibility-testing` | `publishMediaCompatibilityTesting` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/media-credential` | `listMediaCredential` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-design` | `listMediaDesign` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-issuance-encoding` | `listMediaIssuanceEncoding` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-replacement-revocation` | `listMediaReplacementRevocation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-swap-replacement` | `listMediaSwapReplacement` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-type-credential` | `listMediaTypeCredential` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/media-type-technology` | `listMediaTypeTechnology` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/multi-media-binding` | `listMultiMediaBinding` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/multi-media-preview` | `approveMultiMediaPreview` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/multi-park-crossover` | `listMultiParkCrossover` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/multi-park-crossover-2` | `listMultiParkCrossover2` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/my/entitlements/all` | `listEntitlements` | `—` | — | guest-app, guest-web |
+| GET | `/offline-credential-revocation` | `listOfflineCredentialRevocation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/offline-cryptographic-validation` | `listOfflineCryptographicValidation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/offline-edge` | `listOfflineEdge` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/offline-entitlement-usage` | `listOfflineEntitlementUsage` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/offline-resilience-testing` | `simulateOfflineResilienceTesting` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/operating-calendar-special` | `listOperatingCalendarSpecial` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/operational-incident-exception` | `setOperationalIncidentException` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| POST | `/parking-entitlements` | `createParkingEntitlement` | `—` | — | guest-app, guest-web |
+| PATCH | `/parking-entitlements/{entitlementId}` | `updateParkingEntitlement` | `—` | — | guest-app, guest-web |
+| GET | `/parking-facilities` | `listParkingFacilities` | `ACCESS_POINT_CONFIGURE` | ✓ | guest-app, guest-web, venue-management-web |
+| PUT | `/parking-facilities` | `setParkingFacility` | `PARKING_CONFIGURE` | — | venue-management-web |
+| PUT | `/pdf-printable-pos` | `setPdfPrintablePos` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/physical-device-registration` | `listPhysicalDeviceRegistration` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/podium-console` | `listPodiumConsole` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/policy-conflict-impact` | `simulatePolicyConflictImpact` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/policy-evaluation-architecture` | `listPolicyEvaluationArchitecture` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/policy-scope-hierarchy` | `listPolicyScopeHierarchy` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/queue-throughput-lane` | `listQueueThroughputLane` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/reader-scanner-peripheral` | `setReaderScannerPeripheral` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web, venue-pos |
+| PUT | `/real-time-security` | `setRealTimeSecurity` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/reconnection-synchronization-conflict` | `listReconnectionSynchronizationConflict` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/relationship-companion-fraud` | `listRelationshipCompanionFraud` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/rfid-nfc` | `setRfidNfc` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/rfid-nfc-card` | `setRfidNfcCard` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/rule-conflict-check` | `publishRuleConflictCheck` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/security-detection-governance` | `listSecurityDetectionGovernance` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/security-investigation-evidence` | `setSecurityInvestigationEvidence` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/shift-handover-summary` | `listShiftHandoverSummary` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/special-event-free` | `listSpecialEventFree` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/throughput-queue-validation` | `listThroughputQueueValidation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/ticket-credential-investigation` | `listTicketCredentialInvestigation` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/ticket-media` | `listTicketMedia` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/topology-validation` | `publishTopologyValidation` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/turnstile-lane-behavior` | `setTurnstileLaneBehavior` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/unified-identity-credential` | `listUnifiedIdentityCredential` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/validation-exception-reason` | `listValidationExceptionReason` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/validation-outcome-guest` | `setValidationOutcomeGuest` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/validation-outcome-rejection` | `listValidationOutcomeRejection` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/venue-park-access` | `listVenueParkAccess` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/verification-method-selection` | `listVerificationMethodSelection` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/virtual-credential-media` | `listVirtualCredentialMedia` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/virtual-ticket` | `listVirtualTicket` | `SCOPE_VIEW` | — | venue-management-web |
+| GET | `/virtual-ticket-architecture` | `listVirtualTicketArchitecture` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/virtual-ticket-credential` | `setVirtualTicketCredential` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/virtual-ticket-identity` | `setVirtualTicketIdentity` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| GET | `/virtual-ticket-statu` | `listVirtualTicketStatus` | `SCOPE_VIEW` | — | venue-management-web |
+| PUT | `/visual-access-rule` | `setVisualAccessRule` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
+| PUT | `/visual-dynamic-policy` | `setVisualDynamicPolicy` | `ACCESS_POINT_CONFIGURE` | — | venue-management-web |
 
 ### `approvals.yaml` — 45 operation(s)
 
@@ -202,51 +202,51 @@ One approval mechanism, not five.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/accreditation-badges` | `listAccreditationBadges` | `APPROVAL_VIEW` | — | Accreditation |
-| POST | `/accreditation-badges` | `issueAccreditationBadge` | `APPROVAL_ACT` | — | Accreditation |
-| GET | `/approval-analytics` | `getApprovalAnalytics` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/approval-control-policies` | `listApprovalControlPolicies` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/approval-control-policies` | `setApprovalControlPolicy` | `APPROVAL_CONFIGURE` | — | TICVAI Web |
-| PUT | `/approval-delegations/availability` | `setApproverAvailability` | `APPROVAL_DECIDE` | — | Venue Mgmt |
-| POST | `/approval-evidence-packages` | `createApprovalEvidencePackage` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/approval-matrices` | `listApprovalMatrices` | `APPROVAL_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/approval-matrices` | `setApprovalMatrix` | `APPROVAL_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/approval-requests` | `listApprovalRequests` | `APPROVAL_VIEW` | — | Accreditation, TICVAI Web, Venue Mgmt |
-| POST | `/approval-requests` | `createApprovalRequest` | `APPROVAL_REQUEST` | — | TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/approval-requests/evaluate` | `evaluateApprovalRequirement` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/approval-requests/{requestId}/decide` | `decideApprovalRequest` | `APPROVAL_DECIDE` | — | Accreditation, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/approval-requests/{requestId}/escalate` | `escalateApprovalRequest` | `APPROVAL_REQUEST` | — | Venue Mgmt |
-| GET | `/approval-requests/{requestId}/record` | `getApprovalRecord` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| POST | `/approval-requests/{requestId}/resubmit` | `resubmitApprovalRequest` | `APPROVAL_REQUEST` | — | Venue Mgmt |
-| POST | `/approval-requests/{requestId}/signature` | `signApprovalDecision` | `APPROVAL_DECIDE` | — | TICVAI Web, Venue Mgmt |
-| POST | `/approval-requests/{requestId}/withdraw` | `withdrawApprovalRequest` | `APPROVAL_REQUEST` | — | Venue Mgmt |
-| PUT | `/approval-retention` | `setApprovalRetentionPolicy` | `APPROVAL_CONFIGURE` | — | Analytics, TICVAI Web |
-| PUT | `/approval-sla-policies` | `setApprovalSlaPolicy` | `APPROVAL_CONFIGURE` | — | Venue Mgmt |
-| POST | `/automation-autonomou-action` | `createAutomationAutonomouAction` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| GET | `/condition-decision-logic` | `listConditionDecisionLogic` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/cross-module-orchestration` | `listCrossModuleOrchestration` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/delegations` | `listApprovalDelegations` | `APPROVAL_VIEW` | — | Venue Mgmt |
-| POST | `/delegations` | `createApprovalDelegation` | `APPROVAL_DECIDE` | — | Venue Mgmt |
-| DELETE | `/delegations/{delegationId}` | `revokeApprovalDelegation` | `APPROVAL_DECIDE` | — | Venue Mgmt |
-| PUT | `/matrix-multi-level` | `approveMatrixMultiLevel` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| GET | `/process-automation-opportunity` | `listProcessAutomationOpportunity` | `APPROVAL_VIEW` | — | TICVAI Web |
-| PUT | `/role-authority-delegation` | `approveRoleAuthorityDelegation` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| GET | `/rule-workflow` | `listRuleWorkflow` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/sla-escalation-bottleneck` | `listSlaEscalationBottleneck` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/sla-escalation-reminder` | `listSlaEscalationReminder` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/step-up-policies` | `listStepUpPolicies` | `APPROVAL_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/step-up-policies` | `setStepUpPolicy` | `APPROVAL_CONFIGURE` | — | TICVAI Web |
-| PUT | `/trigger-action-cross` | `setTriggerActionCross` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| PUT | `/unified-decision` | `approveUnifiedDecision` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| PUT | `/versioning-governance` | `approveVersioningGovernance` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| PUT | `/visual-business-rule` | `setVisualBusinessRule` | `APPROVAL_REQUEST` | — | TICVAI Web |
-| PUT | `/visual-workflow` | `setVisualWorkflow` | `APPROVAL_REQUEST` | — | TICVAI Web, Venue Mgmt |
-| GET | `/workflow` | `listWorkflow` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/workflow-autonomou-governance` | `listWorkflowAutonomouGovernance` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/workflow-exception-failure` | `listWorkflowExceptionFailure` | `APPROVAL_VIEW` | — | TICVAI Web |
-| GET | `/workflow-instance-process` | `listWorkflowInstanceProcess` | `APPROVAL_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/workflow-process-performance` | `listWorkflowProcessPerformance` | `APPROVAL_VIEW` | — | TICVAI Web |
-| PUT | `/workflow-testing-impact` | `simulateWorkflowTestingImpact` | `APPROVAL_REQUEST` | — | TICVAI Web |
+| GET | `/accreditation-badges` | `listAccreditationBadges` | `APPROVAL_VIEW` | — | accreditation-web |
+| POST | `/accreditation-badges` | `issueAccreditationBadge` | `APPROVAL_ACT` | — | accreditation-web |
+| GET | `/approval-analytics` | `getApprovalAnalytics` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/approval-control-policies` | `listApprovalControlPolicies` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/approval-control-policies` | `setApprovalControlPolicy` | `APPROVAL_CONFIGURE` | — | ticvai-web |
+| PUT | `/approval-delegations/availability` | `setApproverAvailability` | `APPROVAL_DECIDE` | — | venue-management-web |
+| POST | `/approval-evidence-packages` | `createApprovalEvidencePackage` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/approval-matrices` | `listApprovalMatrices` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/approval-matrices` | `setApprovalMatrix` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/approval-requests` | `listApprovalRequests` | `APPROVAL_VIEW` | — | accreditation-web, ticvai-web, venue-management-web |
+| POST | `/approval-requests` | `createApprovalRequest` | `APPROVAL_REQUEST` | — | ticvai-web, venue-management-web, venue-pos |
+| POST | `/approval-requests/evaluate` | `evaluateApprovalRequirement` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web, venue-pos |
+| POST | `/approval-requests/{requestId}/decide` | `decideApprovalRequest` | `APPROVAL_DECIDE` | — | accreditation-web, ticvai-web, venue-management-web, venue-pos |
+| POST | `/approval-requests/{requestId}/escalate` | `escalateApprovalRequest` | `APPROVAL_REQUEST` | — | venue-management-web |
+| GET | `/approval-requests/{requestId}/record` | `getApprovalRecord` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/approval-requests/{requestId}/resubmit` | `resubmitApprovalRequest` | `APPROVAL_REQUEST` | — | venue-management-web |
+| POST | `/approval-requests/{requestId}/signature` | `signApprovalDecision` | `APPROVAL_DECIDE` | — | ticvai-web, venue-management-web |
+| POST | `/approval-requests/{requestId}/withdraw` | `withdrawApprovalRequest` | `APPROVAL_REQUEST` | — | venue-management-web |
+| PUT | `/approval-retention` | `setApprovalRetentionPolicy` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/approval-sla-policies` | `setApprovalSlaPolicy` | `APPROVAL_CONFIGURE` | — | venue-management-web |
+| POST | `/automation-autonomou-action` | `createAutomationAutonomouAction` | `APPROVAL_REQUEST` | — | ticvai-web |
+| GET | `/condition-decision-logic` | `listConditionDecisionLogic` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/cross-module-orchestration` | `listCrossModuleOrchestration` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/delegations` | `listApprovalDelegations` | `APPROVAL_VIEW` | — | venue-management-web |
+| POST | `/delegations` | `createApprovalDelegation` | `APPROVAL_DECIDE` | — | venue-management-web |
+| DELETE | `/delegations/{delegationId}` | `revokeApprovalDelegation` | `APPROVAL_DECIDE` | — | venue-management-web |
+| PUT | `/matrix-multi-level` | `approveMatrixMultiLevel` | `APPROVAL_REQUEST` | — | ticvai-web |
+| GET | `/process-automation-opportunity` | `listProcessAutomationOpportunity` | `APPROVAL_VIEW` | — | ticvai-web |
+| PUT | `/role-authority-delegation` | `approveRoleAuthorityDelegation` | `APPROVAL_REQUEST` | — | ticvai-web |
+| GET | `/rule-workflow` | `listRuleWorkflow` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/sla-escalation-bottleneck` | `listSlaEscalationBottleneck` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/sla-escalation-reminder` | `listSlaEscalationReminder` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/step-up-policies` | `listStepUpPolicies` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/step-up-policies` | `setStepUpPolicy` | `APPROVAL_CONFIGURE` | — | ticvai-web |
+| PUT | `/trigger-action-cross` | `setTriggerActionCross` | `APPROVAL_REQUEST` | — | ticvai-web |
+| PUT | `/unified-decision` | `approveUnifiedDecision` | `APPROVAL_REQUEST` | — | ticvai-web |
+| PUT | `/versioning-governance` | `approveVersioningGovernance` | `APPROVAL_REQUEST` | — | ticvai-web |
+| PUT | `/visual-business-rule` | `setVisualBusinessRule` | `APPROVAL_REQUEST` | — | ticvai-web |
+| PUT | `/visual-workflow` | `setVisualWorkflow` | `APPROVAL_REQUEST` | — | ticvai-web, venue-management-web |
+| GET | `/workflow` | `listWorkflow` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/workflow-autonomou-governance` | `listWorkflowAutonomouGovernance` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/workflow-exception-failure` | `listWorkflowExceptionFailure` | `APPROVAL_VIEW` | — | ticvai-web |
+| GET | `/workflow-instance-process` | `listWorkflowInstanceProcess` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/workflow-process-performance` | `listWorkflowProcessPerformance` | `APPROVAL_VIEW` | — | ticvai-web |
+| PUT | `/workflow-testing-impact` | `simulateWorkflowTestingImpact` | `APPROVAL_REQUEST` | — | ticvai-web |
 
 ### `catalogue.yaml` — 190 operation(s)
 
@@ -254,196 +254,196 @@ Defines what can be sold and what it grants.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| PUT | `/activation-scheduler` | `publishActivationScheduler` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/automation-policy-autonomou` | `listAutomationPolicyAutonomous` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/availability` | `getAvailability` | `PRODUCT_VIEW` | — | Guest App, Guest Kiosk, Guest Web, Partner Web, Venue POS |
-| PUT | `/booking-velocity-time` | `setBookingVelocityTime` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/bulk-pricing-update` | `listBulkPricingUpdate` | `PRODUCT_VIEW` | — | TICVAI Web |
-| POST | `/bulk-product-catalogue` | `createBulkProductCatalogue` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/calculation-validation-reconciliation` | `listCalculationValidationReconciliation` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/catalogue-review` | `setCatalogueReview` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/catalogue/bundles` | `listCatalogueBundles` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web, Staff App, Venue Mgmt |
-| POST | `/catalogue/bundles` | `publishBundle` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/catalogue/bundles/latest` | `getLatestBundle` | `PRODUCT_VIEW` | — | Staff App, Venue Mgmt, Venue POS |
-| POST | `/catalogue/bundles/{version}/applied` | `reportBundleApplied` | `PRODUCT_VIEW` | — | Staff App, Venue Mgmt |
-| GET | `/change-impact-analysi` | `listChangeImpactAnalysis` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/change-propagation-dependency` | `listChangePropagationDependency` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel` | `listChannel` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-2` | `listChannel2` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-allocation-rebalancing` | `listChannelAllocationRebalancing` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/channel-availability` | `publishChannelAvailability` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/channel-based-pricing` | `listChannelBasedPricing` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-capacities` | `listChannelCapacities` | `PRODUCT_VIEW` | — | Partner Web, Staff App, Venue Mgmt |
-| POST | `/channel-capacities` | `createChannelCapacity` | `CAPACITY_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| PATCH | `/channel-capacities/{channelCapacityId}` | `updateChannelCapacity` | `CAPACITY_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| GET | `/channel-capacities/{channelCapacityId}/channel-allocations` | `getChannelAllocations` | `PRODUCT_VIEW` | — | Partner Web, Staff App, Venue Mgmt |
-| PUT | `/channel-capacities/{channelCapacityId}/channel-allocations` | `setChannelAllocations` | `CAPACITY_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| POST | `/channel-capacities/{channelCapacityId}/channel-allocations/release` | `relinquishChannelAllocation` | `CAPACITY_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| GET | `/channel-connection-integration` | `listChannelConnectionIntegration` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-customer-segment` | `listChannelCustomerSegment` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-exception-incident` | `listChannelExceptionIncident` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/channel-fee-payment` | `setChannelFeePayment` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/channel-governance-sla` | `listChannelGovernanceSla` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-log-transaction` | `listChannelLogTransaction` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-performance-commercial` | `listChannelPerformanceCommercial` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/channel-pricing-commercial` | `setChannelPricingCommercial` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| POST | `/channel-profile` | `createChannelProfile` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/channel-readiness-validation` | `publishChannelReadinessValidation` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/channel-sale-rule` | `listChannelSaleRule` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/channel-sale-schedule` | `listChannelSaleSchedule` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/commercial-pricing` | `listCommercialPricing` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/commercial-pricing-structure` | `listCommercialPricingStructure` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/competitor-pricing-market` | `listCompetitorPricingMarket` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/currency-precision-rounding` | `listCurrencyPrecisionRounding` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/customer-eligibility-rule` | `listCustomerEligibilityRule` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/customer-segment-profile` | `listCustomerSegmentProfile` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/demand-booking-curve` | `listDemandBookingCurve` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/demand-occupancy-availability` | `setDemandOccupancyAvailability` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
+| PUT | `/activation-scheduler` | `publishActivationScheduler` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/automation-policy-autonomou` | `listAutomationPolicyAutonomous` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/availability` | `getAvailability` | `PRODUCT_VIEW` | — | guest-app, guest-web, partner-web, venue-pos |
+| PUT | `/booking-velocity-time` | `setBookingVelocityTime` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/bulk-pricing-update` | `listBulkPricingUpdate` | `PRODUCT_VIEW` | — | ticvai-web |
+| POST | `/bulk-product-catalogue` | `createBulkProductCatalogue` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/calculation-validation-reconciliation` | `listCalculationValidationReconciliation` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/catalogue-review` | `setCatalogueReview` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/catalogue/bundles` | `listCatalogueBundles` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-staff-app |
+| POST | `/catalogue/bundles` | `publishBundle` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/catalogue/bundles/latest` | `getLatestBundle` | `PRODUCT_VIEW` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/catalogue/bundles/{version}/applied` | `reportBundleApplied` | `PRODUCT_VIEW` | — | venue-management-web, venue-staff-app |
+| GET | `/change-impact-analysi` | `listChangeImpactAnalysis` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/change-propagation-dependency` | `listChangePropagationDependency` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel` | `listChannel` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-2` | `listChannel2` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-allocation-rebalancing` | `listChannelAllocationRebalancing` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/channel-availability` | `publishChannelAvailability` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/channel-based-pricing` | `listChannelBasedPricing` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-capacities` | `listChannelCapacities` | `PRODUCT_VIEW` | — | partner-web, venue-management-web, venue-staff-app |
+| POST | `/channel-capacities` | `createChannelCapacity` | `CAPACITY_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| PATCH | `/channel-capacities/{channelCapacityId}` | `updateChannelCapacity` | `CAPACITY_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| GET | `/channel-capacities/{channelCapacityId}/channel-allocations` | `getChannelAllocations` | `PRODUCT_VIEW` | — | partner-web, venue-management-web, venue-staff-app |
+| PUT | `/channel-capacities/{channelCapacityId}/channel-allocations` | `setChannelAllocations` | `CAPACITY_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| POST | `/channel-capacities/{channelCapacityId}/channel-allocations/release` | `relinquishChannelAllocation` | `CAPACITY_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| GET | `/channel-connection-integration` | `listChannelConnectionIntegration` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-customer-segment` | `listChannelCustomerSegment` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-exception-incident` | `listChannelExceptionIncident` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/channel-fee-payment` | `setChannelFeePayment` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/channel-governance-sla` | `listChannelGovernanceSla` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-log-transaction` | `listChannelLogTransaction` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-performance-commercial` | `listChannelPerformanceCommercial` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/channel-pricing-commercial` | `setChannelPricingCommercial` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| POST | `/channel-profile` | `createChannelProfile` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/channel-readiness-validation` | `publishChannelReadinessValidation` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/channel-sale-rule` | `listChannelSaleRule` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/channel-sale-schedule` | `listChannelSaleSchedule` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/commercial-pricing` | `listCommercialPricing` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/commercial-pricing-structure` | `listCommercialPricingStructure` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/competitor-pricing-market` | `listCompetitorPricingMarket` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/currency-precision-rounding` | `listCurrencyPrecisionRounding` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/customer-eligibility-rule` | `listCustomerEligibilityRule` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/customer-segment-profile` | `listCustomerSegmentProfile` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/demand-booking-curve` | `listDemandBookingCurve` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/demand-occupancy-availability` | `setDemandOccupancyAvailability` | `PRODUCT_CONFIGURE` | — | ticvai-web |
 | GET | `/donation-campaigns` | `listDonationCampaigns` | `PRODUCT_VIEW` | ✓ | — |
 | POST | `/donation-campaigns` | `createDonationCampaign` | `PRODUCT_CONFIGURE` | — | — |
 | PATCH | `/donation-campaigns/{campaignId}` | `updateDonationCampaign` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/dynamic-price-band` | `listDynamicPriceBand` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-pricing-automation` | `listDynamicPricingAutomation` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-pricing-guardrail` | `listDynamicPricingGuardrail` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-pricing-performance` | `listDynamicPricingPerformance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-pricing-strategy` | `listDynamicPricingStrategy` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/dynamic-pricing-strategy-2` | `setDynamicPricingStrategy` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/effective-date-season` | `listEffectiveDateSeason` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/entitlement-templates` | `listEntitlementTemplates` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/entitlement-templates` | `createEntitlementTemplate` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/dynamic-price-band` | `listDynamicPriceBand` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/dynamic-pricing-automation` | `listDynamicPricingAutomation` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/dynamic-pricing-guardrail` | `listDynamicPricingGuardrail` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/dynamic-pricing-performance` | `listDynamicPricingPerformance` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/dynamic-pricing-strategy` | `listDynamicPricingStrategy` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/dynamic-pricing-strategy-2` | `setDynamicPricingStrategy` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/effective-date-season` | `listEffectiveDateSeason` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/entitlement-templates` | `listEntitlementTemplates` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/entitlement-templates` | `createEntitlementTemplate` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/entitlements/{entitlementId}/freeze` | `freezeEntitlement` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/entitlements/{entitlementId}/reinstate` | `reinstateEntitlement` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/entitlements/{entitlementId}/suspend` | `suspendEntitlement` | `ORDER_MODIFY` | — | — |
-| GET | `/event-types` | `listEventTypes` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/event-types` | `setEventType` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/events` | `listEvents` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/events` | `createEvent` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/events/{eventId}` | `getEvent` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PATCH | `/events/{eventId}` | `updateEvent` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/events/{eventId}/capacity-profile` | `setEventCapacityProfile` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/events/{eventId}/clone` | `cloneEvent` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/events/{eventId}/lifecycle` | `setEventLifecycleState` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/events/{eventId}/performances` | `listPerformances` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/events/{eventId}/performances` | `createPerformances` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/events/{eventId}/registration` | `setEventRegistration` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/events/{eventId}/reschedule` | `rescheduleEvent` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/events/{eventId}/resource-plan` | `getEventResourcePlan` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/events/{eventId}/resource-plan` | `setEventResourcePlan` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/events/{eventId}/schedule` | `setEventSchedule` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/fee-applicability-charging` | `setFeeApplicabilityCharging` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/fee-surcharge` | `listFeeSurcharge` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/fee-waiver-tax` | `listFeeWaiverTax` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/governance-risk-monitoring` | `listGovernanceRiskMonitoring` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/guest/memberships` | `listGuestMemberships` | `PRODUCT_VIEW` | — | Guest App, Guest Web |
-| GET | `/guests/me/memberships` | `getMyMemberships` | `PRODUCT_VIEW` | — | Guest App, Guest Web |
-| GET | `/internal-demand-booking` | `listInternalDemandBooking` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/inventory-capacity-channel` | `listInventoryCapacityChannel` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/inventory-holds` | `listInventoryHolds` | `PRODUCT_VIEW` | — | Venue Mgmt, Venue POS |
-| POST | `/inventory-holds` | `acquireInventoryHold` | `ORDER_CREATE` | — | Guest App, Guest Kiosk, Guest Web, Venue Mgmt, Venue POS |
-| DELETE | `/inventory-holds/{inventoryHoldId}` | `relinquishInventoryHold` | `ORDER_CREATE` | — | Venue Mgmt, Venue POS |
-| POST | `/inventory-holds/{inventoryHoldId}/force-release` | `forceReleaseInventoryHold` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/inventory-holds/{inventoryHoldId}/renew` | `renewInventoryHold` | `ORDER_CREATE` | — | Venue Mgmt, Venue POS |
-| GET | `/learning-model-performance` | `listLearningModelPerformance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/lifecycle-statu-workflow` | `setLifecycleStatuWorkflow` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| POST | `/live-dynamic-price` | `createLiveDynamicPrice` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/location-venue-event` | `listLocationVenueEvent` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/market-tourism-holiday` | `listMarketTourismHoliday` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/market-venue-currency` | `listMarketVenueCurrency` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/membership-loyalty-pricing` | `listMembershipLoyaltyPricing` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/nearby-event-exhibition` | `listNearbyEventExhibition` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/package-bundle-add` | `listPackageBundleAdd` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/performances/{performanceId}` | `getPerformance` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt, Venue POS |
-| PATCH | `/performances/{performanceId}` | `updatePerformance` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt, Venue POS |
-| POST | `/performances/{performanceId}/cancel` | `cancelPerformance` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/prepaid-minute-packages` | `setPrepaidMinutePackage` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/price-breakdown-calculation` | `simulatePriceBreakdownCalculation` | `PRODUCT_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/price-calculation-sequence` | `listPriceCalculationSequence` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/price-category-rate` | `listPriceCategoryRate` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/price-elasticity-revenue` | `listPriceElasticityRevenue` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/price-hierarchy-inheritance` | `setPriceHierarchyInheritance` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/price-list-master` | `setPriceListMaster` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/price-list-template` | `listPriceListTemplate` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/price-lists` | `listPriceLists` | `PRICE_VIEW` | — | Partner Web, Venue Mgmt |
-| POST | `/price-lists` | `createPriceList` | `PRICE_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| GET | `/price-lists/{priceListId}` | `getPriceList` | `PRICE_VIEW` | — | Partner Web, Venue Mgmt |
-| PATCH | `/price-lists/{priceListId}` | `updatePriceList` | `PRICE_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| POST | `/price-lists/{priceListId}/copy` | `copyPriceList` | `PRICE_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| GET | `/price-lists/{priceListId}/prices` | `listPrices` | `PRICE_VIEW` | — | Partner Web, Venue Mgmt |
-| PUT | `/price-lists/{priceListId}/prices` | `setPrices` | `PRICE_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| GET | `/pricing` | `listPricing` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/pricing-2` | `setPricing` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/pricing-change-impact` | `listPricingChangeImpact` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/pricing-change-request` | `setPricingChangeRequest` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/pricing-compliance` | `listPricingCompliance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-distribution-synchronization` | `listPricingDistributionSynchronization` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/pricing-effective-date` | `publishPricingEffectiveDate` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/pricing-experiment` | `setPricingExperiment` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/pricing-governance` | `listPricingGovernance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-recommendation-explainability` | `listPricingRecommendationExplainability` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-rollback-emergency` | `listPricingRollbackEmergency` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-rule` | `listPricingRule` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-rule-priority` | `listPricingRulePriority` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/pricing-version-baseline` | `listPricingVersionBaseline` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/pricing-workflow-authority` | `approvePricingWorkflowAuthority` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/product-catalogue` | `setProductCatalogue` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/product-categories` | `listProductCategories` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| PUT | `/product-categories` | `setProductCategories` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/product-context-ownership` | `setProductContextOwnership` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/product-duplication-template` | `listProductDuplicationTemplate` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-governance` | `listProductGovernance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-import-export` | `listProductImportExport` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-lifecycle` | `listProductLifecycle` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-price-availability` | `listProductPriceAvailability` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-retirement-suspension` | `listProductRetirementSuspension` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/product-service-price` | `setProductServicePrice` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/product-trail-change` | `listProductTrailChange` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/products` | `listProducts` | `PRODUCT_VIEW` | ✓ | Analytics, Guest App, Guest Kiosk, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/products` | `createProduct` | `PRODUCT_CONFIGURE` | — | Partner Web, TICVAI Web, Venue Mgmt |
+| GET | `/event-types` | `listEventTypes` | `EVENT_CONFIGURE` | — | venue-management-web |
+| PUT | `/event-types` | `setEventType` | `EVENT_CONFIGURE` | — | venue-management-web |
+| GET | `/events` | `listEvents` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/events` | `createEvent` | `EVENT_CONFIGURE` | — | venue-management-web |
+| GET | `/events/{eventId}` | `getEvent` | `PRODUCT_VIEW` | — | venue-management-web |
+| PATCH | `/events/{eventId}` | `updateEvent` | `EVENT_CONFIGURE` | — | venue-management-web |
+| PUT | `/events/{eventId}/capacity-profile` | `setEventCapacityProfile` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/events/{eventId}/clone` | `cloneEvent` | `EVENT_CONFIGURE` | — | venue-management-web |
+| POST | `/events/{eventId}/lifecycle` | `setEventLifecycleState` | `EVENT_CONFIGURE` | — | venue-management-web |
+| GET | `/events/{eventId}/performances` | `listPerformances` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/events/{eventId}/performances` | `createPerformances` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/events/{eventId}/registration` | `setEventRegistration` | `EVENT_CONFIGURE` | — | venue-management-web |
+| POST | `/events/{eventId}/reschedule` | `rescheduleEvent` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| GET | `/events/{eventId}/resource-plan` | `getEventResourcePlan` | `EVENT_CONFIGURE` | — | venue-management-web |
+| PUT | `/events/{eventId}/resource-plan` | `setEventResourcePlan` | `EVENT_CONFIGURE` | — | venue-management-web |
+| PUT | `/events/{eventId}/schedule` | `setEventSchedule` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/fee-applicability-charging` | `setFeeApplicabilityCharging` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/fee-surcharge` | `listFeeSurcharge` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/fee-waiver-tax` | `listFeeWaiverTax` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/governance-risk-monitoring` | `listGovernanceRiskMonitoring` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/guest/memberships` | `listGuestMemberships` | `PRODUCT_VIEW` | — | guest-app, guest-web |
+| GET | `/guests/me/memberships` | `getMyMemberships` | `PRODUCT_VIEW` | — | guest-app, guest-web |
+| GET | `/internal-demand-booking` | `listInternalDemandBooking` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/inventory-capacity-channel` | `listInventoryCapacityChannel` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/inventory-holds` | `listInventoryHolds` | `PRODUCT_VIEW` | — | venue-management-web, venue-pos |
+| POST | `/inventory-holds` | `acquireInventoryHold` | `ORDER_CREATE` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| DELETE | `/inventory-holds/{inventoryHoldId}` | `relinquishInventoryHold` | `ORDER_CREATE` | — | venue-management-web, venue-pos |
+| POST | `/inventory-holds/{inventoryHoldId}/force-release` | `forceReleaseInventoryHold` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/inventory-holds/{inventoryHoldId}/renew` | `renewInventoryHold` | `ORDER_CREATE` | — | venue-management-web, venue-pos |
+| GET | `/learning-model-performance` | `listLearningModelPerformance` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/lifecycle-statu-workflow` | `setLifecycleStatuWorkflow` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| POST | `/live-dynamic-price` | `createLiveDynamicPrice` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/location-venue-event` | `listLocationVenueEvent` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/market-tourism-holiday` | `listMarketTourismHoliday` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/market-venue-currency` | `listMarketVenueCurrency` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/membership-loyalty-pricing` | `listMembershipLoyaltyPricing` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/nearby-event-exhibition` | `listNearbyEventExhibition` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/package-bundle-add` | `listPackageBundleAdd` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/performances/{performanceId}` | `getPerformance` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-pos |
+| PATCH | `/performances/{performanceId}` | `updatePerformance` | `PERFORMANCE_CONFIGURE` | — | venue-management-web, venue-pos |
+| POST | `/performances/{performanceId}/cancel` | `cancelPerformance` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/prepaid-minute-packages` | `setPrepaidMinutePackage` | `PRICE_CONFIGURE` | — | venue-management-web |
+| PUT | `/price-breakdown-calculation` | `simulatePriceBreakdownCalculation` | `PRODUCT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/price-calculation-sequence` | `listPriceCalculationSequence` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/price-category-rate` | `listPriceCategoryRate` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/price-elasticity-revenue` | `listPriceElasticityRevenue` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/price-hierarchy-inheritance` | `setPriceHierarchyInheritance` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/price-list-master` | `setPriceListMaster` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/price-list-template` | `listPriceListTemplate` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/price-lists` | `listPriceLists` | `PRICE_VIEW` | — | partner-web, venue-management-web |
+| POST | `/price-lists` | `createPriceList` | `PRICE_CONFIGURE` | — | partner-web, venue-management-web |
+| GET | `/price-lists/{priceListId}` | `getPriceList` | `PRICE_VIEW` | — | partner-web, venue-management-web |
+| PATCH | `/price-lists/{priceListId}` | `updatePriceList` | `PRICE_CONFIGURE` | — | partner-web, venue-management-web |
+| POST | `/price-lists/{priceListId}/copy` | `copyPriceList` | `PRICE_CONFIGURE` | — | partner-web, venue-management-web |
+| GET | `/price-lists/{priceListId}/prices` | `listPrices` | `PRICE_VIEW` | — | partner-web, venue-management-web |
+| PUT | `/price-lists/{priceListId}/prices` | `setPrices` | `PRICE_CONFIGURE` | — | partner-web, venue-management-web |
+| GET | `/pricing` | `listPricing` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/pricing-2` | `setPricing` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/pricing-change-impact` | `listPricingChangeImpact` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/pricing-change-request` | `setPricingChangeRequest` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/pricing-compliance` | `listPricingCompliance` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-distribution-synchronization` | `listPricingDistributionSynchronization` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/pricing-effective-date` | `publishPricingEffectiveDate` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/pricing-experiment` | `setPricingExperiment` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/pricing-governance` | `listPricingGovernance` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-recommendation-explainability` | `listPricingRecommendationExplainability` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-rollback-emergency` | `listPricingRollbackEmergency` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-rule` | `listPricingRule` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-rule-priority` | `listPricingRulePriority` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/pricing-version-baseline` | `listPricingVersionBaseline` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/pricing-workflow-authority` | `approvePricingWorkflowAuthority` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/product-catalogue` | `setProductCatalogue` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/product-categories` | `listProductCategories` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| PUT | `/product-categories` | `setProductCategories` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/product-context-ownership` | `setProductContextOwnership` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/product-duplication-template` | `listProductDuplicationTemplate` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-governance` | `listProductGovernance` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-import-export` | `listProductImportExport` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-lifecycle` | `listProductLifecycle` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-price-availability` | `listProductPriceAvailability` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-retirement-suspension` | `listProductRetirementSuspension` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/product-service-price` | `setProductServicePrice` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/product-trail-change` | `listProductTrailChange` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/products` | `listProducts` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/products` | `createProduct` | `PRODUCT_CONFIGURE` | — | partner-web, ticvai-web, venue-management-web |
 | POST | `/products/bulk-price` | `bulkChangePrices` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/products/import` | `importProductCatalogue` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| POST | `/products/import` | `importProductCatalogue` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/products/import/{jobId}/commit` | `commitCatalogueImport` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/products/resolve` | `resolveProductByCode` | `PRODUCT_VIEW` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/products/{productId}` | `getProduct` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| PATCH | `/products/{productId}` | `updateProduct` | `PRODUCT_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| GET | `/products/{productId}/alternative-codes` | `listAlternativeCodes` | `PRODUCT_VIEW` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| PUT | `/products/{productId}/alternative-codes` | `setAlternativeCodes` | `PRODUCT_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| PUT | `/products/{productId}/attributes` | `setProductAttributes` | `PRODUCT_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
+| GET | `/products/resolve` | `resolveProductByCode` | `PRODUCT_VIEW` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/products/{productId}` | `getProduct` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| PATCH | `/products/{productId}` | `updateProduct` | `PRODUCT_CONFIGURE` | — | partner-web, venue-management-web |
+| GET | `/products/{productId}/alternative-codes` | `listAlternativeCodes` | `PRODUCT_VIEW` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| PUT | `/products/{productId}/alternative-codes` | `setAlternativeCodes` | `PRODUCT_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| PUT | `/products/{productId}/attributes` | `setProductAttributes` | `PRODUCT_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
 | POST | `/products/{productId}/change-impact` | `assessProductChange` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/products/{productId}/clone` | `cloneProduct` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/products/{productId}/lifecycle` | `transitionProductLifecycle` | `PRODUCT_CONFIGURE` | — | Partner Web, Staff App, Venue Mgmt |
-| GET | `/products/{productId}/variants` | `listProductVariants` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Kiosk, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/products/{productId}/versions` | `listProductVersions` | `PRODUCT_VIEW` | — | TICVAI Web |
+| POST | `/products/{productId}/lifecycle` | `transitionProductLifecycle` | `PRODUCT_CONFIGURE` | — | partner-web, venue-management-web, venue-staff-app |
+| GET | `/products/{productId}/variants` | `listProductVariants` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/products/{productId}/versions` | `listProductVersions` | `PRODUCT_VIEW` | — | ticvai-web |
 | POST | `/products/{productId}/versions/{version}/restore` | `restoreProductVersion` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/quantity-group-volume` | `listQuantityGroupVolume` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/rate-structure` | `setRateStructure` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/real-time-channel` | `listRealTimeChannel` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/recommendation-review-decision` | `listRecommendationReviewDecision` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/residency-nationality-market` | `listResidencyNationalityMarket` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/revenue` | `listRevenue` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/revenue-demand-impact` | `listRevenueDemandImpact` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/review-decision` | `approveReviewDecision` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/rollback-recovery` | `listRollbackRecovery` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/rule-priority-conflict` | `listRulePriorityConflict` | `PRODUCT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/sale-channel` | `listSaleChannel` | `PRODUCT_VIEW` | — | Sign-up, TICVAI Web |
-| GET | `/scenario-modeling-what` | `listScenarioModelingWhat` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/search` | `searchCatalogue` | `—` | ✓ | Guest App, Guest Web |
-| GET | `/seasonal-calendar-day` | `listSeasonalCalendarDay` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/session-templates` | `listSessionTemplates` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/session-templates` | `setSessionTemplate` | `PERFORMANCE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/sessions/{sessionId}/media` | `assignSessionMedia` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/signal-data-quality` | `listSignalDataQuality` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/spaces` | `listSpaces` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/spaces` | `setSpace` | `EVENT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/tax-fee-calculation` | `listTaxFeeCalculation` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/tax-profile-jurisdiction` | `setTaxProfileJurisdiction` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/tax-rule-treatment` | `setTaxRuleTreatment` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/timeslot-performance-time` | `listTimeslotPerformanceTime` | `PRODUCT_VIEW` | — | TICVAI Web |
+| GET | `/quantity-group-volume` | `listQuantityGroupVolume` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/rate-structure` | `setRateStructure` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/real-time-channel` | `listRealTimeChannel` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/recommendation-review-decision` | `listRecommendationReviewDecision` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/residency-nationality-market` | `listResidencyNationalityMarket` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/revenue` | `listRevenue` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/revenue-demand-impact` | `listRevenueDemandImpact` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/review-decision` | `approveReviewDecision` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/rollback-recovery` | `listRollbackRecovery` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/rule-priority-conflict` | `listRulePriorityConflict` | `PRODUCT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/sale-channel` | `listSaleChannel` | `PRODUCT_VIEW` | — | signup-web, ticvai-web |
+| GET | `/scenario-modeling-what` | `listScenarioModelingWhat` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/search` | `searchCatalogue` | `—` | ✓ | guest-app, guest-web |
+| GET | `/seasonal-calendar-day` | `listSeasonalCalendarDay` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/session-templates` | `listSessionTemplates` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/session-templates` | `setSessionTemplate` | `PERFORMANCE_CONFIGURE` | — | venue-management-web |
+| POST | `/sessions/{sessionId}/media` | `assignSessionMedia` | `EVENT_CONFIGURE` | — | venue-management-web |
+| GET | `/signal-data-quality` | `listSignalDataQuality` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/spaces` | `listSpaces` | `EVENT_CONFIGURE` | — | venue-management-web |
+| PUT | `/spaces` | `setSpace` | `EVENT_CONFIGURE` | — | venue-management-web |
+| GET | `/tax-fee-calculation` | `listTaxFeeCalculation` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/tax-profile-jurisdiction` | `setTaxProfileJurisdiction` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/tax-rule-treatment` | `setTaxRuleTreatment` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/timeslot-performance-time` | `listTimeslotPerformanceTime` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/waitlist-entries` | `listWaitlistEntries` | `PRODUCT_VIEW` | — | — |
-| POST | `/waitlist-entries` | `joinWaitlist` | `—` | — | Guest App, Guest Web |
-| DELETE | `/waitlist-entries/{entryId}` | `leaveWaitlist` | `—` | — | Guest App, Guest Web |
+| POST | `/waitlist-entries` | `joinWaitlist` | `—` | — | guest-app, guest-web |
+| DELETE | `/waitlist-entries/{entryId}` | `leaveWaitlist` | `—` | — | guest-app, guest-web |
 | POST | `/waitlist-entries/{entryId}/offer` | `offerWaitlistCapacity` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/weather-demand-impact` | `listWeatherDemandImpact` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/workflow` | `approveWorkflow` | `PRODUCT_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
+| GET | `/weather-demand-impact` | `listWeatherDemandImpact` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/workflow` | `approveWorkflow` | `PRODUCT_CONFIGURE` | — | ticvai-web, venue-management-web |
 
 ### `cross-region.yaml` — 16 operation(s)
 
@@ -451,11 +451,11 @@ Makes a multi-region tenant behave as one platform without moving personal data.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| POST | `/cross-region-entitlements` | `propagateCrossRegionEntitlement` | `—` | — | TICVAI Web |
-| POST | `/cross-region-entitlements/reconcile` | `reconcileRedemptions` | `—` | — | TICVAI Web |
+| POST | `/cross-region-entitlements` | `propagateCrossRegionEntitlement` | `—` | — | ticvai-web |
+| POST | `/cross-region-entitlements/reconcile` | `reconcileRedemptions` | `—` | — | ticvai-web |
 | DELETE | `/cross-region-entitlements/{rightId}` | `revokeCrossRegionEntitlement` | `—` | — | — |
-| GET | `/cross-region-entitlements/{rightId}` | `getCrossRegionEntitlement` | `TICKET_LOOKUP` | ✓ | Scanner, TICVAI Web |
-| POST | `/cross-region-entitlements/{rightId}/consume` | `consumeCrossRegionEntitlement` | `ACCESS_VALIDATE` | ✓ | Scanner |
+| GET | `/cross-region-entitlements/{rightId}` | `getCrossRegionEntitlement` | `TICKET_LOOKUP` | ✓ | ticvai-web, venue-scanner |
+| POST | `/cross-region-entitlements/{rightId}/consume` | `consumeCrossRegionEntitlement` | `ACCESS_VALIDATE` | ✓ | venue-scanner |
 | POST | `/dsar/requests` | `createDsarRequest` | `—` | — | — |
 | GET | `/dsar/requests/{requestId}` | `getDsarRequest` | `—` | — | — |
 | POST | `/guest-links` | `createGuestLink` | `—` | — | — |
@@ -474,60 +474,60 @@ The append-only record of everything. Corrections are entries, never edits.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/account-mappings` | `listAccountMappings` | `LEDGER_VIEW` | — | Venue Mgmt |
-| PUT | `/account-mappings` | `setAccountMappings` | `ACCOUNT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/accounts` | `listAccounts` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/accounts` | `createAccount` | `ACCOUNT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/accounts/{accountId}` | `getAccount` | `LEDGER_VIEW` | — | Venue Mgmt |
-| PATCH | `/accounts/{accountId}` | `updateAccount` | `ACCOUNT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/cost-centers` | `listCostCenters` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/cost-centers` | `createCostCenter` | `ACCOUNT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/deferred-revenue` | `getDeferredRevenue` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/deposits` | `recordDeposit` | `LEDGER_POST` | — | Venue Mgmt |
-| POST | `/deposits/{depositId}/settle` | `settleDeposit` | `LEDGER_POST` | — | Venue Mgmt |
-| GET | `/fiscal-periods` | `listFiscalPeriods` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/fiscal-periods/{periodId}/abandon-close` | `abandonPeriodClose` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/fiscal-periods/{periodId}/begin-close` | `beginPeriodClose` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/fiscal-periods/{periodId}/close` | `closeFiscalPeriod` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/fiscal-periods/{periodId}/reopen` | `reopenPeriod` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| GET | `/fx-rates` | `listFxRates` | `LEDGER_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| PUT | `/fx-rates` | `setFxRate` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/fx-rates/ingest` | `ingestFxRates` | `LEDGER_APPROVE` | — | — |
+| GET | `/account-mappings` | `listAccountMappings` | `LEDGER_VIEW` | — | venue-management-web |
+| PUT | `/account-mappings` | `setAccountMappings` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
+| GET | `/accounts` | `listAccounts` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/accounts` | `createAccount` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
+| GET | `/accounts/{accountId}` | `getAccount` | `LEDGER_VIEW` | — | venue-management-web |
+| PATCH | `/accounts/{accountId}` | `updateAccount` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
+| GET | `/cost-centers` | `listCostCenters` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/cost-centers` | `createCostCenter` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
+| GET | `/deferred-revenue` | `getDeferredRevenue` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/deposits` | `recordDeposit` | `LEDGER_POST` | — | venue-management-web |
+| POST | `/deposits/{depositId}/settle` | `settleDeposit` | `LEDGER_POST` | — | venue-management-web |
+| GET | `/fiscal-periods` | `listFiscalPeriods` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/fiscal-periods/{periodId}/abandon-close` | `abandonPeriodClose` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/fiscal-periods/{periodId}/begin-close` | `beginPeriodClose` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/fiscal-periods/{periodId}/close` | `closeFiscalPeriod` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/fiscal-periods/{periodId}/reopen` | `reopenPeriod` | `LEDGER_APPROVE` | — | venue-management-web |
+| GET | `/fx-rates` | `listFxRates` | `LEDGER_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| PUT | `/fx-rates` | `setFxRate` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/fx-rates/ingest` | `ingestFxRates` | `LEDGER_APPROVE` | — | venue-management-web |
 | PUT | `/fx-rates/providers` | `setFxProvider` | `LEDGER_APPROVE` | — | — |
 | GET | `/fx/foreign-tender` | `getForeignTenderReport` | `LEDGER_VIEW` | — | — |
 | GET | `/fx/inter-entity` | `listInterEntityObligations` | `LEDGER_VIEW` | — | — |
 | POST | `/fx/revaluation` | `runFxRevaluation` | `LEDGER_APPROVE` | — | — |
 | POST | `/inter-entity-obligations/{obligationId}/dispute` | `disputeObligation` | `LEDGER_POST` | — | — |
 | POST | `/inter-entity-obligations/{obligationId}/resolve` | `resolveObligationDispute` | `LEDGER_POST` | — | — |
-| POST | `/inter-entity-obligations/{obligationId}/settle` | `recordSettlement` | `LEDGER_POST` | — | TICVAI Web |
-| GET | `/journal-entries` | `listJournalEntries` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/journal-entries` | `createJournalEntry` | `LEDGER_POST` | — | Venue Mgmt |
-| GET | `/journal-entries/{entryId}` | `getJournalEntry` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/journal-entries/{entryId}/approve` | `approveJournalEntry` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/journal-entries/{entryId}/reject` | `rejectJournal` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/journal-entries/{entryId}/reverse` | `reverseJournalEntry` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| GET | `/ledger/entries` | `listLedgerEntries` | `LEDGER_VIEW` | — | Venue Mgmt |
-| GET | `/ledger/trial-balance` | `getTrialBalance` | `LEDGER_VIEW` | — | Venue Mgmt |
-| GET | `/legal-entities` | `listLegalEntities` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/legal-entities` | `createLegalEntity` | `ACCOUNT_CONFIGURE` | — | Sign-up, TICVAI Web, Venue Mgmt |
-| GET | `/price-variances` | `listPriceVariances` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/price-variances/{varianceId}/review` | `reviewPriceVariance` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| GET | `/recognition-schedules` | `listRecognitionSchedules` | `LEDGER_VIEW` | — | Venue Mgmt |
-| POST | `/recognition-schedules` | `createRecognitionSchedule` | `ACCOUNT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/recognition-schedules/validate` | `validateRecognitionSchedules` | `LEDGER_VIEW` | — | — |
-| POST | `/recognition/run` | `runRecognition` | `LEDGER_POST` | — | Venue Mgmt |
-| GET | `/reconciliation/unified` | `getUnifiedReconciliation` | `LEDGER_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/reports/financial` | `getFinancialReport` | `REPORT_VIEW_VENUE` | — | Partner Web, Support, Venue Mgmt, Venue POS |
-| GET | `/settlements` | `listSettlements` | `SETTLEMENT_VIEW` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| POST | `/settlements` | `ingestSettlementFile` | `SETTLEMENT_RECONCILE` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| GET | `/settlements/{settlementId}` | `getSettlement` | `SETTLEMENT_VIEW` | — | Partner Web, Venue Mgmt |
-| GET | `/settlements/{settlementId}/exceptions` | `listSettlementExceptions` | `SETTLEMENT_VIEW` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| POST | `/settlements/{settlementId}/exceptions` | `resolveSettlementException` | `SETTLEMENT_RECONCILE` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| GET | `/tax-codes` | `listTaxCodes` | `LEDGER_VIEW` | ✓ | Venue Mgmt |
-| POST | `/tax-codes` | `createTaxCode` | `TAX_CONFIGURE` | — | Venue Mgmt |
-| PATCH | `/tax-codes/{taxCodeId}` | `updateTaxCode` | `TAX_CONFIGURE` | — | Venue Mgmt |
-| GET | `/tax-exemptions` | `listTaxExemptions` | `LEDGER_VIEW` | ✓ | Venue Mgmt |
-| POST | `/tax-exemptions` | `createTaxExemption` | `TAX_CONFIGURE` | — | Venue Mgmt |
+| POST | `/inter-entity-obligations/{obligationId}/settle` | `recordSettlement` | `LEDGER_POST` | — | ticvai-web |
+| GET | `/journal-entries` | `listJournalEntries` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/journal-entries` | `createJournalEntry` | `LEDGER_POST` | — | venue-management-web |
+| GET | `/journal-entries/{entryId}` | `getJournalEntry` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/journal-entries/{entryId}/approve` | `approveJournalEntry` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/journal-entries/{entryId}/reject` | `rejectJournal` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/journal-entries/{entryId}/reverse` | `reverseJournalEntry` | `LEDGER_APPROVE` | — | venue-management-web |
+| GET | `/ledger/entries` | `listLedgerEntries` | `LEDGER_VIEW` | — | venue-management-web |
+| GET | `/ledger/trial-balance` | `getTrialBalance` | `LEDGER_VIEW` | — | venue-management-web |
+| GET | `/legal-entities` | `listLegalEntities` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/legal-entities` | `createLegalEntity` | `ACCOUNT_CONFIGURE` | — | signup-web, ticvai-web, venue-management-web |
+| GET | `/price-variances` | `listPriceVariances` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/price-variances/{varianceId}/review` | `reviewPriceVariance` | `LEDGER_APPROVE` | — | venue-management-web |
+| GET | `/recognition-schedules` | `listRecognitionSchedules` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/recognition-schedules` | `createRecognitionSchedule` | `ACCOUNT_CONFIGURE` | — | venue-management-web |
+| POST | `/recognition-schedules/validate` | `validateRecognitionSchedules` | `LEDGER_VIEW` | — | venue-management-web |
+| POST | `/recognition/run` | `runRecognition` | `LEDGER_POST` | — | venue-management-web |
+| GET | `/reconciliation/unified` | `getUnifiedReconciliation` | `LEDGER_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/reports/financial` | `getFinancialReport` | `REPORT_VIEW_VENUE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| GET | `/settlements` | `listSettlements` | `SETTLEMENT_VIEW` | — | partner-web, ticvai-web, venue-management-web |
+| POST | `/settlements` | `ingestSettlementFile` | `SETTLEMENT_RECONCILE` | — | partner-web, ticvai-web, venue-management-web |
+| GET | `/settlements/{settlementId}` | `getSettlement` | `SETTLEMENT_VIEW` | — | partner-web, venue-management-web |
+| GET | `/settlements/{settlementId}/exceptions` | `listSettlementExceptions` | `SETTLEMENT_VIEW` | — | partner-web, ticvai-web, venue-management-web |
+| POST | `/settlements/{settlementId}/exceptions` | `resolveSettlementException` | `SETTLEMENT_RECONCILE` | — | partner-web, ticvai-web, venue-management-web |
+| GET | `/tax-codes` | `listTaxCodes` | `LEDGER_VIEW` | ✓ | venue-management-web |
+| POST | `/tax-codes` | `createTaxCode` | `TAX_CONFIGURE` | — | venue-management-web |
+| PATCH | `/tax-codes/{taxCodeId}` | `updateTaxCode` | `TAX_CONFIGURE` | — | venue-management-web |
+| GET | `/tax-exemptions` | `listTaxExemptions` | `LEDGER_VIEW` | ✓ | venue-management-web |
+| POST | `/tax-exemptions` | `createTaxExemption` | `TAX_CONFIGURE` | — | venue-management-web |
 | POST | `/tax/calculate` | `calculateTax` | `LEDGER_VIEW` | ✓ | — |
 | POST | `/write-offs` | `recordWriteOff` | `LEDGER_POST` | — | — |
 
@@ -540,59 +540,59 @@ Defines who is asking, and what they may do.
 | POST | `/access-decisions` | `evaluateAccess` | `PERMISSION_VIEW` | — | — |
 | GET | `/access-decisions/audit` | `listAccessDecisions` | `PERMISSION_VIEW` | — | — |
 | POST | `/access-overrides` | `createEmergencyAccessOverride` | `PERMISSION_MANAGE` | — | — |
-| GET | `/access-policies` | `listAccessPolicies` | `PERMISSION_VIEW` | — | Analytics, TICVAI Web, Venue CMS, Venue Mgmt |
-| POST | `/access-policies` | `createAccessPolicy` | `PERMISSION_MANAGE` | — | Venue CMS, Venue Mgmt |
+| GET | `/access-policies` | `listAccessPolicies` | `PERMISSION_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/access-policies` | `createAccessPolicy` | `PERMISSION_MANAGE` | — | venue-management-web |
 | GET | `/access-policies/bundle` | `getAccessPolicyBundle` | `PERMISSION_VIEW` | ✓ | — |
-| POST | `/access-policies/simulate` | `simulateAccessPolicy` | `PERMISSION_VIEW` | — | — |
+| POST | `/access-policies/simulate` | `simulateAccessPolicy` | `PERMISSION_VIEW` | — | venue-management-web |
 | GET | `/access-policies/{policyId}` | `getAccessPolicy` | `PERMISSION_VIEW` | — | — |
 | PUT | `/access-policies/{policyId}` | `updateAccessPolicy` | `PERMISSION_MANAGE` | — | — |
 | GET | `/access-policies/{policyId}/history` | `listAccessPolicyHistory` | `PERMISSION_VIEW` | — | — |
 | POST | `/access-policies/{policyId}/state` | `setAccessPolicyState` | `PERMISSION_MANAGE` | — | — |
 | GET | `/access-policy-templates` | `listAccessPolicyTemplates` | `PERMISSION_VIEW` | — | — |
-| DELETE | `/auth/guest/account` | `deleteGuestAccount` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/link-checkout` | `linkGuestCheckout` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/otp` | `requestGuestOtp` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/otp/verify` | `verifyGuestOtp` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/register` | `registerGuest` | `—` | — | Guest App, Guest Web |
-| DELETE | `/auth/guest/session` | `guestLogout` | `—` | — | Guest App, Guest Web |
-| GET | `/auth/guest/session` | `getGuestSession` | `—` | ✓ | Guest App, Guest Web |
-| POST | `/auth/guest/social` | `guestSocialLogin` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/uae-pass` | `guestUaePassLogin` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/guest/verify-email` | `verifyGuestEmail` | `GUEST_VIEW` | — | Guest App, Guest Web |
-| POST | `/auth/login` | `login` | `—` | — | Guest App, Guest Web, Partner Web, Scanner, Staff App, Support, TICVAI Web, Venue POS |
-| POST | `/auth/logout` | `logout` | `—` | ✓ | Staff App |
-| POST | `/auth/mfa/challenge` | `createMfaChallenge` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/mfa/challenge/{challengeId}/verify` | `verifyMfaChallenge` | `—` | — | Guest App, Guest Web |
-| GET | `/auth/mfa/methods` | `listMfaMethods` | `—` | — | Guest App, Guest Web, Partner Web, Scanner, Staff App, Support, TICVAI Web |
-| POST | `/auth/mfa/methods` | `enrolMfaMethod` | `—` | — | Guest App, Guest Web |
-| DELETE | `/auth/mfa/methods/{methodId}` | `removeMfaMethod` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/mfa/methods/{methodId}` | `verifyMfaEnrolment` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/refresh` | `refreshToken` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/select-role` | `selectRole` | `—` | — | Scanner, Staff App, Venue POS |
-| GET | `/auth/session` | `getCurrentSession` | `—` | ✓ | Partner Web, Scanner, Staff App, Support, TICVAI Web, Venue POS |
-| GET | `/auth/sessions` | `listActiveSessions` | `SESSION_FORCE_LOGOUT` | — | Partner Web, Support, TICVAI Web, Venue POS |
-| POST | `/auth/sessions/revoke-all` | `revokeAllSessions` | `SESSION_FORCE_LOGOUT` | — | Partner Web, Support, TICVAI Web |
-| POST | `/auth/sessions/{sessionId}/force-logout` | `forceLogout` | `SESSION_FORCE_LOGOUT` | — | Partner Web, Support, TICVAI Web, Venue POS |
-| GET | `/auth/sso/providers` | `listSsoProviders` | `—` | — | Guest App, Guest Web, Partner Web, Scanner, Staff App, Support, TICVAI Web |
-| GET | `/auth/sso/{providerId}/authorize` | `startSsoAuthorization` | `—` | — | Guest App, Guest Web |
-| POST | `/auth/sso/{providerId}/callback` | `completeSsoAuthorization` | `—` | — | Guest App, Guest Web |
-| GET | `/delegated-access` | `listDelegatedAccess` | `PERMISSION_VIEW` | — | Partner Web |
-| POST | `/delegated-access` | `createDelegatedAccess` | `PERMISSION_GRANT` | — | Partner Web |
-| DELETE | `/delegated-access/{delegatedAccessId}` | `deleteDelegatedAccess` | `PERMISSION_GRANT` | — | Partner Web |
-| POST | `/guests/{subjectId}/data-export` | `exportSubjectData` | `GUEST_VIEW_PII` | — | Guest App, Guest Web |
-| GET | `/guests/{subjectId}/delegations` | `listDelegations` | `GUEST_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/guests/{subjectId}/delegations` | `grantDelegation` | `GUEST_MANAGE` | — | Guest App, Guest Web |
-| PUT | `/password-policy` | `setPasswordPolicy` | `TENANT_CONFIGURE` | — | TICVAI Web |
-| POST | `/permissions/resolve` | `resolvePermissions` | `PERMISSION_VIEW` | — | Scanner, Venue Mgmt |
-| GET | `/principals` | `listPrincipals` | `USER_MANAGE` | — | Analytics, Partner Web, TICVAI Web, Venue CMS, Venue Mgmt, Venue POS |
-| POST | `/principals` | `createPrincipal` | `USER_MANAGE` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| GET | `/principals/{principalId}` | `getPrincipal` | `USER_MANAGE` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| PATCH | `/principals/{principalId}` | `updatePrincipal` | `USER_MANAGE` | — | Partner Web, TICVAI Web, Venue Mgmt |
-| GET | `/roles` | `listRoles` | `ROLE_MANAGE` | ✓ | Staff App, TICVAI Web, Venue CMS, Venue Mgmt |
-| POST | `/roles` | `createRole` | `ROLE_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/segregation-rules` | `setSegregationRules` | `ROLE_MANAGE` | — | TICVAI Web |
-| GET | `/tenants/sso-config` | `getSsoConfig` | `USER_MANAGE` | — | TICVAI Web, Venue CMS |
-| PUT | `/tenants/sso-config` | `setSsoConfig` | `USER_MANAGE` | — | TICVAI Web, Venue CMS |
+| DELETE | `/auth/guest/account` | `deleteGuestAccount` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/link-checkout` | `linkGuestCheckout` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/otp` | `requestGuestOtp` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/otp/verify` | `verifyGuestOtp` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/register` | `registerGuest` | `—` | — | guest-app, guest-web |
+| DELETE | `/auth/guest/session` | `guestLogout` | `—` | — | guest-app, guest-web |
+| GET | `/auth/guest/session` | `getGuestSession` | `—` | ✓ | guest-app, guest-web |
+| POST | `/auth/guest/social` | `guestSocialLogin` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/uae-pass` | `guestUaePassLogin` | `—` | — | guest-app, guest-web |
+| POST | `/auth/guest/verify-email` | `verifyGuestEmail` | `GUEST_VIEW` | — | guest-app, guest-web |
+| POST | `/auth/login` | `login` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
+| POST | `/auth/logout` | `logout` | `—` | ✓ | venue-staff-app |
+| POST | `/auth/mfa/challenge` | `createMfaChallenge` | `—` | — | guest-app, guest-web |
+| POST | `/auth/mfa/challenge/{challengeId}/verify` | `verifyMfaChallenge` | `—` | — | guest-app, guest-web |
+| GET | `/auth/mfa/methods` | `listMfaMethods` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-scanner, venue-staff-app, venue-support-web |
+| POST | `/auth/mfa/methods` | `enrolMfaMethod` | `—` | — | guest-app, guest-web |
+| DELETE | `/auth/mfa/methods/{methodId}` | `removeMfaMethod` | `—` | — | guest-app, guest-web |
+| POST | `/auth/mfa/methods/{methodId}` | `verifyMfaEnrolment` | `—` | — | guest-app, guest-web |
+| POST | `/auth/refresh` | `refreshToken` | `—` | — | guest-app, guest-web |
+| POST | `/auth/select-role` | `selectRole` | `—` | — | venue-pos, venue-scanner, venue-staff-app |
+| GET | `/auth/session` | `getCurrentSession` | `—` | ✓ | partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
+| GET | `/auth/sessions` | `listActiveSessions` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-pos, venue-support-web |
+| POST | `/auth/sessions/revoke-all` | `revokeAllSessions` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-support-web |
+| POST | `/auth/sessions/{sessionId}/force-logout` | `forceLogout` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-pos, venue-support-web |
+| GET | `/auth/sso/providers` | `listSsoProviders` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-scanner, venue-staff-app, venue-support-web |
+| GET | `/auth/sso/{providerId}/authorize` | `startSsoAuthorization` | `—` | — | guest-app, guest-web |
+| POST | `/auth/sso/{providerId}/callback` | `completeSsoAuthorization` | `—` | — | guest-app, guest-web |
+| GET | `/delegated-access` | `listDelegatedAccess` | `PERMISSION_VIEW` | — | partner-web |
+| POST | `/delegated-access` | `createDelegatedAccess` | `PERMISSION_GRANT` | — | partner-web |
+| DELETE | `/delegated-access/{delegatedAccessId}` | `deleteDelegatedAccess` | `PERMISSION_GRANT` | — | partner-web |
+| POST | `/guests/{subjectId}/data-export` | `exportSubjectData` | `GUEST_VIEW_PII` | — | guest-app, guest-web |
+| GET | `/guests/{subjectId}/delegations` | `listDelegations` | `GUEST_VIEW` | — | guest-app, guest-web, venue-management-web |
+| POST | `/guests/{subjectId}/delegations` | `grantDelegation` | `GUEST_MANAGE` | — | guest-app, guest-web |
+| PUT | `/password-policy` | `setPasswordPolicy` | `TENANT_CONFIGURE` | — | ticvai-web |
+| POST | `/permissions/resolve` | `resolvePermissions` | `PERMISSION_VIEW` | — | venue-management-web, venue-scanner |
+| GET | `/principals` | `listPrincipals` | `USER_MANAGE` | — | partner-web, ticvai-web, venue-management-web, venue-pos |
+| POST | `/principals` | `createPrincipal` | `USER_MANAGE` | — | partner-web, ticvai-web, venue-management-web |
+| GET | `/principals/{principalId}` | `getPrincipal` | `USER_MANAGE` | — | partner-web, ticvai-web, venue-management-web |
+| PATCH | `/principals/{principalId}` | `updatePrincipal` | `USER_MANAGE` | — | partner-web, ticvai-web, venue-management-web |
+| GET | `/roles` | `listRoles` | `ROLE_MANAGE` | ✓ | ticvai-web, venue-management-web, venue-staff-app |
+| POST | `/roles` | `createRole` | `ROLE_MANAGE` | — | ticvai-web, venue-management-web |
+| PUT | `/segregation-rules` | `setSegregationRules` | `ROLE_MANAGE` | — | ticvai-web |
+| GET | `/tenants/sso-config` | `getSsoConfig` | `USER_MANAGE` | — | ticvai-web, venue-management-web |
+| PUT | `/tenants/sso-config` | `setSsoConfig` | `USER_MANAGE` | — | ticvai-web, venue-management-web |
 
 ### `orders.yaml` — 167 operation(s)
 
@@ -600,173 +600,173 @@ Money moves here. One atomic transaction with entitlement and ledger.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| PUT | `/after-sale-financial` | `setAfterSaleFinancial` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/amendment-after-sale` | `listAmendmentAfterSale` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/amendment-after-sale-2` | `listAmendmentAfterSale2` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/amendment-eligibility-policy` | `setAmendmentEligibilityPolicy` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/b2b-accounts/{accountId}/credit` | `getB2bCredit` | `ORDER_VIEW` | — | Partner Web |
-| PUT | `/b2b-accounts/{accountId}/credit` | `setB2bCreditLimit` | `CREDIT_MANAGE` | — | Partner Web |
-| POST | `/b2b-accounts/{accountId}/credit/override` | `overrideCreditLimit` | `CREDIT_OVERRIDE` | — | Partner Web |
-| GET | `/bulk-group-assisted` | `listBulkGroupAssisted` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/buyer-checkout-inventory` | `listBuyerCheckoutInventory` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/buyer-purchase-resale` | `listBuyerPurchaseResale` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/cancellation-partial-policy` | `setCancellationPartialPolicy` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/capacity-inventory-reconciliation` | `listCapacityInventoryReconciliation` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/capacity-reservation-inventory` | `listCapacityReservationInventory` | `ORDER_VIEW` | — | Venue Mgmt |
-| POST | `/carts` | `createCart` | `—` | — | — |
-| GET | `/carts/abandoned` | `listAbandonedCarts` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| DELETE | `/carts/{cartId}` | `abandonCart` | `—` | — | Guest App, Guest Web |
-| GET | `/carts/{cartId}` | `getCart` | `—` | — | Guest App, Guest Kiosk, Guest Web, Partner Web, Venue POS |
-| POST | `/carts/{cartId}/checkout` | `checkoutCart` | `—` | — | Guest App, Guest Kiosk, Guest Web, Partner Web |
-| POST | `/carts/{cartId}/claim` | `claimCart` | `—` | — | Guest App, Guest Web |
-| POST | `/carts/{cartId}/extend` | `extendCart` | `—` | — | Guest App, Guest Web |
-| POST | `/carts/{cartId}/lines` | `addCartLine` | `—` | — | Guest App, Guest Kiosk, Guest Web, Partner Web, Venue POS |
-| DELETE | `/carts/{cartId}/lines/{lineId}` | `removeCartLine` | `—` | — | Guest App, Guest Web, Partner Web |
-| PATCH | `/carts/{cartId}/lines/{lineId}` | `updateCartLine` | `—` | — | Guest App, Guest Web, Partner Web |
-| GET | `/chargebacks` | `listChargebacks` | `ORDER_REFUND_APPROVE` | — | TICVAI Web |
-| POST | `/chargebacks/{chargebackId}/respond` | `respondToChargeback` | `ORDER_REFUND_APPROVE` | — | TICVAI Web |
-| GET | `/create-listing-resale` | `listCreateListingResale` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/credential-revocation-regeneration` | `listCredentialRevocationRegeneration` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/customer-guest-account` | `setCustomerGuestAccount` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/deposit-partial-payment` | `listDepositPartialPayment` | `ORDER_VIEW` | — | Venue Mgmt |
-| POST | `/entitlements/{entitlementId}/reissue` | `reissueEntitlement` | `ORDER_EXCHANGE` | — | Venue POS |
-| POST | `/entitlements/{entitlementId}/share` | `shareEntitlement` | `ORDER_MODIFY` | — | Guest App, Guest Web |
-| PUT | `/exception-service-recovery` | `approveExceptionServiceRecovery` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/external-payment-partner` | `listExternalPaymentPartner` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/fee-seller-proceed` | `listFeeSellerProceed` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/financial-traceability` | `listFinancialTraceability` | `ORDER_VIEW` | — | Venue Mgmt |
+| PUT | `/after-sale-financial` | `setAfterSaleFinancial` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/amendment-after-sale` | `listAmendmentAfterSale` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/amendment-after-sale-2` | `listAmendmentAfterSale2` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/amendment-eligibility-policy` | `setAmendmentEligibilityPolicy` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/b2b-accounts/{accountId}/credit` | `getB2bCredit` | `ORDER_VIEW` | — | partner-web |
+| PUT | `/b2b-accounts/{accountId}/credit` | `setB2bCreditLimit` | `CREDIT_MANAGE` | — | partner-web |
+| POST | `/b2b-accounts/{accountId}/credit/override` | `overrideCreditLimit` | `CREDIT_OVERRIDE` | — | partner-web |
+| GET | `/bulk-group-assisted` | `listBulkGroupAssisted` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/buyer-checkout-inventory` | `listBuyerCheckoutInventory` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/buyer-purchase-resale` | `listBuyerPurchaseResale` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/cancellation-partial-policy` | `setCancellationPartialPolicy` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/capacity-inventory-reconciliation` | `listCapacityInventoryReconciliation` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/capacity-reservation-inventory` | `listCapacityReservationInventory` | `ORDER_VIEW` | — | venue-management-web |
+| POST | `/carts` | `createCart` | `—` | — | guest-web |
+| GET | `/carts/abandoned` | `listAbandonedCarts` | `MARKETING_MANAGE` | — | venue-management-web |
+| DELETE | `/carts/{cartId}` | `abandonCart` | `—` | — | guest-app, guest-web |
+| GET | `/carts/{cartId}` | `getCart` | `—` | — | guest-app, guest-web, partner-web, venue-pos |
+| POST | `/carts/{cartId}/checkout` | `checkoutCart` | `—` | — | guest-app, guest-web, partner-web |
+| POST | `/carts/{cartId}/claim` | `claimCart` | `—` | — | guest-app, guest-web |
+| POST | `/carts/{cartId}/extend` | `extendCart` | `—` | — | guest-app, guest-web |
+| POST | `/carts/{cartId}/lines` | `addCartLine` | `—` | — | guest-app, guest-web, partner-web, venue-pos |
+| DELETE | `/carts/{cartId}/lines/{lineId}` | `removeCartLine` | `—` | — | guest-app, guest-web, partner-web |
+| PATCH | `/carts/{cartId}/lines/{lineId}` | `updateCartLine` | `—` | — | guest-app, guest-web, partner-web |
+| GET | `/chargebacks` | `listChargebacks` | `ORDER_REFUND_APPROVE` | — | ticvai-web |
+| POST | `/chargebacks/{chargebackId}/respond` | `respondToChargeback` | `ORDER_REFUND_APPROVE` | — | ticvai-web |
+| GET | `/create-listing-resale` | `listCreateListingResale` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/credential-revocation-regeneration` | `listCredentialRevocationRegeneration` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/customer-guest-account` | `setCustomerGuestAccount` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/deposit-partial-payment` | `listDepositPartialPayment` | `ORDER_VIEW` | — | venue-management-web |
+| POST | `/entitlements/{entitlementId}/reissue` | `reissueEntitlement` | `ORDER_EXCHANGE` | — | venue-pos |
+| POST | `/entitlements/{entitlementId}/share` | `shareEntitlement` | `ORDER_MODIFY` | — | guest-app, guest-web |
+| PUT | `/exception-service-recovery` | `approveExceptionServiceRecovery` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/external-payment-partner` | `listExternalPaymentPartner` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/fee-seller-proceed` | `listFeeSellerProceed` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/financial-traceability` | `listFinancialTraceability` | `ORDER_VIEW` | — | venue-management-web |
 | GET | `/fraud-rules` | `listFraudRules` | `ORDER_VIEW` | — | — |
 | PUT | `/fraud-rules` | `setFraudRules` | `ORDER_MODIFY` | — | — |
-| GET | `/group-amendment-cancellation` | `listGroupAmendmentCancellation` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-arrival-check` | `listGroupArrivalCheck` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-booking` | `listGroupBooking` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/group-booking-handover` | `setGroupBookingHandover` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/group-booking-reconciliation` | `listGroupBookingReconciliation` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-bookings/{groupBookingId}` | `getGroupBooking` | `ORDER_VIEW` | — | Guest App, Guest Web |
-| GET | `/group-customer-organization` | `listGroupCustomerOrganization` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/group-discount-exception` | `approveGroupDiscountException` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/group-enquiry-opportunity` | `listGroupEnquiryOpportunity` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/group-operational-planning` | `setGroupOperationalPlanning` | `ORDER_CREATE` | — | Venue Mgmt |
-| PUT | `/group-package-experience` | `setGroupPackageExperience` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/group-payment-deposit` | `listGroupPaymentDeposit` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/group-quotation-proposal` | `setGroupQuotationProposal` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/group-requirement-availability` | `listGroupRequirementAvailability` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-sale` | `listGroupSale` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-sale-2` | `listGroupSale2` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-ticket-fulfillment` | `listGroupTicketFulfillment` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/group-ticket-seat` | `listGroupTicketSeat` | `ORDER_VIEW` | — | Venue Mgmt |
+| GET | `/group-amendment-cancellation` | `listGroupAmendmentCancellation` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-arrival-check` | `listGroupArrivalCheck` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-booking` | `listGroupBooking` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/group-booking-handover` | `setGroupBookingHandover` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/group-booking-reconciliation` | `listGroupBookingReconciliation` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-bookings/{groupBookingId}` | `getGroupBooking` | `ORDER_VIEW` | — | guest-app, guest-web |
+| GET | `/group-customer-organization` | `listGroupCustomerOrganization` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/group-discount-exception` | `approveGroupDiscountException` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/group-enquiry-opportunity` | `listGroupEnquiryOpportunity` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/group-operational-planning` | `setGroupOperationalPlanning` | `ORDER_CREATE` | — | venue-management-web |
+| PUT | `/group-package-experience` | `setGroupPackageExperience` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/group-payment-deposit` | `listGroupPaymentDeposit` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/group-quotation-proposal` | `setGroupQuotationProposal` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/group-requirement-availability` | `listGroupRequirementAvailability` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-sale` | `listGroupSale` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-sale-2` | `listGroupSale2` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-ticket-fulfillment` | `listGroupTicketFulfillment` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/group-ticket-seat` | `listGroupTicketSeat` | `ORDER_VIEW` | — | venue-management-web |
 | POST | `/guest-credit-accounts` | `openGuestCreditAccount` | `ORDER_CREATE` | — | — |
 | POST | `/invitations` | `issueInvitation` | `ORDER_CREATE` | — | — |
 | GET | `/invitations/allowances` | `listInvitationAllowances` | `ORDER_VIEW` | — | — |
-| GET | `/listing-lifecycle-expiry` | `listListingLifecycleExpiry` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/listing-moderation` | `approveListingModeration` | `ORDER_CREATE` | — | TICVAI Web |
-| POST | `/listing-seller` | `createListingSeller` | `ORDER_CREATE` | — | TICVAI Web |
-| GET | `/media/{mediaCode}/entitlements` | `getMediaEntitlements` | `ORDER_VIEW` | ✓ | Staff App, Venue CMS, Venue Mgmt, Venue POS |
-| POST | `/media/{mediaCode}/entitlements` | `appendEntitlementToMedia` | `ORDER_CREATE` | — | Staff App, Venue CMS, Venue Mgmt, Venue POS |
-| PUT | `/multi-payment-split` | `setMultiPaymentSplit` | `ORDER_CREATE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/my/orders` | `listMyOrders` | `—` | — | Guest App, Guest Web |
-| GET | `/official-resale-marketplace` | `listOfficialResaleMarketplace` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/order-amendment` | `setOrderAmendment` | `ORDER_CREATE` | — | Venue Mgmt |
-| PUT | `/order-detail-transaction` | `setOrderDetailTransaction` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/order-financial-reconciliation` | `listOrderFinancialReconciliation` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/order-lifecycle-timeline` | `listOrderLifecycleTimeline` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/order-line-product` | `listOrderLineProduct` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/order-payment-detail` | `listOrderPaymentDetail` | `ORDER_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/order-reservation` | `listOrderReservation` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/order-reservation-statu` | `setOrderReservationStatus` | `ORDER_CREATE` | — | Venue Mgmt |
-| POST | `/order-source-channel` | `createOrderSourceChannel` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/order-split-merge` | `listOrderSplitMerge` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/orders` | `listOrders` | `ORDER_VIEW` | ✓ | Analytics, Guest App, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders` | `createOrder` | `ORDER_CREATE` | ✓ | Guest App, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/orders/{orderId}` | `getOrder` | `ORDER_VIEW` | ✓ | Guest App, Guest Kiosk, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
+| GET | `/listing-lifecycle-expiry` | `listListingLifecycleExpiry` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/listing-moderation` | `approveListingModeration` | `ORDER_CREATE` | — | ticvai-web |
+| POST | `/listing-seller` | `createListingSeller` | `ORDER_CREATE` | — | ticvai-web |
+| GET | `/media/{mediaCode}/entitlements` | `getMediaEntitlements` | `ORDER_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/media/{mediaCode}/entitlements` | `appendEntitlementToMedia` | `ORDER_CREATE` | — | venue-management-web, venue-pos, venue-staff-app |
+| PUT | `/multi-payment-split` | `setMultiPaymentSplit` | `ORDER_CREATE` | — | ticvai-web, venue-management-web |
+| GET | `/my/orders` | `listMyOrders` | `—` | — | guest-app, guest-web |
+| GET | `/official-resale-marketplace` | `listOfficialResaleMarketplace` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/order-amendment` | `setOrderAmendment` | `ORDER_CREATE` | — | venue-management-web |
+| PUT | `/order-detail-transaction` | `setOrderDetailTransaction` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/order-financial-reconciliation` | `listOrderFinancialReconciliation` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/order-lifecycle-timeline` | `listOrderLifecycleTimeline` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/order-line-product` | `listOrderLineProduct` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/order-payment-detail` | `listOrderPaymentDetail` | `ORDER_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/order-reservation` | `listOrderReservation` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/order-reservation-statu` | `setOrderReservationStatus` | `ORDER_CREATE` | — | venue-management-web |
+| POST | `/order-source-channel` | `createOrderSourceChannel` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/order-split-merge` | `listOrderSplitMerge` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/orders` | `listOrders` | `ORDER_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders` | `createOrder` | `ORDER_CREATE` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/orders/{orderId}` | `getOrder` | `ORDER_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
 | POST | `/orders/{orderId}/convert-to-term` | `convertToTermProduct` | `ORDER_MODIFY` | — | — |
-| POST | `/orders/{orderId}/discounts` | `applyManualDiscount` | `ORDER_DISCOUNT` | ✓ | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/exchanges` | `exchangeOrderLines` | `ORDER_EXCHANGE` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/hold` | `holdOrder` | `ORDER_MODIFY` | ✓ | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/modify` | `modifyOrder` | `ORDER_MODIFY` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/orders/{orderId}/refunds` | `listOrderRefunds` | `ORDER_VIEW` | ✓ | Partner Web, Staff App, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/refunds` | `createRefund` | `ORDER_REFUND` | — | Partner Web, Staff App, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/reprints` | `reprintOrder` | `ORDER_REPRINT` | ✓ | Guest App, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/reschedule` | `rescheduleOrder` | `ORDER_RESCHEDULE` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/resume` | `resumeOrder` | `ORDER_MODIFY` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/split` | `splitOrder` | `ORDER_MODIFY` | — | — |
-| GET | `/orders/{orderId}/statement` | `getOrderStatement` | `ORDER_VIEW` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/orders/{orderId}/transfer` | `transferOrderTickets` | `—` | — | Guest App, Guest Kiosk, Guest Web |
-| POST | `/orders/{orderId}/upgrade-quote` | `quoteUpgrade` | `ORDER_MODIFY` | — | TICVAI Web |
-| POST | `/orders/{orderId}/voids` | `voidOrder` | `ORDER_VOID` | ✓ | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/participant-guest-list` | `listParticipantGuestList` | `ORDER_VIEW` | — | Venue Mgmt |
-| POST | `/payment-links` | `createPaymentLink` | `ORDER_CREATE` | — | TICVAI Web |
-| POST | `/payment-links/{linkId}/resend` | `resendPaymentLink` | `ORDER_MODIFY` | — | TICVAI Web |
-| GET | `/payment-links/{token}` | `getPaymentLink` | `ORDER_VIEW` | — | Guest App, Guest Web, TICVAI Web |
-| POST | `/payment-links/{token}/pay` | `payByLink` | `ORDER_CREATE` | — | Guest App, Guest Web |
-| GET | `/payment-order-financial` | `listPaymentOrderFinancial` | `ORDER_VIEW` | — | Venue Mgmt |
+| POST | `/orders/{orderId}/discounts` | `applyManualDiscount` | `ORDER_DISCOUNT` | ✓ | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/exchanges` | `exchangeOrderLines` | `ORDER_EXCHANGE` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/hold` | `holdOrder` | `ORDER_MODIFY` | ✓ | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/modify` | `modifyOrder` | `ORDER_MODIFY` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/orders/{orderId}/refunds` | `listOrderRefunds` | `ORDER_VIEW` | ✓ | partner-web, ticvai-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/refunds` | `createRefund` | `ORDER_REFUND` | — | partner-web, ticvai-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/reprints` | `reprintOrder` | `ORDER_REPRINT` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/reschedule` | `rescheduleOrder` | `ORDER_RESCHEDULE` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/resume` | `resumeOrder` | `ORDER_MODIFY` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/split` | `splitOrder` | `ORDER_MODIFY` | — | venue-staff-app |
+| GET | `/orders/{orderId}/statement` | `getOrderStatement` | `ORDER_VIEW` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/orders/{orderId}/transfer` | `transferOrderTickets` | `—` | — | guest-app, guest-web |
+| POST | `/orders/{orderId}/upgrade-quote` | `quoteUpgrade` | `ORDER_MODIFY` | — | ticvai-web |
+| POST | `/orders/{orderId}/voids` | `voidOrder` | `ORDER_VOID` | ✓ | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/participant-guest-list` | `listParticipantGuestList` | `ORDER_VIEW` | — | venue-management-web |
+| POST | `/payment-links` | `createPaymentLink` | `ORDER_CREATE` | — | ticvai-web |
+| POST | `/payment-links/{linkId}/resend` | `resendPaymentLink` | `ORDER_MODIFY` | — | ticvai-web |
+| GET | `/payment-links/{token}` | `getPaymentLink` | `ORDER_VIEW` | — | guest-app, guest-web, ticvai-web |
+| POST | `/payment-links/{token}/pay` | `payByLink` | `ORDER_CREATE` | — | guest-app, guest-web |
+| GET | `/payment-order-financial` | `listPaymentOrderFinancial` | `ORDER_VIEW` | — | venue-management-web |
 | GET | `/payment-providers` | `listPaymentProviders` | `ORDER_VIEW` | — | — |
-| PUT | `/payment-providers` | `setPaymentProvider` | `TENANT_CONFIGURE` | — | Sign-up, TICVAI Web |
-| GET | `/payment-reconciliation-exception` | `listPaymentReconciliationException` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/payment-tokens` | `listPaymentTokens` | `ORDER_VIEW` | — | Guest App, Guest Web |
-| POST | `/payment-tokens` | `storePaymentToken` | `ORDER_CREATE` | — | Guest App, Guest Web |
-| POST | `/payments` | `createPayment` | `ORDER_CREATE` | ✓ | Guest App, Guest Kiosk, Guest Web, Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/payments/{paymentId}/capture` | `capturePayment` | `ORDER_CREATE` | — | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/payments/{paymentId}/inquiry` | `inquirePaymentStatus` | `ORDER_CREATE` | — | Guest App, Guest Kiosk, Guest Web, Partner Web, Staff App, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/payments/{paymentId}/tip` | `addTip` | `ORDER_MODIFY` | ✓ | Partner Web, Staff App, Venue Mgmt, Venue POS |
-| POST | `/payments/{paymentId}/void` | `voidPayment` | `PAYMENT_VOID` | — | TICVAI Web |
-| GET | `/person-type-product` | `listPersonTypeProduct` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/pro-rata-residual` | `setProRataResidual` | `ORDER_CREATE` | — | TICVAI Web |
-| GET | `/quote-booking-conversion` | `listQuoteBookingConversion` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/quote-revision-negotiation` | `listQuoteRevisionNegotiation` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/refund-dispute-resale` | `listRefundDisputeResale` | `ORDER_VIEW` | — | TICVAI Web |
-| POST | `/refund-requests` | `createRefundRequest` | `—` | — | Guest App, Guest Web, TICVAI Web, Venue Mgmt |
-| POST | `/refunds/bulk` | `createBulkRefund` | `ORDER_REFUND_BULK` | — | Venue Mgmt |
-| POST | `/refunds/{refundId}/approve` | `approveRefund` | `ORDER_REFUND_APPROVE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/related-order-transaction` | `listRelatedOrderTransaction` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/resale` | `listResale` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-2` | `listResale2` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-confirmation-ownership` | `listResaleConfirmationOwnership` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/resale-eligibility-rule` | `setResaleEligibilityRule` | `ORDER_CREATE` | — | TICVAI Web |
-| GET | `/resale-eligibility-ticket` | `listResaleEligibilityTicket` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-fee-commission` | `listResaleFeeCommission` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-fraud-duplicate` | `listResaleFraudDuplicate` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-inventory-availability` | `listResaleInventoryAvailability` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-listing-seller` | `listResaleListingSeller` | `ORDER_VIEW` | — | TICVAI Web |
-| POST | `/resale-listings` | `createResaleListing` | `ORDER_CREATE` | — | Guest App, Guest Web |
-| GET | `/resale-marketplace` | `listResaleMarketplace` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/resale-marketplace-recommendation` | `setResaleMarketplaceRecommendation` | `ORDER_CREATE` | — | TICVAI Web |
-| GET | `/resale-ownership` | `listResaleOwnership` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-policy-marketplace` | `listResalePolicyMarketplace` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-pricing-price` | `listResalePricingPrice` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/resale-ticket-detail` | `listResaleTicketDetail` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/reservation-confirmation-expiry` | `listReservationConfirmationExpiry` | `ORDER_VIEW` | — | Venue Mgmt |
-| PUT | `/reservation-hold-policy` | `setReservationHoldPolicy` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/reservations` | `listReservations` | `ORDER_VIEW` | — | Guest App, Guest Web |
+| PUT | `/payment-providers` | `setPaymentProvider` | `TENANT_CONFIGURE` | — | signup-web, ticvai-web |
+| GET | `/payment-reconciliation-exception` | `listPaymentReconciliationException` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/payment-tokens` | `listPaymentTokens` | `ORDER_VIEW` | — | guest-app, guest-web |
+| POST | `/payment-tokens` | `storePaymentToken` | `ORDER_CREATE` | — | guest-app, guest-web |
+| POST | `/payments` | `createPayment` | `ORDER_CREATE` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/payments/{paymentId}/capture` | `capturePayment` | `ORDER_CREATE` | — | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/payments/{paymentId}/inquiry` | `inquirePaymentStatus` | `ORDER_CREATE` | — | guest-app, guest-web, partner-web, ticvai-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/payments/{paymentId}/tip` | `addTip` | `ORDER_MODIFY` | ✓ | partner-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/payments/{paymentId}/void` | `voidPayment` | `PAYMENT_VOID` | — | ticvai-web |
+| GET | `/person-type-product` | `listPersonTypeProduct` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/pro-rata-residual` | `setProRataResidual` | `ORDER_CREATE` | — | ticvai-web |
+| GET | `/quote-booking-conversion` | `listQuoteBookingConversion` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/quote-revision-negotiation` | `listQuoteRevisionNegotiation` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/refund-dispute-resale` | `listRefundDisputeResale` | `ORDER_VIEW` | — | ticvai-web |
+| POST | `/refund-requests` | `createRefundRequest` | `—` | — | guest-app, guest-web, ticvai-web, venue-management-web |
+| POST | `/refunds/bulk` | `createBulkRefund` | `ORDER_REFUND_BULK` | — | venue-management-web |
+| POST | `/refunds/{refundId}/approve` | `approveRefund` | `ORDER_REFUND_APPROVE` | — | ticvai-web, venue-management-web |
+| GET | `/related-order-transaction` | `listRelatedOrderTransaction` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/resale` | `listResale` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-2` | `listResale2` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-confirmation-ownership` | `listResaleConfirmationOwnership` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/resale-eligibility-rule` | `setResaleEligibilityRule` | `ORDER_CREATE` | — | ticvai-web |
+| GET | `/resale-eligibility-ticket` | `listResaleEligibilityTicket` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-fee-commission` | `listResaleFeeCommission` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-fraud-duplicate` | `listResaleFraudDuplicate` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-inventory-availability` | `listResaleInventoryAvailability` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-listing-seller` | `listResaleListingSeller` | `ORDER_VIEW` | — | ticvai-web |
+| POST | `/resale-listings` | `createResaleListing` | `ORDER_CREATE` | — | guest-app, guest-web |
+| GET | `/resale-marketplace` | `listResaleMarketplace` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/resale-marketplace-recommendation` | `setResaleMarketplaceRecommendation` | `ORDER_CREATE` | — | ticvai-web |
+| GET | `/resale-ownership` | `listResaleOwnership` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-policy-marketplace` | `listResalePolicyMarketplace` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-pricing-price` | `listResalePricingPrice` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/resale-ticket-detail` | `listResaleTicketDetail` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/reservation-confirmation-expiry` | `listReservationConfirmationExpiry` | `ORDER_VIEW` | — | venue-management-web |
+| PUT | `/reservation-hold-policy` | `setReservationHoldPolicy` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/reservations` | `listReservations` | `ORDER_VIEW` | — | guest-app, guest-web |
 | POST | `/reservations` | `createReservation` | `ORDER_CREATE` | — | — |
-| DELETE | `/reservations/{reservationId}` | `cancelReservation` | `ORDER_CANCEL` | — | Guest App, Guest Web |
-| GET | `/reservations/{reservationId}` | `getReservation` | `ORDER_VIEW` | — | Guest App, Guest Web |
+| DELETE | `/reservations/{reservationId}` | `cancelReservation` | `ORDER_CANCEL` | — | guest-app, guest-web |
+| GET | `/reservations/{reservationId}` | `getReservation` | `ORDER_VIEW` | — | guest-app, guest-web |
 | POST | `/reservations/{reservationId}/convert` | `convertReservation` | `ORDER_CREATE` | — | — |
 | POST | `/reservations/{reservationId}/extend` | `extendReservation` | `ORDER_CREATE` | — | — |
-| GET | `/seller-settlement-payout` | `listSellerSettlementPayout` | `ORDER_VIEW` | — | TICVAI Web |
-| POST | `/stored-value/authorisations` | `authoriseStoredValue` | `ORDER_CREATE` | — | Venue Mgmt |
-| POST | `/stored-value/authorisations/{authorisationId}/capture` | `captureStoredValue` | `ORDER_CREATE` | — | — |
-| POST | `/stored-value/authorisations/{authorisationId}/release` | `relinquishStoredValue` | `ORDER_CREATE` | — | Venue Mgmt |
-| POST | `/sync/orders` | `syncOrders` | `ORDER_CREATE` | — | Scanner, Staff App, Venue Mgmt, Venue POS |
-| GET | `/sync/rejections` | `listSyncRejections` | `ORDER_VIEW` | — | Scanner, Staff App, Venue Mgmt |
-| GET | `/ticket-ownership-transfer` | `listTicketOwnershipTransfer` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/ticket-reissue-fulfillment` | `listTicketReissueFulfillment` | `ORDER_VIEW` | — | Venue Mgmt |
-| GET | `/ticket-resale-marketplace` | `listTicketResaleMarketplace` | `ORDER_VIEW` | — | TICVAI Web |
+| GET | `/seller-settlement-payout` | `listSellerSettlementPayout` | `ORDER_VIEW` | — | ticvai-web |
+| POST | `/stored-value/authorisations` | `authoriseStoredValue` | `ORDER_CREATE` | — | venue-management-web |
+| POST | `/stored-value/authorisations/{authorisationId}/capture` | `captureStoredValue` | `ORDER_CREATE` | — | venue-management-web |
+| POST | `/stored-value/authorisations/{authorisationId}/release` | `relinquishStoredValue` | `ORDER_CREATE` | — | venue-management-web |
+| POST | `/sync/orders` | `syncOrders` | `ORDER_CREATE` | — | venue-management-web, venue-pos, venue-scanner, venue-staff-app |
+| GET | `/sync/rejections` | `listSyncRejections` | `ORDER_VIEW` | — | venue-management-web, venue-scanner, venue-staff-app |
+| GET | `/ticket-ownership-transfer` | `listTicketOwnershipTransfer` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/ticket-reissue-fulfillment` | `listTicketReissueFulfillment` | `ORDER_VIEW` | — | venue-management-web |
+| GET | `/ticket-resale-marketplace` | `listTicketResaleMarketplace` | `ORDER_VIEW` | — | ticvai-web |
 | POST | `/ticket-templates/{templateId}/proof` | `printTicketProof` | `ORDER_REPRINT` | ✓ | — |
-| POST | `/ticket-transfers/{transferId}/claim` | `claimTicketTransfer` | `—` | — | Guest App, Guest Web |
-| GET | `/upgrade-conversion` | `listUpgradeConversion` | `ORDER_VIEW` | — | TICVAI Web |
-| PUT | `/upgrade-conversion-path` | `setUpgradeConversionPath` | `ORDER_CREATE` | — | TICVAI Web |
-| POST | `/upgrade-credential-regeneration` | `createUpgradeCredentialRegeneration` | `ORDER_CREATE` | — | TICVAI Web |
-| GET | `/upgrade-eligibility-qualification` | `listUpgradeEligibilityQualification` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/upgrade-exception` | `listUpgradeException` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/upgrade-financial-treatment` | `listUpgradeFinancialTreatment` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/upgrade-timing-usage` | `listUpgradeTimingUsage` | `ORDER_VIEW` | — | TICVAI Web |
-| GET | `/venues/{venueId}/refund-policy` | `getRefundPolicy` | `ORDER_VIEW` | ✓ | TICVAI Web, Venue Mgmt |
-| PUT | `/venues/{venueId}/refund-policy` | `setRefundPolicy` | `REGION_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/void-reversal-same` | `listVoidReversalSame` | `ORDER_VIEW` | — | Venue Mgmt |
-| POST | `/wallet-passes` | `issueWalletPass` | `ORDER_VIEW` | — | Guest App, Guest Web |
+| POST | `/ticket-transfers/{transferId}/claim` | `claimTicketTransfer` | `—` | — | guest-app, guest-web |
+| GET | `/upgrade-conversion` | `listUpgradeConversion` | `ORDER_VIEW` | — | ticvai-web |
+| PUT | `/upgrade-conversion-path` | `setUpgradeConversionPath` | `ORDER_CREATE` | — | ticvai-web |
+| POST | `/upgrade-credential-regeneration` | `createUpgradeCredentialRegeneration` | `ORDER_CREATE` | — | ticvai-web |
+| GET | `/upgrade-eligibility-qualification` | `listUpgradeEligibilityQualification` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/upgrade-exception` | `listUpgradeException` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/upgrade-financial-treatment` | `listUpgradeFinancialTreatment` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/upgrade-timing-usage` | `listUpgradeTimingUsage` | `ORDER_VIEW` | — | ticvai-web |
+| GET | `/venues/{venueId}/refund-policy` | `getRefundPolicy` | `ORDER_VIEW` | ✓ | ticvai-web, venue-management-web |
+| PUT | `/venues/{venueId}/refund-policy` | `setRefundPolicy` | `REGION_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/void-reversal-same` | `listVoidReversalSame` | `ORDER_VIEW` | — | venue-management-web |
+| POST | `/wallet-passes` | `issueWalletPass` | `ORDER_VIEW` | — | guest-app, guest-web |
 | POST | `/wallet-passes/{passId}/push` | `pushWalletPassUpdate` | `ORDER_MODIFY` | — | — |
-| GET | `/white-label-marketplace` | `listWhiteLabelMarketplace` | `ORDER_VIEW` | — | TICVAI Web |
+| GET | `/white-label-marketplace` | `listWhiteLabelMarketplace` | `ORDER_VIEW` | — | ticvai-web |
 
 ### `shift.yaml` — 19 operation(s)
 
@@ -774,25 +774,25 @@ Cash reconciles to a drawer and a person.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/denominations` | `listDenominations` | `SHIFT_OPEN` | ✓ | Venue POS |
-| GET | `/deposit-boxes` | `listDepositBoxes` | `SHIFT_OPEN` | ✓ | Venue POS |
-| POST | `/deposit-boxes` | `allocateDepositBox` | `SHIFT_OPEN` | ✓ | Venue POS |
-| POST | `/deposit-boxes/close` | `closeDepositBoxes` | `SHIFT_CLOSE` | — | Venue Mgmt, Venue POS |
-| POST | `/deposit-boxes/{boxId}/adjust-float` | `adjustDepositBoxFloat` | `CASH_ADD` | — | Venue POS |
-| POST | `/deposit-boxes/{boxId}/withdraw` | `withdrawFromDepositBox` | `CASH_LIFT` | ✓ | Venue POS |
-| GET | `/shifts` | `listShifts` | `REPORT_VIEW_WORKSTATION` | — | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts` | `openShift` | `SHIFT_OPEN` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| GET | `/shifts/current` | `getCurrentShift` | `SHIFT_OPEN` | ✓ | Scanner, Staff App, Venue Mgmt, Venue POS |
-| GET | `/shifts/{shiftId}` | `getShift` | `REPORT_VIEW_WORKSTATION` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/accept-variance` | `acceptShiftVariance` | `OVERSHORT_ACCEPT` | — | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/approve-open` | `approveShiftOpen` | `SHIFT_APPROVE_OPEN` | — | Staff App, Venue Mgmt, Venue POS |
-| GET | `/shifts/{shiftId}/cash-movements` | `listCashMovements` | `REPORT_VIEW_WORKSTATION` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/cash-movements` | `createCashMovement` | `CASH_LIFT` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/close` | `closeShift` | `SHIFT_CLOSE` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/no-sale` | `recordNoSale` | `SHIFT_SUSPEND` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/reopen` | `reopenShift` | `SHIFT_REOPEN` | — | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/resume` | `resumeShift` | `SHIFT_OPEN` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/shifts/{shiftId}/suspend` | `suspendShift` | `SHIFT_SUSPEND` | ✓ | Staff App, Venue Mgmt, Venue POS |
+| GET | `/denominations` | `listDenominations` | `SHIFT_OPEN` | ✓ | venue-pos |
+| GET | `/deposit-boxes` | `listDepositBoxes` | `SHIFT_OPEN` | ✓ | venue-pos |
+| POST | `/deposit-boxes` | `allocateDepositBox` | `SHIFT_OPEN` | ✓ | venue-pos |
+| POST | `/deposit-boxes/close` | `closeDepositBoxes` | `SHIFT_CLOSE` | — | venue-management-web, venue-pos |
+| POST | `/deposit-boxes/{boxId}/adjust-float` | `adjustDepositBoxFloat` | `CASH_ADD` | — | venue-pos |
+| POST | `/deposit-boxes/{boxId}/withdraw` | `withdrawFromDepositBox` | `CASH_LIFT` | ✓ | venue-pos |
+| GET | `/shifts` | `listShifts` | `REPORT_VIEW_WORKSTATION` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts` | `openShift` | `SHIFT_OPEN` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| GET | `/shifts/current` | `getCurrentShift` | `SHIFT_OPEN` | ✓ | venue-management-web, venue-pos, venue-scanner, venue-staff-app |
+| GET | `/shifts/{shiftId}` | `getShift` | `REPORT_VIEW_WORKSTATION` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/accept-variance` | `acceptShiftVariance` | `OVERSHORT_ACCEPT` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/approve-open` | `approveShiftOpen` | `SHIFT_APPROVE_OPEN` | — | venue-management-web, venue-pos, venue-staff-app |
+| GET | `/shifts/{shiftId}/cash-movements` | `listCashMovements` | `REPORT_VIEW_WORKSTATION` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/cash-movements` | `createCashMovement` | `CASH_LIFT` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/close` | `closeShift` | `SHIFT_CLOSE` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/no-sale` | `recordNoSale` | `SHIFT_SUSPEND` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/reopen` | `reopenShift` | `SHIFT_REOPEN` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/resume` | `resumeShift` | `SHIFT_OPEN` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/shifts/{shiftId}/suspend` | `suspendShift` | `SHIFT_SUSPEND` | ✓ | venue-management-web, venue-pos, venue-staff-app |
 
 ### `tenancy.yaml` — 38 operation(s)
 
@@ -800,44 +800,44 @@ Defines where everything else lives.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/audit-records` | `listAuditRecords` | `AI_AUDIT_VIEW` | — | Venue Mgmt |
-| PUT | `/configuration-profiles` | `setConfigurationProfile` | `TENANT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/configuration-profiles/{profileId}/deploy` | `deployConfigurationProfile` | `TENANT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/connectivity-policy` | `setConnectivityThresholds` | `TENANT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/audit-records` | `listAuditRecords` | `AI_AUDIT_VIEW` | — | venue-management-web |
+| PUT | `/configuration-profiles` | `setConfigurationProfile` | `TENANT_CONFIGURE` | — | venue-management-web |
+| POST | `/configuration-profiles/{profileId}/deploy` | `deployConfigurationProfile` | `TENANT_CONFIGURE` | — | venue-management-web |
+| PUT | `/connectivity-policy` | `setConnectivityThresholds` | `TENANT_CONFIGURE` | — | venue-management-web |
 | GET | `/device-firmware` | `listDeviceFirmware` | `DEVICE_VIEW` | — | — |
 | POST | `/device-firmware/rollouts` | `startDeviceFirmwareRollout` | `DEVICE_MANAGE` | — | — |
 | POST | `/device-firmware/rollouts/{rolloutId}/rollback` | `rollbackDeviceFirmware` | `DEVICE_MANAGE` | — | — |
 | GET | `/device-tamper-events` | `listDeviceTamperEvents` | `DEVICE_VIEW` | — | — |
 | POST | `/device-tamper-events` | `recordDeviceTamperEvent` | `DEVICE_VIEW` | ✓ | — |
-| GET | `/devices` | `listDevices` | `DEVICE_VIEW` | ✓ | Analytics, Staff App, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/devices` | `registerDevice` | `DEVICE_CONFIGURE` | — | Staff App, Venue Mgmt |
-| PUT | `/devices/{deviceId}/assignment` | `setDeviceAssignment` | `DEVICE_MANAGE` | — | TICVAI Web |
+| GET | `/devices` | `listDevices` | `DEVICE_VIEW` | ✓ | ticvai-web, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/devices` | `registerDevice` | `DEVICE_CONFIGURE` | — | venue-management-web, venue-staff-app |
+| PUT | `/devices/{deviceId}/assignment` | `setDeviceAssignment` | `DEVICE_MANAGE` | — | ticvai-web |
 | GET | `/devices/{deviceId}/audit` | `listDeviceAuditRecords` | `DEVICE_VIEW` | — | — |
 | DELETE | `/devices/{deviceId}/credentials` | `revokeDeviceCredential` | `DEVICE_MANAGE` | — | — |
 | POST | `/devices/{deviceId}/credentials` | `issueDeviceCredential` | `DEVICE_MANAGE` | — | — |
-| POST | `/devices/{deviceId}/enrolment` | `enrolDevice` | `DEVICE_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| POST | `/devices/{deviceId}/heartbeat` | `recordDeviceHeartbeat` | `—` | — | Venue Mgmt, Venue POS |
-| GET | `/devices/{deviceId}/telemetry` | `getDeviceTelemetry` | `DEVICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/offline-policy` | `setOfflinePolicy` | `TENANT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/org-units` | `listOrgUnits` | `SCOPE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| POST | `/org-units` | `createOrgUnit` | `SCOPE_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/org-units/{orgUnitId}` | `getOrgUnit` | `SCOPE_VIEW` | — | Venue Mgmt |
-| PATCH | `/org-units/{orgUnitId}` | `updateOrgUnit` | `SCOPE_MANAGE` | — | Venue Mgmt |
-| GET | `/outlets` | `listOutlets` | `SCOPE_VIEW` | ✓ | Venue Mgmt, Venue POS |
-| POST | `/outlets` | `createOutlet` | `REGION_CONFIGURE` | — | Venue Mgmt |
-| PATCH | `/outlets/{outletId}` | `updateOutlet` | `REGION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/regions/{regionId}/settings` | `getRegionSettings` | `SCOPE_VIEW` | ✓ | Venue Mgmt |
-| PUT | `/regions/{regionId}/settings` | `updateRegionSettings` | `REGION_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/roles/{roleId}/permissions` | `setRolePermissions` | `ROLE_MANAGE` | — | Venue Mgmt |
-| GET | `/sale-boards` | `listSaleBoards` | `SCOPE_VIEW` | ✓ | Venue Mgmt, Venue POS |
-| POST | `/sale-boards` | `createSaleBoard` | `WORKSTATION_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/sale-boards/{saleBoardId}` | `updateSaleBoard` | `WORKSTATION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/venues/{venueId}/settings` | `getVenueSettings` | `TENANT_CONFIGURE` | ✓ | Venue Mgmt, Venue POS |
-| PUT | `/venues/{venueId}/settings` | `setVenueSettings` | `TENANT_CONFIGURE` | — | Kitchen, Venue Mgmt, Venue POS |
-| GET | `/workstations` | `listWorkstations` | `SCOPE_VIEW` | — | Venue Mgmt, Venue POS |
-| GET | `/workstations/{workstationId}` | `getWorkstation` | `SCOPE_VIEW` | ✓ | Venue Mgmt |
-| PUT | `/workstations/{workstationId}` | `configureWorkstation` | `WORKSTATION_CONFIGURE` | — | Venue Mgmt, Venue POS |
-| GET | `/workstations/{workstationId}/health` | `getWorkstationHealth` | `DEVICE_VIEW` | — | Venue Mgmt, Venue POS |
+| POST | `/devices/{deviceId}/enrolment` | `enrolDevice` | `DEVICE_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/devices/{deviceId}/heartbeat` | `recordDeviceHeartbeat` | `—` | — | venue-management-web, venue-pos |
+| GET | `/devices/{deviceId}/telemetry` | `getDeviceTelemetry` | `DEVICE_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/offline-policy` | `setOfflinePolicy` | `TENANT_CONFIGURE` | — | venue-management-web |
+| GET | `/org-units` | `listOrgUnits` | `SCOPE_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/org-units` | `createOrgUnit` | `SCOPE_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/org-units/{orgUnitId}` | `getOrgUnit` | `SCOPE_VIEW` | — | venue-management-web |
+| PATCH | `/org-units/{orgUnitId}` | `updateOrgUnit` | `SCOPE_MANAGE` | — | venue-management-web |
+| GET | `/outlets` | `listOutlets` | `SCOPE_VIEW` | ✓ | venue-management-web, venue-pos |
+| POST | `/outlets` | `createOutlet` | `REGION_CONFIGURE` | — | venue-management-web |
+| PATCH | `/outlets/{outletId}` | `updateOutlet` | `REGION_CONFIGURE` | — | venue-management-web |
+| GET | `/regions/{regionId}/settings` | `getRegionSettings` | `SCOPE_VIEW` | ✓ | venue-management-web |
+| PUT | `/regions/{regionId}/settings` | `updateRegionSettings` | `REGION_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/roles/{roleId}/permissions` | `setRolePermissions` | `ROLE_MANAGE` | — | venue-management-web |
+| GET | `/sale-boards` | `listSaleBoards` | `SCOPE_VIEW` | ✓ | venue-management-web, venue-pos |
+| POST | `/sale-boards` | `createSaleBoard` | `WORKSTATION_CONFIGURE` | — | venue-management-web |
+| PUT | `/sale-boards/{saleBoardId}` | `updateSaleBoard` | `WORKSTATION_CONFIGURE` | — | venue-management-web |
+| GET | `/venues/{venueId}/settings` | `getVenueSettings` | `TENANT_CONFIGURE` | ✓ | venue-management-web, venue-pos |
+| PUT | `/venues/{venueId}/settings` | `setVenueSettings` | `TENANT_CONFIGURE` | — | kitchen-display, venue-management-web, venue-pos |
+| GET | `/workstations` | `listWorkstations` | `SCOPE_VIEW` | — | venue-management-web, venue-pos |
+| GET | `/workstations/{workstationId}` | `getWorkstation` | `SCOPE_VIEW` | ✓ | venue-management-web |
+| PUT | `/workstations/{workstationId}` | `configureWorkstation` | `WORKSTATION_CONFIGURE` | — | venue-management-web, venue-pos |
+| GET | `/workstations/{workstationId}/health` | `getWorkstationHealth` | `DEVICE_VIEW` | — | venue-management-web, venue-pos |
 
 ## Satellite — 23 contract(s), 1210 operation(s)
 
@@ -847,35 +847,35 @@ Accreditation is the opposite of ticketing, and that is why it cannot live in it
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/accreditation-access-activity` | `listAccreditationAccessActivity` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| GET | `/accreditation-access-profiles` | `listAccessProfiles` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| PUT | `/accreditation-access-profiles` | `setAccessProfile` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| POST | `/accreditation-access-profiles/preview` | `previewAccessImpact` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/accreditation-applications` | `listAccreditationApplications` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| POST | `/accreditation-applications` | `createAccreditationApplication` | `ACCREDITATION_APPLY` | — | Venue Mgmt |
-| POST | `/accreditation-applications/{applicationId}/decide` | `decideAccreditationApplication` | `ACCREDITATION_APPROVE` | — | Venue Mgmt |
-| GET | `/accreditation-audit` | `listAccreditationAudit` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| GET | `/accreditation-credentials` | `listAccreditationCredentials` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| POST | `/accreditation-credentials` | `issueAccreditationCredential` | `ACCREDITATION_ISSUE` | — | Venue Mgmt |
+| GET | `/accreditation-access-activity` | `listAccreditationAccessActivity` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| GET | `/accreditation-access-profiles` | `listAccessProfiles` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| PUT | `/accreditation-access-profiles` | `setAccessProfile` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| POST | `/accreditation-access-profiles/preview` | `previewAccessImpact` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| GET | `/accreditation-applications` | `listAccreditationApplications` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| POST | `/accreditation-applications` | `createAccreditationApplication` | `ACCREDITATION_APPLY` | — | venue-management-web |
+| POST | `/accreditation-applications/{applicationId}/decide` | `decideAccreditationApplication` | `ACCREDITATION_APPROVE` | — | venue-management-web |
+| GET | `/accreditation-audit` | `listAccreditationAudit` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| GET | `/accreditation-credentials` | `listAccreditationCredentials` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| POST | `/accreditation-credentials` | `issueAccreditationCredential` | `ACCREDITATION_ISSUE` | — | venue-management-web |
 | POST | `/accreditation-credentials/{credentialId}/replace` | `replaceAccreditationCredential` | `ACCREDITATION_ISSUE` | — | — |
-| POST | `/accreditation-documents` | `submitAccreditationDocument` | `ACCREDITATION_APPLY` | — | Venue Mgmt |
-| POST | `/accreditation-documents/{documentId}/verify` | `verifyAccreditationDocument` | `ACCREDITATION_APPROVE` | — | Venue Mgmt |
-| GET | `/accreditation-holders` | `listAccreditationHolders` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| GET | `/accreditation-holders/{holderId}` | `getAccreditationHolder` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| PUT | `/accreditation-holders/{holderId}` | `updateAccreditationHolder` | `ACCREDITATION_MANAGE` | — | Venue Mgmt |
-| PUT | `/accreditation-holders/{holderId}/access` | `setHolderAccess` | `ACCREDITATION_MANAGE` | — | Venue Mgmt |
-| POST | `/accreditation-holders/{holderId}/status` | `setAccreditationStatus` | `ACCREDITATION_MANAGE` | — | Venue Mgmt |
-| GET | `/accreditation-identity-conflicts` | `listAccreditationIdentityConflicts` | `ACCREDITATION_MANAGE` | — | Venue Mgmt |
-| POST | `/accreditation-imports` | `importAccreditationHolders` | `ACCREDITATION_MANAGE` | — | Venue Mgmt |
-| PUT | `/accreditation-notifications` | `setAccreditationNotificationRules` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/accreditation-programmes` | `listAccreditationProgrammes` | `ACCREDITATION_VIEW` | — | Venue Mgmt |
-| POST | `/accreditation-programmes` | `createAccreditationProgramme` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/accreditation-requirements` | `setAccreditationRequirements` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/accreditation-validity` | `setAccreditationValidity` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/badge-print-jobs` | `listBadgePrintJobs` | `ACCREDITATION_ISSUE` | — | Venue Mgmt |
-| POST | `/badge-print-jobs` | `createBadgePrintJob` | `ACCREDITATION_ISSUE` | — | Venue Mgmt |
-| GET | `/badge-templates` | `listBadgeTemplates` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/badge-templates` | `setBadgeTemplate` | `ACCREDITATION_CONFIGURE` | — | Venue Mgmt |
+| POST | `/accreditation-documents` | `submitAccreditationDocument` | `ACCREDITATION_APPLY` | — | venue-management-web |
+| POST | `/accreditation-documents/{documentId}/verify` | `verifyAccreditationDocument` | `ACCREDITATION_APPROVE` | — | venue-management-web |
+| GET | `/accreditation-holders` | `listAccreditationHolders` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| GET | `/accreditation-holders/{holderId}` | `getAccreditationHolder` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| PUT | `/accreditation-holders/{holderId}` | `updateAccreditationHolder` | `ACCREDITATION_MANAGE` | — | venue-management-web |
+| PUT | `/accreditation-holders/{holderId}/access` | `setHolderAccess` | `ACCREDITATION_MANAGE` | — | venue-management-web |
+| POST | `/accreditation-holders/{holderId}/status` | `setAccreditationStatus` | `ACCREDITATION_MANAGE` | — | venue-management-web |
+| GET | `/accreditation-identity-conflicts` | `listAccreditationIdentityConflicts` | `ACCREDITATION_MANAGE` | — | venue-management-web |
+| POST | `/accreditation-imports` | `importAccreditationHolders` | `ACCREDITATION_MANAGE` | — | venue-management-web |
+| PUT | `/accreditation-notifications` | `setAccreditationNotificationRules` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| GET | `/accreditation-programmes` | `listAccreditationProgrammes` | `ACCREDITATION_VIEW` | — | venue-management-web |
+| POST | `/accreditation-programmes` | `createAccreditationProgramme` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| PUT | `/accreditation-requirements` | `setAccreditationRequirements` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| PUT | `/accreditation-validity` | `setAccreditationValidity` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| GET | `/badge-print-jobs` | `listBadgePrintJobs` | `ACCREDITATION_ISSUE` | — | venue-management-web |
+| POST | `/badge-print-jobs` | `createBadgePrintJob` | `ACCREDITATION_ISSUE` | — | venue-management-web |
+| GET | `/badge-templates` | `listBadgeTemplates` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
+| PUT | `/badge-templates` | `setBadgeTemplate` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
 
 ### `ai.yaml` — 31 operation(s)
 
@@ -883,37 +883,37 @@ Retrieval and inference over data the platform already holds. Nothing here needs
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| PUT | `/ai-providers/{providerId}/credential` | `setAiCredential` | `AI_CONFIGURE` | — | TICVAI Web |
-| POST | `/ai-providers/{providerId}/test` | `testAiProvider` | `AI_CONFIGURE` | — | TICVAI Web |
+| PUT | `/ai-providers/{providerId}/credential` | `setAiCredential` | `AI_CONFIGURE` | — | ticvai-web |
+| POST | `/ai-providers/{providerId}/test` | `testAiProvider` | `AI_CONFIGURE` | — | ticvai-web |
 | PUT | `/ai/suggestion-providers` | `setSuggestionProvider` | `AI_CONFIGURE` | — | — |
-| POST | `/ai/suggestions` | `requestSuggestion` | `AI_USE` | — | Analytics, Guest App, Guest Web, Venue Mgmt |
-| POST | `/ai/suggestions/{suggestionId}/outcome` | `recordSuggestionOutcome` | `AI_USE` | — | Analytics |
+| POST | `/ai/suggestions` | `requestSuggestion` | `AI_USE` | — | guest-app, guest-web, venue-management-web |
+| POST | `/ai/suggestions/{suggestionId}/outcome` | `recordSuggestionOutcome` | `AI_USE` | — | venue-management-web |
 | POST | `/ai/translate` | `proposeTranslations` | `TENANT_CONFIGURE` | — | — |
-| POST | `/ai/venue-map/{mapId}/propose-labels` | `proposeVenueLabels` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
+| POST | `/ai/venue-map/{mapId}/propose-labels` | `proposeVenueLabels` | `VENUE_MAP_MANAGE` | — | venue-management-web |
 | POST | `/ai/venue-map/{mapId}/propose-walkways` | `proposeWalkways` | `VENUE_MAP_MANAGE` | — | — |
-| GET | `/collections` | `listKnowledgeCollections` | `AI_CONFIGURE` | — | Support |
+| GET | `/collections` | `listKnowledgeCollections` | `AI_CONFIGURE` | — | venue-support-web |
 | POST | `/collections` | `createKnowledgeCollection` | `AI_CONFIGURE` | — | — |
 | POST | `/collections/{collectionId}/documents` | `ingestKnowledgeDocument` | `AI_CONFIGURE` | — | — |
-| GET | `/conversations` | `listAiConversations` | `AI_USE` | — | Guest App, Guest Web, Staff App |
-| POST | `/conversations` | `createAiConversation` | `AI_USE` | — | Guest App, Guest Web, Staff App |
-| POST | `/conversations/{conversationId}/messages` | `sendAiMessage` | `AI_USE` | — | Guest App, Guest Kiosk, Guest Web, Staff App |
-| POST | `/generate/configuration` | `generateConfiguration` | `AI_USE` | — | Venue Mgmt |
+| GET | `/conversations` | `listAiConversations` | `AI_USE` | — | guest-app, guest-web, venue-staff-app |
+| POST | `/conversations` | `createAiConversation` | `AI_USE` | — | guest-app, guest-web, venue-staff-app |
+| POST | `/conversations/{conversationId}/messages` | `sendAiMessage` | `AI_USE` | — | guest-app, guest-web, venue-staff-app |
+| POST | `/generate/configuration` | `generateConfiguration` | `AI_USE` | — | venue-management-web |
 | POST | `/generate/venue-layout` | `generateVenueLayout` | `CAPACITY_CONFIGURE` | — | — |
-| GET | `/index-failures` | `listIndexFailures` | `AI_CONFIGURE` | — | Venue Mgmt |
-| GET | `/index-jobs` | `listIndexJobs` | `AI_CONFIGURE` | — | Venue Mgmt |
+| GET | `/index-failures` | `listIndexFailures` | `AI_CONFIGURE` | — | venue-management-web |
+| GET | `/index-jobs` | `listIndexJobs` | `AI_CONFIGURE` | — | venue-management-web |
 | GET | `/index-sources` | `listIndexSources` | `AI_CONFIGURE` | — | — |
 | PUT | `/index-sources` | `setIndexSource` | `AI_CONFIGURE` | — | — |
 | DELETE | `/index-sources/{sourceId}/entries/{entryId}` | `removeIndexEntry` | `AI_CONFIGURE` | — | — |
 | POST | `/index-sources/{sourceId}/reindex` | `reindexSource` | `AI_CONFIGURE` | — | — |
-| GET | `/interactions` | `listAiInteractions` | `AI_AUDIT_VIEW` | — | TICVAI Web |
-| GET | `/policy` | `getAiPolicy` | `AI_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/policy` | `setAiPolicy` | `AI_CONFIGURE` | — | Venue Mgmt |
-| GET | `/proposed-actions` | `listProposedActions` | `AI_APPROVE` | — | Analytics |
-| POST | `/proposed-actions/{actionId}/decide` | `decideProposedAction` | `AI_APPROVE` | — | Analytics |
-| GET | `/providers` | `listAiProviders` | `AI_CONFIGURE` | — | TICVAI Web |
-| PUT | `/providers` | `setAiProvider` | `AI_CONFIGURE` | — | TICVAI Web |
-| POST | `/search` | `semanticSearch` | `AI_USE` | — | Staff App |
-| GET | `/usage` | `getAiUsage` | `AI_AUDIT_VIEW` | — | Venue Mgmt |
+| GET | `/interactions` | `listAiInteractions` | `AI_AUDIT_VIEW` | — | ticvai-web |
+| GET | `/policy` | `getAiPolicy` | `AI_CONFIGURE` | — | venue-management-web |
+| PUT | `/policy` | `setAiPolicy` | `AI_CONFIGURE` | — | venue-management-web |
+| GET | `/proposed-actions` | `listProposedActions` | `AI_APPROVE` | — | venue-management-web |
+| POST | `/proposed-actions/{actionId}/decide` | `decideProposedAction` | `AI_APPROVE` | — | venue-management-web |
+| GET | `/providers` | `listAiProviders` | `AI_CONFIGURE` | — | ticvai-web |
+| PUT | `/providers` | `setAiProvider` | `AI_CONFIGURE` | — | ticvai-web |
+| POST | `/search` | `semanticSearch` | `AI_USE` | — | venue-staff-app |
+| GET | `/usage` | `getAiUsage` | `AI_AUDIT_VIEW` | — | venue-management-web |
 
 ### `assets.yaml` — 26 operation(s)
 
@@ -921,32 +921,32 @@ The single library every image, video and document is referenced from.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/media` | `searchMedia` | `ASSET_LIBRARY_VIEW` | — | Venue CMS, Venue Mgmt |
-| POST | `/media-assets/bulk` | `bulkUpdateMediaAssets` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| GET | `/media-assets/similar` | `findSimilarMediaAssets` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| POST | `/media-assets/{assetId}/analyse` | `analyseMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| POST | `/media-assets/{assetId}/approval` | `setMediaAssetApproval` | `ASSET_LIBRARY_APPROVE` | — | Venue CMS |
-| GET | `/media-assets/{assetId}/audit` | `listMediaAssetAudit` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| GET | `/media-assets/{assetId}/renditions` | `listMediaRenditions` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| POST | `/media-assets/{assetId}/renditions` | `requestMediaRendition` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| PUT | `/media-assets/{assetId}/rights` | `setMediaAssetRights` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| PUT | `/media-assets/{assetId}/tags` | `setMediaAssetTags` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| GET | `/media-assets/{assetId}/versions` | `listMediaAssetVersions` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| GET | `/media-distribution` | `getMediaDistribution` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| PUT | `/media-distribution/channels` | `setMediaDistributionChannels` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| POST | `/media-shares` | `createMediaShare` | `ASSET_LIBRARY_SHARE` | — | Venue CMS |
-| GET | `/media-taxonomy` | `getMediaTaxonomy` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| PUT | `/media-taxonomy` | `setMediaTaxonomy` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| GET | `/media-usage` | `getMediaUsageAnalytics` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| GET | `/media/collections` | `listCollections` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| POST | `/media/collections` | `createCollection` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| GET | `/media/rights-expiring` | `getExpiringRights` | `ASSET_LIBRARY_VIEW` | — | Venue CMS |
-| POST | `/media/uploads` | `createUpload` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| POST | `/media/uploads/{uploadId}/complete` | `completeUpload` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| DELETE | `/media/{mediaId}` | `deleteMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| GET | `/media/{mediaId}` | `getMediaAsset` | `ASSET_LIBRARY_VIEW` | ✓ | Staff App, Venue CMS, Venue Mgmt, Venue POS |
-| PATCH | `/media/{mediaId}` | `updateMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS |
-| POST | `/media/{mediaId}/replace` | `replaceMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | Venue CMS, Venue Mgmt |
+| GET | `/media` | `searchMedia` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| POST | `/media-assets/bulk` | `bulkUpdateMediaAssets` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| GET | `/media-assets/similar` | `findSimilarMediaAssets` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| POST | `/media-assets/{assetId}/analyse` | `analyseMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| POST | `/media-assets/{assetId}/approval` | `setMediaAssetApproval` | `ASSET_LIBRARY_APPROVE` | — | venue-management-web |
+| GET | `/media-assets/{assetId}/audit` | `listMediaAssetAudit` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| GET | `/media-assets/{assetId}/renditions` | `listMediaRenditions` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| POST | `/media-assets/{assetId}/renditions` | `requestMediaRendition` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| PUT | `/media-assets/{assetId}/rights` | `setMediaAssetRights` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| PUT | `/media-assets/{assetId}/tags` | `setMediaAssetTags` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| GET | `/media-assets/{assetId}/versions` | `listMediaAssetVersions` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| GET | `/media-distribution` | `getMediaDistribution` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| PUT | `/media-distribution/channels` | `setMediaDistributionChannels` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| POST | `/media-shares` | `createMediaShare` | `ASSET_LIBRARY_SHARE` | — | venue-management-web |
+| GET | `/media-taxonomy` | `getMediaTaxonomy` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| PUT | `/media-taxonomy` | `setMediaTaxonomy` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| GET | `/media-usage` | `getMediaUsageAnalytics` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| GET | `/media/collections` | `listCollections` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| POST | `/media/collections` | `createCollection` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| GET | `/media/rights-expiring` | `getExpiringRights` | `ASSET_LIBRARY_VIEW` | — | venue-management-web |
+| POST | `/media/uploads` | `createUpload` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| POST | `/media/uploads/{uploadId}/complete` | `completeUpload` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| DELETE | `/media/{mediaId}` | `deleteMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| GET | `/media/{mediaId}` | `getMediaAsset` | `ASSET_LIBRARY_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| PATCH | `/media/{mediaId}` | `updateMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
+| POST | `/media/{mediaId}/replace` | `replaceMediaAsset` | `ASSET_LIBRARY_MANAGE` | — | venue-management-web |
 
 ### `fnb.yaml` — 99 operation(s)
 
@@ -956,103 +956,103 @@ Menus, table service and kitchen handoff. KDS is an integration point, not a bui
 |---|---|---|---|---|---|
 | POST | `/combos` | `createCombo` | `PRODUCT_CONFIGURE` | — | — |
 | PUT | `/combos/{comboId}/slots` | `setComboSlots` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/fnb-orders` | `listFnbOrders` | `ORDER_VIEW` | — | Kitchen, Staff App, Venue Mgmt, Venue POS |
-| POST | `/fnb-orders` | `createFnbOrder` | `ORDER_CREATE` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| GET | `/fnb-orders/{orderId}` | `getFnbOrder` | `ORDER_VIEW` | ✓ | Kitchen, Venue Mgmt |
-| PATCH | `/fnb-orders/{orderId}` | `amendFnbOrder` | `ORDER_MODIFY` | — | Venue Mgmt |
-| POST | `/fnb-orders/{orderId}/accept` | `acceptFnbOrder` | `ORDER_MODIFY` | ✓ | Venue Mgmt |
-| POST | `/fnb-orders/{orderId}/cancel` | `cancelFnbOrder` | `ORDER_MODIFY` | ✓ | Venue Mgmt |
+| GET | `/fnb-orders` | `listFnbOrders` | `ORDER_VIEW` | — | kitchen-display, venue-management-web, venue-pos, venue-staff-app |
+| POST | `/fnb-orders` | `createFnbOrder` | `ORDER_CREATE` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| GET | `/fnb-orders/{orderId}` | `getFnbOrder` | `ORDER_VIEW` | ✓ | kitchen-display, venue-management-web |
+| PATCH | `/fnb-orders/{orderId}` | `amendFnbOrder` | `ORDER_MODIFY` | — | venue-management-web |
+| POST | `/fnb-orders/{orderId}/accept` | `acceptFnbOrder` | `ORDER_MODIFY` | ✓ | venue-management-web |
+| POST | `/fnb-orders/{orderId}/cancel` | `cancelFnbOrder` | `ORDER_MODIFY` | ✓ | venue-management-web |
 | POST | `/fnb-orders/{orderId}/notify` | `sendOrderNotification` | `ORDER_MODIFY` | — | — |
-| POST | `/food-safety/cold-chain` | `logColdChain` | `INCIDENT_REPORT` | ✓ | Staff App |
+| POST | `/food-safety/cold-chain` | `logColdChain` | `INCIDENT_REPORT` | ✓ | venue-staff-app |
 | POST | `/food-safety/corrective-actions/{actionId}/action` | `recordCorrectiveAction` | `INCIDENT_MANAGE` | — | — |
 | POST | `/food-safety/corrective-actions/{actionId}/close` | `closeCorrectiveAction` | `INCIDENT_MANAGE` | — | — |
 | POST | `/food-safety/corrective-actions/{actionId}/escalate` | `escalateCorrectiveAction` | `INCIDENT_MANAGE` | — | — |
-| POST | `/food-safety/corrective-actions/{actionId}/sign` | `signCorrectiveAction` | `INCIDENT_MANAGE` | — | Staff App, Venue Mgmt |
-| GET | `/food-safety/status` | `getHaccpStatus` | `INCIDENT_VIEW` | ✓ | Kitchen, Staff App, Venue Mgmt |
-| POST | `/food-safety/temperature-logs` | `logTemperature` | `INCIDENT_REPORT` | ✓ | Staff App |
-| POST | `/guest-orders` | `createGuestFnbOrder` | `—` | — | Guest App, Guest Kiosk, Guest Web |
-| GET | `/guest-orders/{orderId}` | `getGuestOrderStatus` | `—` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/guest-orders/{orderId}/delivery` | `recordOrderHandover` | `ORDER_MODIFY` | ✓ | Kitchen, Venue Mgmt, Venue POS |
-| POST | `/kitchen-exceptions` | `logKitchenException` | `INCIDENT_REPORT` | ✓ | Kitchen |
+| POST | `/food-safety/corrective-actions/{actionId}/sign` | `signCorrectiveAction` | `INCIDENT_MANAGE` | — | venue-management-web, venue-staff-app |
+| GET | `/food-safety/status` | `getHaccpStatus` | `INCIDENT_VIEW` | ✓ | kitchen-display, venue-management-web, venue-staff-app |
+| POST | `/food-safety/temperature-logs` | `logTemperature` | `INCIDENT_REPORT` | ✓ | venue-staff-app |
+| POST | `/guest-orders` | `createGuestFnbOrder` | `—` | — | guest-app, guest-web |
+| GET | `/guest-orders/{orderId}` | `getGuestOrderStatus` | `—` | — | guest-app, guest-web, venue-management-web |
+| POST | `/guest-orders/{orderId}/delivery` | `recordOrderHandover` | `ORDER_MODIFY` | ✓ | kitchen-display, venue-management-web, venue-pos |
+| POST | `/kitchen-exceptions` | `logKitchenException` | `INCIDENT_REPORT` | ✓ | kitchen-display |
 | POST | `/kitchen-stations/rebalance` | `rebalanceStationLoad` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/kitchen-stations/{stationId}/chase` | `chaseStation` | `ORDER_MODIFY` | ✓ | Kitchen |
-| POST | `/kitchen-tickets/{ticketId}/fire` | `fireCourse` | `ORDER_MODIFY` | ✓ | Kitchen, Staff App |
-| POST | `/kitchen-tickets/{ticketId}/hold` | `holdCourse` | `ORDER_MODIFY` | ✓ | Kitchen, Staff App |
-| POST | `/kitchen-tickets/{ticketId}/label` | `printOrderLabel` | `ORDER_VIEW` | ✓ | Kitchen |
-| POST | `/kitchen-tickets/{ticketId}/recall` | `recallKitchenTicket` | `ORDER_MODIFY` | ✓ | Kitchen |
-| POST | `/kitchen-tickets/{ticketId}/refire` | `refireItem` | `ORDER_MODIFY` | ✓ | Kitchen |
-| GET | `/kitchen/stations` | `listKitchenStations` | `PRODUCT_VIEW` | ✓ | Kitchen, Venue Mgmt |
-| PUT | `/kitchen/stations` | `setKitchenStations` | `PRODUCT_CONFIGURE` | — | Kitchen, Venue Mgmt |
-| GET | `/kitchen/tickets` | `listKitchenTickets` | `ORDER_VIEW` | ✓ | Kitchen, Venue Mgmt, Venue POS |
-| POST | `/kitchen/tickets/{ticketId}/prioritise` | `prioritiseKitchenTicket` | `ORDER_MODIFY` | — | Kitchen, Venue Mgmt |
-| PUT | `/kitchen/tickets/{ticketId}/status` | `setKitchenTicketStatus` | `ORDER_MODIFY` | ✓ | Kitchen, Venue Mgmt, Venue POS |
-| POST | `/location-sessions` | `claimLocationSession` | `—` | — | Guest App, Guest Web |
-| PUT | `/menu-items/{itemId}/availability` | `setItemAvailability` | `PRODUCT_CONFIGURE` | ✓ | Kitchen, Staff App, Venue Mgmt, Venue POS |
+| POST | `/kitchen-stations/{stationId}/chase` | `chaseStation` | `ORDER_MODIFY` | ✓ | kitchen-display |
+| POST | `/kitchen-tickets/{ticketId}/fire` | `fireCourse` | `ORDER_MODIFY` | ✓ | kitchen-display, venue-staff-app |
+| POST | `/kitchen-tickets/{ticketId}/hold` | `holdCourse` | `ORDER_MODIFY` | ✓ | kitchen-display, venue-staff-app |
+| POST | `/kitchen-tickets/{ticketId}/label` | `printOrderLabel` | `ORDER_VIEW` | ✓ | kitchen-display |
+| POST | `/kitchen-tickets/{ticketId}/recall` | `recallKitchenTicket` | `ORDER_MODIFY` | ✓ | kitchen-display |
+| POST | `/kitchen-tickets/{ticketId}/refire` | `refireItem` | `ORDER_MODIFY` | ✓ | kitchen-display |
+| GET | `/kitchen/stations` | `listKitchenStations` | `PRODUCT_VIEW` | ✓ | kitchen-display, venue-management-web |
+| PUT | `/kitchen/stations` | `setKitchenStations` | `PRODUCT_CONFIGURE` | — | kitchen-display, venue-management-web |
+| GET | `/kitchen/tickets` | `listKitchenTickets` | `ORDER_VIEW` | ✓ | kitchen-display, venue-management-web, venue-pos |
+| POST | `/kitchen/tickets/{ticketId}/prioritise` | `prioritiseKitchenTicket` | `ORDER_MODIFY` | — | kitchen-display, venue-management-web |
+| PUT | `/kitchen/tickets/{ticketId}/status` | `setKitchenTicketStatus` | `ORDER_MODIFY` | ✓ | kitchen-display, venue-management-web, venue-pos |
+| POST | `/location-sessions` | `claimLocationSession` | `—` | — | guest-app, guest-web |
+| PUT | `/menu-items/{itemId}/availability` | `setItemAvailability` | `PRODUCT_CONFIGURE` | ✓ | kitchen-display, venue-management-web, venue-pos, venue-staff-app |
 | PUT | `/menu-items/{menuItemId}/modifier-groups` | `attachModifierGroup` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/menu-items/{menuItemId}/verify-allergens` | `verifyAllergens` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| GET | `/menus` | `listMenus` | `PRODUCT_VIEW` | — | Venue CMS, Venue Mgmt, Venue POS |
-| POST | `/menus` | `createMenu` | `PRODUCT_CONFIGURE` | — | Venue CMS, Venue Mgmt |
-| GET | `/menus/{menuId}` | `getMenu` | `PRODUCT_VIEW` | — | Venue CMS, Venue Mgmt |
-| PATCH | `/menus/{menuId}` | `updateMenu` | `PRODUCT_CONFIGURE` | — | Venue CMS, Venue Mgmt |
-| POST | `/menus/{menuId}/actions` | `applyMenuActions` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/menus/{menuId}/publish` | `publishMenu` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/menus/{menuId}/rollback` | `rollbackMenu` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/menus/{menuId}/schedule` | `scheduleMenuPublish` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/menus/{menuId}/sections` | `setMenuSections` | `PRODUCT_CONFIGURE` | — | Venue CMS, Venue Mgmt |
-| GET | `/modifier-groups` | `listModifierGroups` | `PRODUCT_VIEW` | — | Guest App, Guest Web, Venue POS |
+| POST | `/menu-items/{menuItemId}/verify-allergens` | `verifyAllergens` | `PRODUCT_VIEW` | — | venue-management-web |
+| GET | `/menus` | `listMenus` | `PRODUCT_VIEW` | — | venue-management-web, venue-pos |
+| POST | `/menus` | `createMenu` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/menus/{menuId}` | `getMenu` | `PRODUCT_VIEW` | — | venue-management-web |
+| PATCH | `/menus/{menuId}` | `updateMenu` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/menus/{menuId}/actions` | `applyMenuActions` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/menus/{menuId}/publish` | `publishMenu` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/menus/{menuId}/rollback` | `rollbackMenu` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/menus/{menuId}/schedule` | `scheduleMenuPublish` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/menus/{menuId}/sections` | `setMenuSections` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/modifier-groups` | `listModifierGroups` | `PRODUCT_VIEW` | — | guest-app, guest-web, venue-pos |
 | POST | `/modifier-groups` | `createModifierGroup` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/orders/{orderId}/collected` | `markOrderCollected` | `ORDER_MODIFY` | ✓ | Kitchen, Venue POS |
-| GET | `/outlets/{outletId}/86-events` | `list86Events` | `PRODUCT_VIEW` | ✓ | Kitchen |
-| PUT | `/outlets/{outletId}/course-rules` | `setCourseRules` | `PRODUCT_CONFIGURE` | — | Kitchen |
-| GET | `/outlets/{outletId}/guest-menu` | `getGuestMenu` | `—` | — | Guest App, Guest Kiosk, Guest Web, Venue Mgmt, Venue POS |
+| POST | `/orders/{orderId}/collected` | `markOrderCollected` | `ORDER_MODIFY` | ✓ | kitchen-display, venue-pos |
+| GET | `/outlets/{outletId}/86-events` | `list86Events` | `PRODUCT_VIEW` | ✓ | kitchen-display |
+| PUT | `/outlets/{outletId}/course-rules` | `setCourseRules` | `PRODUCT_CONFIGURE` | — | kitchen-display |
+| GET | `/outlets/{outletId}/guest-menu` | `getGuestMenu` | `—` | — | guest-app, guest-web, venue-management-web, venue-pos |
 | PUT | `/outlets/{outletId}/kitchen-sla` | `setKitchenSla` | `PRODUCT_CONFIGURE` | — | — |
 | PUT | `/outlets/{outletId}/sections` | `setSectionLayout` | `PRODUCT_CONFIGURE` | — | — |
-| PUT | `/outlets/{outletId}/table-combinations` | `setTableCombinations` | `PRODUCT_CONFIGURE` | — | Staff App, Venue POS |
-| GET | `/outlets/{outletId}/tables` | `getTableMap` | `ORDER_VIEW` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| PUT | `/outlets/{outletId}/tables` | `setTableLayout` | `PRODUCT_CONFIGURE` | — | Staff App, Venue Mgmt, Venue POS |
-| POST | `/outlets/{outletId}/waste` | `recordWaste` | `ORDER_MODIFY` | ✓ | Staff App, Venue Mgmt |
-| POST | `/production-plans` | `buildProductionPlan` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/production-plans/{planId}/release` | `releaseProductionPlan` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/production-runs` | `listProductionRuns` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/production-runs` | `planProductionRun` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/production-runs/{runId}` | `getProductionRun` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/production-runs/{runId}/complete` | `completeProductionRun` | `PRODUCT_CONFIGURE` | ✓ | Venue Mgmt |
-| GET | `/recipes` | `listRecipes` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PUT | `/recipes` | `setRecipe` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/stock-counts/{countId}/lines` | `enterCountLine` | `PRODUCT_CONFIGURE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/stock-counts/{countId}/recount` | `requestRecount` | `PRODUCT_CONFIGURE` | — | Staff App, Venue Mgmt |
-| PUT | `/substitution-rules` | `setSubstitutionRules` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/table-reservations` | `listTableReservations` | `ORDER_MODIFY` | ✓ | Staff App, Venue POS |
-| POST | `/table-reservations` | `createTableReservation` | `—` | — | Guest App, Guest Web, Staff App |
+| PUT | `/outlets/{outletId}/table-combinations` | `setTableCombinations` | `PRODUCT_CONFIGURE` | — | venue-pos, venue-staff-app |
+| GET | `/outlets/{outletId}/tables` | `getTableMap` | `ORDER_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| PUT | `/outlets/{outletId}/tables` | `setTableLayout` | `PRODUCT_CONFIGURE` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/outlets/{outletId}/waste` | `recordWaste` | `ORDER_MODIFY` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/production-plans` | `buildProductionPlan` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/production-plans/{planId}/release` | `releaseProductionPlan` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/production-runs` | `listProductionRuns` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/production-runs` | `planProductionRun` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/production-runs/{runId}` | `getProductionRun` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/production-runs/{runId}/complete` | `completeProductionRun` | `PRODUCT_CONFIGURE` | ✓ | venue-management-web |
+| GET | `/recipes` | `listRecipes` | `PRODUCT_VIEW` | — | venue-management-web |
+| PUT | `/recipes` | `setRecipe` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/stock-counts/{countId}/lines` | `enterCountLine` | `PRODUCT_CONFIGURE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/stock-counts/{countId}/recount` | `requestRecount` | `PRODUCT_CONFIGURE` | — | venue-management-web, venue-staff-app |
+| PUT | `/substitution-rules` | `setSubstitutionRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/table-reservations` | `listTableReservations` | `ORDER_MODIFY` | ✓ | venue-pos, venue-staff-app |
+| POST | `/table-reservations` | `createTableReservation` | `—` | — | guest-app, guest-web, venue-staff-app |
 | GET | `/table-reservations/conflicts` | `resolveBookingConflict` | `ORDER_VIEW` | — | — |
-| PATCH | `/table-reservations/{reservationId}` | `updateTableReservation` | `—` | — | Guest App, Guest Web |
+| PATCH | `/table-reservations/{reservationId}` | `updateTableReservation` | `—` | — | guest-app, guest-web |
 | POST | `/table-reservations/{reservationId}/confirm` | `sendBookingConfirmation` | `ORDER_MODIFY` | — | — |
-| POST | `/table-reservations/{reservationId}/seat` | `seatTableReservation` | `ORDER_MODIFY` | ✓ | Staff App, Venue POS |
-| POST | `/table-sessions` | `claimTableSession` | `—` | — | Guest App, Guest Web |
-| GET | `/table-sessions/{sessionId}/bill` | `getGuestBill` | `—` | — | Guest App, Guest Web |
-| POST | `/table-visits` | `openTableVisit` | `ORDER_CREATE` | ✓ | Staff App, Venue POS |
-| GET | `/table-visits/{visitId}` | `getTableVisit` | `ORDER_VIEW` | ✓ | — |
-| PATCH | `/table-visits/{visitId}` | `updateTableVisit` | `ORDER_MODIFY` | ✓ | Staff App |
-| GET | `/table-visits/{visitId}/bill` | `getBill` | `ORDER_VIEW` | ✓ | Staff App |
-| POST | `/table-visits/{visitId}/bill/split` | `splitBill` | `ORDER_MODIFY` | ✓ | Staff App |
-| POST | `/table-visits/{visitId}/close` | `closeTableVisit` | `ORDER_CREATE` | — | Staff App, Venue POS |
-| POST | `/table-visits/{visitId}/comp` | `compItem` | `ORDER_MODIFY` | ✓ | Staff App |
-| POST | `/table-visits/{visitId}/merge` | `mergeTableVisits` | `ORDER_MODIFY` | — | Staff App, Venue POS |
-| POST | `/table-visits/{visitId}/move` | `moveTableVisit` | `ORDER_MODIFY` | ✓ | Staff App, Venue POS |
-| POST | `/table-visits/{visitId}/notify-server` | `notifyServer` | `ORDER_MODIFY` | — | Kitchen, Staff App |
-| POST | `/table-visits/{visitId}/request-bill` | `requestBill` | `ORDER_MODIFY` | ✓ | — |
-| PUT | `/table-visits/{visitId}/server` | `reassignServer` | `ORDER_MODIFY` | ✓ | Staff App |
-| PUT | `/table-visits/{visitId}/stage` | `setServiceStage` | `ORDER_MODIFY` | ✓ | Staff App |
-| POST | `/table-visits/{visitId}/transfer` | `transferTableVisit` | `ORDER_MODIFY` | ✓ | Staff App |
-| POST | `/table-visits/{visitId}/transfer-items` | `transferOrderItems` | `ORDER_MODIFY` | ✓ | Staff App |
+| POST | `/table-reservations/{reservationId}/seat` | `seatTableReservation` | `ORDER_MODIFY` | ✓ | venue-pos, venue-staff-app |
+| POST | `/table-sessions` | `claimTableSession` | `—` | — | guest-app, guest-web |
+| GET | `/table-sessions/{sessionId}/bill` | `getGuestBill` | `—` | — | guest-app, guest-web |
+| POST | `/table-visits` | `openTableVisit` | `ORDER_CREATE` | ✓ | venue-pos, venue-staff-app |
+| GET | `/table-visits/{visitId}` | `getTableVisit` | `ORDER_VIEW` | ✓ | venue-staff-app |
+| PATCH | `/table-visits/{visitId}` | `updateTableVisit` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| GET | `/table-visits/{visitId}/bill` | `getBill` | `ORDER_VIEW` | ✓ | venue-staff-app |
+| POST | `/table-visits/{visitId}/bill/split` | `splitBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| POST | `/table-visits/{visitId}/close` | `closeTableVisit` | `ORDER_CREATE` | — | venue-pos, venue-staff-app |
+| POST | `/table-visits/{visitId}/comp` | `compItem` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| POST | `/table-visits/{visitId}/merge` | `mergeTableVisits` | `ORDER_MODIFY` | — | venue-pos, venue-staff-app |
+| POST | `/table-visits/{visitId}/move` | `moveTableVisit` | `ORDER_MODIFY` | ✓ | venue-pos, venue-staff-app |
+| POST | `/table-visits/{visitId}/notify-server` | `notifyServer` | `ORDER_MODIFY` | — | kitchen-display, venue-staff-app |
+| POST | `/table-visits/{visitId}/request-bill` | `requestBill` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| PUT | `/table-visits/{visitId}/server` | `reassignServer` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| PUT | `/table-visits/{visitId}/stage` | `setServiceStage` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| POST | `/table-visits/{visitId}/transfer` | `transferTableVisit` | `ORDER_MODIFY` | ✓ | venue-staff-app |
+| POST | `/table-visits/{visitId}/transfer-items` | `transferOrderItems` | `ORDER_MODIFY` | ✓ | venue-staff-app |
 | POST | `/tables` | `createTable` | `PRODUCT_CONFIGURE` | — | — |
 | PUT | `/tables/{tableId}` | `updateTable` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/tables/{tableId}/clear` | `clearTable` | `ORDER_MODIFY` | ✓ | Venue POS |
-| GET | `/venues/{venueId}/delivery-locations` | `listDeliveryLocations` | `—` | — | Guest App, Guest Web, Staff App, Venue Mgmt |
-| GET | `/venues/{venueId}/dining` | `listDiningOutlets` | `—` | — | Guest App, Guest Web, Staff App, Venue Mgmt |
-| POST | `/waitlist` | `joinRestaurantWaitlist` | `ORDER_MODIFY` | ✓ | Guest App, Guest Web, Staff App |
-| POST | `/waitlist/{entryId}/notify` | `notifyWaitlistParty` | `ORDER_MODIFY` | — | Staff App |
-| POST | `/waitlist/{entryId}/quote` | `quoteWaitTime` | `ORDER_MODIFY` | — | Staff App |
+| POST | `/tables/{tableId}/clear` | `clearTable` | `ORDER_MODIFY` | ✓ | venue-pos |
+| GET | `/venues/{venueId}/delivery-locations` | `listDeliveryLocations` | `—` | — | guest-app, guest-web, venue-management-web, venue-staff-app |
+| GET | `/venues/{venueId}/dining` | `listDiningOutlets` | `—` | — | guest-app, guest-web, venue-management-web, venue-staff-app |
+| POST | `/waitlist` | `joinRestaurantWaitlist` | `ORDER_MODIFY` | ✓ | guest-app, guest-web, venue-staff-app |
+| POST | `/waitlist/{entryId}/notify` | `notifyWaitlistParty` | `ORDER_MODIFY` | — | venue-staff-app |
+| POST | `/waitlist/{entryId}/quote` | `quoteWaitTime` | `ORDER_MODIFY` | — | venue-staff-app |
 
 ### `games.yaml` — 35 operation(s)
 
@@ -1060,41 +1060,41 @@ Arcade play, game credits and prize redemption.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/attraction-types` | `listAttractionTypes` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PUT | `/attraction-types` | `setAttractionType` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/game-card-expiry-rules` | `setGameCardExpiryRules` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/game-cards` | `issueGameCard` | `ORDER_CREATE` | — | Venue POS |
-| GET | `/game-cards/{cardCode}` | `getGameCard` | `—` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/game-cards/{cardCode}/transfer` | `transferGameCard` | `ORDER_MODIFY` | — | — |
-| POST | `/game-cards/{cardId}/lifecycle` | `setGameCardLifecycle` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/game-eligibility` | `getGameEligibility` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| GET | `/game-entitlements` | `listGameEntitlements` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/game-entitlements` | `createGameEntitlement` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/game-kiosk-config` | `setGameKioskConfiguration` | `TENANT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/game-plays` | `recordGamePlay` | `—` | ✓ | Venue Mgmt |
-| POST | `/game-plays/sync` | `syncGamePlays` | `—` | — | Venue Mgmt |
-| GET | `/game-pricing` | `getGamePricing` | `PRICE_VIEW` | — | Venue Mgmt |
-| PUT | `/game-pricing` | `setGamePricing` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/gameplay-authorisations` | `authoriseGameplay` | `ACCESS_VALIDATE` | ✓ | Venue Mgmt |
-| POST | `/gameplay-authorisations/simulate` | `simulateGameplayAuthorisation` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/gameplay-sync-status` | `getGameplaySyncStatus` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| GET | `/gameplay-transactions` | `listGameplayTransactions` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| GET | `/gameplay-validation-rules` | `getGameplayValidationRules` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PUT | `/gameplay-validation-rules` | `setGameplayValidationRules` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/games` | `listGames` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/games` | `createGame` | `PRODUCT_CONFIGURE` | — | — |
-| PATCH | `/games/{gameId}` | `updateGame` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/games/{gameId}/operations` | `setGameOperationalConfiguration` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/prize-redemptions` | `redeemPrize` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/prizes` | `listPrizes` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/prizes` | `createPrize` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/prizes/{prizeId}/cost` | `setPrizeCost` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/reader-profiles` | `setReaderProfile` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/readers` | `listReaders` | `DEVICE_VIEW` | — | Venue Mgmt |
-| PUT | `/readers/{readerId}` | `setReaderConfiguration` | `DEVICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/readers/{readerId}/deploy` | `deployReaderConfiguration` | `DEVICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/readers/{readerId}/test` | `testReader` | `DEVICE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/redemption-rules` | `setRedemptionRules` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/attraction-types` | `listAttractionTypes` | `PRODUCT_VIEW` | — | venue-management-web |
+| PUT | `/attraction-types` | `setAttractionType` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/game-card-expiry-rules` | `setGameCardExpiryRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/game-cards` | `issueGameCard` | `ORDER_CREATE` | — | venue-pos |
+| GET | `/game-cards/{cardCode}` | `getGameCard` | `—` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/game-cards/{cardCode}/transfer` | `transferGameCard` | `ORDER_MODIFY` | — | venue-pos |
+| POST | `/game-cards/{cardId}/lifecycle` | `setGameCardLifecycle` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/game-eligibility` | `getGameEligibility` | `PRODUCT_VIEW` | — | venue-management-web |
+| GET | `/game-entitlements` | `listGameEntitlements` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/game-entitlements` | `createGameEntitlement` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/game-kiosk-config` | `setGameKioskConfiguration` | `TENANT_CONFIGURE` | — | venue-management-web |
+| POST | `/game-plays` | `recordGamePlay` | `—` | ✓ | venue-management-web |
+| POST | `/game-plays/sync` | `syncGamePlays` | `—` | — | venue-management-web |
+| GET | `/game-pricing` | `getGamePricing` | `PRICE_VIEW` | — | venue-management-web |
+| PUT | `/game-pricing` | `setGamePricing` | `PRICE_CONFIGURE` | — | venue-management-web |
+| POST | `/gameplay-authorisations` | `authoriseGameplay` | `ACCESS_VALIDATE` | ✓ | venue-management-web |
+| POST | `/gameplay-authorisations/simulate` | `simulateGameplayAuthorisation` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/gameplay-sync-status` | `getGameplaySyncStatus` | `PRODUCT_VIEW` | — | venue-management-web |
+| GET | `/gameplay-transactions` | `listGameplayTransactions` | `PRODUCT_VIEW` | — | venue-management-web |
+| GET | `/gameplay-validation-rules` | `getGameplayValidationRules` | `PRODUCT_VIEW` | — | venue-management-web |
+| PUT | `/gameplay-validation-rules` | `setGameplayValidationRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/games` | `listGames` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/games` | `createGame` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PATCH | `/games/{gameId}` | `updateGame` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/games/{gameId}/operations` | `setGameOperationalConfiguration` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/prize-redemptions` | `redeemPrize` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/prizes` | `listPrizes` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/prizes` | `createPrize` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/prizes/{prizeId}/cost` | `setPrizeCost` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/reader-profiles` | `setReaderProfile` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/readers` | `listReaders` | `DEVICE_VIEW` | — | venue-management-web |
+| PUT | `/readers/{readerId}` | `setReaderConfiguration` | `DEVICE_CONFIGURE` | — | venue-management-web |
+| POST | `/readers/{readerId}/deploy` | `deployReaderConfiguration` | `DEVICE_CONFIGURE` | — | venue-management-web |
+| POST | `/readers/{readerId}/test` | `testReader` | `DEVICE_CONFIGURE` | — | venue-management-web |
+| PUT | `/redemption-rules` | `setRedemptionRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 
 ### `inventory.yaml` — 50 operation(s)
 
@@ -1102,56 +1102,56 @@ Stock is a ledger, not a number. Every change is a movement with a reason.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/goods-receipts` | `listGoodsReceipts` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/goods-receipts` | `createGoodsReceipt` | `PRODUCT_CONFIGURE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/goods-receipts/{receiptId}/reject` | `rejectReceivedGoods` | `PRODUCT_CONFIGURE` | — | Staff App, Venue Mgmt |
-| GET | `/inventory-items` | `listInventoryItems` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/inventory-items` | `createInventoryItem` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/inventory-items/lookup` | `lookupInventoryItem` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| GET | `/inventory-items/{itemId}` | `getInventoryItem` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| PATCH | `/inventory-items/{itemId}` | `updateInventoryItem` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/products/bulk` | `bulkUpdateProducts` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/purchase-orders` | `listPurchaseOrders` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/purchase-orders` | `createPurchaseOrder` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/purchase-orders/{purchaseOrderId}` | `getPurchaseOrder` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/purchase-orders/{purchaseOrderId}/acknowledge` | `acknowledgePurchaseOrder` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/purchase-orders/{purchaseOrderId}/cancel` | `cancelPurchaseOrder` | `ORDER_CANCEL` | — | Venue Mgmt |
-| POST | `/purchase-orders/{purchaseOrderId}/close-short` | `closePurchaseOrderShort` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/purchase-orders/{purchaseOrderId}/send` | `sendPurchaseOrder` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/requisitions` | `listRequisitions` | `PRODUCT_VIEW` | ✓ | Staff App, Venue Mgmt |
-| POST | `/requisitions` | `createRequisition` | `ORDER_CREATE` | ✓ | Staff App, Venue Mgmt |
-| GET | `/requisitions/suggested` | `getSuggestedRequisitions` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/requisitions/{requisitionId}/approve` | `approveRequisition` | `APPROVAL_ACT` | — | Venue Mgmt |
-| POST | `/requisitions/{requisitionId}/cancel` | `cancelRequisition` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/requisitions/{requisitionId}/lines` | `updateRequisitionLines` | `PRODUCT_CONFIGURE` | ✓ | Venue Mgmt |
-| GET | `/requisitions/{requisitionId}/quotations` | `compareQuotations` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/requisitions/{requisitionId}/reject` | `rejectRequisition` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/requisitions/{requisitionId}/return` | `returnRequisition` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| GET | `/serialised-items` | `listSerialisedItems` | `PRODUCT_VIEW` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| GET | `/stock` | `getStockPositions` | `PRODUCT_VIEW` | ✓ | Staff App, Venue Mgmt |
-| GET | `/stock-batches/expiring` | `listExpiringBatches` | `PRODUCT_VIEW` | ✓ | Analytics, Venue Mgmt |
-| GET | `/stock-counts` | `listStockCounts` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/stock-counts` | `startStockCount` | `PRODUCT_CONFIGURE` | ✓ | Staff App, Venue Mgmt |
-| PUT | `/stock-counts/daily` | `setDailyCount` | `PRODUCT_CONFIGURE` | — | Staff App |
-| POST | `/stock-counts/{countId}/cancel` | `cancelStockCount` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/goods-receipts` | `listGoodsReceipts` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/goods-receipts` | `createGoodsReceipt` | `PRODUCT_CONFIGURE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/goods-receipts/{receiptId}/reject` | `rejectReceivedGoods` | `PRODUCT_CONFIGURE` | — | venue-management-web, venue-staff-app |
+| GET | `/inventory-items` | `listInventoryItems` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/inventory-items` | `createInventoryItem` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/inventory-items/lookup` | `lookupInventoryItem` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| GET | `/inventory-items/{itemId}` | `getInventoryItem` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| PATCH | `/inventory-items/{itemId}` | `updateInventoryItem` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/products/bulk` | `bulkUpdateProducts` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/purchase-orders` | `listPurchaseOrders` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/purchase-orders` | `createPurchaseOrder` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/purchase-orders/{purchaseOrderId}` | `getPurchaseOrder` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/purchase-orders/{purchaseOrderId}/acknowledge` | `acknowledgePurchaseOrder` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/purchase-orders/{purchaseOrderId}/cancel` | `cancelPurchaseOrder` | `ORDER_CANCEL` | — | venue-management-web |
+| POST | `/purchase-orders/{purchaseOrderId}/close-short` | `closePurchaseOrderShort` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/purchase-orders/{purchaseOrderId}/send` | `sendPurchaseOrder` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/requisitions` | `listRequisitions` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/requisitions` | `createRequisition` | `ORDER_CREATE` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/requisitions/suggested` | `getSuggestedRequisitions` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/requisitions/{requisitionId}/approve` | `approveRequisition` | `APPROVAL_ACT` | — | venue-management-web |
+| POST | `/requisitions/{requisitionId}/cancel` | `cancelRequisition` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/requisitions/{requisitionId}/lines` | `updateRequisitionLines` | `PRODUCT_CONFIGURE` | ✓ | venue-management-web |
+| GET | `/requisitions/{requisitionId}/quotations` | `compareQuotations` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/requisitions/{requisitionId}/reject` | `rejectRequisition` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/requisitions/{requisitionId}/return` | `returnRequisition` | `LEDGER_APPROVE` | — | venue-management-web |
+| GET | `/serialised-items` | `listSerialisedItems` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| GET | `/stock` | `getStockPositions` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/stock-batches/expiring` | `listExpiringBatches` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| GET | `/stock-counts` | `listStockCounts` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/stock-counts` | `startStockCount` | `PRODUCT_CONFIGURE` | ✓ | venue-management-web, venue-staff-app |
+| PUT | `/stock-counts/daily` | `setDailyCount` | `PRODUCT_CONFIGURE` | — | venue-staff-app |
+| POST | `/stock-counts/{countId}/cancel` | `cancelStockCount` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/stock-counts/{countId}/lines` | `submitCountLines` | `PRODUCT_CONFIGURE` | ✓ | — |
-| POST | `/stock-counts/{countId}/post` | `postStockCount` | `LEDGER_POST` | — | Staff App, Venue Mgmt |
-| POST | `/stock-counts/{countId}/recount` | `recountStockCount` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| GET | `/stock-counts/{countId}/variance` | `getCountVariance` | `PRODUCT_VIEW` | ✓ | Analytics, Staff App, Venue Mgmt |
-| GET | `/stock-locations` | `listStockLocations` | `PRODUCT_VIEW` | ✓ | Staff App, Venue Mgmt |
-| POST | `/stock-locations` | `createStockLocation` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/stock-movements` | `listStockMovements` | `PRODUCT_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/stock-movements` | `createStockMovement` | `PRODUCT_CONFIGURE` | — | Staff App, Venue Mgmt |
-| GET | `/stock-transfers` | `listStockTransfers` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/stock-transfers` | `createStockTransfer` | `PRODUCT_CONFIGURE` | — | Staff App, Venue Mgmt |
-| GET | `/stock-transfers/{transferId}` | `getStockTransfer` | `PRODUCT_VIEW` | ✓ | Staff App, Venue Mgmt |
-| POST | `/stock-transfers/{transferId}/close-short` | `closeTransferShort` | `LEDGER_APPROVE` | — | Venue Mgmt |
-| POST | `/stock-transfers/{transferId}/receive` | `receiveStockTransfer` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/stock/valuation` | `getStockValuation` | `LEDGER_VIEW` | — | Analytics, Venue Mgmt |
-| GET | `/suppliers` | `listSuppliers` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/suppliers` | `createSupplier` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/suppliers/{supplierId}` | `updateSupplier` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/suppliers/{supplierId}/quotations` | `recordQuotation` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| POST | `/stock-counts/{countId}/post` | `postStockCount` | `LEDGER_POST` | — | venue-management-web, venue-staff-app |
+| POST | `/stock-counts/{countId}/recount` | `recountStockCount` | `LEDGER_APPROVE` | — | venue-management-web |
+| GET | `/stock-counts/{countId}/variance` | `getCountVariance` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/stock-locations` | `listStockLocations` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/stock-locations` | `createStockLocation` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/stock-movements` | `listStockMovements` | `PRODUCT_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/stock-movements` | `createStockMovement` | `PRODUCT_CONFIGURE` | — | venue-management-web, venue-staff-app |
+| GET | `/stock-transfers` | `listStockTransfers` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/stock-transfers` | `createStockTransfer` | `PRODUCT_CONFIGURE` | — | venue-management-web, venue-staff-app |
+| GET | `/stock-transfers/{transferId}` | `getStockTransfer` | `PRODUCT_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/stock-transfers/{transferId}/close-short` | `closeTransferShort` | `LEDGER_APPROVE` | — | venue-management-web |
+| POST | `/stock-transfers/{transferId}/receive` | `receiveStockTransfer` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/stock/valuation` | `getStockValuation` | `LEDGER_VIEW` | — | venue-management-web |
+| GET | `/suppliers` | `listSuppliers` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/suppliers` | `createSupplier` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| PUT | `/suppliers/{supplierId}` | `updateSupplier` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/suppliers/{supplierId}/quotations` | `recordQuotation` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 
 ### `maintenance.yaml` — 36 operation(s)
 
@@ -1159,42 +1159,42 @@ Assets, work orders, inspections and incidents. Photo-first, offline-capable.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/assets` | `listAssets` | `ASSET_VIEW` | ✓ | Venue CMS, Venue Mgmt |
-| POST | `/assets` | `createAsset` | `ASSET_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/assets/lookup` | `lookupAsset` | `ASSET_VIEW` | ✓ | Staff App, Venue CMS, Venue Mgmt |
-| GET | `/assets/{assetId}` | `getAsset` | `ASSET_VIEW` | ✓ | Venue CMS, Venue Mgmt |
-| PATCH | `/assets/{assetId}` | `updateAsset` | `ASSET_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/assets/{assetId}/history` | `getAssetHistory` | `ASSET_VIEW` | — | Venue CMS, Venue Mgmt |
-| PUT | `/assets/{assetId}/status` | `setAssetStatus` | `ASSET_MANAGE` | ✓ | Staff App, Venue CMS, Venue Mgmt |
-| GET | `/incidents` | `listIncidents` | `INCIDENT_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/incidents` | `reportIncident` | `INCIDENT_REPORT` | ✓ | Staff App, Venue Mgmt |
-| GET | `/incidents/{incidentId}` | `getIncident` | `INCIDENT_VIEW` | — | Staff App, Venue Mgmt |
-| PATCH | `/incidents/{incidentId}` | `updateIncident` | `INCIDENT_MANAGE` | — | Staff App, Venue Mgmt |
-| POST | `/incidents/{incidentId}/notify-authority` | `recordAuthorityNotification` | `INCIDENT_MANAGE` | — | Staff App, Venue Mgmt |
-| GET | `/inspection-templates` | `listInspectionTemplates` | `INSPECTION_VIEW` | ✓ | Staff App |
-| POST | `/inspection-templates` | `createInspectionTemplate` | `INSPECTION_MANAGE` | — | Staff App |
-| GET | `/inspections` | `listInspections` | `INSPECTION_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/inspections` | `submitInspection` | `INSPECTION_SUBMIT` | ✓ | Staff App, Venue Mgmt |
-| GET | `/maintenance-plans` | `listMaintenancePlans` | `ASSET_VIEW` | — | Venue Mgmt |
-| POST | `/maintenance-plans` | `createMaintenancePlan` | `ASSET_MANAGE` | — | Venue Mgmt |
-| GET | `/maintenance-plans/due` | `getDueMaintenance` | `ASSET_VIEW` | — | Venue Mgmt |
-| PATCH | `/maintenance-plans/{planId}` | `updateMaintenancePlan` | `ASSET_MANAGE` | — | Venue Mgmt |
-| GET | `/work-orders` | `listWorkOrders` | `WORK_ORDER_VIEW` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders` | `createWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | Staff App, TICVAI Web, Venue Mgmt |
-| GET | `/work-orders/{workOrderId}` | `getWorkOrder` | `WORK_ORDER_VIEW` | ✓ | Staff App, Venue Mgmt |
-| PATCH | `/work-orders/{workOrderId}` | `updateWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/accept` | `acceptWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/attachments` | `attachWorkOrderEvidence` | `MAINTENANCE_EXECUTE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/cancel` | `cancelWorkOrder` | `WORK_ORDER_MANAGE` | — | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/close` | `closeWorkOrder` | `MAINTENANCE_APPROVE` | — | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/complete` | `completeWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/parts` | `recordWorkOrderParts` | `WORK_ORDER_MANAGE` | — | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/pause` | `pauseWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | Staff App |
-| POST | `/work-orders/{workOrderId}/reject` | `rejectWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | Staff App |
-| POST | `/work-orders/{workOrderId}/resume` | `resumeWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | Staff App |
-| POST | `/work-orders/{workOrderId}/start` | `startWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/time` | `recordWorkOrderTime` | `WORK_ORDER_MANAGE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/work-orders/{workOrderId}/verify` | `verifyWorkOrder` | `WORK_ORDER_VERIFY` | — | Staff App, Venue Mgmt |
+| GET | `/assets` | `listAssets` | `ASSET_VIEW` | ✓ | venue-management-web |
+| POST | `/assets` | `createAsset` | `ASSET_MANAGE` | — | venue-management-web |
+| GET | `/assets/lookup` | `lookupAsset` | `ASSET_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/assets/{assetId}` | `getAsset` | `ASSET_VIEW` | ✓ | venue-management-web |
+| PATCH | `/assets/{assetId}` | `updateAsset` | `ASSET_MANAGE` | — | venue-management-web |
+| GET | `/assets/{assetId}/history` | `getAssetHistory` | `ASSET_VIEW` | — | venue-management-web |
+| PUT | `/assets/{assetId}/status` | `setAssetStatus` | `ASSET_MANAGE` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/incidents` | `listIncidents` | `INCIDENT_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/incidents` | `reportIncident` | `INCIDENT_REPORT` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/incidents/{incidentId}` | `getIncident` | `INCIDENT_VIEW` | — | venue-management-web, venue-staff-app |
+| PATCH | `/incidents/{incidentId}` | `updateIncident` | `INCIDENT_MANAGE` | — | venue-management-web, venue-staff-app |
+| POST | `/incidents/{incidentId}/notify-authority` | `recordAuthorityNotification` | `INCIDENT_MANAGE` | — | venue-management-web, venue-staff-app |
+| GET | `/inspection-templates` | `listInspectionTemplates` | `INSPECTION_VIEW` | ✓ | venue-staff-app |
+| POST | `/inspection-templates` | `createInspectionTemplate` | `INSPECTION_MANAGE` | — | venue-staff-app |
+| GET | `/inspections` | `listInspections` | `INSPECTION_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/inspections` | `submitInspection` | `INSPECTION_SUBMIT` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/maintenance-plans` | `listMaintenancePlans` | `ASSET_VIEW` | — | venue-management-web |
+| POST | `/maintenance-plans` | `createMaintenancePlan` | `ASSET_MANAGE` | — | venue-management-web |
+| GET | `/maintenance-plans/due` | `getDueMaintenance` | `ASSET_VIEW` | — | venue-management-web |
+| PATCH | `/maintenance-plans/{planId}` | `updateMaintenancePlan` | `ASSET_MANAGE` | — | venue-management-web |
+| GET | `/work-orders` | `listWorkOrders` | `WORK_ORDER_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders` | `createWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | ticvai-web, venue-management-web, venue-staff-app |
+| GET | `/work-orders/{workOrderId}` | `getWorkOrder` | `WORK_ORDER_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| PATCH | `/work-orders/{workOrderId}` | `updateWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/accept` | `acceptWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/attachments` | `attachWorkOrderEvidence` | `MAINTENANCE_EXECUTE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/cancel` | `cancelWorkOrder` | `WORK_ORDER_MANAGE` | — | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/close` | `closeWorkOrder` | `MAINTENANCE_APPROVE` | — | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/complete` | `completeWorkOrder` | `WORK_ORDER_MANAGE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/parts` | `recordWorkOrderParts` | `WORK_ORDER_MANAGE` | — | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/pause` | `pauseWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | venue-staff-app |
+| POST | `/work-orders/{workOrderId}/reject` | `rejectWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | venue-staff-app |
+| POST | `/work-orders/{workOrderId}/resume` | `resumeWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | venue-staff-app |
+| POST | `/work-orders/{workOrderId}/start` | `startWorkOrder` | `MAINTENANCE_EXECUTE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/time` | `recordWorkOrderTime` | `WORK_ORDER_MANAGE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/work-orders/{workOrderId}/verify` | `verifyWorkOrder` | `WORK_ORDER_VERIFY` | — | venue-management-web, venue-staff-app |
 
 ### `marketing-crm.yaml` — 183 operation(s)
 
@@ -1202,189 +1202,189 @@ Consent gates everything. A segment is a definition, not a list.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| PUT | `/agent-availability` | `setAgentAvailability` | `CASE_MANAGE` | — | Support |
-| GET | `/agent-workload-availability` | `listAgentWorkloadAvailability` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
+| PUT | `/agent-availability` | `setAgentAvailability` | `CASE_MANAGE` | — | venue-support-web |
+| GET | `/agent-workload-availability` | `listAgentWorkloadAvailability` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
 | POST | `/attribution/touches` | `recordTouchPoint` | `MARKETING_MANAGE` | — | — |
-| GET | `/audience-activations` | `listAudienceActivations` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/audience-activations` | `activateAudience` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/audience-lists` | `listAudienceLists` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/audience-lists` | `importAudienceList` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/audience-overlap` | `getAudienceOverlap` | `MARKETING_VIEW` | — | Venue Mgmt |
-| GET | `/business-event-notification` | `listBusinessEventNotification` | `MARKETING_VIEW` | — | TICVAI Web |
-| GET | `/campaigns` | `listCampaigns` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/campaigns` | `createCampaign` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/campaigns/{campaignId}` | `getCampaign` | `MARKETING_VIEW` | — | Venue Mgmt |
-| PATCH | `/campaigns/{campaignId}` | `updateCampaign` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/campaigns/{campaignId}/launch` | `launchCampaign` | `MARKETING_SEND` | — | Venue Mgmt |
-| POST | `/campaigns/{campaignId}/pause` | `pauseCampaign` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/campaigns/{campaignId}/performance` | `getCampaignPerformance` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/campaigns/{campaignId}/stop` | `stopCampaign` | `MARKETING_SEND` | — | Venue Mgmt |
-| POST | `/campaigns/{campaignId}/test-send` | `testSendCampaign` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/campaigns/{campaignId}/unschedule` | `unscheduleCampaign` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/case-classification-intelligent` | `createCaseClassificationIntelligent` | `MARKETING_MANAGE` | — | Support |
-| PUT | `/case-investigation-resolution` | `setCaseInvestigationResolution` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
-| GET | `/case-resolution-closure` | `listCaseResolutionClosure` | `MARKETING_VIEW` | — | Support |
-| GET | `/cases` | `listCases` | `CASE_VIEW` | — | Guest App, Guest Web, Partner Web, Staff App, Support, Venue Mgmt |
-| POST | `/cases` | `createCase` | `CASE_MANAGE` | ✓ | Guest App, Guest Web, Partner Web, Staff App, Support, Venue Mgmt |
-| GET | `/cases/{caseId}` | `getCase` | `CASE_VIEW` | — | Partner Web, Staff App, Support, Venue Mgmt |
-| PATCH | `/cases/{caseId}` | `updateCase` | `CASE_MANAGE` | — | Partner Web, Staff App, Support, Venue Mgmt |
-| POST | `/cases/{caseId}/escalate` | `escalateCase` | `CASE_MANAGE` | — | Partner Web, Staff App, Support, Venue Mgmt |
-| POST | `/cases/{caseId}/messages` | `addCaseMessage` | `CASE_MANAGE` | ✓ | Partner Web, Staff App, Support, Venue Mgmt |
-| POST | `/cases/{caseId}/reopen` | `reopenCase` | `CASE_MANAGE` | — | Partner Web, Staff App, Support |
-| POST | `/challenges` | `createChallenge` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| PUT | `/channel-provider` | `setChannelProvider` | `MARKETING_MANAGE` | — | TICVAI Web |
-| PUT | `/communication-preference-marketing` | `setCommunicationPreferenceMarketing` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/communication-service` | `listCommunicationService` | `MARKETING_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/compliance-evidence-waiver` | `listComplianceEvidenceWaiver` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| PUT | `/consent-capture-point` | `setConsentCapturePoint` | `MARKETING_MANAGE` | — | Venue CMS |
-| GET | `/consent-evidence-withdrawal` | `listConsentEvidenceWithdrawal` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/consent-preference-communication` | `listConsentPreferenceCommunication` | `MARKETING_VIEW` | — | TICVAI Web |
-| GET | `/consent-purposes` | `listConsentPurposes` | `GUEST_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| PUT | `/consent-purposes` | `setConsentPurposes` | `GUEST_MANAGE` | — | Venue CMS, Venue Mgmt |
+| GET | `/audience-activations` | `listAudienceActivations` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/audience-activations` | `activateAudience` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/audience-lists` | `listAudienceLists` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/audience-lists` | `importAudienceList` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/audience-overlap` | `getAudienceOverlap` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/business-event-notification` | `listBusinessEventNotification` | `MARKETING_VIEW` | — | ticvai-web |
+| GET | `/campaigns` | `listCampaigns` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/campaigns` | `createCampaign` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/campaigns/{campaignId}` | `getCampaign` | `MARKETING_VIEW` | — | venue-management-web |
+| PATCH | `/campaigns/{campaignId}` | `updateCampaign` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/campaigns/{campaignId}/launch` | `launchCampaign` | `MARKETING_SEND` | — | venue-management-web |
+| POST | `/campaigns/{campaignId}/pause` | `pauseCampaign` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/campaigns/{campaignId}/performance` | `getCampaignPerformance` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/campaigns/{campaignId}/stop` | `stopCampaign` | `MARKETING_SEND` | — | venue-management-web |
+| POST | `/campaigns/{campaignId}/test-send` | `testSendCampaign` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/campaigns/{campaignId}/unschedule` | `unscheduleCampaign` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/case-classification-intelligent` | `createCaseClassificationIntelligent` | `MARKETING_MANAGE` | — | venue-support-web |
+| PUT | `/case-investigation-resolution` | `setCaseInvestigationResolution` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
+| GET | `/case-resolution-closure` | `listCaseResolutionClosure` | `MARKETING_VIEW` | — | venue-support-web |
+| GET | `/cases` | `listCases` | `CASE_VIEW` | — | guest-app, guest-web, partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| POST | `/cases` | `createCase` | `CASE_MANAGE` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| GET | `/cases/{caseId}` | `getCase` | `CASE_VIEW` | — | partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| PATCH | `/cases/{caseId}` | `updateCase` | `CASE_MANAGE` | — | partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| POST | `/cases/{caseId}/escalate` | `escalateCase` | `CASE_MANAGE` | — | partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| POST | `/cases/{caseId}/messages` | `addCaseMessage` | `CASE_MANAGE` | ✓ | partner-web, venue-management-web, venue-staff-app, venue-support-web |
+| POST | `/cases/{caseId}/reopen` | `reopenCase` | `CASE_MANAGE` | — | partner-web, venue-staff-app, venue-support-web |
+| POST | `/challenges` | `createChallenge` | `MARKETING_MANAGE` | — | venue-management-web |
+| PUT | `/channel-provider` | `setChannelProvider` | `MARKETING_MANAGE` | — | ticvai-web |
+| PUT | `/communication-preference-marketing` | `setCommunicationPreferenceMarketing` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/communication-service` | `listCommunicationService` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/compliance-evidence-waiver` | `listComplianceEvidenceWaiver` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/consent-capture-point` | `setConsentCapturePoint` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/consent-evidence-withdrawal` | `listConsentEvidenceWithdrawal` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/consent-preference-communication` | `listConsentPreferenceCommunication` | `MARKETING_VIEW` | — | ticvai-web |
+| GET | `/consent-purposes` | `listConsentPurposes` | `GUEST_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| PUT | `/consent-purposes` | `setConsentPurposes` | `GUEST_MANAGE` | — | venue-management-web |
 | GET | `/consent/suppression-list` | `getSuppressionList` | `GUEST_VIEW` | — | — |
 | POST | `/consent/suppression-list` | `addSuppression` | `GUEST_MANAGE` | — | — |
-| GET | `/contact` | `listContact` | `MARKETING_VIEW` | — | Support |
-| GET | `/contact-automation` | `listContactAutomation` | `MARKETING_VIEW` | — | Support |
-| GET | `/conversations` | `listConversations` | `CASE_VIEW` | — | Support, Venue Mgmt |
-| GET | `/conversations/{conversationId}` | `getConversation` | `CASE_VIEW` | — | Support, Venue Mgmt |
-| POST | `/conversations/{conversationId}/claim` | `claimConversation` | `CASE_MANAGE` | — | Support, Venue Mgmt |
-| POST | `/conversations/{conversationId}/close` | `closeConversation` | `CASE_MANAGE` | — | Support |
+| GET | `/contact` | `listContact` | `MARKETING_VIEW` | — | venue-support-web |
+| GET | `/contact-automation` | `listContactAutomation` | `MARKETING_VIEW` | — | venue-support-web |
+| GET | `/conversations` | `listConversations` | `CASE_VIEW` | — | venue-management-web, venue-support-web |
+| GET | `/conversations/{conversationId}` | `getConversation` | `CASE_VIEW` | — | venue-management-web, venue-support-web |
+| POST | `/conversations/{conversationId}/claim` | `claimConversation` | `CASE_MANAGE` | — | venue-management-web, venue-support-web |
+| POST | `/conversations/{conversationId}/close` | `closeConversation` | `CASE_MANAGE` | — | venue-support-web |
 | POST | `/conversations/{conversationId}/disposition` | `setCallDisposition` | `CASE_MANAGE` | — | — |
-| POST | `/conversations/{conversationId}/handover` | `handoverToAgent` | `—` | — | Guest App, Guest Kiosk, Guest Web, Venue Mgmt |
-| POST | `/conversations/{conversationId}/messages` | `sendConversationMessage` | `CASE_MANAGE` | — | Guest App, Guest Web, Support, Venue Mgmt |
-| POST | `/conversations/{conversationId}/transfer` | `transferConversation` | `CASE_MANAGE` | — | Support |
-| GET | `/cookie-banner-preference` | `listCookieBannerPreference` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/cookie-tracking-digital` | `listCookieTrackingDigital` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/customer-privacy-consent` | `listCustomerPrivacyConsent` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/customer-satisfaction-feedback` | `listCustomerSatisfactionFeedback` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| GET | `/customer-service` | `listCustomerService` | `MARKETING_VIEW` | — | Support |
-| PUT | `/customer-service-copilot` | `setCustomerServiceCopilot` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
-| GET | `/customer-service-profile` | `listCustomerServiceProfile` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| PUT | `/data-discovery-access` | `setDataDiscoveryAccess` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/data-processing-purpose` | `listDataProcessingPurpose` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/data-retention-expiry` | `listDataRetentionExpiry` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/data-subject-customer` | `listDataSubjectCustomer` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/deletion-anonymization-restriction` | `listDeletionAnonymizationRestriction` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/delivery-communication-platform` | `listDeliveryCommunicationPlatform` | `MARKETING_VIEW` | — | TICVAI Web |
-| GET | `/delivery-queue-failure` | `listDeliveryQueueFailure` | `MARKETING_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/digital-signing-collection` | `listDigitalSigningCollection` | `MARKETING_VIEW` | — | Venue CMS |
-| PUT | `/digital-waiver-form` | `setDigitalWaiverForm` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/duplicate-candidates` | `listDuplicateCandidates` | `GUEST_MANAGE` | — | Venue Mgmt |
-| POST | `/duplicate-candidates/{candidateId}/decide` | `decideDuplicateCandidate` | `GUEST_MANAGE` | — | Venue Mgmt |
-| GET | `/dynamic-field-question` | `listDynamicFieldQuestion` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/escalation-collaboration-internal` | `listEscalationCollaborationInternal` | `MARKETING_VIEW` | — | Support |
-| GET | `/escalation-critical-case` | `listEscalationCriticalCase` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
+| POST | `/conversations/{conversationId}/handover` | `handoverToAgent` | `—` | — | guest-app, guest-web, venue-management-web |
+| POST | `/conversations/{conversationId}/messages` | `sendConversationMessage` | `CASE_MANAGE` | — | guest-app, guest-web, venue-management-web, venue-support-web |
+| POST | `/conversations/{conversationId}/transfer` | `transferConversation` | `CASE_MANAGE` | — | venue-support-web |
+| GET | `/cookie-banner-preference` | `listCookieBannerPreference` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/cookie-tracking-digital` | `listCookieTrackingDigital` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/customer-privacy-consent` | `listCustomerPrivacyConsent` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/customer-satisfaction-feedback` | `listCustomerSatisfactionFeedback` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| GET | `/customer-service` | `listCustomerService` | `MARKETING_VIEW` | — | venue-support-web |
+| PUT | `/customer-service-copilot` | `setCustomerServiceCopilot` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
+| GET | `/customer-service-profile` | `listCustomerServiceProfile` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| PUT | `/data-discovery-access` | `setDataDiscoveryAccess` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/data-processing-purpose` | `listDataProcessingPurpose` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/data-retention-expiry` | `listDataRetentionExpiry` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/data-subject-customer` | `listDataSubjectCustomer` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/deletion-anonymization-restriction` | `listDeletionAnonymizationRestriction` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/delivery-communication-platform` | `listDeliveryCommunicationPlatform` | `MARKETING_VIEW` | — | ticvai-web |
+| GET | `/delivery-queue-failure` | `listDeliveryQueueFailure` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/digital-signing-collection` | `listDigitalSigningCollection` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/digital-waiver-form` | `setDigitalWaiverForm` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/duplicate-candidates` | `listDuplicateCandidates` | `GUEST_MANAGE` | — | venue-management-web |
+| POST | `/duplicate-candidates/{candidateId}/decide` | `decideDuplicateCandidate` | `GUEST_MANAGE` | — | venue-management-web |
+| GET | `/dynamic-field-question` | `listDynamicFieldQuestion` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/escalation-collaboration-internal` | `listEscalationCollaborationInternal` | `MARKETING_VIEW` | — | venue-support-web |
+| GET | `/escalation-critical-case` | `listEscalationCriticalCase` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
 | POST | `/form-submissions` | `submitForm` | `GUEST_VIEW` | ✓ | — |
-| POST | `/forms` | `createForm` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/guest-attribute-model` | `getGuestAttributeModel` | `GUEST_VIEW` | — | Venue Mgmt |
-| PUT | `/guest-attribute-model` | `setGuestAttributeModel` | `GUEST_MANAGE` | — | Venue Mgmt |
-| POST | `/guest-documents` | `uploadGuestDocument` | `GUEST_VIEW_PII` | — | Guest App, Guest Web, Venue Mgmt |
-| GET | `/guests` | `searchGuests` | `GUEST_VIEW` | — | Venue CMS, Venue Mgmt, Venue POS |
-| POST | `/guests/identify` | `identifyGuest` | `GUEST_VIEW` | — | Venue POS |
-| POST | `/guests/match` | `matchGuest` | `GUEST_VIEW` | — | Staff App |
-| GET | `/guests/me/challenges` | `getMyChallenges` | `MARKETING_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| PATCH | `/guests/me/profile` | `updateMyProfile` | `GUEST_VIEW` | — | Guest App, Guest Web |
-| POST | `/guests/merge` | `mergeGuests` | `GUEST_MANAGE` | — | Staff App, Venue Mgmt |
-| GET | `/guests/{guestId}/intelligence` | `getGuestIntelligence` | `GUEST_VIEW` | — | Venue Mgmt |
-| GET | `/guests/{guestId}/relationships` | `getGuestRelationships` | `GUEST_VIEW` | — | Venue Mgmt |
-| PUT | `/guests/{guestId}/relationships` | `setGuestRelationships` | `GUEST_MANAGE` | — | Venue Mgmt |
-| GET | `/guests/{guestId}/timeline` | `getGuestTimeline` | `GUEST_VIEW` | — | Venue Mgmt |
-| GET | `/guests/{subjectId}` | `getGuestProfile` | `GUEST_VIEW` | — | Guest App, Guest Web, Staff App, TICVAI Web, Venue CMS, Venue Mgmt |
-| PATCH | `/guests/{subjectId}` | `updateGuestProfile` | `GUEST_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/guests/{subjectId}/consents` | `getGuestConsents` | `GUEST_VIEW` | — | Guest App, Guest Web, Venue CMS, Venue Mgmt |
-| POST | `/guests/{subjectId}/consents` | `recordConsent` | `—` | — | Guest App, Guest Web, Venue CMS, Venue Mgmt |
-| GET | `/guests/{subjectId}/consents/history` | `getConsentHistory` | `GUEST_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/guests/{subjectId}/devices` | `listGuestDevices` | `—` | — | Guest App, Guest Web, Venue CMS, Venue Mgmt |
-| POST | `/guests/{subjectId}/devices` | `registerGuestDevice` | `—` | — | Guest App, Guest Web |
-| DELETE | `/guests/{subjectId}/devices/{deviceId}` | `revokeGuestDevice` | `—` | — | Guest App, Guest Web |
-| GET | `/guests/{subjectId}/loyalty` | `getGuestLoyalty` | `GUEST_VIEW` | — | Venue CMS, Venue Mgmt |
-| POST | `/guests/{subjectId}/loyalty/adjust` | `adjustLoyaltyPoints` | `LEDGER_POST` | — | Venue CMS, Venue Mgmt |
-| POST | `/guests/{subjectId}/merge` | `mergeGuestProfiles` | `GUEST_MANAGE` | — | Venue CMS, Venue Mgmt |
+| POST | `/forms` | `createForm` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/guest-attribute-model` | `getGuestAttributeModel` | `GUEST_VIEW` | — | venue-management-web |
+| PUT | `/guest-attribute-model` | `setGuestAttributeModel` | `GUEST_MANAGE` | — | venue-management-web |
+| POST | `/guest-documents` | `uploadGuestDocument` | `GUEST_VIEW_PII` | — | guest-app, guest-web, venue-management-web |
+| GET | `/guests` | `searchGuests` | `GUEST_VIEW` | — | venue-management-web, venue-pos |
+| POST | `/guests/identify` | `identifyGuest` | `GUEST_VIEW` | — | venue-pos |
+| POST | `/guests/match` | `matchGuest` | `GUEST_VIEW` | — | venue-staff-app |
+| GET | `/guests/me/challenges` | `getMyChallenges` | `MARKETING_VIEW` | — | guest-app, guest-web, venue-management-web |
+| PATCH | `/guests/me/profile` | `updateMyProfile` | `GUEST_VIEW` | — | guest-app, guest-web |
+| POST | `/guests/merge` | `mergeGuests` | `GUEST_MANAGE` | — | venue-management-web, venue-staff-app |
+| GET | `/guests/{guestId}/intelligence` | `getGuestIntelligence` | `GUEST_VIEW` | — | venue-management-web |
+| GET | `/guests/{guestId}/relationships` | `getGuestRelationships` | `GUEST_VIEW` | — | venue-management-web |
+| PUT | `/guests/{guestId}/relationships` | `setGuestRelationships` | `GUEST_MANAGE` | — | venue-management-web |
+| GET | `/guests/{guestId}/timeline` | `getGuestTimeline` | `GUEST_VIEW` | — | venue-management-web |
+| GET | `/guests/{subjectId}` | `getGuestProfile` | `GUEST_VIEW` | — | guest-app, guest-web, ticvai-web, venue-management-web, venue-staff-app |
+| PATCH | `/guests/{subjectId}` | `updateGuestProfile` | `GUEST_MANAGE` | — | venue-management-web |
+| GET | `/guests/{subjectId}/consents` | `getGuestConsents` | `GUEST_VIEW` | — | guest-app, guest-web, venue-management-web |
+| POST | `/guests/{subjectId}/consents` | `recordConsent` | `—` | — | guest-app, guest-web, venue-management-web |
+| GET | `/guests/{subjectId}/consents/history` | `getConsentHistory` | `GUEST_VIEW` | — | venue-management-web |
+| GET | `/guests/{subjectId}/devices` | `listGuestDevices` | `—` | — | guest-app, guest-web, venue-management-web |
+| POST | `/guests/{subjectId}/devices` | `registerGuestDevice` | `—` | — | guest-app, guest-web |
+| DELETE | `/guests/{subjectId}/devices/{deviceId}` | `revokeGuestDevice` | `—` | — | guest-app, guest-web |
+| GET | `/guests/{subjectId}/loyalty` | `getGuestLoyalty` | `GUEST_VIEW` | — | venue-management-web |
+| POST | `/guests/{subjectId}/loyalty/adjust` | `adjustLoyaltyPoints` | `LEDGER_POST` | — | venue-management-web |
+| POST | `/guests/{subjectId}/merge` | `mergeGuestProfiles` | `GUEST_MANAGE` | — | venue-management-web |
 | POST | `/guests/{subjectId}/notes` | `addGuestNote` | `GUEST_MANAGE` | ✓ | — |
-| PUT | `/guests/{subjectId}/preferences` | `updateGuestPreferences` | `GUEST_MANAGE` | — | Guest App, Guest Web, Venue Mgmt |
-| GET | `/guests/{subjectId}/waiver-status` | `getWaiverStatus` | `GUEST_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| GET | `/guests/{subjectId}/wishlist` | `getWishlist` | `—` | — | Guest App, Guest Web, Venue CMS, Venue Mgmt |
-| POST | `/guests/{subjectId}/wishlist` | `addToWishlist` | `—` | — | Guest App, Guest Web |
-| DELETE | `/guests/{subjectId}/wishlist/{itemId}` | `removeFromWishlist` | `—` | — | Guest App, Guest Web |
-| GET | `/identity-resolution-rules` | `getIdentityResolutionRules` | `GUEST_VIEW` | — | Venue Mgmt |
-| PUT | `/identity-resolution-rules` | `setIdentityResolutionRules` | `GUEST_MANAGE` | — | Venue Mgmt |
-| PUT | `/intelligent-routing-skill` | `setIntelligentRoutingSkill` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
+| PUT | `/guests/{subjectId}/preferences` | `updateGuestPreferences` | `GUEST_MANAGE` | — | guest-app, guest-web, venue-management-web |
+| GET | `/guests/{subjectId}/waiver-status` | `getWaiverStatus` | `GUEST_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| GET | `/guests/{subjectId}/wishlist` | `getWishlist` | `—` | — | guest-app, guest-web, venue-management-web |
+| POST | `/guests/{subjectId}/wishlist` | `addToWishlist` | `—` | — | guest-app, guest-web |
+| DELETE | `/guests/{subjectId}/wishlist/{itemId}` | `removeFromWishlist` | `—` | — | guest-app, guest-web |
+| GET | `/identity-resolution-rules` | `getIdentityResolutionRules` | `GUEST_VIEW` | — | venue-management-web |
+| PUT | `/identity-resolution-rules` | `setIdentityResolutionRules` | `GUEST_MANAGE` | — | venue-management-web |
+| PUT | `/intelligent-routing-skill` | `setIntelligentRoutingSkill` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
 | POST | `/invitation-campaigns` | `createInvitationCampaign` | `MARKETING_MANAGE` | — | — |
-| POST | `/invitations/{token}/respond` | `respondToInvitation` | `GUEST_VIEW` | — | Guest App, Guest Web |
-| GET | `/journeys` | `listJourneys` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/journeys` | `createJourney` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/journeys/{journeyId}/activate` | `activateJourney` | `MARKETING_SEND` | — | Venue Mgmt |
-| GET | `/journeys/{journeyId}/performance` | `getJourneyPerformance` | `MARKETING_VIEW` | — | Venue Mgmt |
+| POST | `/invitations/{token}/respond` | `respondToInvitation` | `GUEST_VIEW` | — | guest-app, guest-web |
+| GET | `/journeys` | `listJourneys` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/journeys` | `createJourney` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/journeys/{journeyId}/activate` | `activateJourney` | `MARKETING_SEND` | — | venue-management-web |
+| GET | `/journeys/{journeyId}/performance` | `getJourneyPerformance` | `MARKETING_VIEW` | — | venue-management-web |
 | POST | `/kiosk-assists` | `startKioskAssist` | `CASE_MANAGE` | — | — |
-| POST | `/kiosk-assists/{sessionId}/end` | `endKioskAssist` | `—` | — | Guest Kiosk |
-| PUT | `/localization-branding-customer` | `setLocalizationBrandingCustomer` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/lost-items` | `listLostItems` | `CASE_VIEW` | — | Venue Mgmt |
+| POST | `/kiosk-assists/{sessionId}/end` | `endKioskAssist` | `—` | — | guest-app |
+| PUT | `/localization-branding-customer` | `setLocalizationBrandingCustomer` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/lost-items` | `listLostItems` | `CASE_VIEW` | — | venue-management-web |
 | POST | `/lost-items` | `recordLostItem` | `CASE_MANAGE` | ✓ | — |
-| POST | `/lost-items/{itemId}/match` | `matchLostItem` | `CASE_MANAGE` | — | Venue Mgmt |
+| POST | `/lost-items/{itemId}/match` | `matchLostItem` | `CASE_MANAGE` | — | venue-management-web |
 | GET | `/lost-items/{itemId}/matches` | `getLostItemMatches` | `CASE_VIEW` | — | — |
 | POST | `/loyalty/accruals` | `accrueLoyaltyPoints` | `LOYALTY_ACCRUE` | — | — |
-| GET | `/loyalty/position` | `getLoyaltyPosition` | `—` | — | Guest App, Guest Web, Venue Mgmt, Venue POS |
-| GET | `/loyalty/programmes` | `listLoyaltyProgrammes` | `MARKETING_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/loyalty/programmes` | `createLoyaltyProgramme` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/loyalty/redemptions` | `redeemLoyaltyPoints` | `LOYALTY_REDEEM` | — | Guest App, Guest Web, Venue POS |
-| GET | `/marketing-subscriptions` | `getMarketingSubscription` | `MARKETING_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| PUT | `/marketing-subscriptions` | `setMarketingSubscription` | `MARKETING_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/message-dispatches/{dispatchId}/retry` | `retryMessageDispatch` | `MARKETING_SEND` | — | Venue Mgmt |
-| GET | `/message-templates` | `listMessageTemplates` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| POST | `/message-templates` | `createMessageTemplate` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
-| GET | `/message-triggers` | `listMessageTriggers` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/message-triggers` | `setMessageTrigger` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| POST | `/messages` | `sendTransactionalMessage` | `—` | — | Partner Web, Staff App, Venue Mgmt |
-| GET | `/messages/{messageId}` | `getMessageStatus` | `GUEST_VIEW` | — | Partner Web |
-| PUT | `/minor-guardian-age` | `setMinorGuardianAge` | `MARKETING_MANAGE` | — | Venue CMS |
-| GET | `/minor-guardian-group` | `listMinorGuardianGroup` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/missing-expired-invalid` | `listMissingExpiredInvalid` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/my/cases` | `listMyCases` | `—` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/my/cases` | `raiseMyCase` | `—` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/my/cases/{caseId}/messages` | `replyToMyCase` | `—` | — | Guest App, Guest Web |
-| PUT | `/order-booking-ticket` | `setOrderBookingTicket` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
-| GET | `/participant-waiver-statu` | `listParticipantWaiverStatus` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/privacy` | `listPrivacy` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/privacy-compliance` | `listPrivacyCompliance` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| PUT | `/privacy-compliance-exception` | `setPrivacyComplianceException` | `MARKETING_MANAGE` | — | Venue CMS |
-| GET | `/privacy-consent` | `listPrivacyConsent` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/privacy-evidence-compliance` | `listPrivacyEvidenceCompliance` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| POST | `/privacy-incidents` | `recordPrivacyIncident` | `GUEST_MANAGE` | — | Venue Mgmt |
-| GET | `/privacy-notice-policy` | `listPrivacyNoticePolicy` | `MARKETING_VIEW` | — | Venue CMS |
-| PUT | `/privacy-testing` | `approvePrivacyTesting` | `MARKETING_MANAGE` | — | Venue CMS |
-| GET | `/product-event-experience` | `listProductEventExperience` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/provider-health-usage` | `listProviderHealthUsage` | `MARKETING_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/quality-agent-evaluation` | `listQualityAgentEvaluation` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| POST | `/referrals` | `createReferral` | `MARKETING_MANAGE` | — | Guest App, Guest Web, Venue Mgmt |
-| PUT | `/refund-compensation-service` | `setRefundCompensationService` | `MARKETING_MANAGE` | — | Support, Venue Mgmt |
-| PUT | `/retention-policies` | `setDataRetentionPolicy` | `GUEST_MANAGE` | — | Venue Mgmt |
-| POST | `/retention-runs` | `runDataRetention` | `GUEST_MANAGE` | — | Venue Mgmt |
-| GET | `/reviews` | `listReviews` | `MARKETING_VIEW` | — | Venue Mgmt |
-| POST | `/reviews` | `submitReview` | `—` | — | Guest App, Guest Web |
-| POST | `/reviews/{reviewId}/respond` | `respondToReview` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/routing-priority-throttling` | `listRoutingPriorityThrottling` | `MARKETING_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/segments` | `listSegments` | `MARKETING_VIEW` | — | Analytics, Venue Mgmt |
-| POST | `/segments` | `createSegment` | `MARKETING_MANAGE` | — | Analytics, Venue Mgmt |
+| GET | `/loyalty/position` | `getLoyaltyPosition` | `—` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| GET | `/loyalty/programmes` | `listLoyaltyProgrammes` | `MARKETING_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/loyalty/programmes` | `createLoyaltyProgramme` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/loyalty/redemptions` | `redeemLoyaltyPoints` | `LOYALTY_REDEEM` | — | guest-app, guest-web, venue-pos |
+| GET | `/marketing-subscriptions` | `getMarketingSubscription` | `MARKETING_VIEW` | — | guest-app, guest-web, venue-management-web |
+| PUT | `/marketing-subscriptions` | `setMarketingSubscription` | `MARKETING_VIEW` | — | guest-app, guest-web, venue-management-web |
+| POST | `/message-dispatches/{dispatchId}/retry` | `retryMessageDispatch` | `MARKETING_SEND` | — | venue-management-web |
+| GET | `/message-templates` | `listMessageTemplates` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| POST | `/message-templates` | `createMessageTemplate` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
+| GET | `/message-triggers` | `listMessageTriggers` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/message-triggers` | `setMessageTrigger` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/messages` | `sendTransactionalMessage` | `—` | — | partner-web, venue-management-web, venue-staff-app |
+| GET | `/messages/{messageId}` | `getMessageStatus` | `GUEST_VIEW` | — | partner-web |
+| PUT | `/minor-guardian-age` | `setMinorGuardianAge` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/minor-guardian-group` | `listMinorGuardianGroup` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/missing-expired-invalid` | `listMissingExpiredInvalid` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/my/cases` | `listMyCases` | `—` | — | guest-app, guest-web, venue-management-web |
+| POST | `/my/cases` | `raiseMyCase` | `—` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/my/cases/{caseId}/messages` | `replyToMyCase` | `—` | — | guest-app, guest-web |
+| PUT | `/order-booking-ticket` | `setOrderBookingTicket` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
+| GET | `/participant-waiver-statu` | `listParticipantWaiverStatus` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/privacy` | `listPrivacy` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/privacy-compliance` | `listPrivacyCompliance` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/privacy-compliance-exception` | `setPrivacyComplianceException` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/privacy-consent` | `listPrivacyConsent` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/privacy-evidence-compliance` | `listPrivacyEvidenceCompliance` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/privacy-incidents` | `recordPrivacyIncident` | `GUEST_MANAGE` | — | venue-management-web |
+| GET | `/privacy-notice-policy` | `listPrivacyNoticePolicy` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/privacy-testing` | `approvePrivacyTesting` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/product-event-experience` | `listProductEventExperience` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/provider-health-usage` | `listProviderHealthUsage` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/quality-agent-evaluation` | `listQualityAgentEvaluation` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| POST | `/referrals` | `createReferral` | `MARKETING_MANAGE` | — | guest-app, guest-web, venue-management-web |
+| PUT | `/refund-compensation-service` | `setRefundCompensationService` | `MARKETING_MANAGE` | — | venue-management-web, venue-support-web |
+| PUT | `/retention-policies` | `setDataRetentionPolicy` | `GUEST_MANAGE` | — | venue-management-web |
+| POST | `/retention-runs` | `runDataRetention` | `GUEST_MANAGE` | — | venue-management-web |
+| GET | `/reviews` | `listReviews` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/reviews` | `submitReview` | `—` | — | guest-app, guest-web |
+| POST | `/reviews/{reviewId}/respond` | `respondToReview` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/routing-priority-throttling` | `listRoutingPriorityThrottling` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/segments` | `listSegments` | `MARKETING_VIEW` | — | venue-management-web |
+| POST | `/segments` | `createSegment` | `MARKETING_MANAGE` | — | venue-management-web |
 | GET | `/segments/{segmentId}/members` | `listSegmentMembers` | `MARKETING_VIEW` | — | — |
-| POST | `/segments/{segmentId}/preview` | `previewSegment` | `MARKETING_VIEW` | — | Analytics, Venue Mgmt |
-| PUT | `/sender-identity-domain` | `setSenderIdentityDomain` | `MARKETING_MANAGE` | — | TICVAI Web |
-| PUT | `/seo-metadata` | `setSeoMetadata` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| POST | `/seo-redirects` | `createUrlRedirect` | `MARKETING_MANAGE` | — | Venue Mgmt |
-| GET | `/service-root-cause` | `listServiceRootCause` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| PUT | `/signatory-signature-guardian` | `setSignatorySignatureGuardian` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
-| GET | `/site-waiver-exception` | `listSiteWaiverException` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/sla-policy-service` | `listSlaPolicyService` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| GET | `/system-transactional-template` | `listSystemTransactionalTemplate` | `MARKETING_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/unified-interaction-communication` | `listUnifiedInteractionCommunication` | `MARKETING_VIEW` | — | Support, Venue Mgmt |
-| GET | `/versioning-effective-date` | `listVersioningEffectiveDate` | `MARKETING_VIEW` | — | TICVAI Web, Venue CMS, Venue Mgmt |
-| GET | `/waiver` | `listWaiver` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| GET | `/waiver-compliance-operational` | `listWaiverComplianceOperational` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/waiver-compliance-risk` | `listWaiverComplianceRisk` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/waiver-consent` | `listWaiverConsent` | `MARKETING_VIEW` | — | Venue CMS |
-| GET | `/waiver-template-master` | `listWaiverTemplateMaster` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| PUT | `/waiver-testing` | `approveWaiverTesting` | `MARKETING_MANAGE` | — | Venue CMS |
-| GET | `/waiver-trigger-eligibility` | `listWaiverTriggerEligibility` | `MARKETING_VIEW` | — | Venue CMS, Venue Mgmt |
-| PUT | `/waiver-verification-validation` | `setWaiverVerificationValidation` | `MARKETING_MANAGE` | — | Venue CMS, Venue Mgmt |
+| POST | `/segments/{segmentId}/preview` | `previewSegment` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/sender-identity-domain` | `setSenderIdentityDomain` | `MARKETING_MANAGE` | — | ticvai-web |
+| PUT | `/seo-metadata` | `setSeoMetadata` | `MARKETING_MANAGE` | — | venue-management-web |
+| POST | `/seo-redirects` | `createUrlRedirect` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/service-root-cause` | `listServiceRootCause` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| PUT | `/signatory-signature-guardian` | `setSignatorySignatureGuardian` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/site-waiver-exception` | `listSiteWaiverException` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/sla-policy-service` | `listSlaPolicyService` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| GET | `/system-transactional-template` | `listSystemTransactionalTemplate` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/unified-interaction-communication` | `listUnifiedInteractionCommunication` | `MARKETING_VIEW` | — | venue-management-web, venue-support-web |
+| GET | `/versioning-effective-date` | `listVersioningEffectiveDate` | `MARKETING_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/waiver` | `listWaiver` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/waiver-compliance-operational` | `listWaiverComplianceOperational` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/waiver-compliance-risk` | `listWaiverComplianceRisk` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/waiver-consent` | `listWaiverConsent` | `MARKETING_VIEW` | — | venue-management-web |
+| GET | `/waiver-template-master` | `listWaiverTemplateMaster` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/waiver-testing` | `approveWaiverTesting` | `MARKETING_MANAGE` | — | venue-management-web |
+| GET | `/waiver-trigger-eligibility` | `listWaiverTriggerEligibility` | `MARKETING_VIEW` | — | venue-management-web |
+| PUT | `/waiver-verification-validation` | `setWaiverVerificationValidation` | `MARKETING_MANAGE` | — | venue-management-web |
 
 ### `payments.yaml` — 31 operation(s)
 
@@ -1392,37 +1392,37 @@ Consent gates everything. A segment is a definition, not a list.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/b2b-credit-accounts` | `listB2bCreditAccounts` | `PAYMENT_VIEW` | — | TICVAI Web |
-| POST | `/b2b-credit-accounts` | `createB2bCreditAccount` | `CREDIT_MANAGE` | — | TICVAI Web |
-| PUT | `/b2b-credit-accounts/{accountId}/terms` | `setB2bPaymentTerms` | `CREDIT_MANAGE` | — | TICVAI Web |
-| POST | `/chargebacks/{chargebackId}/evidence` | `submitChargebackEvidence` | `PAYMENT_DISPUTE` | — | TICVAI Web |
-| PUT | `/hosted-checkout-config` | `setHostedCheckoutConfiguration` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/merchant-accounts` | `listMerchantAccounts` | `PAYMENT_VIEW` | — | TICVAI Web |
-| PUT | `/merchant-accounts` | `setMerchantAccount` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/mixed-tender-rules` | `getMixedTenderRules` | `PAYMENT_VIEW` | — | TICVAI Web |
-| PUT | `/mixed-tender-rules` | `setMixedTenderRules` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/payment-authentication-policy` | `setPaymentAuthenticationPolicy` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| POST | `/payment-configuration/simulate` | `simulatePaymentConfiguration` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/payment-failover-policy` | `setPaymentFailoverPolicy` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/payment-methods` | `listPaymentMethods` | `PAYMENT_VIEW` | — | TICVAI Web |
-| POST | `/payment-methods` | `createPaymentMethod` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/payment-methods/{methodId}` | `updatePaymentMethod` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/payment-performance` | `getPaymentPerformance` | `PAYMENT_VIEW` | — | TICVAI Web |
-| GET | `/payment-providers` | `listPaymentProviderConnections` | `PAYMENT_VIEW` | — | TICVAI Web |
-| POST | `/payment-providers` | `createPaymentProviderConnection` | `PAYMENT_PROVIDER_MANAGE` | — | TICVAI Web |
-| GET | `/payment-providers/economics` | `getPaymentProviderEconomics` | `PAYMENT_VIEW` | — | TICVAI Web |
-| GET | `/payment-providers/health` | `getPaymentProviderHealth` | `PAYMENT_VIEW` | — | TICVAI Web |
-| POST | `/payment-providers/{connectionId}/test` | `testPaymentProviderConnection` | `PAYMENT_PROVIDER_MANAGE` | — | TICVAI Web |
-| PUT | `/payment-risk-rules` | `setPaymentRiskRules` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/payment-routing-rules` | `listPaymentRoutingRules` | `PAYMENT_VIEW` | — | TICVAI Web |
-| PUT | `/payment-routing-rules` | `setPaymentRoutingRules` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| POST | `/payment-routing/simulate` | `simulatePaymentRouting` | `PAYMENT_VIEW` | — | TICVAI Web |
-| GET | `/payment-terminals` | `listPaymentTerminals` | `PAYMENT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/payment-terminals` | `setPaymentTerminalConfiguration` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/payment-terminals/{terminalId}/forwarded` | `listStoredForwardTransactions` | `PAYMENT_VIEW` | — | TICVAI Web |
-| PUT | `/reconciliation-rules` | `setReconciliationMatchingRules` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
-| GET | `/reconciliation-sources` | `listReconciliationSources` | `PAYMENT_VIEW` | — | TICVAI Web |
-| PUT | `/reconciliation-sources` | `setReconciliationSource` | `PAYMENT_CONFIGURE` | — | TICVAI Web |
+| GET | `/b2b-credit-accounts` | `listB2bCreditAccounts` | `PAYMENT_VIEW` | — | ticvai-web |
+| POST | `/b2b-credit-accounts` | `createB2bCreditAccount` | `CREDIT_MANAGE` | — | ticvai-web |
+| PUT | `/b2b-credit-accounts/{accountId}/terms` | `setB2bPaymentTerms` | `CREDIT_MANAGE` | — | ticvai-web |
+| POST | `/chargebacks/{chargebackId}/evidence` | `submitChargebackEvidence` | `PAYMENT_DISPUTE` | — | ticvai-web |
+| PUT | `/hosted-checkout-config` | `setHostedCheckoutConfiguration` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/merchant-accounts` | `listMerchantAccounts` | `PAYMENT_VIEW` | — | ticvai-web |
+| PUT | `/merchant-accounts` | `setMerchantAccount` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/mixed-tender-rules` | `getMixedTenderRules` | `PAYMENT_VIEW` | — | ticvai-web |
+| PUT | `/mixed-tender-rules` | `setMixedTenderRules` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| PUT | `/payment-authentication-policy` | `setPaymentAuthenticationPolicy` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| POST | `/payment-configuration/simulate` | `simulatePaymentConfiguration` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| PUT | `/payment-failover-policy` | `setPaymentFailoverPolicy` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/payment-methods` | `listPaymentMethods` | `PAYMENT_VIEW` | — | ticvai-web |
+| POST | `/payment-methods` | `createPaymentMethod` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| PUT | `/payment-methods/{methodId}` | `updatePaymentMethod` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/payment-performance` | `getPaymentPerformance` | `PAYMENT_VIEW` | — | ticvai-web |
+| GET | `/payment-providers` | `listPaymentProviderConnections` | `PAYMENT_VIEW` | — | ticvai-web |
+| POST | `/payment-providers` | `createPaymentProviderConnection` | `PAYMENT_PROVIDER_MANAGE` | — | ticvai-web |
+| GET | `/payment-providers/economics` | `getPaymentProviderEconomics` | `PAYMENT_VIEW` | — | ticvai-web |
+| GET | `/payment-providers/health` | `getPaymentProviderHealth` | `PAYMENT_VIEW` | — | ticvai-web |
+| POST | `/payment-providers/{connectionId}/test` | `testPaymentProviderConnection` | `PAYMENT_PROVIDER_MANAGE` | — | ticvai-web |
+| PUT | `/payment-risk-rules` | `setPaymentRiskRules` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/payment-routing-rules` | `listPaymentRoutingRules` | `PAYMENT_VIEW` | — | ticvai-web |
+| PUT | `/payment-routing-rules` | `setPaymentRoutingRules` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| POST | `/payment-routing/simulate` | `simulatePaymentRouting` | `PAYMENT_VIEW` | — | ticvai-web |
+| GET | `/payment-terminals` | `listPaymentTerminals` | `PAYMENT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/payment-terminals` | `setPaymentTerminalConfiguration` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/payment-terminals/{terminalId}/forwarded` | `listStoredForwardTransactions` | `PAYMENT_VIEW` | — | ticvai-web |
+| PUT | `/reconciliation-rules` | `setReconciliationMatchingRules` | `PAYMENT_CONFIGURE` | — | ticvai-web |
+| GET | `/reconciliation-sources` | `listReconciliationSources` | `PAYMENT_VIEW` | — | ticvai-web |
+| PUT | `/reconciliation-sources` | `setReconciliationSource` | `PAYMENT_CONFIGURE` | — | ticvai-web |
 
 ### `platform-ops.yaml` — 33 operation(s)
 
@@ -1430,39 +1430,39 @@ Releases, environments and the migration orchestrator.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/archival-jobs` | `listArchivalJobs` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| GET | `/backup-runs` | `listBackupRuns` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| GET | `/dead-letters` | `listDeadLetters` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| POST | `/dead-letters/{deadLetterId}/replay` | `replayDeadLetter` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
-| GET | `/environments` | `listEnvironments` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/environments` | `registerEnvironment` | `PLATFORM_RELEASE_MANAGE` | — | TICVAI Web |
-| GET | `/migrations` | `listMigrations` | `PLATFORM_MIGRATION_VIEW` | — | TICVAI Web |
-| POST | `/migrations/apply` | `applyMigration` | `PLATFORM_MIGRATION_APPLY` | — | TICVAI Web |
-| POST | `/migrations/plan` | `planMigration` | `PLATFORM_MIGRATION_VIEW` | — | TICVAI Web |
-| GET | `/migrations/runs/{runId}` | `getMigrationRun` | `PLATFORM_MIGRATION_VIEW` | — | TICVAI Web |
-| POST | `/migrations/runs/{runId}/rollback` | `rollbackMigrationRun` | `PLATFORM_MIGRATION_APPLY` | — | TICVAI Web |
-| GET | `/migrations/version-skew` | `getVersionSkew` | `PLATFORM_MIGRATION_VIEW` | — | TICVAI Web |
-| GET | `/releases` | `listReleases` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/releases` | `createRelease` | `PLATFORM_RELEASE_MANAGE` | — | TICVAI Web |
-| GET | `/releases/{reinventoryHoldId}` | `getRelease` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/releases/{reinventoryHoldId}/promote` | `promoteRelease` | `PLATFORM_RELEASE_PROMOTE` | — | TICVAI Web |
-| GET | `/releases/{reinventoryHoldId}/readiness` | `getReleaseReadiness` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/releases/{reinventoryHoldId}/reject` | `rejectRelease` | `PLATFORM_RELEASE_PROMOTE` | — | TICVAI Web |
-| POST | `/releases/{reinventoryHoldId}/withdraw` | `withdrawRelease` | `PLATFORM_RELEASE_MANAGE` | — | TICVAI Web |
-| GET | `/rollouts` | `listRollouts` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| GET | `/rollouts/{rolloutId}` | `getRollout` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
+| GET | `/archival-jobs` | `listArchivalJobs` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| GET | `/backup-runs` | `listBackupRuns` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| GET | `/dead-letters` | `listDeadLetters` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| POST | `/dead-letters/{deadLetterId}/replay` | `replayDeadLetter` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
+| GET | `/environments` | `listEnvironments` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/environments` | `registerEnvironment` | `PLATFORM_RELEASE_MANAGE` | — | ticvai-web |
+| GET | `/migrations` | `listMigrations` | `PLATFORM_MIGRATION_VIEW` | — | ticvai-web |
+| POST | `/migrations/apply` | `applyMigration` | `PLATFORM_MIGRATION_APPLY` | — | ticvai-web |
+| POST | `/migrations/plan` | `planMigration` | `PLATFORM_MIGRATION_VIEW` | — | ticvai-web |
+| GET | `/migrations/runs/{runId}` | `getMigrationRun` | `PLATFORM_MIGRATION_VIEW` | — | ticvai-web |
+| POST | `/migrations/runs/{runId}/rollback` | `rollbackMigrationRun` | `PLATFORM_MIGRATION_APPLY` | — | ticvai-web |
+| GET | `/migrations/version-skew` | `getVersionSkew` | `PLATFORM_MIGRATION_VIEW` | — | ticvai-web |
+| GET | `/releases` | `listReleases` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/releases` | `createRelease` | `PLATFORM_RELEASE_MANAGE` | — | ticvai-web |
+| GET | `/releases/{reinventoryHoldId}` | `getRelease` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/releases/{reinventoryHoldId}/promote` | `promoteRelease` | `PLATFORM_RELEASE_PROMOTE` | — | ticvai-web |
+| GET | `/releases/{reinventoryHoldId}/readiness` | `getReleaseReadiness` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/releases/{reinventoryHoldId}/reject` | `rejectRelease` | `PLATFORM_RELEASE_PROMOTE` | — | ticvai-web |
+| POST | `/releases/{reinventoryHoldId}/withdraw` | `withdrawRelease` | `PLATFORM_RELEASE_MANAGE` | — | ticvai-web |
+| GET | `/rollouts` | `listRollouts` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| GET | `/rollouts/{rolloutId}` | `getRollout` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
 | POST | `/rollouts/{rolloutId}/cells/{cellId}/skip` | `skipRolloutCell` | `PLATFORM_CELL_MANAGE` | — | — |
-| POST | `/rollouts/{rolloutId}/pause` | `pauseRollout` | `PLATFORM_RELEASE_PROMOTE` | — | TICVAI Web |
-| POST | `/rollouts/{rolloutId}/rollback` | `rollbackRollout` | `PLATFORM_RELEASE_PROMOTE` | — | TICVAI Web |
-| POST | `/rollouts/{rolloutId}/start` | `startRollout` | `PLATFORM_RELEASE_PROMOTE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/scaling-policies` | `getScalingPolicy` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| PUT | `/scaling-policies` | `setScalingPolicy` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
-| GET | `/support-notices` | `listSupportNotices` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/support-notices` | `publishSupportNotice` | `PLATFORM_RELEASE_MANAGE` | — | TICVAI Web |
-| GET | `/upgrade-schedules` | `listUpgradeSchedules` | `PLATFORM_RELEASE_VIEW` | — | TICVAI Web |
-| POST | `/upgrade-schedules` | `scheduleTenantUpgrade` | `PLATFORM_RELEASE_MANAGE` | — | TICVAI Web |
-| GET | `/waf-policies` | `listWafRules` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| PUT | `/waf-policies` | `setWafPolicy` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
+| POST | `/rollouts/{rolloutId}/pause` | `pauseRollout` | `PLATFORM_RELEASE_PROMOTE` | — | ticvai-web |
+| POST | `/rollouts/{rolloutId}/rollback` | `rollbackRollout` | `PLATFORM_RELEASE_PROMOTE` | — | ticvai-web |
+| POST | `/rollouts/{rolloutId}/start` | `startRollout` | `PLATFORM_RELEASE_PROMOTE` | — | ticvai-web, venue-management-web |
+| GET | `/scaling-policies` | `getScalingPolicy` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| PUT | `/scaling-policies` | `setScalingPolicy` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
+| GET | `/support-notices` | `listSupportNotices` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/support-notices` | `publishSupportNotice` | `PLATFORM_RELEASE_MANAGE` | — | ticvai-web |
+| GET | `/upgrade-schedules` | `listUpgradeSchedules` | `PLATFORM_RELEASE_VIEW` | — | ticvai-web |
+| POST | `/upgrade-schedules` | `scheduleTenantUpgrade` | `PLATFORM_RELEASE_MANAGE` | — | ticvai-web |
+| GET | `/waf-policies` | `listWafRules` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| PUT | `/waf-policies` | `setWafPolicy` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
 
 ### `promotions.yaml` — 145 operation(s)
 
@@ -1470,147 +1470,147 @@ Discounts, coupons, bundles and revenue allocation.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/advanced-offer` | `listAdvancedOffer` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/advanced-offer-guardrail` | `listAdvancedOfferGuardrail` | `PRICE_VIEW` | — | TICVAI Web |
+| GET | `/advanced-offer` | `listAdvancedOffer` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/advanced-offer-guardrail` | `listAdvancedOfferGuardrail` | `PRICE_VIEW` | — | ticvai-web |
 | GET | `/allocation-splits` | `listAllocationSplits` | `LEDGER_VIEW` | — | — |
 | POST | `/allocation-splits/preview` | `previewAllocationSplit` | `LEDGER_VIEW` | — | — |
-| GET | `/audience-discovery-targeting` | `listAudienceDiscoveryTargeting` | `PRICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/audience-preview-reach` | `listAudiencePreviewReach` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/behavioral-transaction-targeting` | `listBehavioralTransactionTargeting` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/best-offer-customer` | `listBestOfferCustomer` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/budget-consumption-forecast` | `listBudgetConsumptionForecast` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-availability-capacity` | `listBundleAvailabilityCapacity` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-availability-channel` | `listBundleAvailabilityChannel` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-availability-forecast` | `listBundleAvailabilityForecast` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-bogo-advanced` | `listBundleBogoAdvanced` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-combo` | `listBundleCombo` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/bundle-component` | `setBundleComponent` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| PUT | `/bundle-definition` | `setBundleDefinition` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| PUT | `/bundle-preview-recommendation` | `simulateBundlePreviewRecommendation` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/bundle-pricing-commercial` | `listBundlePricingCommercial` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-sellability-dependency` | `listBundleSellabilityDependency` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/bundle-validity-scheduling` | `listBundleValidityScheduling` | `PRICE_VIEW` | — | TICVAI Web |
+| GET | `/audience-discovery-targeting` | `listAudienceDiscoveryTargeting` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/audience-preview-reach` | `listAudiencePreviewReach` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/behavioral-transaction-targeting` | `listBehavioralTransactionTargeting` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/best-offer-customer` | `listBestOfferCustomer` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/budget-consumption-forecast` | `listBudgetConsumptionForecast` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-availability-capacity` | `listBundleAvailabilityCapacity` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-availability-channel` | `listBundleAvailabilityChannel` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-availability-forecast` | `listBundleAvailabilityForecast` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-bogo-advanced` | `listBundleBogoAdvanced` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-combo` | `listBundleCombo` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/bundle-component` | `setBundleComponent` | `PRICE_CONFIGURE` | — | ticvai-web |
+| PUT | `/bundle-definition` | `setBundleDefinition` | `PRICE_CONFIGURE` | — | ticvai-web |
+| PUT | `/bundle-preview-recommendation` | `simulateBundlePreviewRecommendation` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/bundle-pricing-commercial` | `listBundlePricingCommercial` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-sellability-dependency` | `listBundleSellabilityDependency` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/bundle-validity-scheduling` | `listBundleValidityScheduling` | `PRICE_VIEW` | — | ticvai-web |
 | GET | `/bundles` | `listBundles` | `PRODUCT_VIEW` | — | — |
-| POST | `/bundles` | `createBundle` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| GET | `/bundles/{bundleId}` | `getBundle` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web |
+| POST | `/bundles` | `createBundle` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| GET | `/bundles/{bundleId}` | `getBundle` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web |
 | PATCH | `/bundles/{bundleId}` | `updateBundle` | `PRODUCT_CONFIGURE` | — | — |
-| PUT | `/buy-get-bogo` | `setBuyGetBogo` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| PUT | `/campaign-budget-financial` | `setCampaignBudgetFinancial` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/campaign-calendar-timeline` | `listCampaignCalendarTimeline` | `PRICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/campaign-experiment-test` | `listCampaignExperimentTest` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/campaign-financial-commercial` | `listCampaignFinancialCommercial` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/campaign-governance-budget` | `listCampaignGovernanceBudget` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/campaign-promotion-performance` | `listCampaignPromotionPerformance` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/campaign-workflow` | `approveCampaignWorkflow` | `PRICE_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/capacity-pool-reservation` | `listCapacityPoolReservation` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/cart-transaction-threshold` | `listCartTransactionThreshold` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/cheapest-lowest-value` | `listCheapestLowestValue` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/code-distribution-manager` | `setCodeDistributionManager` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/code-eligibility-restriction` | `listCodeEligibilityRestriction` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/code-security-fraud` | `listCodeSecurityFraud` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/component-inventory-availability` | `listComponentInventoryAvailability` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/conflict` | `listConflict` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/conflict-detection-resolution` | `listConflictDetectionResolution` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/context-location-channel` | `listContextLocationChannel` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/coupon-campaigns` | `listCouponCampaigns` | `PRICE_VIEW` | — | Venue Mgmt |
-| POST | `/coupon-campaigns` | `createCouponCampaign` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/coupon-campaigns/{campaignId}/codes` | `listCouponCodes` | `PRICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| POST | `/coupon-campaigns/{campaignId}/codes` | `generateCouponCodes` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/coupon-codes/{code}` | `getCouponCode` | `PRICE_VIEW` | ✓ | Guest App, Guest Web |
+| PUT | `/buy-get-bogo` | `setBuyGetBogo` | `PRICE_CONFIGURE` | — | ticvai-web |
+| PUT | `/campaign-budget-financial` | `setCampaignBudgetFinancial` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/campaign-calendar-timeline` | `listCampaignCalendarTimeline` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/campaign-experiment-test` | `listCampaignExperimentTest` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/campaign-financial-commercial` | `listCampaignFinancialCommercial` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/campaign-governance-budget` | `listCampaignGovernanceBudget` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/campaign-promotion-performance` | `listCampaignPromotionPerformance` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/campaign-workflow` | `approveCampaignWorkflow` | `PRICE_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/capacity-pool-reservation` | `listCapacityPoolReservation` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/cart-transaction-threshold` | `listCartTransactionThreshold` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/cheapest-lowest-value` | `listCheapestLowestValue` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/code-distribution-manager` | `setCodeDistributionManager` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/code-eligibility-restriction` | `listCodeEligibilityRestriction` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/code-security-fraud` | `listCodeSecurityFraud` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/component-inventory-availability` | `listComponentInventoryAvailability` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/conflict` | `listConflict` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/conflict-detection-resolution` | `listConflictDetectionResolution` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/context-location-channel` | `listContextLocationChannel` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/coupon-campaigns` | `listCouponCampaigns` | `PRICE_VIEW` | — | venue-management-web |
+| POST | `/coupon-campaigns` | `createCouponCampaign` | `PRICE_CONFIGURE` | — | venue-management-web |
+| GET | `/coupon-campaigns/{campaignId}/codes` | `listCouponCodes` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/coupon-campaigns/{campaignId}/codes` | `generateCouponCodes` | `PRICE_CONFIGURE` | — | venue-management-web |
+| GET | `/coupon-codes/{code}` | `getCouponCode` | `PRICE_VIEW` | ✓ | guest-app, guest-web |
 | POST | `/coupon-codes/{code}/assign` | `assignCoupon` | `PRICE_CONFIGURE` | — | — |
-| POST | `/coupon-codes/{code}/void` | `voidCouponCode` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/coupon-promo-code` | `setCouponPromoCode` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/crm-customer-segment` | `listCrmCustomerSegment` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/cross-category-promotion` | `setCrossCategoryPromotion` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/customer-membership-segment` | `listCustomerMembershipSegment` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/customer-segment-channel` | `listCustomerSegmentChannel` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/decision` | `approveDecision` | `PRICE_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/discount-calculation-application` | `listDiscountCalculationApplication` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/discount-cap-maximum` | `listDiscountCapMaximum` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/discount-limit-guardrail` | `listDiscountLimitGuardrail` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/discount-margin-profitability` | `listDiscountMarginProfitability` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-bundle` | `listDynamicBundle` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-bundle-2` | `listDynamicBundle2` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-bundle-rule` | `listDynamicBundleRule` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/dynamic-component-substitution` | `listDynamicComponentSubstitution` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/eligibility-rule` | `setEligibilityRule` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/executive-promotion-reporting` | `listExecutivePromotionReporting` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/fixed-price-offer` | `setFixedPriceOffer` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| PUT | `/gift-free-product` | `setGiftFreeProduct` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/governance-risk-launch` | `listGovernanceRiskLaunch` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/guest-choice-build` | `setGuestChoiceBuild` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/incrementality-attribution-cannibalization` | `listIncrementalityAttributionCannibalization` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/membership-loyalty-guest` | `listMembershipLoyaltyGuest` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/multi-buy-quantity` | `listMultiBuyQuantity` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/next-best-action` | `listNextBestAction` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/offer-basket-trace` | `listOfferBasketTrace` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/partner-external-product` | `listPartnerExternalProduct` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/partner-payment-eligibility` | `listPartnerPaymentEligibility` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/payment-method-bank` | `listPaymentMethodBank` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/percentage-fixed-discount` | `listPercentageFixedDiscount` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/product-affinity` | `getProductAffinity` | `PRODUCT_VIEW` | — | TICVAI Web |
-| GET | `/product-relationships` | `listProductRelationships` | `PRODUCT_VIEW` | — | TICVAI Web |
-| PUT | `/product-relationships` | `setProductRelationships` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/promotion-activity-version` | `listPromotionActivityVersion` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-alert-exception` | `listPromotionAlertException` | `PRICE_VIEW` | — | Analytics, TICVAI Web |
-| GET | `/promotion-campaign` | `listPromotionCampaign` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-channel` | `listPromotionChannel` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-decision-trace` | `listPromotionDecisionTrace` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-exclusion-compatibility` | `listPromotionExclusionCompatibility` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-health-performance` | `listPromotionHealthPerformance` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-lifecycle-statu` | `listPromotionLifecycleStatus` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-performance` | `listPromotionPerformance` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/promotion-priority-hierarchy` | `listPromotionPriorityHierarchy` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/promotion-rule` | `setPromotionRule` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| PUT | `/promotion-stacking-rule` | `setPromotionStackingRule` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/promotions` | `listPromotions` | `PRICE_VIEW` | ✓ | Guest App, Guest Web, Partner Web, TICVAI Web, Venue Mgmt, Venue POS |
-| POST | `/promotions` | `createPromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/promotions/evaluate` | `evaluatePromotions` | `PRICE_VIEW` | ✓ | Guest App, Guest Kiosk, Guest Web, Partner Web, Venue Mgmt, Venue POS |
-| GET | `/promotions/{promotionId}` | `getPromotion` | `PRICE_VIEW` | ✓ | Guest App, Guest Web, Partner Web, Venue Mgmt, Venue POS |
-| PATCH | `/promotions/{promotionId}` | `updatePromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/promotions/{promotionId}/conflicts` | `analysePromotionConflicts` | `PRICE_VIEW` | — | Partner Web, Venue Mgmt, Venue POS |
-| POST | `/promotions/{promotionId}/end` | `endPromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/promotions/{promotionId}/pause` | `pausePromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/promotions/{promotionId}/publish` | `publishPromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/promotions/{promotionId}/simulate` | `simulatePromotion` | `PRICE_VIEW` | — | Venue Mgmt |
-| POST | `/promotions/{promotionId}/unschedule` | `unschedulePromotion` | `PRICE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/promotions/{promotionId}/usage` | `getPromotionUsage` | `PRICE_VIEW` | — | Partner Web, TICVAI Web, Venue Mgmt, Venue POS |
+| POST | `/coupon-codes/{code}/void` | `voidCouponCode` | `PRICE_CONFIGURE` | — | venue-management-web |
+| PUT | `/coupon-promo-code` | `setCouponPromoCode` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/crm-customer-segment` | `listCrmCustomerSegment` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/cross-category-promotion` | `setCrossCategoryPromotion` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/customer-membership-segment` | `listCustomerMembershipSegment` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/customer-segment-channel` | `listCustomerSegmentChannel` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/decision` | `approveDecision` | `PRICE_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/discount-calculation-application` | `listDiscountCalculationApplication` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/discount-cap-maximum` | `listDiscountCapMaximum` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/discount-limit-guardrail` | `listDiscountLimitGuardrail` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/discount-margin-profitability` | `listDiscountMarginProfitability` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/dynamic-bundle` | `listDynamicBundle` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/dynamic-bundle-2` | `listDynamicBundle2` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/dynamic-bundle-rule` | `listDynamicBundleRule` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/dynamic-component-substitution` | `listDynamicComponentSubstitution` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/eligibility-rule` | `setEligibilityRule` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/executive-promotion-reporting` | `listExecutivePromotionReporting` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/fixed-price-offer` | `setFixedPriceOffer` | `PRICE_CONFIGURE` | — | ticvai-web |
+| PUT | `/gift-free-product` | `setGiftFreeProduct` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/governance-risk-launch` | `listGovernanceRiskLaunch` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/guest-choice-build` | `setGuestChoiceBuild` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/incrementality-attribution-cannibalization` | `listIncrementalityAttributionCannibalization` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/membership-loyalty-guest` | `listMembershipLoyaltyGuest` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/multi-buy-quantity` | `listMultiBuyQuantity` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/next-best-action` | `listNextBestAction` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/offer-basket-trace` | `listOfferBasketTrace` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/partner-external-product` | `listPartnerExternalProduct` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/partner-payment-eligibility` | `listPartnerPaymentEligibility` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/payment-method-bank` | `listPaymentMethodBank` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/percentage-fixed-discount` | `listPercentageFixedDiscount` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/product-affinity` | `getProductAffinity` | `PRODUCT_VIEW` | — | ticvai-web |
+| GET | `/product-relationships` | `listProductRelationships` | `PRODUCT_VIEW` | — | ticvai-web |
+| PUT | `/product-relationships` | `setProductRelationships` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/promotion-activity-version` | `listPromotionActivityVersion` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-alert-exception` | `listPromotionAlertException` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/promotion-campaign` | `listPromotionCampaign` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-channel` | `listPromotionChannel` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-decision-trace` | `listPromotionDecisionTrace` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-exclusion-compatibility` | `listPromotionExclusionCompatibility` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-health-performance` | `listPromotionHealthPerformance` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-lifecycle-statu` | `listPromotionLifecycleStatus` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-performance` | `listPromotionPerformance` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/promotion-priority-hierarchy` | `listPromotionPriorityHierarchy` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/promotion-rule` | `setPromotionRule` | `PRICE_CONFIGURE` | — | ticvai-web |
+| PUT | `/promotion-stacking-rule` | `setPromotionStackingRule` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/promotions` | `listPromotions` | `PRICE_VIEW` | ✓ | guest-app, guest-web, partner-web, ticvai-web, venue-management-web, venue-pos |
+| POST | `/promotions` | `createPromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| POST | `/promotions/evaluate` | `evaluatePromotions` | `PRICE_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos |
+| GET | `/promotions/{promotionId}` | `getPromotion` | `PRICE_VIEW` | ✓ | guest-app, guest-web, partner-web, venue-management-web, venue-pos |
+| PATCH | `/promotions/{promotionId}` | `updatePromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| GET | `/promotions/{promotionId}/conflicts` | `analysePromotionConflicts` | `PRICE_VIEW` | — | partner-web, venue-management-web, venue-pos |
+| POST | `/promotions/{promotionId}/end` | `endPromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| POST | `/promotions/{promotionId}/pause` | `pausePromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| POST | `/promotions/{promotionId}/publish` | `publishPromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| POST | `/promotions/{promotionId}/simulate` | `simulatePromotion` | `PRICE_VIEW` | — | venue-management-web |
+| POST | `/promotions/{promotionId}/unschedule` | `unschedulePromotion` | `PRICE_CONFIGURE` | — | venue-management-web |
+| GET | `/promotions/{promotionId}/usage` | `getPromotionUsage` | `PRICE_VIEW` | — | partner-web, ticvai-web, venue-management-web, venue-pos |
 | PUT | `/promotions/{promotionId}/variants` | `setPromotionVariants` | `PRICE_CONFIGURE` | — | — |
-| GET | `/real-time-availability` | `listRealTimeAvailability` | `PRICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/recommendation-experiments` | `listRecommendationExperiments` | `PRODUCT_VIEW` | — | TICVAI Web |
-| POST | `/recommendation-experiments` | `createRecommendationExperiment` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| POST | `/recommendation-experiments/{experimentId}/conclude` | `concludeRecommendationExperiment` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/recommendation-performance` | `getRecommendationPerformance` | `PRODUCT_VIEW` | — | TICVAI Web |
-| POST | `/recommendation-simulations` | `simulateRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| GET | `/recommendation-strategies` | `listRecommendationStrategies` | `PRODUCT_VIEW` | — | TICVAI Web |
-| POST | `/recommendation-strategies` | `createRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/recommendation-strategies/{strategyId}` | `updateRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/recommendation-suppressions` | `setRecommendationSuppression` | `PRODUCT_CONFIGURE` | — | TICVAI Web |
-| POST | `/recommendations` | `getRecommendations` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/recommendations/explain` | `explainRecommendation` | `PRODUCT_VIEW` | — | TICVAI Web |
+| GET | `/real-time-availability` | `listRealTimeAvailability` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/recommendation-experiments` | `listRecommendationExperiments` | `PRODUCT_VIEW` | — | ticvai-web |
+| POST | `/recommendation-experiments` | `createRecommendationExperiment` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| POST | `/recommendation-experiments/{experimentId}/conclude` | `concludeRecommendationExperiment` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/recommendation-performance` | `getRecommendationPerformance` | `PRODUCT_VIEW` | — | ticvai-web |
+| POST | `/recommendation-simulations` | `simulateRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| GET | `/recommendation-strategies` | `listRecommendationStrategies` | `PRODUCT_VIEW` | — | ticvai-web |
+| POST | `/recommendation-strategies` | `createRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/recommendation-strategies/{strategyId}` | `updateRecommendationStrategy` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| PUT | `/recommendation-suppressions` | `setRecommendationSuppression` | `PRODUCT_CONFIGURE` | — | ticvai-web |
+| POST | `/recommendations` | `getRecommendations` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/recommendations/explain` | `explainRecommendation` | `PRODUCT_VIEW` | — | ticvai-web |
 | POST | `/recommendations/outcomes` | `recordRecommendationOutcome` | `PRODUCT_VIEW` | ✓ | — |
-| GET | `/redemption` | `listRedemption` | `PRICE_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/redemption-code-lookup` | `listRedemptionCodeLookup` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/redemption-conversion-funnel` | `listRedemptionConversionFunnel` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/redemption-discount-exposure` | `listRedemptionDiscountExposure` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/revenue-allocation-cost` | `listRevenueAllocationCost` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/reward-selection-substitution` | `listRewardSelectionSubstitution` | `PRICE_VIEW` | — | TICVAI Web |
-| PUT | `/rule-test-recommendation` | `setRuleTestRecommendation` | `PRICE_CONFIGURE` | — | TICVAI Web |
-| GET | `/special-price-guest` | `listSpecialPriceGuest` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/stacking-conflict` | `listStackingConflict` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/targeting-conflict-frequency` | `listTargetingConflictFrequency` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/targeting-eligibility` | `listTargetingEligibility` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/threshold-action-automatic` | `listThresholdActionAutomatic` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/time-based-seasonal` | `listTimeBasedSeasonal` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/unique-code-generation` | `listUniqueCodeGeneration` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/upsell-cross-sell` | `listUpsellCrossSell` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/upsell-rules` | `listUpsellRules` | `PRODUCT_VIEW` | — | Venue Mgmt |
+| GET | `/redemption` | `listRedemption` | `PRICE_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/redemption-code-lookup` | `listRedemptionCodeLookup` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/redemption-conversion-funnel` | `listRedemptionConversionFunnel` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/redemption-discount-exposure` | `listRedemptionDiscountExposure` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/revenue-allocation-cost` | `listRevenueAllocationCost` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/reward-selection-substitution` | `listRewardSelectionSubstitution` | `PRICE_VIEW` | — | ticvai-web |
+| PUT | `/rule-test-recommendation` | `setRuleTestRecommendation` | `PRICE_CONFIGURE` | — | ticvai-web |
+| GET | `/special-price-guest` | `listSpecialPriceGuest` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/stacking-conflict` | `listStackingConflict` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/targeting-conflict-frequency` | `listTargetingConflictFrequency` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/targeting-eligibility` | `listTargetingEligibility` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/threshold-action-automatic` | `listThresholdActionAutomatic` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/time-based-seasonal` | `listTimeBasedSeasonal` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/unique-code-generation` | `listUniqueCodeGeneration` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/upsell-cross-sell` | `listUpsellCrossSell` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/upsell-rules` | `listUpsellRules` | `PRODUCT_VIEW` | — | venue-management-web |
 | POST | `/upsell-rules` | `createUpsellRule` | `PRODUCT_CONFIGURE` | — | — |
 | DELETE | `/upsell-rules/{ruleId}` | `deleteUpsellRule` | `PRODUCT_CONFIGURE` | — | — |
-| POST | `/upsell-suggestions` | `getUpsellSuggestions` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| GET | `/usage-capacity-frequency` | `listUsageCapacityFrequency` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/validity-date-time` | `listValidityDateTime` | `PRICE_VIEW` | — | TICVAI Web |
-| GET | `/volume-bulk-tier` | `listVolumeBulkTier` | `PRICE_VIEW` | — | TICVAI Web |
+| POST | `/upsell-suggestions` | `getUpsellSuggestions` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| GET | `/usage-capacity-frequency` | `listUsageCapacityFrequency` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/validity-date-time` | `listValidityDateTime` | `PRICE_VIEW` | — | ticvai-web |
+| GET | `/volume-bulk-tier` | `listVolumeBulkTier` | `PRICE_VIEW` | — | ticvai-web |
 | GET | `/voucher-batches` | `listVoucherBatches` | `PRICE_VIEW` | — | — |
 | POST | `/voucher-batches` | `createVoucherBatch` | `PRICE_CONFIGURE` | — | — |
 | POST | `/vouchers/{voucherCode}/redeem` | `redeemVoucher` | `ORDER_CREATE` | — | — |
@@ -1622,28 +1622,28 @@ The developer-facing surface: who may call TICVAI, with what credential, against
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/api-clients` | `listApiClients` | `DEVELOPER_VIEW` | — | Developer, Partner Web, TICVAI Web, Venue Mgmt |
-| POST | `/api-clients` | `createApiClient` | `DEVELOPER_MANAGE` | — | Developer, Partner Web, Venue Mgmt |
-| DELETE | `/api-clients/{clientId}/credentials` | `revokeApiCredential` | `DEVELOPER_MANAGE` | — | Developer, Partner Web |
-| POST | `/api-clients/{clientId}/credentials` | `rotateApiCredential` | `DEVELOPER_MANAGE` | — | Developer, Partner Web |
-| PUT | `/api-licensing` | `setApiLicensing` | `DEVELOPER_ADMIN` | — | Developer |
-| PUT | `/api-quotas` | `setApiQuota` | `DEVELOPER_ADMIN` | — | Developer, TICVAI Web |
-| GET | `/api-usage` | `getApiUsage` | `DEVELOPER_VIEW` | — | Developer, TICVAI Web |
-| GET | `/api-versions` | `listApiVersions` | `DEVELOPER_VIEW` | — | Developer, Venue Mgmt |
-| POST | `/api-versions/{version}/deprecate` | `deprecateApiVersion` | `DEVELOPER_ADMIN` | — | Developer, TICVAI Web |
-| POST | `/developers` | `registerDeveloper` | `DEVELOPER_VIEW` | — | Developer |
-| PUT | `/developers/{developerId}/members` | `setDeveloperMembers` | `DEVELOPER_MANAGE` | — | Developer |
-| GET | `/listings` | `listIntegrationListings` | `DEVELOPER_VIEW` | — | Developer |
-| POST | `/listings` | `submitIntegrationListing` | `DEVELOPER_MANAGE` | — | Developer |
-| POST | `/listings/{listingId}/certify` | `certifyIntegration` | `DEVELOPER_ADMIN` | — | Developer, Venue Mgmt |
+| GET | `/api-clients` | `listApiClients` | `DEVELOPER_VIEW` | — | developer-portal-web, partner-web, ticvai-web, venue-management-web |
+| POST | `/api-clients` | `createApiClient` | `DEVELOPER_MANAGE` | — | developer-portal-web, partner-web, venue-management-web |
+| DELETE | `/api-clients/{clientId}/credentials` | `revokeApiCredential` | `DEVELOPER_MANAGE` | — | developer-portal-web, partner-web |
+| POST | `/api-clients/{clientId}/credentials` | `rotateApiCredential` | `DEVELOPER_MANAGE` | — | developer-portal-web, partner-web |
+| PUT | `/api-licensing` | `setApiLicensing` | `DEVELOPER_ADMIN` | — | developer-portal-web |
+| PUT | `/api-quotas` | `setApiQuota` | `DEVELOPER_ADMIN` | — | developer-portal-web, ticvai-web |
+| GET | `/api-usage` | `getApiUsage` | `DEVELOPER_VIEW` | — | developer-portal-web, ticvai-web |
+| GET | `/api-versions` | `listApiVersions` | `DEVELOPER_VIEW` | — | developer-portal-web, venue-management-web |
+| POST | `/api-versions/{version}/deprecate` | `deprecateApiVersion` | `DEVELOPER_ADMIN` | — | developer-portal-web, ticvai-web |
+| POST | `/developers` | `registerDeveloper` | `DEVELOPER_VIEW` | — | developer-portal-web |
+| PUT | `/developers/{developerId}/members` | `setDeveloperMembers` | `DEVELOPER_MANAGE` | — | developer-portal-web |
+| GET | `/listings` | `listIntegrationListings` | `DEVELOPER_VIEW` | — | developer-portal-web |
+| POST | `/listings` | `submitIntegrationListing` | `DEVELOPER_MANAGE` | — | developer-portal-web |
+| POST | `/listings/{listingId}/certify` | `certifyIntegration` | `DEVELOPER_ADMIN` | — | developer-portal-web, venue-management-web |
 | POST | `/oauth/token` | `issueApiToken` | `DEVELOPER_VIEW` | — | — |
-| GET | `/sandboxes` | `listSandboxes` | `DEVELOPER_VIEW` | — | Developer |
-| POST | `/sandboxes` | `createSandbox` | `DEVELOPER_MANAGE` | — | Developer |
-| POST | `/sandboxes/{sandboxId}/reset` | `resetSandbox` | `DEVELOPER_MANAGE` | — | Developer |
-| GET | `/webhook-subscriptions` | `listWebhookSubscriptions` | `DEVELOPER_VIEW` | — | Developer, Venue Mgmt |
-| POST | `/webhook-subscriptions` | `createWebhookSubscription` | `DEVELOPER_MANAGE` | — | Developer, TICVAI Web, Venue Mgmt |
-| GET | `/webhook-subscriptions/{subscriptionId}/deliveries` | `listWebhookDeliveries` | `DEVELOPER_VIEW` | — | Developer, Venue Mgmt |
-| POST | `/webhook-subscriptions/{subscriptionId}/replay` | `replayEvents` | `DEVELOPER_MANAGE` | — | Developer |
+| GET | `/sandboxes` | `listSandboxes` | `DEVELOPER_VIEW` | — | developer-portal-web |
+| POST | `/sandboxes` | `createSandbox` | `DEVELOPER_MANAGE` | — | developer-portal-web |
+| POST | `/sandboxes/{sandboxId}/reset` | `resetSandbox` | `DEVELOPER_MANAGE` | — | developer-portal-web |
+| GET | `/webhook-subscriptions` | `listWebhookSubscriptions` | `DEVELOPER_VIEW` | — | developer-portal-web, venue-management-web |
+| POST | `/webhook-subscriptions` | `createWebhookSubscription` | `DEVELOPER_MANAGE` | — | developer-portal-web, ticvai-web, venue-management-web |
+| GET | `/webhook-subscriptions/{subscriptionId}/deliveries` | `listWebhookDeliveries` | `DEVELOPER_VIEW` | — | developer-portal-web, venue-management-web |
+| POST | `/webhook-subscriptions/{subscriptionId}/replay` | `replayEvents` | `DEVELOPER_MANAGE` | — | developer-portal-web |
 
 ### `queue.yaml` — 21 operation(s)
 
@@ -1651,25 +1651,25 @@ TICVAI builds the engine and the inbound API; the venue supplies the sensor feed
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/queue-feeds` | `listQueueFeeds` | `QUEUE_MANAGE` | — | Venue Mgmt |
-| PUT | `/queue-feeds` | `configureQueueFeed` | `QUEUE_MANAGE` | — | Venue Mgmt |
+| GET | `/queue-feeds` | `listQueueFeeds` | `QUEUE_MANAGE` | — | venue-management-web |
+| PUT | `/queue-feeds` | `configureQueueFeed` | `QUEUE_MANAGE` | — | venue-management-web |
 | POST | `/queue-feeds/readings` | `submitQueueReading` | `—` | — | — |
-| GET | `/queue-feeds/{feedId}/health` | `getQueueFeedHealth` | `QUEUE_MANAGE` | — | Venue Mgmt, Venue POS |
-| POST | `/queue-feeds/{feedId}/test` | `testQueueFeed` | `QUEUE_MANAGE` | — | Venue Mgmt |
-| GET | `/queues` | `listQueues` | `QUEUE_VIEW` | ✓ | Guest App, Guest Web, Staff App, Support, Venue Mgmt |
-| POST | `/queues` | `createQueue` | `QUEUE_MANAGE` | — | Venue Mgmt |
-| GET | `/queues/wait-times` | `getWaitTimes` | `—` | ✓ | Guest App, Guest Web, Staff App, Venue Mgmt |
-| GET | `/queues/{queueId}` | `getQueue` | `QUEUE_VIEW` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| PATCH | `/queues/{queueId}` | `updateQueue` | `QUEUE_MANAGE` | — | Venue Mgmt |
-| POST | `/queues/{queueId}/call-next` | `callNextParties` | `QUEUE_MANAGE` | — | Staff App, Venue Mgmt |
-| GET | `/queues/{queueId}/entries` | `listQueueEntries` | `QUEUE_VIEW` | — | Staff App, Venue Mgmt, Venue POS |
-| PUT | `/queues/{queueId}/status` | `setQueueStatus` | `QUEUE_MANAGE` | ✓ | Staff App, Venue Mgmt |
-| PUT | `/queues/{queueId}/wait-time` | `setWaitTime` | `QUEUE_MANAGE` | ✓ | Staff App, Venue Mgmt |
+| GET | `/queue-feeds/{feedId}/health` | `getQueueFeedHealth` | `QUEUE_MANAGE` | — | venue-management-web, venue-pos |
+| POST | `/queue-feeds/{feedId}/test` | `testQueueFeed` | `QUEUE_MANAGE` | — | venue-management-web |
+| GET | `/queues` | `listQueues` | `QUEUE_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-staff-app, venue-support-web |
+| POST | `/queues` | `createQueue` | `QUEUE_MANAGE` | — | venue-management-web |
+| GET | `/queues/wait-times` | `getWaitTimes` | `—` | ✓ | guest-app, guest-web, venue-management-web, venue-staff-app |
+| GET | `/queues/{queueId}` | `getQueue` | `QUEUE_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| PATCH | `/queues/{queueId}` | `updateQueue` | `QUEUE_MANAGE` | — | venue-management-web |
+| POST | `/queues/{queueId}/call-next` | `callNextParties` | `QUEUE_MANAGE` | — | venue-management-web, venue-staff-app |
+| GET | `/queues/{queueId}/entries` | `listQueueEntries` | `QUEUE_VIEW` | — | venue-management-web, venue-pos, venue-staff-app |
+| PUT | `/queues/{queueId}/status` | `setQueueStatus` | `QUEUE_MANAGE` | ✓ | venue-management-web, venue-staff-app |
+| PUT | `/queues/{queueId}/wait-time` | `setWaitTime` | `QUEUE_MANAGE` | ✓ | venue-management-web, venue-staff-app |
 | GET | `/signage/queue-board` | `getSignageQueueBoard` | `—` | ✓ | — |
 | GET | `/signage/queue-calls` | `getSignageQueueCalls` | `—` | ✓ | — |
-| POST | `/waiting-guests` | `joinQueue` | `—` | — | Guest App, Guest Web |
-| DELETE | `/waiting-guests/{entryId}` | `leaveQueue` | `—` | — | Guest App, Guest Web |
-| GET | `/waiting-guests/{entryId}` | `getWaitingGuest` | `—` | — | Guest App, Guest Web |
+| POST | `/waiting-guests` | `joinQueue` | `—` | — | guest-app, guest-web |
+| DELETE | `/waiting-guests/{entryId}` | `leaveQueue` | `—` | — | guest-app, guest-web |
+| GET | `/waiting-guests/{entryId}` | `getWaitingGuest` | `—` | — | guest-app, guest-web |
 | POST | `/waiting-guests/{entryId}/override` | `overrideWaitingGuest` | `QUEUE_OVERRIDE` | ✓ | — |
 | POST | `/waiting-guests/{entryId}/redeem` | `redeemWaitingGuest` | `QUEUE_REDEEM` | ✓ | — |
 
@@ -1679,46 +1679,46 @@ A rental is a commercial agreement with a return date.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/rental-availability` | `getRentalAvailability` | `RENTAL_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/rental-blackouts` | `createRentalBlackout` | `RENTAL_MANAGE` | — | Venue Mgmt |
-| GET | `/rental-bookings` | `listRentalBookings` | `RENTAL_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/rental-bookings` | `createRentalBooking` | `RENTAL_BOOK` | — | Venue Mgmt |
-| GET | `/rental-bookings/overdue` | `listOverdueRentals` | `RENTAL_VIEW` | — | Staff App, Venue Mgmt |
-| GET | `/rental-bookings/{bookingId}` | `getRentalBooking` | `RENTAL_VIEW` | — | Staff App, Venue Mgmt |
-| PATCH | `/rental-bookings/{bookingId}` | `updateRentalBooking` | `RENTAL_BOOK` | — | Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/agreement` | `signRentalAgreement` | `RENTAL_BOOK` | — | Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/check-out` | `checkOutRental` | `RENTAL_OPERATE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/damage` | `assessRentalDamage` | `RENTAL_OPERATE` | — | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/equipment` | `assignRentalEquipment` | `RENTAL_OPERATE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/extend` | `extendRental` | `RENTAL_OPERATE` | — | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/inspection` | `recordRentalInspection` | `RENTAL_OPERATE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/return` | `returnRental` | `RENTAL_OPERATE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/rental-bookings/{bookingId}/swap` | `swapRentalEquipment` | `RENTAL_OPERATE` | — | Staff App, Venue Mgmt |
-| GET | `/rental-categories` | `listRentalCategories` | `RENTAL_VIEW` | — | Venue Mgmt |
-| POST | `/rental-categories` | `createRentalCategory` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-deposit-policies` | `setRentalDepositPolicy` | `RENTAL_PRICE` | — | Venue Mgmt |
-| PUT | `/rental-fee-policies` | `setRentalFeePolicy` | `RENTAL_PRICE` | — | Venue Mgmt |
-| POST | `/rental-incidents` | `reportRentalIncident` | `RENTAL_OPERATE` | ✓ | Staff App, Venue Mgmt |
-| POST | `/rental-overrides` | `requestRentalCommercialOverride` | `RENTAL_OVERRIDE` | — | Venue Mgmt |
-| POST | `/rental-price` | `quoteRentalPrice` | `RENTAL_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/rental-price/explain` | `explainRentalPrice` | `RENTAL_VIEW` | — | Venue Mgmt |
-| POST | `/rental-price/simulate` | `simulateRentalPricing` | `RENTAL_PRICE` | — | Venue Mgmt |
-| GET | `/rental-pricing-profiles` | `listRentalPricingProfiles` | `RENTAL_VIEW` | — | Venue Mgmt |
-| POST | `/rental-pricing-profiles` | `createRentalPricingProfile` | `RENTAL_PRICE` | — | Venue Mgmt |
-| PUT | `/rental-pricing-profiles/{profileId}` | `updateRentalPricingProfile` | `RENTAL_PRICE` | — | Venue Mgmt |
-| GET | `/rental-products` | `listRentalProducts` | `RENTAL_VIEW` | — | Venue Mgmt |
-| POST | `/rental-products` | `createRentalProduct` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
+| GET | `/rental-availability` | `getRentalAvailability` | `RENTAL_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/rental-blackouts` | `createRentalBlackout` | `RENTAL_MANAGE` | — | venue-management-web |
+| GET | `/rental-bookings` | `listRentalBookings` | `RENTAL_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings` | `createRentalBooking` | `RENTAL_BOOK` | — | venue-management-web |
+| GET | `/rental-bookings/overdue` | `listOverdueRentals` | `RENTAL_VIEW` | — | venue-management-web, venue-staff-app |
+| GET | `/rental-bookings/{bookingId}` | `getRentalBooking` | `RENTAL_VIEW` | — | venue-management-web, venue-staff-app |
+| PATCH | `/rental-bookings/{bookingId}` | `updateRentalBooking` | `RENTAL_BOOK` | — | venue-management-web |
+| POST | `/rental-bookings/{bookingId}/agreement` | `signRentalAgreement` | `RENTAL_BOOK` | — | venue-management-web |
+| POST | `/rental-bookings/{bookingId}/check-out` | `checkOutRental` | `RENTAL_OPERATE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/damage` | `assessRentalDamage` | `RENTAL_OPERATE` | — | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/equipment` | `assignRentalEquipment` | `RENTAL_OPERATE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/extend` | `extendRental` | `RENTAL_OPERATE` | — | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/inspection` | `recordRentalInspection` | `RENTAL_OPERATE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/return` | `returnRental` | `RENTAL_OPERATE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/rental-bookings/{bookingId}/swap` | `swapRentalEquipment` | `RENTAL_OPERATE` | — | venue-management-web, venue-staff-app |
+| GET | `/rental-categories` | `listRentalCategories` | `RENTAL_VIEW` | — | venue-management-web |
+| POST | `/rental-categories` | `createRentalCategory` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-deposit-policies` | `setRentalDepositPolicy` | `RENTAL_PRICE` | — | venue-management-web |
+| PUT | `/rental-fee-policies` | `setRentalFeePolicy` | `RENTAL_PRICE` | — | venue-management-web |
+| POST | `/rental-incidents` | `reportRentalIncident` | `RENTAL_OPERATE` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/rental-overrides` | `requestRentalCommercialOverride` | `RENTAL_OVERRIDE` | — | venue-management-web |
+| POST | `/rental-price` | `quoteRentalPrice` | `RENTAL_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/rental-price/explain` | `explainRentalPrice` | `RENTAL_VIEW` | — | venue-management-web |
+| POST | `/rental-price/simulate` | `simulateRentalPricing` | `RENTAL_PRICE` | — | venue-management-web |
+| GET | `/rental-pricing-profiles` | `listRentalPricingProfiles` | `RENTAL_VIEW` | — | venue-management-web |
+| POST | `/rental-pricing-profiles` | `createRentalPricingProfile` | `RENTAL_PRICE` | — | venue-management-web |
+| PUT | `/rental-pricing-profiles/{profileId}` | `updateRentalPricingProfile` | `RENTAL_PRICE` | — | venue-management-web |
+| GET | `/rental-products` | `listRentalProducts` | `RENTAL_VIEW` | — | venue-management-web |
+| POST | `/rental-products` | `createRentalProduct` | `RENTAL_CONFIGURE` | — | venue-management-web |
 | POST | `/rental-products/import` | `importRentalCatalogue` | `RENTAL_CONFIGURE` | — | — |
-| GET | `/rental-products/{productId}` | `getRentalProduct` | `RENTAL_VIEW` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}` | `updateRentalProduct` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/agreement` | `setRentalAgreementRequirements` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/availability-rules` | `setRentalAvailabilityRules` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/duration` | `setRentalDurationRules` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/inventory-model` | `setRentalInventoryModel` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/locations` | `setRentalProductLocations` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| POST | `/rental-products/{productId}/publish` | `publishRentalProduct` | `RENTAL_APPROVE` | — | Venue Mgmt |
-| PUT | `/rental-products/{productId}/rules` | `setRentalOperationalRules` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
-| POST | `/rental-products/{productId}/validate` | `validateRentalProduct` | `RENTAL_CONFIGURE` | — | Venue Mgmt |
+| GET | `/rental-products/{productId}` | `getRentalProduct` | `RENTAL_VIEW` | — | venue-management-web |
+| PUT | `/rental-products/{productId}` | `updateRentalProduct` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/agreement` | `setRentalAgreementRequirements` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/availability-rules` | `setRentalAvailabilityRules` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/duration` | `setRentalDurationRules` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/inventory-model` | `setRentalInventoryModel` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/locations` | `setRentalProductLocations` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| POST | `/rental-products/{productId}/publish` | `publishRentalProduct` | `RENTAL_APPROVE` | — | venue-management-web |
+| PUT | `/rental-products/{productId}/rules` | `setRentalOperationalRules` | `RENTAL_CONFIGURE` | — | venue-management-web |
+| POST | `/rental-products/{productId}/validate` | `validateRentalProduct` | `RENTAL_CONFIGURE` | — | venue-management-web |
 
 ### `reporting.yaml` — 42 operation(s)
 
@@ -1727,47 +1727,47 @@ Reads a lag-tolerant replica, never the primary.
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
 | GET | `/alert-rules` | `listAlertRules` | `REPORT_VIEW_VENUE` | — | — |
-| PUT | `/alert-rules` | `setAlertRule` | `REPORT_MANAGE` | — | Analytics, Venue Mgmt |
-| GET | `/alerts` | `listAlerts` | `REPORT_VIEW_VENUE` | — | Analytics, Staff App, Venue Mgmt, Venue POS |
-| POST | `/alerts/{alertId}/acknowledge` | `acknowledgeAlert` | `REPORT_VIEW_VENUE` | — | Analytics, Staff App, Venue Mgmt |
-| GET | `/analytics-anomalies` | `listAnalyticsAnomalies` | `REPORT_VIEW_VENUE` | — | Analytics |
-| GET | `/analytics-benchmarks` | `getAnalyticsBenchmark` | `REPORT_VIEW_TENANT` | — | Analytics, Venue Mgmt |
-| GET | `/analytics-pipelines` | `listAnalyticsPipelines` | `REPORT_VIEW_TENANT` | — | Analytics, Venue Mgmt |
-| GET | `/analytics-usage` | `getAnalyticsUsage` | `REPORT_VIEW_TENANT` | — | Analytics |
-| GET | `/dashboards` | `listDashboards` | `REPORT_VIEW_VENUE` | — | Analytics, TICVAI Web |
-| POST | `/dashboards` | `createDashboard` | `REPORT_MANAGE` | — | Analytics, TICVAI Web |
-| GET | `/dashboards/{dashboardId}` | `getDashboard` | `REPORT_VIEW_VENUE` | — | Analytics, Kitchen, TICVAI Web, Venue Mgmt |
-| PUT | `/dashboards/{dashboardId}` | `updateDashboard` | `REPORT_MANAGE` | — | Analytics, TICVAI Web |
-| GET | `/kpi-values` | `getKpiValues` | `REPORT_VIEW_VENUE` | — | Analytics, Venue Mgmt |
-| GET | `/kpis` | `listKpis` | `REPORT_VIEW_TENANT` | — | Analytics |
-| POST | `/kpis` | `createKpi` | `REPORT_MANAGE` | — | Analytics |
-| PUT | `/kpis/{kpiId}/targets` | `setKpiTargets` | `REPORT_MANAGE` | — | Analytics |
-| GET | `/report-deliveries` | `listReportDeliveries` | `REPORT_VIEW_TENANT` | — | Analytics |
-| GET | `/report-executions` | `listReportExecutions` | `REPORT_VIEW_VENUE` | — | Venue Mgmt |
-| DELETE | `/report-executions/{executionId}` | `cancelReportExecution` | `REPORT_VIEW_VENUE` | — | — |
-| GET | `/report-executions/{executionId}` | `getReportExecution` | `REPORT_VIEW_VENUE` | — | Analytics |
-| POST | `/report-executions/{executionId}/export` | `exportReportResult` | `REPORT_EXPORT` | — | Analytics, Venue Mgmt |
-| GET | `/report-executions/{executionId}/result` | `getReportResult` | `REPORT_VIEW_VENUE` | — | Analytics |
-| GET | `/report-exports/{exportId}` | `getReportExport` | `REPORT_EXPORT` | — | Analytics |
-| GET | `/report-fields` | `listReportFields` | `REPORT_VIEW_VENUE` | — | Analytics |
-| GET | `/report-schedules` | `listReportSchedules` | `REPORT_VIEW_VENUE` | — | Analytics |
-| POST | `/report-schedules` | `createReportSchedule` | `REPORT_SCHEDULE` | — | Analytics, Venue Mgmt |
+| PUT | `/alert-rules` | `setAlertRule` | `REPORT_MANAGE` | — | venue-management-web |
+| GET | `/alerts` | `listAlerts` | `REPORT_VIEW_VENUE` | — | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/alerts/{alertId}/acknowledge` | `acknowledgeAlert` | `REPORT_VIEW_VENUE` | — | venue-management-web, venue-staff-app |
+| GET | `/analytics-anomalies` | `listAnalyticsAnomalies` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| GET | `/analytics-benchmarks` | `getAnalyticsBenchmark` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| GET | `/analytics-pipelines` | `listAnalyticsPipelines` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| GET | `/analytics-usage` | `getAnalyticsUsage` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| GET | `/dashboards` | `listDashboards` | `REPORT_VIEW_VENUE` | — | ticvai-web, venue-management-web |
+| POST | `/dashboards` | `createDashboard` | `REPORT_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/dashboards/{dashboardId}` | `getDashboard` | `REPORT_VIEW_VENUE` | — | kitchen-display, ticvai-web, venue-management-web |
+| PUT | `/dashboards/{dashboardId}` | `updateDashboard` | `REPORT_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/kpi-values` | `getKpiValues` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| GET | `/kpis` | `listKpis` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| POST | `/kpis` | `createKpi` | `REPORT_MANAGE` | — | venue-management-web |
+| PUT | `/kpis/{kpiId}/targets` | `setKpiTargets` | `REPORT_MANAGE` | — | venue-management-web |
+| GET | `/report-deliveries` | `listReportDeliveries` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| GET | `/report-executions` | `listReportExecutions` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| DELETE | `/report-executions/{executionId}` | `cancelReportExecution` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| GET | `/report-executions/{executionId}` | `getReportExecution` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| POST | `/report-executions/{executionId}/export` | `exportReportResult` | `REPORT_EXPORT` | — | venue-management-web |
+| GET | `/report-executions/{executionId}/result` | `getReportResult` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| GET | `/report-exports/{exportId}` | `getReportExport` | `REPORT_EXPORT` | — | venue-management-web |
+| GET | `/report-fields` | `listReportFields` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| GET | `/report-schedules` | `listReportSchedules` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| POST | `/report-schedules` | `createReportSchedule` | `REPORT_SCHEDULE` | — | venue-management-web |
 | DELETE | `/report-schedules/{scheduleId}` | `deleteReportSchedule` | `REPORT_SCHEDULE` | — | — |
 | PATCH | `/report-schedules/{scheduleId}` | `updateReportSchedule` | `REPORT_SCHEDULE` | — | — |
-| GET | `/report-subscriptions` | `listReportSubscriptions` | `REPORT_VIEW_VENUE` | — | Analytics |
-| POST | `/report-subscriptions` | `createReportSubscription` | `REPORT_SCHEDULE` | — | Analytics |
-| GET | `/reports` | `listReports` | `REPORT_VIEW_VENUE` | — | Analytics, Partner Web, Support, Venue Mgmt, Venue POS |
-| POST | `/reports` | `createReport` | `REPORT_MANAGE` | — | Analytics, Partner Web, Support, Venue Mgmt |
-| POST | `/reports/ask` | `askReportingQuestion` | `REPORT_VIEW_VENUE` | — | Analytics, Kitchen, Partner Web, Support, Venue Mgmt, Venue POS |
-| POST | `/reports/ask/{conversationId}/save` | `saveNaturalLanguageQuery` | `REPORT_MANAGE` | — | Analytics, Partner Web, Support, Venue Mgmt, Venue POS |
-| GET | `/reports/seeded` | `listSeededReports` | `REPORT_VIEW_VENUE` | — | Analytics |
-| DELETE | `/reports/{reportId}` | `deleteReport` | `REPORT_MANAGE` | — | Partner Web, Support, Venue Mgmt, Venue POS |
-| GET | `/reports/{reportId}` | `getReport` | `REPORT_VIEW_VENUE` | — | Partner Web, Support, Venue Mgmt, Venue POS |
-| PUT | `/reports/{reportId}` | `updateReport` | `REPORT_MANAGE` | — | Analytics, Partner Web, Support, Venue Mgmt |
-| POST | `/reports/{reportId}/run` | `runReport` | `REPORT_VIEW_VENUE` | — | Analytics, Partner Web, Support, Venue Mgmt, Venue POS |
-| GET | `/semantic-model` | `getSemanticModel` | `REPORT_VIEW_TENANT` | — | Analytics |
-| PUT | `/semantic-model` | `setSemanticModel` | `REPORT_MANAGE` | — | Analytics |
-| GET | `/suppliers/{supplierId}/performance` | `getSupplierPerformance` | `REPORT_VIEW_VENUE` | — | Venue Mgmt |
+| GET | `/report-subscriptions` | `listReportSubscriptions` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| POST | `/report-subscriptions` | `createReportSubscription` | `REPORT_SCHEDULE` | — | venue-management-web |
+| GET | `/reports` | `listReports` | `REPORT_VIEW_VENUE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| POST | `/reports` | `createReport` | `REPORT_MANAGE` | — | partner-web, venue-management-web, venue-support-web |
+| POST | `/reports/ask` | `askReportingQuestion` | `REPORT_VIEW_VENUE` | — | kitchen-display, partner-web, venue-management-web, venue-pos, venue-support-web |
+| POST | `/reports/ask/{conversationId}/save` | `saveNaturalLanguageQuery` | `REPORT_MANAGE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| GET | `/reports/seeded` | `listSeededReports` | `REPORT_VIEW_VENUE` | — | venue-management-web |
+| DELETE | `/reports/{reportId}` | `deleteReport` | `REPORT_MANAGE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| GET | `/reports/{reportId}` | `getReport` | `REPORT_VIEW_VENUE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| PUT | `/reports/{reportId}` | `updateReport` | `REPORT_MANAGE` | — | partner-web, venue-management-web, venue-support-web |
+| POST | `/reports/{reportId}/run` | `runReport` | `REPORT_VIEW_VENUE` | — | partner-web, venue-management-web, venue-pos, venue-support-web |
+| GET | `/semantic-model` | `getSemanticModel` | `REPORT_VIEW_TENANT` | — | venue-management-web |
+| PUT | `/semantic-model` | `setSemanticModel` | `REPORT_MANAGE` | — | venue-management-web |
+| GET | `/suppliers/{supplierId}/performance` | `getSupplierPerformance` | `REPORT_VIEW_VENUE` | — | venue-management-web |
 
 ### `resources.yaml` — 48 operation(s)
 
@@ -1775,54 +1775,54 @@ A bookable resource is a specific object checked out to a named guest and return
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/experiences/{experienceId}/resource-requirements` | `getExperienceResourceRequirements` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/experiences/{experienceId}/resource-requirements` | `setExperienceResourceRequirements` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resource-allocation-policy` | `getResourceAllocationPolicy` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/resource-allocation-policy` | `setResourceAllocationPolicy` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/resource-allocations` | `allocateResources` | `RESOURCE_BOOK` | — | Venue Mgmt |
-| POST | `/resource-allocations/{bookingId}/replace` | `replaceResourceAllocation` | `RESOURCE_BOOK` | — | Venue Mgmt |
-| GET | `/resource-attributes` | `listResourceAttributes` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-attributes` | `createResourceAttribute` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resource-blocks` | `listResourceBlocks` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-blocks` | `createResourceBlock` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| DELETE | `/resource-blocks/{blockId}` | `releaseResourceBlock` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/resource-bookings` | `listResourceBookings` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-bookings` | `bookResource` | `RESOURCE_BOOK` | — | Venue Mgmt |
-| DELETE | `/resource-bookings/{bookingId}` | `cancelResourceBooking` | `RESOURCE_BOOK` | — | Venue Mgmt |
-| PATCH | `/resource-bookings/{bookingId}` | `updateResourceBooking` | `RESOURCE_BOOK` | — | Venue Mgmt |
-| POST | `/resource-bookings/{bookingId}/check-in` | `checkInResource` | `RESOURCE_BOOK` | ✓ | Venue Mgmt |
-| POST | `/resource-bookings/{bookingId}/check-out` | `checkOutResource` | `RESOURCE_BOOK` | ✓ | Venue Mgmt |
-| GET | `/resource-calendar` | `getResourceCalendar` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| GET | `/resource-categories` | `listResourceCategories` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-categories` | `createResourceCategory` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/resource-categories/{categoryId}` | `updateResourceCategory` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resource-packages` | `listResourcePackages` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-packages` | `createResourcePackage` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/resource-packages/{packageId}` | `updateResourcePackage` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/resource-selection-policy` | `setResourceSelectionPolicy` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resource-suggestions` | `suggestResources` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| GET | `/resource-types` | `listResourceTypes` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resource-types` | `createResourceType` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/resource-types/{resourceTypeId}` | `updateResourceType` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resource-utilisation` | `getResourceUtilisation` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| GET | `/resources` | `listResources` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| POST | `/resources` | `createResource` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}` | `getResource` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}` | `updateResource` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}/audit` | `getResourceAuditTrail` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}/availability` | `getResourceAvailability` | `RESOURCE_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/resources/{resourceId}/clone` | `cloneResource` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}/dependencies` | `getResourceDependencies` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}/dependencies` | `setResourceDependencies` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}/hierarchy` | `getResourceHierarchy` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}/hierarchy` | `setResourceHierarchy` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}/qualifications` | `setResourceQualifications` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/resources/{resourceId}/schedule` | `getResourceSchedule` | `RESOURCE_VIEW` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}/schedule` | `setResourceSchedule` | `RESOURCE_CONFIGURE` | — | Venue Mgmt |
-| POST | `/resources/{resourceId}/state` | `setResourceLifecycleState` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| PUT | `/resources/{resourceId}/venues` | `setResourceVenueAssignment` | `RESOURCE_MANAGE` | — | Venue Mgmt |
-| GET | `/sessions/{sessionId}/manifest` | `getSessionManifest` | `RESOURCE_VIEW` | ✓ | Venue Mgmt |
-| PUT | `/sessions/{sessionId}/manifest` | `reorderSessionManifest` | `RESOURCE_BOOK` | ✓ | Venue Mgmt |
+| GET | `/experiences/{experienceId}/resource-requirements` | `getExperienceResourceRequirements` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/experiences/{experienceId}/resource-requirements` | `setExperienceResourceRequirements` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resource-allocation-policy` | `getResourceAllocationPolicy` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/resource-allocation-policy` | `setResourceAllocationPolicy` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| POST | `/resource-allocations` | `allocateResources` | `RESOURCE_BOOK` | — | venue-management-web |
+| POST | `/resource-allocations/{bookingId}/replace` | `replaceResourceAllocation` | `RESOURCE_BOOK` | — | venue-management-web |
+| GET | `/resource-attributes` | `listResourceAttributes` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-attributes` | `createResourceAttribute` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resource-blocks` | `listResourceBlocks` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-blocks` | `createResourceBlock` | `RESOURCE_MANAGE` | — | venue-management-web |
+| DELETE | `/resource-blocks/{blockId}` | `releaseResourceBlock` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/resource-bookings` | `listResourceBookings` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-bookings` | `bookResource` | `RESOURCE_BOOK` | — | venue-management-web |
+| DELETE | `/resource-bookings/{bookingId}` | `cancelResourceBooking` | `RESOURCE_BOOK` | — | venue-management-web |
+| PATCH | `/resource-bookings/{bookingId}` | `updateResourceBooking` | `RESOURCE_BOOK` | — | venue-management-web |
+| POST | `/resource-bookings/{bookingId}/check-in` | `checkInResource` | `RESOURCE_BOOK` | ✓ | venue-management-web |
+| POST | `/resource-bookings/{bookingId}/check-out` | `checkOutResource` | `RESOURCE_BOOK` | ✓ | venue-management-web |
+| GET | `/resource-calendar` | `getResourceCalendar` | `RESOURCE_VIEW` | — | venue-management-web |
+| GET | `/resource-categories` | `listResourceCategories` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-categories` | `createResourceCategory` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/resource-categories/{categoryId}` | `updateResourceCategory` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resource-packages` | `listResourcePackages` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-packages` | `createResourcePackage` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/resource-packages/{packageId}` | `updateResourcePackage` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/resource-selection-policy` | `setResourceSelectionPolicy` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resource-suggestions` | `suggestResources` | `RESOURCE_VIEW` | — | venue-management-web |
+| GET | `/resource-types` | `listResourceTypes` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resource-types` | `createResourceType` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| PUT | `/resource-types/{resourceTypeId}` | `updateResourceType` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resource-utilisation` | `getResourceUtilisation` | `RESOURCE_VIEW` | — | venue-management-web |
+| GET | `/resources` | `listResources` | `RESOURCE_VIEW` | — | venue-management-web |
+| POST | `/resources` | `createResource` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/resources/{resourceId}` | `getResource` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/resources/{resourceId}` | `updateResource` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/resources/{resourceId}/audit` | `getResourceAuditTrail` | `RESOURCE_VIEW` | — | venue-management-web |
+| GET | `/resources/{resourceId}/availability` | `getResourceAvailability` | `RESOURCE_VIEW` | — | guest-app, guest-web, venue-management-web |
+| POST | `/resources/{resourceId}/clone` | `cloneResource` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/resources/{resourceId}/dependencies` | `getResourceDependencies` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/resources/{resourceId}/dependencies` | `setResourceDependencies` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| GET | `/resources/{resourceId}/hierarchy` | `getResourceHierarchy` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/resources/{resourceId}/hierarchy` | `setResourceHierarchy` | `RESOURCE_MANAGE` | — | venue-management-web |
+| PUT | `/resources/{resourceId}/qualifications` | `setResourceQualifications` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/resources/{resourceId}/schedule` | `getResourceSchedule` | `RESOURCE_VIEW` | — | venue-management-web |
+| PUT | `/resources/{resourceId}/schedule` | `setResourceSchedule` | `RESOURCE_CONFIGURE` | — | venue-management-web |
+| POST | `/resources/{resourceId}/state` | `setResourceLifecycleState` | `RESOURCE_MANAGE` | — | venue-management-web |
+| PUT | `/resources/{resourceId}/venues` | `setResourceVenueAssignment` | `RESOURCE_MANAGE` | — | venue-management-web |
+| GET | `/sessions/{sessionId}/manifest` | `getSessionManifest` | `RESOURCE_VIEW` | ✓ | venue-management-web |
+| PUT | `/sessions/{sessionId}/manifest` | `reorderSessionManifest` | `RESOURCE_BOOK` | ✓ | venue-management-web |
 
 ### `retail.yaml` — 24 operation(s)
 
@@ -1830,30 +1830,30 @@ Merchandise, returns and stored value. Blocked offline — stock depletes in rea
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/merchandise` | `listMerchandise` | `PRODUCT_VIEW` | ✓ | Guest App, Guest Kiosk, Guest Web, Venue Mgmt, Venue POS |
-| POST | `/merchandise` | `createMerchandise` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/merchandise` | `listMerchandise` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-pos |
+| POST | `/merchandise` | `createMerchandise` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 | POST | `/merchandise-reservations/{reservationId}/cancel` | `cancelMerchandiseReservation` | `ORDER_CREATE` | — | — |
 | POST | `/merchandise-reservations/{reservationId}/collect` | `collectMerchandiseReservation` | `ORDER_CREATE` | — | — |
-| GET | `/merchandise/lookup` | `lookupMerchandise` | `PRODUCT_VIEW` | — | Guest App, Guest Kiosk, Guest Web, Staff App, Venue Mgmt, Venue POS |
-| PATCH | `/merchandise/{merchandiseId}` | `updateMerchandise` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
-| POST | `/outlets/{outletId}/reserve` | `reserveMerchandise` | `ORDER_CREATE` | — | Guest App, Guest Kiosk, Guest Web, Staff App, Venue Mgmt, Venue POS |
-| GET | `/outlets/{outletId}/return-policy` | `getReturnPolicy` | `ORDER_VIEW` | ✓ | Venue Mgmt, Venue POS |
-| PUT | `/outlets/{outletId}/return-policy` | `setReturnPolicy` | `REGION_CONFIGURE` | — | Venue Mgmt |
-| GET | `/outlets/{outletId}/stock-check` | `getOutletStock` | `PRODUCT_VIEW` | — | Venue Mgmt |
+| GET | `/merchandise/lookup` | `lookupMerchandise` | `PRODUCT_VIEW` | — | guest-app, guest-web, venue-management-web, venue-pos, venue-staff-app |
+| PATCH | `/merchandise/{merchandiseId}` | `updateMerchandise` | `PRODUCT_CONFIGURE` | — | venue-management-web |
+| POST | `/outlets/{outletId}/reserve` | `reserveMerchandise` | `ORDER_CREATE` | — | guest-app, guest-web, venue-management-web, venue-pos, venue-staff-app |
+| GET | `/outlets/{outletId}/return-policy` | `getReturnPolicy` | `ORDER_VIEW` | ✓ | venue-management-web, venue-pos |
+| PUT | `/outlets/{outletId}/return-policy` | `setReturnPolicy` | `REGION_CONFIGURE` | — | venue-management-web |
+| GET | `/outlets/{outletId}/stock-check` | `getOutletStock` | `PRODUCT_VIEW` | — | venue-management-web |
 | POST | `/retail-exchanges` | `createRetailExchange` | `ORDER_EXCHANGE` | — | — |
 | GET | `/retail-returns` | `listRetailReturns` | `ORDER_VIEW` | — | — |
-| POST | `/retail-returns` | `createRetailReturn` | `ORDER_REFUND` | — | Venue POS |
-| GET | `/retail-sales` | `listRetailSales` | `ORDER_VIEW` | — | Venue POS |
-| POST | `/retail-sales` | `createRetailSale` | `ORDER_CREATE` | — | Venue POS |
-| GET | `/retail-sales/lookup` | `lookupRetailSale` | `ORDER_VIEW` | — | Venue POS |
-| GET | `/retail-sales/{saleId}` | `getRetailSale` | `ORDER_VIEW` | — | Venue POS |
-| POST | `/retail-sales/{saleId}/reprint` | `reprintReceipt` | `ORDER_REPRINT` | — | Venue POS |
+| POST | `/retail-returns` | `createRetailReturn` | `ORDER_REFUND` | — | venue-pos |
+| GET | `/retail-sales` | `listRetailSales` | `ORDER_VIEW` | — | venue-pos |
+| POST | `/retail-sales` | `createRetailSale` | `ORDER_CREATE` | — | venue-pos |
+| GET | `/retail-sales/lookup` | `lookupRetailSale` | `ORDER_VIEW` | — | venue-pos |
+| GET | `/retail-sales/{saleId}` | `getRetailSale` | `ORDER_VIEW` | — | venue-pos |
+| POST | `/retail-sales/{saleId}/reprint` | `reprintReceipt` | `ORDER_REPRINT` | — | venue-pos |
 | POST | `/shop-and-drop` | `createShopAndDrop` | `ORDER_CREATE` | — | — |
-| GET | `/shop-and-drop/lookup` | `lookupShopAndDrop` | `ORDER_VIEW` | — | Guest App, Guest Kiosk, Guest Web |
+| GET | `/shop-and-drop/lookup` | `lookupShopAndDrop` | `ORDER_VIEW` | — | guest-app, guest-web |
 | POST | `/shop-and-drop/{dropId}/collect` | `collectShopAndDrop` | `ORDER_MODIFY` | — | — |
 | POST | `/shop-and-drop/{dropId}/dispose` | `disposeShopAndDrop` | `PRODUCT_CONFIGURE` | — | — |
-| GET | `/store-rules` | `listStoreRules` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PUT | `/store-rules` | `setStoreRules` | `PRODUCT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/store-rules` | `listStoreRules` | `PRODUCT_VIEW` | — | venue-management-web |
+| PUT | `/store-rules` | `setStoreRules` | `PRODUCT_CONFIGURE` | — | venue-management-web |
 
 ### `seating.yaml` — 54 operation(s)
 
@@ -1861,60 +1861,60 @@ Seat maps, holds and allocation. Seat categories are entitlement concepts.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/accessible-seating` | `getAccessibleSeating` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/accessible-seating` | `setAccessibleSeating` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/group-seat-requests` | `listGroupSeatRequests` | `ORDER_VIEW` | — | Venue Mgmt |
-| POST | `/group-seat-requests` | `createGroupSeatRequest` | `ORDER_CREATE` | — | Venue Mgmt |
-| POST | `/group-seat-requests/{requestId}/allocate` | `allocateGroupSeats` | `ORDER_CREATE` | — | Venue Mgmt |
-| PUT | `/group-seat-requests/{requestId}/roster` | `setGroupSeatRoster` | `ORDER_MODIFY` | — | Venue Mgmt |
-| POST | `/performances/{performanceId}/assign-seats` | `assignSeats` | `ORDER_CREATE` | — | Venue Mgmt |
-| GET | `/performances/{performanceId}/seat-availability` | `getSeatAvailability` | `PRODUCT_VIEW` | — | Guest App, Guest Web, Venue Mgmt, Venue POS |
-| POST | `/performances/{performanceId}/seat-recommendations` | `recommendSeats` | `PRODUCT_VIEW` | — | Guest App, Guest Web, Venue Mgmt, Venue POS |
-| GET | `/seat-blocks` | `listSeatBlocks` | `PRODUCT_VIEW` | — | Partner Web, Venue Mgmt |
-| POST | `/seat-blocks` | `createSeatBlock` | `CAPACITY_CONFIGURE` | — | Partner Web, Venue Mgmt |
-| DELETE | `/seat-blocks/{blockId}` | `relinquishSeatBlock` | `CAPACITY_CONFIGURE` | — | Partner Web |
-| POST | `/seat-blocks/{blockId}/allocate` | `allocateBlockedSeats` | `ORDER_CREATE` | — | Partner Web |
-| GET | `/seat-categories` | `listSeatCategories` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| POST | `/seat-categories` | `createSeatCategory` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-compliance` | `validateSeatCompliance` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-hold-pools` | `listSeatHoldPools` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-hold-pools` | `createSeatHoldPool` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-hold-pools/{poolId}/release` | `releaseSeatHoldPool` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-hold-types` | `listSeatHoldTypes` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/seat-hold-types` | `setSeatHoldType` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-holds` | `createSeatHold` | `ORDER_CREATE` | — | Guest App, Guest Web, Venue Mgmt, Venue POS |
-| DELETE | `/seat-holds/{holdId}` | `relinquishSeatHold` | `ORDER_CREATE` | — | Venue Mgmt, Venue POS |
-| GET | `/seat-holds/{holdId}` | `getSeatHold` | `ORDER_VIEW` | — | Venue Mgmt, Venue POS |
-| POST | `/seat-holds/{holdId}/extend` | `extendSeatHold` | `ORDER_CREATE` | — | Venue Mgmt, Venue POS |
-| GET | `/seat-inventory` | `getSeatInventory` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-map-imports` | `importSeatMap` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-map-imports/{importId}` | `getSeatMapImport` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| GET | `/seat-map-templates` | `listSeatMapTemplates` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/seat-map-templates` | `createSeatMapTemplate` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps` | `listSeatMaps` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/seat-maps` | `createSeatMap` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps/{seatMapId}` | `getSeatMap` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PATCH | `/seat-maps/{seatMapId}` | `updateSeatMap` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/clone` | `cloneSeatMap` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps/{seatMapId}/diff` | `diffSeatMapVersions` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/import/geometry` | `importSeatGeometry` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/import/manifest` | `importSeatManifest` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps/{seatMapId}/import/{jobId}` | `getImportJob` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/import/{jobId}` | `commitImportJob` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/publish` | `publishSeatMap` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps/{seatMapId}/rules` | `getSeatingRules` | `PRODUCT_VIEW` | ✓ | Venue Mgmt |
-| PUT | `/seat-maps/{seatMapId}/rules` | `setSeatingRules` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-maps/{seatMapId}/seats` | `listSeats` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PATCH | `/seat-maps/{seatMapId}/seats` | `updateSeats` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/sections/copy` | `copySeatMapSection` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-maps/{seatMapId}/validate` | `validateSeatMap` | `PRODUCT_VIEW` | — | Venue Mgmt |
-| PUT | `/seat-maps/{seatMapId}/zones` | `setMapZones` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| POST | `/seat-reassignment` | `reassignSeats` | `ORDER_MODIFY` | — | Venue Mgmt |
-| GET | `/seat-recommendation-rules` | `getSeatRecommendationRules` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/seat-recommendation-rules` | `setSeatRecommendationRules` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-reconciliation` | `getSeatReconciliation` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| GET | `/seat-rules` | `getSeatRules` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/seat-rules` | `setSeatRules` | `CAPACITY_CONFIGURE` | — | Venue Mgmt |
+| GET | `/accessible-seating` | `getAccessibleSeating` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| PUT | `/accessible-seating` | `setAccessibleSeating` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/group-seat-requests` | `listGroupSeatRequests` | `ORDER_VIEW` | — | venue-management-web |
+| POST | `/group-seat-requests` | `createGroupSeatRequest` | `ORDER_CREATE` | — | venue-management-web |
+| POST | `/group-seat-requests/{requestId}/allocate` | `allocateGroupSeats` | `ORDER_CREATE` | — | venue-management-web |
+| PUT | `/group-seat-requests/{requestId}/roster` | `setGroupSeatRoster` | `ORDER_MODIFY` | — | venue-management-web |
+| POST | `/performances/{performanceId}/assign-seats` | `assignSeats` | `ORDER_CREATE` | — | venue-management-web |
+| GET | `/performances/{performanceId}/seat-availability` | `getSeatAvailability` | `PRODUCT_VIEW` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| POST | `/performances/{performanceId}/seat-recommendations` | `recommendSeats` | `PRODUCT_VIEW` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| GET | `/seat-blocks` | `listSeatBlocks` | `PRODUCT_VIEW` | — | partner-web, venue-management-web |
+| POST | `/seat-blocks` | `createSeatBlock` | `CAPACITY_CONFIGURE` | — | partner-web, venue-management-web |
+| DELETE | `/seat-blocks/{blockId}` | `relinquishSeatBlock` | `CAPACITY_CONFIGURE` | — | partner-web |
+| POST | `/seat-blocks/{blockId}/allocate` | `allocateBlockedSeats` | `ORDER_CREATE` | — | partner-web |
+| GET | `/seat-categories` | `listSeatCategories` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| POST | `/seat-categories` | `createSeatCategory` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-compliance` | `validateSeatCompliance` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-hold-pools` | `listSeatHoldPools` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-hold-pools` | `createSeatHoldPool` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-hold-pools/{poolId}/release` | `releaseSeatHoldPool` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-hold-types` | `listSeatHoldTypes` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| PUT | `/seat-hold-types` | `setSeatHoldType` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-holds` | `createSeatHold` | `ORDER_CREATE` | — | guest-app, guest-web, venue-management-web, venue-pos |
+| DELETE | `/seat-holds/{holdId}` | `relinquishSeatHold` | `ORDER_CREATE` | — | venue-management-web, venue-pos |
+| GET | `/seat-holds/{holdId}` | `getSeatHold` | `ORDER_VIEW` | — | venue-management-web, venue-pos |
+| POST | `/seat-holds/{holdId}/extend` | `extendSeatHold` | `ORDER_CREATE` | — | venue-management-web, venue-pos |
+| GET | `/seat-inventory` | `getSeatInventory` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-map-imports` | `importSeatMap` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-map-imports/{importId}` | `getSeatMapImport` | `PRODUCT_VIEW` | — | venue-management-web |
+| GET | `/seat-map-templates` | `listSeatMapTemplates` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/seat-map-templates` | `createSeatMapTemplate` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps` | `listSeatMaps` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/seat-maps` | `createSeatMap` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps/{seatMapId}` | `getSeatMap` | `PRODUCT_VIEW` | — | venue-management-web |
+| PATCH | `/seat-maps/{seatMapId}` | `updateSeatMap` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/clone` | `cloneSeatMap` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps/{seatMapId}/diff` | `diffSeatMapVersions` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/import/geometry` | `importSeatGeometry` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/import/manifest` | `importSeatManifest` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps/{seatMapId}/import/{jobId}` | `getImportJob` | `PRODUCT_VIEW` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/import/{jobId}` | `commitImportJob` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/publish` | `publishSeatMap` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps/{seatMapId}/rules` | `getSeatingRules` | `PRODUCT_VIEW` | ✓ | venue-management-web |
+| PUT | `/seat-maps/{seatMapId}/rules` | `setSeatingRules` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-maps/{seatMapId}/seats` | `listSeats` | `PRODUCT_VIEW` | — | venue-management-web |
+| PATCH | `/seat-maps/{seatMapId}/seats` | `updateSeats` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/sections/copy` | `copySeatMapSection` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-maps/{seatMapId}/validate` | `validateSeatMap` | `PRODUCT_VIEW` | — | venue-management-web |
+| PUT | `/seat-maps/{seatMapId}/zones` | `setMapZones` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| POST | `/seat-reassignment` | `reassignSeats` | `ORDER_MODIFY` | — | venue-management-web |
+| GET | `/seat-recommendation-rules` | `getSeatRecommendationRules` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| PUT | `/seat-recommendation-rules` | `setSeatRecommendationRules` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-reconciliation` | `getSeatReconciliation` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| GET | `/seat-rules` | `getSeatRules` | `CAPACITY_CONFIGURE` | — | venue-management-web |
+| PUT | `/seat-rules` | `setSeatRules` | `CAPACITY_CONFIGURE` | — | venue-management-web |
 
 ### `subscription.yaml` — 127 operation(s)
 
@@ -1922,133 +1922,133 @@ Control Plane. Runs outside any cell, because it provisions cells.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| PUT | `/agreement-contract-term` | `setAgreementContractTerm` | `PLATFORM_CELL_MANAGE` | — | Partner Web, Sign-up, TICVAI Web |
+| PUT | `/agreement-contract-term` | `setAgreementContractTerm` | `PLATFORM_CELL_MANAGE` | — | partner-web, signup-web, ticvai-web |
 | POST | `/ai-usage/settle` | `settleAiUsage` | `PLATFORM_BILLING_MANAGE` | — | — |
-| GET | `/billing-reconciliation` | `getBillingReconciliation` | `PLATFORM_BILLING_VIEW` | — | TICVAI Web |
-| PUT | `/booking-limit-commercial` | `approveBookingLimitCommercial` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
+| GET | `/billing-reconciliation` | `getBillingReconciliation` | `PLATFORM_BILLING_VIEW` | — | ticvai-web |
+| PUT | `/booking-limit-commercial` | `approveBookingLimitCommercial` | `PLATFORM_CELL_MANAGE` | — | partner-web |
 | GET | `/burst-environments` | `listBurstEnvironments` | `PLATFORM_CELL_VIEW` | — | — |
 | POST | `/burst-environments` | `requestBurstEnvironment` | `PLATFORM_CELL_MANAGE` | — | — |
 | POST | `/burst-environments/{burstEnvironmentId}/decommission` | `decommissionBurstEnvironment` | `PLATFORM_CELL_MANAGE` | — | — |
 | POST | `/burst-environments/{burstEnvironmentId}/drain` | `drainBurstEnvironment` | `PLATFORM_CELL_MANAGE` | — | — |
 | POST | `/burst-environments/{burstEnvironmentId}/reconcile` | `reconcileBurstEnvironment` | `PLATFORM_CELL_MANAGE` | — | — |
-| POST | `/capacity-packs` | `addCapacityPack` | `PLATFORM_BILLING_MANAGE` | — | Sign-up, TICVAI Web |
+| POST | `/capacity-packs` | `addCapacityPack` | `PLATFORM_BILLING_MANAGE` | — | signup-web, ticvai-web |
 | GET | `/cell-clusters` | `listCellClusters` | `PLATFORM_CELL_VIEW` | — | — |
 | POST | `/cell-clusters` | `launchCellCluster` | `PLATFORM_CELL_MANAGE` | — | — |
-| GET | `/cells/{cellId}` | `getCell` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| PATCH | `/cells/{cellId}` | `updateCellTier` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
-| POST | `/cells/{cellId}/cancel-decommission` | `cancelDecommission` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
-| GET | `/cells/{cellId}/capacity` | `getCellCapacity` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| POST | `/cells/{cellId}/decommission` | `decommissionCell` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web |
-| GET | `/cells/{cellId}/health` | `getCellHealth` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| GET | `/cells/{cellId}/jobs` | `listCellJobs` | `PLATFORM_CELL_VIEW` | — | TICVAI Web |
-| GET | `/channel-listings` | `listChannelListings` | `PARTNER_VIEW` | — | Venue Mgmt |
-| PUT | `/channel-listings` | `setChannelListing` | `PARTNER_MANAGE` | — | Venue Mgmt |
-| GET | `/commercial-agreement` | `listCommercialAgreement` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/commercial-agreement-health` | `listCommercialAgreementHealth` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/commercial-allocation-quota` | `listCommercialAllocationQuota` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/commission-calculation-settlement` | `listCommissionCalculationSettlement` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/commission-margin-incentive` | `listCommissionMarginIncentive` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/credit-limit-exposure` | `listCreditLimitExposure` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/deposit-guarantee-financial` | `listDepositGuaranteeFinancial` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| PUT | `/family-household-dependent` | `setFamilyHouseholdDependent` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| GET | `/go-live-readiness` | `getGoLiveReadiness` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| POST | `/go-live-readiness/run` | `runGoLiveValidation` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| POST | `/invoices/{invoiceId}/cancel` | `cancelInvoice` | `PLATFORM_BILLING_MANAGE` | — | TICVAI Web |
-| POST | `/invoices/{invoiceId}/dispute` | `disputeInvoice` | `PLATFORM_BILLING_MANAGE` | — | TICVAI Web |
-| POST | `/invoices/{invoiceId}/payment` | `recordInvoicePayment` | `PLATFORM_BILLING_MANAGE` | — | TICVAI Web |
+| GET | `/cells/{cellId}` | `getCell` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| PATCH | `/cells/{cellId}` | `updateCellTier` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
+| POST | `/cells/{cellId}/cancel-decommission` | `cancelDecommission` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
+| GET | `/cells/{cellId}/capacity` | `getCellCapacity` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| POST | `/cells/{cellId}/decommission` | `decommissionCell` | `PLATFORM_CELL_MANAGE` | — | ticvai-web |
+| GET | `/cells/{cellId}/health` | `getCellHealth` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| GET | `/cells/{cellId}/jobs` | `listCellJobs` | `PLATFORM_CELL_VIEW` | — | ticvai-web |
+| GET | `/channel-listings` | `listChannelListings` | `PARTNER_VIEW` | — | venue-management-web |
+| PUT | `/channel-listings` | `setChannelListing` | `PARTNER_MANAGE` | — | venue-management-web |
+| GET | `/commercial-agreement` | `listCommercialAgreement` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/commercial-agreement-health` | `listCommercialAgreementHealth` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/commercial-allocation-quota` | `listCommercialAllocationQuota` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/commission-calculation-settlement` | `listCommissionCalculationSettlement` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/commission-margin-incentive` | `listCommissionMarginIncentive` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/credit-limit-exposure` | `listCreditLimitExposure` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/deposit-guarantee-financial` | `listDepositGuaranteeFinancial` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| PUT | `/family-household-dependent` | `setFamilyHouseholdDependent` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| GET | `/go-live-readiness` | `getGoLiveReadiness` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/go-live-readiness/run` | `runGoLiveValidation` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/invoices/{invoiceId}/cancel` | `cancelInvoice` | `PLATFORM_BILLING_MANAGE` | — | ticvai-web |
+| POST | `/invoices/{invoiceId}/dispute` | `disputeInvoice` | `PLATFORM_BILLING_MANAGE` | — | ticvai-web |
+| POST | `/invoices/{invoiceId}/payment` | `recordInvoicePayment` | `PLATFORM_BILLING_MANAGE` | — | ticvai-web |
 | POST | `/invoices/{invoiceId}/resolve-dispute` | `resolveInvoiceDispute` | `PLATFORM_BILLING_MANAGE` | — | — |
-| GET | `/licence-enforcement` | `getLicenceEnforcement` | `PLATFORM_BILLING_VIEW` | — | TICVAI Web |
-| PUT | `/licence-enforcement` | `setLicenceEnforcementPolicy` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| GET | `/licensing-models` | `listLicensingModels` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| PUT | `/licensing-models` | `setLicensingModel` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| GET | `/member` | `listMember` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/member-exception-override` | `listMemberExceptionOverride` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/member-lifecycle-case` | `listMemberLifecycleCase` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| PUT | `/member-membership-account` | `setMemberMembershipAccount` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| GET | `/membership-activation-credential` | `listMembershipActivationCredential` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/membership-annual-pass` | `listMembershipAnnualPass` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/membership-commercial-pricing` | `listMembershipCommercialPricing` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/membership-eligibility-qualification` | `setMembershipEligibilityQualification` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| PUT | `/membership-entitlement-admission` | `setMembershipEntitlementAdmission` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| GET | `/membership-freeze-suspension` | `listMembershipFreezeSuspension` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| PUT | `/membership-product-tier` | `setMembershipProductTier` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| PUT | `/membership-product-validation` | `approveMembershipProductValidation` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| GET | `/membership-renewal-retention` | `listMembershipRenewalRetention` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| GET | `/membership-upgrade-downgrade` | `listMembershipUpgradeDowngrade` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/membership-usage-visit` | `listMembershipUsageVisit` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| GET | `/module-catalogue` | `listModuleCatalogue` | `PLATFORM_PLAN_MANAGE` | — | Sign-up, TICVAI Web |
-| PUT | `/module-catalogue` | `setModuleListing` | `PLATFORM_PLAN_MANAGE` | — | Sign-up, TICVAI Web |
-| POST | `/onboarding-applications` | `submitOnboardingApplication` | `TENANT_CONFIGURE` | — | Sign-up, TICVAI Web |
-| POST | `/package-simulations` | `simulateCommercialPackage` | `PLATFORM_PLAN_MANAGE` | — | Sign-up, TICVAI Web |
-| GET | `/partner` | `listPartner` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-2` | `listPartner2` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-access-role` | `listPartnerAccessRole` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-agreements` | `listPartnerAgreements` | `PARTNER_MANAGE` | — | Partner Web, TICVAI Web |
-| POST | `/partner-agreements` | `createPartnerAgreement` | `PARTNER_MANAGE` | — | TICVAI Web |
-| PATCH | `/partner-agreements/{agreementId}` | `updatePartnerAgreement` | `PARTNER_MANAGE` | — | TICVAI Web |
-| GET | `/partner-agreements/{agreementId}/commission-statement` | `getCommissionStatement` | `PARTNER_VIEW` | — | Partner Web |
-| PUT | `/partner-brand-venue` | `setPartnerBrandVenue` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
-| GET | `/partner-cancellation-refund` | `listPartnerCancellationRefund` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-contact-user` | `listPartnerContactUser` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-dispute-case` | `listPartnerDisputeCase` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-documentation-compliance` | `listPartnerDocumentationCompliance` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-onboarding-application` | `listPartnerOnboardingApplication` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-order-booking` | `listPartnerOrderBooking` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-performance-scorecard` | `listPartnerPerformanceScorecard` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| PUT | `/partner-profile-organization` | `setPartnerProfileOrganization` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
-| GET | `/partner-profile-readiness` | `listPartnerProfileReadiness` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-quotes` | `listPartnerQuotes` | `PARTNER_VIEW` | — | Partner Web |
-| POST | `/partner-quotes` | `createPartnerQuote` | `PARTNER_MANAGE` | — | Partner Web, TICVAI Web |
-| PUT | `/partner-rate-net` | `setPartnerRateNet` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
-| GET | `/partner-reconciliation-exception` | `listPartnerReconciliationException` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
+| GET | `/licence-enforcement` | `getLicenceEnforcement` | `PLATFORM_BILLING_VIEW` | — | ticvai-web |
+| PUT | `/licence-enforcement` | `setLicenceEnforcementPolicy` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| GET | `/licensing-models` | `listLicensingModels` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| PUT | `/licensing-models` | `setLicensingModel` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| GET | `/member` | `listMember` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/member-exception-override` | `listMemberExceptionOverride` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/member-lifecycle-case` | `listMemberLifecycleCase` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| PUT | `/member-membership-account` | `setMemberMembershipAccount` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| GET | `/membership-activation-credential` | `listMembershipActivationCredential` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/membership-annual-pass` | `listMembershipAnnualPass` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/membership-commercial-pricing` | `listMembershipCommercialPricing` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/membership-eligibility-qualification` | `setMembershipEligibilityQualification` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| PUT | `/membership-entitlement-admission` | `setMembershipEntitlementAdmission` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| GET | `/membership-freeze-suspension` | `listMembershipFreezeSuspension` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| PUT | `/membership-product-tier` | `setMembershipProductTier` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| PUT | `/membership-product-validation` | `approveMembershipProductValidation` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| GET | `/membership-renewal-retention` | `listMembershipRenewalRetention` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/membership-upgrade-downgrade` | `listMembershipUpgradeDowngrade` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/membership-usage-visit` | `listMembershipUsageVisit` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| GET | `/module-catalogue` | `listModuleCatalogue` | `PLATFORM_PLAN_MANAGE` | — | signup-web, ticvai-web |
+| PUT | `/module-catalogue` | `setModuleListing` | `PLATFORM_PLAN_MANAGE` | — | signup-web, ticvai-web |
+| POST | `/onboarding-applications` | `submitOnboardingApplication` | `TENANT_CONFIGURE` | — | signup-web, ticvai-web |
+| POST | `/package-simulations` | `simulateCommercialPackage` | `PLATFORM_PLAN_MANAGE` | — | signup-web, ticvai-web |
+| GET | `/partner` | `listPartner` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-2` | `listPartner2` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-access-role` | `listPartnerAccessRole` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-agreements` | `listPartnerAgreements` | `PARTNER_MANAGE` | — | partner-web, ticvai-web |
+| POST | `/partner-agreements` | `createPartnerAgreement` | `PARTNER_MANAGE` | — | ticvai-web |
+| PATCH | `/partner-agreements/{agreementId}` | `updatePartnerAgreement` | `PARTNER_MANAGE` | — | ticvai-web |
+| GET | `/partner-agreements/{agreementId}/commission-statement` | `getCommissionStatement` | `PARTNER_VIEW` | — | partner-web |
+| PUT | `/partner-brand-venue` | `setPartnerBrandVenue` | `PLATFORM_CELL_MANAGE` | — | partner-web |
+| GET | `/partner-cancellation-refund` | `listPartnerCancellationRefund` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-contact-user` | `listPartnerContactUser` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-dispute-case` | `listPartnerDisputeCase` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-documentation-compliance` | `listPartnerDocumentationCompliance` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-onboarding-application` | `listPartnerOnboardingApplication` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-order-booking` | `listPartnerOrderBooking` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-performance-scorecard` | `listPartnerPerformanceScorecard` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| PUT | `/partner-profile-organization` | `setPartnerProfileOrganization` | `PLATFORM_CELL_MANAGE` | — | partner-web |
+| GET | `/partner-profile-readiness` | `listPartnerProfileReadiness` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-quotes` | `listPartnerQuotes` | `PARTNER_VIEW` | — | partner-web |
+| POST | `/partner-quotes` | `createPartnerQuote` | `PARTNER_MANAGE` | — | partner-web, ticvai-web |
+| PUT | `/partner-rate-net` | `setPartnerRateNet` | `PLATFORM_CELL_MANAGE` | — | partner-web |
+| GET | `/partner-reconciliation-exception` | `listPartnerReconciliationException` | `PLATFORM_TENANT_VIEW` | — | partner-web |
 | POST | `/partner-registrations` | `registerPartner` | `—` | — | — |
-| GET | `/partner-relationship` | `listPartnerRelationship` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| GET | `/partner-statement-account` | `listPartnerStatementAccount` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| PUT | `/partner-statu-lifecycle` | `approvePartnerStatuLifecycle` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
+| GET | `/partner-relationship` | `listPartnerRelationship` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| GET | `/partner-statement-account` | `listPartnerStatementAccount` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| PUT | `/partner-statu-lifecycle` | `approvePartnerStatuLifecycle` | `PLATFORM_CELL_MANAGE` | — | partner-web |
 | POST | `/partners/{partnerId}/invoice-export` | `exportPartnerInvoice` | `LEDGER_VIEW` | — | — |
 | GET | `/partners/{partnerId}/users` | `listPartnerUsers` | `PARTNER_VIEW` | — | — |
 | POST | `/partners/{partnerId}/users` | `createPartnerUser` | `PARTNER_MANAGE` | — | — |
-| PUT | `/payment-term-billing` | `setPaymentTermBilling` | `PLATFORM_CELL_MANAGE` | — | Partner Web |
-| GET | `/plans` | `listPlans` | `PLATFORM_TENANT_VIEW` | — | Sign-up, TICVAI Web |
-| POST | `/plans` | `createPlan` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| GET | `/plans/{planId}` | `getPlan` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web |
-| POST | `/plans/{planId}` | `createPlanVersion` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| GET | `/renewal-auto` | `listRenewalAuto` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/renewal-auto-membership` | `setRenewalAutoMembership` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web, Venue Mgmt |
-| GET | `/reservation-hold-release` | `listReservationHoldRelease` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
+| PUT | `/payment-term-billing` | `setPaymentTermBilling` | `PLATFORM_CELL_MANAGE` | — | partner-web |
+| GET | `/plans` | `listPlans` | `PLATFORM_TENANT_VIEW` | — | signup-web, ticvai-web |
+| POST | `/plans` | `createPlan` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| GET | `/plans/{planId}` | `getPlan` | `PLATFORM_TENANT_VIEW` | — | ticvai-web |
+| POST | `/plans/{planId}` | `createPlanVersion` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| GET | `/renewal-auto` | `listRenewalAuto` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/renewal-auto-membership` | `setRenewalAutoMembership` | `PLATFORM_CELL_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/reservation-hold-release` | `listReservationHoldRelease` | `PLATFORM_TENANT_VIEW` | — | partner-web |
 | POST | `/subscriptions/{subscriptionId}/cancel` | `cancelSubscription` | `PLATFORM_BILLING_MANAGE` | — | — |
 | GET | `/tenant-migrations` | `listTenantMigrations` | `PLATFORM_CELL_VIEW` | — | — |
 | POST | `/tenant-migrations` | `planTenantMigration` | `PLATFORM_CELL_VIEW` | — | — |
 | POST | `/tenant-migrations/{migrationId}/execute` | `executeTenantMigration` | `PLATFORM_CELL_MANAGE` | — | — |
 | POST | `/tenant-migrations/{migrationId}/rollback` | `rollbackTenantMigration` | `PLATFORM_CELL_MANAGE` | — | — |
-| GET | `/tenants` | `listTenants` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue CMS, Venue Mgmt |
-| POST | `/tenants` | `createTenant` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}` | `getTenant` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue CMS |
-| PATCH | `/tenants/{tenantId}` | `updateTenant` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/cells` | `listTenantCells` | `PLATFORM_CELL_VIEW` | — | TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/cells` | `provisionCell` | `PLATFORM_CELL_MANAGE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/entitlement-usage` | `getEntitlementUsage` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/invoices` | `listSubscriptionInvoices` | `PLATFORM_BILLING_VIEW` | — | TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/invoices` | `generateInvoice` | `PLATFORM_BILLING_MANAGE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/licences` | `getTenantLicences` | `PLATFORM_TENANT_VIEW` | ✓ | TICVAI Web, Venue CMS |
-| DELETE | `/tenants/{tenantId}/licences/add-ons` | `removeLicenceAddOn` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/licences/add-ons` | `addLicenceAddOn` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/reactivate` | `reactivateTenant` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/subscription` | `getSubscription` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue CMS |
-| PUT | `/tenants/{tenantId}/subscription` | `setSubscription` | `PLATFORM_TENANT_MANAGE` | — | Sign-up, TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/subscription/preview` | `previewSubscriptionChange` | `PLATFORM_TENANT_VIEW` | — | Sign-up, TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/suspend` | `suspendTenant` | `PLATFORM_TENANT_MANAGE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenants/{tenantId}/terminate` | `terminateTenant` | `PLATFORM_TENANT_TERMINATE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenants/{tenantId}/usage` | `getUsageMetering` | `PLATFORM_TENANT_VIEW` | — | TICVAI Web, Venue CMS |
-| GET | `/territory-market-distribution` | `listTerritoryMarketDistribution` | `PLATFORM_TENANT_VIEW` | — | Partner Web |
-| PUT | `/trial-configurations` | `setTrialConfiguration` | `PLATFORM_PLAN_MANAGE` | — | Sign-up, TICVAI Web |
+| GET | `/tenants` | `listTenants` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/tenants` | `createTenant` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}` | `getTenant` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| PATCH | `/tenants/{tenantId}` | `updateTenant` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/cells` | `listTenantCells` | `PLATFORM_CELL_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/cells` | `provisionCell` | `PLATFORM_CELL_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/entitlement-usage` | `getEntitlementUsage` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/invoices` | `listSubscriptionInvoices` | `PLATFORM_BILLING_VIEW` | — | ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/invoices` | `generateInvoice` | `PLATFORM_BILLING_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/licences` | `getTenantLicences` | `PLATFORM_TENANT_VIEW` | ✓ | ticvai-web, venue-management-web |
+| DELETE | `/tenants/{tenantId}/licences/add-ons` | `removeLicenceAddOn` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/licences/add-ons` | `addLicenceAddOn` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/reactivate` | `reactivateTenant` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/subscription` | `getSubscription` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/tenants/{tenantId}/subscription` | `setSubscription` | `PLATFORM_TENANT_MANAGE` | — | signup-web, ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/subscription/preview` | `previewSubscriptionChange` | `PLATFORM_TENANT_VIEW` | — | signup-web, ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/suspend` | `suspendTenant` | `PLATFORM_TENANT_MANAGE` | — | ticvai-web, venue-management-web |
+| POST | `/tenants/{tenantId}/terminate` | `terminateTenant` | `PLATFORM_TENANT_TERMINATE` | — | ticvai-web, venue-management-web |
+| GET | `/tenants/{tenantId}/usage` | `getUsageMetering` | `PLATFORM_TENANT_VIEW` | — | ticvai-web, venue-management-web |
+| GET | `/territory-market-distribution` | `listTerritoryMarketDistribution` | `PLATFORM_TENANT_VIEW` | — | partner-web |
+| PUT | `/trial-configurations` | `setTrialConfiguration` | `PLATFORM_PLAN_MANAGE` | — | signup-web, ticvai-web |
 | POST | `/usage-records` | `recordUsage` | `—` | — | — |
-| PUT | `/validity-activation-expiry` | `setValidityActivationExpiry` | `PLATFORM_CELL_MANAGE` | — | Venue Mgmt |
-| GET | `/venue-type-templates` | `listVenueTypeTemplates` | `TENANT_CONFIGURE` | — | TICVAI Web |
-| GET | `/visit-admission-entitlement` | `listVisitAdmissionEntitlement` | `PLATFORM_TENANT_VIEW` | — | Venue Mgmt |
-| POST | `/vsi-assessments` | `scoreVsiAssessment` | `PLATFORM_PLAN_MANAGE` | — | Sign-up, TICVAI Web |
-| GET | `/vsi-models` | `getVsiModel` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
-| PUT | `/vsi-models` | `setVsiModel` | `PLATFORM_PLAN_MANAGE` | — | TICVAI Web |
+| PUT | `/validity-activation-expiry` | `setValidityActivationExpiry` | `PLATFORM_CELL_MANAGE` | — | venue-management-web |
+| GET | `/venue-type-templates` | `listVenueTypeTemplates` | `TENANT_CONFIGURE` | — | ticvai-web |
+| GET | `/visit-admission-entitlement` | `listVisitAdmissionEntitlement` | `PLATFORM_TENANT_VIEW` | — | venue-management-web |
+| POST | `/vsi-assessments` | `scoreVsiAssessment` | `PLATFORM_PLAN_MANAGE` | — | signup-web, ticvai-web |
+| GET | `/vsi-models` | `getVsiModel` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
+| PUT | `/vsi-models` | `setVsiModel` | `PLATFORM_PLAN_MANAGE` | — | ticvai-web |
 
 ### `venue-map.yaml` — 12 operation(s)
 
@@ -2056,17 +2056,17 @@ A venue map is not a seat map, and conflating them is the mistake this contract 
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/venue-maps` | `listVenueMaps` | `VENUE_MAP_VIEW` | — | Venue Mgmt |
-| POST | `/venue-maps` | `createVenueMap` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
-| GET | `/venue-maps/{mapId}` | `getVenueMap` | `VENUE_MAP_VIEW` | ✓ | Guest App, Guest Web, Staff App, Venue Mgmt |
-| GET | `/venue-maps/{mapId}/graph` | `getVenueMapGraph` | `VENUE_MAP_VIEW` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/venue-maps/{mapId}/import` | `importVenueGeometry` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
-| GET | `/venue-maps/{mapId}/live` | `getVenueMapLive` | `VENUE_MAP_VIEW` | — | Staff App |
-| POST | `/venue-maps/{mapId}/paths/{pathId}/closure` | `setPathClosure` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
-| POST | `/venue-maps/{mapId}/points` | `setVenuePoint` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
-| POST | `/venue-maps/{mapId}/proposals` | `acceptVenueLabelProposals` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
-| POST | `/venue-maps/{mapId}/publish` | `publishVenueMap` | `VENUE_MAP_PUBLISH` | — | Venue Mgmt |
-| POST | `/venue-maps/{mapId}/validate-graph` | `validateVenueMapGraph` | `VENUE_MAP_MANAGE` | — | Venue Mgmt |
+| GET | `/venue-maps` | `listVenueMaps` | `VENUE_MAP_VIEW` | — | venue-management-web |
+| POST | `/venue-maps` | `createVenueMap` | `VENUE_MAP_MANAGE` | — | venue-management-web |
+| GET | `/venue-maps/{mapId}` | `getVenueMap` | `VENUE_MAP_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-staff-app |
+| GET | `/venue-maps/{mapId}/graph` | `getVenueMapGraph` | `VENUE_MAP_VIEW` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/venue-maps/{mapId}/import` | `importVenueGeometry` | `VENUE_MAP_MANAGE` | — | venue-management-web |
+| GET | `/venue-maps/{mapId}/live` | `getVenueMapLive` | `VENUE_MAP_VIEW` | — | venue-staff-app |
+| POST | `/venue-maps/{mapId}/paths/{pathId}/closure` | `setPathClosure` | `VENUE_MAP_MANAGE` | — | venue-management-web |
+| POST | `/venue-maps/{mapId}/points` | `setVenuePoint` | `VENUE_MAP_MANAGE` | — | venue-management-web |
+| POST | `/venue-maps/{mapId}/proposals` | `acceptVenueLabelProposals` | `VENUE_MAP_MANAGE` | — | venue-management-web |
+| POST | `/venue-maps/{mapId}/publish` | `publishVenueMap` | `VENUE_MAP_PUBLISH` | — | venue-management-web |
+| POST | `/venue-maps/{mapId}/validate-graph` | `validateVenueMapGraph` | `VENUE_MAP_MANAGE` | — | venue-management-web |
 | POST | `/venue-maps/{mapId}/walkway-proposals` | `acceptWalkwayProposals` | `VENUE_MAP_MANAGE` | — | — |
 
 ### `wallet.yaml` — 48 operation(s)
@@ -2075,54 +2075,54 @@ Two vocabularies, and confusing them is why the wallet was built five times.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/credit-consumption-policy` | `getCreditConsumptionPolicy` | `WALLET_VIEW` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/credit-consumption-policy` | `setCreditConsumptionPolicy` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| POST | `/credit-consumption/simulate` | `simulateCreditConsumption` | `WALLET_VIEW` | — | Venue Mgmt |
-| GET | `/credit-lots` | `listCreditLots` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/credit-lots/expire` | `expireCreditLots` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/credit-types` | `listCreditTypes` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/credit-types` | `createCreditType` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/credit-types/{creditTypeId}` | `updateCreditType` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/credit-types/{creditTypeId}/eligibility` | `setCreditEligibilityRules` | `WALLET_CONFIGURE` | — | Venue Mgmt |
+| GET | `/credit-consumption-policy` | `getCreditConsumptionPolicy` | `WALLET_VIEW` | — | ticvai-web, venue-management-web |
+| PUT | `/credit-consumption-policy` | `setCreditConsumptionPolicy` | `WALLET_CONFIGURE` | — | venue-management-web |
+| POST | `/credit-consumption/simulate` | `simulateCreditConsumption` | `WALLET_VIEW` | — | venue-management-web |
+| GET | `/credit-lots` | `listCreditLots` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/credit-lots/expire` | `expireCreditLots` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/credit-types` | `listCreditTypes` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/credit-types` | `createCreditType` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/credit-types/{creditTypeId}` | `updateCreditType` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/credit-types/{creditTypeId}/eligibility` | `setCreditEligibilityRules` | `WALLET_CONFIGURE` | — | venue-management-web |
 | POST | `/game-cards/{cardCode}/adjust` | `adjustGameCard` | `WALLET_OPERATE` | — | — |
-| POST | `/game-cards/{cardCode}/load` | `loadGameCredits` | `WALLET_OPERATE` | — | Venue POS |
-| PUT | `/gift-card-products` | `setGiftCardProduct` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| POST | `/gift-cards` | `issueGiftCard` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/gift-cards/{cardCode}` | `getGiftCard` | `WALLET_VIEW` | — | Guest App, Guest Web |
+| POST | `/game-cards/{cardCode}/load` | `loadGameCredits` | `WALLET_OPERATE` | — | venue-pos |
+| PUT | `/gift-card-products` | `setGiftCardProduct` | `WALLET_CONFIGURE` | — | venue-management-web |
+| POST | `/gift-cards` | `issueGiftCard` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/gift-cards/{cardCode}` | `getGiftCard` | `WALLET_VIEW` | — | guest-app, guest-web |
 | POST | `/gift-cards/{cardCode}/block` | `blockGiftCard` | `WALLET_OPERATE` | — | — |
-| POST | `/gift-cards/{giftCardId}/activate` | `activateGiftCard` | `WALLET_OPERATE` | — | Venue Mgmt |
-| POST | `/gift-cards/{giftCardId}/redeem` | `redeemGiftCard` | `WALLET_OPERATE` | — | — |
-| GET | `/shared-wallets` | `listSharedWallets` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/shared-wallets` | `createSharedWallet` | `WALLET_OPERATE` | — | Venue Mgmt |
-| PUT | `/shared-wallets/{sharedWalletId}/members` | `setSharedWalletMembers` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/voucher-types` | `listVoucherTypes` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/voucher-types` | `createVoucherType` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/wallet-accounting` | `setWalletAccountingMapping` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/wallet-channel-rules` | `setWalletChannelRules` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| POST | `/wallet-configuration/publish` | `publishWalletConfiguration` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| POST | `/wallet-credentials` | `linkWalletCredential` | `WALLET_OPERATE` | ✓ | Venue Mgmt |
-| GET | `/wallet-disputes` | `listWalletDisputes` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/wallet-disputes` | `raiseWalletDispute` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/wallet-funding-rules` | `getWalletFundingRules` | `WALLET_VIEW` | — | Venue Mgmt |
-| PUT | `/wallet-funding-rules` | `setWalletFundingRules` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| POST | `/wallet-funding/reversals` | `reverseWalletFunding` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/wallet-liability` | `getWalletLiability` | `WALLET_VIEW` | — | Venue Mgmt |
-| GET | `/wallet-reconciliation` | `getWalletReconciliation` | `WALLET_VIEW` | — | Venue Mgmt |
-| PUT | `/wallet-refund-policy` | `setWalletRefundPolicy` | `WALLET_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| POST | `/wallet-restrictions` | `setWalletRestriction` | `WALLET_OPERATE` | — | Venue Mgmt |
-| PUT | `/wallet-risk-rules` | `setWalletRiskRules` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/wallet-transfer-rules` | `setWalletTransferRules` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| GET | `/wallet-types` | `listWalletTypes` | `WALLET_VIEW` | — | Venue Mgmt |
-| POST | `/wallet-types` | `createWalletType` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| PUT | `/wallet-types/{walletTypeId}` | `updateWalletType` | `WALLET_CONFIGURE` | — | Venue Mgmt |
-| GET | `/wallets/{subjectId}` | `getWallet` | `WALLET_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
-| POST | `/wallets/{subjectId}/adjust` | `adjustWallet` | `WALLET_OPERATE` | — | Venue Mgmt |
-| POST | `/wallets/{subjectId}/top-ups` | `topUpWallet` | `WALLET_OPERATE` | — | Venue Mgmt |
-| GET | `/wallets/{subjectId}/transactions` | `listWalletTransactions` | `WALLET_VIEW` | — | Guest App, Guest Web, Venue Mgmt |
+| POST | `/gift-cards/{giftCardId}/activate` | `activateGiftCard` | `WALLET_OPERATE` | — | venue-management-web |
+| POST | `/gift-cards/{giftCardId}/redeem` | `redeemGiftCard` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/shared-wallets` | `listSharedWallets` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/shared-wallets` | `createSharedWallet` | `WALLET_OPERATE` | — | venue-management-web |
+| PUT | `/shared-wallets/{sharedWalletId}/members` | `setSharedWalletMembers` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/voucher-types` | `listVoucherTypes` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/voucher-types` | `createVoucherType` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/wallet-accounting` | `setWalletAccountingMapping` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/wallet-channel-rules` | `setWalletChannelRules` | `WALLET_CONFIGURE` | — | venue-management-web |
+| POST | `/wallet-configuration/publish` | `publishWalletConfiguration` | `WALLET_CONFIGURE` | — | venue-management-web |
+| POST | `/wallet-credentials` | `linkWalletCredential` | `WALLET_OPERATE` | ✓ | venue-management-web |
+| GET | `/wallet-disputes` | `listWalletDisputes` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/wallet-disputes` | `raiseWalletDispute` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/wallet-funding-rules` | `getWalletFundingRules` | `WALLET_VIEW` | — | venue-management-web |
+| PUT | `/wallet-funding-rules` | `setWalletFundingRules` | `WALLET_CONFIGURE` | — | venue-management-web |
+| POST | `/wallet-funding/reversals` | `reverseWalletFunding` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/wallet-liability` | `getWalletLiability` | `WALLET_VIEW` | — | venue-management-web |
+| GET | `/wallet-reconciliation` | `getWalletReconciliation` | `WALLET_VIEW` | — | venue-management-web |
+| PUT | `/wallet-refund-policy` | `setWalletRefundPolicy` | `WALLET_CONFIGURE` | — | ticvai-web, venue-management-web |
+| POST | `/wallet-restrictions` | `setWalletRestriction` | `WALLET_OPERATE` | — | venue-management-web |
+| PUT | `/wallet-risk-rules` | `setWalletRiskRules` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/wallet-transfer-rules` | `setWalletTransferRules` | `WALLET_CONFIGURE` | — | venue-management-web |
+| GET | `/wallet-types` | `listWalletTypes` | `WALLET_VIEW` | — | venue-management-web |
+| POST | `/wallet-types` | `createWalletType` | `WALLET_CONFIGURE` | — | venue-management-web |
+| PUT | `/wallet-types/{walletTypeId}` | `updateWalletType` | `WALLET_CONFIGURE` | — | venue-management-web |
+| GET | `/wallets/{subjectId}` | `getWallet` | `WALLET_VIEW` | — | guest-app, guest-web, venue-management-web |
+| POST | `/wallets/{subjectId}/adjust` | `adjustWallet` | `WALLET_OPERATE` | — | venue-management-web |
+| POST | `/wallets/{subjectId}/top-ups` | `topUpWallet` | `WALLET_OPERATE` | — | venue-management-web |
+| GET | `/wallets/{subjectId}/transactions` | `listWalletTransactions` | `WALLET_VIEW` | — | guest-app, guest-web, venue-management-web |
 | POST | `/wallets/{walletId}/close` | `closeWallet` | `WALLET_OPERATE` | — | — |
 | POST | `/wallets/{walletId}/reinstate` | `reinstateWallet` | `WALLET_OPERATE` | — | — |
 | POST | `/wallets/{walletId}/suspend` | `suspendWallet` | `WALLET_OPERATE` | — | — |
-| POST | `/wallets/{walletId}/transfer` | `transferWalletBalance` | `WALLET_OPERATE` | — | Guest App, Guest Web, Venue Mgmt |
+| POST | `/wallets/{walletId}/transfer` | `transferWalletBalance` | `WALLET_OPERATE` | — | guest-app, guest-web, venue-management-web |
 
 ### `white-label.yaml` — 50 operation(s)
 
@@ -2130,56 +2130,56 @@ How a tenant configures their branded guest app. A CMS plus an app builder.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| POST | `/content-blocks` | `createContentBlock` | `TENANT_CONFIGURE` | — | Venue Mgmt |
+| POST | `/content-blocks` | `createContentBlock` | `TENANT_CONFIGURE` | — | venue-management-web |
 | POST | `/content-blocks/{blockId}/publish` | `publishContentBlock` | `TENANT_PUBLISH` | — | — |
 | PUT | `/footer` | `setFooter` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config` | `getTenantConfig` | `TENANT_CONFIGURE` | — | Guest App, Guest Kiosk, Guest Web, Venue CMS, Venue Mgmt |
-| GET | `/tenant-config/app-icons` | `getAppIcons` | `TENANT_CONFIGURE` | — | TICVAI Web |
-| PUT | `/tenant-config/app-icons` | `setAppIcons` | `TENANT_CONFIGURE` | — | TICVAI Web |
-| GET | `/tenant-config/banners` | `listBanners` | `TENANT_CONFIGURE` | — | Venue CMS |
+| GET | `/tenant-config` | `getTenantConfig` | `TENANT_CONFIGURE` | — | guest-app, guest-web, venue-management-web |
+| GET | `/tenant-config/app-icons` | `getAppIcons` | `TENANT_CONFIGURE` | — | ticvai-web |
+| PUT | `/tenant-config/app-icons` | `setAppIcons` | `TENANT_CONFIGURE` | — | ticvai-web |
+| GET | `/tenant-config/banners` | `listBanners` | `TENANT_CONFIGURE` | — | venue-management-web |
 | POST | `/tenant-config/banners` | `createBanner` | `TENANT_CONFIGURE` | — | — |
 | DELETE | `/tenant-config/banners/{bannerId}` | `deleteBanner` | `TENANT_CONFIGURE` | — | — |
 | PATCH | `/tenant-config/banners/{bannerId}` | `updateBanner` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/brand` | `getBrandIdentity` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| PUT | `/tenant-config/brand` | `setBrandIdentity` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS, Venue Mgmt |
-| GET | `/tenant-config/faqs` | `listFaqs` | `TENANT_CONFIGURE` | ✓ | Guest App, Guest Web, Support, TICVAI Web |
-| PUT | `/tenant-config/faqs` | `setFaqs` | `TENANT_CONFIGURE` | — | TICVAI Web |
+| GET | `/tenant-config/brand` | `getBrandIdentity` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/tenant-config/brand` | `setBrandIdentity` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/tenant-config/faqs` | `listFaqs` | `TENANT_CONFIGURE` | ✓ | guest-app, guest-web, ticvai-web, venue-support-web |
+| PUT | `/tenant-config/faqs` | `setFaqs` | `TENANT_CONFIGURE` | — | ticvai-web |
 | GET | `/tenant-config/features` | `getFeatureToggles` | `TENANT_CONFIGURE` | — | — |
 | PUT | `/tenant-config/features` | `setFeatureToggles` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/fonts` | `getFonts` | `TENANT_CONFIGURE` | — | Venue CMS |
-| PUT | `/tenant-config/fonts` | `setFonts` | `TENANT_CONFIGURE` | — | Venue CMS |
+| GET | `/tenant-config/fonts` | `getFonts` | `TENANT_CONFIGURE` | — | venue-management-web |
+| PUT | `/tenant-config/fonts` | `setFonts` | `TENANT_CONFIGURE` | — | venue-management-web |
 | PUT | `/tenant-config/header` | `setHeader` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/homepage` | `getHomepageLayout` | `TENANT_CONFIGURE` | — | Venue CMS |
-| PUT | `/tenant-config/homepage` | `setHomepageLayout` | `TENANT_CONFIGURE` | — | Venue CMS, Venue Mgmt |
-| PUT | `/tenant-config/languages` | `setLanguages` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
+| GET | `/tenant-config/homepage` | `getHomepageLayout` | `TENANT_CONFIGURE` | — | venue-management-web |
+| PUT | `/tenant-config/homepage` | `setHomepageLayout` | `TENANT_CONFIGURE` | — | venue-management-web |
+| PUT | `/tenant-config/languages` | `setLanguages` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
 | GET | `/tenant-config/modules` | `getModuleEnablement` | `TENANT_CONFIGURE` | — | — |
 | PUT | `/tenant-config/modules` | `setModuleEnablement` | `TENANT_CONFIGURE` | — | — |
 | GET | `/tenant-config/navigation` | `getNavigation` | `TENANT_CONFIGURE` | — | — |
 | PUT | `/tenant-config/navigation` | `setNavigation` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/pages` | `listContentPages` | `TENANT_CONFIGURE` | ✓ | Guest App, Guest Web, Venue Mgmt |
-| POST | `/tenant-config/pages` | `createContentPage` | `TENANT_CONFIGURE` | — | Venue Mgmt |
+| GET | `/tenant-config/pages` | `listContentPages` | `TENANT_CONFIGURE` | ✓ | guest-app, guest-web, venue-management-web |
+| POST | `/tenant-config/pages` | `createContentPage` | `TENANT_CONFIGURE` | — | venue-management-web |
 | DELETE | `/tenant-config/pages/{pageId}` | `deleteContentPage` | `TENANT_CONFIGURE` | — | — |
 | PUT | `/tenant-config/pages/{pageId}` | `updateContentPage` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/policies` | `listPolicies` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue Mgmt |
-| PUT | `/tenant-config/policies/{policyKind}` | `setPolicy` | `TENANT_CONFIGURE` | — | TICVAI Web |
-| POST | `/tenant-config/preview` | `createPreview` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenant-config/promo-blocks` | `listPromoBlocks` | `TENANT_CONFIGURE` | — | Venue CMS |
+| GET | `/tenant-config/policies` | `listPolicies` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/tenant-config/policies/{policyKind}` | `setPolicy` | `TENANT_CONFIGURE` | — | ticvai-web |
+| POST | `/tenant-config/preview` | `createPreview` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/tenant-config/promo-blocks` | `listPromoBlocks` | `TENANT_CONFIGURE` | — | venue-management-web |
 | POST | `/tenant-config/promo-blocks` | `createPromoBlock` | `TENANT_CONFIGURE` | — | — |
 | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | `deletePromoBlock` | `TENANT_CONFIGURE` | — | — |
 | PATCH | `/tenant-config/promo-blocks/{promoBlockId}` | `updatePromoBlock` | `TENANT_CONFIGURE` | — | — |
-| POST | `/tenant-config/publish` | `publishTenantConfig` | `TENANT_PUBLISH` | — | TICVAI Web, Venue CMS, Venue Mgmt |
-| GET | `/tenant-config/status` | `getTenantAppStatus` | `—` | ✓ | Guest App, Guest Kiosk, Guest Web, Venue CMS |
+| POST | `/tenant-config/publish` | `publishTenantConfig` | `TENANT_PUBLISH` | — | ticvai-web, venue-management-web |
+| GET | `/tenant-config/status` | `getTenantAppStatus` | `—` | ✓ | guest-app, guest-web, venue-management-web |
 | PUT | `/tenant-config/status` | `setMaintenanceMode` | `TENANT_CONFIGURE` | — | — |
-| GET | `/tenant-config/theme` | `getTheme` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| PUT | `/tenant-config/theme` | `setTheme` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenant-config/validate` | `validateTenantConfig` | `TENANT_CONFIGURE` | — | Venue CMS |
-| GET | `/tenant-config/versions` | `listConfigVersions` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| GET | `/tenant-config/versions/{version}/diff` | `diffConfigVersion` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenant-config/versions/{version}/restore` | `restoreConfigVersion` | `TENANT_PUBLISH` | — | TICVAI Web, Venue CMS |
-| GET | `/tenant-domains` | `listCustomDomains` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenant-domains` | `claimCustomDomain` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS, Venue Mgmt |
-| DELETE | `/tenant-domains/{domainId}` | `relinquishCustomDomain` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
-| POST | `/tenant-domains/{domainId}/verify` | `verifyCustomDomain` | `TENANT_CONFIGURE` | — | TICVAI Web, Venue CMS |
+| GET | `/tenant-config/theme` | `getTheme` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| PUT | `/tenant-config/theme` | `setTheme` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| POST | `/tenant-config/validate` | `validateTenantConfig` | `TENANT_CONFIGURE` | — | venue-management-web |
+| GET | `/tenant-config/versions` | `listConfigVersions` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| GET | `/tenant-config/versions/{version}/diff` | `diffConfigVersion` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| POST | `/tenant-config/versions/{version}/restore` | `restoreConfigVersion` | `TENANT_PUBLISH` | — | ticvai-web, venue-management-web |
+| GET | `/tenant-domains` | `listCustomDomains` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| POST | `/tenant-domains` | `claimCustomDomain` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| DELETE | `/tenant-domains/{domainId}` | `relinquishCustomDomain` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
+| POST | `/tenant-domains/{domainId}/verify` | `verifyCustomDomain` | `TENANT_CONFIGURE` | — | ticvai-web, venue-management-web |
 
 ### `workforce.yaml` — 24 operation(s)
 
@@ -2187,27 +2187,27 @@ Rota, attendance and announcements.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/announcements` | `listAnnouncements` | `WORKFORCE_VIEW` | ✓ | Staff App, TICVAI Web, Venue Mgmt |
-| POST | `/announcements` | `publishAnnouncement` | `ANNOUNCEMENT_PUBLISH` | — | Staff App, TICVAI Web, Venue Mgmt |
-| POST | `/announcements/{announcementId}/acknowledge` | `acknowledgeAnnouncement` | `WORKFORCE_VIEW` | ✓ | Staff App, Venue Mgmt |
-| GET | `/announcements/{announcementId}/reach` | `getAnnouncementReach` | `WORKFORCE_VIEW` | — | Staff App, Venue Mgmt |
-| GET | `/attendance` | `listAttendance` | `WORKFORCE_VIEW` | — | Staff App, Venue Mgmt |
-| POST | `/attendance/clock` | `recordAttendance` | `ATTENDANCE_RECORD` | ✓ | Staff App, Venue Mgmt |
-| POST | `/attendance/{recordId}/amend` | `amendAttendance` | `WORKFORCE_MANAGE` | — | Staff App, Venue Mgmt |
+| GET | `/announcements` | `listAnnouncements` | `WORKFORCE_VIEW` | ✓ | ticvai-web, venue-management-web, venue-staff-app |
+| POST | `/announcements` | `publishAnnouncement` | `ANNOUNCEMENT_PUBLISH` | — | ticvai-web, venue-management-web, venue-staff-app |
+| POST | `/announcements/{announcementId}/acknowledge` | `acknowledgeAnnouncement` | `WORKFORCE_VIEW` | ✓ | venue-management-web, venue-staff-app |
+| GET | `/announcements/{announcementId}/reach` | `getAnnouncementReach` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
+| GET | `/attendance` | `listAttendance` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
+| POST | `/attendance/clock` | `recordAttendance` | `ATTENDANCE_RECORD` | ✓ | venue-management-web, venue-staff-app |
+| POST | `/attendance/{recordId}/amend` | `amendAttendance` | `WORKFORCE_MANAGE` | — | venue-management-web, venue-staff-app |
 | POST | `/guest-broadcast` | `broadcastToGuests` | `ANNOUNCEMENT_PUBLISH` | — | — |
-| GET | `/labour-cost` | `getLabourCost` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| GET | `/leave-requests` | `listLeaveRequests` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| POST | `/leave-requests` | `requestLeave` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| GET | `/rota-assignments` | `listRotaAssignments` | `WORKFORCE_VIEW` | ✓ | Staff App, Venue Mgmt, Venue POS |
-| POST | `/rota-assignments` | `createRotaAssignment` | `WORKFORCE_MANAGE` | — | Venue Mgmt, Venue POS |
-| PATCH | `/rota-assignments/{assignmentId}` | `updateRotaAssignment` | `WORKFORCE_MANAGE` | — | Venue Mgmt |
-| POST | `/rota-assignments/{assignmentId}/swap` | `requestShiftSwap` | `WORKFORCE_VIEW` | — | Staff App, Venue Mgmt |
-| GET | `/shift-marketplace` | `listOpenShifts` | `WORKFORCE_VIEW` | ✓ | Venue Mgmt |
-| POST | `/shift-marketplace` | `claimOpenShift` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| GET | `/shift-swaps` | `listShiftSwapRequests` | `WORKFORCE_VIEW` | — | Staff App, Venue Mgmt |
-| GET | `/shift-templates` | `listShiftTemplates` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| PUT | `/shift-templates` | `setShiftTemplate` | `WORKFORCE_MANAGE` | — | Venue Mgmt |
-| GET | `/staffing-coverage` | `getStaffingCoverage` | `WORKFORCE_VIEW` | — | Venue Mgmt |
-| PUT | `/staffing-rules` | `setStaffingRules` | `WORKFORCE_MANAGE` | — | Venue Mgmt |
-| GET | `/training-records` | `listTrainingRecords` | `WORKFORCE_VIEW` | — | Staff App |
-| GET | `/workforce-compliance` | `validateWorkforceCompliance` | `WORKFORCE_VIEW` | — | Venue Mgmt |
+| GET | `/labour-cost` | `getLabourCost` | `WORKFORCE_VIEW` | — | venue-management-web |
+| GET | `/leave-requests` | `listLeaveRequests` | `WORKFORCE_VIEW` | — | venue-management-web |
+| POST | `/leave-requests` | `requestLeave` | `WORKFORCE_VIEW` | — | venue-management-web |
+| GET | `/rota-assignments` | `listRotaAssignments` | `WORKFORCE_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| POST | `/rota-assignments` | `createRotaAssignment` | `WORKFORCE_MANAGE` | — | venue-management-web, venue-pos |
+| PATCH | `/rota-assignments/{assignmentId}` | `updateRotaAssignment` | `WORKFORCE_MANAGE` | — | venue-management-web |
+| POST | `/rota-assignments/{assignmentId}/swap` | `requestShiftSwap` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
+| GET | `/shift-marketplace` | `listOpenShifts` | `WORKFORCE_VIEW` | ✓ | venue-management-web |
+| POST | `/shift-marketplace` | `claimOpenShift` | `WORKFORCE_VIEW` | — | venue-management-web |
+| GET | `/shift-swaps` | `listShiftSwapRequests` | `WORKFORCE_VIEW` | — | venue-management-web, venue-staff-app |
+| GET | `/shift-templates` | `listShiftTemplates` | `WORKFORCE_VIEW` | — | venue-management-web |
+| PUT | `/shift-templates` | `setShiftTemplate` | `WORKFORCE_MANAGE` | — | venue-management-web |
+| GET | `/staffing-coverage` | `getStaffingCoverage` | `WORKFORCE_VIEW` | — | venue-management-web |
+| PUT | `/staffing-rules` | `setStaffingRules` | `WORKFORCE_MANAGE` | — | venue-management-web |
+| GET | `/training-records` | `listTrainingRecords` | `WORKFORCE_VIEW` | — | venue-staff-app |
+| GET | `/workforce-compliance` | `validateWorkforceCompliance` | `WORKFORCE_VIEW` | — | venue-management-web |

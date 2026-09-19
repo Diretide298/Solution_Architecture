@@ -25,6 +25,29 @@ duplicates and superseded rows. Derived from `handoff/traceability.json` and
 **3.1% of the matrix**, against an August position where whole artefact classes had no
 register at all.
 
+## Artefact classes, and what stands behind each
+
+**The requirement counts are the August classification and cannot be re-derived** — the walk
+records a verdict per row, not an artefact class, so these are kept as the only classification
+that exists. **The `Artefact` column is current**, taken from `handoff/closed_classes.json`.
+
+| Reqs | Class | What we hold | Artefact |
+|---|---|---|---|
+| 347 | Report | 23 operations, a definition engine, the report register | ✅ closed |
+| 290 | Permission / role | 111 permissions, 28 test vectors | ✅ `permission-resolution.md` |
+| 273 | Configuration | the configuration catalogue | ✅ closed — **but see the scope finding below** |
+| 206 | Audit | `identity.authz_audit` and the audit register | ✅ closed |
+| 193 | Notification | `MessageTemplate` and the notification catalogue | ✅ closed |
+| 171 | Integration | adaptor patterns, ADR-0012/0015, the integration register | ✅ closed |
+| 117 | State model | 6 models, transitions checked | ✅ closed |
+| **105** | **Device / hardware** | 11 device kinds, ADR-0015 | 🟡 **No driver register or vendor matrix.** Device Management is the third-worst gap domain, 17 rows |
+| 94 | Validation rule | the business rules register | ✅ closed |
+| **89** | **Retention / archive** | mentioned nowhere concrete | 🔴 **Nothing.** Five contradictory periods, CF-64 |
+| 53 | Event / async | 29 events, consumers, idempotency | ✅ closed |
+| 40 | Test / acceptance | 28 permission vectors | ✅ closed |
+| — | Accessibility | WCAG 2.2 AA obligations | ✅ closed |
+| — | Localisation | translation and locale handling | ✅ closed |
+
 ## The artefact classes the August audit called missing
 
 Twelve are now closed, recorded in `handoff/closed_classes.json`:

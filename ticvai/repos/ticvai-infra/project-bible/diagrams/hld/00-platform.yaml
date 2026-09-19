@@ -9,7 +9,7 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 1981
+  operations: 1974
   contracts: 32
   tables: 560
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 1859
+  operations: 1852
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 164
+  operations: 162
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -80,7 +80,7 @@ actors:
   reaches:
   - P07
   - P15
-  operations: 13
+  operations: 12
   note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
 surfaces:
 - platform: P01
@@ -499,14 +499,14 @@ services:
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 1967
+  operations: 1960
   usedBy:
   - service: CatalogueService
-    operations: 393
-  - service: OrderService
-    operations: 218
+    operations: 389
   - service: VenueOpsService
     operations: 218
+  - service: OrderService
+    operations: 217
   - service: MarketingService
     operations: 183
   - service: PlatformService
@@ -521,9 +521,9 @@ stores:
     operations: 56
   - service: IdentityService
     operations: 51
-  - service: WhiteLabelService
-    operations: 51
   - service: InventoryService
+    operations: 50
+  - service: WhiteLabelService
     operations: 50
   - service: WalletService
     operations: 48
@@ -534,18 +534,18 @@ stores:
   - service: RetailService
     operations: 24
   - service: CrossRegionService
-    operations: 17
+    operations: 16
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 1490
+  operations: 1483
   usedBy:
   - service: CatalogueService
-    operations: 338
+    operations: 334
   - service: AccessService
     operations: 163
   - service: OrderService
-    operations: 160
+    operations: 159
   - service: MarketingService
     operations: 151
   - service: VenueOpsService
@@ -559,7 +559,7 @@ stores:
   - service: IdentityService
     operations: 47
   - service: WhiteLabelService
-    operations: 38
+    operations: 37
   - service: LedgerService
     operations: 30
   - service: InventoryService
@@ -570,10 +570,10 @@ stores:
     operations: 21
   - service: RetailService
     operations: 16
-  - service: CrossRegionService
-    operations: 12
   - service: WalletService
     operations: 12
+  - service: CrossRegionService
+    operations: 11
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
@@ -665,7 +665,7 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 1981 operations across 28 contracts — the join
+  holds: 1974 operations across 28 contracts — the join
 - layer: backend
   holds: 560 tables in 26 schemas, 910 relationships
 - layer: domain

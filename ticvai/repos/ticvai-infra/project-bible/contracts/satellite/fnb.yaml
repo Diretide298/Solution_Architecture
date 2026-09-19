@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 82
+  x-ticvai-screen-count: 84
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -2851,6 +2851,8 @@ paths:
         format: uuid
     post:
       operationId: requestBill
+      x-ticvai-consumed-by:
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
       summary: The party asked to pay
@@ -4395,6 +4397,8 @@ paths:
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     get:
       operationId: getTableVisit
+      x-ticvai-consumed-by:
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

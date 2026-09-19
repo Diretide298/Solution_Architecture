@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 43
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -1853,6 +1853,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: redeemGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Spend against a card
       description: >

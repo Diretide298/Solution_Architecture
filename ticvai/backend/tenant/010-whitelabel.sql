@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
 -- agreeing to the next
 CREATE TABLE IF NOT EXISTS whitelabel.policy (
     kind                              text NOT NULL,
+    title                             text,
     version                           text NOT NULL,
     body                              jsonb NOT NULL,
     requires_reconsent                boolean,

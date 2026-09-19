@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1182 |
-| Operations | 1075 |
+| Operations | 1081 |
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 175 |
+| Operations with no screen | 157 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 175 operations with no screen here
+### 157 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -41,26 +41,26 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
-| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
-| … | | | 135 more |
+| `createTable` | fnb | POST | A table as a thing, not an inference |
+| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
+| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
+| … | | | 117 more |
 
 ### 8 modules split across waves
 
@@ -172,8 +172,8 @@
 | `BO-073` | Lost & Found Register | Guests & Marketing | 2 | 2 | yes |
 | `BO-074` | Chart of Accounts | Orders & Money | 1 | 8 | yes |
 | `BO-075` | Account Mapping | Orders & Money | 1 | 7 | yes |
-| `BO-076` | Revenue Recognition | Orders & Money | 2 | 4 | yes |
-| `BO-077` | FX Rates & Variances | Orders & Money | 2 | 4 | yes |
+| `BO-076` | Revenue Recognition | Orders & Money | 2 | 5 | yes |
+| `BO-077` | FX Rates & Variances | Orders & Money | 2 | 5 | yes |
 | `BO-078` | Requisitions | Stock & Supply | 1 | 10 | yes |
 | `BO-079` | Stock Count | Stock & Supply | 1 | 8 | yes |
 | `BO-080` | Stock Transfers | Stock & Supply | 2 | 6 | yes |
@@ -193,7 +193,7 @@
 | `BO-094` | Map Editor & Publish | Access & Venue | 2 | 6 | yes |
 | `BO-095` | Resources | Access & Venue | 2 | 2 | yes |
 | `BO-096` | Resource Calendar | Access & Venue | 2 | 2 | yes |
-| `BO-097` | Check Out & Check In | Access & Venue | 2 | 4 | yes |
+| `BO-097` | Check Out & Check In | Access & Venue | 2 | 5 | yes |
 | `BO-098` | Qualifications | Access & Venue | 2 | 1 | yes |
 | `BO-099` | Session Manifest | Access & Venue | 2 | 2 | yes |
 | `BO-100` | Venue Home | Venue Operations | 1 | 2 | yes |
@@ -269,7 +269,7 @@
 | `BO-1063` | Venue-Specific Configuration | Access & Venue | 3 | 2 | yes |
 | `BO-1064` | Naming, Numbering & Localization | Access & Venue | 3 | 2 | yes |
 | `BO-1065` | Currency, Timezone & Channels | Access & Venue | 3 | 1 | yes |
-| `BO-1066` | Roles, Permissions & Masking | Access & Venue | 3 | 2 | yes |
+| `BO-1066` | Roles, Permissions & Masking | Access & Venue | 3 | 3 | yes |
 | `BO-1067` | Seat Approval Workflows | Access & Venue | 3 | 1 | yes |
 | `BO-1068` | Lifecycle & Environment Promotion | Access & Venue | 3 | 1 | yes |
 | `BO-1069` | Platform Health & Observability | Access & Venue | 3 | 1 | yes |
@@ -334,7 +334,7 @@
 | `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | Orders & Money | 3 | 2 | yes |
 | `BO-1123` | Gift Card & Digital Benefit Command Center | Orders & Money | 3 | 1 | yes |
 | `BO-1124` | Gift Card Product Configuration | Orders & Money | 3 | 1 | yes |
-| `BO-1125` | Gift Card Issuance, Activation & Distribution | Orders & Money | 3 | 2 | yes |
+| `BO-1125` | Gift Card Issuance, Activation & Distribution | Orders & Money | 3 | 3 | yes |
 | `BO-1126` | Voucher & Coupon Type Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1127` | Voucher Eligibility & Redemption Rule Studio | Orders & Money | 3 | 1 | yes |
 | `BO-1128` | Membership Benefits & Entitlement Mapping | Orders & Money | 3 | 1 | yes |
@@ -675,7 +675,7 @@
 | `BO-393` | AI SLA & Escalation Advisor | Venue Operations | 3 | 1 | yes |
 | `BO-394` | Game & Ride Operations Dashboard | Games & Rides | 3 | 2 | yes |
 | `BO-395` | Game & Ride Directory | Games & Rides | 3 | 1 | yes |
-| `BO-396` | Attraction Profile | Games & Rides | 3 | 2 | yes |
+| `BO-396` | Attraction Profile | Games & Rides | 3 | 3 | yes |
 | `BO-397` | Attraction Type Configuration | Games & Rides | 3 | 2 | yes |
 | `BO-398` | Game & Ride Operational Configuration | Games & Rides | 3 | 1 | yes |
 | `BO-399` | Wallet & Credit Acceptance Mapping | Games & Rides | 3 | 1 | yes |

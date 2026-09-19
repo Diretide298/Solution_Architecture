@@ -17,15 +17,15 @@ tiers:
 contracts:
 - contract: catalogue
   tier: spine
-  operations: 192
+  operations: 190
   holds: null
   service: CatalogueService
   verbs:
     GET: 108
     PUT: 40
-    POST: 35
+    POST: 34
     PATCH: 6
-    DELETE: 3
+    DELETE: 2
   guestCallable: 13
   offlineCapable: 10
   events:
@@ -66,12 +66,12 @@ contracts:
   ref: diagrams/lld/contracts/access.yaml
 - contract: orders
   tier: spine
-  operations: 168
+  operations: 167
   holds: null
   service: OrderService
   verbs:
     GET: 86
-    POST: 54
+    POST: 53
     PUT: 24
     DELETE: 3
     PATCH: 1
@@ -130,22 +130,6 @@ contracts:
   - fnb-menuPublished
   - fnb-orderReady
   ref: diagrams/lld/contracts/fnb.yaml
-- contract: seating
-  tier: satellite
-  operations: 56
-  holds: null
-  service: CatalogueService
-  verbs:
-    POST: 22
-    GET: 21
-    PUT: 7
-    DELETE: 4
-    PATCH: 2
-  guestCallable: 3
-  offlineCapable: 2
-  events:
-  - seat-sold
-  ref: diagrams/lld/contracts/seating.yaml
 - contract: finance
   tier: spine
   operations: 56
@@ -175,21 +159,22 @@ contracts:
   offlineCapable: 5
   events: null
   ref: diagrams/lld/contracts/identity.yaml
-- contract: white-label
+- contract: seating
   tier: satellite
-  operations: 51
+  operations: 54
   holds: null
-  service: WhiteLabelService
+  service: CatalogueService
   verbs:
-    GET: 18
-    PUT: 15
-    POST: 11
-    DELETE: 5
+    POST: 22
+    GET: 21
+    PUT: 7
     PATCH: 2
-  guestCallable: 4
-  offlineCapable: 3
-  events: null
-  ref: diagrams/lld/contracts/white-label.yaml
+    DELETE: 2
+  guestCallable: 3
+  offlineCapable: 2
+  events:
+  - seat-sold
+  ref: diagrams/lld/contracts/seating.yaml
 - contract: inventory
   tier: satellite
   operations: 50
@@ -206,6 +191,21 @@ contracts:
   - inventory-purchaseOrderReceived
   - stock-depleted
   ref: diagrams/lld/contracts/inventory.yaml
+- contract: white-label
+  tier: satellite
+  operations: 50
+  holds: null
+  service: WhiteLabelService
+  verbs:
+    GET: 18
+    PUT: 15
+    POST: 11
+    DELETE: 4
+    PATCH: 2
+  guestCallable: 4
+  offlineCapable: 3
+  events: null
+  ref: diagrams/lld/contracts/white-label.yaml
 - contract: resources
   tier: satellite
   operations: 48
@@ -469,11 +469,11 @@ contracts:
   ref: diagrams/lld/contracts/shift.yaml
 - contract: cross-region
   tier: spine
-  operations: 17
+  operations: 16
   holds: null
   service: CrossRegionService
   verbs:
-    POST: 9
+    POST: 8
     GET: 5
     DELETE: 2
     PUT: 1

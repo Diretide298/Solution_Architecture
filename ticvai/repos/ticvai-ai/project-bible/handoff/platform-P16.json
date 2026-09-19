@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 52,
+  "operations": 53,
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 87
+  "operationsWithNoScreen": 79
  },
  "waves": {
   "wave3": 69
@@ -32,7 +32,7 @@
  "contracts": [
   {
    "contract": "reporting",
-   "operations": 34
+   "operations": 35
   },
   {
    "contract": "ai",
@@ -51,11 +51,11 @@
    "operations": 2
   },
   {
-   "contract": "promotions",
+   "contract": "approvals",
    "operations": 1
   },
   {
-   "contract": "access",
+   "contract": "tenancy",
    "operations": 1
   },
   {
@@ -63,11 +63,11 @@
    "operations": 1
   },
   {
-   "contract": "approvals",
+   "contract": "promotions",
    "operations": 1
   },
   {
-   "contract": "tenancy",
+   "contract": "access",
    "operations": 1
   },
   {
@@ -415,7 +415,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-preview-test-validation-anl-039",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -821,18 +821,6 @@
     "summary": "Lift a suspension"
    },
    {
-    "operation": "releaseChannelAllocation",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Return unsold channel allocation to the general pool"
-   },
-   {
-    "operation": "releaseInventoryHold",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Return unsold units"
-   },
-   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -897,12 +885,6 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
    },
    {
     "operation": "updateAccessPolicy",
@@ -977,12 +959,6 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "captureStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Take some or all of a held balance"
-   },
-   {
     "operation": "convertReservation",
     "contract": "orders",
     "verb": "POST",
@@ -993,12 +969,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
    },
    {
     "operation": "createReservation",
@@ -1055,22 +1025,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "releaseStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Give a hold back"
-   },
-   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "splitOrder",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Break one order into independent orders"
    },
    {
     "operation": "assignCoupon",
@@ -1149,12 +1107,6 @@
     "contract": "promotions",
     "verb": "POST",
     "summary": "Cancel a voucher"
-   },
-   {
-    "operation": "cancelReportExecution",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Cancel a running execution"
    },
    {
     "operation": "deleteReportSchedule",

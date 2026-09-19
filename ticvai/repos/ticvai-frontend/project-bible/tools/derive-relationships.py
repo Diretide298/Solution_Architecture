@@ -133,6 +133,46 @@ def main() -> int:
             if target:
                 add(table, name, target, "convention", "foreignKey")
 
+    # 2b. Precedent. A column name the contracts declare a target for everywhere they
+    #     mention it, applied to the columns that name it and declare nothing.
+    #
+    # **The stem rules cannot see a domain alias and should not guess one.** A venue is
+    # `platform.org_unit`, so `venue_id` matches no stem and 15 columns carrying it stayed
+    # unlinked — while 59 others declared `platform.org_unit` explicitly. `order_id` is the
+    # opposite problem: `order` is a suffix of `sales_order`, `work_order` and
+    # `purchase_order`, so the ambiguity rule correctly refuses it, and 12 declared columns
+    # say which one is meant.
+    #
+    # **This is read off the package, not written into it.** A name is only carried over when
+    # every declaration of it agrees and at least two exist — one author's choice is not yet a
+    # convention. Names with no declared precedent stay unlinked, which is 143 of them and the
+    # right answer: `template_id` is genuinely ambiguous and a guess would be worse than a gap.
+    precedent: dict[str, str] = {}
+    votes: dict[str, dict] = {}
+    for _t, columns in cols.items():
+        for c in columns:
+            tgt = c.get("references")
+            if tgt:
+                votes.setdefault(c["column"], {}).setdefault(tgt, 0)
+                votes[c["column"]][tgt] += 1
+    for name, tally in votes.items():
+        if len(tally) == 1 and sum(tally.values()) >= 2:
+            precedent[name] = next(iter(tally))
+    carried = 0
+    for table, columns in cols.items():
+        for c in columns:
+            name = c["column"]
+            if c.get("references") or name not in precedent:
+                continue
+            if precedent[name] == table:        # a self-reference needs the declared form
+                continue
+            add(table, name, precedent[name], "precedent", "foreignKey")
+            carried += 1
+    if carried:
+        print("  %d edge(s) from declared precedent (%d name(s))"
+              % (carried, len({c["column"] for cs in cols.values() for c in cs
+                               if not c.get("references") and c["column"] in precedent})))
+
     # 3. Ambient coupling from the lineage. Two tables written by one operation are related in
     #    fact — an order and its lines, a shift and its deposit box — even where the column-level
     #    reference is absent because one side holds no id.

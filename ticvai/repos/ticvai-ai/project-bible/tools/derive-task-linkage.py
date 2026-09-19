@@ -419,7 +419,13 @@ def main():
     for c, k in by_contract.most_common(12):
         print('    %-16s %d' % (c, k))
     print()
-    for sid, picks in list(per_screen.items())[:8]:
+    # **Eight was a sample and it reads like the answer.** Measuring how much of the
+    # unwired surface this would actually close needs every proposal, not the first
+    # eight screens — on 19 September the sample named 13 operations of 481 references,
+    # and an intersection taken against it said the tool reached one unwired operation
+    # when the real figure was unknown.
+    _show = len(per_screen) if '--all' in sys.argv else 8
+    for sid, picks in list(per_screen.items())[:_show]:
         print('  %-9s %s' % (sid, ', '.join('%s (%.2f)' % (k, v) for k, v in
                                             sorted(picks.items(), key=lambda x: -x[1])[:4])))
     if '--apply' not in sys.argv:

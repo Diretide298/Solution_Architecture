@@ -19,7 +19,7 @@ schemas:
   tables: 34
   stores:
   - postgres
-  largestTable: fnb.table_reservation
+  largestTable: fnb.kitchen_ticket
 operationsByContract:
 - contract: fnb
   count: 99
@@ -1061,9 +1061,9 @@ tables:
   - fnb
   foreignWriters: null
 readsFrom:
-- service: InventoryService
-  operations: 7
 - service: IdentityService
+  operations: 10
+- service: InventoryService
   operations: 7
 - service: TenancyService
   operations: 5
@@ -1085,6 +1085,9 @@ writesOutside:
   why: '**The owner defines the row; this service may only append to it.**'
 - service: CatalogueService
   operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-031 My Reservations

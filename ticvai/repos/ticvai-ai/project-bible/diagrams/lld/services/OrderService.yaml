@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 218 operations, 34 tables
+title: OrderService — 217 operations, 50 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 218
+  operations: 217
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -31,9 +31,14 @@ schemas:
   stores:
   - postgres
   largestTable: orders.shift
+- schema: payments
+  tables: 16
+  stores:
+  - postgres
+  largestTable: payments.method
 operationsByContract:
 - contract: orders
-  count: 168
+  count: 167
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -1083,14 +1088,6 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
-  - operation: releaseStoredValue
-    verb: POST
-    path: /stored-value/authorisations/{authorisationId}/release
-    scope: venue
-    permission: ORDER_CREATE
-    offline: false
-    reads: 1
-    writes: 2
   - operation: relinquishStoredValue
     verb: POST
     path: /stored-value/authorisations/{authorisationId}/release
@@ -2047,19 +2044,134 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
+- table: payments.authentication_policy
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.chargeback_evidence
+  columns: 7
+  store: postgres
+  parent: orders.chargeback
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.credit_account
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.failover_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.hosted_checkout
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.matching_rules
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.merchant_account
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.method
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.mixed_tender_rules
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.payment_terms
+  columns: 11
+  store: postgres
+  parent: ledger.account
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.provider_connection
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.reconciliation_source
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.risk_rules
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.routing_rule
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.stored_forward
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: payments.terminal
+  columns: 11
+  store: postgres
+  parent: platform.device
+  writtenBy:
+  - payments
+  foreignWriters: null
 readsFrom:
 - service: CatalogueService
   operations: 19
 - service: IdentityService
-  operations: 13
+  operations: 14
 - service: AccessService
   operations: 12
 - service: TenancyService
   operations: 8
 - service: LedgerService
   operations: 5
-- service: RetailService
+- service: WalletService
   operations: 2
+- service: CrossRegionService
+  operations: 1
+- service: MarketingService
+  operations: 1
 writesOutside:
 - service: LedgerService
   operations: 7
@@ -2067,11 +2179,20 @@ writesOutside:
 - service: AccessService
   operations: 7
   why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 5
+  why: '**The owner defines the row; this service may only append to it.**'
 - service: CatalogueService
   operations: 5
   why: '**The owner defines the row; this service may only append to it.**'
 - service: MarketingService
   operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: WalletService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: IdentityService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-008 Add-ons & Upsell

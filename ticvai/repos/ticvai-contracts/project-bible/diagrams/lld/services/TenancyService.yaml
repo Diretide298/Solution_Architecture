@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 136 operations, 50 tables
+title: TenancyService — 136 operations, 70 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -41,6 +41,16 @@ schemas:
   stores:
   - postgres
   largestTable: approvals.request
+- schema: accreditation
+  tables: 13
+  stores:
+  - postgres
+  largestTable: accreditation.holder
+- schema: tenancy
+  tables: 7
+  stores:
+  - postgres
+  largestTable: tenancy.device_telemetry
 operationsByContract:
 - contract: approvals
   count: 45
@@ -1157,6 +1167,96 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: accreditation.access_profile
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.application
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.audit
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: accreditation.badge_template
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.credential
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.document
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.holder
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.holder_access
+  columns: 5
+  store: postgres
+  parent: accreditation.holder
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.notification_rules
+  columns: 3
+  store: postgres
+  parent: accreditation.programme
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.print_job
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.programme
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.requirements
+  columns: 3
+  store: postgres
+  parent: accreditation.programme
+  writtenBy:
+  - accreditation
+  foreignWriters: null
+- table: accreditation.validity
+  columns: 9
+  store: postgres
+  parent: accreditation.programme
+  writtenBy:
+  - accreditation
+  foreignWriters: null
 - table: approvals.accreditation_badge
   columns: 8
   store: postgres
@@ -1465,6 +1565,51 @@ tables:
   parent: null
   writtenBy:
   - tenancy
+  foreignWriters: null
+- table: tenancy.device_assignment
+  columns: 12
+  store: postgres
+  parent: platform.device
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: tenancy.device_audit
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: tenancy.device_credential
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: tenancy.device_firmware
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: tenancy.device_rollout
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: tenancy.device_tamper_event
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: tenancy.device_telemetry
+  columns: 13
+  store: postgres
+  parent: platform.device
+  writtenBy: []
   foreignWriters: null
 - table: workforce.announcement
   columns: 13

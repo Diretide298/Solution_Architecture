@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 32
+  "operationsWithNoScreen": 26
  },
  "waves": {
   "wave1": 11
@@ -173,12 +173,6 @@
     "summary": "The consuming cell's bounded offline allocation"
    },
    {
-    "operation": "releaseWalletAuthorisation",
-    "contract": "cross-region",
-    "verb": "POST",
-    "summary": "Release a hold without capturing"
-   },
-   {
     "operation": "relinquishWalletAuthorisation",
     "contract": "cross-region",
     "verb": "POST",
@@ -239,22 +233,10 @@
     "summary": "Submit, approve, activate or retire a policy"
    },
    {
-    "operation": "simulateAccessPolicy",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "What this policy would decide, before it decides anything"
-   },
-   {
     "operation": "updateAccessPolicy",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Change a policy, as a new version"
-   },
-   {
-    "operation": "captureStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Take some or all of a held balance"
    },
    {
     "operation": "convertReservation",
@@ -267,12 +249,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
    },
    {
     "operation": "createReservation",
@@ -329,22 +305,10 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "releaseStoredValue",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Give a hold back"
-   },
-   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "splitOrder",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Break one order into independent orders"
    }
   ],
   "modulesSplitAcrossWaves": [],

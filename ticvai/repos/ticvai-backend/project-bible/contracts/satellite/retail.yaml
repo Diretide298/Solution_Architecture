@@ -1129,6 +1129,11 @@ components:
       type: object
       required: [id, sku, name, outletId, variantId, price, onHand, isActive]
       properties:
+        description:
+          type: string
+          description: 'What the item is, in the guest''s words. Indexed for guest-app search.
+
+            '
         id: { type: string, format: uuid }
         sku: { type: string }
         barcode: { type: string, nullable: true }

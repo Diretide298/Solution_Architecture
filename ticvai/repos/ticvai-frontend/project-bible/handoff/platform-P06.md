@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 199 |
+| Operations | 202 |
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 103 |
+| Operations with no screen | 93 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 103 operations with no screen here
+### 93 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,8 +40,6 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
-| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
@@ -51,16 +49,18 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| … | | | 63 more |
+| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
+| `updateTable` | fnb | PUT | Change what a table is |
+| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| … | | | 53 more |
 
 ### 1 modules split across waves
 
@@ -110,7 +110,7 @@
 | `EMP-031` | Queue monitor | Operations | 2 | 7 | yes |
 | `EMP-032` | Manual wait entry | Operations | 2 | 5 | yes |
 | `EMP-033` | Capacity view | Operations | 2 | 6 | yes |
-| `EMP-034` | Walk-up sale | Operations | 2 | 22 | yes |
+| `EMP-034` | Walk-up sale | Operations | 2 | 23 | yes |
 | `EMP-035` | Payment on device | Operations | 2 | 4 | yes |
 | `EMP-036` | Issue media | Operations | 2 | 3 | yes |
 | `EMP-037` | Notifications | Operations | 1 | 4 | yes |
@@ -134,8 +134,8 @@
 | `EMP-055` | Create / Edit Reservation | Floor Service | 2 | 2 | yes |
 | `EMP-056` | Walk-In & Waitlist Management | Floor Service | 2 | 1 | yes |
 | `EMP-057` | Guest Profile & Dining History | Floor Service | 2 | 4 | yes |
-| `EMP-058` | Live Table & Service Management | Floor Service | 2 | 16 | yes |
-| `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 7 | yes |
+| `EMP-058` | Live Table & Service Management | Floor Service | 2 | 17 | yes |
+| `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 8 | yes |
 | `EMP-060` | Reservation & Table Performance | Floor Service | 2 | 2 | yes |
 | `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 2 | yes |
 | `EMP-062` | Store Stock & SKU Availability | Stock on the Floor | 2 | 4 | yes |

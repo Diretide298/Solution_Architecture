@@ -17,11 +17,13 @@ tiers:
   services:
   - service: TenancyService
     operations: 136
-    tables: 50
+    tables: 70
     schemas:
     - platform
     - workforce
     - approvals
+    - accreditation
+    - tenancy
     contracts:
     - tenancy
     - workforce
@@ -47,7 +49,7 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 393
+    operations: 389
     tables: 61
     schemas:
     - catalogue
@@ -63,10 +65,11 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 218
-    tables: 34
+    operations: 217
+    tables: 50
     schemas:
     - orders
+    - payments
     contracts:
     - orders
     - shift
@@ -120,7 +123,7 @@ tiers:
   services:
   - service: VenueOpsService
     operations: 218
-    tables: 65
+    tables: 86
     schemas:
     - queue
     - maintenance
@@ -128,6 +131,7 @@ tiers:
     - venuemap
     - assets
     - games
+    - rental
     contracts:
     - queue
     - maintenance
@@ -205,9 +209,10 @@ tiers:
   services:
   - service: PlatformService
     operations: 182
-    tables: 51
+    tables: 60
     schemas:
     - control
+    - subscription
     contracts:
     - subscription
     - platform-ops
@@ -217,7 +222,7 @@ tiers:
     ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
     ref: diagrams/lld/services/PlatformService.yaml
   - service: WhiteLabelService
-    operations: 51
+    operations: 50
     tables: 13
     schemas:
     - whitelabel
@@ -239,7 +244,7 @@ tiers:
     ifDown: Down stops dashboards. **Nothing operational depends on it.**
     ref: diagrams/lld/services/ReportingService.yaml
   - service: CrossRegionService
-    operations: 17
+    operations: 16
     tables: 1
     schemas:
     - sync
@@ -252,8 +257,8 @@ tiers:
 crossServiceWrites:
 - from: CrossRegionService
   to: TenancyService
-  writes: 11
-  reads: 17
+  writes: 10
+  reads: 16
   kind: strong
 - from: OrderService
   to: LedgerService

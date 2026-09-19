@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 399
-  configurations: 40
+  operations: 398
+  configurations: 64
   configuredBy:
   - claimCustomDomain
   - createAccessPolicy
@@ -91,8 +91,8 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1461
-  configurations: 46
+  operations: 1457
+  configurations: 80
   configuredBy:
   - configureQueueFeed
   - configureWorkstation
@@ -134,7 +134,7 @@ levels:
 - level: workstation
   branch: organisational
   parent: subDepartment
-  operations: 47
+  operations: 45
   configurations: 0
   configuredBy: null
   owns:

@@ -463,34 +463,6 @@
    "partner"
   ]
  },
- "releaseChannelAllocation": {
-  "contract": "catalogue",
-  "verb": "POST",
-  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
-  "reads": [
-   "cache:idempotency",
-   "catalogue.channel_allocation"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "catalogue.channel_allocation"
-  ],
-  "routing": "",
-  "scope": "venue",
-  "perm": "CAPACITY_CONFIGURE",
-  "offline": false,
-  "summary": "Return unsold channel allocation to the general pool",
-  "source": "derived",
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff",
-   "partner"
-  ]
- },
  "listCatalogueBundles": {
   "contract": "catalogue",
   "verb": "GET",
@@ -642,33 +614,6 @@
   "audience": [
    "staff",
    "guest"
-  ]
- },
- "releaseInventoryHold": {
-  "contract": "catalogue",
-  "verb": "DELETE",
-  "path": "/inventory-holds/{inventoryHoldId}",
-  "reads": [
-   "cache:idempotency",
-   "catalogue.inventory_hold"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "catalogue.inventory_hold"
-  ],
-  "routing": "",
-  "scope": "workstation",
-  "perm": "ORDER_CREATE",
-  "offline": false,
-  "summary": "Return unsold units",
-  "source": "derived",
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff"
   ]
  },
  "renewInventoryHold": {
@@ -3823,33 +3768,6 @@
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Capture a held amount",
-  "source": "derived",
-  "service": "CrossRegionService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff"
-  ]
- },
- "releaseWalletAuthorisation": {
-  "contract": "cross-region",
-  "verb": "POST",
-  "path": "/wallet-authorisations/{authorisationId}/release",
-  "reads": [
-   "cache:idempotency",
-   "platform.wallet_authorisation"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "platform.wallet_authorisation"
-  ],
-  "routing": "",
-  "scope": "workstation",
-  "perm": "ORDER_CREATE",
-  "offline": false,
-  "summary": "Release a hold without capturing",
   "source": "derived",
   "service": "CrossRegionService",
   "stores": [
@@ -10039,33 +9957,6 @@
    "staff"
   ]
  },
- "releaseSeatHold": {
-  "contract": "seating",
-  "verb": "DELETE",
-  "path": "/seat-holds/{holdId}",
-  "reads": [
-   "cache:idempotency",
-   "seating.seat_hold"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "seating.seat_hold"
-  ],
-  "routing": "",
-  "scope": "venue",
-  "perm": "ORDER_CREATE",
-  "offline": false,
-  "summary": "Release a hold",
-  "source": "path-inferred",
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff"
-  ]
- },
  "extendSeatHold": {
   "contract": "seating",
   "verb": "POST",
@@ -10134,34 +10025,6 @@
   "offline": false,
   "summary": "Block seats from sale",
   "source": "derived",
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff",
-   "partner"
-  ]
- },
- "releaseSeatBlock": {
-  "contract": "seating",
-  "verb": "DELETE",
-  "path": "/seat-blocks/{blockId}",
-  "reads": [
-   "cache:idempotency",
-   "seating.seat_block"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "seating.seat_block"
-  ],
-  "routing": "",
-  "scope": "venue",
-  "perm": "CAPACITY_CONFIGURE",
-  "offline": false,
-  "summary": "Release a block back to sale",
-  "source": "path-inferred",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -20510,33 +20373,6 @@
    "device"
   ]
  },
- "releaseStoredValue": {
-  "contract": "orders",
-  "verb": "POST",
-  "path": "/stored-value/authorisations/{authorisationId}/release",
-  "reads": [
-   "orders.stored_value_authorisation"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "orders.stored_value_authorisation"
-  ],
-  "routing": "",
-  "scope": "venue",
-  "perm": "ORDER_CREATE",
-  "offline": false,
-  "summary": "Give a hold back",
-  "source": "hand-mapped",
-  "service": "OrderService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff",
-   "device"
-  ]
- },
  "listProductVersions": {
   "contract": "catalogue",
   "verb": "GET",
@@ -26812,35 +26648,6 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Check the record and issue the certificate",
-  "source": "hand-mapped",
-  "service": "WhiteLabelService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "audience": [
-   "staff"
-  ]
- },
- "releaseCustomDomain": {
-  "contract": "white-label",
-  "verb": "DELETE",
-  "path": "/tenant-domains/{domainId}",
-  "reads": [
-   "cache:idempotency",
-   "whitelabel.config_version",
-   "whitelabel.custom_domain"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "cache:resolution",
-   "whitelabel.custom_domain"
-  ],
-  "routing": "",
-  "scope": "tenant",
-  "perm": "TENANT_CONFIGURE",
-  "offline": false,
-  "summary": "Give the domain up",
   "source": "hand-mapped",
   "service": "WhiteLabelService",
   "stores": [

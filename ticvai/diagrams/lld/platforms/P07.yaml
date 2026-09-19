@@ -117,12 +117,16 @@ screens:
   - validateAccess
   - validateGroupAccess
   states:
+  - admitted
+  - blocked
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
   - offline
+  - overrideRequired
   offlineState: true
   entryParams:
   - mediaCode<-deepLink

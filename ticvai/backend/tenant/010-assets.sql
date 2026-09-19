@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS assets.media_upload (
 
 -- Where an asset is used. What a takedown has to check before deleting
 CREATE TABLE IF NOT EXISTS assets.media_usage (
+    extracted_text                    text,
     id                                uuid PRIMARY KEY,
     surface                           text NOT NULL,
     reference_id                      text NOT NULL,

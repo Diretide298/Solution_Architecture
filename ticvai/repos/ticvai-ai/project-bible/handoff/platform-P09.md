@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 147 |
+| Operations with no screen | 134 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 147 operations with no screen here
+### 134 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,27 +40,27 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
-| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
-| `releaseWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| … | | | 107 more |
+| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| … | | | 94 more |
 
 ### 4 modules split across waves
 

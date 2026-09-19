@@ -15,7 +15,7 @@
   "contracts": 10,
   "modules": 9,
   "undrawn": 0,
-  "operationsWithNoScreen": 5
+  "operationsWithNoScreen": 3
  },
  "waves": {
   "wave2": 11,
@@ -122,11 +122,11 @@
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "public-api",
    "operations": 4
   }
  ],
@@ -594,22 +594,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "releaseChannelAllocation",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Return unsold channel allocation to the general pool"
-   },
-   {
     "operation": "issueApiToken",
     "contract": "public-api",
     "verb": "POST",
     "summary": "Exchange a credential for an access token"
-   },
-   {
-    "operation": "releaseSeatBlock",
-    "contract": "seating",
-    "verb": "DELETE",
-    "summary": "Release a block back to sale"
    },
    {
     "operation": "createPartnerUser",

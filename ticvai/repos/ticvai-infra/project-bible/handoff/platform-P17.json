@@ -53,11 +53,11 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "orders",
    "operations": 1
   }
  ],

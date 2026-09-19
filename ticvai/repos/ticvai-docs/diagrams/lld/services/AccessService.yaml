@@ -1515,10 +1515,10 @@ tables:
   writtenBy: []
   foreignWriters: null
 readsFrom:
+- service: CatalogueService
+  operations: 8
 - service: IdentityService
   operations: 8
-- service: CatalogueService
-  operations: 7
 - service: VenueOpsService
   operations: 3
 - service: OrderService
@@ -1528,6 +1528,9 @@ readsFrom:
 writesOutside:
 - service: IdentityService
   operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: CrossRegionService
   operations: 1

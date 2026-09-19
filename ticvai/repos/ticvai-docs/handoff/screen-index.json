@@ -800,7 +800,8 @@
    "checkoutCart",
    "abandonCart",
    "evaluatePromotions",
-   "getCouponCode"
+   "getCouponCode",
+   "createCart"
   ],
   "services": [
    "CatalogueService",
@@ -819,6 +820,8 @@
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
+   "pii.subject",
+   "platform.org_unit",
    "promotions.coupon_code",
    "promotions.promotion"
   ],
@@ -9485,7 +9488,8 @@
    "createRetailReturn",
    "redeemLoyaltyPoints",
    "createApprovalRequest",
-   "createRetailSale"
+   "createRetailSale",
+   "transferGameCard"
   ],
   "services": [
    "AccessService",
@@ -16227,7 +16231,8 @@
    "setAlternativeCodes",
    "setProductAttributes",
    "transitionProductLifecycle",
-   "voidOrder"
+   "voidOrder",
+   "splitOrder"
   ],
   "services": [
    "CatalogueService",
@@ -18872,7 +18877,8 @@
    "setTableCombinations",
    "quoteWaitTime",
    "joinRestaurantWaitlist",
-   "notifyWaitlistParty"
+   "notifyWaitlistParty",
+   "getTableVisit"
   ],
   "services": [
    "FnbService"
@@ -18967,7 +18973,8 @@
    "splitBill",
    "getBill",
    "compItem",
-   "transferOrderItems"
+   "transferOrderItems",
+   "requestBill"
   ],
   "services": [
    "FnbService",
@@ -21768,7 +21775,11 @@
    "emptyFirstRun": "No ready scan yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the ready scan are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and the screen already had an `offline` state \u2014 two places describing one condition is two places to disagree."
+   "offline": "**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and the screen already had an `offline` state \u2014 two places describing one condition is two places to disagree.",
+   "admitted": "**Green, and gone in 1.5 seconds.** The absorbed SCN-004. Shows what was admitted and against which right; at a gate doing 40 a minute this is the state the device is in most of the time.",
+   "denied": "Denied with the reason and the time of the previous scan. **The reason matters more than the refusal** \u2014 a steward has to explain it to somebody standing in front of them. The absorbed SCN-005.",
+   "overrideRequired": "A supervisor override, which requires a permission a steward may not hold, and records who, why and when. The absorbed SCN-006.",
+   "blocked": "Blacklisted or otherwise barred. **No override is offered on the device** \u2014 this is not a judgement a steward makes at a lane. The absorbed SCN-010."
   },
   "overlays": [
    {
@@ -30535,7 +30546,8 @@
    "getDeferredRevenue",
    "runRecognition",
    "listRecognitionSchedules",
-   "createRecognitionSchedule"
+   "createRecognitionSchedule",
+   "validateRecognitionSchedules"
   ],
   "services": [
    "LedgerService"
@@ -30546,6 +30558,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.product",
    "ledger.account",
    "ledger.fiscal_period",
    "ledger.posting",
@@ -30627,7 +30640,8 @@
    "listFxRates",
    "setFxRate",
    "listPriceVariances",
-   "reviewPriceVariance"
+   "reviewPriceVariance",
+   "ingestFxRates"
   ],
   "services": [
    "LedgerService"
@@ -30639,7 +30653,8 @@
   "reads": [
    "cache:idempotency",
    "ledger.fx_rate",
-   "ledger.price_variance"
+   "ledger.price_variance",
+   "platform.region_settings"
   ],
   "writes": [
    "cache:idempotency",
@@ -32380,7 +32395,8 @@
    "checkOutResource",
    "checkInResource",
    "authoriseStoredValue",
-   "relinquishStoredValue"
+   "relinquishStoredValue",
+   "captureStoredValue"
   ],
   "services": [
    "OrderService",
@@ -32404,7 +32420,8 @@
    "cache:idempotency",
    "orders.stored_value_authorisation",
    "resources.booking",
-   "resources.resource"
+   "resources.resource",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -50942,7 +50959,8 @@
   "route": "/games-rides/attraction-profile-bo-396",
   "operations": [
    "getGameCard",
-   "updateGame"
+   "updateGame",
+   "createGame"
   ],
   "services": [
    "VenueOpsService"
@@ -89153,7 +89171,8 @@
   "route": "/access-venue/roles-permissions-masking-bo-1066",
   "operations": [
    "listAccessPolicies",
-   "createAccessPolicy"
+   "createAccessPolicy",
+   "simulateAccessPolicy"
   ],
   "services": [
    "IdentityService"
@@ -89163,6 +89182,7 @@
    "redis"
   ],
   "reads": [
+   "identity.access_decision",
    "identity.access_policy"
   ],
   "writes": [
@@ -92529,7 +92549,8 @@
   "route": "/orders-money/gift-card-issuance-activation-distribution-bo-1125",
   "operations": [
    "issueGiftCard",
-   "activateGiftCard"
+   "activateGiftCard",
+   "redeemGiftCard"
   ],
   "services": [
    "WalletService"
@@ -92544,7 +92565,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "wallet.gift_card"
+   "wallet.gift_card",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -150134,7 +150156,8 @@
   "route": "/analytics/report-preview-test-validation-anl-039",
   "operations": [
    "runReport",
-   "getReportExecution"
+   "getReportExecution",
+   "cancelReportExecution"
   ],
   "services": [
    "ReportingService"

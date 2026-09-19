@@ -2454,7 +2454,7 @@
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
    "bytes": 1234289,
-   "sha256": "c7c4e1562f6ac148",
+   "sha256": "0c670f4573627fcc",
    "frames": 134,
    "screensFramed": 134,
    "screens": [
@@ -4297,8 +4297,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 3914014,
-   "sha256": "5c82a98e15e0295e",
+   "bytes": 3914104,
+   "sha256": "efe19d257a10f09b",
    "frames": 1379,
    "screensFramed": 1379,
    "screens": [
@@ -7077,7 +7077,7 @@
    "file": "APP venue-pos.dc.html",
    "provenance": "clientPack",
    "bytes": 151846,
-   "sha256": "677769fe5911f66f",
+   "sha256": "112cc195d321b997",
    "frames": 40,
    "screensFramed": 40,
    "screens": [
@@ -7175,8 +7175,8 @@
   {
    "file": "APP venue-staff-mobile.dc.html",
    "provenance": "clientPack",
-   "bytes": 352519,
-   "sha256": "2693bf10fc56ca45",
+   "bytes": 352531,
+   "sha256": "56762173c654e3c7",
    "frames": 107,
    "screensFramed": 107,
    "screens": [
@@ -7409,7 +7409,7 @@
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
    "bytes": 1006308,
-   "sha256": "d25f1cbb496b7194",
+   "sha256": "b8ddfcc79e091055",
    "frames": 46,
    "screensFramed": 46,
    "screens": [
@@ -7679,7 +7679,7 @@
    "file": "P04 Venue POS.dc.html",
    "provenance": "generated",
    "bytes": 114627,
-   "sha256": "f6238a0f5fa11916",
+   "sha256": "f2ff174d74127618",
    "frames": 30,
    "screensFramed": 30,
    "screens": [
@@ -7809,7 +7809,7 @@
    "file": "P06 Venue Staff App.dc.html",
    "provenance": "generated",
    "bytes": 314560,
-   "sha256": "d4b737bc285b6938",
+   "sha256": "39f6496a06f12e77",
    "frames": 96,
    "screensFramed": 96,
    "screens": [
@@ -8018,8 +8018,8 @@
   {
    "file": "P07 Venue Scanner.dc.html",
    "provenance": "generated",
-   "bytes": 46787,
-   "sha256": "b3b9a830b467868c",
+   "bytes": 46799,
+   "sha256": "e17ad687ddbc1cde",
    "frames": 11,
    "screensFramed": 11,
    "screens": [
@@ -8058,8 +8058,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 3358669,
-   "sha256": "1d8c6b14f47aa9c3",
+   "bytes": 3358734,
+   "sha256": "df2a43bb6db5760d",
    "frames": 1182,
    "screensFramed": 1182,
    "screens": [
@@ -12333,8 +12333,8 @@
   {
    "file": "P16 Venue Analytics.dc.html",
    "provenance": "generated",
-   "bytes": 213034,
-   "sha256": "d4a84182f68c47cc",
+   "bytes": 213059,
+   "sha256": "427ce442a242215c",
    "frames": 69,
    "screensFramed": 69,
    "screens": [

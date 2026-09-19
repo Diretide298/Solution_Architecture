@@ -1100,7 +1100,12 @@ def main() -> int:
     real_codes = {yaml.safe_load(f.read_text(encoding="utf-8"))["platform"]["code"]
                   for f in (ROOT / "screens").glob("P*.yaml")}
     for f in list(ROOT.rglob("*.md")) + list((ROOT / "contracts").rglob("*.yaml")):
-        if "repos" in str(f):
+        # **`sources/` is what the client sent and is never edited.** It also contains the
+        # only document that explains the gap this rule is about: the 7 September design note
+        # says "the skipped code is P03 ... there is no screens/P03-*.yaml", and was reported
+        # for naming P03 while documenting its absence. A rule that fires on the sentence
+        # explaining the rule is checking the wrong folder.
+        if "repos" in str(f) or "sources" in str(f):
             continue
         try:
             text = f.read_text(encoding="utf-8")

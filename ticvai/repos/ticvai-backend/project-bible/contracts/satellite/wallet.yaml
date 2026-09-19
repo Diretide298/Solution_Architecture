@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 43
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -150,6 +150,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -263,6 +264,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -306,6 +308,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -368,6 +371,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -598,6 +602,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -834,6 +839,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -914,6 +920,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -994,6 +1001,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1031,6 +1039,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1172,6 +1181,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1210,6 +1220,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1349,6 +1360,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1841,6 +1853,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: redeemGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Spend against a card
       description: >
