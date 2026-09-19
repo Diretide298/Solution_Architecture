@@ -11,9 +11,9 @@
 | **States** | 11 |
 | **Events** | 11 |
 | **Tables** | 51 |
-| **Screens** | 34 |
+| **Screens** | 40 |
 | **Flows** | 11 |
-| **Documents** | 27 |
+| **Documents** | 29 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -180,6 +180,9 @@
 - `BO-093` Map Import & Labelling — wave 2, 1 operation
 - `BO-115` Category, Brand & Merchandise Hierarchy — wave 2, 1 operation
 - `BO-117` Product Import, Governance & AI Configuration Assistant — wave 2, 2 operations
+- `BO-593` AI Rental Management Copilot & Action Center — wave 3, 1 operation
+- `BO-597` AI Configuration Workspace — wave 3, 1 operation
+- `BO-598` AI Draft Review & Approval — wave 3, 1 operation
 
 **P09 TICVAI Web**
 
@@ -205,6 +208,9 @@
 - `ANL-008` Demand Forecasting — wave 3, 1 operation
 - `ANL-009` AI Assistant & Action Center — wave 3, 3 operations
 - `ANL-010` Suggestions & Advice — wave 3, 2 operations
+- `ANL-019` AI Management Insights — wave 3, 1 operation
+- `ANL-052` Ask TICVAI — Natural Language Analytics — wave 3, 2 operations
+- `ANL-056` Root-Cause Analysis Explorer — wave 3, 1 operation
 
 ## Flows
 
@@ -226,6 +232,8 @@
 |---|---|---|
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
 | [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 1 |
+| [Contract audit — every contract against the four things that must agree with it](..\docs\active\contract-audit-19-september.md) |  | 7 |
+| [The contract run — plan](..\docs\active\contract-run-plan-19-september.md) |  | 1 |
 | [Current work](..\docs\active\current-work.md) |  | 2 |
 | [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 4 |
 | [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |

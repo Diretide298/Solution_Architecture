@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 88
+  x-ticvai-screen-count: 108
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -68,6 +68,8 @@ paths:
   /onboarding-applications:
     post:
       operationId: submitOnboardingApplication
+      x-ticvai-consumed-by:
+        - "P09 ADM-380 Customer & Organization Registration"
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.
@@ -106,6 +108,8 @@ paths:
   /venue-type-templates:
     get:
       operationId: listVenueTypeTemplates
+      x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
       summary: Starting configurations by venue kind
       description: '**A water park and a theatre need different defaults**, and asking a prospect to configure
         300 settings from empty is asking them to leave.
@@ -225,6 +229,7 @@ paths:
       operationId: setChannelListing
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
       summary: List a product on a channel, with its own allocation
       description: 'BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap
         between pushes is the oversell window and the allocation is the bound on it.
@@ -726,6 +731,7 @@ paths:
     get:
       operationId: listTenants
       x-ticvai-consumed-by:
+        - "P08 BO-594 Environment Ready & Handoff to AI Setup"
         - "P09 ADM-002 Platform Dashboard"
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
@@ -736,6 +742,9 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-369 Commercial Command Center"
+        - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
+        - "P09 ADM-374 Trial & Conversion Monitor"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -779,6 +788,7 @@ paths:
       operationId: createTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-419 Provisioning Command Center"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1072,6 +1082,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-392 Subscription Tier Configuration"
+        - "P09 ADM-400 Commercial Model & Tier Selection"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1096,6 +1108,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-392 Subscription Tier Configuration"
       x-ticvai-audience:
       - staff
       summary: Create a subscription plan
@@ -1161,6 +1174,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-398 Rule Versioning, Approval & Publication"
       x-ticvai-audience:
       - staff
       summary: Publish a new version of a plan
@@ -1205,6 +1219,9 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-369 Commercial Command Center"
+        - "P09 ADM-371 Customer Commercial 360°"
+        - "P09 ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1230,6 +1247,9 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-410 Contract & Billing Cycle Selection"
+        - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
+        - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1285,6 +1305,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-414 Order & Commercial Pricing Review"
+        - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1335,6 +1357,8 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-422 Administrator & Security Initialization"
+        - "P09 ADM-450 Entitlement & License Inventory"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1374,6 +1398,7 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-422 Administrator & Security Initialization"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -1471,6 +1496,9 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-371 Customer Commercial 360°"
+        - "P09 ADM-449 Usage & License Command Center"
+        - "P09 ADM-457 AI Usage Forecast & Commercial Optimization"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2250,6 +2278,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-451 Commercial Consumption & Billable Event Metering"
+        - "P09 ADM-458 License, Metering & Commercial Synchronization Audit"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2352,6 +2382,8 @@ paths:
         type: string
     post:
       operationId: recordInvoicePayment
+      x-ticvai-consumed-by:
+        - "P09 ADM-462 Invoice & Payment Management"
       x-ticvai-audience:
       - staff
       summary: Record payment against an invoice
@@ -2397,6 +2429,8 @@ paths:
         type: string
     post:
       operationId: disputeInvoice
+      x-ticvai-consumed-by:
+        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-audience:
       - staff
       summary: Raise a dispute
@@ -2485,6 +2519,8 @@ paths:
         type: string
     post:
       operationId: cancelInvoice
+      x-ticvai-consumed-by:
+        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-audience:
       - staff
       summary: Cancel or credit an invoice
@@ -2533,6 +2569,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-459 Billing & Commercial Command Center"
+        - "P09 ADM-462 Invoice & Payment Management"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2574,6 +2612,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-460 Billing Calculation & Charge Breakdown"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2853,6 +2892,7 @@ paths:
     post:
       operationId: createPartnerQuote
       x-ticvai-consumed-by:
+        - "P09 ADM-408 Final Package Approval & Handoff"
         - "P10 PTR-011 Quote Management"
       x-ticvai-audience:
       - partner
@@ -3216,6 +3256,7 @@ paths:
       operationId: setRenewalAutoMembership
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
+        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3585,6 +3626,8 @@ paths:
       operationId: listRenewalAuto
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
+        - "P09 ADM-376 Commercial Optimization & Expansion Opportunities"
+        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -4309,6 +4352,7 @@ paths:
     put:
       operationId: setAgreementContractTerm
       x-ticvai-consumed-by:
+        - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
       x-ticvai-audience:
       - partner
@@ -5133,6 +5177,8 @@ paths:
   /vsi-models:
     get:
       operationId: getVsiModel
+      x-ticvai-consumed-by:
+        - "P09 ADM-390 VSI Model Builder"
       summary: How a customer's scale is scored into a tier
       description: 'Boards 3.2 and 3.3. **VSI is the number the whole commercial model hangs on**, and
         the boards make it configurable rather than a price list: visitors, capacity, venues, channels,
@@ -5159,6 +5205,9 @@ paths:
                 $ref: '#/components/schemas/VsiModel'
     put:
       operationId: setVsiModel
+      x-ticvai-consumed-by:
+        - "P09 ADM-390 VSI Model Builder"
+        - "P09 ADM-391 VSI Scoring & Tier Threshold Configuration"
       summary: Weights, thresholds and the tiers they map to
       tags:
       - subscription
@@ -5184,6 +5233,16 @@ paths:
   /vsi-assessments:
     post:
       operationId: scoreVsiAssessment
+      x-ticvai-consumed-by:
+        - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
+        - "P09 ADM-379 Welcome & Start Your TICVAI Journey"
+        - "P09 ADM-381 Venue Type & Business Profile"
+        - "P09 ADM-382 Visitor, Capacity & Operational Scale"
+        - "P09 ADM-384 Ticketing & Product Requirements"
+        - "P09 ADM-385 Access, Queue & Visitor Experience Assessment"
+        - "P09 ADM-386 Additional Business Module Assessment"
+        - "P09 ADM-387 Integration, Payment & Technical Readiness"
+        - "P09 ADM-388 AI Assessment Summary & Handoff"
       summary: Score a prospect's answers into a tier and a package
       description: 'Board 2, all ten screens of it — venue type, visitor scale, channels, ticketing
         needs, access and queue, additional modules, integrations.
@@ -5219,6 +5278,8 @@ paths:
   /licensing-models:
     get:
       operationId: listLicensingModels
+      x-ticvai-consumed-by:
+        - "P09 ADM-389 Commercial Rules Engine Overview"
       summary: Billable units, minimum guarantees and overage
       description: 'Boards 3.6 and 3.7. **The billable unit is the single most consequential commercial
         decision in the product**, and different customers want different ones: per venue, per
@@ -5247,6 +5308,11 @@ paths:
                   $ref: '#/components/schemas/LicensingModel'
     put:
       operationId: setLicensingModel
+      x-ticvai-consumed-by:
+        - "P09 ADM-393 Tier Included Allowances"
+        - "P09 ADM-394 Commercial & Licensing Model Configuration"
+        - "P09 ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules"
+        - "P09 ADM-396 Overage Pricing & Capacity Packs"
       summary: Define the billable unit and what happens at the edges
       tags:
       - subscription
@@ -5272,6 +5338,13 @@ paths:
   /module-catalogue:
     get:
       operationId: listModuleCatalogue
+      x-ticvai-consumed-by:
+        - "P09 ADM-386 Additional Business Module Assessment"
+        - "P09 ADM-401 Module Marketplace"
+        - "P09 ADM-402 AI Module & Package Recommendations"
+        - "P09 ADM-403 Module Detail & Commercial Treatment"
+        - "P09 ADM-404 Module Dependency & Compatibility Manager"
+        - "P09 ADM-423 License & Entitlement Activation"
       summary: Modules, their dependencies and their commercial treatment
       description: 'Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells
         combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map;
@@ -5299,6 +5372,8 @@ paths:
                   $ref: '#/components/schemas/ModuleListing'
     put:
       operationId: setModuleListing
+      x-ticvai-consumed-by:
+        - "P09 ADM-404 Module Dependency & Compatibility Manager"
       summary: Define a module's dependencies, incompatibilities and price
       tags:
       - subscription
@@ -5324,6 +5399,16 @@ paths:
   /package-simulations:
     post:
       operationId: simulateCommercialPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
+        - "P09 ADM-397 Commercial Model & Rule Simulation"
+        - "P09 ADM-399 Recommended Package Overview"
+        - "P09 ADM-400 Commercial Model & Tier Selection"
+        - "P09 ADM-406 Commercial Package Simulator"
+        - "P09 ADM-407 Package Review & Commercial Summary"
+        - "P09 ADM-416 Payment, Contract & Commercial Validation"
+        - "P09 ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing"
+        - "P09 ADM-466 Commercial Scenario Simulator"
       summary: What this package would cost, and what it would provision
       description: 'Boards 3.9, 4.8 and 10.8. **Four boards ask for a simulator, which is the pack
         saying the model is too complex to hold in a head.** Tier, allowances, billable unit, minimum
@@ -5358,6 +5443,10 @@ paths:
   /trial-configurations:
     put:
       operationId: setTrialConfiguration
+      x-ticvai-consumed-by:
+        - "P09 ADM-374 Trial & Conversion Monitor"
+        - "P09 ADM-409 Purchase / Trial Journey Selection"
+        - "P09 ADM-413 Trial Configuration & Conversion Rules"
       summary: What a trial includes, how long it lasts and how it converts
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of a
         customer''s real data that nobody can bill.** So the configuration states the conversion
@@ -5392,6 +5481,14 @@ paths:
   /go-live-readiness:
     get:
       operationId: getGoLiveReadiness
+      x-ticvai-consumed-by:
+        - "P08 BO-595 AI Setup Command Center"
+        - "P08 BO-596 Guided Setup Plan"
+        - "P08 BO-604 Setup Completion & Handoff to Go-Live"
+        - "P08 BO-605 Go-Live Readiness Command Center"
+        - "P08 BO-613 Blocker, Warning & AI Resolution Center"
+        - "P08 BO-614 Final Go-Live Approval & Production Launch"
+        - "P09 ADM-427 Provisioning Validation & Exception Management"
       summary: Everything that must pass before a tenant can sell
       description: 'Board 8, all ten screens. **Ticketing, sales channels, payment, QR and access,
         users and security, communications — validated automatically and blocked on anything
@@ -5429,6 +5526,16 @@ paths:
   /go-live-readiness/run:
     post:
       operationId: runGoLiveValidation
+      x-ticvai-consumed-by:
+        - "P08 BO-603 Configuration Health & AI Review"
+        - "P08 BO-606 Automated Validation Plan"
+        - "P08 BO-607 Ticketing & Product Validation"
+        - "P08 BO-608 End-to-End Sales Channel Testing"
+        - "P08 BO-609 Payment & Financial Validation"
+        - "P08 BO-610 Ticket, QR & Access Validation"
+        - "P08 BO-611 User, Security & Integration Validation"
+        - "P08 BO-612 Communication & Customer Journey Validation"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       summary: Run the validation plan against a tenant
       tags:
       - subscription
@@ -5464,6 +5571,10 @@ paths:
   /licence-enforcement:
     get:
       operationId: getLicenceEnforcement
+      x-ticvai-consumed-by:
+        - "P09 ADM-378 Executive AI Commercial Intelligence"
+        - "P09 ADM-452 Operational Usage & Threshold Monitor"
+        - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
       summary: Where a tenant stands against its entitlements, and what happens next
       description: 'Board 9.5. **`getEntitlementUsage` reported consumption and nothing said what to do
         about it.** Approaching a limit, at it, and over it are three states with three responses —
@@ -5497,6 +5608,8 @@ paths:
                 $ref: '#/components/schemas/LicenceEnforcement'
     put:
       operationId: setLicenceEnforcementPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-453 License Enforcement & Decision Engine"
       summary: What happens at each threshold
       tags:
       - subscription
@@ -5522,6 +5635,10 @@ paths:
   /capacity-packs:
     post:
       operationId: addCapacityPack
+      x-ticvai-consumed-by:
+        - "P09 ADM-396 Overage Pricing & Capacity Packs"
+        - "P09 ADM-405 Add-Ons, Capacity & Commercial Options"
+        - "P09 ADM-455 Overage, Capacity & Temporary Exception Management"
       summary: Buy headroom without changing tier
       description: 'Board 3.8. **A venue having an unexpectedly good season should not have to
         renegotiate a contract to keep selling.** A capacity pack is a bounded, priced increment on one
@@ -5553,6 +5670,11 @@ paths:
   /billing-reconciliation:
     get:
       operationId: getBillingReconciliation
+      x-ticvai-consumed-by:
+        - "P09 ADM-373 Revenue & Commercial Model Analytics"
+        - "P09 ADM-456 Usage Alerts, Reconciliation & Exception Center"
+        - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
+        - "P09 ADM-468 Renewal Approval, Activation & Commercial Handoff"
       summary: Metered consumption against what was invoiced
       description: 'Boards 10.2 and 10.3. **The customer will check, and the first invoice sets the
         tone for the relationship.** Every billable event, grouped and priced, against the invoice line

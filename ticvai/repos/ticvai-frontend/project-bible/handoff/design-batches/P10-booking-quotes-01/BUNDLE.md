@@ -1,14 +1,14 @@
-# P10-booking-quotes-01 — P10 · Booking & Quotes
+# P01-account-self-service-01 — P01 · Account & Self-Service
 
-**4 screens · 32 operations · 40 schemas · 14 permissions**
+**5 screens · 46 operations · 37 schemas · 5 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
-partner audience · web ·
+Platform P01 Guest Web · ships as **guest** ·
+guest audience · web ·
 online only
 
 ## Who this is for
 
-**partner on web.** Everything below is how you know what is
+**guest on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 14 permissions apply here:
-  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PARTNER_MANAGE, PARTNER_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: applyManualDiscount, createOrder, evaluatePromotions, getOrder, getPromotion, holdOrder, listOrderRefunds, listOrders
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +61,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | listDetail | 14 | 1 | — |
-| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 0 | — |
-| `PTR-010` | Cart & Quote | listDetail | 10 | 1 | — |
-| `PTR-011` | Quote Management | listDetail | 4 | 0 | — |
+| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
+| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
+| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
+| `WEB-019` | Order History | listDetail | 5 | 0 | — |
+| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
 
 ## Thin screens in this batch
 
-**PTR-011 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -79,84 +80,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "PTR-008",
-  "name": "Booking Creation",
-  "module": "Booking & Quotes",
-  "requiresModule": "partner",
-  "wave": 2,
-  "capability": "C02",
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "partner-web",
-   "route": "/general/booking-creation",
-   "component": "apps/partner-web/src/routes/general/BookingCreationForm.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "PTR-001",
-    "PTR-007"
+    "WEB-001"
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
-    "PTR-003",
-    "PTR-016"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "flowDerived": true,
-   "fromFlows": true,
    "transitions": [
     {
-     "to": "PTR-016",
-     "trigger": "Downloads vouchers",
-     "provenance": "flow F03 step 3→4",
-     "operation": "createOrder"
-    },
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "accountId",
-      "sessionId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
+     "to": "WEB-018",
+     "trigger": "My Tickets",
      "carries": [
-      "accountId",
+      "entitlementId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-003",
-     "trigger": "Profile & Company Details",
+     "to": "WEB-019",
+     "trigger": "Order History",
      "carries": [
-      "principalId"
+      "orderId"
      ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "SCN-003",
-     "trigger": "A customer arrives and is admitted",
-     "provenance": "flow F10 step 3→4",
-     "operation": "listOrders",
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
      "crossesDevice": true,
      "back": false
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Add booking creation for this venue.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -169,19 +161,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every booking creation",
-       "bindsTo": "OrderSummary",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -191,7 +184,1060 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected booking creation",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
+       "columns": [
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
+       ],
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
+  "states": {
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
+  },
+  "apis": [
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "preloaded": [
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -222,123 +1268,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createRefund",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A booking creation this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   }
-  ],
   "states": {
-   "loading": "The booking creation list.",
-   "error": "Could not load. Names which read failed and leaves the booking creation untouched.",
-   "emptyFirstRun": "No booking creation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the booking creation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "createOrder",
+    "operationId": "transferOrderTickets",
     "contract": "orders",
-    "purpose": "from page inventory",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "createRefund",
-    "contract": "orders",
-    "purpose": "Refund an order, wholly or in part",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    },
    {
     "operationId": "getOrder",
@@ -347,70 +1307,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onLoad"
    },
    {
-    "operationId": "getOrderStatement",
+    "operationId": "listOrders",
     "contract": "orders",
-    "purpose": "Full financial history of an order",
+    "purpose": "List orders",
     "trigger": "onLoad"
    },
    {
-    "operationId": "holdOrder",
+    "operationId": "createRefundRequest",
     "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrderRefunds",
-    "contract": "orders",
-    "purpose": "List refunds against an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "reprintOrder",
-    "contract": "orders",
-    "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -432,356 +1338,102 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-008"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-009",
-  "name": "Group / Bulk Booking",
-  "module": "Booking & Quotes",
-  "requiresModule": "partner",
-  "wave": 3,
-  "capability": "C54",
-  "implementation": {
-   "app": "partner-web",
-   "route": "/general/group-bulk-booking",
-   "component": "apps/partner-web/src/routes/general/GroupBulkBookingDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "PTR-001",
-    "PTR-002",
-    "PTR-003"
-   ],
-   "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-003",
-     "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
-  "density": "compact",
-  "boardFrames": [
-   "Seat Board 3.dc.html#seat-3d"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listSeatBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Work with group / bulk booking for this venue.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every group bulk booking",
-       "bindsTo": "SeatBlock",
-       "columns": [
-        "SeatBlock.id",
-        "SeatBlock.performanceId",
-        "SeatBlock.seatIds",
-        "SeatBlock.reason",
-        "SeatBlock.note",
-        "SeatBlock.createdByPrincipalId",
-        "SeatBlock.releaseAt",
-        "SeatBlock.releasedAt",
-        "SeatBlock.scopePath"
-       ],
-       "operation": "listSeatBlocks",
-       "provenance": "contract seating.yaml GET /seat-blocks"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected group bulk booking",
-       "bindsTo": "SeatBlock",
-       "columns": [
-        "SeatBlock.id",
-        "SeatBlock.performanceId",
-        "SeatBlock.seatIds",
-        "SeatBlock.reason",
-        "SeatBlock.note",
-        "SeatBlock.createdByPrincipalId",
-        "SeatBlock.releaseAt",
-        "SeatBlock.releasedAt",
-        "SeatBlock.scopePath"
-       ],
-       "operation": "listSeatBlocks",
-       "provenance": "contract seating.yaml GET /seat-blocks"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Allocate",
-       "operation": "allocateBlockedSeats",
-       "provenance": "contract seating.yaml POST /seat-blocks/{blockId}/allocate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createSeatBlock",
-       "provenance": "contract seating.yaml POST /seat-blocks"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release hold",
-       "operation": "relinquishSeatBlock",
-       "provenance": "contract seating.yaml DELETE /seat-blocks/{blockId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatBlocks",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "relinquishSeatBlock",
-       "label": "Release seat block",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "allocateBlockedSeats",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The group bulk booking list.",
-   "error": "Could not load. Names which read failed and leaves the group bulk booking untouched.",
-   "emptyFirstRun": "No group bulk booking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the group bulk booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "allocateBlockedSeats",
-    "contract": "seating",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createSeatBlock",
-    "contract": "seating",
-    "purpose": "Block seats from sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSeatBlocks"
-    ]
-   },
-   {
-    "operationId": "listSeatBlocks",
-    "contract": "seating",
-    "purpose": "List seat blocks",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "relinquishSeatBlock",
-    "contract": "seating",
-    "purpose": "Release a block back to sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSeatBlocks"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "blockId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `blockId`.",
-   "preloaded": [
-    "SeatBlock.id",
-    "SeatBlock.performanceId",
-    "SeatBlock.seatIds",
-    "SeatBlock.reason",
-    "SeatBlock.note"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-009",
-   "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P10",
-   "audience": "partner",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "PTR-010",
-  "name": "Cart & Quote",
-  "module": "Booking & Quotes",
-  "requiresModule": "partner",
-  "wave": 3,
-  "capability": "C02",
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "partner-web",
-   "route": "/general/cart-and-quote",
-   "component": "apps/partner-web/src/routes/general/CartAndQuoteDetail.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "PTR-001"
+    "WEB-001"
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
-    "PTR-003"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "accountId",
-      "sessionId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "accountId",
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-003",
-     "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
-  "purpose": "Work with cart & quote for this venue.",
-  "gaps": [
-   {
-    "operation": "getPromotionUsage",
-    "why": "**2 declared operations reach no component on this screen**: getPromotionUsage, getCart. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
    "template": "split",
    "regions": [
@@ -791,24 +1443,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every cart quote",
-       "bindsTo": "Promotion",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.venueId",
-        "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
        ],
-       "operation": "listPromotions",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
       }
      ]
     },
@@ -818,28 +1465,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cart quote",
-       "bindsTo": "Promotion",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.venueId",
-        "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions",
-        "Promotion.maxRedemptionsPerGuest",
-        "Promotion.budgetCap",
-        "Promotion.id",
-        "Promotion.status"
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
        ],
-       "operation": "getPromotion",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
       }
      ]
     },
@@ -849,39 +1496,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Evaluate",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Analyse",
-       "operation": "analysePromotionConflicts",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Add",
-       "operation": "addCartLine",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Save changes",
-       "operation": "updateCartLine",
-       "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeCartLine",
-       "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
        "kind": "secondaryButton",
-       "label": "Checkout",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
@@ -890,18 +1519,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "dataTable",
+       "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "listPromotions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "destructiveButton",
+       "kind": "dataTable",
        "derived": true,
-       "impliedBy": "removeCartLine",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove cart line",
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
        "provenance": "carried from the previous definition"
       },
       {
@@ -909,378 +1537,117 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "evaluatePromotions",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "impliedBy": "updateMyProfile",
        "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmRemoveCartLine",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A cart quote this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
-   }
-  ],
   "states": {
-   "loading": "The cart quote list.",
-   "error": "Could not load. Names which read failed and leaves the cart quote untouched.",
-   "emptyFirstRun": "No cart quote yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cart quote are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "evaluatePromotions",
-    "contract": "promotions",
-    "purpose": "from page inventory",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
    },
    {
-    "operationId": "analysePromotionConflicts",
-    "contract": "promotions",
-    "purpose": "Analyse stacking against live promotions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getPromotion",
-    "contract": "promotions",
-    "purpose": "Read a promotion",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getPromotionUsage",
-    "contract": "promotions",
-    "purpose": "Redemption count and discount given",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listPromotions",
-    "contract": "promotions",
-    "purpose": "List promotions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCart",
-    "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "addCartLine",
-    "contract": "orders",
-    "purpose": "Add something",
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
     "trigger": "onAction",
     "invalidates": [
-     "listPromotions"
+     "listConsentPurposes"
     ]
    },
    {
-    "operationId": "updateCartLine",
-    "contract": "orders",
-    "purpose": "Change a quantity",
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
     "trigger": "onAction",
     "invalidates": [
-     "listPromotions"
+     "listConsentPurposes"
     ]
    },
    {
-    "operationId": "removeCartLine",
-    "contract": "orders",
-    "purpose": "Take something out",
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
     "trigger": "onAction",
     "invalidates": [
-     "listPromotions"
+     "listConsentPurposes"
     ]
    },
    {
-    "operationId": "checkoutCart",
-    "contract": "orders",
-    "purpose": "Turn the cart into an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPromotions"
-    ]
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "cartId",
+     "name": "subjectId",
      "from": "session"
-    },
-    {
-     "name": "lineId",
-     "from": "deepLink"
-    },
-    {
-     "name": "promotionId",
-     "from": "deepLink"
     }
    ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `lineId`, `promotionId`.",
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Promotion.code",
-    "Promotion.name",
-    "Promotion.description",
-    "Promotion.venueId",
-    "Promotion.discount"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-010"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P10",
-   "audience": "partner",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-011",
-  "name": "Quote Management",
-  "module": "Booking & Quotes",
-  "requiresModule": "partner",
-  "wave": 3,
-  "implementation": {
-   "app": "partner-web",
-   "route": "/general/quote-management",
-   "component": "apps/partner-web/src/routes/general/QuoteManagementForm.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-001"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "PTR-001",
-    "PTR-002",
-    "PTR-003"
-   ],
-   "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-003",
-     "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "No contract — quotes are procurement-side only"
-  ],
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act",
-  "purpose": "Find quote management for this venue.",
-  "gaps": [
-   {
-    "operation": "listPartnerQuotes",
-    "why": "**1 declared operation reach no component on this screen**: listPartnerQuotes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every quote",
-       "bindsTo": "PartnerAgreement",
-       "columns": [
-        "PartnerAgreement.id",
-        "PartnerAgreement.partnerId",
-        "PartnerAgreement.partnerName",
-        "PartnerAgreement.status",
-        "PartnerAgreement.rateMode",
-        "PartnerAgreement.commissionPercent",
-        "PartnerAgreement.volumeTiers",
-        "PartnerAgreement.volumeWindow",
-        "PartnerAgreement.seasonalRates",
-        "PartnerAgreement.segmentTier",
-        "PartnerAgreement.brandingAssetId",
-        "PartnerAgreement.storefrontSubdomain"
-       ],
-       "operation": "listPartnerAgreements",
-       "provenance": "contract subscription.yaml GET /partner-agreements"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected quote",
-       "bindsTo": "CommissionStatement",
-       "columns": [
-        "CommissionStatement.agreementId",
-        "CommissionStatement.partnerName",
-        "CommissionStatement.from",
-        "CommissionStatement.to",
-        "CommissionStatement.currency",
-        "CommissionStatement.grossSales",
-        "CommissionStatement.refunds",
-        "CommissionStatement.netSales",
-        "CommissionStatement.commissionEarned",
-        "CommissionStatement.amountDue",
-        "CommissionStatement.lines"
-       ],
-       "operation": "getCommissionStatement",
-       "provenance": "contract subscription.yaml GET /partner-agreements/{agreementId}/commission-statement"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createPartnerQuote",
-       "provenance": "contract subscription.yaml POST /partner-quotes"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The quote list.",
-   "error": "Could not load. Names which read failed and leaves the quote untouched.",
-   "emptyFirstRun": "No quote yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the quote are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartnerAgreements",
-    "contract": "subscription",
-    "purpose": "Commercial agreements with B2B partners",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCommissionStatement",
-    "contract": "subscription",
-    "purpose": "What the partner earned and what is owed",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listPartnerQuotes",
-    "contract": "subscription",
-    "purpose": "Quotes offered to this partner",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createPartnerQuote",
-    "contract": "subscription",
-    "purpose": "Raise a quote",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPartnerAgreements"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "agreementId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
-   "preloaded": [
-    "CommissionStatement.agreementId",
-    "CommissionStatement.partnerName",
-    "CommissionStatement.from",
-    "CommissionStatement.to",
-    "CommissionStatement.currency"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-011"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
@@ -1294,34 +1661,15 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "addCartLine": {
+ "addToWishlist": {
   "method": "POST",
-  "path": "/carts/{cartId}/lines",
-  "contract": "orders",
-  "summary": "Add something",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AddCartLineRequest",
-  "responds": "Cart"
- },
- "allocateBlockedSeats": {
-  "method": "POST",
-  "path": "/seat-blocks/{blockId}/allocate",
-  "contract": "seating",
-  "summary": "Issue seats from a block to a group",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1330,45 +1678,13 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "SeatHold"
+  "responds": "Wishlist"
  },
- "analysePromotionConflicts": {
-  "method": "GET",
-  "path": "/promotions/{promotionId}/conflicts",
-  "contract": "promotions",
-  "summary": "Analyse stacking against live promotions",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ConflictAnalysis"
- },
- "applyManualDiscount": {
+ "claimCart": {
   "method": "POST",
-  "path": "/orders/{orderId}/discounts",
+  "path": "/carts/{cartId}/claim",
   "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
- },
- "checkoutCart": {
-  "method": "POST",
-  "path": "/carts/{cartId}/checkout",
-  "contract": "orders",
-  "summary": "Turn the cart into an order",
+  "summary": "Attach an anonymous cart to a guest",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1381,49 +1697,17 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "CartMergeResult"
  },
- "createOrder": {
+ "completeSsoAuthorization": {
   "method": "POST",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
- "createPartnerQuote": {
-  "method": "POST",
-  "path": "/partner-quotes",
-  "contract": "subscription",
-  "summary": "Raise a quote",
-  "permission": "PARTNER_MANAGE",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": "PartnerQuote",
-  "responds": "PartnerQuote"
- },
- "createRefund": {
-  "method": "POST",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "Refund an order, wholly or in part",
-  "permission": "ORDER_REFUND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -1431,102 +1715,149 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "CreateRefundRequest",
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": null
  },
- "createSeatBlock": {
+ "createRefundRequest": {
   "method": "POST",
-  "path": "/seat-blocks",
-  "contract": "seating",
-  "summary": "Block seats from sale",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateSeatBlockRequest",
-  "responds": "SeatBlock"
- },
- "evaluatePromotions": {
-  "method": "POST",
-  "path": "/promotions/evaluate",
-  "contract": "promotions",
-  "summary": "Evaluate promotions against a cart",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "EvaluatePromotionsRequest",
-  "responds": "PromotionEvaluation"
- },
- "exchangeOrderLines": {
-  "method": "POST",
-  "path": "/orders/{orderId}/exchanges",
+  "path": "/refund-requests",
   "contract": "orders",
-  "summary": "Exchange lines for different products or dates",
-  "permission": "ORDER_EXCHANGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ExchangeOrderRequest",
-  "responds": "OrderExchangeResult"
- },
- "getCart": {
-  "method": "GET",
-  "path": "/carts/{cartId}",
-  "contract": "orders",
-  "summary": "The cart, priced and checked, right now",
+  "summary": "Guest-initiated refund request",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "Cart"
+  "responds": null
  },
- "getCommissionStatement": {
-  "method": "GET",
-  "path": "/partner-agreements/{agreementId}/commission-statement",
-  "contract": "subscription",
-  "summary": "What the partner earned and what is owed",
-  "permission": "PARTNER_VIEW",
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "from",
-    "in": "query",
+    "name": null,
+    "in": null,
     "required": null
-   },
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
+ "getEntitlement": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "getEntitlementCredential": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
    {
-    "name": "to",
+    "name": "rotate",
     "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "CommissionStatement"
+  "responds": null
+ },
+ "getEntitlementHistory": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChallengeProgress"
  },
  "getOrder": {
   "method": "GET",
@@ -1541,54 +1872,47 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Order"
  },
- "getOrderStatement": {
+ "getWishlist": {
   "method": "GET",
-  "path": "/orders/{orderId}/statement",
-  "contract": "orders",
-  "summary": "Full financial history of an order",
-  "permission": "ORDER_VIEW",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "subject",
   "parameters": [],
   "requestBody": null,
-  "responds": "OrderStatement"
+  "responds": "Wishlist"
  },
- "getPromotion": {
-  "method": "GET",
-  "path": "/promotions/{promotionId}",
-  "contract": "promotions",
-  "summary": "Read a promotion",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Promotion"
- },
- "getPromotionUsage": {
-  "method": "GET",
-  "path": "/promotions/{promotionId}/usage",
-  "contract": "promotions",
-  "summary": "Redemption count and discount given",
-  "permission": "PRICE_VIEW",
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "allDevices",
+    "in": "query",
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PromotionUsage"
+  "responds": null
  },
- "holdOrder": {
+ "guestSocialLogin": {
   "method": "POST",
-  "path": "/orders/{orderId}/hold",
-  "contract": "orders",
-  "summary": "Park a sale and free the till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "workstation",
+  "path": "/auth/guest/social",
+  "contract": "identity",
+  "summary": "Sign in with Apple or Google",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1597,17 +1921,74 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "GuestSession"
  },
- "listOrderRefunds": {
-  "method": "GET",
-  "path": "/orders/{orderId}/refunds",
+ "guestUaePassLogin": {
+  "method": "POST",
+  "path": "/auth/guest/uae-pass",
+  "contract": "identity",
+  "summary": "Sign in with a national identity provider",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "issueWalletPass": {
+  "method": "POST",
+  "path": "/wallet-passes",
   "contract": "orders",
-  "summary": "List refunds against an order",
+  "summary": "Generate an Apple or Google wallet pass",
   "permission": "ORDER_VIEW",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletPass"
+ },
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1621,7 +2002,136 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "ConsentPurposeConfig"
+ },
+ "listEntitlements": {
+  "method": "GET",
+  "path": "/my/entitlements/all",
+  "contract": "access",
+  "summary": "Every entitlement this guest holds, including expired",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeExpired",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
  },
  "listOrders": {
   "method": "GET",
@@ -1677,73 +2187,67 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listPartnerAgreements": {
+ "listSsoProviders": {
   "method": "GET",
-  "path": "/partner-agreements",
-  "contract": "subscription",
-  "summary": "Commercial agreements with B2B partners",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "expiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerAgreement"
- },
- "listPartnerQuotes": {
-  "method": "GET",
-  "path": "/partner-quotes",
-  "contract": "subscription",
-  "summary": "Quotes offered to this partner",
-  "permission": "PARTNER_VIEW",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "PartnerQuote"
+  "responds": "SsoProvider"
  },
- "listPromotions": {
-  "method": "GET",
-  "path": "/promotions",
-  "contract": "promotions",
-  "summary": "List promotions",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "activeAt",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
     "required": null
-   },
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "refreshToken": {
+  "method": "POST",
+  "path": "/auth/refresh",
+  "contract": "identity",
+  "summary": "Rotate the access token",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -1751,33 +2255,132 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "TokenPair"
  },
- "listSeatBlocks": {
-  "method": "GET",
-  "path": "/seat-blocks",
-  "contract": "seating",
-  "summary": "List seat blocks",
-  "permission": "PRODUCT_VIEW",
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp",
+  "contract": "identity",
+  "summary": "Request a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "performanceId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "reason",
-    "in": "query",
-    "required": null
-   },
-   {
     "name": null,
     "in": null,
     "required": null
-   },
+   }
+  ],
+  "requestBody": null,
+  "responds": "Invitation"
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -1785,13 +2388,13 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": null
  },
- "modifyOrder": {
+ "shareEntitlement": {
   "method": "POST",
-  "path": "/orders/{orderId}/modify",
+  "path": "/entitlements/{entitlementId}/share",
   "contract": "orders",
-  "summary": "Add or remove lines on an existing order",
+  "summary": "Let somebody else use this, without giving it away",
   "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1803,33 +2406,33 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": "ModifyOrderRequest",
-  "responds": "OrderModificationResult"
+  "requestBody": null,
+  "responds": "Problem"
  },
- "relinquishSeatBlock": {
-  "method": "DELETE",
-  "path": "/seat-blocks/{blockId}",
-  "contract": "seating",
-  "summary": "Release a block back to sale",
-  "permission": "CAPACITY_CONFIGURE",
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": null,
-    "in": null,
-    "required": null
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
    }
   ],
   "requestBody": null,
   "responds": null
  },
- "removeCartLine": {
-  "method": "DELETE",
-  "path": "/carts/{cartId}/lines/{lineId}",
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
   "contract": "orders",
-  "summary": "Take something out",
+  "summary": "Transfer tickets to another guest",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1842,17 +2445,17 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Cart"
+  "responds": null
  },
- "reprintOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reprints",
-  "contract": "orders",
-  "summary": "Reprint or resend tickets",
-  "permission": "ORDER_REPRINT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+ "updateGuestPreferences": {
+  "method": "PUT",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1863,53 +2466,53 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "rescheduleOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reschedule",
-  "contract": "orders",
-  "summary": "Move an order to another performance",
-  "permission": "ORDER_RESCHEDULE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderExchangeResult"
- },
- "resumeOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/resume",
-  "contract": "orders",
-  "summary": "Bring a parked sale back to a till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderResumeResult"
- },
- "updateCartLine": {
+ "updateMyProfile": {
   "method": "PATCH",
-  "path": "/carts/{cartId}/lines/{lineId}",
-  "contract": "orders",
-  "summary": "Change a quantity",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp/verify",
+  "contract": "identity",
+  "summary": "Verify a one-time code and issue a session",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1918,17 +2521,17 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Cart"
+  "responds": "GuestSession"
  },
- "voidOrder": {
+ "verifyMfaChallenge": {
   "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1937,7 +2540,26 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }
 ```
@@ -1948,57 +2570,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "AddCartLineRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "variantId",
-   "quantity"
-  ],
-  "properties": {
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "parentLineId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
-   },
-   "attributes": {
-    "type": "object",
-    "additionalProperties": true
-   }
-  }
- },
- "BlockReason": {
-  "type": "string",
-  "enum": [
-   "productionHold",
-   "houseSeats",
-   "groupAllocation",
-   "maintenance",
-   "accessibilityReserve",
-   "distancing",
-   "other"
-  ]
- },
  "Cart": {
   "type": "object",
   "x-ticvai-persistence": "orders.cart",
@@ -2093,437 +2664,277 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "CartConflict": {
+ "CartMergeResult": {
   "type": "object",
-  "x-ticvai-persistence": "none — computed on read",
-  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "overlappingTime",
-     "sameSessionDifferentVenue",
-     "exceedsPartySize",
-     "requiresPrerequisite"
-    ]
-   },
-   "lineIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "message": {
-    "type": "string"
-   },
-   "isBlocking": {
-    "type": "boolean",
-    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold.\n"
-   }
-  }
- },
- "CartLine": {
-  "type": "object",
-  "x-ticvai-persistence": "orders.cart_line",
+  "x-ticvai-persistence": "none — computed",
   "required": [
-   "id",
-   "variantId",
-   "quantity"
+   "cart"
   ],
   "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
+   "cart": {
+    "$ref": "#/components/schemas/Cart"
    },
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
+   "mergedLineCount": {
+    "type": "integer"
    },
-   "productName": {
-    "type": "string",
-    "readOnly": true
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "seatIds": {
+   "droppedLines": {
     "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "overridePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "overrideReason": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "priceMatch",
-     "serviceRecovery",
-     "negotiated",
-     "damagedGoods",
-     "staffSale",
-     "error"
-    ],
-    "description": "BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"
-   },
-   "feeKind": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "booking",
-     "transaction",
-     "service",
-     "delivery",
-     "convenience",
-     "cancellation"
-    ],
-    "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
-   },
-   "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "lineTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "inventoryHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The capacity held for this line. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
-   },
-   "leaseExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"
-   },
-   "isAvailable": {
-    "type": "boolean",
-    "readOnly": true,
-    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
-   }
-  }
- },
- "CartStatus": {
-  "type": "string",
-  "enum": [
-   "active",
-   "expiring",
-   "expired",
-   "abandoned",
-   "checkedOut"
-  ]
- },
- "Channel": {
-  "type": "string",
-  "enum": [
-   "pos",
-   "kiosk",
-   "web",
-   "mobile",
-   "b2b",
-   "ota",
-   "callCentre"
-  ]
- },
- "CommissionStatement": {
-  "type": "object",
-  "x-ticvai-persistence": "none — aggregated from orders and control.partner_agreement",
-  "properties": {
-   "agreementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partnerName": {
-    "type": "string"
-   },
-   "from": {
-    "type": "string",
-    "format": "date"
-   },
-   "to": {
-    "type": "string",
-    "format": "date"
-   },
-   "currency": {
-    "type": "string"
-   },
-   "grossSales": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refunds": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netSales": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "commissionEarned": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "amountDue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "lines": {
-    "type": "array",
-    "description": "**Reconcilable order by order.** A statement a partner cannot check line by line is a statement they will dispute, and the dispute costs more than the detail.\n",
+    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
     "items": {
      "type": "object",
      "properties": {
-      "orderId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "orderNumber": {
+      "productName": {
        "type": "string"
       },
-      "soldAt": {
+      "reason": {
        "type": "string",
-       "format": "date-time"
-      },
-      "agreementVersion": {
-       "type": "integer",
-       "description": "The version in force at the time of that sale, not the current one."
-      },
-      "gross": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "commission": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "isRefunded": {
-       "type": "boolean"
+       "enum": [
+        "noCapacity",
+        "expired",
+        "notSellableOnChannel",
+        "duplicate"
+       ]
       }
      }
     }
    }
   }
  },
- "ConflictAnalysis": {
-  "x-ticvai-persistence": "none — computed",
+ "ChallengeProgress": {
   "type": "object",
+  "x-ticvai-persistence": "marketing.challenge_progress",
+  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
   "required": [
-   "promotionId",
-   "conflicts",
-   "worstCaseDiscount"
+   "id",
+   "challengeId",
+   "subjectId",
+   "current",
+   "target"
   ],
   "properties": {
-   "promotionId": {
+   "id": {
     "type": "string",
     "format": "uuid"
    },
-   "conflicts": {
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "portfolioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a family or group challenge — where the shared progress accrues."
+   },
+   "current": {
+    "type": "number"
+   },
+   "target": {
+    "type": "number"
+   },
+   "streakCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rewardIssuedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+   },
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   },
+   "expiresAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
     "type": "array",
     "items": {
      "type": "object",
      "required": [
-      "otherPromotionId",
-      "otherPromotionCode",
-      "overlap",
-      "combinedDiscount"
+      "purpose",
+      "decision",
+      "requiresRenewal"
      ],
      "properties": {
-      "otherPromotionId": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
        "type": "string",
-       "format": "uuid"
+       "nullable": true
       },
-      "otherPromotionCode": {
-       "type": "string"
-      },
-      "overlap": {
-       "type": "string",
-       "enum": [
-        "products",
-        "period",
-        "channel",
-        "full"
-       ]
-      },
-      "combinedDiscount": {
-       "type": "number",
-       "description": "Combined percentage where both apply to the same line."
-      },
-      "isBlocking": {
+      "requiresRenewal": {
        "type": "boolean",
-       "description": "True where the combination would produce a negative or near-zero price."
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
       }
      }
     }
-   },
-   "worstCaseDiscount": {
-    "type": "number",
-    "description": "Largest combined discount any single line could receive."
    }
   }
  },
- "CreateOrderLine": {
-  "x-ticvai-persistence": "none — request only",
+ "Entitlement": {
   "type": "object",
+  "x-ticvai-persistence": "access.entitlement",
+  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
   "required": [
    "id",
-   "variantId",
-   "quantity",
-   "quotedUnitPrice"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "inventoryHoldId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Seated products only. Not available offline."
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "quotedUnitPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "What the client charged, from its local bundle."
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true
-   }
-  }
- },
- "CreateOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "channel",
-   "lines",
-   "recordedAt"
+   "templateId",
+   "productId",
+   "orderId",
+   "subjectId",
+   "status",
+   "validFrom",
+   "validTo"
   ],
   "properties": {
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
    },
-   "venueId": {
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
+   },
+   "productId": {
     "type": "string",
     "format": "uuid"
    },
-   "channel": {
-    "$ref": "#/components/schemas/Channel"
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
    },
-   "shiftId": {
-    "type": "string"
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Null for an anonymous sale. Identity and entitlement are separate."
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells."
-   },
-   "catalogueBundleVersion": {
-    "type": "string",
-    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CreatePromotionRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "venueId",
-   "discount",
-   "validFrom"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64,
-    "pattern": "^[A-Za-z0-9_-]+$"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 1000
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
    },
-   "discount": {
-    "$ref": "#/components/schemas/Discount"
+   "scopePath": {
+    "type": "string"
    },
-   "conditions": {
-    "$ref": "#/components/schemas/PromotionConditions"
-   },
-   "stackingMode": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/StackingMode"
-     }
-    ],
-    "default": "bestOnly"
-   },
-   "stackingGroup": {
+   "mediaCode": {
     "type": "string",
-    "maxLength": 64
+    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
    },
-   "precedence": {
-    "type": "integer",
-    "default": 0,
-    "description": "Higher evaluates first where several could apply."
+   "status": {
+    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
+   },
+   "statusNote": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
    },
    "validFrom": {
     "type": "string",
@@ -2531,311 +2942,622 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "validTo": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
    },
-   "maxRedemptions": {
+   "entriesUsed": {
+    "type": "integer",
+    "default": 0,
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+   },
+   "entriesAllowed": {
     "type": "integer",
     "nullable": true
    },
-   "maxRedemptionsPerGuest": {
-    "type": "integer",
+   "lastEntryAt": {
+    "type": "string",
+    "format": "date-time",
     "nullable": true
    },
-   "budgetCap": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
+   "frozenDays": {
+    "type": "integer",
+    "default": 0,
+    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+   },
+   "suspendedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "isNameBound": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "sharedWithSubjectIds": {
+    "type": "array",
+    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "issuedVia": {
+    "type": "string",
+    "enum": [
+     "sale",
+     "invitation",
+     "reissue",
+     "transfer",
+     "resale",
+     "membership",
+     "groupBooking"
     ],
-    "description": "Total discount value after which the promotion stops automatically."
+    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
+   },
+   "supersedesEntitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
+   },
+   "walletValueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
    }
   }
  },
- "CreateRefundRequest": {
+ "GuestDevice": {
   "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
   "required": [
    "id",
-   "amount",
-   "reason",
-   "recordedAt"
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-   },
-   "lineIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Omit to refund the whole order."
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 500
-   },
-   "secondaryAuthorisation": {
-    "type": "object",
-    "description": "Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n",
-    "required": [
-     "principalId",
-     "credential"
-    ],
-    "properties": {
-     "principalId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "credential": {
-      "type": "string",
-      "maxLength": 512
-     }
-    }
-   },
-   "refundToOriginalTender": {
-    "type": "boolean",
-    "default": true
-   },
-   "alternateTender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CreateSeatBlockRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "performanceId",
-   "seatIds",
-   "reason",
-   "note"
-  ],
-  "properties": {
-   "performanceId": {
-    "type": "string",
     "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string"
-    }
-   },
-   "reason": {
-    "$ref": "#/components/schemas/BlockReason"
-   },
-   "note": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 500
-   },
-   "releaseAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Automatic release, for production holds freed close to performance."
-   }
-  }
- },
- "EvaluatePromotionsRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "venueId",
-   "channel",
-   "lines"
-  ],
-  "properties": {
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "type": "string"
    },
    "subjectId": {
     "type": "string",
     "format": "uuid"
    },
-   "membershipTierId": {
+   "platform": {
     "type": "string",
-    "format": "uuid"
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
    },
-   "couponCodes": {
+   "tokenFingerprint": {
+    "type": "string",
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "appVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "osVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "nullable": true
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
+   },
+   "tags": {
     "type": "array",
     "items": {
      "type": "string"
     }
    },
-   "evaluateAt": {
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+   },
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "visitCount": {
+    "type": "integer"
+   },
+   "lastVisitAt": {
     "type": "string",
     "format": "date-time",
-    "description": "For back-office testing of a rule before publishing."
+    "nullable": true
    },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "object",
-     "required": [
-      "lineId",
-      "variantId",
-      "quantity",
-      "unitPrice"
-     ],
-     "properties": {
-      "lineId": {
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
        "type": "string"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "quantity": {
-       "type": "integer",
-       "minimum": 1
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
       }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
      }
     }
    }
-  }
+  ]
  },
- "ExchangeOrderRequest": {
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
   "type": "object",
   "required": [
-   "id",
-   "outgoingLineIds",
-   "incomingLines",
-   "recordedAt"
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
   ],
   "properties": {
-   "id": {
+   "subjectId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
-   "outgoingLineIds": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string"
-    }
+   "displayName": {
+    "type": "string",
+    "nullable": true
    },
-   "incomingLines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
    },
-   "waiveFee": {
+   "isVerified": {
     "type": "boolean",
-    "default": false
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
    },
-   "reason": {
-    "type": "string",
-    "maxLength": 500
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
    },
-   "recordedAt": {
+   "guestLinkId": {
     "type": "string",
-    "format": "date-time"
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
    }
   }
  },
- "ManualDiscountRequest": {
+ "Invitation": {
   "type": "object",
-  "x-ticvai-persistence": "none — request only",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
   "required": [
    "id",
-   "reason",
-   "recordedAt"
+   "campaignId",
+   "token",
+   "status"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
-   "lineId": {
+   "campaignId": {
     "type": "string",
-    "nullable": true,
-    "description": "Omit to discount the order rather than a line."
+    "format": "uuid"
    },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "percentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 300,
-    "description": "Required, and free text rather than a code list. A cashier forced to pick the nearest reason picks the first one, and the register stops meaning anything.\n"
-   },
-   "reasonCode": {
-    "type": "string",
-    "nullable": true,
-    "description": "Optional alongside the free text, where the venue maintains a list."
-   },
-   "approverPrincipalId": {
+   "subjectId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true,
-    "description": "Required above the venue threshold. May not be the requester."
+    "nullable": true
    },
-   "recordedAt": {
+   "recipientEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "token": {
+    "type": "string",
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+   },
+   "plusOnes": {
+    "type": "integer",
+    "default": 0
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
+   },
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "respondedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "LoginRequest": {
+  "type": "object",
+  "required": [
+   "username",
+   "credential",
+   "workstationId"
+  ],
+  "properties": {
+   "username": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "credential": {
+    "type": "string",
+    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "maxLength": 512
+   },
+   "method": {
+    "type": "string",
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
+    "enum": [
+     "password",
+     "pin",
+     "card",
+     "rfid",
+     "sso"
+    ],
+    "default": "password"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
+   },
+   "deviceFingerprint": {
+    "type": "string",
+    "maxLength": 256
+   }
+  }
+ },
+ "LoginResponse": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   {
+    "type": "object",
+    "required": [
+     "requiresRoleSelection"
+    ],
+    "properties": {
+     "requiresRoleSelection": {
+      "type": "boolean"
+     },
+     "availableRoles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RoleSummary"
+      }
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session"
+     }
+    }
+   }
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once on successful verification. Not retrievable afterwards.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
     "type": "string",
     "format": "date-time"
    }
   }
  },
- "ModifyOrderRequest": {
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
   "required": [
    "id",
-   "recordedAt"
+   "kind",
+   "isActive",
+   "enrolledAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
-   "addLines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
    },
-   "removeLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "reason": {
+   "label": {
     "type": "string",
-    "maxLength": 500
+    "nullable": true
    },
-   "recordedAt": {
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2973,56 +3695,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "backOffice"
   ]
  },
- "OrderExchangeResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "orderId",
-   "outgoingValue",
-   "incomingValue",
-   "difference"
-  ],
-  "properties": {
-   "orderId": {
-    "type": "string"
-   },
-   "outgoingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "incomingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "difference": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
-   },
-   "newLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
  "OrderLine": {
   "x-ticvai-persistence": "orders.order_line",
   "allOf": [
@@ -3080,192 +3752,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
- "OrderModificationResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "order",
-   "balanceDue"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "addedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "removedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "balanceDue": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Positive means the guest pays; negative means a refund is due."
-   },
-   "refundId": {
-    "type": "string",
-    "nullable": true
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
- "OrderResumeResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "order",
-   "hasChanged"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "hasChanged": {
-    "type": "boolean",
-    "description": "True where anything moved while the sale was parked. The cashier decides — silently charging the old price loses money, silently charging the new one loses the guest.\n"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "priceChanged",
-        "promotionExpired",
-        "promotionNowApplies",
-        "soldOut",
-        "seatHoldExpired",
-        "productWithdrawn"
-       ]
-      },
-      "lineId": {
-       "type": "string"
-      },
-      "detail": {
-       "type": "string"
-      },
-      "wasAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "nowAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   }
-  }
- },
- "OrderStatement": {
-  "x-ticvai-persistence": "none — computed from order, payment, refund and ledger",
-  "type": "object",
-  "required": [
-   "orderId",
-   "orderNumber",
-   "currency",
-   "entries",
-   "currentBalance"
-  ],
-  "properties": {
-   "orderId": {
-    "type": "string"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "entries": {
-    "type": "array",
-    "description": "Sequential. What an agent reads to a guest asking about a charge.",
-    "items": {
-     "type": "object",
-     "required": [
-      "kind",
-      "amount",
-      "runningBalance",
-      "occurredAt"
-     ],
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "sale",
-        "payment",
-        "refund",
-        "void",
-        "modification",
-        "exchange",
-        "fee",
-        "variance",
-        "chargeback"
-       ]
-      },
-      "description": {
-       "type": "string"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "runningBalance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "referenceId": {
-       "type": "string",
-       "nullable": true
-      },
-      "principalId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "occurredAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   },
-   "totalPaid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "totalRefunded": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "currentBalance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Positive means the guest owes; negative means a refund is outstanding."
-   }
-  }
- },
  "OrderStatus": {
   "type": "string",
   "enum": [
@@ -3299,373 +3785,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
- },
- "PartnerAgreement": {
-  "type": "object",
-  "x-ticvai-persistence": "control.partner_agreement",
-  "required": [
-   "partnerId",
-   "rateMode",
-   "validFrom"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partnerName": {
-    "type": "string",
-    "readOnly": true
-   },
-   "version": {
-    "type": "integer",
-    "readOnly": true,
-    "description": "**Amending creates a version.** An order placed last week was placed under last week's rate, and settlement must be able to say which.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/PartnerAgreementStatus"
-   },
-   "rateMode": {
-    "$ref": "#/components/schemas/PartnerRateMode"
-   },
-   "commissionPercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "volumeTiers": {
-    "type": "array",
-    "description": "2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "fromUnits",
-      "commissionPercent"
-     ],
-     "properties": {
-      "fromUnits": {
-       "type": "integer"
-      },
-      "commissionPercent": {
-       "type": "number"
-      },
-      "appliesRetrospectively": {
-       "type": "boolean",
-       "default": false,
-       "description": "**Whether crossing a tier reprices what came before it.** Retrospective is what a partner assumes and prospective is what a venue budgets for — it has to be stated.\n"
-      }
-     }
-    }
-   },
-   "volumeWindow": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "calendarMonth",
-     "calendarQuarter",
-     "calendarYear",
-     "agreementYear",
-     "rolling12Months"
-    ]
-   },
-   "seasonalRates": {
-    "type": "array",
-    "description": "Rates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "from": {
-       "type": "string",
-       "format": "date"
-      },
-      "to": {
-       "type": "string",
-       "format": "date"
-      },
-      "commissionPercent": {
-       "type": "number"
-      }
-     }
-    }
-   },
-   "segmentTier": {
-    "type": "string",
-    "nullable": true
-   },
-   "brandingAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "2.7.x, BL-078. **A reseller selling a venue's tickets under their own brand is a second scope level white-label does not have** — `BrandIdentity` and `setTheme` are tenant-scoped throughout.\n**Co-branding rather than replacement.** The venue's identity stays on the ticket because the ticket admits to the venue; the partner's sits beside it.\n"
-   },
-   "storefrontSubdomain": {
-    "type": "string",
-    "nullable": true
-   },
-   "sponsorship": {
-    "type": "object",
-    "nullable": true,
-    "description": "BL-050. **Sponsorship inventory is sellable capacity of a different kind** — logo placements, hospitality allocations, naming rights. It is closer to a partner agreement than to a product: **a sponsor buys a relationship for a season, not a ticket for a date.**\nModelled here rather than as a `ProductKind` because the commercial terms — the term, the exclusivity, the settlement — are the agreement's, and duplicating them onto a product would mean two places to disagree.\n",
-    "properties": {
-     "placements": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "surface": {
-         "type": "string",
-         "enum": [
-          "signage",
-          "ticketFace",
-          "appBanner",
-          "emailFooter",
-          "venueNaming",
-          "zoneNaming",
-          "uniform",
-          "printedMap"
-         ]
-        },
-        "quantity": {
-         "type": "integer"
-        },
-        "exclusive": {
-         "type": "boolean",
-         "default": false,
-         "description": "**Exclusivity is the expensive word.** A sponsor paying for category exclusivity has bought the absence of a competitor, and a second agreement breaching it is a legal problem rather than a scheduling one.\n"
-        }
-       }
-      }
-     },
-     "hospitalityAllocation": {
-      "type": "integer",
-      "nullable": true,
-      "description": "Tickets or cabanas included. **Issued as invitations, not sales** — no revenue attaches."
-     },
-     "categoryExclusivity": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "netRates": {
-    "type": "array",
-    "description": "Per product or category. Absent means the commission applies across the catalogue.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "productId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "categoryId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "netPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "maxDiscountPercent": {
-       "type": "number",
-       "nullable": true,
-       "description": "1.6.10. **What the partner may not undercut.** A reseller selling below the venue's own price damages the direct channel, and the venue usually cares more about that than the margin.\n"
-      }
-     }
-    }
-   },
-   "creditTermDays": {
-    "type": "integer",
-    "description": "2.7.36. Net 30, net 60. Drives when an invoice becomes overdue."
-   },
-   "acceptedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "BL-079. **Electronic acceptance against a version**, following the `signatureRef` precedent. An agreement accepted with no version recorded is an agreement nobody can produce in a dispute.\n"
-   },
-   "acceptedVersion": {
-    "type": "integer",
-    "nullable": true
-   },
-   "acceptedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "signatureRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "corporateAllocations": {
-    "type": "array",
-    "description": "BL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "productId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "quantity": {
-       "type": "integer"
-      },
-      "usedQuantity": {
-       "type": "integer",
-       "readOnly": true
-      },
-      "perMemberLimit": {
-       "type": "integer",
-       "nullable": true
-      },
-      "validTo": {
-       "type": "string",
-       "format": "date",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "settlementCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "**The currency this partner is billed and settles in**, which is often not the venue's. A UK tour operator selling a Dubai attraction is invoiced in GBP against sales booked in AED, and the difference is somebody's exposure.\n**`creditLimit` and `netRates` are expressed in this currency**, not the venue's — a limit in the wrong currency is a limit that moves with the exchange rate.\n"
-   },
-   "fxPolicy": {
-    "type": "string",
-    "enum": [
-     "rateAtSale",
-     "rateAtInvoice",
-     "fixedRate"
-    ],
-    "default": "rateAtSale",
-    "description": "**Which rate converts a sale into the settlement currency, and it is a commercial term.** `rateAtSale` puts the movement on the partner; `rateAtInvoice` puts it on the venue; `fixedRate` puts it on whoever guessed wrong when the agreement was signed.\n**Not a default to leave alone** — on a monthly statement across a moving rate the three produce materially different numbers, and the partner will have assumed one of them.\n"
-   },
-   "fixedRate": {
-    "type": "number",
-    "nullable": true,
-    "description": "Where `fxPolicy` is `fixedRate`. **An amendment creates a version** so an old statement stays readable."
-   },
-   "creditLimit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "allowedChannels": {
-    "type": "array",
-    "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-    }
-   },
-   "allowedVenueIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "requiresApprovalAboveValue": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "2.7.39. Routes through `approvals` rather than a second mechanism here."
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed to**, discovered at settlement rather than at sale. Null means open-ended, which should be rare and deliberate.\n"
-   },
-   "expiryAlertDays": {
-    "type": "integer",
-    "default": 30
-   },
-   "approvalRequestId": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true
-   },
-   "notes": {
-    "type": "string"
-   }
-  }
- },
- "PartnerAgreementStatus": {
-  "type": "string",
-  "enum": [
-   "pendingApproval",
-   "active",
-   "expiringSoon",
-   "expired",
-   "suspended",
-   "terminated"
-  ]
- },
- "PartnerQuote": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.partner_quote",
-  "description": "**Drafted 4 September.** A priced offer to a partner, with an expiry. **Not the same as a procurement quotation** - `inventory.quotation` is what a supplier offers this venue, and this is what this venue offers a reseller.",
-  "required": [
-   "id"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "agreementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "currency": {
-    "type": "string",
-    "x-ticvai-persisted": false,
-    "description": "**Not stored on the row.** Currency is region-scoped and resolves from the scope walk (ADR-0018); a quote that carries its own copy is a quote that disagrees with the region the moment one of them changes."
-   },
-   "totalMinor": {
-    "type": "integer"
-   },
-   "state": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "sent",
-     "accepted",
-     "declined",
-     "expired"
-    ]
-   },
-   "validUntil": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Stored, not calculated** - an offer whose expiry moves when you read it is not an offer."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "PartnerRateMode": {
-  "type": "string",
-  "description": "**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n",
-  "enum": [
-   "netRate",
-   "commission"
-  ]
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
@@ -3764,437 +3883,228 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "Promotion": {
-  "x-ticvai-persistence": "promotions.promotion",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreatePromotionRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "status"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "status": {
-      "$ref": "#/components/schemas/PromotionStatus"
-     },
-     "isPaused": {
-      "type": "boolean"
-     },
-     "redemptionCount": {
-      "type": "integer"
-     },
-     "discountGiven": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "publishedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "PromotionEvaluation": {
-  "x-ticvai-persistence": "none — computed",
-  "parameters": [
-   {
-    "$ref": "../shared/common.yaml#/components/parameters/IdempotencyKey"
-   }
-  ],
+ "Problem": {
   "type": "object",
+  "description": "RFC 9457 problem details. Every error response uses this shape.",
   "required": [
-   "totalDiscount",
-   "lines",
-   "applied",
-   "rejected"
+   "type",
+   "title",
+   "status"
   ],
   "properties": {
-   "totalDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "lineId",
-      "originalPrice",
-      "discountedPrice",
-      "discount"
-     ],
-     "properties": {
-      "lineId": {
-       "type": "string"
-      },
-      "originalPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "discountedPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "discount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "appliedPromotionIds": {
-       "type": "array",
-       "items": {
-        "type": "string",
-        "format": "uuid"
-       }
-      }
-     }
-    }
-   },
-   "applied": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "promotionId",
-      "promotionCode",
-      "discount"
-     ],
-     "properties": {
-      "promotionId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "promotionCode": {
-       "type": "string"
-      },
-      "promotionName": {
-       "type": "string"
-      },
-      "discount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "couponCode": {
-       "type": "string",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "rejected": {
-    "type": "array",
-    "description": "Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "promotionCode",
-      "reason"
-     ],
-     "properties": {
-      "promotionCode": {
-       "type": "string"
-      },
-      "promotionName": {
-       "type": "string"
-      },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "conditionsNotMet",
-        "supersededByBetterOffer",
-        "exclusivePromotionApplied",
-        "redemptionLimitReached",
-        "budgetExhausted",
-        "outsideValidPeriod",
-        "wrongChannel",
-        "membershipRequired",
-        "couponRequired"
-       ]
-      },
-      "detail": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "PromotionStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "scheduled",
-   "live",
-   "paused",
-   "expired",
-   "ended"
-  ]
- },
- "PromotionUsage": {
-  "x-ticvai-persistence": "none — aggregated from ledger and orders",
-  "type": "object",
-  "required": [
-   "promotionId",
-   "redemptionCount",
-   "discountGiven"
-  ],
-  "properties": {
-   "promotionId": {
+   "type": {
     "type": "string",
-    "format": "uuid"
+    "format": "uri"
    },
-   "redemptionCount": {
+   "title": {
+    "type": "string"
+   },
+   "status": {
     "type": "integer"
    },
-   "discountGiven": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "detail": {
+    "type": "string"
    },
-   "budgetCap": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "instance": {
+    "type": "string"
    },
-   "budgetRemaining": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "traceId": {
+    "type": "string"
    },
-   "isBudgetExhausted": {
-    "type": "boolean"
-   },
-   "byChannel": {
+   "errors": {
     "type": "array",
     "items": {
      "type": "object",
+     "required": [
+      "field",
+      "code"
+     ],
      "properties": {
-      "channel": {
+      "field": {
        "type": "string"
       },
-      "redemptionCount": {
-       "type": "integer"
+      "code": {
+       "type": "string"
       },
-      "discountGiven": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      "message": {
+       "type": "string"
       }
      }
     }
    }
   }
  },
- "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "RegisterGuestRequest": {
+  "type": "object",
+  "required": [
+   "identifier",
+   "channel"
+  ],
+  "properties": {
+   "identifier": {
+    "type": "string",
+    "maxLength": 256,
+    "description": "Email address or mobile number in E.164."
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ]
+   },
+   "displayName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "password": {
+    "type": "string",
+    "minLength": 8,
+    "maxLength": 256,
+    "description": "Optional. OTP-only accounts are supported and are the default."
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
+   },
+   "consents": {
+    "type": "array",
+    "description": "Consent captured at registration, recorded with the notice version.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "type": "string"
+      },
+      "granted": {
+       "type": "boolean"
+      },
+      "noticeVersion": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
   "type": "object",
   "required": [
    "id",
-   "orderId",
-   "amount",
-   "status",
-   "createdAt"
+   "code",
+   "name"
   ],
   "properties": {
    "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
     "type": "string"
    },
-   "orderId": {
+   "name": {
     "type": "string"
    },
-   "fxRate": {
-    "type": "number",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
-   },
-   "taxReversalEntryId": {
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+    "format": "uuid"
    },
-   "settleTo": {
+   "principalId": {
     "type": "string",
-    "enum": [
-     "originalTender",
-     "advanceBalance",
-     "wireTransfer",
-     "storeCredit"
-    ],
-    "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "format": "uuid"
    },
-   "fxVariance": {
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
     "allOf": [
      {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
    },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "appliedPercentage": {
-    "type": "number",
-    "description": "From the venue's time bands, or an approver override."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pendingApproval",
-     "pendingGateway",
-     "completed",
-     "declined",
-     "failed"
-    ]
-   },
-   "reason": {
-    "type": "string"
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "secondaryPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "approvedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "ledgerEntryId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Written before the gateway is called."
-   },
-   "gatewayReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "SeatBlock": {
-  "x-ticvai-persistence": "seating.seat_block",
-  "type": "object",
-  "required": [
-   "id",
-   "performanceId",
-   "seatIds",
-   "reason",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
+   "permissionsByScope": {
     "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
     "items": {
-     "type": "string"
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }
    },
-   "reason": {
-    "$ref": "#/components/schemas/BlockReason"
-   },
-   "note": {
-    "type": "string"
-   },
-   "createdByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "releaseAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "releasedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   }
-  }
- },
- "SeatHold": {
-  "x-ticvai-persistence": "seating.seat_hold",
-  "type": "object",
-  "required": [
-   "id",
-   "performanceId",
-   "seatIds",
-   "status",
-   "createdAt",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "seatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "bufferedSeatIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Neighbours implicitly held by a seating rule."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "held",
-     "converted",
-     "released",
-     "expired"
-    ]
-   },
-   "totalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "heldByPrincipalId": {
+   "saleBoardId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
    },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
    },
-   "extensionCount": {
-    "type": "integer"
-   },
-   "createdAt": {
+   "openedAt": {
     "type": "string",
     "format": "date-time"
    },
@@ -4204,19 +4114,199 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "TenderKind": {
+ "SsoProtocol": {
   "type": "string",
   "enum": [
-   "cash",
-   "card",
-   "wallet",
-   "voucher",
-   "bankTransfer",
-   "hotelCharge",
-   "installment",
-   "giftCard",
-   "complimentary"
+   "oidc",
+   "saml2"
   ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google"
+    ]
+   },
+   "serialNumber": {
+    "type": "string"
+   },
+   "authenticationToken": {
+    "type": "string",
+    "format": "password",
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Wishlist": {
+  "type": "object",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
  }
 }
 ```

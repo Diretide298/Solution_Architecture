@@ -1,10 +1,86 @@
 {
- "acknowledgePurchaseOrder": {
+ "addToWishlist": {
   "method": "POST",
-  "path": "/purchase-orders/{purchaseOrderId}/acknowledge",
-  "contract": "inventory",
-  "summary": "Record the supplier acknowledgement",
-  "permission": "PRODUCT_CONFIGURE",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "claimCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/claim",
+  "contract": "orders",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CartMergeResult"
+ },
+ "completeSsoAuthorization": {
+  "method": "POST",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -18,15 +94,15 @@
   "requestBody": null,
   "responds": null
  },
- "approveRequisition": {
+ "enrolMfaMethod": {
   "method": "POST",
-  "path": "/requisitions/{requisitionId}/approve",
-  "contract": "inventory",
-  "summary": "Approve or reject a requisition",
-  "permission": "APPROVAL_ACT",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -35,472 +111,251 @@
    }
   ],
   "requestBody": null,
-  "responds": "Requisition"
+  "responds": "MfaEnrolment"
  },
- "cancelPurchaseOrder": {
-  "method": "POST",
-  "path": "/purchase-orders/{purchaseOrderId}/cancel",
-  "contract": "inventory",
-  "summary": "Cancel a purchase order",
-  "permission": "ORDER_CANCEL",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PurchaseOrder"
- },
- "cancelRequisition": {
-  "method": "POST",
-  "path": "/requisitions/{requisitionId}/cancel",
-  "contract": "inventory",
-  "summary": "Cancel a requisition",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "cancelStockCount": {
-  "method": "POST",
-  "path": "/stock-counts/{countId}/cancel",
-  "contract": "inventory",
-  "summary": "Abandon a count",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "closePurchaseOrderShort": {
-  "method": "POST",
-  "path": "/purchase-orders/{purchaseOrderId}/close-short",
-  "contract": "inventory",
-  "summary": "Close an order accepting the balance will not arrive",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "closeTransferShort": {
-  "method": "POST",
-  "path": "/stock-transfers/{transferId}/close-short",
-  "contract": "inventory",
-  "summary": "Close a transfer accepting the balance will not arrive",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "compareQuotations": {
+ "getEntitlement": {
   "method": "GET",
-  "path": "/requisitions/{requisitionId}/quotations",
-  "contract": "inventory",
-  "summary": "Compare quotations for a requisition",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "QuotationComparison"
- },
- "createGoodsReceipt": {
-  "method": "POST",
-  "path": "/goods-receipts",
-  "contract": "inventory",
-  "summary": "Receive goods against a purchase order",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateGoodsReceiptRequest",
-  "responds": "GoodsReceipt"
- },
- "createInventoryItem": {
-  "method": "POST",
-  "path": "/inventory-items",
-  "contract": "inventory",
-  "summary": "Create an inventory item",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateInventoryItemRequest",
-  "responds": "InventoryItem"
- },
- "createPurchaseOrder": {
-  "method": "POST",
-  "path": "/purchase-orders",
-  "contract": "inventory",
-  "summary": "Raise a purchase order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePurchaseOrderRequest",
-  "responds": "PurchaseOrder"
- },
- "createRequisition": {
-  "method": "POST",
-  "path": "/requisitions",
-  "contract": "inventory",
-  "summary": "Raise a requisition",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateRequisitionRequest",
-  "responds": "Requisition"
- },
- "createStockLocation": {
-  "method": "POST",
-  "path": "/stock-locations",
-  "contract": "inventory",
-  "summary": "Create a stock location",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "StockLocation"
- },
- "createStockMovement": {
-  "method": "POST",
-  "path": "/stock-movements",
-  "contract": "inventory",
-  "summary": "Record an issue, return or adjustment",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateStockMovementRequest",
-  "responds": "StockMovement"
- },
- "createStockTransfer": {
-  "method": "POST",
-  "path": "/stock-transfers",
-  "contract": "inventory",
-  "summary": "Send stock to another location",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateStockTransferRequest",
-  "responds": "StockTransfer"
- },
- "createSupplier": {
-  "method": "POST",
-  "path": "/suppliers",
-  "contract": "inventory",
-  "summary": "Create a supplier",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "Supplier",
-  "responds": "Supplier"
- },
- "enterCountLine": {
-  "method": "POST",
-  "path": "/stock-counts/{countId}/lines",
-  "contract": "fnb",
-  "summary": "What was actually on the shelf",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "getCountVariance": {
-  "method": "GET",
-  "path": "/stock-counts/{countId}/variance",
-  "contract": "inventory",
-  "summary": "Variance between counted and expected",
-  "permission": "PRODUCT_VIEW",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "CountVariance"
+  "responds": "Entitlement"
  },
- "getInventoryItem": {
+ "getEntitlementCredential": {
   "method": "GET",
-  "path": "/inventory-items/{itemId}",
-  "contract": "inventory",
-  "summary": "Read an item with stock position",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "InventoryItem"
- },
- "getPurchaseOrder": {
-  "method": "GET",
-  "path": "/purchase-orders/{purchaseOrderId}",
-  "contract": "inventory",
-  "summary": "Read a purchase order with receipt progress",
-  "permission": "PRODUCT_VIEW",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "PurchaseOrder"
- },
- "getStockPositions": {
-  "method": "GET",
-  "path": "/stock",
-  "contract": "inventory",
-  "summary": "Stock on hand by item and location",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "locationId",
+    "name": "rotate",
     "in": "query",
     "required": null
-   },
-   {
-    "name": "itemId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "includeZero",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": null
  },
- "getStockTransfer": {
+ "getEntitlementHistory": {
   "method": "GET",
-  "path": "/stock-transfers/{transferId}",
-  "contract": "inventory",
-  "summary": "One transfer, its manifest and where it is",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
   "responds": null
  },
- "getStockValuation": {
+ "getGuestProfile": {
   "method": "GET",
-  "path": "/stock/valuation",
-  "contract": "inventory",
-  "summary": "Stock value by location and category",
-  "permission": "LEDGER_VIEW",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "asAt",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "locationId",
-    "in": "query",
-    "required": null
-   }
-  ],
+  "parameters": [],
   "requestBody": null,
-  "responds": "StockValuation"
+  "responds": "GuestProfileDetail"
  },
- "getSuggestedRequisitions": {
+ "getGuestSession": {
   "method": "GET",
-  "path": "/requisitions/suggested",
-  "contract": "inventory",
-  "summary": "Draft requisitions from reorder points",
-  "permission": "PRODUCT_VIEW",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "locationId",
-    "in": "query",
-    "required": null
-   }
-  ],
+  "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "ChallengeProgress"
  },
- "getSupplierPerformance": {
+ "getOrder": {
   "method": "GET",
-  "path": "/suppliers/{supplierId}/performance",
-  "contract": "reporting",
-  "summary": "On-time, in-full, and what was rejected",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "getVenueSettings": {
-  "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "VenueSettings"
+  "responds": "Order"
  },
- "listGoodsReceipts": {
+ "getWishlist": {
   "method": "GET",
-  "path": "/goods-receipts",
-  "contract": "inventory",
-  "summary": "List goods receipts",
-  "permission": "PRODUCT_VIEW",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "allDevices",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "guestSocialLogin": {
+  "method": "POST",
+  "path": "/auth/guest/social",
+  "contract": "identity",
+  "summary": "Sign in with Apple or Google",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "guestUaePassLogin": {
+  "method": "POST",
+  "path": "/auth/guest/uae-pass",
+  "contract": "identity",
+  "summary": "Sign in with a national identity provider",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "issueWalletPass": {
+  "method": "POST",
+  "path": "/wallet-passes",
+  "contract": "orders",
+  "summary": "Generate an Apple or Google wallet pass",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "purchaseOrderId",
-    "in": "query",
+    "name": null,
+    "in": null,
     "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletPass"
+ },
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "listEntitlements": {
+  "method": "GET",
+  "path": "/my/entitlements/all",
+  "contract": "access",
+  "summary": "Every entitlement this guest holds, including expired",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeExpired",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,
@@ -514,35 +369,62 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "Entitlement"
  },
- "listInventoryItems": {
+ "listGuestDevices": {
   "method": "GET",
-  "path": "/inventory-items",
-  "contract": "inventory",
-  "summary": "List inventory items",
-  "permission": "PRODUCT_VIEW",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "venueId",
+    "name": "state",
     "in": "query",
     "required": null
    },
    {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "belowReorderPoint",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "search",
+    "name": "includeShared",
     "in": "query",
     "required": null
    },
@@ -558,7 +440,36 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "Entitlement"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
  },
  "listOrders": {
   "method": "GET",
@@ -614,267 +525,28 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listPurchaseOrders": {
+ "listSsoProviders": {
   "method": "GET",
-  "path": "/purchase-orders",
-  "contract": "inventory",
-  "summary": "List purchase orders",
-  "permission": "PRODUCT_VIEW",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "supplierId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
+  "scopeLevel": "tenant",
+  "parameters": [],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "SsoProvider"
  },
- "listRequisitions": {
-  "method": "GET",
-  "path": "/requisitions",
-  "contract": "inventory",
-  "summary": "List requisitions",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "raisedByPrincipalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listStockCounts": {
-  "method": "GET",
-  "path": "/stock-counts",
-  "contract": "inventory",
-  "summary": "List stock counts",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "locationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listStockLocations": {
-  "method": "GET",
-  "path": "/stock-locations",
-  "contract": "inventory",
-  "summary": "List stock locations",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "StockLocation"
- },
- "listStockMovements": {
-  "method": "GET",
-  "path": "/stock-movements",
-  "contract": "inventory",
-  "summary": "The movement ledger",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "itemId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "locationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "recordedFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "recordedTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listStockTransfers": {
-  "method": "GET",
-  "path": "/stock-transfers",
-  "contract": "inventory",
-  "summary": "List transfers",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSuppliers": {
-  "method": "GET",
-  "path": "/suppliers",
-  "contract": "inventory",
-  "summary": "List suppliers",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "lookupInventoryItem": {
-  "method": "GET",
-  "path": "/inventory-items/lookup",
-  "contract": "inventory",
-  "summary": "Look up by barcode or SKU",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "barcode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "sku",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "InventoryItem"
- },
- "postStockCount": {
+ "login": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/post",
-  "contract": "inventory",
-  "summary": "Post a count and adjust stock",
-  "permission": "LEDGER_POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -882,189 +554,18 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "StockCount"
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
  },
- "receiveStockTransfer": {
+ "recordConsent": {
   "method": "POST",
-  "path": "/stock-transfers/{transferId}/receive",
-  "contract": "inventory",
-  "summary": "Receive a transfer",
-  "permission": "PRODUCT_CONFIGURE",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "StockTransfer"
- },
- "recordQuotation": {
-  "method": "POST",
-  "path": "/suppliers/{supplierId}/quotations",
-  "contract": "inventory",
-  "summary": "Record a supplier quotation",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateQuotationRequest",
-  "responds": "Quotation"
- },
- "recountStockCount": {
-  "method": "POST",
-  "path": "/stock-counts/{countId}/recount",
-  "contract": "inventory",
-  "summary": "Send a count back to be recounted",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "rejectReceivedGoods": {
-  "method": "POST",
-  "path": "/goods-receipts/{receiptId}/reject",
-  "contract": "inventory",
-  "summary": "Reject received goods",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GoodsReceipt"
- },
- "rejectRequisition": {
-  "method": "POST",
-  "path": "/requisitions/{requisitionId}/reject",
-  "contract": "inventory",
-  "summary": "Reject a requisition",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "requestRecount": {
-  "method": "POST",
-  "path": "/stock-counts/{countId}/recount",
-  "contract": "fnb",
-  "summary": "Send a line back to be counted again",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "returnRequisition": {
-  "method": "POST",
-  "path": "/requisitions/{requisitionId}/return",
-  "contract": "inventory",
-  "summary": "Return a requisition for more information",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "sendPurchaseOrder": {
-  "method": "POST",
-  "path": "/purchase-orders/{purchaseOrderId}/send",
-  "contract": "inventory",
-  "summary": "Issue the order to the supplier",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "setItemAvailability": {
-  "method": "PUT",
-  "path": "/menu-items/{itemId}/availability",
-  "contract": "fnb",
-  "summary": "Mark an item available or eighty-sixed",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MenuItem"
- },
- "startStockCount": {
-  "method": "POST",
-  "path": "/stock-counts",
-  "contract": "inventory",
-  "summary": "Start a stock count",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
   "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1072,18 +573,18 @@
     "required": null
    }
   ],
-  "requestBody": "StartStockCountRequest",
-  "responds": "StockCount"
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
  },
- "updateInventoryItem": {
-  "method": "PATCH",
-  "path": "/inventory-items/{itemId}",
-  "contract": "inventory",
-  "summary": "Amend an item",
-  "permission": "PRODUCT_CONFIGURE",
+ "refreshToken": {
+  "method": "POST",
+  "path": "/auth/refresh",
+  "contract": "identity",
+  "summary": "Rotate the access token",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1092,17 +593,55 @@
    }
   ],
   "requestBody": null,
-  "responds": "InventoryItem"
+  "responds": "TokenPair"
  },
- "updateRequisitionLines": {
-  "method": "PUT",
-  "path": "/requisitions/{requisitionId}/lines",
-  "contract": "inventory",
-  "summary": "Change what an outlet is asking for, before it is approved",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "venue",
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1113,12 +652,12 @@
   "requestBody": null,
   "responds": null
  },
- "updateSupplier": {
-  "method": "PUT",
-  "path": "/suppliers/{supplierId}",
-  "contract": "inventory",
-  "summary": "Change terms, or stop buying from them",
-  "permission": "PRODUCT_CONFIGURE",
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -1131,5 +670,233 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "requestGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp",
+  "contract": "identity",
+  "summary": "Request a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Invitation"
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "shareEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/share",
+  "contract": "orders",
+  "summary": "Let somebody else use this, without giving it away",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Problem"
+ },
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateGuestPreferences": {
+  "method": "PUT",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateMyProfile": {
+  "method": "PATCH",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp/verify",
+  "contract": "identity",
+  "summary": "Verify a one-time code and issue a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

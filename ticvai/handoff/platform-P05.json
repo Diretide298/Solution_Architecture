@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 0
+  "operationsWithNoScreen": 1
  },
  "waves": {
   "wave2": 17
@@ -42,12 +42,16 @@
    "operations": 7
   },
   {
+   "contract": "retail",
+   "operations": 4
+  },
+  {
    "contract": "catalogue",
    "operations": 4
   },
   {
-   "contract": "retail",
-   "operations": 4
+   "contract": "white-label",
+   "operations": 2
   },
   {
    "contract": "fnb",
@@ -55,10 +59,6 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 2
-  },
-  {
-   "contract": "white-label",
    "operations": 2
   },
   {
@@ -226,7 +226,14 @@
   }
  ],
  "gaps": {
-  "operationsWithNoScreen": [],
+  "operationsWithNoScreen": [
+   {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   }
+  ],
   "modulesSplitAcrossWaves": [],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []

@@ -1,72 +1,74 @@
 [
  {
-  "id": "BO-065",
-  "name": "Venue Configuration",
-  "module": "Orders & Money",
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
   "requiresModule": "ticketing",
   "wave": 1,
-  "capability": "C00",
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/venue-configuration",
-   "component": "apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+   "entryFrom": [
+    "WEB-001"
    ],
    "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
+   ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "BO-007",
-     "trigger": "Product Directory",
+     "to": "WEB-018",
+     "trigger": "My Tickets",
      "carries": [
-      "productId"
+      "entitlementId",
+      "orderId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
+     "to": "WEB-019",
+     "trigger": "Order History",
      "carries": [
-      "productId",
-      "venueId"
+      "orderId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
-  "purpose": "Set the venue-level values everything inherits from.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": "listDeliveryLocations",
-    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -79,24 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every venue",
-       "bindsTo": "DiningOutlet",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -106,21 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected venue",
-       "bindsTo": "RefundPolicy",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "RefundPolicy.id",
-        "RefundPolicy.venueId",
-        "RefundPolicy.selfAuthoriseLimit",
-        "RefundPolicy.requiresSecondUserAbove",
-        "RefundPolicy.requiresApprovalAbove",
-        "RefundPolicy.timeBands",
-        "RefundPolicy.allowPartial",
-        "RefundPolicy.refundWindowDays",
-        "RefundPolicy.varianceThreshold"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "operation": "getRefundPolicy",
-       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -130,211 +128,721 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setRefundPolicy",
-       "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setVenueSettings",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDiningOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "label": "Save refund policy",
-       "provenance": "carried from the previous definition"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundPolicy",
-       "provenance": "carried from the previous definition"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The venue list.",
-   "error": "Could not load. Names which read failed and leaves the venue untouched.",
-   "emptyFirstRun": "No venue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "getRefundPolicy",
-    "contract": "orders",
-    "purpose": "Read a venue's refund policy",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listDiningOutlets",
-    "contract": "fnb",
-    "purpose": "Where a guest can eat, right now",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRefundPolicy",
-    "contract": "orders",
-    "purpose": "Set a venue's refund policy",
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
     "trigger": "onAction",
     "invalidates": [
-     "listDiningOutlets"
+     "listMfaMethods"
     ]
    },
    {
-    "operationId": "listDeliveryLocations",
-    "contract": "fnb",
-    "purpose": "Where an order can be delivered",
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
     "trigger": "onLoad"
    },
    {
-    "operationId": "setVenueSettings",
-    "contract": "tenancy",
-    "purpose": "Save the venue's configuration",
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
     "trigger": "onAction",
     "invalidates": [
-     "listDiningOutlets"
+     "listMfaMethods"
     ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "venueId",
+     "name": "cartId",
      "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "RefundPolicy.id",
-    "RefundPolicy.venueId",
-    "RefundPolicy.selfAuthoriseLimit",
-    "RefundPolicy.requiresSecondUserAbove",
-    "RefundPolicy.requiresApprovalAbove"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-065"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "BO-070",
-  "name": "Work Orders",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/work-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrdersDetail.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
+   "entryFrom": [
+    "WEB-001"
    ],
    "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
+   ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
     },
     {
-     "to": "BO-007",
-     "trigger": "Product Directory",
+     "to": "WEB-018",
+     "trigger": "My Tickets",
      "carries": [
-      "productId"
+      "entitlementId",
+      "orderId"
      ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
+     "to": "WEB-019",
+     "trigger": "Order History",
      "carries": [
-      "productId",
-      "venueId"
+      "orderId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Get something fixed, and know it was.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
   "gaps": [
    {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -347,19 +855,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every work orders",
-       "bindsTo": "OrderSummary",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
        ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
       }
      ]
     },
@@ -369,7 +882,282 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected work orders",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -400,131 +1188,36 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work orders this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   }
-  ],
   "states": {
-   "loading": "The work orders list.",
-   "error": "Could not load. Names which read failed and leaves the work orders untouched.",
-   "emptyFirstRun": "No work orders yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the work orders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listOrders",
+    "operationId": "transferOrderTickets",
     "contract": "orders",
-    "purpose": "List orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
     "trigger": "onLoad"
    },
    {
@@ -534,97 +1227,16 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "createOrder",
+    "operationId": "listOrders",
     "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "getOrderStatement",
-    "contract": "orders",
-    "purpose": "Full financial history of an order",
+    "purpose": "List orders",
     "trigger": "onLoad"
    },
    {
-    "operationId": "holdOrder",
+    "operationId": "createRefundRequest",
     "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrderRefunds",
-    "contract": "orders",
-    "purpose": "List refunds against an order",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "reprintOrder",
-    "contract": "orders",
-    "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -646,1785 +1258,102 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-070"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-074",
-  "name": "Chart of Accounts",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/chart-of-accounts",
-   "component": "apps/venue-management-web/src/routes/finance/ChartOfAccounts.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-075",
-    "BO-076",
-    "BO-077"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "transitions": [
-    {
-     "to": "BO-075",
-     "trigger": "Maps products to accounts",
-     "provenance": "flow F16 step 5→6, F98 step 2→3"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-077",
-     "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
-    }
-   ],
-   "entryFrom": [
-    "BO-043"
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listAccounts` reads the population and `getAccount` reads one of them — list, select, act",
-  "purpose": "Accounts, cost centres and legal entities.",
-  "gaps": [
-   {
-    "operation": "listCostCenters",
-    "why": "**2 declared operations reach no component on this screen**: listCostCenters, listLegalEntities. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every chart accounts",
-       "bindsTo": "Account",
-       "columns": [
-        "Account.id",
-        "Account.code",
-        "Account.externalCode",
-        "Account.isSuspense",
-        "Account.subType",
-        "Account.tags",
-        "Account.notes",
-        "Account.name",
-        "Account.type",
-        "Account.parentId",
-        "Account.legalEntityId",
-        "Account.currency"
-       ],
-       "operation": "listAccounts",
-       "provenance": "contract finance.yaml GET /accounts"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected chart accounts",
-       "bindsTo": "Account",
-       "columns": [
-        "Account.id",
-        "Account.code",
-        "Account.externalCode",
-        "Account.isSuspense",
-        "Account.subType",
-        "Account.tags",
-        "Account.notes",
-        "Account.name",
-        "Account.type",
-        "Account.parentId",
-        "Account.legalEntityId",
-        "Account.currency",
-        "Account.isPostable",
-        "Account.isActive",
-        "Account.balance"
-       ],
-       "operation": "getAccount",
-       "provenance": "contract finance.yaml GET /accounts/{accountId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createAccount",
-       "provenance": "contract finance.yaml POST /accounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateAccount",
-       "provenance": "contract finance.yaml PATCH /accounts/{accountId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createCostCenter",
-       "provenance": "contract finance.yaml POST /cost-centers"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createLegalEntity",
-       "provenance": "contract finance.yaml POST /legal-entities"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The chart accounts list.",
-   "error": "Could not load. Names which read failed and leaves the chart accounts untouched.",
-   "emptyFirstRun": "No chart accounts yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the chart accounts are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listAccounts",
-    "contract": "finance",
-    "purpose": "List the chart of accounts",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getAccount",
-    "contract": "finance",
-    "purpose": "Read an account",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createAccount",
-    "contract": "finance",
-    "purpose": "Create an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccounts"
-    ]
-   },
-   {
-    "operationId": "updateAccount",
-    "contract": "finance",
-    "purpose": "Rename, remap or deactivate an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccounts"
-    ]
-   },
-   {
-    "operationId": "listCostCenters",
-    "contract": "finance",
-    "purpose": "List cost centres",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createCostCenter",
-    "contract": "finance",
-    "purpose": "Create a cost centre",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccounts"
-    ]
-   },
-   {
-    "operationId": "listLegalEntities",
-    "contract": "finance",
-    "purpose": "List legal entities",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createLegalEntity",
-    "contract": "finance",
-    "purpose": "Create a legal entity",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccounts"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "accountId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `accountId`.",
-   "preloaded": [
-    "Account.id",
-    "Account.code",
-    "Account.externalCode",
-    "Account.isSuspense",
-    "Account.subType"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-074"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-075",
-  "name": "Account Mapping",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/account-mapping",
-   "component": "apps/venue-management-web/src/routes/finance/AccountMapping.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-074",
-    "BO-076",
-    "BO-077"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "transitions": [
-    {
-     "to": "BO-076",
-     "trigger": "Revenue Recognition",
-     "provenance": "flow F98 step 3→4"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-077",
-     "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-020",
-     "trigger": "Creates the first venue manager",
-     "provenance": "flow F16 step 6→7",
-     "crossesDevice": true,
-     "back": false
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense. **Cross-platform navigation removed 24 August**: ADM-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
-  "purpose": "Which product or movement posts to which account.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Account mappings",
-       "bindsTo": "AccountMapping",
-       "operation": "listAccountMappings",
-       "provenance": "contract finance.yaml GET /account-mappings"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Tax codes",
-       "bindsTo": "TaxCode",
-       "operation": "listTaxCodes",
-       "provenance": "contract finance.yaml GET /tax-codes"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Tax exemptions",
-       "bindsTo": "TaxExemption",
-       "operation": "listTaxExemptions",
-       "provenance": "contract finance.yaml GET /tax-exemptions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every account mapping",
-       "bindsTo": "AccountMapping",
-       "columns": [
-        "AccountMapping.eventType",
-        "AccountMapping.debitAccountId",
-        "AccountMapping.creditAccountId",
-        "AccountMapping.venueId"
-       ],
-       "operation": "listAccountMappings",
-       "provenance": "contract finance.yaml GET /account-mappings"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setAccountMappings",
-       "provenance": "contract finance.yaml PUT /account-mappings"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createTaxCode",
-       "provenance": "contract finance.yaml POST /tax-codes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateTaxCode",
-       "provenance": "contract finance.yaml PATCH /tax-codes/{taxCodeId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createTaxExemption",
-       "provenance": "contract finance.yaml POST /tax-exemptions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The account mapping list.",
-   "error": "Could not load. Names which read failed and leaves the account mapping untouched.",
-   "emptyFirstRun": "No account mapping yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the account mapping are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listAccountMappings",
-    "contract": "finance",
-    "purpose": "Which account each transaction type posts to",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setAccountMappings",
-    "contract": "finance",
-    "purpose": "Set posting mappings",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccountMappings"
-    ]
-   },
-   {
-    "operationId": "listTaxCodes",
-    "contract": "finance",
-    "purpose": "List tax codes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createTaxCode",
-    "contract": "finance",
-    "purpose": "Create a tax code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccountMappings"
-    ]
-   },
-   {
-    "operationId": "updateTaxCode",
-    "contract": "finance",
-    "purpose": "Amend a tax code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccountMappings"
-    ]
-   },
-   {
-    "operationId": "listTaxExemptions",
-    "contract": "finance",
-    "purpose": "List tax exemptions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createTaxExemption",
-    "contract": "finance",
-    "purpose": "Grant a tax exemption",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAccountMappings"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "taxCodeId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `taxCodeId`."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-075"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-076",
-  "name": "Revenue Recognition",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/revenue-recognition",
-   "component": "apps/venue-management-web/src/routes/finance/RevenueRecognition.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-074",
-    "BO-075",
-    "BO-077"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-075",
-     "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-077",
-     "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listRecognitionSchedules` reads the population and `getDeferredRevenue` reads one of them — list, select, act",
-  "purpose": "Deferred revenue, its ageing, and the schedules that release it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every revenue recognition",
-       "bindsTo": "RecognitionSchedule",
-       "columns": [
-        "RecognitionSchedule.id",
-        "RecognitionSchedule.name",
-        "RecognitionSchedule.method",
-        "RecognitionSchedule.priority",
-        "RecognitionSchedule.recognitionSite",
-        "RecognitionSchedule.frequency",
-        "RecognitionSchedule.revalidateOnValidityChange",
-        "RecognitionSchedule.productKinds",
-        "RecognitionSchedule.deferredAccountId",
-        "RecognitionSchedule.recognisedAccountId",
-        "RecognitionSchedule.breakageAccountId",
-        "RecognitionSchedule.noShowTrigger"
-       ],
-       "operation": "listRecognitionSchedules",
-       "provenance": "contract finance.yaml GET /recognition-schedules"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected revenue recognition",
-       "bindsTo": "DeferredRevenueReport",
-       "columns": [
-        "DeferredRevenueReport.asAt",
-        "DeferredRevenueReport.total",
-        "DeferredRevenueReport.buckets"
-       ],
-       "operation": "getDeferredRevenue",
-       "provenance": "contract finance.yaml GET /deferred-revenue"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Run",
-       "operation": "runRecognition",
-       "provenance": "contract finance.yaml POST /recognition/run"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createRecognitionSchedule",
-       "provenance": "contract finance.yaml POST /recognition-schedules"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The revenue recognition list.",
-   "error": "Could not load. Names which read failed and leaves the revenue recognition untouched.",
-   "emptyFirstRun": "No revenue recognition yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue recognition are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getDeferredRevenue",
-    "contract": "finance",
-    "purpose": "Deferred revenue balance and ageing",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "runRecognition",
-    "contract": "finance",
-    "purpose": "Recognise earned revenue for a period",
-    "trigger": "onAction",
-    "invalidates": [
-     "listRecognitionSchedules"
-    ]
-   },
-   {
-    "operationId": "listRecognitionSchedules",
-    "contract": "finance",
-    "purpose": "List revenue recognition schedules",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createRecognitionSchedule",
-    "contract": "finance",
-    "purpose": "Define how a product class recognises revenue",
-    "trigger": "onAction",
-    "invalidates": [
-     "listRecognitionSchedules"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DeferredRevenueReport.asAt",
-    "DeferredRevenueReport.total",
-    "DeferredRevenueReport.buckets"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-076"
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "BO-077",
-  "name": "FX Rates & Variances",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/fx-rates-variances",
-   "component": "apps/venue-management-web/src/routes/finance/FxRatesVariances.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-074",
-    "BO-075",
-    "BO-076"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-075",
-     "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
-  "density": "compact",
-  "pattern": "approvalInbox",
-  "patternReason": "`reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting for a person, so the empty state is success",
-  "purpose": "Rates, and the price variances waiting for review.",
-  "gaps": [
-   {
-    "operation": "listPriceVariances",
-    "why": "**1 declared operation reach no component on this screen**: listPriceVariances. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "queue",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Waiting for a decision",
-       "bindsTo": "FxRate",
-       "columns": [
-        "FxRate.id",
-        "FxRate.fromCurrency",
-        "FxRate.toCurrency",
-        "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
-       ],
-       "operation": "listFxRates",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "item",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected rates variances",
-       "bindsTo": "FxRate",
-       "columns": [
-        "FxRate.id",
-        "FxRate.fromCurrency",
-        "FxRate.toCurrency",
-        "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
-       ],
-       "operation": "listFxRates",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "decision",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setFxRate",
-       "provenance": "contract finance.yaml PUT /fx-rates"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Review",
-       "operation": "reviewPriceVariance",
-       "provenance": "contract finance.yaml POST /price-variances/{varianceId}/review"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The rates variances list.",
-   "error": "Could not load. Names which read failed and leaves the rates variances untouched.",
-   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the rates variances are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listFxRates",
-    "contract": "finance",
-    "purpose": "The rates in force",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setFxRate",
-    "contract": "finance",
-    "purpose": "Set a rate",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFxRates"
-    ]
-   },
-   {
-    "operationId": "listPriceVariances",
-    "contract": "finance",
-    "purpose": "List price variances",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "reviewPriceVariance",
-    "contract": "finance",
-    "purpose": "Record a review decision on an exception variance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFxRates"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "varianceId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `varianceId`.",
-   "preloaded": [
-    "FxRate.id",
-    "FxRate.fromCurrency",
-    "FxRate.toCurrency",
-    "FxRate.rate",
-    "FxRate.purpose"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-077"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-089",
-  "name": "Journal Entries",
-  "module": "Orders & Money",
-  "requiresModule": "core",
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
   "wave": 1,
-  "capability": "C00",
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/journal-entries",
-   "component": "apps/venue-management-web/src/routes/finance/JournalEntries.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-074",
-    "BO-075",
-    "BO-076",
-    "BO-090"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "transitions": [
-    {
-     "to": "BO-090",
-     "trigger": "Begins the close",
-     "provenance": "flow F13 step 3→4"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-075",
-     "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
-  "density": "compact",
-  "pattern": "approvalInbox",
-  "patternReason": "`approveJournalEntry` decides items that `listJournalEntries` queues — every row is waiting for a person, so the empty state is success",
-  "purpose": "Every posting, and the ones waiting for approval.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "queue",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Waiting for a decision",
-       "bindsTo": "JournalEntry",
-       "columns": [
-        "JournalEntry.id",
-        "JournalEntry.entryNumber",
-        "JournalEntry.fiscalPeriodId",
-        "JournalEntry.status",
-        "JournalEntry.source",
-        "JournalEntry.sourceId",
-        "JournalEntry.description",
-        "JournalEntry.reference",
-        "JournalEntry.lines",
-        "JournalEntry.totalDebit",
-        "JournalEntry.totalCredit",
-        "JournalEntry.postedByPrincipalId"
-       ],
-       "operation": "listJournalEntries",
-       "provenance": "contract finance.yaml GET /journal-entries"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "item",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected journal entries",
-       "bindsTo": "JournalEntry",
-       "columns": [
-        "JournalEntry.id",
-        "JournalEntry.entryNumber",
-        "JournalEntry.fiscalPeriodId",
-        "JournalEntry.status",
-        "JournalEntry.source",
-        "JournalEntry.sourceId",
-        "JournalEntry.description",
-        "JournalEntry.reference",
-        "JournalEntry.lines",
-        "JournalEntry.totalDebit",
-        "JournalEntry.totalCredit",
-        "JournalEntry.postedByPrincipalId",
-        "JournalEntry.approvedByPrincipalId",
-        "JournalEntry.reversalOfEntryId",
-        "JournalEntry.reversedByEntryId",
-        "JournalEntry.postedAt"
-       ],
-       "operation": "getJournalEntry",
-       "provenance": "contract finance.yaml GET /journal-entries/{entryId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "decision",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createJournalEntry",
-       "provenance": "contract finance.yaml POST /journal-entries"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve",
-       "operation": "approveJournalEntry",
-       "provenance": "contract finance.yaml POST /journal-entries/{entryId}/approve"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Reject",
-       "operation": "rejectJournal",
-       "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Reverse",
-       "operation": "reverseJournalEntry",
-       "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRejectJournal",
-    "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectJournal` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reject"
-   },
-   {
-    "id": "confirmReverseJournalEntry",
-    "component": "confirmDialog",
-    "trigger": "Reverse",
-    "body": "**Names what `reverseJournalEntry` changes and what it leaves alone**, in the consequence rather than the verb. A journal entries this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract finance.yaml POST /journal-entries/{entryId}/reverse"
-   }
-  ],
-  "states": {
-   "loading": "The journal entries list.",
-   "error": "Could not load. Names which read failed and leaves the journal entries untouched.",
-   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "The filter narrowed it and the journal entries are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listJournalEntries",
-    "contract": "finance",
-    "purpose": "List journal entries",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getJournalEntry",
-    "contract": "finance",
-    "purpose": "Read a journal entry",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createJournalEntry",
-    "contract": "finance",
-    "purpose": "Post a manual journal voucher",
-    "trigger": "onAction",
-    "invalidates": [
-     "listJournalEntries"
-    ]
-   },
-   {
-    "operationId": "approveJournalEntry",
-    "contract": "finance",
-    "purpose": "Approve a journal entry and post it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listJournalEntries"
-    ]
-   },
-   {
-    "operationId": "rejectJournal",
-    "contract": "finance",
-    "purpose": "Reject a journal awaiting approval",
-    "trigger": "onAction",
-    "invalidates": [
-     "listJournalEntries"
-    ]
-   },
-   {
-    "operationId": "reverseJournalEntry",
-    "contract": "finance",
-    "purpose": "Reverse a posted entry",
-    "trigger": "onAction",
-    "invalidates": [
-     "listJournalEntries"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "entryId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `entryId`.",
-   "preloaded": [
-    "JournalEntry.id",
-    "JournalEntry.entryNumber",
-    "JournalEntry.fiscalPeriodId",
-    "JournalEntry.status",
-    "JournalEntry.source"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-089"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-090",
-  "name": "Period Close",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/finance/period-close",
-   "component": "apps/venue-management-web/src/routes/finance/PeriodClose.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-040",
-    "BO-074",
-    "BO-075",
-    "BO-076"
-   ],
-   "inferred": true,
-   "fromFlows": true,
-   "transitions": [
-    {
-     "to": "BO-040",
-     "trigger": "Clears outstanding shift variances",
-     "provenance": "flow F13 step 1→2"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-075",
-     "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listFiscalPeriods` reads the population and `getTrialBalance` reads one of them — list, select, act",
-  "purpose": "Close a fiscal period, and see what is stopping it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every period close",
-       "bindsTo": "FiscalPeriod",
-       "columns": [
-        "FiscalPeriod.id",
-        "FiscalPeriod.legalEntityId",
-        "FiscalPeriod.name",
-        "FiscalPeriod.startDate",
-        "FiscalPeriod.endDate",
-        "FiscalPeriod.status",
-        "FiscalPeriod.closedByPrincipalId",
-        "FiscalPeriod.closedAt"
-       ],
-       "operation": "listFiscalPeriods",
-       "provenance": "contract finance.yaml GET /fiscal-periods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected period close",
-       "bindsTo": "TrialBalance",
-       "columns": [
-        "TrialBalance.fiscalPeriodId",
-        "TrialBalance.isBalanced",
-        "TrialBalance.totalDebit",
-        "TrialBalance.totalCredit",
-        "TrialBalance.accounts"
-       ],
-       "operation": "getTrialBalance",
-       "provenance": "contract finance.yaml GET /ledger/trial-balance"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Begin",
-       "operation": "beginPeriodClose",
-       "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/begin-close"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close",
-       "operation": "closeFiscalPeriod",
-       "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Abandon",
-       "operation": "abandonPeriodClose",
-       "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen",
-       "operation": "reopenPeriod",
-       "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/reopen"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmCloseFiscalPeriod",
-    "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeFiscalPeriod` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/close"
-   },
-   {
-    "id": "confirmAbandonPeriodClose",
-    "component": "confirmDialog",
-    "trigger": "Abandon",
-    "body": "**Names what `abandonPeriodClose` changes and what it leaves alone**, in the consequence rather than the verb. A period close this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract finance.yaml POST /fiscal-periods/{periodId}/abandon-close"
-   }
-  ],
-  "states": {
-   "loading": "The period close list.",
-   "error": "Could not load. Names which read failed and leaves the period close untouched.",
-   "emptyFirstRun": "No period close yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the period close are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listFiscalPeriods",
-    "contract": "finance",
-    "purpose": "List fiscal periods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "beginPeriodClose",
-    "contract": "finance",
-    "purpose": "Begin closing a period",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFiscalPeriods"
-    ]
-   },
-   {
-    "operationId": "closeFiscalPeriod",
-    "contract": "finance",
-    "purpose": "Close a period and lock postings",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFiscalPeriods"
-    ]
-   },
-   {
-    "operationId": "abandonPeriodClose",
-    "contract": "finance",
-    "purpose": "Abandon a close in progress",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFiscalPeriods"
-    ]
-   },
-   {
-    "operationId": "reopenPeriod",
-    "contract": "finance",
-    "purpose": "Reopen a closed period",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFiscalPeriods"
-    ]
-   },
-   {
-    "operationId": "getTrialBalance",
-    "contract": "finance",
-    "purpose": "Trial balance for a period",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "periodId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `periodId`.",
-   "preloaded": [
-    "TrialBalance.fiscalPeriodId",
-    "TrialBalance.isBalanced",
-    "TrialBalance.totalDebit",
-    "TrialBalance.totalCredit",
-    "TrialBalance.accounts"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-090"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-101",
-  "name": "Orders & Money",
-  "module": "Orders & Money",
-  "requiresModule": "core",
-  "wave": 1,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/orders-money",
-   "component": "apps/venue-management-web/src/routes/home/OrdersMoneyList.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "BO-100"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "BO-008",
-    "BO-022",
-    "BO-023",
-    "BO-024",
-    "BO-025",
-    "BO-026",
-    "BO-027",
-    "BO-028",
-    "BO-029",
-    "BO-039",
-    "BO-040",
-    "BO-041",
-    "BO-042",
-    "BO-043",
-    "BO-047",
-    "BO-048",
-    "BO-051",
-    "BO-059",
-    "BO-061",
-    "BO-062",
-    "BO-065",
-    "BO-070",
-    "BO-074",
-    "BO-075",
-    "BO-076",
-    "BO-077",
-    "BO-089",
-    "BO-090"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
    "transitions": [
     {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "productId",
-      "venueId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
     },
     {
-     "to": "BO-022",
-     "trigger": "Order Detail",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
       "orderId"
      ],
-     "provenance": "derived — BO-022 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-023",
-     "trigger": "Refunds & Exchanges",
-     "carries": [
-      "orderId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-023 declares entryState.params orderId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-024",
-     "trigger": "Payment Exceptions",
-     "carries": [
-      "depositId",
-      "paymentId"
-     ],
-     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-025",
-     "trigger": "Chargebacks & Disputes",
-     "carries": [
-      "settlementId"
-     ],
-     "provenance": "derived — BO-025 declares entryState.params settlementId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-026",
-     "trigger": "Group Bookings",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-026 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-027",
-     "trigger": "Reissue & Media Replacement",
-     "carries": [
-      "mediaCode",
-      "mediaId"
-     ],
-     "provenance": "derived — BO-027 declares entryState.params mediaCode, mediaId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-029",
-     "trigger": "Report Builder",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-039",
-     "trigger": "Shift Directory",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-039 declares entryState.params shiftId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-040",
-     "trigger": "Variance Approval",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-040 declares entryState.params shiftId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-041",
-     "trigger": "Cash Movements",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-041 declares entryState.params shiftId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-042",
-     "trigger": "Banking & Safe",
-     "carries": [
-      "shiftId"
-     ],
-     "provenance": "derived — BO-042 declares entryState.params shiftId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-043",
-     "trigger": "Daily Reconciliation",
-     "carries": [
-      "settlementId"
-     ],
-     "provenance": "derived — BO-043 declares entryState.params settlementId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-047",
-     "trigger": "Order Corrections & Exceptions",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-047 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-048",
-     "trigger": "Retail Products",
-     "carries": [
-      "merchandiseId"
-     ],
-     "provenance": "derived — BO-048 declares entryState.params merchandiseId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-051",
-     "trigger": "Purchase Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-051 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-059",
-     "trigger": "Sales Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-061",
-     "trigger": "Scheduled Reports",
-     "carries": [
-      "conversationId",
-      "reportId"
-     ],
-     "provenance": "derived — BO-061 declares entryState.params conversationId, reportId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-062",
-     "trigger": "Venue Profile",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-062 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-065",
-     "trigger": "Venue Configuration",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-065 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-070",
-     "trigger": "Work Orders",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — BO-070 declares entryState.params orderId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-074",
-     "trigger": "Chart of Accounts",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — BO-074 declares entryState.params accountId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-075",
-     "trigger": "Account Mapping",
-     "carries": [
-      "taxCodeId"
-     ],
-     "provenance": "derived — BO-075 declares entryState.params taxCodeId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-077",
-     "trigger": "FX Rates & Variances",
-     "carries": [
-      "varianceId"
-     ],
-     "provenance": "derived — BO-077 declares entryState.params varianceId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-089",
-     "trigger": "Journal Entries",
-     "carries": [
-      "entryId"
-     ],
-     "provenance": "derived — BO-089 declares entryState.params entryId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-090",
-     "trigger": "Period Close",
-     "carries": [
-      "periodId"
-     ],
-     "provenance": "derived — BO-090 declares entryState.params periodId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
-  "notes": "Section landing. **28 screens reach the entry point through here** — before 20 August they reached it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings` alone, which made it identical to every other section landing page — a hub that shows nothing of its section is a menu item, not a screen.",
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in orders & money, and what in it needs attention.",
-  "gaps": [
-   {
-    "operation": "listSettlements",
-    "why": "**1 declared operation reach no component on this screen**: listSettlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2434,19 +1363,19 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every orders money",
-       "bindsTo": "OrderSummary",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
        "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
        ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
       }
      ]
     },
@@ -2456,18 +1385,52 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected orders money",
-       "bindsTo": "VenueSettings",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
        "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
        ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
@@ -2476,14 +1439,25 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "28 screens, each with what needs attention.",
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "searchField",
-       "label": "Search orders & money",
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -2491,73 +1465,109 @@
    ]
   },
   "states": {
-   "loading": "The list, with counts.",
-   "error": "Could not load. Venue Home is still reachable.",
-   "emptyFirstRun": "**Nothing configured in orders & money yet.** The action is the first thing to set up, not a blank list.",
-   "emptyNoResults": "Nothing matches the filter.",
-   "emptyNoAccess": "You do not have permission for orders & money. **Said plainly** — an empty section reads as broken."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "Orders taken in this venue",
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
     "trigger": "onLoad"
    },
    {
-    "operationId": "listSettlements",
-    "contract": "finance",
-    "purpose": "Money settled and what is outstanding",
-    "trigger": "onLoad"
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "venueId",
+     "name": "subjectId",
      "from": "session"
     }
    ],
-   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "VenueSettings.id",
-    "VenueSettings.venueId",
-    "VenueSettings.supportHours",
-    "VenueSettings.quietHours",
-    "VenueSettings.segregatedAccess"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-101"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

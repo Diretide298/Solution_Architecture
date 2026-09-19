@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 9
+  x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -53,6 +53,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-874 Staff Resource Profile"
+        - "P08 BO-903 Equipment & Asset Command Center"
         - "P08 BO-923 AI Resource Intelligence Command Center"
         - "P08 BO-943 Resource Analytics Command Center"
       summary: Resources at this venue
@@ -93,6 +95,7 @@ paths:
       operationId: createResource
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
+        - "P08 BO-857 Resource Creation & Profile"
       summary: Define a bookable resource
       tags:
       - resources
@@ -176,6 +179,10 @@ paths:
   /resource-bookings:
     get:
       operationId: listResourceBookings
+      x-ticvai-consumed-by:
+        - "P08 BO-868 Advance Reservation Management"
+        - "P08 BO-933 My Resource Operations Home"
+        - "P08 BO-935 Assignment Detail & Operational Brief"
       summary: Bookings, filtered
       tags:
       - resources
@@ -219,6 +226,10 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
+        - "P08 BO-864 Resource Calendar Command Center"
+        - "P08 BO-868 Advance Reservation Management"
+        - "P08 BO-869 Recurring Reservation Configuration"
+        - "P08 BO-915 Venue & Space Allocation"
       summary: Reserve a specific resource for a window — staff only
       description: '**Refuses on conflict, including setup and teardown.** This is the operation the whole
         context exists for — **two bookings on one cabana is a guest arriving to find somebody in their
@@ -337,6 +348,8 @@ paths:
       operationId: checkOutResource
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+        - "P08 BO-907 Guest & Resource Assignment"
+        - "P08 BO-937 Resource Collection, Handover & Return"
       summary: Hand it over, with a deposit against it
       description: '7.6. **A rental leaves with a guest, and the deposit is held against the object rather
         than the order** — which is why `orders` could not carry this: an order completes and a rental
@@ -406,6 +419,7 @@ paths:
       operationId: checkInResource
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+        - "P08 BO-937 Resource Collection, Handover & Return"
       summary: Take it back, and settle the deposit
       description: '**Releases the hold, or captures part of it against damage.** Partial capture is the
         normal case for a damaged item and the reason two-phase spend was worth building.
@@ -468,6 +482,10 @@ paths:
       operationId: setResourceQualifications
       x-ticvai-consumed-by:
         - "P08 BO-098 Qualifications"
+        - "P08 BO-875 Skills & Competency Management"
+        - "P08 BO-876 Certification & Expiry Management"
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
+        - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: What a person resource is certified to do, and until when
       description: '1.2.36. **`RotaAssignment` carried `requiredRoleId` alone, and a role is not a skill.**
 
@@ -588,6 +606,9 @@ paths:
   /resource-types:
     get:
       operationId: listResourceTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-855 Resource Type Configuration"
       summary: The classes of resource this organisation supports
       description: 'Board 1.02. **A resource type is configuration, not code.** The board is explicit
         that administrators define staff, instructor, venue, room, hall, area, cabana, equipment, rental
@@ -619,6 +640,8 @@ paths:
                   $ref: '#/components/schemas/ResourceType'
     post:
       operationId: createResourceType
+      x-ticvai-consumed-by:
+        - "P08 BO-855 Resource Type Configuration"
       summary: Define a class of resource
       description: '**Tenant scope, because 26 August says it may be either.** *"some elements of resource
         management configuration may be controlled at the tenant level rather than only centrally"* —
@@ -658,6 +681,8 @@ paths:
         format: uuid
     put:
       operationId: updateResourceType
+      x-ticvai-consumed-by:
+        - "P08 BO-855 Resource Type Configuration"
       summary: Change a class of resource
       description: '**Existing resources are re-evaluated when their type changes** (board 1.02,
         Governance). Turning off `checkInOutSupported` on a type whose resources are currently checked
@@ -694,6 +719,8 @@ paths:
   /resource-categories:
     get:
       operationId: listResourceCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-856 Resource Category Management"
       summary: The classification tree beneath the types
       description: 'Board 1.03. **Categories inherit from their parent** — default attributes, default
         availability policies and the default approval workflow all cascade, which is what makes a tree
@@ -718,6 +745,8 @@ paths:
                   $ref: '#/components/schemas/ResourceCategory'
     post:
       operationId: createResourceCategory
+      x-ticvai-consumed-by:
+        - "P08 BO-856 Resource Category Management"
       summary: Add a category or subcategory
       tags:
       - resources
@@ -750,6 +779,8 @@ paths:
         format: uuid
     put:
       operationId: updateResourceCategory
+      x-ticvai-consumed-by:
+        - "P08 BO-856 Resource Category Management"
       summary: Change a category
       description: '**Warn before changing one that is in use** (board 1.03). The count of resources
         beneath it comes back with the refusal, so the warning can say how many.
@@ -779,6 +810,8 @@ paths:
   /resource-attributes:
     get:
       operationId: listResourceAttributes
+      x-ticvai-consumed-by:
+        - "P08 BO-858 Configurable Attribute Builder"
       summary: The customer-defined fields on a resource
       description: 'Board 1.05. **The customer extends the record; we do not ship their fields.** Skill
         level, height, seating capacity, equipment model, serial number, warranty expiry, language,
@@ -804,6 +837,8 @@ paths:
                   $ref: '#/components/schemas/ResourceAttributeDefinition'
     post:
       operationId: createResourceAttribute
+      x-ticvai-consumed-by:
+        - "P08 BO-858 Configurable Attribute Builder"
       summary: Define a customer attribute
       tags:
       - resources
@@ -836,6 +871,10 @@ paths:
         format: uuid
     get:
       operationId: getResource
+      x-ticvai-consumed-by:
+        - "P08 BO-857 Resource Creation & Profile"
+        - "P08 BO-862 Multi-Venue Resource Assignment"
+        - "P08 BO-935 Assignment Detail & Operational Brief"
       summary: One resource, with every configured section
       description: 'Board 1.04. Identity, organisation, operational configuration, location, commercial,
         integration and the customer attributes in one read — **the profile is one screen, and a client
@@ -858,6 +897,8 @@ paths:
                 $ref: '#/components/schemas/Resource'
     put:
       operationId: updateResource
+      x-ticvai-consumed-by:
+        - "P08 BO-857 Resource Creation & Profile"
       summary: Change a resource
       tags:
       - resources
@@ -890,6 +931,10 @@ paths:
         format: uuid
     post:
       operationId: setResourceLifecycleState
+      x-ticvai-consumed-by:
+        - "P08 BO-857 Resource Creation & Profile"
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
+        - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
       summary: Move a resource through its lifecycle, with a reason
       description: 'Board 1.10. **One operation, not seven.** Draft, pending approval, approved, active,
         temporarily unavailable, under maintenance, suspended, retired and archived are states of one
@@ -972,6 +1017,8 @@ paths:
         format: uuid
     post:
       operationId: cloneResource
+      x-ticvai-consumed-by:
+        - "P08 BO-857 Resource Creation & Profile"
       summary: Copy a resource and its configuration into new ones
       description: '**A venue with forty identical strollers has forty resources.** That is the model,
         and it is only bearable if the fortieth is one action rather than forty fields.
@@ -1024,6 +1071,8 @@ paths:
         format: uuid
     get:
       operationId: getResourceHierarchy
+      x-ticvai-consumed-by:
+        - "P08 BO-859 Resource Hierarchy & Parent–Child Relationships"
       summary: What this resource contains, and what contains it
       description: 'Board 1.06. Venue → building → floor → hall → room; AV system → projector, screen,
         speakers, microphones. **Booking a parent takes its children with it**, so the tree is
@@ -1046,6 +1095,8 @@ paths:
                 $ref: '#/components/schemas/ResourceHierarchy'
     put:
       operationId: setResourceHierarchy
+      x-ticvai-consumed-by:
+        - "P08 BO-859 Resource Hierarchy & Parent–Child Relationships"
       summary: Re-parent a resource, or attach children to it
       description: '**Refuses a circular hierarchy, an invalid parent, and an unauthorised cross-tenant
         relationship** (board 1.06). The first is the one that cannot be left to the client: a cycle
@@ -1089,6 +1140,8 @@ paths:
         format: uuid
     get:
       operationId: getResourceDependencies
+      x-ticvai-consumed-by:
+        - "P08 BO-860 Resource Dependency Rules"
       summary: What this resource requires, conflicts with, or substitutes for
       tags:
       - resources
@@ -1108,6 +1161,8 @@ paths:
                   $ref: '#/components/schemas/ResourceDependency'
     put:
       operationId: setResourceDependencies
+      x-ticvai-consumed-by:
+        - "P08 BO-860 Resource Dependency Rules"
       summary: Define what must come with it, and what cannot
       description: 'Board 1.07. *Stage A requires Sound System A and Lighting Rig A; a private ski lesson
         requires one instructor and one training zone.*
@@ -1150,6 +1205,10 @@ paths:
   /resource-packages:
     get:
       operationId: listResourcePackages
+      x-ticvai-consumed-by:
+        - "P08 BO-861 Resource Package & Bundle Configuration"
+        - "P08 BO-895 Resource Combination Builder"
+        - "P08 BO-918 Event Resource Template Library"
       summary: Predefined combinations assigned as one
       description: 'Board 1.08. *Conference Package — meeting room, projector, screen, microphone,
         technician. VIP Cabana Package — cabana, towels, locker, service attendant.*
@@ -1177,6 +1236,10 @@ paths:
                   $ref: '#/components/schemas/ResourcePackage'
     post:
       operationId: createResourcePackage
+      x-ticvai-consumed-by:
+        - "P08 BO-861 Resource Package & Bundle Configuration"
+        - "P08 BO-895 Resource Combination Builder"
+        - "P08 BO-918 Event Resource Template Library"
       summary: Define a reusable combination
       tags:
       - resources
@@ -1209,6 +1272,8 @@ paths:
         format: uuid
     put:
       operationId: updateResourcePackage
+      x-ticvai-consumed-by:
+        - "P08 BO-861 Resource Package & Bundle Configuration"
       summary: Change a combination
       tags:
       - resources
@@ -1241,6 +1306,8 @@ paths:
         format: uuid
     put:
       operationId: setResourceVenueAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-862 Multi-Venue Resource Assignment"
       summary: Where it may operate, and whether it travels
       description: 'Board 1.09. **The travel buffer is the part that is not a permission.** A resource
         shared between two venues is unavailable for the journey between them, and a calendar that treats
@@ -1285,6 +1352,10 @@ paths:
         format: uuid
     get:
       operationId: getResourceAuditTrail
+      x-ticvai-consumed-by:
+        - "P08 BO-592 Audit, Governance & Operational Control"
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
+        - "P08 BO-950 Audit Trail & Resource Decision History"
       summary: Every material change, with who and why
       description: 'Board 1.10. **Immutable, and it records the previous value as well as the new one.**
         An audit line saying a field changed, without saying what it changed from, cannot answer the only
@@ -1313,6 +1384,14 @@ paths:
   /resource-calendar:
     get:
       operationId: getResourceCalendar
+      x-ticvai-consumed-by:
+        - "P08 BO-519 Resource / Equipment Calendar"
+        - "P08 BO-864 Resource Calendar Command Center"
+        - "P08 BO-865 Calendar Filters, Search & Smart Discovery"
+        - "P08 BO-871 Multi-Event Resource Planning"
+        - "P08 BO-872 Smart Assignment & Drag-and-Drop Reallocation"
+        - "P08 BO-921 Multi-Event Allocation & Conflict Optimizer"
+        - "P08 BO-934 My Schedule & Assignment Calendar"
       summary: Every resource against time, with conflicts already marked
       description: 'Board 2.01. **This is a grid, not a list of bookings.** The calendar answers *"what
         is the state of every resource over this window"* — available, reserved, assigned, partially
@@ -1383,6 +1462,10 @@ paths:
         format: uuid
     get:
       operationId: getResourceSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-866 Resource Availability Schedule Configuration"
+        - "P08 BO-867 Resource Time-Slot Configuration"
+        - "P08 BO-878 Staff Availability & Working Pattern"
       summary: The pattern of when it is normally available
       tags:
       - resources
@@ -1400,6 +1483,10 @@ paths:
                 $ref: '#/components/schemas/ResourceSchedule'
     put:
       operationId: setResourceSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-866 Resource Availability Schedule Configuration"
+        - "P08 BO-867 Resource Time-Slot Configuration"
+        - "P08 BO-878 Staff Availability & Working Pattern"
       summary: Operating hours, working pattern and bookable slots
       description: 'Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as
         concrete dates has to be rewritten every season and silently expires; a recurring pattern with
@@ -1441,6 +1528,9 @@ paths:
         format: uuid
     patch:
       operationId: updateResourceBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-868 Advance Reservation Management"
+        - "P08 BO-872 Smart Assignment & Drag-and-Drop Reallocation"
       summary: Extend, shorten or reassign a booking
       description: 'Board 2.01, Smart Actions — *view, edit, reassign, extend, shorten, cancel*. **All
         four are one write and all four re-run conflict detection**, because extending into the next
@@ -1496,6 +1586,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: cancelResourceBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-869 Recurring Reservation Configuration"
       summary: Cancel one occurrence, or the whole series
       description: '**Cancelling one week does not cancel the series**, and cancelling the series is a
         separate act — the `scope` parameter makes the caller say which, and there is no default. A
@@ -1534,6 +1626,8 @@ paths:
   /resource-blocks:
     get:
       operationId: listResourceBlocks
+      x-ticvai-consumed-by:
+        - "P08 BO-870 Operational Time & Resource Blocking"
       summary: Operational, setup and maintenance blocks
       tags:
       - resources
@@ -1569,6 +1663,10 @@ paths:
                   $ref: '#/components/schemas/ResourceBlock'
     post:
       operationId: createResourceBlock
+      x-ticvai-consumed-by:
+        - "P08 BO-864 Resource Calendar Command Center"
+        - "P08 BO-870 Operational Time & Resource Blocking"
+        - "P08 BO-910 Maintenance & Resource Blocking"
       summary: Take a resource out of service for a window, with a reason
       description: 'Board 2.07. **A block is not a booking and the difference is operational.** An
         operator looking for something free needs to know whether to wait or to look elsewhere, so
@@ -1616,6 +1714,8 @@ paths:
         format: uuid
     delete:
       operationId: releaseResourceBlock
+      x-ticvai-consumed-by:
+        - "P08 BO-870 Operational Time & Resource Blocking"
       summary: Put it back into service
       tags:
       - resources
@@ -1629,6 +1729,11 @@ paths:
   /resource-allocations:
     post:
       operationId: allocateResources
+      x-ticvai-consumed-by:
+        - "P08 BO-871 Multi-Event Resource Planning"
+        - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
+        - "P08 BO-900 Dynamic Resource Allocation Engine"
+        - "P08 BO-916 Equipment & Asset Allocation"
       summary: Fill a requirement from the pool, rotating rather than repeating
       description: '**The 26 August decision is the whole of this operation.** *"resource allocation
         should rotate across all available resources (e.g., resource 1, then 2, then 3) rather than
@@ -1723,6 +1828,8 @@ paths:
         format: uuid
     post:
       operationId: replaceResourceAllocation
+      x-ticvai-consumed-by:
+        - "P08 BO-902 Automatic Replacement & Assignment Recovery"
       summary: Swap in a substitute when the allocated resource falls through
       description: 'Board 5.09. **The substitute list is configuration, not a search.** `substituteFor`
         and `backupFor` are dependency kinds set on the resource, so recovery picks from a set somebody
@@ -1764,6 +1871,10 @@ paths:
   /resource-allocation-policy:
     get:
       operationId: getResourceAllocationPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-900 Dynamic Resource Allocation Engine"
+        - "P08 BO-901 Priority, Scoring & Allocation Policy"
+        - "P08 BO-948 Resource Governance & Policy Center"
       summary: How the platform chooses between equally valid resources
       tags:
       - resources
@@ -1781,6 +1892,9 @@ paths:
                 $ref: '#/components/schemas/ResourceAllocationPolicy'
     put:
       operationId: setResourceAllocationPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-901 Priority, Scoring & Allocation Policy"
+        - "P08 BO-948 Resource Governance & Policy Center"
       summary: Rotation, priority and scoring
       description: 'Board 5.08. **Rotation is the default and 26 August is why**, but a venue that
         genuinely wants its best room filled first can say so. The policy names the strategy rather than
@@ -1812,6 +1926,8 @@ paths:
   /resource-selection-policy:
     put:
       operationId: setResourceSelectionPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-897 Customer Resource Selection Configuration"
       summary: Whether the guest may choose the resource, per ticket type
       description: '**Two 26 August decisions meet here and they have to be read together.**
 
@@ -1870,6 +1986,12 @@ paths:
   /resource-suggestions:
     get:
       operationId: suggestResources
+      x-ticvai-consumed-by:
+        - "P08 BO-865 Calendar Filters, Search & Smart Discovery"
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
+        - "P08 BO-894 Staff-to-Experience Qualification Mapping"
+        - "P08 BO-898 Skill-Based & Smart Resource Selection"
+        - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
       summary: Resources matching a requirement, by attribute
       description: '**Deliberately not AI, and 26 August says so.** *"skill-based resource matching
         should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather
@@ -1927,6 +2049,8 @@ paths:
         format: uuid
     get:
       operationId: getExperienceResourceRequirements
+      x-ticvai-consumed-by:
+        - "P08 BO-893 Experience Resource Requirement Builder"
       summary: What an experience needs before it can run
       tags:
       - resources
@@ -1946,6 +2070,8 @@ paths:
                   $ref: '#/components/schemas/ResourceRequirement'
     put:
       operationId: setExperienceResourceRequirements
+      x-ticvai-consumed-by:
+        - "P08 BO-893 Experience Resource Requirement Builder"
       summary: Bind resource requirements to an experience
       description: 'Board 5.01. **This is the join between the catalogue and the pool**, and it is what
         makes the 26 August rule enforceable: the guest buys a product, the product states what it needs,
@@ -1989,6 +2115,15 @@ paths:
   /resource-utilisation:
     get:
       operationId: getResourceUtilisation
+      x-ticvai-consumed-by:
+        - "P08 BO-586 Utilization & Capacity Analytics"
+        - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-896 Ticket Demand & Resource Capacity Mapping"
+        - "P08 BO-943 Resource Analytics Command Center"
+        - "P08 BO-944 Resource Utilization & Capacity Analytics"
+        - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+        - "P08 BO-947 Resource KPI, SLA & Performance Framework"
+        - "P08 BO-952 Executive Resource Intelligence & AI Improvement Center"
       summary: How much of each resource's available time was used
       description: 'Board 10.02. **The reporting the original contract said had no source.** Utilisation
         is booked time over available time, and both halves need this context: available time knows about

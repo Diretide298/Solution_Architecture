@@ -1,270 +1,75 @@
 [
  {
-  "id": "ANL-061",
-  "name": "BI & Analytics Administration Command Center",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.1",
-   "page": 123
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/bi-analytics-administration-command-center-anl-061",
-   "component": "apps/venue-management-web/src/routes/analytics/BiAnalyticsAdministrationCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each component shall show) — counts over a population, then the population",
-  "purpose": "Provide administrators with one consolidated view of the health and governance of the TICVAI analytics platform.",
-  "purposeNote": "Administrators can determine overall analytics-platform health without reviewing multiple technical systems.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component shall show"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Dashboards",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Reports",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Published KPIs",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Connected Data Sources",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Datasets",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Data Refresh Success %",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Data Quality Score",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Refreshes",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "BI Service Health",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "AI Analytics Health",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Alerts",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Analytics Users",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every analytics administration",
-       "columns": [
-        "Healthy / Warning / Critical / Offline"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component shall show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected analytics administration",
-       "bindsTo": null,
-       "columns": [
-        "Healthy / Warning / Critical / Offline"
-       ],
-       "notes": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component shall show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The analytics administration list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the analytics administration untouched.",
-   "emptyFirstRun": "No analytics administration yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the analytics administration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-061"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 123. 0 of 1 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
-    "ANL-001"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ANL-001",
-    "ANL-062",
-    "ANL-063",
-    "ANL-064",
-    "ANL-065",
-    "ANL-066",
-    "ANL-067",
-    "ANL-068",
-    "ANL-069",
-    "ANL-070"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "ANL-001",
-     "trigger": "Back to Executive Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "ANL-070",
-     "trigger": "Analytics Governance, Security & Audit Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "ANL-062",
-     "trigger": "Enterprise KPI Library",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "ANL-063",
-     "trigger": "KPI Targets, Thresholds & Scorecards",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-064",
-     "trigger": "Benchmark & Comparative Analytics Configuration",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-065",
-     "trigger": "Data Source & Integration Registry",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-066",
-     "trigger": "Semantic Model & Business Data Catalogue",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-067",
-     "trigger": "Data Refresh, Pipeline & Data Health Monitor",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-068",
-     "trigger": "Embedded BI, Workspace & Tenant Administration",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-069",
-     "trigger": "Analytics Performance, Usage & Cost Monitor",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "_platform": {
-   "code": "P16",
-   "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P13"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ANL-062",
-  "name": "Enterprise KPI Library",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.2",
-   "page": 124
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/enterprise-kpi-library-anl-062",
-   "component": "apps/venue-management-web/src/routes/analytics/EnterpriseKpiLibrary.tsx",
-   "status": "notStarted"
-  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric row",
-  "purpose": "Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard must use the same definition of a metric.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -276,26 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every enterprise kpi",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "Executive",
-        "Sales",
-        "Revenue",
-        "Finance",
-        "Operations",
-        "Access",
-        "Customer",
-        "Membership",
-        "Loyalty",
-        "Marketing",
-        "F&B",
-        "Retail",
-        "Inventory",
-        "Resources"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -305,375 +104,746 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected enterprise kpi",
-       "bindsTo": null,
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "Executive",
-        "Sales",
-        "Revenue",
-        "Finance",
-        "Operations",
-        "Access",
-        "Customer",
-        "Membership",
-        "Loyalty",
-        "Marketing",
-        "F&B",
-        "Retail",
-        "Inventory",
-        "Resources"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Formula”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The enterprise kpi list.",
-   "error": "Could not load. Names which read failed and leaves the enterprise kpi untouched.",
-   "emptyFirstRun": "No enterprise kpi yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the enterprise kpi are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "Executive",
-    "Sales",
-    "Revenue",
-    "Finance",
-    "Operations",
-    "Access"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-062"
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 124. 0 of 14 labels bound to a contract property; 30 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P16",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P13"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ANL-063",
-  "name": "KPI Targets, Thresholds & Scorecards",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.3",
-   "page": 125
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/kpi-targets-thresholds-scorecards-anl-063",
-   "component": "apps/venue-management-web/src/routes/analytics/KpiTargetsThresholdsScorecards.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Targets may be configured by) and no display directory — it is settings, not a population",
-  "purpose": "Centrally configure performance targets and thresholds used throughout TICVAI analytics.",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
+     "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Organization",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
-       "kind": "selectField",
-       "label": "Site",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
-       "kind": "selectField",
-       "label": "Venue",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
       },
       {
-       "kind": "selectField",
-       "label": "Attraction",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
       },
       {
-       "kind": "selectField",
-       "label": "Business Unit",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
-      },
-      {
-       "kind": "selectField",
-       "label": "Product",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
-      },
-      {
-       "kind": "selectField",
-       "label": "Channel",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
-      },
-      {
-       "kind": "selectField",
-       "label": "Period",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
-  "states": {
-   "loading": "The kpi targets thresholds configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the kpi targets thresholds untouched.",
-   "emptyFirstRun": "No kpi targets thresholds configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-063"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 125. 0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P16",
-   "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P13"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
    }
-  }
- },
- {
-  "id": "ANL-064",
-  "name": "Benchmark & Comparative Analytics Configuration",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.4",
-   "page": 127
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/benchmark-comparative-analytics-configuration-anl-064",
-   "component": "apps/venue-management-web/src/routes/analytics/BenchmarkComparativeAnalyticsConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Support metrics such as) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Define how TICVAI compares performance between sites, periods and peer groups.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Revenue per Visitor",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Transactions per 1,000 Visitors",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Entries per Gate per Hour",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Incidents per 10,000 Visitors",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue per m² where applicable",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue per Operating Hour",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Utilization %",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
-      }
-     ]
-    }
-   ]
-  },
+  ],
   "states": {
-   "loading": "The benchmark comparative analytics list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the benchmark comparative analytics untouched.",
-   "emptyFirstRun": "No benchmark comparative analytics yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the benchmark comparative analytics are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "Revenue per Visitor",
-    "Transactions per 1,000 Visitors",
-    "Entries per Gate per Hour",
-    "Incidents per 10,000 Visitors",
-    "Revenue per m² where applicable",
-    "Revenue per Operating Hour"
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-064"
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 127. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P16",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P13"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ANL-065",
-  "name": "Data Source & Integration Registry",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.5",
-   "page": 128
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/data-source-integration-registry-anl-065",
-   "component": "apps/venue-management-web/src/routes/analytics/DataSourceIntegrationRegistry.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Maintain a centralized catalogue of data sources feeding the analytics platform.",
-  "purposeNote": "Administrators can identify every source feeding BI and understand its current status and ownership.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display"
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -685,22 +855,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every data source integration",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "Source Name",
-        "Source Type",
-        "Owner",
-        "Connection",
-        "Authentication Method",
-        "Refresh Type",
-        "Last Sync",
-        "Records Processed",
-        "Status",
-        "Data Classification"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display"
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
       }
      ]
     },
@@ -710,117 +882,243 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected data source integration",
-       "bindsTo": null,
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "Source Name",
-        "Source Type",
-        "Owner",
-        "Connection",
-        "Authentication Method",
-        "Refresh Type",
-        "Last Sync",
-        "Records Processed",
-        "Status",
-        "Data Classification"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Important Security Principle”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display"
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The data source integration list.",
-   "error": "Could not load. Names which read failed and leaves the data source integration untouched.",
-   "emptyFirstRun": "No data source integration yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the data source integration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "Source Name",
-    "Source Type",
-    "Owner",
-    "Connection",
-    "Authentication Method",
-    "Refresh Type"
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-065"
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 128. 0 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P16",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P13"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ANL-066",
-  "name": "Semantic Model & Business Data Catalogue",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.6",
-   "page": 129
-  },
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/semantic-model-business-data-catalogue-anl-066",
-   "component": "apps/venue-management-web/src/routes/analytics/SemanticModelBusinessDataCatalogue.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
-  "purpose": "Create the governed business layer between raw data and dashboards/AI. This is one of the most important technical screens in Board 10.",
-  "purposeNote": "Dashboards, reports and AI operate against a consistent governed business-data model rather than independently querying raw tables.",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -832,17 +1130,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every semantic model business",
+       "label": "Every order history",
+       "bindsTo": "Order",
        "columns": [
-        "Missing relationships",
-        "Circular relationships",
-        "Duplicate aggregation risk",
-        "Invalid cardinality",
-        "Broken references"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
       }
      ]
     },
@@ -852,629 +1157,203 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected semantic model business",
-       "bindsTo": null,
+       "label": "The selected order history",
+       "bindsTo": "Order",
        "columns": [
-        "Missing relationships",
-        "Circular relationships",
-        "Duplicate aggregation risk",
-        "Invalid cardinality",
-        "Broken references"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Customer”, “Order”, “Ticket”, “Admission”, “F&B Sale”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The semantic model business list.",
-   "error": "Could not load. Names which read failed and leaves the semantic model business untouched.",
-   "emptyFirstRun": "No semantic model business yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the semantic model business are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "apis": [],
-  "entryState": {
-   "preloaded": [
-    "Missing relationships",
-    "Circular relationships",
-    "Duplicate aggregation risk",
-    "Invalid cardinality",
-    "Broken references"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-066"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 129. 0 of 5 labels bound to a contract property; 13 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P16",
-   "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P13"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ANL-067",
-  "name": "Data Refresh, Pipeline & Data Health Monitor",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.7",
-   "page": 130
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/data-refresh-pipeline-data-health-monitor-anl-067",
-   "component": "apps/venue-management-web/src/routes/analytics/DataRefreshPipelineDataHealthMonitor.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Administrators can identify stale or failed analytics data before users unknowingly make decisions from outdated information.",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Monitor) — counts over a population, then the population",
-  "purpose": "Monitor movement of information from operational systems into the analytics platform.",
-  "gaps": [
+  "apis": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor"
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Pipelines Running",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Successful Refreshes",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Refreshes",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Refresh Duration",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Data Latency",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Stale Datasets",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Records Processed",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every data refresh pipeline",
-       "columns": [
-        "Completeness",
-        "Timeliness",
-        "Accuracy checks",
-        "Duplicate records",
-        "Missing values",
-        "Schema changes",
-        "Reconciliation status"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected data refresh pipeline",
-       "bindsTo": null,
-       "columns": [
-        "Completeness",
-        "Timeliness",
-        "Accuracy checks",
-        "Duplicate records",
-        "Missing values",
-        "Schema changes",
-        "Reconciliation status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Source”, “Ticketing Dataset Delayed”, “Affected”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The data refresh pipeline list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the data refresh pipeline untouched.",
-   "emptyFirstRun": "No data refresh pipeline yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the data refresh pipeline are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Pipelines Running",
-    "Successful Refreshes",
-    "Failed Refreshes",
-    "Average Refresh Duration",
-    "Data Latency",
-    "Stale Datasets"
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-067"
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 130. 0 of 7 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P16",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P13"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ANL-068",
-  "name": "Embedded BI, Workspace & Tenant Administration",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.8",
-   "page": 131
-  },
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/embedded-bi-workspace-tenant-administration-anl-068",
-   "component": "apps/venue-management-web/src/routes/analytics/EmbeddedBiWorkspaceTenantAdministration.tsx",
-   "status": "notStarted"
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Configure how BI technology is embedded inside TICVAI and separated across clients/tenants.",
-  "purposeNote": "BI content can be securely embedded and governed across TICVAI tenants and environments.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Navigation",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Theme",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Branding",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Language",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Default Dashboard",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile behavior",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Full-screen mode",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The embedded tenant administration configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the embedded tenant administration untouched.",
-   "emptyFirstRun": "No embedded tenant administration configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-068"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 131. 0 of 0 labels bound to a contract property; 7 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P16",
-   "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P13"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ANL-069",
-  "name": "Analytics Performance, Usage & Cost Monitor",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.9",
-   "page": 132
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/analytics-performance-usage-cost-monitor-anl-069",
-   "component": "apps/venue-management-web/src/routes/analytics/AnalyticsPerformanceUsageCostMonitor.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ANL-061"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ANL-061"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
    "transitions": [
     {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and a per-row directory (§Identify) — counts over a population, then the population",
-  "purpose": "Monitor BI adoption, system performance, capacity consumption and analytical operating costs.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Analytics Users",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Dashboard Views",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Report Runs",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "AI Queries",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Exports",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "API Requests",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Peak Concurrent Users",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Dashboard Load Time",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Query Duration",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Slowest Reports",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Queries",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Dataset Size",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refresh Duration",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Embedded BI Availability",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every analytics performance usage",
-       "columns": [
-        "Most Used Dashboards",
-        "Least Used Dashboards",
-        "Most Used Reports",
-        "Unused Reports",
-        "Most Queried KPIs",
-        "Most Active Users/Roles"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected analytics performance usage",
-       "bindsTo": null,
-       "columns": [
-        "Most Used Dashboards",
-        "Least Used Dashboards",
-        "Most Used Reports",
-        "Unused Reports",
-        "Most Queried KPIs",
-        "Most Active Users/Roles"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Where supported, monitor”, “Tenant Usage”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The analytics performance usage list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the analytics performance usage untouched.",
-   "emptyFirstRun": "No analytics performance usage yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the analytics performance usage are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "entryState": {
-   "preloaded": [
-    "Active Analytics Users",
-    "Dashboard Views",
-    "Report Runs",
-    "AI Queries",
-    "Exports",
-    "API Requests"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-069"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 132. 0 of 6 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P16",
-   "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P13"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ANL-070",
-  "name": "Analytics Governance, Security & Audit Center",
-  "module": "Analytics",
-  "requiresModule": "analytics",
-  "wave": 3,
-  "source": {
-   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
-   "board": "10",
-   "number": "10.10",
-   "page": 133
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/analytics/analytics-governance-security-audit-center-anl-070",
-   "component": "apps/venue-management-web/src/routes/analytics/AnalyticsGovernanceSecurityAuditCenter.tsx",
-   "status": "notStarted"
-  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Monitor; Show) and no metric row",
-  "purpose": "Provide final governance over the entire BI and analytics environment.",
-  "purposeNote": "Critical Data Architecture for the Complete Module Board 10 should make the underlying architecture clear to Soft Labs.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
-   }
-  ],
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1484,29 +1363,19 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every analytics governance security",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
        "columns": [
-        "Dashboard Permissions",
-        "Report Permissions",
-        "Dataset Permissions",
-        "KPI Changes",
-        "Data Exports",
-        "API Access",
-        "AI Access",
-        "Sensitive Data Usage",
-        "Configuration Changes",
-        "Administrative Actions",
-        "AI Queries",
-        "Blocked Queries",
-        "Sensitive-Data Requests",
-        "AI Cost",
-        "Model Errors",
-        "Low-Confidence Answers",
-        "User Feedback"
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
       }
      ]
     },
@@ -1516,92 +1385,189 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected analytics governance security",
-       "bindsTo": null,
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
        "columns": [
-        "Dashboard Permissions",
-        "Report Permissions",
-        "Dataset Permissions",
-        "KPI Changes",
-        "Data Exports",
-        "API Access",
-        "AI Access",
-        "Sensitive Data Usage",
-        "Configuration Changes",
-        "Administrative Actions",
-        "AI Queries",
-        "Blocked Queries",
-        "Sensitive-Data Requests",
-        "AI Cost",
-        "Model Errors",
-        "Low-Confidence Answers",
-        "User Feedback"
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “The desired structure is”, “Unified Data Integration Layer”, “Analytics Data Platform”, “Instead”, “Board 10 Benchmarking”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The analytics governance security list.",
-   "error": "Could not load. Names which read failed and leaves the analytics governance security untouched.",
-   "emptyFirstRun": "No analytics governance security yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the analytics governance security are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Dashboard Permissions",
-    "Report Permissions",
-    "Dataset Permissions",
-    "KPI Changes",
-    "Data Exports",
-    "API Access"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-070"
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 133. 0 of 17 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P16",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "venue-management-web",
-   "operator": "venue",
-   "name": "Venue Analytics — Cross-Domain Reporting",
-   "shortName": "Venue Analytics",
-   "audience": "staff",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P13"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

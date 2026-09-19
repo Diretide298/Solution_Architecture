@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 142
+  x-ticvai-screen-count: 171
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -124,6 +124,7 @@ paths:
         - "P02 GST-034 Lost & Found"
         - "P02 GST-035 Feedback & Ratings"
         - "P02 GST-040 Help & Support"
+        - "P08 BO-938 Employee Requests & Resource Support"
       summary: Report something — lost property, a complaint, a question
       description: '**Lost and found, a complaint and a query are one object.** That is what lets a single
         queue serve all three, and it is why `GST-034` and `GST-040` are the same mechanism at two entry
@@ -301,6 +302,7 @@ paths:
       operationId: mergeGuests
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
+        - "P08 BO-746 Duplicate Review & Merge"
       summary: Two records, one person
       description: 'Board 4G. **Always a person''s decision, never the platform''s** — `matchGuest` proposes
         and this acts.
@@ -435,6 +437,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-066 Privacy & My Data"
+        - "P08 BO-740 Family & Guardians"
       summary: The things a regular should not have to say twice
       description: 'Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states an
         allergy on every visit is a guest the venue is not looking after.
@@ -570,6 +573,8 @@ paths:
   /privacy-incidents:
     post:
       operationId: recordPrivacyIncident
+      x-ticvai-consumed-by:
+        - "P08 BO-752 Privacy & AI Governance"
       summary: Log a personal-data breach and start the clock
       description: 'BL-176. **UAE PDPL gives 72 hours from discovery**, and nothing recorded one.
 
@@ -606,6 +611,11 @@ paths:
   /forms:
     post:
       operationId: createForm
+      x-ticvai-consumed-by:
+        - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-815 Survey Builder"
+        - "P08 BO-817 NPS, CSAT & CES Configuration"
+        - "P08 BO-838 Content, Media & Forms"
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
         is this with a scale, a capture is this at the point of sale.
@@ -689,6 +699,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-067 Refunds & Resale"
+        - "P08 BO-852 Documents, Search & Retention"
       summary: Whether this guest may be issued a ticket that requires a waiver
       description: '2.15.9. **Ticket issuance is conditional on waiver acceptance**, which puts this in
         the purchase path rather than beside it — and means it must answer fast and offline.
@@ -739,6 +750,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-066 Privacy & My Data"
+        - "P08 BO-743 AI Guest Intelligence"
       summary: Store a guest photo, ID or signed document
       description: 'BL-133. **Deliberately not `assets`.** A guest''s passport scan is not a marketing
         asset — it has a different retention clock, a different access rule and a different reason to
@@ -775,6 +787,10 @@ paths:
   /challenges:
     post:
       operationId: createChallenge
+      x-ticvai-consumed-by:
+        - "P08 BO-825 Challenge Builder"
+        - "P08 BO-826 Achievement & Badge Engine"
+        - "P08 BO-829 Family, Team & Event Challenges"
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
         pays for behaviour the venue wants that spend does not produce: a second visit, a quiet Tuesday,
@@ -812,6 +828,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-824 Gamification Command Center"
       summary: Active challenges and how far along I am
       description: '22.6.14 and 22.6.15. **Progress is shown, not just the outcome.** A guest two visits
         from a reward behaves differently from one who does not know how close they are — **which is the
@@ -842,6 +859,7 @@ paths:
     put:
       operationId: setSeoMetadata
       x-ticvai-consumed-by:
+        - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
       summary: Titles, descriptions, canonicals and hreflang
       description: '22.11.1 and 22.11.11. **SEO is not a marketing nicety for a venue selling online**
@@ -877,6 +895,8 @@ paths:
   /seo-redirects:
     post:
       operationId: createUrlRedirect
+      x-ticvai-consumed-by:
+        - "P08 BO-842 SEO Management"
       summary: 301, 302 and custom redirects
       description: '22.11.7. **A redirect chain is the failure mode.** A to B to C loses ranking at every
         hop, so a new redirect whose target is itself a redirect is **collapsed rather than appended.**
@@ -1013,6 +1033,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-830 Referral & Streak Management"
       summary: Issue a referral code
       description: 'BL-034. **The reward fires on the referee''s qualifying act, not on the sign-up**
         — a referral that pays on registration pays for accounts rather than for guests.
@@ -1181,6 +1202,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-223 Journey Simulation, Audit & Publication"
+        - "P08 BO-774 Journey Automation Center"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-783 Journey Analytics & Audit"
       summary: Automated journeys
@@ -1209,6 +1231,9 @@ paths:
       operationId: createJourney
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
+        - "P08 BO-775 Visual Journey Builder"
+        - "P08 BO-777 Decision Logic & Timing"
+        - "P08 BO-779 Lifecycle Journeys"
       summary: Define an automated journey
       description: '22.3.1b. **The visual builder is a frontend over this.** The contract holds the graph;
         the canvas renders it.
@@ -1259,6 +1284,8 @@ paths:
         format: uuid
     post:
       operationId: activateJourney
+      x-ticvai-consumed-by:
+        - "P08 BO-775 Visual Journey Builder"
       summary: Start it, or stop it
       description: '**Guests already in a paused journey stay where they are.** Pausing does not evict
         them, because a half-finished recovery sequence that restarts from the top sends the first message
@@ -1307,6 +1334,8 @@ paths:
         format: uuid
     get:
       operationId: getJourneyPerformance
+      x-ticvai-consumed-by:
+        - "P08 BO-781 Cross-Sell & Service Recovery"
       summary: Entrants, completions, goals reached
       description: '**The goal rate is the number that matters, not the open rate.** An abandoned-cart
         journey with a 60% open rate and a 2% purchase rate is a journey annoying people.
@@ -1332,6 +1361,8 @@ paths:
   /message-triggers:
     get:
       operationId: listMessageTriggers
+      x-ticvai-consumed-by:
+        - "P08 BO-776 Trigger Event Catalog"
       summary: What fires a message, and when
       tags:
       - marketing
@@ -1356,6 +1387,10 @@ paths:
                   $ref: '#/components/schemas/MessageTrigger'
     post:
       operationId: setMessageTrigger
+      x-ticvai-consumed-by:
+        - "P08 BO-776 Trigger Event Catalog"
+        - "P08 BO-789 Transactional Notification Rules"
+        - "P08 BO-816 Survey Triggers & Distribution"
       summary: Fire a message from a platform event
       description: '**`sendTransactionalMessage` sends and nothing fired it.** A booking confirmation,
         a reminder the day before, a thank-you after — all of them needed somebody to call the send.
@@ -1403,6 +1438,8 @@ paths:
         format: uuid
     post:
       operationId: retryMessageDispatch
+      x-ticvai-consumed-by:
+        - "P08 BO-791 Delivery, Retry & Failover"
       summary: Send it again, or by another channel
       description: '**`MessageDispatch` recorded `status`, `failureReason` and `providerReference`, so
         a failed send was known and nothing acted on it.** No retry, no fallback.
@@ -1726,6 +1763,8 @@ paths:
     get:
       operationId: listConversations
       x-ticvai-consumed-by:
+        - "P08 BO-794 Omnichannel Command Center"
+        - "P08 BO-795 Unified Inbox"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -1783,6 +1822,7 @@ paths:
     get:
       operationId: getConversation
       x-ticvai-consumed-by:
+        - "P08 BO-796 Guest Conversation 360"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
       - staff
@@ -1821,6 +1861,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
       - staff
@@ -1892,6 +1933,7 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-015 Assistant"
+        - "P08 BO-799 Agent Workspace"
       x-ticvai-audience:
       - guest
       summary: Pass an assistant conversation to a person
@@ -1972,6 +2014,7 @@ paths:
     post:
       operationId: claimConversation
       x-ticvai-consumed-by:
+        - "P08 BO-795 Unified Inbox"
         - "P12 SUP-004 Conversation Queue"
       x-ticvai-audience:
       - staff
@@ -2260,6 +2303,7 @@ paths:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-831 Progress, Leaderboards & Hub"
       x-ticvai-audience:
       - guest
       summary: A guest's points, tier and what is within reach
@@ -2320,6 +2364,8 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P08 BO-036 Device Registry"
+        - "P08 BO-734 CRM Command Center"
+        - "P08 BO-735 Guest Directory"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -2385,6 +2431,10 @@ paths:
         - "P02 GST-001 Home – Default"
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
+        - "P08 BO-738 Activity Timeline"
+        - "P08 BO-740 Family & Guardians"
+        - "P09 ADM-680 Customer Recommendation Profile"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -2533,6 +2583,7 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-036 Device Registry"
+        - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -2569,6 +2620,7 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P08 BO-748 Consent Capture & Versions"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - guest
@@ -2670,6 +2722,7 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P08 BO-747 Consent Policy Configuration"
       x-ticvai-audience:
       - staff
       - guest
@@ -2696,6 +2749,7 @@ paths:
     put:
       operationId: setConsentPurposes
       x-ticvai-consumed-by:
+        - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       x-ticvai-audience:
       - staff
@@ -3177,6 +3231,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
+        - "P08 BO-734 CRM Command Center"
+        - "P08 BO-754 Audience Intelligence"
+        - "P08 BO-768 Multichannel Composer"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -3208,6 +3265,12 @@ paths:
     post:
       operationId: createSegment
       x-ticvai-consumed-by:
+        - "P08 BO-755 Dynamic Segment Builder"
+        - "P08 BO-757 Behavioral Segmentation"
+        - "P08 BO-758 Membership & Loyalty Segments"
+        - "P08 BO-759 Demographic & Geographic"
+        - "P08 BO-760 Revenue & Engagement Segments"
+        - "P08 BO-762 Predictive Audiences"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -3255,6 +3318,8 @@ paths:
     post:
       operationId: previewSegment
       x-ticvai-consumed-by:
+        - "P08 BO-755 Dynamic Segment Builder"
+        - "P08 BO-762 Predictive Audiences"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -3325,6 +3390,7 @@ paths:
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-764 Campaign Command Center"
+        - "P08 BO-766 Campaign Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3363,6 +3429,7 @@ paths:
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
+        - "P08 BO-767 Audience & Offer Selection"
       x-ticvai-audience:
       - staff
       summary: Create a campaign
@@ -3405,6 +3472,7 @@ paths:
       operationId: getCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-771 Budget, Goals & Forecast"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3428,6 +3496,9 @@ paths:
       operationId: updateCampaign
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-767 Audience & Offer Selection"
+        - "P08 BO-768 Multichannel Composer"
+        - "P08 BO-769 Schedule & Trigger Rules"
       x-ticvai-audience:
       - staff
       summary: Amend, pause or resume a campaign
@@ -3738,6 +3809,8 @@ paths:
       operationId: getCampaignPerformance
       x-ticvai-consumed-by:
         - "P08 BO-005 Queue Monitor"
+        - "P08 BO-772 A/B & AI Optimization"
+        - "P08 BO-773 Attribution & Audit"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -3763,6 +3836,9 @@ paths:
     get:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
+        - "P08 BO-677 Communication Template Library"
+        - "P08 BO-769 Schedule & Trigger Rules"
+        - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
       x-ticvai-audience:
       - staff
@@ -3798,6 +3874,9 @@ paths:
     post:
       operationId: createMessageTemplate
       x-ticvai-consumed-by:
+        - "P08 BO-785 Template Library"
+        - "P08 BO-786 Newsletter Builder"
+        - "P08 BO-787 Content Blocks & Product Feed"
         - "P12 SUP-007 Canned Response Management"
       x-ticvai-audience:
       - staff
@@ -3839,6 +3918,7 @@ paths:
     post:
       operationId: sendTransactionalMessage
       x-ticvai-consumed-by:
+        - "P08 BO-679 Manual & Bulk Communication Center"
         - "P10 PTR-004 Notifications"
       x-ticvai-audience:
       - service
@@ -3936,6 +4016,7 @@ paths:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-804 Case Command Center"
+        - "P08 BO-805 Case Queue & Search"
         - "P08 BO-813 Case Analytics & Audit"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
@@ -4042,6 +4123,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-811 Case Workspace"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -4071,6 +4153,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-811 Case Workspace"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -4134,6 +4217,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-811 Case Workspace"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -4259,6 +4343,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-802 Sentiment, Quality & Escalation"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -4306,6 +4391,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P08 BO-833 Gamification Analytics & Audit"
       x-ticvai-audience:
       - staff
       - guest
@@ -4331,6 +4417,9 @@ paths:
                   $ref: '#/components/schemas/LoyaltyProgramme'
     post:
       operationId: createLoyaltyProgramme
+      x-ticvai-consumed-by:
+        - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -4446,6 +4535,8 @@ paths:
   /reviews:
     get:
       operationId: listReviews
+      x-ticvai-consumed-by:
+        - "P08 BO-819 Review Collection & Rating Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4534,6 +4625,8 @@ paths:
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: respondToReview
+      x-ticvai-consumed-by:
+        - "P08 BO-820 Moderation & Publishing"
       x-ticvai-audience:
       - staff
       summary: Respond to a review
@@ -4574,6 +4667,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P08 BO-788 Subscriptions & Preferences"
       x-ticvai-audience:
       - guest
       summary: What this guest has opted into
@@ -4599,6 +4693,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P08 BO-788 Subscriptions & Preferences"
       x-ticvai-audience:
       - guest
       summary: Subscribe or unsubscribe
@@ -4629,6 +4724,7 @@ paths:
     get:
       operationId: listCommunicationService
       x-ticvai-consumed-by:
+        - "P08 BO-784 Communications Center"
         - "P09 ADM-038 Communication Service Command Center"
       x-ticvai-audience:
         - staff
@@ -4753,6 +4849,7 @@ paths:
     get:
       operationId: listSystemTransactionalTemplate
       x-ticvai-consumed-by:
+        - "P08 BO-789 Transactional Notification Rules"
         - "P09 ADM-041 System Transactional Template Registry"
       x-ticvai-audience:
         - staff
@@ -4831,6 +4928,7 @@ paths:
     get:
       operationId: listRoutingPriorityThrottling
       x-ticvai-consumed-by:
+        - "P08 BO-790 Scheduling, Priority & Approval"
         - "P09 ADM-043 Routing, Priority, Throttling & Fallback Rules"
       x-ticvai-audience:
         - staff
@@ -4907,6 +5005,7 @@ paths:
     get:
       operationId: listDeliveryQueueFailure
       x-ticvai-consumed-by:
+        - "P08 BO-791 Delivery, Retry & Failover"
         - "P09 ADM-045 Delivery Queue, Failure & Retry Management"
       x-ticvai-audience:
         - staff
@@ -4945,6 +5044,7 @@ paths:
     get:
       operationId: listProviderHealthUsage
       x-ticvai-consumed-by:
+        - "P08 BO-792 Deliverability & Analytics"
         - "P09 ADM-046 Provider Health, Usage & Cost Monitoring"
       x-ticvai-audience:
         - staff
@@ -5191,6 +5291,7 @@ paths:
     put:
       operationId: setCommunicationPreferenceMarketing
       x-ticvai-consumed-by:
+        - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-024 Communication Preference & Marketing Permission Configuration"
       x-ticvai-audience:
         - staff
@@ -5480,6 +5581,7 @@ paths:
     get:
       operationId: listPrivacy
       x-ticvai-consumed-by:
+        - "P08 BO-752 Privacy & AI Governance"
         - "P13 CMS-031 Privacy Operations Command Center"
       x-ticvai-audience:
         - staff
@@ -5646,6 +5748,7 @@ paths:
     get:
       operationId: listDataSubjectCustomer
       x-ticvai-consumed-by:
+        - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-034 Data Subject / Customer Privacy Request Management"
       x-ticvai-audience:
         - staff
@@ -5684,6 +5787,7 @@ paths:
     put:
       operationId: setDataDiscoveryAccess
       x-ticvai-consumed-by:
+        - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-035 Data Discovery, Access, Export & Correction Workspace"
       x-ticvai-audience:
         - staff
@@ -5847,6 +5951,7 @@ paths:
     get:
       operationId: listPrivacyEvidenceCompliance
       x-ticvai-consumed-by:
+        - "P08 BO-753 Compliance Audit Dashboard"
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
         - "P13 CMS-040 Privacy Analytics & AI Compliance Intelligence"
       x-ticvai-audience:
@@ -5886,6 +5991,7 @@ paths:
     get:
       operationId: listPrivacyCompliance
       x-ticvai-consumed-by:
+        - "P08 BO-744 Data Governance Center"
         - "P13 CMS-040 Privacy Analytics & AI Compliance Intelligence"
       x-ticvai-audience:
         - staff
@@ -6054,6 +6160,7 @@ paths:
     get:
       operationId: listUnifiedInteractionCommunication
       x-ticvai-consumed-by:
+        - "P08 BO-803 Chat Analytics & Audit"
         - "P12 SUP-011 Unified Interaction & Communication History"
       x-ticvai-audience:
         - staff
@@ -6171,6 +6278,7 @@ paths:
     put:
       operationId: setCaseInvestigationResolution
       x-ticvai-consumed-by:
+        - "P08 BO-807 Classification & Workflow"
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
       x-ticvai-audience:
         - staff
@@ -6213,6 +6321,7 @@ paths:
     put:
       operationId: setOrderBookingTicket
       x-ticvai-consumed-by:
+        - "P08 BO-801 Sales & Service Actions"
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-audience:
         - staff
@@ -6255,6 +6364,8 @@ paths:
     put:
       operationId: setRefundCompensationService
       x-ticvai-consumed-by:
+        - "P08 BO-812 Service Recovery"
+        - "P08 BO-822 Service Recovery Automation"
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
       x-ticvai-audience:
         - staff
@@ -6372,6 +6483,8 @@ paths:
     put:
       operationId: setCustomerServiceCopilot
       x-ticvai-consumed-by:
+        - "P08 BO-797 AI Chatbot Configuration"
+        - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
       x-ticvai-audience:
         - staff
@@ -6453,6 +6566,7 @@ paths:
     put:
       operationId: setIntelligentRoutingSkill
       x-ticvai-consumed-by:
+        - "P08 BO-800 Routing & Queue Management"
         - "P12 SUP-021 Intelligent Routing, Skills & Assignment Engine"
       x-ticvai-audience:
         - staff
@@ -6495,6 +6609,7 @@ paths:
     get:
       operationId: listSlaPolicyService
       x-ticvai-consumed-by:
+        - "P08 BO-809 SLA Policy Configuration"
         - "P12 SUP-022 SLA Policy & Service-Level Management"
       x-ticvai-audience:
         - staff
@@ -6533,6 +6648,8 @@ paths:
     get:
       operationId: listAgentWorkloadAvailability
       x-ticvai-consumed-by:
+        - "P08 BO-800 Routing & Queue Management"
+        - "P08 BO-808 Assignment & Workload"
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-audience:
         - staff
@@ -6571,6 +6688,7 @@ paths:
     get:
       operationId: listEscalationCriticalCase
       x-ticvai-consumed-by:
+        - "P08 BO-810 Escalation Rules"
         - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-audience:
         - staff
@@ -6609,6 +6727,7 @@ paths:
     get:
       operationId: listQualityAgentEvaluation
       x-ticvai-consumed-by:
+        - "P08 BO-802 Sentiment, Quality & Escalation"
         - "P12 SUP-025 Quality Management & Agent Evaluation"
       x-ticvai-audience:
         - staff
@@ -6647,6 +6766,9 @@ paths:
     get:
       operationId: listCustomerSatisfactionFeedback
       x-ticvai-consumed-by:
+        - "P08 BO-814 Voice of Customer Center"
+        - "P08 BO-818 Survey Responses & Insights"
+        - "P08 BO-821 AI Sentiment & Topic Analysis"
         - "P12 SUP-026 Customer Satisfaction, Feedback & Voice of Customer"
       x-ticvai-audience:
         - staff
@@ -6685,6 +6807,7 @@ paths:
     get:
       operationId: listServiceRootCause
       x-ticvai-consumed-by:
+        - "P08 BO-823 VOC Analytics & Audit"
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-audience:
         - staff
@@ -6832,6 +6955,7 @@ paths:
     get:
       operationId: listWaiverTemplateMaster
       x-ticvai-consumed-by:
+        - "P08 BO-846 Assignment Rules"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
       x-ticvai-audience:
         - staff
@@ -6870,6 +6994,7 @@ paths:
     put:
       operationId: setDigitalWaiverForm
       x-ticvai-consumed-by:
+        - "P08 BO-846 Assignment Rules"
         - "P13 CMS-043 Digital Waiver & Form Builder"
       x-ticvai-audience:
         - staff
@@ -6950,6 +7075,7 @@ paths:
     put:
       operationId: setSignatorySignatureGuardian
       x-ticvai-consumed-by:
+        - "P08 BO-849 Guardian & Group Signing"
         - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
       x-ticvai-audience:
         - staff
@@ -7030,6 +7156,7 @@ paths:
     get:
       operationId: listWaiverTriggerEligibility
       x-ticvai-consumed-by:
+        - "P08 BO-847 Version, Expiry & Renewal"
         - "P13 CMS-047 Waiver Trigger, Eligibility & Completion Rules"
       x-ticvai-audience:
         - staff
@@ -7068,6 +7195,9 @@ paths:
     get:
       operationId: listVersioningEffectiveDate
       x-ticvai-consumed-by:
+        - "P08 BO-748 Consent Capture & Versions"
+        - "P08 BO-848 Signature Experience Setup"
+        - "P09 ADM-328 Workflow Versioning & Change History"
         - "P13 CMS-048 Versioning, Effective Dates & Legal Change Control"
       x-ticvai-audience:
         - staff
@@ -7106,6 +7236,9 @@ paths:
     put:
       operationId: setLocalizationBrandingCustomer
       x-ticvai-consumed-by:
+        - "P08 BO-678 Channel, Language & Branding Configuration"
+        - "P08 BO-793 AI Content, Translation & Audit"
+        - "P08 BO-841 Personalization & Localization"
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
       x-ticvai-audience:
         - staff
@@ -7191,6 +7324,7 @@ paths:
       operationId: listWaiver
       x-ticvai-consumed-by:
         - "P08 BO-844 Waiver Command Center"
+        - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-audience:
         - staff
@@ -7267,6 +7401,7 @@ paths:
     get:
       operationId: listParticipantWaiverStatus
       x-ticvai-consumed-by:
+        - "P08 BO-851 Verification & Access Control"
         - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-audience:
         - staff
@@ -7362,6 +7497,7 @@ paths:
     get:
       operationId: listMinorGuardianGroup
       x-ticvai-consumed-by:
+        - "P08 BO-850 Pre-Arrival Completion"
         - "P13 CMS-054 Minor, Guardian & Group Consent Management"
       x-ticvai-audience:
         - staff
@@ -7401,6 +7537,7 @@ paths:
     put:
       operationId: setWaiverVerificationValidation
       x-ticvai-consumed-by:
+        - "P08 BO-852 Documents, Search & Retention"
         - "P13 CMS-055 Waiver Verification & Validation Workspace"
       x-ticvai-audience:
         - staff
@@ -7519,6 +7656,7 @@ paths:
     get:
       operationId: listComplianceEvidenceWaiver
       x-ticvai-consumed-by:
+        - "P08 BO-853 Legal Evidence & Audit"
         - "P13 CMS-058 Compliance Evidence, Audit & Waiver Repository"
       x-ticvai-audience:
         - staff
@@ -7731,6 +7869,8 @@ paths:
   /guest-attribute-model:
     get:
       operationId: getGuestAttributeModel
+      x-ticvai-consumed-by:
+        - "P08 BO-736 Guest Master Configuration"
       summary: The shared guest data model
       description: 'Board 1.3 — *"configure the shared guest data model without software changes."*
 
@@ -7756,6 +7896,8 @@ paths:
                 $ref: '#/components/schemas/GuestAttributeModel'
     put:
       operationId: setGuestAttributeModel
+      x-ticvai-consumed-by:
+        - "P08 BO-736 Guest Master Configuration"
       summary: Change the model, as a version
       description: '**Versioned and audited, because a guest record answers questions years later.** A
         field whose meaning changed in March makes every value before it ambiguous unless the change is
@@ -7794,6 +7936,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestTimeline
+      x-ticvai-consumed-by:
+        - "P08 BO-739 Contact & Preferences"
+        - "P08 BO-743 AI Guest Intelligence"
+        - "P08 BO-796 Guest Conversation 360"
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
         wallet, campaigns, messages, cases, surveys and waivers — **twelve contexts, one chronology.**
@@ -7845,6 +7991,9 @@ paths:
         format: uuid
     get:
       operationId: getGuestRelationships
+      x-ticvai-consumed-by:
+        - "P08 BO-738 Activity Timeline"
+        - "P08 BO-741 Corporate & Groups"
       summary: Household, guardians, corporate and group links
       tags:
       - guests
@@ -7864,6 +8013,9 @@ paths:
                   $ref: '#/components/schemas/GuestRelationship'
     put:
       operationId: setGuestRelationships
+      x-ticvai-consumed-by:
+        - "P08 BO-741 Corporate & Groups"
+        - "P08 BO-742 Commerce & Documents"
       summary: Link people without merging them
       description: 'Boards 1.7 and 1.8 — *"model households, dependants and guardians **while preserving
         each person''s individual identity**."*
@@ -7917,6 +8069,9 @@ paths:
         format: uuid
     get:
       operationId: getGuestIntelligence
+      x-ticvai-consumed-by:
+        - "P08 BO-738 Activity Timeline"
+        - "P08 BO-832 AI Engagement Optimization"
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
 
@@ -7945,6 +8100,8 @@ paths:
   /identity-resolution-rules:
     get:
       operationId: getIdentityResolutionRules
+      x-ticvai-consumed-by:
+        - "P08 BO-745 Identity Resolution Rules"
       summary: How duplicates are detected and a master is chosen
       tags:
       - guests
@@ -7962,6 +8119,8 @@ paths:
                 $ref: '#/components/schemas/IdentityResolutionRules'
     put:
       operationId: setIdentityResolutionRules
+      x-ticvai-consumed-by:
+        - "P08 BO-745 Identity Resolution Rules"
       summary: Matching weights, thresholds and survivorship
       description: 'Board 2.2. **`mergeGuests` existed and nothing said which records were duplicates or
         which value survives.**
@@ -7999,6 +8158,9 @@ paths:
   /duplicate-candidates:
     get:
       operationId: listDuplicateCandidates
+      x-ticvai-consumed-by:
+        - "P08 BO-744 Data Governance Center"
+        - "P08 BO-746 Duplicate Review & Merge"
       summary: Suspected duplicates awaiting a decision
       description: 'Board 2.3. **Side by side, with conflicts highlighted and the recommended master
         value shown with its confidence and provenance** — and the linked tickets, bookings,
@@ -8042,6 +8204,8 @@ paths:
         format: uuid
     post:
       operationId: decideDuplicateCandidate
+      x-ticvai-consumed-by:
+        - "P08 BO-746 Duplicate Review & Merge"
       summary: Merge, reject or split
       description: 'Board 2.3. **Rejection is as valuable as merging.** Two guests who genuinely share a
         name and a postcode will be proposed again every week unless the rejection is remembered, and an
@@ -8091,6 +8255,8 @@ paths:
   /retention-policies:
     put:
       operationId: setDataRetentionPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-751 Retention & Anonymization"
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
 
@@ -8126,6 +8292,8 @@ paths:
   /retention-runs:
     post:
       operationId: runDataRetention
+      x-ticvai-consumed-by:
+        - "P08 BO-751 Retention & Anonymization"
       summary: Preview or execute a retention pass
       description: 'Board 2.8. **Produces completion evidence**, because demonstrating that data *was*
         deleted is the half of compliance that gets forgotten until an audit asks.
@@ -8169,6 +8337,8 @@ paths:
   /audience-lists:
     get:
       operationId: listAudienceLists
+      x-ticvai-consumed-by:
+        - "P08 BO-756 Static Lists & Imports"
       summary: Static and imported audiences
       tags:
       - guests
@@ -8188,6 +8358,8 @@ paths:
                   $ref: '#/components/schemas/AudienceList'
     post:
       operationId: importAudienceList
+      x-ticvai-consumed-by:
+        - "P08 BO-756 Static Lists & Imports"
       summary: Load a supplied list, matched against the guest master
       description: 'Board 3.3. **The question an imported list forces is what to do with the rows that
         do not match**, and there are only two honest answers: create a lead, or quarantine it. A system
@@ -8222,6 +8394,8 @@ paths:
   /audience-activations:
     get:
       operationId: listAudienceActivations
+      x-ticvai-consumed-by:
+        - "P08 BO-763 Activation & Governance"
       summary: Where audiences are being used, and whether they are still in sync
       tags:
       - guests
@@ -8241,6 +8415,8 @@ paths:
                   $ref: '#/components/schemas/AudienceActivation'
     post:
       operationId: activateAudience
+      x-ticvai-consumed-by:
+        - "P08 BO-763 Activation & Governance"
       summary: Push an audience to a campaign, journey or external platform
       description: 'Board 3.10. **Sending an audience to an external advertising platform is a data
         export**, and it is the one marketers make most casually. So it carries suppression, consent
@@ -8282,6 +8458,8 @@ paths:
   /audience-overlap:
     get:
       operationId: getAudienceOverlap
+      x-ticvai-consumed-by:
+        - "P08 BO-754 Audience Intelligence"
       summary: How much audiences overlap, and how many are reachable
       description: 'Board 3.1. **Reachable is the number that matters and it is always smaller.** A
         segment of eighty thousand with consent, a valid address and no suppression may reach nine

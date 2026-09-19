@@ -2741,8 +2741,8 @@
   {
    "file": "APP ticvai-control.dc.html",
    "provenance": "clientPack",
-   "bytes": 2146287,
-   "sha256": "f18bd94469104546",
+   "bytes": 2143491,
+   "sha256": "b633871aa6c9db69",
    "frames": 767,
    "screensFramed": 767,
    "screens": [
@@ -4297,8 +4297,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 3917676,
-   "sha256": "bcc30d8e6cb61a0d",
+   "bytes": 3907733,
+   "sha256": "d35d2bc207b57ada",
    "frames": 1379,
    "screensFramed": 1379,
    "screens": [
@@ -8058,8 +8058,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 3367115,
-   "sha256": "02c9eaeb18523b67",
+   "bytes": 3352490,
+   "sha256": "3e5d086af3a74727",
    "frames": 1182,
    "screensFramed": 1182,
    "screens": [
@@ -10441,8 +10441,8 @@
   {
    "file": "P09 TICVAI Web.dc.html",
    "provenance": "generated",
-   "bytes": 1899423,
-   "sha256": "01470945fb8f5a54",
+   "bytes": 1896627,
+   "sha256": "498883d6d8700a80",
    "frames": 676,
    "screensFramed": 676,
    "screens": [
@@ -12042,8 +12042,8 @@
   {
    "file": "P13 Venue CMS.dc.html",
    "provenance": "generated",
-   "bytes": 291695,
-   "sha256": "14b5ea44a8fa5c03",
+   "bytes": 294643,
+   "sha256": "fa7892f534170d82",
    "frames": 100,
    "screensFramed": 100,
    "screens": [
@@ -12333,8 +12333,8 @@
   {
    "file": "P16 Venue Analytics.dc.html",
    "provenance": "generated",
-   "bytes": 211198,
-   "sha256": "54aee99d9feebf77",
+   "bytes": 212932,
+   "sha256": "9e1ed92f2fb01c77",
    "frames": 69,
    "screensFramed": 69,
    "screens": [

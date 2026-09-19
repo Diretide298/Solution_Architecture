@@ -1,14 +1,14 @@
-# WS47 — Promotions   Bundles Management board 3
+# P01-account-self-service-01 — P01 · Account & Self-Service
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**5 screens · 46 operations · 37 schemas · 5 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P01 Guest Web · ships as **guest** ·
+guest audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**guest on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +61,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-158` | Coupon & Promo Code Command Center | commandCentre | 1 | 0 | — |
-| `ADM-159` | Coupon & Promo Code Builder | configEditor | 1 | 0 | — |
-| `ADM-160` | Unique Code Generation & Batch Manager | configEditor | 1 | 0 | — |
-| `ADM-161` | Code Eligibility & Restriction Manager | listDetail | 1 | 0 | — |
-| `ADM-162` | Usage, Capacity & Frequency Control | listDetail | 1 | 0 | — |
-| `ADM-163` | Validity, Date & Time Control | listDetail | 1 | 0 | — |
-| `ADM-164` | Code Distribution & Assignment Manager | listDetail | 1 | 0 | — |
-| `ADM-165` | Redemption Monitor & Code Lookup | listDetail | 1 | 0 | — |
-| `ADM-166` | Code Security, Fraud & Exception Center | listDetail | 1 | 0 | — |
-| `ADM-167` | Redemption Analytics, Audit & AI Optimization | commandCentre | 1 | 0 | — |
+| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
+| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
+| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
+| `WEB-019` | Order History | listDetail | 5 | 0 | — |
+| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-161, ADM-162, ADM-163, ADM-164, ADM-165, ADM-166 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -85,211 +80,101 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "ADM-158",
-  "name": "Coupon & Promo Code Command Center",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "1",
-   "page": 36
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/coupon-promo-code-command-center-adm-158",
-   "component": "apps/ticvai-web/src/routes/commercial/CouponPromoCodeCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-002",
-    "ADM-159",
-    "ADM-160",
-    "ADM-161",
-    "ADM-162",
-    "ADM-163",
-    "ADM-164",
-    "ADM-165",
-    "ADM-166",
-    "ADM-167"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "tenantId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-159",
-     "trigger": "Works in Coupon & Promo Code Builder",
-     "provenance": "flow F156 step 1→2",
-     "operation": "listCouponCodes"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-160",
-     "trigger": "Works in Unique Code Generation & Batch Manager",
-     "provenance": "flow F156 step 3→4",
-     "operation": "listCouponCodes"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-161",
-     "trigger": "Works in Code Eligibility & Restriction Manager",
-     "provenance": "flow F156 step 5→6",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-162",
-     "trigger": "Works in Usage, Capacity & Frequency Control",
-     "provenance": "flow F156 step 7→8",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-163",
-     "trigger": "Works in Validity, Date & Time Control",
-     "provenance": "flow F156 step 9→10",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-164",
-     "trigger": "Works in Code Distribution & Assignment Manager",
-     "provenance": "flow F156 step 11→12",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-165",
-     "trigger": "Works in Redemption Monitor & Code Lookup",
-     "provenance": "flow F156 step 13→14",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-166",
-     "trigger": "Works in Code Security, Fraud & Exception Center",
-     "provenance": "flow F156 step 15→16",
-     "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-167",
-     "trigger": "Works in Redemption Analytics, Audit & AI Optimization",
-     "provenance": "flow F156 step 17→18",
-     "operation": "listCouponCodes"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population",
-  "purpose": "Provide the central operational dashboard for all coupon, promo-code, and promotional voucher activities.",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Draft, Pending Approval, Capacity Reached. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Code Campaigns",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Coupons",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unique Codes Issued",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Codes Redeemed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Redemption Rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unused Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expired Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Suspended Codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Remaining Redemption Capacity",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Discount Granted",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue Generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Order Value",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fraud/Suspicious Usage Alerts",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §KPI Cards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
+     "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every coupon promo code",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "Top-performing codes",
-        "Redemption trend",
-        "Redemption by channel",
-        "Redemption by venue",
-        "Redemption by partner",
-        "Redemption by customer segment",
-        "Discount exposure",
-        "Campaign budget consumption"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "CouponCode",
-       "operation": "listCouponCodes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Show"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -299,20 +184,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected coupon promo code",
-       "bindsTo": "CouponCode",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "Top-performing codes",
-        "Redemption trend",
-        "Redemption by channel",
-        "Redemption by venue",
-        "Redemption by partner",
-        "Redemption by customer segment",
-        "Discount exposure",
-        "Campaign budget consumption"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Show"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -322,566 +208,413 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Draft",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Pending Approval",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Capacity Reached",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 36 §Support"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The coupon promo code list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the coupon promo code untouched.",
-   "emptyFirstRun": "No coupon promo code yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the coupon promo code are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listCouponCodes",
-    "contract": "promotions",
-    "purpose": "List generated codes",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "campaignId",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable.",
-   "preloaded": [
-    "Active Code Campaigns",
-    "Active Coupons",
-    "Unique Codes Issued",
-    "Codes Redeemed",
-    "Redemption Rate",
-    "Unused Codes"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-158"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 36. 0 of 8 labels bound to a contract property; 24 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-159",
-  "name": "Coupon & Promo Code Builder",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "2",
-   "page": 37
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/coupon-promo-code-builder-adm-159",
-   "component": "apps/ticvai-web/src/routes/commercial/CouponPromoCodeBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Create the commercial definition of a coupon or promo-code campaign.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Percentage discount",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed-value discount",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed promotional price",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free product",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free ticket",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Free add-on",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Upgrade",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Bundle benefit",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Added value",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 37 §Configure"
-      }
-     ]
+     "name": "cartId",
+     "from": "session"
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCouponPromoCode"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The coupon promo code configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the coupon promo code untouched.",
-   "emptyFirstRun": "No coupon promo code configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setCouponPromoCode",
-    "contract": "promotions",
-    "purpose": "Coupon & Promo Code Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCouponPromoCode"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-159"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-160",
-  "name": "Unique Code Generation & Batch Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "3",
-   "page": 38
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/unique-code-generation-batch-manager-adm-160",
-   "component": "apps/ticvai-web/src/routes/commercial/UniqueCodeGenerationBatchManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
+     "name": "challengeId",
+     "from": "deepLink"
+    },
     {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Users define) and no display directory — it is settings, not a population",
-  "purpose": "Generate and manage large quantities of secure unique promotional codes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Unique Code Generation & Batch Manager declares no operation that writes anything** — its only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
+     "name": "methodId",
+     "from": "deepLink"
+    },
     {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Campaign",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Number of codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Code length",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Prefix",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Suffix",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Character type",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Case sensitivity",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Expiration",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Number of uses",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Distribution owner",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 38 §Users define"
-      }
-     ]
+     "name": "providerId",
+     "from": "deepLink"
     }
-   ]
-  },
-  "states": {
-   "loading": "The unique code generation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the unique code generation untouched.",
-   "emptyFirstRun": "No unique code generation configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listUniqueCodeGeneration",
-    "contract": "promotions",
-    "purpose": "Unique Code Generation & Batch Manager",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-160"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-161",
-  "name": "Code Eligibility & Restriction Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "4",
-   "page": 39
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-eligibility-restriction-manager-adm-161",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeEligibilityRestrictionManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
    ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Determine where, when, by whom, and against what a code can be redeemed. The matrix explicitly requires promo codes to support restrictions for usage, dates, duration, capacity, frequency, location, group, partner, operating area, and sales channel.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Code Eligibility & Restriction Manager declares no operation that writes anything** — its only declared call is `listCodeEligibilityRestriction`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 39"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 39"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCodeEligibilityRestriction",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The code eligibility restriction list.",
-   "error": "Could not load. Names which read failed and leaves the code eligibility restriction untouched.",
-   "emptyFirstRun": "No code eligibility restriction yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code eligibility restriction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCodeEligibilityRestriction",
-    "contract": "promotions",
-    "purpose": "Code Eligibility & Restriction Manager",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "CodeEligibilityRestrictionManagerView.ticket",
-    "CodeEligibilityRestrictionManagerView.ticketType",
-    "CodeEligibilityRestrictionManagerView.product",
-    "CodeEligibilityRestrictionManagerView.productCategory",
-    "CodeEligibilityRestrictionManagerView.attraction"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-161"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-162",
-  "name": "Usage, Capacity & Frequency Control",
-  "module": "Commercial",
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
   "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "5",
-   "page": 41
-  },
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/usage-capacity-frequency-control-adm-162",
-   "component": "apps/ticvai-web/src/routes/commercial/UsageCapacityFrequencyControl.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-158"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-158"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "campaignId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Control exactly how frequently and how many times promotional codes may be redeemed.",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -891,16 +624,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every usage capacity frequency",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "UsageCapacityFrequencyControlView.issued50000",
-        "UsageCapacityFrequencyControlView.redeemed31450",
-        "UsageCapacityFrequencyControlView.reservedPending420",
-        "UsageCapacityFrequencyControlView.remaining18130"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "UsageCapacityFrequencyControlView",
-       "operation": "listUsageCapacityFrequency",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 41 §Show"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -910,286 +651,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected usage capacity frequency",
-       "bindsTo": "UsageCapacityFrequencyControlView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "UsageCapacityFrequencyControlView.issued50000",
-        "UsageCapacityFrequencyControlView.redeemed31450",
-        "UsageCapacityFrequencyControlView.reservedPending420",
-        "UsageCapacityFrequencyControlView.remaining18130"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 41 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The usage capacity frequency list.",
-   "error": "Could not load. Names which read failed and leaves the usage capacity frequency untouched.",
-   "emptyFirstRun": "No usage capacity frequency yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the usage capacity frequency are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listUsageCapacityFrequency",
-    "contract": "promotions",
-    "purpose": "Usage, Capacity & Frequency Control",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "UsageCapacityFrequencyControlView.issued50000",
-    "UsageCapacityFrequencyControlView.redeemed31450",
-    "UsageCapacityFrequencyControlView.reservedPending420",
-    "UsageCapacityFrequencyControlView.remaining18130"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-162"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 4 of 4 labels bound to a contract property; 4 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-163",
-  "name": "Validity, Date & Time Control",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "6",
-   "page": 41
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/validity-date-time-control-adm-163",
-   "component": "apps/ticvai-web/src/routes/commercial/ValidityDateTimeControl.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Control the temporal validity of coupons and codes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 41"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 41"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listValidityDateTime",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The validity date time list.",
-   "error": "Could not load. Names which read failed and leaves the validity date time untouched.",
-   "emptyFirstRun": "No validity date time yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the validity date time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listValidityDateTime",
-    "contract": "promotions",
-    "purpose": "Validity, Date & Time Control",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ValidityDateTimeControlView.valid18002200",
-    "ValidityDateTimeControlView.mondayThursdayOnly",
-    "ValidityDateTimeControlView.blackoutDates",
-    "ValidityDateTimeControlView.holidays",
-    "ValidityDateTimeControlView.selectedTimeslots"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-163"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-164",
-  "name": "Code Distribution & Assignment Manager",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "7",
-   "page": 42
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-distribution-assignment-manager-adm-164",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeDistributionAssignmentManager.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-158"
-   ],
-   "exitTo": [
-    "ADM-158"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Manage how promotional codes are allocated and distributed.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every code distribution",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "operation": "setCodeDistributionManager",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected code distribution",
-       "bindsTo": "CodeDistributionAssignmentManagerView",
-       "columns": [
-        "CodeDistributionAssignmentManagerView.generated",
-        "CodeDistributionAssignmentManagerView.assigned",
-        "CodeDistributionAssignmentManagerView.sent",
-        "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
-        "CodeDistributionAssignmentManagerView.redeemed",
-        "CodeDistributionAssignmentManagerView.expired",
-        "CodeDistributionAssignmentManagerView.cancelled"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Distribution Channels”, “Codes may be assigned to”, “External Partner Example”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 42 §Show"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
@@ -1199,113 +668,264 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCodeDistributionManager"
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "The code distribution list.",
-   "error": "Could not load. Names which read failed and leaves the code distribution untouched.",
-   "emptyFirstRun": "No code distribution yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "setCodeDistributionManager",
-    "contract": "promotions",
-    "purpose": "Code Distribution & Assignment Manager",
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
     "trigger": "onAction",
     "invalidates": [
-     "setCodeDistributionManager"
+     "listGuestDevices"
     ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "CodeDistributionAssignmentManagerView.generated",
-    "CodeDistributionAssignmentManagerView.assigned",
-    "CodeDistributionAssignmentManagerView.sent",
-    "CodeDistributionAssignmentManagerView.delivered",
-    "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
-    "CodeDistributionAssignmentManagerView.redeemed"
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-164"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 42. 8 of 8 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-165",
-  "name": "Redemption Monitor & Code Lookup",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "8",
-   "page": 43
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/redemption-monitor-code-lookup-adm-165",
-   "component": "apps/ticvai-web/src/routes/commercial/RedemptionMonitorCodeLookup.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-158"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-158"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "campaignId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Provide real-time operational visibility into coupon and promo-code redemption.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1315,27 +935,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every redemption code lookup",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "RedemptionMonitorCodeLookupView.code",
-        "RedemptionMonitorCodeLookupView.campaign",
-        "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.transaction",
-        "RedemptionMonitorCodeLookupView.booking",
-        "RedemptionMonitorCodeLookupView.customerAccountReference",
-        "RedemptionMonitorCodeLookupView.product",
-        "RedemptionMonitorCodeLookupView.originalValue",
-        "RedemptionMonitorCodeLookupView.discount",
-        "RedemptionMonitorCodeLookupView.finalValue",
-        "RedemptionMonitorCodeLookupView.channel",
-        "RedemptionMonitorCodeLookupView.venue",
-        "RedemptionMonitorCodeLookupView.devicePos",
-        "RedemptionMonitorCodeLookupView.operator",
-        "RedemptionMonitorCodeLookupView.validationResult"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
        ],
-       "bindsTo": "RedemptionMonitorCodeLookupView",
-       "operation": "listRedemptionCodeLookup",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Show"
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
       }
      ]
     },
@@ -1345,27 +962,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected redemption code lookup",
-       "bindsTo": "RedemptionMonitorCodeLookupView",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "RedemptionMonitorCodeLookupView.code",
-        "RedemptionMonitorCodeLookupView.campaign",
-        "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.transaction",
-        "RedemptionMonitorCodeLookupView.booking",
-        "RedemptionMonitorCodeLookupView.customerAccountReference",
-        "RedemptionMonitorCodeLookupView.product",
-        "RedemptionMonitorCodeLookupView.originalValue",
-        "RedemptionMonitorCodeLookupView.discount",
-        "RedemptionMonitorCodeLookupView.finalValue",
-        "RedemptionMonitorCodeLookupView.channel",
-        "RedemptionMonitorCodeLookupView.venue",
-        "RedemptionMonitorCodeLookupView.devicePos",
-        "RedemptionMonitorCodeLookupView.operator",
-        "RedemptionMonitorCodeLookupView.validationResult"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
        ],
-       "notes": null,
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Show"
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
       }
      ]
     },
@@ -1374,112 +992,215 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "rowActions",
      "components": [
       {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Promo code, Coupon ID, Batch ID, Transaction, Booking, Customer, Partner, Campaign. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 43 §Authorized users can search by"
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The redemption code lookup list.",
-   "error": "Could not load. Names which read failed and leaves the redemption code lookup untouched.",
-   "emptyFirstRun": "No redemption code lookup yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the redemption code lookup are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
-    "operationId": "listRedemptionCodeLookup",
-    "contract": "promotions",
-    "purpose": "Redemption Monitor & Code Lookup",
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "RedemptionMonitorCodeLookupView.code",
-    "RedemptionMonitorCodeLookupView.campaign",
-    "Redemption date/time",
-    "RedemptionMonitorCodeLookupView.transaction",
-    "RedemptionMonitorCodeLookupView.booking",
-    "RedemptionMonitorCodeLookupView.customerAccountReference"
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-165"
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 43. 14 of 15 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-166",
-  "name": "Code Security, Fraud & Exception Center",
-  "module": "Commercial",
-  "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "9",
-   "page": 44
-  },
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/code-security-fraud-exception-center-adm-166",
-   "component": "apps/ticvai-web/src/routes/commercial/CodeSecurityFraudExceptionCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-158"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-158"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "campaignId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
-  "purpose": "Detect promo-code abuse, leakage, abnormal redemption, and suspicious campaign behavior.",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1489,21 +1210,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every code security fraud",
+       "label": "Every order history",
+       "bindsTo": "Order",
        "columns": [
-        "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-        "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-        "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-        "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-        "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-        "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity",
-        "CodeSecurityFraudExceptionCenterView.codeEnumerationAttempts",
-        "CodeSecurityFraudExceptionCenterView.partnerCodeLeakage",
-        "CodeSecurityFraudExceptionCenterView.redemptionAboveExpectedCampaignPattern"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
        ],
-       "bindsTo": "CodeSecurityFraudExceptionCenterView",
-       "operation": "listCodeSecurityFraud",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Monitor"
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
       }
      ]
     },
@@ -1513,21 +1237,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected code security fraud",
-       "bindsTo": "CodeSecurityFraudExceptionCenterView",
+       "label": "The selected order history",
+       "bindsTo": "Order",
        "columns": [
-        "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-        "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-        "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-        "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-        "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-        "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity",
-        "CodeSecurityFraudExceptionCenterView.codeEnumerationAttempts",
-        "CodeSecurityFraudExceptionCenterView.partnerCodeLeakage",
-        "CodeSecurityFraudExceptionCenterView.redemptionAboveExpectedCampaignPattern"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Risk Levels”.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Monitor"
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
       }
      ]
     },
@@ -1536,276 +1267,387 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "rowActions",
      "components": [
       {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Suspend individual code, Suspend batch, Suspend campaign, Block redemption, Reinstate code, Assign investigation, Add case note. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Authorized users can"
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The code security fraud list.",
-   "error": "Could not load. Names which read failed and leaves the code security fraud untouched.",
-   "emptyFirstRun": "No code security fraud yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the code security fraud are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listCodeSecurityFraud",
-    "contract": "promotions",
-    "purpose": "Code Security, Fraud & Exception Center",
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-    "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-    "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-    "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-    "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-    "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity"
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-166"
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 44. 9 of 9 labels bound to a contract property; 16 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-167",
-  "name": "Redemption Analytics, Audit & AI Optimization",
-  "module": "Commercial",
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
   "requiresModule": "marketing",
-  "wave": 3,
-  "source": {
-   "pack": "Promotions___Bundles_Management_Reference.pdf",
-   "board": "3",
-   "number": "10",
-   "page": 45
-  },
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/redemption-analytics-audit-ai-optimization-adm-167",
-   "component": "apps/ticvai-web/src/routes/commercial/RedemptionAnalyticsAuditAiOptimization.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-158"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-158"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-158, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-158",
-     "trigger": "Coupon & Promo Code Command Center",
+     "to": "WEB-016",
+     "trigger": "Login / Register",
      "carries": [
-      "campaignId"
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
      ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
-  "purposeNote": "Board 3 shall be considered complete when: 1. Users can create common and unique promotional codes. 2. Coupons and promotional vouchers can be configured. 3. Large unique-code batches can be generated. 4. Codes can support single, multiple, capped, or unlimited redemption. Pag e 48 | 158TICVAI • 48 5. Usage can be limited per booking, customer, account, channel, venue, or campaign. 6. Date/time/relative validity rules are supported. 7. Product and ticket eligibility can be configured. 8. Customer and segment eligibility can be configured. 9. Channel, partner, and location restrictions can be c",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Performance KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide complete performance analytics and governance for coupon and promo-code campaigns. Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions involving relationships between products, quantities, basket composition, rewards, and qualifying purchases. While Board 2 defines standard discounts and thresholds and Board 3 manages promo codes/coupons, Board 4 answers: “When the customer buys X, what exactly should TICVAI give them, discount, replace, upgrade, or add to the transaction?” The matrix requires mechanics such as Buy X Get X, Buy X Get Y, Buy N Get X, percentage/amount discounts on another product, cheapest-item-free, fixed-price combinations, cross-category F&B/Retail rewards, added-value gifts, and automatic cart-level promotion application. Board 4 shall contain 10 backend screens.",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "filters",
+     "slot": "collection",
      "components": [
       {
-       "kind": "searchField",
-       "label": "Search redemption analytics audit",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Analyze by"
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Campaign",
-        "Code",
-        "Batch",
-        "Product",
-        "Venue",
-        "Channel",
-        "Customer segment",
-        "Partner",
-        "Date/time",
-        "Promotion type"
-       ],
-       "notes": "The pack filters this screen by campaign, code, batch, product, venue, channel and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Analyze by"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
     {
      "name": "contentBody",
-     "slot": "headline",
+     "slot": "carried",
      "components": [
       {
-       "kind": "metricTile",
-       "label": "Codes generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesGenerated"
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "metricTile",
-       "label": "Codes distributed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesDistributed"
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "metricTile",
-       "label": "Codes redeemed",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.codesRedeemed"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Redemption rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.redemptionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Conversion rate",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.conversionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue generated",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.revenueGenerated"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Discount granted",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.discountGranted"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Incremental revenue",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.incrementalRevenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "AOV uplift",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.aovUplift"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Cost per redemption",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.costPerRedemption"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Margin impact",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.marginImpact"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expired unused codes",
-       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 45 §Performance KPIs",
-       "bindsTo": "RedemptionAnalyticsAuditAiOptimizationView.expiredUnusedCodes"
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The redemption analytics audit list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the redemption analytics audit untouched.",
-   "emptyFirstRun": "No redemption analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the redemption analytics audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listRedemption",
-    "contract": "promotions",
-    "purpose": "Redemption Analytics, Audit & AI Optimization",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "RedemptionAnalyticsAuditAiOptimizationView.codesGenerated",
-    "RedemptionAnalyticsAuditAiOptimizationView.codesDistributed",
-    "RedemptionAnalyticsAuditAiOptimizationView.codesRedeemed",
-    "RedemptionAnalyticsAuditAiOptimizationView.redemptionRate",
-    "RedemptionAnalyticsAuditAiOptimizationView.conversionRate",
-    "RedemptionAnalyticsAuditAiOptimizationView.revenueGenerated"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-167"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 45. 12 of 22 labels bound to a contract property; 22 of 144 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
@@ -1819,44 +1661,515 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "listCodeEligibilityRestriction": {
-  "method": "GET",
-  "path": "/code-eligibility-restriction",
-  "contract": "promotions",
-  "summary": "Code Eligibility & Restriction Manager",
-  "permission": "PRICE_VIEW",
+ "addToWishlist": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CodeEligibilityRestrictionManagerView"
+  "responds": "Wishlist"
  },
- "listCodeSecurityFraud": {
-  "method": "GET",
-  "path": "/code-security-fraud",
-  "contract": "promotions",
-  "summary": "Code Security, Fraud & Exception Center",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CodeSecurityFraudExceptionCenterView"
- },
- "listCouponCodes": {
-  "method": "GET",
-  "path": "/coupon-campaigns/{campaignId}/codes",
-  "contract": "promotions",
-  "summary": "List generated codes",
-  "permission": "PRICE_VIEW",
+ "claimCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/claim",
+  "contract": "orders",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CartMergeResult"
+ },
+ "completeSsoAuthorization": {
+  "method": "POST",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
+ "getEntitlement": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "getEntitlementCredential": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "rotate",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getEntitlementHistory": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChallengeProgress"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "allDevices",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "guestSocialLogin": {
+  "method": "POST",
+  "path": "/auth/guest/social",
+  "contract": "identity",
+  "summary": "Sign in with Apple or Google",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "guestUaePassLogin": {
+  "method": "POST",
+  "path": "/auth/guest/uae-pass",
+  "contract": "identity",
+  "summary": "Sign in with a national identity provider",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "issueWalletPass": {
+  "method": "POST",
+  "path": "/wallet-passes",
+  "contract": "orders",
+  "summary": "Generate an Apple or Google wallet pass",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletPass"
+ },
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "listEntitlements": {
+  "method": "GET",
+  "path": "/my/entitlements/all",
+  "contract": "access",
+  "summary": "Every entitlement this guest holds, including expired",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeExpired",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
     "in": "query",
     "required": null
    },
@@ -1874,137 +2187,379 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listRedemption": {
+ "listSsoProviders": {
   "method": "GET",
-  "path": "/redemption",
-  "contract": "promotions",
-  "summary": "Redemption Analytics, Audit & AI Optimization",
-  "permission": "PRICE_VIEW",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "refreshToken": {
+  "method": "POST",
+  "path": "/auth/refresh",
+  "contract": "identity",
+  "summary": "Rotate the access token",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TokenPair"
+ },
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp",
+  "contract": "identity",
+  "summary": "Request a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "campaign",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "code",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "batch",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerSegment",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "partner",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "RedemptionAnalyticsAuditAiOptimizationView"
+  "responds": "Invitation"
  },
- "listRedemptionCodeLookup": {
-  "method": "GET",
-  "path": "/redemption-code-lookup",
-  "contract": "promotions",
-  "summary": "Redemption Monitor & Code Lookup",
-  "permission": "PRICE_VIEW",
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "shareEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/share",
+  "contract": "orders",
+  "summary": "Let somebody else use this, without giving it away",
+  "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RedemptionMonitorCodeLookupView"
+  "responds": "Problem"
  },
- "listUniqueCodeGeneration": {
+ "startSsoAuthorization": {
   "method": "GET",
-  "path": "/unique-code-generation",
-  "contract": "promotions",
-  "summary": "Unique Code Generation & Batch Manager",
-  "permission": "PRICE_VIEW",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "UniqueCodeGenerationBatchManagerView"
+  "responds": null
  },
- "listUsageCapacityFrequency": {
-  "method": "GET",
-  "path": "/usage-capacity-frequency",
-  "contract": "promotions",
-  "summary": "Usage, Capacity & Frequency Control",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "UsageCapacityFrequencyControlView"
- },
- "listValidityDateTime": {
-  "method": "GET",
-  "path": "/validity-date-time",
-  "contract": "promotions",
-  "summary": "Validity, Date & Time Control",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ValidityDateTimeControlView"
- },
- "setCodeDistributionManager": {
+ "updateGuestPreferences": {
   "method": "PUT",
-  "path": "/code-distribution-manager",
-  "contract": "promotions",
-  "summary": "Code Distribution & Assignment Manager",
-  "permission": "PRICE_CONFIGURE",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "CodeDistributionAssignmentManagerInput",
-  "responds": "CodeDistributionAssignmentManagerView"
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
- "setCouponPromoCode": {
-  "method": "PUT",
-  "path": "/coupon-promo-code",
-  "contract": "promotions",
-  "summary": "Coupon & Promo Code Builder",
-  "permission": "PRICE_CONFIGURE",
+ "updateMyProfile": {
+  "method": "PATCH",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "CouponPromoCodeBuilderInput",
-  "responds": "CouponPromoCodeBuilderView"
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp/verify",
+  "contract": "identity",
+  "summary": "Verify a one-time code and issue a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }
 ```
@@ -2015,591 +2570,1202 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "CodeDistributionAssignmentManagerInput": {
+ "Cart": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "orders.cart",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
   "properties": {
-   "channelsType": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
+   },
+   "status": {
+    "$ref": "#/components/schemas/CartStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+   },
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CartMergeResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "required": [
+   "cart"
+  ],
+  "properties": {
+   "cart": {
+    "$ref": "#/components/schemas/Cart"
+   },
+   "mergedLineCount": {
+    "type": "integer"
+   },
+   "droppedLines": {
+    "type": "array",
+    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "noCapacity",
+        "expired",
+        "notSellableOnChannel",
+        "duplicate"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "ChallengeProgress": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.challenge_progress",
+  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
+  "required": [
+   "id",
+   "challengeId",
+   "subjectId",
+   "current",
+   "target"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "portfolioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a family or group challenge — where the shared progress accrues."
+   },
+   "current": {
+    "type": "number"
+   },
+   "target": {
+    "type": "number"
+   },
+   "streakCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rewardIssuedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+   },
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   },
+   "expiresAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Entitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "access.entitlement",
+  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
+  "required": [
+   "id",
+   "templateId",
+   "productId",
+   "orderId",
+   "subjectId",
+   "status",
+   "validFrom",
+   "validTo"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "mediaCode": {
+    "type": "string",
+    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "status": {
+    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
+   },
+   "statusNote": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+   },
+   "entriesUsed": {
+    "type": "integer",
+    "default": 0,
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true
+   },
+   "lastEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "frozenDays": {
+    "type": "integer",
+    "default": 0,
+    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+   },
+   "suspendedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "isNameBound": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "sharedWithSubjectIds": {
+    "type": "array",
+    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "issuedVia": {
     "type": "string",
     "enum": [
-     "email",
-     "sms",
-     "whatsapp",
-     "mobileApp",
-     "crmJourney",
-     "guestPortal",
-     "b2bPortal",
-     "partnerPortal",
-     "pos",
-     "callCenter",
-     "api",
-     "exportedBatch"
+     "sale",
+     "invitation",
+     "reissue",
+     "transfer",
+     "resale",
+     "membership",
+     "groupBooking"
     ],
-    "description": "Vocabulary listed under Distribution Channels."
+    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
    },
-   "individualCustomer": {
+   "supersedesEntitlementId": {
     "type": "string",
-    "description": "Individual customer"
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
-   "customerSegment": {
+   "walletValueId": {
     "type": "string",
-    "description": "Customer segment"
-   },
-   "membershipAccount": {
-    "type": "string",
-    "description": "Membership account"
-   },
-   "b2bCompany": {
-    "type": "string",
-    "description": "B2B company"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "travelAgency": {
-    "type": "string",
-    "description": "Travel agency"
-   },
-   "school": {
-    "type": "string",
-    "description": "School"
-   },
-   "hotel": {
-    "type": "string",
-    "description": "Hotel"
-   },
-   "bank": {
-    "type": "string",
-    "description": "Bank"
-   },
-   "corporatePartner": {
-    "type": "string",
-    "description": "Corporate partner"
-   },
-   "marketingCampaign": {
-    "type": "string",
-    "description": "Marketing campaign"
-   },
-   "partnerBankAbc": {
-    "type": "string",
-    "description": "Partner: Bank ABC"
-   },
-   "batchBankabc2027001": {
-    "type": "string",
-    "description": "Batch: BANKABC-2027-001"
-   },
-   "codes25000": {
-    "type": "string",
-    "description": "Codes: 25,000"
-   },
-   "assigned25000": {
-    "type": "string",
-    "description": "Assigned: 25,000"
-   },
-   "redeemed8720": {
-    "type": "string",
-    "description": "Redeemed: 8,720"
-   },
-   "remaining16280": {
-    "type": "string",
-    "description": "Remaining: 16,280"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
    }
   }
  },
- "CodeDistributionAssignmentManagerView": {
+ "GuestDevice": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Distribution & Assignment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
   "properties": {
-   "channelsType": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
     "type": "string",
     "enum": [
-     "email",
-     "sms",
-     "whatsapp",
-     "mobileApp",
-     "crmJourney",
-     "guestPortal",
-     "b2bPortal",
-     "partnerPortal",
-     "pos",
-     "callCenter",
-     "api",
-     "exportedBatch"
-    ],
-    "description": "Vocabulary listed under Distribution Channels."
+     "ios",
+     "android",
+     "web"
+    ]
    },
-   "individualCustomer": {
+   "tokenFingerprint": {
     "type": "string",
-    "description": "Individual customer"
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
-   "customerSegment": {
+   "appVersion": {
     "type": "string",
-    "description": "Customer segment"
+    "nullable": true
    },
-   "membershipAccount": {
+   "osVersion": {
     "type": "string",
-    "description": "Membership account"
+    "nullable": true
    },
-   "b2bCompany": {
+   "deviceModel": {
     "type": "string",
-    "description": "B2B company"
+    "nullable": true
    },
-   "reseller": {
+   "locale": {
     "type": "string",
-    "description": "Reseller"
+    "nullable": true
    },
-   "travelAgency": {
-    "type": "string",
-    "description": "Travel agency"
-   },
-   "school": {
-    "type": "string",
-    "description": "School"
-   },
-   "hotel": {
-    "type": "string",
-    "description": "Hotel"
-   },
-   "bank": {
-    "type": "string",
-    "description": "Bank"
-   },
-   "corporatePartner": {
-    "type": "string",
-    "description": "Corporate partner"
-   },
-   "marketingCampaign": {
-    "type": "string",
-    "description": "Marketing campaign"
-   },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "assigned": {
-    "type": "string",
-    "description": "Assigned"
-   },
-   "sent": {
-    "type": "string",
-    "description": "Sent"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "viewedWhereAvailable": {
-    "type": "string",
-    "description": "Viewed where available"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "partnerBankAbc": {
-    "type": "string",
-    "description": "Partner: Bank ABC"
-   },
-   "batchBankabc2027001": {
-    "type": "string",
-    "description": "Batch: BANKABC-2027-001"
-   },
-   "codes25000": {
-    "type": "string",
-    "description": "Codes: 25,000"
-   },
-   "assigned25000": {
-    "type": "string",
-    "description": "Assigned: 25,000"
-   },
-   "redeemed8720": {
-    "type": "string",
-    "description": "Redeemed: 8,720"
-   },
-   "remaining16280": {
-    "type": "string",
-    "description": "Remaining: 16,280"
-   }
-  }
- },
- "CodeEligibilityRestrictionManagerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket type"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "bundle": {
-    "type": "string",
-    "description": "Bundle"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "addOn": {
-    "type": "string",
-    "description": "Add-on"
-   },
-   "guestType": {
-    "type": "string",
-    "description": "Guest type"
-   },
-   "crmSegment": {
-    "type": "string",
-    "description": "CRM segment"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty tier"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B account"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "corporateGroup": {
-    "type": "string",
-    "description": "Corporate group"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobilePos": {
-    "type": "string",
-    "description": "Mobile POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "operatingArea": {
-    "type": "string",
-    "description": "Operating area"
-   },
-   "conditions": {
-    "type": "string",
-    "description": "conditions"
-   }
-  }
- },
- "CodeSecurityFraudExceptionCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "excessiveRedemptionVelocity": {
-    "type": "string",
-    "description": "Excessive redemption velocity"
-   },
-   "repeatedFailedAttempts": {
-    "type": "integer",
-    "description": "Repeated failed attempts"
-   },
-   "multipleCustomersUsingCustomerSpecificCode": {
-    "type": "string",
-    "description": "Multiple customers using customer-specific code"
-   },
-   "unusualGeographicUsage": {
-    "type": "string",
-    "description": "Unusual geographic usage"
-   },
-   "highVolumeRedemptionFromOneDevice": {
-    "type": "integer",
-    "description": "High-volume redemption from one device"
-   },
-   "suspiciousPosOperatorActivity": {
-    "type": "string",
-    "description": "Suspicious POS/operator activity"
-   },
-   "codeEnumerationAttempts": {
-    "type": "integer",
-    "description": "Code enumeration attempts"
-   },
-   "partnerCodeLeakage": {
-    "type": "string",
-    "description": "Partner code leakage"
-   },
-   "redemptionAboveExpectedCampaignPattern": {
-    "type": "string",
-    "description": "Redemption above expected campaign pattern"
-   },
-   "levelsType": {
+   "status": {
     "type": "string",
     "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "nullable": true
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
     ],
-    "description": "Vocabulary listed under Risk Levels."
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
-   "reinstateCode": {
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "visitCount": {
+    "type": "integer"
+   },
+   "lastVisitAt": {
     "type": "string",
-    "description": "Reinstate code"
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  },
- "CouponPromoCodeBuilderInput": {
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
   "properties": {
-   "commonPromoCode": {
+   "subjectId": {
     "type": "string",
-    "description": "Common promo code"
+    "format": "uuid"
    },
-   "uniquePromoCode": {
+   "displayName": {
     "type": "string",
-    "description": "Unique promo code"
+    "nullable": true
    },
-   "coupon": {
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
     "type": "string",
-    "description": "Coupon"
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
    },
-   "promotionalVoucher": {
+   "homeCellName": {
     "type": "string",
-    "description": "Promotional voucher"
+    "nullable": true
    },
-   "freeTicketCode": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Free-ticket code"
+    "nullable": true
    },
-   "discountVoucher": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount voucher"
-   },
-   "partnerCode": {
+   "expiresAt": {
     "type": "string",
-    "description": "Partner code"
-   },
-   "employeeCode": {
-    "type": "string",
-    "description": "Employee code"
-   },
-   "influencerAffiliateCode": {
-    "type": "string",
-    "description": "Influencer/affiliate code"
-   },
-   "compensationServiceRecoveryCode": {
-    "type": "string",
-    "description": "Compensation/service-recovery code"
-   },
-   "bulkCampaignCode": {
-    "type": "string",
-    "description": "Bulk campaign code"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedValueDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed-value discount"
-   },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
-   },
-   "freeProduct": {
-    "type": "string",
-    "description": "Free product"
-   },
-   "freeTicket": {
-    "type": "string",
-    "description": "Free ticket"
-   },
-   "freeAddOn": {
-    "type": "string",
-    "description": "Free add-on"
-   },
-   "bundleBenefit": {
-    "type": "string",
-    "description": "Bundle benefit"
-   },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
-   },
-   "thanDuplicateDiscountLogic": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "than duplicate discount logic"
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
    }
   }
  },
- "CouponPromoCodeBuilderView": {
+ "Invitation": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "token",
+   "status"
+  ],
   "properties": {
-   "commonPromoCode": {
+   "id": {
     "type": "string",
-    "description": "Common promo code"
+    "format": "uuid"
    },
-   "uniquePromoCode": {
+   "campaignId": {
     "type": "string",
-    "description": "Unique promo code"
+    "format": "uuid"
    },
-   "coupon": {
+   "subjectId": {
     "type": "string",
-    "description": "Coupon"
+    "format": "uuid",
+    "nullable": true
    },
-   "promotionalVoucher": {
+   "recipientEmail": {
     "type": "string",
-    "description": "Promotional voucher"
+    "format": "email",
+    "nullable": true
    },
-   "freeTicketCode": {
+   "token": {
     "type": "string",
-    "description": "Free-ticket code"
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
    },
-   "discountVoucher": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount voucher"
+   "plusOnes": {
+    "type": "integer",
+    "default": 0
    },
-   "partnerCode": {
+   "status": {
     "type": "string",
-    "description": "Partner code"
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
    },
-   "employeeCode": {
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "respondedAt": {
     "type": "string",
-    "description": "Employee code"
+    "format": "date-time",
+    "nullable": true
    },
-   "influencerAffiliateCode": {
+   "scopePath": {
     "type": "string",
-    "description": "Influencer/affiliate code"
-   },
-   "compensationServiceRecoveryCode": {
-    "type": "string",
-    "description": "Compensation/service-recovery code"
-   },
-   "bulkCampaignCode": {
-    "type": "string",
-    "description": "Bulk campaign code"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedValueDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed-value discount"
-   },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
-   },
-   "freeProduct": {
-    "type": "string",
-    "description": "Free product"
-   },
-   "freeTicket": {
-    "type": "string",
-    "description": "Free ticket"
-   },
-   "freeAddOn": {
-    "type": "string",
-    "description": "Free add-on"
-   },
-   "bundleBenefit": {
-    "type": "string",
-    "description": "Bundle benefit"
-   },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
-   },
-   "thanDuplicateDiscountLogic": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "than duplicate discount logic"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
+ },
+ "LoginRequest": {
+  "type": "object",
+  "required": [
+   "username",
+   "credential",
+   "workstationId"
+  ],
+  "properties": {
+   "username": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "credential": {
+    "type": "string",
+    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "maxLength": 512
+   },
+   "method": {
+    "type": "string",
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
+    "enum": [
+     "password",
+     "pin",
+     "card",
+     "rfid",
+     "sso"
+    ],
+    "default": "password"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
+   },
+   "deviceFingerprint": {
+    "type": "string",
+    "maxLength": 256
+   }
+  }
+ },
+ "LoginResponse": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   {
+    "type": "object",
+    "required": [
+     "requiresRoleSelection"
+    ],
+    "properties": {
+     "requiresRoleSelection": {
+      "type": "boolean"
+     },
+     "availableRoles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RoleSummary"
+      }
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session"
+     }
+    }
+   }
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once on successful verification. Not retrievable afterwards.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     }
+    }
+   }
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -2620,502 +3786,525 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "RedemptionAnalyticsAuditAiOptimizationView": {
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
   "properties": {
-   "codesGenerated": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
     "type": "string",
-    "description": "Codes generated"
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
    },
-   "codesDistributed": {
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
     "type": "string",
-    "description": "Codes distributed"
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
    },
-   "codesRedeemed": {
+   "changeCurrency": {
     "type": "string",
-    "description": "Codes redeemed"
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
    },
-   "redemptionRate": {
-    "type": "number",
-    "description": "Redemption rate"
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "conversionRate": {
-    "type": "number",
-    "description": "Conversion rate"
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "revenueGenerated": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue generated"
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
    },
-   "discountGranted": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount granted"
+   "providerName": {
+    "type": "string",
+    "nullable": true
    },
-   "incrementalRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Incremental revenue"
+   "providerReference": {
+    "type": "string",
+    "nullable": true
    },
-   "aovUplift": {
-    "type": "number",
-    "description": "AOV uplift"
-   },
-   "costPerRedemption": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per redemption"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact"
-   },
-   "expiredUnusedCodes": {
-    "type": "integer",
-    "description": "Expired unused codes"
-   },
-   "created": {
+   "lastInquiryAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Created"
+    "nullable": true
    },
-   "modified": {
+   "recordedAt": {
     "type": "string",
-    "description": "Modified"
+    "format": "date-time"
    },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "assigned": {
-    "type": "string",
-    "description": "Assigned"
-   },
-   "distributed": {
-    "type": "string",
-    "description": "Distributed"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "reactivated": {
-    "type": "string",
-    "description": "Reactivated"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "timestamp": {
+   "syncedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Timestamp"
-   },
-   "previousValue": {
-    "type": "string",
-    "description": "Previous value"
-   },
-   "newValue": {
-    "type": "integer",
-    "description": "New value"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approvalReference": {
-    "type": "string",
-    "description": "Approval reference"
-   },
-   "identifiesBenefit": {
-    "type": "string",
-    "description": "↓ identifies benefit"
-   },
-   "determinesQualificationAndCalculation": {
-    "type": "string",
-    "description": "↓ determines qualification and calculation"
-   },
-   "ticketingCatalogueEligibleTicketsProducts": {
-    "type": "string",
-    "description": "Ticketing Catalogue — eligible tickets/products"
-   },
-   "bundlesBundleRelatedCouponBenefits": {
-    "type": "string",
-    "description": "Bundles — bundle-related coupon benefits"
-   },
-   "paymentPaymentMethodDependentPromotions": {
-    "type": "string",
-    "description": "Payment — payment-method-dependent promotions"
-   },
-   "matrixCoverageBoard3": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 3"
+    "nullable": true
    }
   }
  },
- "RedemptionMonitorCodeLookupView": {
+ "Problem": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Redemption Monitor & Code Lookup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "RFC 9457 problem details. Every error response uses this shape.",
+  "required": [
+   "type",
+   "title",
+   "status"
+  ],
   "properties": {
-   "promoCode": {
+   "type": {
     "type": "string",
-    "description": "Promo code"
+    "format": "uri"
    },
-   "couponId": {
+   "title": {
+    "type": "string"
+   },
+   "status": {
+    "type": "integer"
+   },
+   "detail": {
+    "type": "string"
+   },
+   "instance": {
+    "type": "string"
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "errors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "code"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
     "type": "string",
-    "description": "Coupon ID"
-   },
-   "batchId": {
+    "format": "date-time"
+   }
+  }
+ },
+ "RegisterGuestRequest": {
+  "type": "object",
+  "required": [
+   "identifier",
+   "channel"
+  ],
+  "properties": {
+   "identifier": {
     "type": "string",
-    "description": "Batch ID"
-   },
-   "transaction": {
-    "type": "string",
-    "description": "Transaction"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "code": {
-    "type": "string",
-    "description": "Code"
-   },
-   "redemptionDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Redemption date"
-   },
-   "redemptionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Redemption time"
-   },
-   "customerAccountReference": {
-    "type": "string",
-    "description": "Customer/account reference"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "originalValue": {
-    "type": "string",
-    "description": "Original value"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "finalValue": {
-    "type": "string",
-    "description": "Final value"
+    "maxLength": 256,
+    "description": "Email address or mobile number in E.164."
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ]
    },
-   "venue": {
+   "displayName": {
     "type": "string",
-    "description": "Venue"
+    "maxLength": 200
    },
-   "devicePos": {
-    "type": "integer",
-    "description": "Device/POS"
-   },
-   "operator": {
+   "password": {
     "type": "string",
-    "description": "Operator"
+    "minLength": 8,
+    "maxLength": 256,
+    "description": "Optional. OTP-only accounts are supported and are the default."
    },
-   "validationResult": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Validation result"
+    "pattern": "^[a-z]{2}$"
    },
-   "valid": {
-    "type": "string",
-    "description": "Valid"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "notStarted": {
-    "type": "string",
-    "description": "Not Started"
-   },
-   "usageLimitReached": {
-    "type": "integer",
-    "description": "Usage Limit Reached"
-   },
-   "invalidProduct": {
-    "type": "string",
-    "description": "Invalid Product"
-   },
-   "invalidChannel": {
-    "type": "string",
-    "description": "Invalid Channel"
-   },
-   "invalidCustomer": {
-    "type": "string",
-    "description": "Invalid Customer"
-   },
-   "invalidLocation": {
-    "type": "string",
-    "description": "Invalid Location"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "requiresRedemptionReporting": {
-    "type": "string",
-    "description": "requires redemption reporting"
+   "consents": {
+    "type": "array",
+    "description": "Consent captured at registration, recorded with the notice version.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "type": "string"
+      },
+      "granted": {
+       "type": "boolean"
+      },
+      "noticeVersion": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "UniqueCodeGenerationBatchManagerView": {
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Unique Code Generation & Batch Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
   "properties": {
-   "campaign": {
+   "id": {
     "type": "string",
-    "description": "Campaign"
+    "format": "uuid"
    },
-   "numberOfCodes": {
-    "type": "integer",
-    "description": "Number of codes"
+   "code": {
+    "type": "string"
    },
-   "codeLength": {
-    "type": "string",
-    "description": "Code length"
+   "name": {
+    "type": "string"
    },
-   "prefix": {
-    "type": "string",
-    "description": "Prefix"
-   },
-   "suffix": {
-    "type": "string",
-    "description": "Suffix"
-   },
-   "characterType": {
-    "type": "string",
-    "description": "Character type"
-   },
-   "caseSensitivity": {
-    "type": "string",
-    "description": "Case sensitivity"
-   },
-   "expiration": {
-    "type": "string",
-    "description": "Expiration"
-   },
-   "numberOfUses": {
-    "type": "integer",
-    "description": "Number of uses"
-   },
-   "distributionOwner": {
-    "type": "string",
-    "description": "Distribution owner"
-   },
-   "batchId": {
-    "type": "string",
-    "description": "Batch ID"
-   },
-   "quantityGenerated": {
-    "type": "integer",
-    "description": "Quantity generated"
-   },
-   "generatedBy": {
-    "type": "string",
-    "description": "Generated by"
-   },
-   "generationDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Generation date"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
-   },
-   "assignedPartner": {
-    "type": "string",
-    "description": "Assigned partner"
-   },
-   "distributionStatus": {
-    "type": "string",
-    "description": "Distribution status"
-   },
-   "redeemedQuantity": {
-    "type": "integer",
-    "description": "Redeemed quantity"
-   },
-   "remainingQuantity": {
-    "type": "integer",
-    "description": "Remaining quantity"
-   },
-   "it": {
-    "type": "string",
-    "description": "it"
-   },
-   "permissionsExplicitlyAllowIt": {
-    "type": "string",
-    "description": "permissions explicitly allow it"
+   "isPrimary": {
+    "type": "boolean"
    }
   }
  },
- "UsageCapacityFrequencyControlView": {
+ "Session": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Usage, Capacity & Frequency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
   "properties": {
-   "singleUse": {
+   "sessionId": {
     "type": "string",
-    "description": "Single use"
+    "format": "uuid"
    },
-   "multipleUse": {
+   "principalId": {
     "type": "string",
-    "description": "Multiple use"
+    "format": "uuid"
    },
-   "unlimitedUse": {
+   "roleId": {
     "type": "string",
-    "description": "Unlimited use"
+    "format": "uuid"
    },
-   "maximumTotalRedemptions": {
-    "type": "string",
-    "description": "Maximum total redemptions"
+   "displayName": {
+    "type": "string"
    },
-   "maximumPerCustomer": {
-    "type": "string",
-    "description": "Maximum per customer"
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
    },
-   "maximumPerAccount": {
-    "type": "string",
-    "description": "Maximum per account"
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
    },
-   "maximumPerTransaction": {
-    "type": "string",
-    "description": "Maximum per transaction"
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
    },
-   "maximumPerDay": {
+   "saleBoardId": {
     "type": "string",
-    "description": "Maximum per day"
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
    },
-   "maximumPerChannel": {
-    "type": "string",
-    "description": "Maximum per channel"
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
    },
-   "maximumPerVenue": {
+   "openedAt": {
     "type": "string",
-    "description": "Maximum per venue"
+    "format": "date-time"
    },
-   "issued50000": {
+   "expiresAt": {
     "type": "string",
-    "description": "Issued: 50,000"
-   },
-   "redeemed31450": {
-    "type": "string",
-    "description": "Redeemed: 31,450"
-   },
-   "reservedPending420": {
-    "type": "string",
-    "description": "Reserved/Pending: 420"
-   },
-   "remaining18130": {
-    "type": "string",
-    "description": "Remaining: 18,130"
-   },
-   "at": {
-    "type": "string",
-    "description": "At"
-   },
-   "thresholdsShallBeConfigurable": {
-    "type": "string",
-    "description": "Thresholds shall be configurable"
+    "format": "date-time"
    }
   }
  },
- "ValidityDateTimeControlView": {
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Validity, Date & Time Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
   "properties": {
-   "valid18002200": {
+   "id": {
     "type": "string",
-    "description": "Valid 18:00–22:00"
+    "format": "uuid"
    },
-   "mondayThursdayOnly": {
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
     "type": "string",
-    "description": "Monday–Thursday only"
+    "nullable": true
    },
-   "blackoutDates": {
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
     "type": "string",
-    "description": "Blackout dates"
-   },
-   "holidays": {
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
     "type": "string",
-    "description": "Holidays"
+    "description": "JWT carrying `sid`, validated per request against the session registry."
    },
-   "selectedTimeslots": {
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Selected timeslots"
+    "format": "uuid"
    },
-   "selectedEvents": {
+   "entitlementId": {
     "type": "string",
-    "description": "Selected events"
+    "format": "uuid"
    },
-   "seasonalCalendars": {
+   "platform": {
     "type": "string",
-    "description": "Seasonal calendars"
+    "enum": [
+     "apple",
+     "google"
+    ]
    },
-   "expirationGracePeriod": {
+   "serialNumber": {
+    "type": "string"
+   },
+   "authenticationToken": {
+    "type": "string",
+    "format": "password",
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiration grace period"
+    "nullable": true
    },
-   "theAdministratorSBrowserTimezone": {
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
     "type": "string",
-    "description": "the administrator's browser timezone"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Wishlist": {
+  "type": "object",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  }

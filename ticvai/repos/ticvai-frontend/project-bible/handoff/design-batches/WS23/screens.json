@@ -1,1393 +1,75 @@
 [
  {
-  "id": "PTR-042",
-  "name": "Partner Operations Command Center",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.1",
-   "page": 44
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-operations-command-center-ptr-042",
-   "component": "apps/partner-web/src/routes/partners/PartnerOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "PTR-001"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-043",
-    "PTR-044",
-    "PTR-045",
-    "PTR-046",
-    "PTR-047",
-    "PTR-048",
-    "PTR-049",
-    "PTR-050",
-    "PTR-051"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "accountId",
-      "sessionId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-043",
-     "trigger": "Works in Partner Orders & Booking Management",
-     "provenance": "flow F132 step 1→2",
-     "operation": "listPartner2"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-044",
-     "trigger": "Works in Reservations, Holds & Release Management",
-     "provenance": "flow F132 step 3→4",
-     "operation": "listPartner2"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "PTR-045",
-     "trigger": "Works in Partner Cancellations, Refunds & Amendments",
-     "provenance": "flow F132 step 5→6",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-046",
-     "trigger": "Works in Partner Statement & Account Activity",
-     "provenance": "flow F132 step 7→8",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-047",
-     "trigger": "Works in Partner Reconciliation & Exception Management",
-     "provenance": "flow F132 step 9→10",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-048",
-     "trigger": "Works in Commission Calculation & Settlement Management",
-     "provenance": "flow F132 step 11→12",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-049",
-     "trigger": "Works in Partner Disputes, Cases & Service Management",
-     "provenance": "flow F132 step 13→14",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-050",
-     "trigger": "Works in Partner Performance Scorecard & Risk Monitoring",
-     "provenance": "flow F132 step 15→16",
-     "operation": "listPartner2"
-    },
-    {
-     "to": "PTR-051",
-     "trigger": "Works in Partner AI Intelligence & Relationship Optimization",
-     "provenance": "flow F132 step 17→18",
-     "operation": "listPartner2"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population",
-  "purpose": "Provide commercial, operations and finance teams with one real-time view of active B2B, reseller and OTA business.",
-  "purposeNote": "Authorized users can understand current partner activity, financial exposure and operational exceptions from one centralized workspace.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search partner operations",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "PartnerOperationsCommandCenterView.partner",
-        "PartnerOperationsCommandCenterView.partnerType",
-        "Venue",
-        "Event",
-        "Market",
-        "PartnerOperationsCommandCenterView.accountManager",
-        "Channel",
-        "Date",
-        "PartnerOperationsCommandCenterView.operationalStatus",
-        "PartnerOperationsCommandCenterView.risk"
-       ],
-       "notes": "The pack filters this screen by partner, partner type, venue, event, market, account manager and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Partner Sales Today",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesToday"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Partner Sales MTD",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesMtd"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Partner Orders",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.activePartnerOrders"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Reservations/Holds",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Tickets Sold",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.ticketsSold"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Cancellations",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.cancellations"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refunds",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.refunds"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Outstanding Receivables",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.outstandingReceivables"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Commission Payable",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.commissionPayable"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Settlements",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.pendingSettlements"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Operational Exceptions",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.operationalExceptions"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Partners Requiring Attention",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnersRequiringAttention"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every partner operations",
-       "columns": [
-        "PartnerOperationsCommandCenterView.partner",
-        "PartnerOperationsCommandCenterView.partnerType",
-        "PartnerOperationsCommandCenterView.accountManager",
-        "PartnerOperationsCommandCenterView.orders",
-        "PartnerOperationsCommandCenterView.tickets",
-        "PartnerOperationsCommandCenterView.grossSales",
-        "PartnerOperationsCommandCenterView.netSales",
-        "PartnerOperationsCommandCenterView.commission",
-        "PartnerOperationsCommandCenterView.outstandingBalance",
-        "PartnerOperationsCommandCenterView.creditUtilization",
-        "PartnerOperationsCommandCenterView.allocationUtilization",
-        "PartnerOperationsCommandCenterView.cancellationRate",
-        "PartnerOperationsCommandCenterView.operationalStatus",
-        "PartnerOperationsCommandCenterView.risk"
-       ],
-       "bindsTo": "PartnerOperationsCommandCenterView",
-       "operation": "listPartner2",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner should show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected partner operations",
-       "bindsTo": "PartnerOperationsCommandCenterView",
-       "columns": [
-        "PartnerOperationsCommandCenterView.partner",
-        "PartnerOperationsCommandCenterView.partnerType",
-        "PartnerOperationsCommandCenterView.accountManager",
-        "PartnerOperationsCommandCenterView.orders",
-        "PartnerOperationsCommandCenterView.tickets",
-        "PartnerOperationsCommandCenterView.grossSales",
-        "PartnerOperationsCommandCenterView.netSales",
-        "PartnerOperationsCommandCenterView.commission",
-        "PartnerOperationsCommandCenterView.outstandingBalance",
-        "PartnerOperationsCommandCenterView.creditUtilization",
-        "PartnerOperationsCommandCenterView.allocationUtilization",
-        "PartnerOperationsCommandCenterView.cancellationRate",
-        "PartnerOperationsCommandCenterView.operationalStatus",
-        "PartnerOperationsCommandCenterView.risk"
-       ],
-       "notes": null,
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner should show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The partner operations list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the partner operations untouched.",
-   "emptyFirstRun": "No partner operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartner2",
-    "contract": "subscription",
-    "purpose": "Partner Operations Command Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-042"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 44. 30 of 35 labels bound to a contract property; 36 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-043",
-  "name": "Partner Orders & Booking Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.2",
-   "page": 46
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-orders-booking-management-ptr-043",
-   "component": "apps/partner-web/src/routes/partners/PartnerOrdersBookingManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 2→3",
-     "operation": "listPartnerOrderBooking"
-    }
-   ]
-  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide a consolidated operational view of orders created by each partner.",
-  "purposeNote": "Operations can locate and service any partner transaction while preserving central order and commercial-rule integrity.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search partner orders booking",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 46 §Search/filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Partner",
-        "Partner Order Reference",
-        "TICVAI Order ID",
-        "Event",
-        "Venue",
-        "Product",
-        "Booking Date",
-        "Visit/Event Date",
-        "Status",
-        "Agent",
-        "Channel"
-       ],
-       "notes": "The pack filters this screen by partner, partner order reference, ticvai order id, event, venue, product and 5 more — which are present is a decision the pack already made.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 46 §Search/filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every partner orders booking",
-       "columns": [
-        "TICVAI Order ID",
-        "PartnerOrdersBookingManagementView.partnerReference",
-        "Partner",
-        "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
-        "Booking Date",
-        "Event",
-        "PartnerOrdersBookingManagementView.products",
-        "PartnerOrdersBookingManagementView.quantity",
-        "PartnerOrdersBookingManagementView.grossValue",
-        "PartnerOrdersBookingManagementView.partnerRate",
-        "PartnerOrdersBookingManagementView.commission",
-        "PartnerOrdersBookingManagementView.netAmount",
-        "PartnerOrdersBookingManagementView.paymentMethod",
-        "PartnerOrdersBookingManagementView.billingStatus",
-        "PartnerOrdersBookingManagementView.fulfillmentStatus"
-       ],
-       "bindsTo": "PartnerOrdersBookingManagementView",
-       "operation": "listPartnerOrderBooking",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 46 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected partner orders booking",
-       "bindsTo": "PartnerOrdersBookingManagementView",
-       "columns": [
-        "TICVAI Order ID",
-        "PartnerOrdersBookingManagementView.partnerReference",
-        "Partner",
-        "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
-        "Booking Date",
-        "Event",
-        "PartnerOrdersBookingManagementView.products",
-        "PartnerOrdersBookingManagementView.quantity",
-        "PartnerOrdersBookingManagementView.grossValue",
-        "PartnerOrdersBookingManagementView.partnerRate",
-        "PartnerOrdersBookingManagementView.commission",
-        "PartnerOrdersBookingManagementView.netAmount",
-        "PartnerOrdersBookingManagementView.paymentMethod",
-        "PartnerOrdersBookingManagementView.billingStatus",
-        "PartnerOrdersBookingManagementView.fulfillmentStatus"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Important Architecture”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 46 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** View, Modify, Cancel, Rebook, Resend Tickets, Reissue, Add Internal Note, Escalate, Open Financial Record. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 46 §Subject to permission"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The partner orders booking list.",
-   "error": "Could not load. Names which read failed and leaves the partner orders booking untouched.",
-   "emptyFirstRun": "No partner orders booking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner orders booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartnerOrderBooking",
-    "contract": "subscription",
-    "purpose": "Partner Orders & Booking Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "TICVAI Order ID",
-    "PartnerOrdersBookingManagementView.partnerReference",
-    "Partner",
-    "PartnerOrdersBookingManagementView.agentUser",
-    "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
-    "Booking Date"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-043"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 46. 12 of 27 labels bound to a contract property; 36 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-044",
-  "name": "Reservations, Holds & Release Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.3",
-   "page": 48
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/reservations-holds-release-management-ptr-044",
-   "component": "apps/partner-web/src/routes/partners/ReservationsHoldsReleaseManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 4→5",
-     "operation": "listReservationHoldRelease"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly important for tour operators, corporate groups and travel-trade partners.",
-  "purposeNote": "Partner reservations and holds cannot indefinitely block sellable capacity and are automatically governed by configured duration, allocation and approval rules.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every reservations holds release",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
-       "bindsTo": "ReservationsHoldsReleaseManagementView",
-       "operation": "listReservationHoldRelease",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reservations holds release",
-       "bindsTo": "ReservationsHoldsReleaseManagementView",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “When a hold expires”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Extend Hold, Reduce Hold, Release Hold, Convert to Booking, Reassign where permitted, Escalate. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The reservations holds release list.",
-   "error": "Could not load. Names which read failed and leaves the reservations holds release untouched.",
-   "emptyFirstRun": "No reservations holds release yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservations holds release are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listReservationHoldRelease",
-    "contract": "subscription",
-    "purpose": "Reservations, Holds & Release Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ReservationsHoldsReleaseManagementView.activeHolds",
-    "ReservationsHoldsReleaseManagementView.heldTickets",
-    "ReservationsHoldsReleaseManagementView.heldValue",
-    "ReservationsHoldsReleaseManagementView.expiringToday",
-    "ReservationsHoldsReleaseManagementView.expiredHolds",
-    "ReservationsHoldsReleaseManagementView.convertedHolds"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-044"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 48. 7 of 7 labels bound to a contract property; 25 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-045",
-  "name": "Partner Cancellations, Refunds & Amendments",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.4",
-   "page": 49
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-cancellations-refunds-amendments-ptr-045",
-   "component": "apps/partner-web/src/routes/partners/PartnerCancellationsRefundsAmendments.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 6→7",
-     "operation": "listPartnerCancellationRefund"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Manage post-booking changes according to the partner's commercial agreement and product policies.",
-  "purposeNote": "Partner booking changes are processed according to applicable commercial and product policies with complete financial and inventory impact visibility.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 49"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 49"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPartnerCancellationRefund",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The partner cancellations refunds list.",
-   "error": "Could not load. Names which read failed and leaves the partner cancellations refunds untouched.",
-   "emptyFirstRun": "No partner cancellations refunds yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner cancellations refunds are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartnerCancellationRefund",
-    "contract": "subscription",
-    "purpose": "Partner Cancellations, Refunds & Amendments",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "PartnerCancellationsRefundsAmendmentsView.fullCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.partialCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.dateChange",
-    "PartnerCancellationsRefundsAmendmentsView.performanceChange",
-    "PartnerCancellationsRefundsAmendmentsView.quantityReduction"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-045"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-046",
-  "name": "Partner Statement & Account Activity",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.5",
-   "page": 51
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-statement-account-activity-ptr-046",
-   "component": "apps/partner-web/src/routes/partners/PartnerStatementAccountActivity.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 8→9",
-     "operation": "listPartnerStatementAccount"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population",
-  "purpose": "Give finance and commercial teams a complete financial statement for each partner account.",
-  "purposeNote": "Finance and authorized partner users can reconcile all commercial account activity against a clear running balance and supporting transaction references.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Opening Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.openingBalance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sales",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.sales"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Payments",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.payments"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Credits",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.credits"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refunds",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.refunds"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Commission",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.commission"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Adjustments",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.adjustments"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Closing Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.closingBalance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Overdue Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.overdueBalance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Available Credit",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.availableCredit"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Current",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.current"
-      },
-      {
-       "kind": "metricTile",
-       "label": "1–30 Days",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "31–60 Days",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "61–90 Days",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "90+ Days",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every partner statement account",
-       "columns": [
-        "PartnerStatementAccountActivityView.date",
-        "PartnerStatementAccountActivityView.transactionType",
-        "PartnerStatementAccountActivityView.reference",
-        "PartnerStatementAccountActivityView.orderInvoice",
-        "PartnerStatementAccountActivityView.debit",
-        "PartnerStatementAccountActivityView.credit",
-        "PartnerStatementAccountActivityView.runningBalance",
-        "PartnerStatementAccountActivityView.dueDate",
-        "PartnerStatementAccountActivityView.status"
-       ],
-       "bindsTo": "PartnerStatementAccountActivityView",
-       "operation": "listPartnerStatementAccount",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Each line should show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected partner statement account",
-       "bindsTo": "PartnerStatementAccountActivityView",
-       "columns": [
-        "PartnerStatementAccountActivityView.date",
-        "PartnerStatementAccountActivityView.transactionType",
-        "PartnerStatementAccountActivityView.reference",
-        "PartnerStatementAccountActivityView.orderInvoice",
-        "PartnerStatementAccountActivityView.debit",
-        "PartnerStatementAccountActivityView.credit",
-        "PartnerStatementAccountActivityView.runningBalance",
-        "PartnerStatementAccountActivityView.dueDate",
-        "PartnerStatementAccountActivityView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Generate by”, “Partner Access”, “Architecture”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Each line should show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The partner statement account list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the partner statement account untouched.",
-   "emptyFirstRun": "No partner statement account yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner statement account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartnerStatementAccount",
-    "contract": "subscription",
-    "purpose": "Partner Statement & Account Activity",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-046"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-047",
-  "name": "Partner Reconciliation & Exception Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.6",
-   "page": 52
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-reconciliation-exception-management-ptr-047",
-   "component": "apps/partner-web/src/routes/partners/PartnerReconciliationExceptionManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 10→11",
-     "operation": "listPartnerReconciliationException"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Reconcile operational bookings against financial and channel records and identify discrepancies.",
-  "purposeNote": "Partner operational and financial records can be reconciled systematically, with every unresolved difference tracked through resolution.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every partner reconciliation exception",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
-       "bindsTo": "PartnerReconciliationExceptionManagementView",
-       "operation": "listPartnerReconciliationException",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected partner reconciliation exception",
-       "bindsTo": "PartnerReconciliationExceptionManagementView",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Partner Orders”, “Partner Reference OTA-82714”, “Exception Types”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate, Dispute. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The partner reconciliation exception list.",
-   "error": "Could not load. Names which read failed and leaves the partner reconciliation exception untouched.",
-   "emptyFirstRun": "No partner reconciliation exception yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner reconciliation exception are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPartnerReconciliationException",
-    "contract": "subscription",
-    "purpose": "Partner Reconciliation & Exception Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "PartnerReconciliationExceptionManagementView.recordsReconciled",
-    "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-    "PartnerReconciliationExceptionManagementView.amountMismatches",
-    "PartnerReconciliationExceptionManagementView.missingTickets",
-    "PartnerReconciliationExceptionManagementView.pricingDifferences",
-    "PartnerReconciliationExceptionManagementView.commissionDifferences"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-047"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-048",
-  "name": "Commission Calculation & Settlement Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.7",
-   "page": 54
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/commission-calculation-settlement-management-ptr-048",
-   "component": "apps/partner-web/src/routes/partners/CommissionCalculationSettlementManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 12→13",
-     "operation": "listCommissionCalculationSettlement"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.",
-  "purposeNote": "until relevant transactions and adjustments have been reconciled.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every commission calculation settlement",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
-       "bindsTo": "CommissionCalculationSettlementManagementView",
-       "operation": "listCommissionCalculationSettlement",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected commission calculation settlement",
-       "bindsTo": "CommissionCalculationSettlementManagementView",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “For each transaction”, “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commission calculation settlement list.",
-   "error": "Could not load. Names which read failed and leaves the commission calculation settlement untouched.",
-   "emptyFirstRun": "No commission calculation settlement yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commission calculation settlement are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCommissionCalculationSettlement",
-    "contract": "subscription",
-    "purpose": "Commission Calculation & Settlement Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CommissionCalculationSettlementManagementView.commissionEarned",
-    "CommissionCalculationSettlementManagementView.commissionPending",
-    "CommissionCalculationSettlementManagementView.approved",
-    "CommissionCalculationSettlementManagementView.onHold",
-    "CommissionCalculationSettlementManagementView.paid",
-    "CommissionCalculationSettlementManagementView.reversed"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-048"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 54. 8 of 8 labels bound to a contract property; 8 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-049",
-  "name": "Partner Disputes, Cases & Service Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.8",
-   "page": 56
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-disputes-cases-service-management-ptr-049",
-   "component": "apps/partner-web/src/routes/partners/PartnerDisputesCasesServiceManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-042"
-   ],
-   "exitTo": [
-    "PTR-042"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 14→15",
-     "operation": "listPartnerDisputeCase"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
-  "purpose": "Provide a structured case-management environment for partner operational and commercial disputes.",
-  "purposeNote": "Every partner dispute has a traceable owner, SLA, supporting evidence, financial context and documented resolution.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Booking Dispute, Pricing Dispute, Ticket Issue, Allocation Issue, Finance review, Technical review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -1399,16 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every partner disputes cases",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "PartnerDisputesCasesServiceManagementView.firstResponse",
-        "PartnerDisputesCasesServiceManagementView.resolutionTarget",
-        "PartnerDisputesCasesServiceManagementView.timeOpen",
-        "PartnerDisputesCasesServiceManagementView.slaBreach"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "PartnerDisputesCasesServiceManagementView",
-       "operation": "listPartnerDisputeCase",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Monitor"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -1418,16 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected partner disputes cases",
-       "bindsTo": "PartnerDisputesCasesServiceManagementView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "PartnerDisputesCasesServiceManagementView.firstResponse",
-        "PartnerDisputesCasesServiceManagementView.resolutionTarget",
-        "PartnerDisputesCasesServiceManagementView.timeOpen",
-        "PartnerDisputesCasesServiceManagementView.slaBreach"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": null,
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Monitor"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -1437,132 +128,413 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Booking Dispute",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Pricing Dispute",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ticket Issue",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
       },
       {
        "kind": "secondaryButton",
-       "label": "Allocation Issue",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
       },
       {
        "kind": "secondaryButton",
-       "label": "Finance review",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow"
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
-       "label": "Technical review",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow"
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The partner disputes cases list.",
-   "error": "Could not load. Names which read failed and leaves the partner disputes cases untouched.",
-   "emptyFirstRun": "No partner disputes cases yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner disputes cases are still there. The pack's own statuses are Proposed → Resolved → Closed — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listPartnerDisputeCase",
-    "contract": "subscription",
-    "purpose": "Partner Disputes, Cases & Service Management",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "PartnerDisputesCasesServiceManagementView.firstResponse",
-    "PartnerDisputesCasesServiceManagementView.resolutionTarget",
-    "PartnerDisputesCasesServiceManagementView.timeOpen",
-    "PartnerDisputesCasesServiceManagementView.slaBreach"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-049"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 56. 4 of 4 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P10",
-   "audience": "partner",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "PTR-050",
-  "name": "Partner Performance Scorecard & Risk Monitoring",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.9",
-   "page": 57
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-performance-scorecard-risk-monitoring-ptr-050",
-   "component": "apps/partner-web/src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "PTR-042"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "PTR-042"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "PTR-042",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F132 step 16→17",
-     "operation": "listPartnerPerformanceScorecard"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.",
-  "purposeNote": "Management can objectively compare partners and identify commercial, operational or financial deterioration before it becomes a material issue.",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1572,15 +544,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every partner performance scorecard",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
-       "operation": "listPartnerPerformanceScorecard",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -1590,105 +571,281 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected partner performance scorecard",
-       "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Financial”, “Operational”, “Technical”, “Compliance”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "The partner performance scorecard list.",
-   "error": "Could not load. Names which read failed and leaves the partner performance scorecard untouched.",
-   "emptyFirstRun": "No partner performance scorecard yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner performance scorecard are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listPartnerPerformanceScorecard",
-    "contract": "subscription",
-    "purpose": "Partner Performance Scorecard & Risk Monitoring",
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "PartnerPerformanceScorecardRiskMonitoringView.improving",
-    "PartnerPerformanceScorecardRiskMonitoringView.stable",
-    "PartnerPerformanceScorecardRiskMonitoringView.declining"
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-050"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 57. 3 of 3 labels bound to a contract property; 3 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P10",
-   "audience": "partner",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "PTR-051",
-  "name": "Partner AI Intelligence & Relationship Optimization",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "3",
-   "number": "8.3.10",
-   "page": 59
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "partner-web",
-   "route": "/partners/partner-ai-intelligence-relationship-optimization-ptr-051",
-   "component": "apps/partner-web/src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "PTR-042"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "PTR-042"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
   },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
-  "purpose": "Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.",
-  "purposeNote": "Management receives explainable partner-level intelligence and scenario modelling that supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1698,26 +855,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every partner intelligence relationship",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
        ],
-       "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
-       "operation": "listPartnerRelationship",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze"
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
       }
      ]
     },
@@ -1727,82 +882,692 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected partner intelligence relationship",
-       "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Credit”, “Risk”, “Growth”, “Natural-Language Analysis”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze"
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The partner intelligence relationship list.",
-   "error": "Could not load. Names which read failed and leaves the partner intelligence relationship untouched.",
-   "emptyFirstRun": "No partner intelligence relationship yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner intelligence relationship are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
-    "operationId": "listPartnerRelationship",
-    "contract": "subscription",
-    "purpose": "Partner AI Intelligence & Relationship Optimization",
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-    "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-    "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-    "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-    "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-    "PartnerAiIntelligenceRelationshipOptimizationView.credit"
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-051"
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 59. 14 of 14 labels bound to a contract property; 14 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P10",
-   "audience": "partner",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

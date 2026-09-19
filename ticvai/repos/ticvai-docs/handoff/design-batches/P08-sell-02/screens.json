@@ -1,1812 +1,74 @@
 [
  {
-  "id": "BO-018",
-  "name": "Allocation & Holds",
-  "module": "Sell",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/allocation-holds",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AllocationHoldsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "entryFrom": [
-    "BO-102"
-   ],
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listInventoryHolds` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See who is holding capacity, and release it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every allocation holds",
-       "bindsTo": "InventoryHold",
-       "columns": [
-        "InventoryHold.id",
-        "InventoryHold.channelCapacityId",
-        "InventoryHold.holderWorkstationId",
-        "InventoryHold.parentLeaseId",
-        "InventoryHold.requestedUnits",
-        "InventoryHold.channel",
-        "InventoryHold.grantedUnits",
-        "InventoryHold.consumedUnits",
-        "InventoryHold.status",
-        "InventoryHold.acquiredAt",
-        "InventoryHold.expiresAt",
-        "InventoryHold.releasedAt"
-       ],
-       "operation": "listInventoryHolds",
-       "provenance": "contract catalogue.yaml GET /inventory-holds"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected allocation holds",
-       "bindsTo": "InventoryHold",
-       "columns": [
-        "InventoryHold.id",
-        "InventoryHold.channelCapacityId",
-        "InventoryHold.holderWorkstationId",
-        "InventoryHold.parentLeaseId",
-        "InventoryHold.requestedUnits",
-        "InventoryHold.channel",
-        "InventoryHold.grantedUnits",
-        "InventoryHold.consumedUnits",
-        "InventoryHold.status",
-        "InventoryHold.acquiredAt",
-        "InventoryHold.expiresAt",
-        "InventoryHold.releasedAt",
-        "InventoryHold.forceReleasedByPrincipalId",
-        "InventoryHold.forceReleaseReason"
-       ],
-       "operation": "listInventoryHolds",
-       "provenance": "contract catalogue.yaml GET /inventory-holds"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Acquire",
-       "operation": "acquireInventoryHold",
-       "provenance": "contract catalogue.yaml POST /inventory-holds"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Force",
-       "operation": "forceReleaseInventoryHold",
-       "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/force-release"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release hold",
-       "operation": "relinquishInventoryHold",
-       "provenance": "contract catalogue.yaml DELETE /inventory-holds/{inventoryHoldId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Renew",
-       "operation": "renewInventoryHold",
-       "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/renew"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listInventoryHolds",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "relinquishInventoryHold",
-       "label": "Release lease",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acquireInventoryHold",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmForceReleaseInventoryHold",
-    "component": "confirmDialog",
-    "trigger": "Force",
-    "body": "**Names what `forceReleaseInventoryHold` changes and what it leaves alone**, in the consequence rather than the verb. A allocation holds this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/force-release"
-   }
-  ],
-  "states": {
-   "loading": "The allocation holds list.",
-   "error": "Could not load. Names which read failed and leaves the allocation holds untouched.",
-   "emptyFirstRun": "No allocation holds yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the allocation holds are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listInventoryHolds",
-    "contract": "catalogue",
-    "purpose": "List leases",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "acquireInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Acquire an inventory lease",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
-    "operationId": "forceReleaseInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Reclaim a stranded lease",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
-    "operationId": "relinquishInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Return unsold units",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
-    "operationId": "renewInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Extend a lease TTL",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "inventoryHoldId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `inventoryHoldId`.",
-   "preloaded": [
-    "InventoryHold.id",
-    "InventoryHold.channelCapacityId",
-    "InventoryHold.holderWorkstationId",
-    "InventoryHold.parentLeaseId",
-    "InventoryHold.requestedUnits"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-018"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-019",
-  "name": "Closures & Blackouts",
-  "module": "Sell",
-  "requiresModule": "ticketing",
-  "wave": 2,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/closures-blackouts",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ClosuresBlackoutsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "entryFrom": [
-    "BO-102"
-   ],
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2d`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
-  "density": "compact",
-  "boardFrames": [
-   "Seat Board 2.dc.html#seat-2d"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listPerformances` reads the population and `getEvent` reads one of them — list, select, act",
-  "purpose": "Stop selling something, for a reason.",
-  "gaps": [
-   {
-    "operation": "getPerformance",
-    "why": "**3 declared operations reach no component on this screen**: getPerformance, getSeatAvailability, listEvents. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every closures blackouts",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected closures blackouts",
-       "bindsTo": "Event",
-       "columns": [
-        "Event.id",
-        "Event.code",
-        "Event.name",
-        "Event.venueId",
-        "Event.scopePath",
-        "Event.parentEventId",
-        "Event.performanceCount",
-        "Event.isActive"
-       ],
-       "operation": "getEvent",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createEvent",
-       "provenance": "contract catalogue.yaml POST /events"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateEvent",
-       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setPathClosure",
-       "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/paths/{pathId}/closure"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPerformances",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelPerformance",
-       "label": "Cancel performance",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createEvent",
-       "label": "Create event",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "cancelPerformance",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmCancelPerformance",
-    "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A closures blackouts this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-   }
-  ],
-  "states": {
-   "loading": "The closures blackouts list.",
-   "error": "Could not load. Names which read failed and leaves the closures blackouts untouched.",
-   "emptyFirstRun": "No closures blackouts yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the closures blackouts are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPerformances",
-    "contract": "catalogue",
-    "purpose": "List performances of an event",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "cancelPerformance",
-    "contract": "catalogue",
-    "purpose": "Cancel a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "createEvent",
-    "contract": "catalogue",
-    "purpose": "Create an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "createPerformances",
-    "contract": "catalogue",
-    "purpose": "Create performances, singly or by schedule",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "getEvent",
-    "contract": "catalogue",
-    "purpose": "Read an event",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getPerformance",
-    "contract": "catalogue",
-    "purpose": "Read a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getSeatAvailability",
-    "contract": "seating",
-    "purpose": "Seat status for a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEvents",
-    "contract": "catalogue",
-    "purpose": "List events",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recommendSeats",
-    "contract": "seating",
-    "purpose": "Recommend seats for a party",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updateEvent",
-    "contract": "catalogue",
-    "purpose": "Amend an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updatePerformance",
-    "contract": "catalogue",
-    "purpose": "Amend a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "setPathClosure",
-    "contract": "venue-map",
-    "purpose": "Close a path or an area",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "eventId",
-     "from": "deepLink"
-    },
-    {
-     "name": "performanceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "mapId",
-     "from": "navigation"
-    },
-    {
-     "name": "pathId",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event.",
-   "preloaded": [
-    "Event.id",
-    "Event.code",
-    "Event.name",
-    "Event.venueId",
-    "Event.scopePath"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-019",
-   "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-037",
-  "name": "Offline Package Status",
-  "module": "Sell",
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
   "requiresModule": "ticketing",
   "wave": 1,
-  "capability": "C00",
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/offline-package-status",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OfflinePackageStatusDetail.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009",
-    "BO-128"
+   "entryFrom": [
+    "WEB-001"
    ],
    "inferred": true,
-   "entryFrom": [
-    "BO-102"
-   ],
-   "transitions": [
-    {
-     "to": "BO-128",
-     "trigger": "Live Workstation Health Monitor",
-     "provenance": "flow F89 step 1→2",
-     "operation": "setOfflinePolicy"
-    },
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 2 board screen(s): Offline Operations Dashboard; Offline Product & Data Cache Management. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Owns POS board frame(s) POS-5A, POS-5C** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
-  "density": "compact",
-  "boardFrames": [
-   "POS Board 5.dc.html#pos-5a",
-   "POS Board 5.dc.html#pos-5c",
-   "Retail Board 3.dc.html#ret-3j"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act",
-  "purpose": "Know what each device is enforcing right now.",
-  "gaps": [
-   {
-    "operation": "getOfflinePackage",
-    "why": "**3 declared operations reach no component on this screen**: getOfflinePackage, listSyncRejections, listWorkstations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every offline package status",
-       "bindsTo": "BundleSummary",
-       "columns": [
-        "BundleSummary.venueId",
-        "BundleSummary.publishedAt",
-        "BundleSummary.publishedBy",
-        "BundleSummary.contentHash",
-        "BundleSummary.signatureKeyId",
-        "BundleSummary.staleAfter",
-        "BundleSummary.sizeBytes",
-        "BundleSummary.note",
-        "BundleSummary.appliedByWorkstations"
-       ],
-       "operation": "listCatalogueBundles",
-       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected offline package status",
-       "bindsTo": "CatalogueBundle",
-       "columns": [
-        "CatalogueBundle.venueId",
-        "CatalogueBundle.isDelta",
-        "CatalogueBundle.baseVersion",
-        "CatalogueBundle.signature",
-        "CatalogueBundle.signatureKeyId",
-        "CatalogueBundle.contentHash",
-        "CatalogueBundle.staleAfter",
-        "CatalogueBundle.payload"
-       ],
-       "operation": "getLatestBundle",
-       "provenance": "contract catalogue.yaml GET /catalogue/bundles/latest"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Publish",
-       "operation": "publishBundle",
-       "provenance": "contract catalogue.yaml POST /catalogue/bundles"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Report",
-       "operation": "reportBundleApplied",
-       "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setOfflinePolicy",
-       "provenance": "contract tenancy.yaml PUT /offline-policy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Sync",
-       "operation": "syncOrders",
-       "provenance": "contract orders.yaml POST /sync/orders"
-      },
-      {
-       "kind": "publishGate",
-       "label": "What publishing changes",
-       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCatalogueBundles",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishBundle",
-       "label": "Publish bundle",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishBundle",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishBundle",
-       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The offline package status list.",
-   "error": "Could not load. Names which read failed and leaves the offline package status untouched.",
-   "emptyFirstRun": "No offline package status yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offline package status are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCatalogueBundles",
-    "contract": "catalogue",
-    "purpose": "List published bundles",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getLatestBundle",
-    "contract": "catalogue",
-    "purpose": "Pull the current bundle for this workstation's venue",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "publishBundle",
-    "contract": "catalogue",
-    "purpose": "Compute, sign and publish a catalogue bundle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
-   },
-   {
-    "operationId": "reportBundleApplied",
-    "contract": "catalogue",
-    "purpose": "Report that a workstation applied a bundle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
-   },
-   {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "Entitlement and rule set for offline validation",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSyncRejections",
-    "contract": "orders",
-    "purpose": "Entries the server refused",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listWorkstations",
-    "contract": "tenancy",
-    "purpose": "List workstations",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "setOfflinePolicy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
-   },
-   {
-    "operationId": "syncOrders",
-    "contract": "orders",
-    "purpose": "Replay orders recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "version",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `version`.",
-   "preloaded": [
-    "CatalogueBundle.venueId",
-    "CatalogueBundle.isDelta",
-    "CatalogueBundle.baseVersion",
-    "CatalogueBundle.signature",
-    "CatalogueBundle.signatureKeyId"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-037",
-   "source": "Claude Design POS pack, 24 August",
-   "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-063",
-  "name": "Opening Hours & Calendar",
-  "module": "Sell",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/opening-hours-calendar",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OpeningHoursCalendarDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
    "exitTo": [
-    "BO-001",
-    "BO-007",
-    "BO-008",
-    "BO-009"
-   ],
-   "inferred": true,
-   "entryFrom": [
-    "BO-102"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "eventId",
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "carries": [
-      "productId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 2 board screen(s): Operating Hours & Service Periods; Operating Hours & Sales Periods. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
-  "density": "compact",
-  "boardFrames": [
-   "Seat Board 1.dc.html#seat-1c"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listPerformances` reads the population and `getPerformance` reads one of them — list, select, act",
-  "purpose": "Say when the venue is open, including the exceptions.",
-  "gaps": [
-   {
-    "operation": "getEvent",
-    "why": "**4 declared operations reach no component on this screen**: getEvent, getSeatAvailability, listEvents, getVenueSettings. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every opening hours calendar",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected opening hours calendar",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "getPerformance",
-       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createEvent",
-       "provenance": "contract catalogue.yaml POST /events"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateEvent",
-       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateOutlet",
-       "provenance": "contract tenancy.yaml PATCH /outlets/{outletId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPerformances",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "label": "Create performances",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelPerformance",
-       "label": "Cancel performance",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPerformances",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmCancelPerformance",
-    "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A opening hours calendar this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-   }
-  ],
-  "states": {
-   "loading": "The opening hours calendar list.",
-   "error": "Could not load. Names which read failed and leaves the opening hours calendar untouched.",
-   "emptyFirstRun": "No opening hours calendar yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the opening hours calendar are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPerformances",
-    "contract": "catalogue",
-    "purpose": "List performances of an event",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getPerformance",
-    "contract": "catalogue",
-    "purpose": "Read a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createPerformances",
-    "contract": "catalogue",
-    "purpose": "Create performances, singly or by schedule",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "cancelPerformance",
-    "contract": "catalogue",
-    "purpose": "Cancel a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "createEvent",
-    "contract": "catalogue",
-    "purpose": "Create an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "getEvent",
-    "contract": "catalogue",
-    "purpose": "Read an event",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getSeatAvailability",
-    "contract": "seating",
-    "purpose": "Seat status for a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEvents",
-    "contract": "catalogue",
-    "purpose": "List events",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recommendSeats",
-    "contract": "seating",
-    "purpose": "Recommend seats for a party",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updateEvent",
-    "contract": "catalogue",
-    "purpose": "Amend an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updatePerformance",
-    "contract": "catalogue",
-    "purpose": "Amend a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "Operational settings for this venue",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateOutlet",
-    "contract": "tenancy",
-    "purpose": "Amend an outlet",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    },
-    {
-     "name": "eventId",
-     "from": "deepLink"
-    },
-    {
-     "name": "outletId",
-     "from": "deepLink"
-    },
-    {
-     "name": "performanceId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "An outlet opened from the directory.",
-   "preloaded": [
-    "Performance.id",
-    "Performance.eventId",
-    "Performance.startsAt",
-    "Performance.endsAt",
-    "Performance.approvalRequestId"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-063",
-   "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-102",
-  "name": "Sell",
-  "module": "Sell",
-  "requiresModule": "core",
-  "wave": 1,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell",
-   "component": "apps/venue-management-web/src/routes/home/SellList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-100"
-   ],
-   "exitTo": [
-    "BO-007",
-    "BO-009",
-    "BO-010",
-    "BO-011",
-    "BO-012",
-    "BO-013",
-    "BO-014",
-    "BO-015",
-    "BO-016",
-    "BO-017",
-    "BO-018",
-    "BO-019",
-    "BO-037",
-    "BO-063",
-    "BO-109",
-    "BO-110",
-    "BO-111",
-    "BO-112",
-    "BO-113",
-    "BO-114",
-    "BO-115",
-    "BO-116",
-    "BO-117",
-    "BO-118",
-    "BO-119",
-    "BO-120",
-    "BO-121",
-    "BO-122",
-    "BO-123",
-    "BO-124",
-    "BO-125",
-    "BO-126",
-    "BO-142",
-    "BO-143"
-   ],
-   "transitions": [
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "carries": [
-      "priceListId"
-     ],
-     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-010",
-     "trigger": "Promotions & Coupons",
-     "carries": [
-      "campaignId",
-      "code",
-      "dashboardId",
-      "promotionId",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-011",
-     "trigger": "Packages & Bundles",
-     "carries": [
-      "version"
-     ],
-     "provenance": "derived — BO-011 declares entryState.params version, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-012",
-     "trigger": "Membership Products",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — BO-012 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-013",
-     "trigger": "Channel & Distribution",
-     "carries": [
-      "channelCapacityId"
-     ],
-     "provenance": "derived — BO-013 declares entryState.params channelCapacityId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-014",
-     "trigger": "Catalogue Publishing",
-     "carries": [
+      "deviceId",
       "itemId",
-      "priceListId",
-      "productId",
-      "venueId"
+      "subjectId"
      ],
-     "provenance": "derived — BO-014 declares entryState.params itemId, priceListId, productId, venueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "BO-015",
-     "trigger": "Session Calendar",
+     "to": "WEB-018",
+     "trigger": "My Tickets",
      "carries": [
-      "eventId",
-      "performanceId"
+      "entitlementId",
+      "orderId"
      ],
-     "provenance": "derived — BO-015 declares entryState.params eventId, performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-016",
-     "trigger": "Session Template",
+     "to": "WEB-019",
+     "trigger": "Order History",
      "carries": [
-      "eventId",
-      "performanceId"
+      "orderId"
      ],
-     "provenance": "derived — BO-016 declares entryState.params eventId, performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-017",
-     "trigger": "Capacity Management",
-     "carries": [
-      "channelCapacityId"
-     ],
-     "provenance": "derived — BO-017 declares entryState.params channelCapacityId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-018",
-     "trigger": "Allocation & Holds",
-     "carries": [
-      "inventoryHoldId"
-     ],
-     "provenance": "derived — BO-018 declares entryState.params inventoryHoldId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-019",
-     "trigger": "Closures & Blackouts",
-     "carries": [
-      "eventId",
-      "mapId",
-      "pathId",
-      "performanceId"
-     ],
-     "provenance": "derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-037",
-     "trigger": "Offline Package Status",
-     "carries": [
-      "version"
-     ],
-     "provenance": "derived — BO-037 declares entryState.params version, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-063",
-     "trigger": "Opening Hours & Calendar",
-     "carries": [
-      "eventId",
-      "outletId",
-      "performanceId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-063 declares entryState.params eventId, outletId, performanceId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-109",
-     "trigger": "Menu Builder & POS Layout Designer",
-     "carries": [
-      "menuId",
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-110",
-     "trigger": "Recipe & BOM Management",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-110 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-111",
-     "trigger": "Ingredient Substitution, Allergen & Nutrition",
-     "carries": [
-      "menuId",
-      "menuItemId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-111 declares entryState.params menuId, menuItemId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-112",
-     "trigger": "Production Planning & Production Sheets",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-112 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-113",
-     "trigger": "Central Kitchen & Commissary Management",
-     "carries": [
-      "runId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-113 declares entryState.params runId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-114",
-     "trigger": "Variants, Attributes, Barcode & RFID Management",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-114 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-115",
-     "trigger": "Category, Brand & Merchandise Hierarchy",
-     "carries": [
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-115 declares entryState.params reportId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-116",
-     "trigger": "Merchandising & Product Presentation",
-     "carries": [
-      "merchandiseId",
-      "roleId",
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-116 declares entryState.params merchandiseId, roleId, saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-117",
-     "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "carries": [
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-117 declares entryState.params saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-118",
-     "trigger": "Campaign & Audience Management",
-     "carries": [
-      "reportId",
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-118 declares entryState.params reportId, saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-119",
-     "trigger": "Cross-Sell, Upsell & Recommendation Rules",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-119 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-120",
-     "trigger": "Omnichannel Commerce & Journey Configuration",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-120 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-121",
-     "trigger": "Personalized Offers & Guest Engagement",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-121 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-122",
-     "trigger": "POS Experience Dashboard",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-122 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-123",
-     "trigger": "POS Profile Management",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-123 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-124",
-     "trigger": "Layout & Journey Builder",
-     "carries": [
-      "deviceId",
-      "profileId",
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-125",
-     "trigger": "Product & Category Button Configuration",
-     "carries": [
-      "deviceId",
-      "saleBoardId",
-      "venueId",
-      "workstationId"
-     ],
-     "provenance": "derived — BO-125 declares entryState.params deviceId, saleBoardId, venueId, workstationId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-126",
-     "trigger": "Deployment, Preview & Audit",
-     "carries": [
-      "profileId",
-      "reportId",
-      "rolloutId",
-      "saleBoardId",
-      "venueId"
-     ],
-     "provenance": "derived — BO-126 declares entryState.params profileId, reportId, rolloutId, saleBoardId, venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-142",
-     "trigger": "Store Rules, Controls & Permissions",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-142 declares entryState.params venueId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-143",
-     "trigger": "Retail Global Settings & Controls",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-143 declares entryState.params venueId, so an edge into it must carry them"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "notes": "Section landing. **14 screens reach the entry point through here** — before 20 August they reached it through nothing.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listUpsellRules` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Everything in sell, and what in it needs attention.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": "getUpsellSuggestions",
-    "why": "**1 declared operation reach no component on this screen**: getUpsellSuggestions. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -1819,23 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every sell",
-       "bindsTo": "UpsellRule",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "UpsellRule.id",
-        "UpsellRule.name",
-        "UpsellRule.placement",
-        "UpsellRule.triggerVariantIds",
-        "UpsellRule.triggerCategoryIds",
-        "UpsellRule.suggestedVariantIds",
-        "UpsellRule.suggestedBundleId",
-        "UpsellRule.channels",
-        "UpsellRule.priority",
-        "UpsellRule.maxSuggestions",
-        "UpsellRule.isActive"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "operation": "listUpsellRules",
-       "provenance": "contract promotions.yaml GET /upsell-rules"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -1845,196 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sell",
-       "bindsTo": "VenueSettings",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "screens",
-       "notes": "14 screens, each with what needs attention.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search sell",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The list, with counts.",
-   "error": "Could not load. Venue Home is still reachable.",
-   "emptyFirstRun": "**Nothing configured in sell yet.** The action is the first thing to set up, not a blank list.",
-   "emptyNoResults": "Nothing matches the filter.",
-   "emptyNoAccess": "You do not have permission for sell. **Said plainly** — an empty section reads as broken."
-  },
-  "apis": [
-   {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listUpsellRules",
-    "contract": "promotions",
-    "purpose": "Upsell rules in force",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getUpsellSuggestions",
-    "contract": "promotions",
-    "purpose": "What to offer this basket",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
-   "preloaded": [
-    "VenueSettings.id",
-    "VenueSettings.venueId",
-    "VenueSettings.supportHours",
-    "VenueSettings.quietHours",
-    "VenueSettings.segregatedAccess"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-102"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-109",
-  "name": "Menu Builder & POS Layout Designer",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/menu-builder-pos-layout-designer",
-   "component": "apps/venue-management-web/src/routes/sell/MenuBuilderPosLayoutDesignerList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Drawn 31 August** — `FnB Board 2.dc.html` frame `fnb-2b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Menu Builder &amp; POS Layout Designer* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
-  "density": "compact",
-  "boardFrames": [
-   "FnB Board 2.dc.html#fnb-2b"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listMenus` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Menu Builder & POS Layout Designer — from the client design board, 20 August.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every menu pos layout",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected menu pos layout",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -2044,799 +128,794 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setMenuSections",
-       "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateSaleBoard",
-       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search menu builder",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The menu pos layout list.",
-   "error": "Could not load. Names which read failed and leaves the menu pos layout untouched.",
-   "emptyFirstRun": "No menu pos layout yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the menu pos layout are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "List menus",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setMenuSections",
-    "contract": "fnb",
-    "purpose": "Set menu sections and their item ordering",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
-   },
-   {
-    "operationId": "updateSaleBoard",
-    "contract": "tenancy",
-    "purpose": "Update a sale board",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    },
-    {
-     "name": "menuId",
-     "from": "deepLink"
-    },
-    {
-     "name": "saleBoardId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "Menu.id",
-    "Menu.code",
-    "Menu.name",
-    "Menu.outletId",
-    "Menu.availability"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-109",
-   "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-110",
-  "name": "Recipe & BOM Management",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/recipe-bom-management",
-   "component": "apps/venue-management-web/src/routes/sell/RecipeBomManagementList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Recipe & BOM Management — from the client design board, 20 August.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every recipe bom",
-       "bindsTo": "Recipe",
-       "columns": [
-        "Recipe.menuItemId",
-        "Recipe.yield",
-        "Recipe.ingredients",
-        "Recipe.costPerPortion"
-       ],
-       "operation": "listRecipes",
-       "provenance": "contract fnb.yaml GET /recipes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected recipe bom",
-       "bindsTo": "Recipe",
-       "columns": [
-        "Recipe.menuItemId",
-        "Recipe.yield",
-        "Recipe.ingredients",
-        "Recipe.costPerPortion"
-       ],
-       "operation": "listRecipes",
-       "provenance": "contract fnb.yaml GET /recipes"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setRecipe",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search recipe",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The recipe bom list.",
-   "error": "Could not load. Names which read failed and leaves the recipe bom untouched.",
-   "emptyFirstRun": "No recipe bom yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the recipe bom are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRecipes",
-    "contract": "fnb",
-    "purpose": "List recipes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRecipe",
-    "contract": "fnb",
-    "purpose": "Define a recipe for a menu item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listRecipes"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "Recipe.menuItemId",
-    "Recipe.yield",
-    "Recipe.ingredients",
-    "Recipe.costPerPortion"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-110"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-111",
-  "name": "Ingredient Substitution, Allergen & Nutrition",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/ingredient-substitution-allergen-nutrition",
-   "component": "apps/venue-management-web/src/routes/sell/IngredientSubstitutionAllergenNutritioList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102",
-    "BO-045"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product. **flow F31 — allergen verification returns to the menu it was opened from.** The flow is the authority on the journey and the navigation has to agree with it; marking this block non-inferred is what turned the disagreement from a warning into a failure.",
-   "transitions": [
-    {
-     "to": "BO-045",
-     "trigger": "The draft is scheduled for Monday rather than published now",
-     "provenance": "flow F31 step 3→4, F93 step 1→2"
-    },
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "boardFrames": [
-   "FnB Board 2.dc.html#fnb-2l"
-  ],
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`setRecipe`, `updateMenu`, `setSubstitutionRules`) and no read of a population — it is settings, not a list",
-  "purpose": "Ingredient Substitution, Allergen & Nutrition — from the client design board, 20 August.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "menuItemId",
-       "bindsTo": "Recipe.menuItemId",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "yield",
-       "bindsTo": "Recipe.yield",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "ingredients",
-       "bindsTo": "Recipe.ingredients",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "costPerPortion",
-       "bindsTo": "Recipe.costPerPortion",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setRecipe",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateMenu",
-       "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setSubstitutionRules",
-       "provenance": "contract fnb.yaml PUT /substitution-rules"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyAllergens",
-       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search ingredient substitution, allergen",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The saved ingredient substitution allergen.",
-   "error": "Could not load. Names which read failed and leaves the ingredient substitution allergen untouched.",
-   "emptyFirstRun": "No ingredient substitution allergen configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setRecipe",
-    "contract": "fnb",
-    "purpose": "Define a recipe for a menu item",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "updateMenu",
-    "contract": "fnb",
-    "purpose": "Amend a menu",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setSubstitutionRules",
-    "contract": "fnb",
-    "purpose": "What may replace what",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "verifyAllergens",
-    "contract": "fnb",
-    "purpose": "Does this dish still match its claim?",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    },
-    {
-     "name": "menuId",
-     "from": "deepLink"
-    },
-    {
-     "name": "menuItemId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders. An item opened from the menu. **Allergen verification is per item** — a menu-wide check is a job, not a screen."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-111",
-   "source": "Claude Design F&B pack, 24 August",
-   "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-112",
-  "name": "Production Planning & Production Sheets",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/production-planning-production-sheets",
-   "component": "apps/venue-management-web/src/routes/sell/ProductionPlanningProductionSheetsList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-007",
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-009",
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "provenance": "flow F78 step 3→4",
-     "operation": "planProductionRun"
-    },
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "boardFrames": [
-   "Retail Board 2.dc.html#ret-2e"
-  ],
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`planProductionRun`) and no read of a population — it is settings, not a list",
-  "purpose": "Production Planning & Production Sheets — from the client design board, 20 August.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ProductionRun.id",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "recipeId",
-       "bindsTo": "ProductionRun.recipeId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "producingOutletId",
-       "bindsTo": "ProductionRun.producingOutletId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "forOutletIds",
-       "bindsTo": "ProductionRun.forOutletIds",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "plannedQuantity",
-       "bindsTo": "ProductionRun.plannedQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "actualQuantity",
-       "bindsTo": "ProductionRun.actualQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "scheduledFor",
-       "bindsTo": "ProductionRun.scheduledFor",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "status",
-       "bindsTo": "ProductionRun.status",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "varianceReason",
-       "bindsTo": "ProductionRun.varianceReason",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Plan",
-       "operation": "planProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search production planning",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The saved production planning production.",
-   "error": "Could not load. Names which read failed and leaves the production planning production untouched.",
-   "emptyFirstRun": "No production planning production configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "planProductionRun",
-    "contract": "fnb",
-    "purpose": "Plan a batch, for one outlet or several",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-112",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-113",
-  "name": "Central Kitchen & Commissary Management",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/central-kitchen-commissary-management",
-   "component": "apps/venue-management-web/src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "carries": [
-      "venueId"
-     ],
-     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "boardFrames": [
-   "Retail Board 2.dc.html#ret-2d"
-  ],
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no read of a population — it is settings, not a list",
-  "purpose": "Central Kitchen & Commissary Management — from the client design board, 20 August.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ProductionRun.id",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "recipeId",
-       "bindsTo": "ProductionRun.recipeId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "producingOutletId",
-       "bindsTo": "ProductionRun.producingOutletId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "forOutletIds",
-       "bindsTo": "ProductionRun.forOutletIds",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "plannedQuantity",
-       "bindsTo": "ProductionRun.plannedQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "actualQuantity",
-       "bindsTo": "ProductionRun.actualQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "scheduledFor",
-       "bindsTo": "ProductionRun.scheduledFor",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "status",
-       "bindsTo": "ProductionRun.status",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "varianceReason",
-       "bindsTo": "ProductionRun.varianceReason",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Plan",
-       "operation": "planProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
        "label": "Complete",
-       "operation": "completeProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
+  "states": {
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
+  },
+  "apis": [
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "preloaded": [
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     },
@@ -2845,8 +924,10 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "searchField",
-       "label": "Search central kitchen",
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -2854,65 +935,639 @@
    ]
   },
   "states": {
-   "loading": "The saved central kitchen commissary.",
-   "error": "Could not load. Names which read failed and leaves the central kitchen commissary untouched.",
-   "emptyFirstRun": "No central kitchen commissary configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
-    "operationId": "planProductionRun",
-    "contract": "fnb",
-    "purpose": "Plan a batch, for one outlet or several",
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
     "trigger": "onAction"
    },
    {
-    "operationId": "completeProductionRun",
-    "contract": "fnb",
-    "purpose": "Record what was actually made",
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "venueId",
-     "from": "session"
+     "name": "entitlementId",
+     "from": "deepLink"
     },
     {
-     "name": "runId",
+     "name": "orderId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-113",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

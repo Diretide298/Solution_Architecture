@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
-  x-ticvai-screen-count: 80
+  x-ticvai-screen-count: 31
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Payments and Wallet
   x-ticvai-platforms:
@@ -55,6 +55,11 @@ paths:
   /payment-methods:
     get:
       operationId: listPaymentMethods
+      x-ticvai-consumed-by:
+        - "P09 ADM-559 Payment Command Center\t7"
+        - "P09 ADM-560 Payment Method Catalogue\t8"
+        - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
+        - "P09 ADM-590 Digital & Alternative Payment Method Manager\t71"
       summary: The methods this tenant can offer, and where
       description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
         behind it is a routing decision, and a venue that models them as one thing cannot change
@@ -89,6 +94,8 @@ paths:
                   $ref: '#/components/schemas/PaymentMethod'
     post:
       operationId: createPaymentMethod
+      x-ticvai-consumed-by:
+        - "P09 ADM-560 Payment Method Catalogue\t8"
       summary: Add a payment method to the catalogue
       tags:
       - payments
@@ -122,6 +129,15 @@ paths:
         format: uuid
     put:
       operationId: updatePaymentMethod
+      x-ticvai-consumed-by:
+        - "P09 ADM-561 Payment Method Configuration\t9"
+        - "P09 ADM-562 Channel & Touchpoint Payment Configuration\t10"
+        - "P09 ADM-563 Venue, Location & Business Unit Payment Assignment\t11"
+        - "P09 ADM-564 Currency & Payment Currency Configuration\t12"
+        - "P09 ADM-565 Payment Eligibility & Availability Rule Builder\t13"
+        - "P09 ADM-566 Payment Fees, Surcharges & Commercial Rules\t14"
+        - "P09 ADM-590 Digital & Alternative Payment Method Manager\t71"
+        - "P09 ADM-591 Digital Wallet & Mobile Payment Configuration\t72"
       summary: Change availability, fees and eligibility
       description: 'Boards 1.4, 1.7 and 1.8. **Eligibility, fees and availability travel together
         because they are one commercial decision.** Offering a method that costs 2.9% on a five-dirham
@@ -153,6 +169,10 @@ paths:
   /payment-providers:
     get:
       operationId: listPaymentProviderConnections
+      x-ticvai-consumed-by:
+        - "P09 ADM-569 Payment Orchestration Command Center\t27"
+        - "P09 ADM-570 Gateway, PSP & Acquirer Directory\t28"
+        - "P09 ADM-572 Gateway Capability & Payment Method Mapping\t30"
       summary: Gateways, PSPs and acquirers, and what each can do
       description: 'Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped and then
         causes an incident.** Not every provider supports every method, currency, partial capture,
@@ -178,6 +198,9 @@ paths:
                   $ref: '#/components/schemas/PaymentProviderConnection'
     post:
       operationId: createPaymentProviderConnection
+      x-ticvai-consumed-by:
+        - "P09 ADM-570 Gateway, PSP & Acquirer Directory\t28"
+        - "P09 ADM-571 Provider Connection & Adapter Configuration\t29"
       summary: Connect a provider
       description: '**Credentials are written and never read back.** The response carries a fingerprint
         so somebody can confirm which key is in use without the key being retrievable from a screen.
@@ -214,6 +237,9 @@ paths:
         format: uuid
     post:
       operationId: testPaymentProviderConnection
+      x-ticvai-consumed-by:
+        - "P09 ADM-571 Provider Connection & Adapter Configuration\t29"
+        - "P09 ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59"
       summary: Prove the connection works before anybody pays through it
       description: 'Board 3.10. **A provider configured and never tested is a provider that fails on
         the first real transaction**, in front of a guest, at the busiest moment somebody chose to
@@ -236,6 +262,8 @@ paths:
   /payment-routing-rules:
     get:
       operationId: listPaymentRoutingRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-573 Payment Routing Rule Builder\t31"
       summary: Which provider takes which transaction
       tags:
       - payments
@@ -255,6 +283,9 @@ paths:
                   $ref: '#/components/schemas/PaymentRoutingRule'
     put:
       operationId: setPaymentRoutingRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-573 Payment Routing Rule Builder\t31"
+        - "P09 ADM-574 Routing Strategy, Priority & Load Distribution\t33"
       summary: Route by method, currency, venue, amount, cost or share
       description: 'Boards 2.5 and 2.6. **Priority and load distribution are both needed and they are
         not the same.** Priority says *this acquirer unless it cannot*; distribution says *sixty per
@@ -304,6 +335,8 @@ paths:
   /payment-routing/simulate:
     post:
       operationId: simulatePaymentRouting
+      x-ticvai-consumed-by:
+        - "P09 ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor\t37"
       summary: Where would this transaction go, and why
       description: 'Board 2.10. **The decision trace, including the rules that did not match.** Routing
         is the configuration most likely to be subtly wrong and least likely to announce it — a
@@ -332,6 +365,8 @@ paths:
   /payment-failover-policy:
     put:
       operationId: setPaymentFailoverPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
       summary: What happens when a provider fails, and when to stop trying
       description: 'Board 2.7. **A declined card and a broken gateway need opposite responses, and this
         is where they are told apart.** A decline is final and the till asks for another card; a
@@ -369,6 +404,9 @@ paths:
   /payment-providers/health:
     get:
       operationId: getPaymentProviderHealth
+      x-ticvai-consumed-by:
+        - "P09 ADM-569 Payment Orchestration Command Center\t27"
+        - "P09 ADM-576 Provider Health, SLA & Performance Monitor\t35"
       summary: Authorisation rate, latency and availability, per provider
       description: 'Board 2.8. **Authorisation rate is the number that matters and it is not an uptime
         figure.** A provider that is up and declining 30% of cards it should be approving is worse than
@@ -403,6 +441,9 @@ paths:
   /payment-providers/economics:
     get:
       operationId: getPaymentProviderEconomics
+      x-ticvai-consumed-by:
+        - "P09 ADM-577 Provider Cost, Commercial & Routing Economics\t36"
+        - "P09 ADM-624 Fees, Commission, FX & Settlement Economics\t145"
       summary: What each provider actually costs
       description: 'Board 2.9. **Cost per transaction is a routing input, not a finance report.** Scheme
         fees, interchange, acquirer margin, FX spread and chargeback costs differ per provider, per
@@ -439,6 +480,11 @@ paths:
   /payment-terminals:
     get:
       operationId: listPaymentTerminals
+      x-ticvai-consumed-by:
+        - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
+        - "P09 ADM-579 Terminal & Card-Present Command Center\t48"
+        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P09 ADM-585 Card-Present Transaction Monitor & Operations\t55"
       summary: Terminals, and the payment configuration on each
       description: 'Board 3.2. **The device register is `tenancy`''s; this is the payment layer on top
         of it.** Merchant id, terminal id, the acquirer it talks to, EMV configuration and its
@@ -470,6 +516,10 @@ paths:
                   $ref: '#/components/schemas/PaymentTerminal'
     put:
       operationId: setPaymentTerminalConfiguration
+      x-ticvai-consumed-by:
+        - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
+        - "P09 ADM-583 EMV & Card-Present Processing Configuration\t53"
+        - "P09 ADM-586 Degraded, Offline & Store-and-Forward Manager\t56"
       summary: Merchant account, acquirer, EMV and offline behaviour
       description: 'Boards 3.3, 3.5 and 3.8. **Store-and-forward is the setting that decides whether a
         venue can trade when the line drops**, and it is a risk decision rather than a technical one: a
@@ -508,6 +558,8 @@ paths:
         format: uuid
     get:
       operationId: listStoredForwardTransactions
+      x-ticvai-consumed-by:
+        - "P09 ADM-586 Degraded, Offline & Store-and-Forward Manager\t56"
       summary: What a terminal took offline and has not yet sent
       description: 'Board 3.8. **Money the venue has taken and the platform does not know about.** Until
         these land, the till total, the acquirer and the ledger all disagree, and a terminal that dies
@@ -535,6 +587,9 @@ paths:
   /hosted-checkout-config:
     put:
       operationId: setHostedCheckoutConfiguration
+      x-ticvai-consumed-by:
+        - "P09 ADM-594 Hosted Checkout, Redirect & Return Flow Configuration\t75"
+        - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
       summary: Redirect, return and the journey back
       description: 'Board 4.6. **The return leg is where hosted checkout goes wrong.** A guest who pays
         on a provider''s page and closes the tab before the redirect has paid, and the platform does not
@@ -566,6 +621,8 @@ paths:
   /payment-authentication-policy:
     put:
       operationId: setPaymentAuthenticationPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-596 Authentication, Tokenization & Recurring Payment Controls\t78"
       summary: 3-D Secure, tokenisation and recurring mandates
       description: 'Board 4.8. **Strong authentication is a commercial trade as much as a security
         one.** Challenging every transaction raises abandonment; challenging none raises fraud and moves
@@ -600,6 +657,8 @@ paths:
   /mixed-tender-rules:
     get:
       operationId: getMixedTenderRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-599 Mixed Tender & Credit Command Center\t93"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments
@@ -617,6 +676,12 @@ paths:
                 $ref: '#/components/schemas/MixedTenderRules'
     put:
       operationId: setMixedTenderRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-600 Mixed Tender Rule & Combination Builder\t93"
+        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
+        - "P09 ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97"
+        - "P09 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules\t98"
+        - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
       summary: Split payment, tender sequence and restrictions
       description: 'Boards 5.2, 5.3 and 5.7. **Sequence is not cosmetic.** Stored value before card
         means a guest''s gift card is used up on a purchase they would happily have paid for with a
@@ -651,6 +716,9 @@ paths:
   /b2b-credit-accounts:
     get:
       operationId: listB2bCreditAccounts
+      x-ticvai-consumed-by:
+        - "P09 ADM-602 B2B Credit Account & Limit Manager\t95"
+        - "P09 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor\t102"
       summary: On-account customers, their limits and their exposure
       description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions
         and the account they govern did not.** A school booking on account, a tour operator with thirty
@@ -685,6 +753,8 @@ paths:
                   $ref: '#/components/schemas/B2bCreditAccount'
     post:
       operationId: createB2bCreditAccount
+      x-ticvai-consumed-by:
+        - "P09 ADM-602 B2B Credit Account & Limit Manager\t95"
       summary: Open an on-account relationship
       tags:
       - payments
@@ -717,6 +787,8 @@ paths:
         format: uuid
     put:
       operationId: setB2bPaymentTerms
+      x-ticvai-consumed-by:
+        - "P09 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96"
       summary: Limit, terms, billing cycle and what happens at the limit
       description: 'Board 5.5. **What happens at the limit is the decision, not the limit.** Refuse,
         warn, or allow with an override — and a tour operator turned away at a gate with sixty children
@@ -747,6 +819,8 @@ paths:
   /reconciliation-sources:
     get:
       operationId: listReconciliationSources
+      x-ticvai-consumed-by:
+        - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
       summary: The files and feeds reconciliation is run against
       description: 'Board 7.2. **`finance.ingestSettlementFile` could read one and nothing said where
         they come from.** Format, schedule, credentials, the field mapping and what a missing file
@@ -772,6 +846,8 @@ paths:
                   $ref: '#/components/schemas/ReconciliationSource'
     put:
       operationId: setReconciliationSource
+      x-ticvai-consumed-by:
+        - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
       summary: Define a settlement or statement feed
       tags:
       - payments
@@ -797,6 +873,8 @@ paths:
   /reconciliation-rules:
     put:
       operationId: setReconciliationMatchingRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-621 Transaction Matching & Reconciliation Engine\t142"
       summary: How a platform transaction is matched to a settled one
       description: 'Board 7.3. **Exact matching is not enough and never was.** An acquirer settles net
         of fees, rounds differently, batches across midnight and uses its own reference — so the rules
@@ -828,6 +906,8 @@ paths:
   /merchant-accounts:
     get:
       operationId: listMerchantAccounts
+      x-ticvai-consumed-by:
+        - "P09 ADM-625 Merchant Account & Settlement Calendar Manager\t146"
       summary: Merchant accounts, settlement calendars and payout routing
       description: 'Board 7.7. **Which legal entity gets the money, and when.** A group with venues in
         two entities settles into two bank accounts on two calendars, and a payout arriving in the wrong
@@ -852,6 +932,8 @@ paths:
                   $ref: '#/components/schemas/MerchantAccount'
     put:
       operationId: setMerchantAccount
+      x-ticvai-consumed-by:
+        - "P09 ADM-625 Merchant Account & Settlement Calendar Manager\t146"
       summary: Bind a merchant account to entities, venues and a calendar
       tags:
       - payments
@@ -877,6 +959,10 @@ paths:
   /payment-risk-rules:
     put:
       operationId: setPaymentRiskRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P09 ADM-631 Velocity, Behavioral & Transaction Risk Controls\t168"
+        - "P09 ADM-632 Risk Lists, Signals & Payment Control Center\t169"
       summary: Velocity, behaviour, lists and what a hit does
       description: 'Boards 8.2, 8.3 and 8.4. **Distinct from `wallet` risk, which watches stored value.**
         This watches card presentation: the same card across many accounts, many cards from one device,
@@ -918,6 +1004,8 @@ paths:
         format: uuid
     post:
       operationId: submitChargebackEvidence
+      x-ticvai-consumed-by:
+        - "P09 ADM-635 Chargeback Evidence & Representment Workspace\t173"
       summary: Assemble and send a representment
       description: 'Board 8.7. **`respondToChargeback` existed and nothing assembled the case.** Winning
         a representment is almost entirely about producing the right documents inside the scheme''s
@@ -952,6 +1040,12 @@ paths:
   /payment-performance:
     get:
       operationId: getPaymentPerformance
+      x-ticvai-consumed-by:
+        - "P09 ADM-559 Payment Command Center\t7"
+        - "P09 ADM-589 Digital Payments Command Center\t71"
+        - "P09 ADM-629 Payment Risk & Fraud Command Center\t166"
+        - "P09 ADM-636 Payment Performance & Conversion Analytics\t174"
+        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
       summary: Authorisation rate, conversion and where payments are lost
       description: 'Board 8.8. **Conversion at the payment step is the last and most expensive place a
         venue loses a sale**, because everything before it has already been paid for in marketing.
@@ -996,6 +1090,11 @@ paths:
   /payment-configuration/simulate:
     post:
       operationId: simulatePaymentConfiguration
+      x-ticvai-consumed-by:
+        - "P09 ADM-568 Payment Configuration Simulator & Validation Center\t16"
+        - "P09 ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80"
+        - "P09 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor\t102"
+        - "P09 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
       summary: What a guest would be offered, and what it would cost
       description: 'Boards 1.10 and 5.10. **Eight boards of configuration that compose**, and the
         failure is silent: a method enabled at a venue whose acquirer cannot take that currency looks

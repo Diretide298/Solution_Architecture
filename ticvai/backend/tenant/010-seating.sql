@@ -1,5 +1,69 @@
--- seating — 11 tables
+-- seating — 18 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.accessible (
+    seat_map_id                       uuid,
+    eligibility                       text,
+    minimum_provision_percent         numeric(18,4),
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.group_request (
+    id                                uuid PRIMARY KEY,
+    reference                         text,
+    performance_id                    uuid NOT NULL,
+    organisation_id                   uuid,
+    contact_name                      text,
+    party_size                        integer NOT NULL,
+    minimum_contiguous                integer,
+    accessible_spaces_needed          integer,
+    preferred_section_ids             text[],
+    budget_per_head                   numeric(18,4),
+    status                            text,
+    quote_expires_at                  timestamptz,
+    deposit_amount                    numeric(18,4),
+    order_id                          uuid,
+    scope_path                        text
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.hold_pool (
+    id                                uuid PRIMARY KEY,
+    hold_type_id                      uuid NOT NULL,
+    performance_id                    uuid NOT NULL,
+    seat_ids                          text[],
+    seat_count                        integer,
+    used_count                        integer,
+    released_count                    integer,
+    holder_name                       text,
+    reason                            text,
+    release_at                        timestamptz,
+    status                            text,
+    created_by                        uuid,
+    scope_path                        text
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.hold_type (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    purpose                           text,
+    owner_role                        text,
+    release_rule                      text,
+    release_hours_before              integer,
+    release_to                        text,
+    counts_against_capacity           boolean,
+    visible_to_guest                  boolean,
+    scope_path                        text
+);
 
 -- A seat map read from a plan or a manifest. It proposes a draft; a person accepts it (ADR-0020)
 CREATE TABLE IF NOT EXISTS seating.import_job (
@@ -14,6 +78,33 @@ CREATE TABLE IF NOT EXISTS seating.import_job (
     layers_found                      text[],
     created_at                        timestamptz NOT NULL,
     completed_at                      timestamptz
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.reassignment (
+    id                                uuid PRIMARY KEY,
+    order_id                          uuid,
+    from_seat_ids                     text[],
+    to_seat_ids                       text[],
+    reason                            text,
+    price_difference                  numeric(18,4),
+    refund_issued                     boolean,
+    guest_notified_at                 timestamptz,
+    performed_by                      uuid,
+    at                                timestamptz,
+    scope_path                        text
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.recommendation_rules (
+    seat_map_id                       uuid,
+    performance_id                    uuid,
+    reverse_row_order                 boolean,
+    explain_to_guest                  boolean,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- One seat, addressable and holdable. 396 rows in the sample manifest is one amphitheatre
@@ -99,6 +190,19 @@ CREATE TABLE IF NOT EXISTS seating.seat_map_template (
     has_geometry                      boolean,
     created_at                        timestamptz,
     region_id                         uuid NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.seat_rules (
+    seat_map_id                       uuid,
+    killed_seat_ids                   text[],
+    kill_reasons                      jsonb,
+    buffer_rule                       jsonb,
+    companion_rule                    jsonb,
+    flexible_spacing                  jsonb,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- How seats may be chosen — best available, adjacency, party splitting

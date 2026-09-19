@@ -1,14 +1,14 @@
-# WS61 — Ticket Media   Credential Management board 3
+# P01-account-self-service-01 — P01 · Account & Self-Service
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**5 screens · 46 operations · 37 schemas · 5 permissions**
 
-Platform P08 Venue Management · ships as **venue-management** ·
-staff audience · web ·
+Platform P01 Guest Web · ships as **guest** ·
+guest audience · web ·
 online only
 
 ## Who this is for
 
-**staff on web.** Everything below is how you know what is
+**guest on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +61,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-354` | Credential Operations Command Center | commandCentre | 1 | 0 | — |
-| `BO-355` | Virtual Ticket & Credential 360° Workspace | commandCentre | 1 | 0 | — |
-| `BO-356` | Credential Generation & Issuance Monitor | listDetail | 1 | 0 | — |
-| `BO-357` | Credential Delivery & Distribution Operations | listDetail | 1 | 0 | — |
-| `BO-358` | Media Binding, Activation & Assignment Operations | listDetail | 1 | 0 | — |
-| `BO-359` | Credential Replacement, Reissue, Revocation & Recovery | configEditor | 1 | 0 | — |
-| `BO-360` | Failed Generation, Delivery & Credential Exception Management | listDetail | 1 | 0 | — |
-| `BO-361` | Credential Usage & Cross-Media Traceability | configEditor | 1 | 0 | — |
-| `BO-362` | Credential Security, Audit & Operational Evidence | listDetail | 1 | 0 | — |
-| `BO-363` | Ticket Media Analytics & AI Operations Intelligence | listDetail | 1 | 0 | — |
+| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
+| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
+| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
+| `WEB-019` | Order History | listDetail | 5 | 0 | — |
+| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-362 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -85,265 +80,101 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 ```json
 [
  {
-  "id": "BO-354",
-  "name": "Credential Operations Command Center",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.1",
-   "page": 41
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-operations-command-center-bo-354",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "BO-100"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "BO-100",
-    "BO-355",
-    "BO-356",
-    "BO-357",
-    "BO-358",
-    "BO-359",
-    "BO-360",
-    "BO-361",
-    "BO-362",
-    "BO-363"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "BO-100",
-     "trigger": "Venue Home",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "venueId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "BO-355",
-     "trigger": "Works in Virtual Ticket & Credential 360° Workspace",
-     "provenance": "flow F170 step 1→2",
-     "operation": "listCredential"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-356",
-     "trigger": "Works in Credential Generation & Issuance Monitor",
-     "provenance": "flow F170 step 3→4",
-     "operation": "listCredential"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-357",
-     "trigger": "Works in Credential Delivery & Distribution Operations",
-     "provenance": "flow F170 step 5→6",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-358",
-     "trigger": "Works in Media Binding, Activation & Assignment Operations",
-     "provenance": "flow F170 step 7→8",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-359",
-     "trigger": "Works in Credential Replacement, Reissue, Revocation & Recovery",
-     "provenance": "flow F170 step 9→10",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-360",
-     "trigger": "Works in Failed Generation, Delivery & Credential Exception Management",
-     "provenance": "flow F170 step 11→12",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-361",
-     "trigger": "Works in Credential Usage & Cross-Media Traceability",
-     "provenance": "flow F170 step 13→14",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-362",
-     "trigger": "Works in Credential Security, Audit & Operational Evidence",
-     "provenance": "flow F170 step 15→16",
-     "operation": "listCredential"
-    },
-    {
-     "to": "BO-363",
-     "trigger": "Works in Ticket Media Analytics & AI Operations Intelligence",
-     "provenance": "flow F170 step 17→18",
-     "operation": "listCredential"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
-  "purpose": "Provide Operations, Ticketing, Customer Service and Technical teams with a real-time command center covering all issued credential media. This is the operational starting point for Area 15.",
-  "purposeNote": "Operations can understand the health, status and exceptions of all issued credentials from one central workspace.",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "gaps": [
+   {
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search credential operations",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Brand",
-        "Venue",
-        "CredentialOperationsCommandCenterView.event",
-        "CredentialOperationsCommandCenterView.product",
-        "Date",
-        "Media",
-        "CredentialOperationsCommandCenterView.provider",
-        "Status",
-        "Channel",
-        "CredentialOperationsCommandCenterView.exception",
-        "Customer"
-       ],
-       "notes": "The pack filters this screen by brand, venue, event, product, date, media and 5 more — which are present is a decision the pack already made.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Virtual Tickets Issued",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.virtualTicketsIssued"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Credentials Generated",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.credentialsGenerated"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Credentials",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.activeCredentials"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Generation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.pendingGeneration"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Delivery",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.pendingDelivery"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Binding",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.pendingBinding"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Activation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.pendingActivation"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Suspended",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.suspended"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revoked",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.revoked"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expired",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.expired"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Generation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.failedGeneration"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Delivery",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.failedDelivery"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Synchronization Exceptions",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.synchronizationExceptions"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Multi-Media Virtual Tickets",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
-       "bindsTo": "CredentialOperationsCommandCenterView.multiMediaVirtualTickets"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Virtual Tickets Without Active Media",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
+     "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every credential operations",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "CredentialOperationsCommandCenterView.virtualTicketId",
-        "CredentialOperationsCommandCenterView.credentialId",
-        "CredentialOperationsCommandCenterView.mediaType",
-        "CredentialOperationsCommandCenterView.customerParticipant",
-        "CredentialOperationsCommandCenterView.product",
-        "CredentialOperationsCommandCenterView.event",
-        "CredentialOperationsCommandCenterView.credentialStatus",
-        "CredentialOperationsCommandCenterView.deliveryStatus",
-        "CredentialOperationsCommandCenterView.activationStatus",
-        "CredentialOperationsCommandCenterView.bindingStatus",
-        "CredentialOperationsCommandCenterView.provider",
-        "CredentialOperationsCommandCenterView.lastActivity",
-        "CredentialOperationsCommandCenterView.exception",
-        "CredentialOperationsCommandCenterView.owner"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "CredentialOperationsCommandCenterView",
-       "operation": "listCredential",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Each record should show"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -353,26 +184,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected credential operations",
-       "bindsTo": "CredentialOperationsCommandCenterView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "CredentialOperationsCommandCenterView.virtualTicketId",
-        "CredentialOperationsCommandCenterView.credentialId",
-        "CredentialOperationsCommandCenterView.mediaType",
-        "CredentialOperationsCommandCenterView.customerParticipant",
-        "CredentialOperationsCommandCenterView.product",
-        "CredentialOperationsCommandCenterView.event",
-        "CredentialOperationsCommandCenterView.credentialStatus",
-        "CredentialOperationsCommandCenterView.deliveryStatus",
-        "CredentialOperationsCommandCenterView.activationStatus",
-        "CredentialOperationsCommandCenterView.bindingStatus",
-        "CredentialOperationsCommandCenterView.provider",
-        "CredentialOperationsCommandCenterView.lastActivity",
-        "CredentialOperationsCommandCenterView.exception",
-        "CredentialOperationsCommandCenterView.owner"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Display credentials by”, “Provide indicators such as”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Each record should show"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -381,240 +207,441 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "rowActions",
      "components": [
       {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Open Virtual Ticket, Generate Credential, Resend, Activate, Suspend Media, Replace, Revoke, Diagnose, View History. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Authorized users can"
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The credential operations list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the credential operations untouched.",
-   "emptyFirstRun": "No credential operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the credential operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listCredential",
-    "contract": "access",
-    "purpose": "Credential Operations Command Center",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "preloaded": [
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
+   ]
+  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-354"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 41. 32 of 39 labels bound to a contract property; 49 of 72 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "BO-355",
-  "name": "Virtual Ticket & Credential 360° Workspace",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.2",
-   "page": 43
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/virtual-ticket-credential-360-workspace-bo-355",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketCredential360Workspace.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "BO-354"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "BO-354"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 2→3",
-     "operation": "setVirtualTicketCredential"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display; Identify) and a per-row directory (§For each media show) — counts over a population, then the population",
-  "purpose": "Provide a complete operational view of one Virtual Ticket and every media credential currently or historically associated with it. This is one of the most important operational screens.",
-  "purposeNote": "Staff can view and manage the complete multi-media credential history of a Virtual Ticket without treating each credential as a separate ticket.",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Virtual Ticket ID",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.virtualTicketId"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Ticket Holder",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketHolder"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Participant",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.participant"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Product",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.product"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Event",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.event"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Performance",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.performance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Venue",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.venue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Seat",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.seat"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Order",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.order"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Ticket Status",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketStatus"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Usage Status",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.usageStatus"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Validity",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.validity"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Entitlements",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.entitlements"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Primary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.primary"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Secondary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.secondary"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fallback",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.fallback"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Temporary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.temporary"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revoked historical media",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.revokedHistoricalMedia"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
+     "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every virtual ticket credential",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "VirtualTicketCredential360WorkspaceView.bindingId",
-        "VirtualTicketCredential360WorkspaceView.mediaType",
-        "VirtualTicketCredential360WorkspaceView.provider",
-        "VirtualTicketCredential360WorkspaceView.issued",
-        "VirtualTicketCredential360WorkspaceView.delivered",
-        "VirtualTicketCredential360WorkspaceView.activated",
-        "Valid From/To",
-        "VirtualTicketCredential360WorkspaceView.lastUpdate",
-        "Last presentation/use",
-        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
-        "VirtualTicketCredential360WorkspaceView.status"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "VirtualTicketCredential360WorkspaceView",
-       "operation": "setVirtualTicketCredential",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -624,23 +651,842 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected virtual ticket credential",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "VirtualTicketCredential360WorkspaceView.bindingId",
-        "VirtualTicketCredential360WorkspaceView.mediaType",
-        "VirtualTicketCredential360WorkspaceView.provider",
-        "VirtualTicketCredential360WorkspaceView.issued",
-        "VirtualTicketCredential360WorkspaceView.delivered",
-        "VirtualTicketCredential360WorkspaceView.activated",
-        "Valid From/To",
-        "VirtualTicketCredential360WorkspaceView.lastUpdate",
-        "Last presentation/use",
-        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
-        "VirtualTicketCredential360WorkspaceView.status"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Credential Wallet”, “Media Status”, “Dynamic QR Active”, “Apple Wallet Active”, “Old RFID RF-88410”, “Provide one chronological timeline”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
       }
      ]
     },
@@ -651,1467 +1497,157 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setVirtualTicketCredential"
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Generate Additional Media, Bind RFID, Add Wallet Pass, Initiate Face Enrollment, Replace Media, Suspend, Revoke, Resend, Refresh, Diagnose. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Depending on permission"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The virtual ticket credential list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the virtual ticket credential untouched.",
-   "emptyFirstRun": "No virtual ticket credential yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the virtual ticket credential are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "setVirtualTicketCredential",
-    "contract": "access",
-    "purpose": "Virtual Ticket & Credential 360° Workspace",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
     "trigger": "onAction",
     "invalidates": [
-     "setVirtualTicketCredential"
+     "listConsentPurposes"
     ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-355"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 43. 27 of 29 labels bound to a contract property; 39 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-356",
-  "name": "Credential Generation & Issuance Monitor",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.3",
-   "page": 45
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-generation-issuance-monitor-bo-356",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialGenerationIssuanceMonitor.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 4→5",
-     "operation": "listCredentialGenerationIssuance"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show; Display) and no metric row",
-  "purpose": "Manage and monitor generation of credential instances from approved Board 2 media templates.",
-  "purposeNote": "operational visibility into successful and failed issuance.",
-  "gaps": [
+   },
    {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Automatic Retry, Manual Retry, Retry Selected, Retry All Eligible, Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every credential generation issuance",
-       "columns": [
-        "→ Bound → Ready → Delivered",
-        "CredentialGenerationIssuanceMonitorView.requestId",
-        "CredentialGenerationIssuanceMonitorView.virtualTicket",
-        "CredentialGenerationIssuanceMonitorView.media",
-        "CredentialGenerationIssuanceMonitorView.template",
-        "CredentialGenerationIssuanceMonitorView.templateVersion",
-        "CredentialGenerationIssuanceMonitorView.product",
-        "CredentialGenerationIssuanceMonitorView.customer",
-        "Trigger",
-        "CredentialGenerationIssuanceMonitorView.provider",
-        "CredentialGenerationIssuanceMonitorView.requestedAt",
-        "CredentialGenerationIssuanceMonitorView.generatedAt",
-        "CredentialGenerationIssuanceMonitorView.status",
-        "CredentialGenerationIssuanceMonitorView.error"
-       ],
-       "bindsTo": "CredentialGenerationIssuanceMonitorView",
-       "operation": "listCredentialGenerationIssuance",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected credential generation issuance",
-       "bindsTo": "CredentialGenerationIssuanceMonitorView",
-       "columns": [
-        "→ Bound → Ready → Delivered",
-        "CredentialGenerationIssuanceMonitorView.requestId",
-        "CredentialGenerationIssuanceMonitorView.virtualTicket",
-        "CredentialGenerationIssuanceMonitorView.media",
-        "CredentialGenerationIssuanceMonitorView.template",
-        "CredentialGenerationIssuanceMonitorView.templateVersion",
-        "CredentialGenerationIssuanceMonitorView.product",
-        "CredentialGenerationIssuanceMonitorView.customer",
-        "Trigger",
-        "CredentialGenerationIssuanceMonitorView.provider",
-        "CredentialGenerationIssuanceMonitorView.requestedAt",
-        "CredentialGenerationIssuanceMonitorView.generatedAt",
-        "CredentialGenerationIssuanceMonitorView.status",
-        "CredentialGenerationIssuanceMonitorView.error"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Generation Sources”, “Template Resolution”, “Bulk Generation”, “Failures may include”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Automatic Retry",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Manual Retry",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Retry Selected",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Retry All Eligible",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential generation issuance list.",
-   "error": "Could not load. Names which read failed and leaves the credential generation issuance untouched.",
-   "emptyFirstRun": "No credential generation issuance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the credential generation issuance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialGenerationIssuance",
-    "contract": "access",
-    "purpose": "Credential Generation & Issuance Monitor",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "→ Bound → Ready → Delivered",
-    "CredentialGenerationIssuanceMonitorView.requestId",
-    "CredentialGenerationIssuanceMonitorView.virtualTicket",
-    "CredentialGenerationIssuanceMonitorView.media",
-    "CredentialGenerationIssuanceMonitorView.template",
-    "CredentialGenerationIssuanceMonitorView.templateVersion"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-356"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 45. 12 of 14 labels bound to a contract property; 19 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-357",
-  "name": "Credential Delivery & Distribution Operations",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.4",
-   "page": 47
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-delivery-distribution-operations-bo-357",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialDeliveryDistributionOperations.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 6→7",
-     "operation": "listCredentialDeliveryDistribution"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Manage how generated ticket media are delivered or made available to customers, participants and operational staff.",
-  "purposeNote": "delivery tracking.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: SMS Link, Send All, Send Selected, Resend Failed, Send Group, Export Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support as applicable"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every credential delivery distribution",
-       "columns": [
-        "CredentialDeliveryDistributionOperationsView.virtualTicket",
-        "CredentialDeliveryDistributionOperationsView.media",
-        "CredentialDeliveryDistributionOperationsView.recipient",
-        "CredentialDeliveryDistributionOperationsView.channel",
-        "CredentialDeliveryDistributionOperationsView.destination",
-        "CredentialDeliveryDistributionOperationsView.sentAt",
-        "CredentialDeliveryDistributionOperationsView.deliveredAt",
-        "CredentialDeliveryDistributionOperationsView.openedDownloaded",
-        "CredentialDeliveryDistributionOperationsView.attempt",
-        "CredentialDeliveryDistributionOperationsView.status"
-       ],
-       "bindsTo": "CredentialDeliveryDistributionOperationsView",
-       "operation": "listCredentialDeliveryDistribution",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected credential delivery distribution",
-       "bindsTo": "CredentialDeliveryDistributionOperationsView",
-       "columns": [
-        "CredentialDeliveryDistributionOperationsView.virtualTicket",
-        "CredentialDeliveryDistributionOperationsView.media",
-        "CredentialDeliveryDistributionOperationsView.recipient",
-        "CredentialDeliveryDistributionOperationsView.channel",
-        "CredentialDeliveryDistributionOperationsView.destination",
-        "CredentialDeliveryDistributionOperationsView.sentAt",
-        "CredentialDeliveryDistributionOperationsView.deliveredAt",
-        "CredentialDeliveryDistributionOperationsView.openedDownloaded",
-        "CredentialDeliveryDistributionOperationsView.attempt",
-        "CredentialDeliveryDistributionOperationsView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Alternative states”, “Where allowed, support”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "SMS Link",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support as applicable"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send All",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send Selected",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resend Failed",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send Group",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Export Status",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential delivery distribution list.",
-   "error": "Could not load. Names which read failed and leaves the credential delivery distribution untouched.",
-   "emptyFirstRun": "No credential delivery distribution yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the credential delivery distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialDeliveryDistribution",
-    "contract": "access",
-    "purpose": "Credential Delivery & Distribution Operations",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CredentialDeliveryDistributionOperationsView.virtualTicket",
-    "CredentialDeliveryDistributionOperationsView.media",
-    "CredentialDeliveryDistributionOperationsView.recipient",
-    "CredentialDeliveryDistributionOperationsView.channel",
-    "CredentialDeliveryDistributionOperationsView.destination",
-    "CredentialDeliveryDistributionOperationsView.sentAt"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-357"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 47. 10 of 10 labels bound to a contract property; 22 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-358",
-  "name": "Media Binding, Activation & Assignment Operations",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.5",
-   "page": 48
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/media-binding-activation-assignment-operations-bo-358",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaBindingActivationAssignmentOperations.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 8→9",
-     "operation": "setMediaBindingActivation"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Manage credentials that require operational assignment or activation after ticket issuance.",
-  "purposeNote": "Operational staff can securely assign and activate supported physical, digital and biometric credential media against the correct Virtual Ticket.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Activate Now, Schedule, Activate on First Use, Activate on Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every media binding activation",
-       "columns": [
-        "MediaBindingActivationAssignmentOperationsView.virtualTicket",
-        "MediaBindingActivationAssignmentOperationsView.customer",
-        "MediaBindingActivationAssignmentOperationsView.product",
-        "MediaBindingActivationAssignmentOperationsView.existingMedia",
-        "MediaBindingActivationAssignmentOperationsView.newMediaType",
-        "MediaBindingActivationAssignmentOperationsView.credentialIdUid",
-        "MediaBindingActivationAssignmentOperationsView.provider",
-        "MediaBindingActivationAssignmentOperationsView.activation",
-        "MediaBindingActivationAssignmentOperationsView.validity",
-        "MediaBindingActivationAssignmentOperationsView.bindingRule"
-       ],
-       "bindsTo": "MediaBindingActivationAssignmentOperationsView",
-       "operation": "setMediaBindingActivation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected media binding activation",
-       "bindsTo": "MediaBindingActivationAssignmentOperationsView",
-       "columns": [
-        "MediaBindingActivationAssignmentOperationsView.virtualTicket",
-        "MediaBindingActivationAssignmentOperationsView.customer",
-        "MediaBindingActivationAssignmentOperationsView.product",
-        "MediaBindingActivationAssignmentOperationsView.existingMedia",
-        "MediaBindingActivationAssignmentOperationsView.newMediaType",
-        "MediaBindingActivationAssignmentOperationsView.credentialIdUid",
-        "MediaBindingActivationAssignmentOperationsView.provider",
-        "MediaBindingActivationAssignmentOperationsView.activation",
-        "MediaBindingActivationAssignmentOperationsView.validity",
-        "MediaBindingActivationAssignmentOperationsView.bindingRule"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “This is especially important for”, “Scan Virtual Ticket QR”, “Scan Wristband UID”, “Resolve Virtual Ticket”, “Bind”, “Activate”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Activate Now",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Schedule",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Activate on First Use",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Activate on Collection",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The media binding activation list.",
-   "error": "Could not load. Names which read failed and leaves the media binding activation untouched.",
-   "emptyFirstRun": "No media binding activation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the media binding activation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setMediaBindingActivation",
-    "contract": "access",
-    "purpose": "Media Binding, Activation & Assignment Operations",
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
     "trigger": "onAction",
     "invalidates": [
-     "setMediaBindingActivation"
+     "listConsentPurposes"
     ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "MediaBindingActivationAssignmentOperationsView.virtualTicket",
-    "MediaBindingActivationAssignmentOperationsView.customer",
-    "MediaBindingActivationAssignmentOperationsView.product",
-    "MediaBindingActivationAssignmentOperationsView.existingMedia",
-    "MediaBindingActivationAssignmentOperationsView.newMediaType",
-    "MediaBindingActivationAssignmentOperationsView.credentialIdUid"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-358"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 48. 10 of 10 labels bound to a contract property; 15 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-359",
-  "name": "Credential Replacement, Reissue, Revocation & Recovery",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.6",
-   "page": 50
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-replacement-reissue-revocation-recovery-bo-359",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialReplacementReissueRevocationRecovery.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 10→11",
-     "operation": "listCredentialReplacementReissue"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
-  "purpose": "Manage operational credential changes while preserving the underlying Virtual Ticket.",
-  "purposeNote": "Ticket and without losing historical traceability.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Customer changed phone. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Support"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Immediate old-media revocation",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Grace period",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Maximum replacements",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Identity verification",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Supervisor approval",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reason codes",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Customer changed phone",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential replacement reissue configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the credential replacement reissue untouched.",
-   "emptyFirstRun": "No credential replacement reissue configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialReplacementReissue",
-    "contract": "access",
-    "purpose": "Credential Replacement, Reissue, Revocation & Recovery",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-359"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 7 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-360",
-  "name": "Failed Generation, Delivery & Credential Exception Management",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.7",
-   "page": 51
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/failed-generation-delivery-credential-exception-manageme-bo-360",
-   "component": "apps/venue-management-web/src/routes/access-venue/FailedGenerationDeliveryCredentialExceptionManag.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 12→13",
-     "operation": "listFailedGenerationDelivery"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide one dedicated operational queue for credential-related failures.",
-  "purposeNote": "Credential failures are centrally identified, prioritized and resolved before unnecessarily impacting customer admission or fulfillment.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Escalate, Assign Owner, Open Technical Case. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every failed generation delivery",
-       "columns": [
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.event",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.failure",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.time",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.operationalImpact",
-        "Retry Status",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.owner"
-       ],
-       "bindsTo": "FailedGenerationDeliveryCredentialExceptionManagemenView",
-       "operation": "listFailedGenerationDelivery",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected failed generation delivery",
-       "bindsTo": "FailedGenerationDeliveryCredentialExceptionManagemenView",
-       "columns": [
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.event",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.failure",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.time",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.operationalImpact",
-        "Retry Status",
-        "FailedGenerationDeliveryCredentialExceptionManagemenView.owner"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Include”, “Consider”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Retry",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Assign Owner",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open Technical Case",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The failed generation delivery list.",
-   "error": "Could not load. Names which read failed and leaves the failed generation delivery untouched.",
-   "emptyFirstRun": "No failed generation delivery yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the failed generation delivery are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listFailedGenerationDelivery",
-    "contract": "access",
-    "purpose": "Failed Generation, Delivery & Credential Exception Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
-    "FailedGenerationDeliveryCredentialExceptionManagemenView.event"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-360"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 51. 10 of 11 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-361",
-  "name": "Credential Usage & Cross-Media Traceability",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.8",
-   "page": 53
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-usage-cross-media-traceability-bo-361",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialUsageCrossMediaTraceability.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 14→15",
-     "operation": "listCredentialUsageCross"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Capture/reference) and no display directory — it is settings, not a population",
-  "purpose": "Provide end-to-end visibility into how the different media attached to one Virtual Ticket have been presented or used. This screen is for credential traceability, while Area 16 remains responsible for the actual access-control decision.",
-  "purposeNote": "authoritative admission decision engine.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: What happened to the master entitlement?. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Allow administrators to understand"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Virtual Ticket",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Credential",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Media",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Presentation timestamp",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Location",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Device",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "External system",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Transaction type",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Result",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Entitlement impact",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Synchronization status",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "What happened to the master entitlement?",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Allow administrators to understand"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential usage cross-media configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the credential usage cross-media untouched.",
-   "emptyFirstRun": "No credential usage cross-media configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialUsageCross",
-    "contract": "access",
-    "purpose": "Credential Usage & Cross-Media Traceability",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-361"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 12 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-362",
-  "name": "Credential Security, Audit & Operational Evidence",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.9",
-   "page": 54
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/credential-security-audit-operational-evidence-bo-362",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialSecurityAuditOperationalEvidence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-354",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F170 step 16→17",
-     "operation": "listCredentialSecurityOperational"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row",
-  "purpose": "Maintain complete evidence of credential creation and lifecycle activity.",
-  "purposeNote": "Every significant credential lifecycle action is traceable with sufficient evidence to reconstruct who did what, when, why and to which Virtual Ticket.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every credential security audit",
-       "columns": [
-        "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
-        "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
-        "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
-        "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
-        "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
-        "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
-       ],
-       "bindsTo": "CredentialSecurityAuditOperationalEvidenceView",
-       "operation": "listCredentialSecurityOperational",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 54 §Identify"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected credential security audit",
-       "bindsTo": "CredentialSecurityAuditOperationalEvidenceView",
-       "columns": [
-        "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
-        "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
-        "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
-        "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
-        "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
-        "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Record”, “RFID-1001”, “Access Control”, “Evidence Export”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 54 §Identify"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential security audit list.",
-   "error": "Could not load. Names which read failed and leaves the credential security audit untouched.",
-   "emptyFirstRun": "No credential security audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the credential security audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialSecurityOperational",
-    "contract": "access",
-    "purpose": "Credential Security, Audit & Operational Evidence",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
-    "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
-    "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
-    "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
-    "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
-    "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-362"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 54. 6 of 6 labels bound to a contract property; 21 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-363",
-  "name": "Ticket Media Analytics & AI Operations Intelligence",
-  "module": "Access & Venue",
-  "requiresModule": "access",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
-   "board": "3",
-   "number": "15.3.10",
-   "page": 56
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/access-venue/ticket-media-analytics-ai-operations-intelligence-bo-363",
-   "component": "apps/venue-management-web/src/routes/access-venue/TicketMediaAnalyticsAiOperationsIntelligence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-354"
-   ],
-   "exitTo": [
-    "BO-354"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze; Compare) and no metric row",
-  "purpose": "Provide management and operations with analytics and AI intelligence across Virtual Tickets and credential media. This should be a serious operational intelligence layer—not simply a chatbot.",
-  "purposeNote": "and operational performance without transferring authoritative ticket or security decisions to generative AI. Board 3 — Final Screen Register",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search ticket media analytics",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Brand",
-        "Venue",
-        "Event",
-        "Product",
-        "Channel",
-        "Media",
-        "Provider",
-        "Device",
-        "Customer segment",
-        "Time period"
-       ],
-       "notes": "The pack filters this screen by brand, venue, event, product, channel, media and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every ticket media analytics",
-       "columns": [
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.faceCredentialAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.multiMediaAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementRate",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.revocationRate",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailure",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailure",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageGenerationTime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageResolutionTime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.mediaUsageDistribution",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.providerUptime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.encodingFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.synchronizationDelay",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementFrequency"
-       ],
-       "bindsTo": "TicketMediaAnalyticsAiOperationsIntelligenceView",
-       "operation": "listTicketMedia",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected ticket media analytics",
-       "bindsTo": "TicketMediaAnalyticsAiOperationsIntelligenceView",
-       "columns": [
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.faceCredentialAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.multiMediaAdoption",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementRate",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.revocationRate",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailure",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailure",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageGenerationTime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageResolutionTime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.mediaUsageDistribution",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.providerUptime",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.encodingFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailures",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.synchronizationDelay",
-        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementFrequency"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Eligible customers”, “Backend Screen”, “Credential Operations Command Center”, “Operational exceptions”, “ONE VIRTUAL TICKET”.",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The ticket media analytics list.",
-   "error": "Could not load. Names which read failed and leaves the ticket media analytics untouched.",
-   "emptyFirstRun": "No ticket media analytics yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket media analytics are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listTicketMedia",
-    "contract": "access",
-    "purpose": "Ticket Media Analytics & AI Operations Intelligence",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
-    "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-363"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 56. 21 of 31 labels bound to a contract property; 31 of 133 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
@@ -2125,212 +1661,905 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "listCredential": {
-  "method": "GET",
-  "path": "/credential",
-  "contract": "access",
-  "summary": "Credential Operations Command Center",
-  "permission": "SCOPE_VIEW",
+ "addToWishlist": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "claimCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/claim",
+  "contract": "orders",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "brand",
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CartMergeResult"
+ },
+ "completeSsoAuthorization": {
+  "method": "POST",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
+ "getEntitlement": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "getEntitlementCredential": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "rotate",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getEntitlementHistory": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChallengeProgress"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "allDevices",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "guestSocialLogin": {
+  "method": "POST",
+  "path": "/auth/guest/social",
+  "contract": "identity",
+  "summary": "Sign in with Apple or Google",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "guestUaePassLogin": {
+  "method": "POST",
+  "path": "/auth/guest/uae-pass",
+  "contract": "identity",
+  "summary": "Sign in with a national identity provider",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "issueWalletPass": {
+  "method": "POST",
+  "path": "/wallet-passes",
+  "contract": "orders",
+  "summary": "Generate an Apple or Google wallet pass",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletPass"
+ },
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "listEntitlements": {
+  "method": "GET",
+  "path": "/my/entitlements/all",
+  "contract": "access",
+  "summary": "Every entitlement this guest holds, including expired",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeExpired",
     "in": "query",
     "required": false
    },
    {
-    "name": "venue",
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "since",
     "in": "query",
     "required": false
    },
    {
-    "name": "date",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
-    "name": "media",
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
     "in": "query",
-    "required": false
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
    },
    {
     "name": "status",
     "in": "query",
-    "required": false
+    "required": null
    },
    {
-    "name": "channel",
+    "name": "createdFrom",
     "in": "query",
-    "required": false
+    "required": null
    },
    {
-    "name": "customer",
+    "name": "createdTo",
     "in": "query",
-    "required": false
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "CredentialOperationsCommandCenterView"
+  "responds": "Page"
  },
- "listCredentialDeliveryDistribution": {
+ "listSsoProviders": {
   "method": "GET",
-  "path": "/credential-delivery-distribution",
-  "contract": "access",
-  "summary": "Credential Delivery & Distribution Operations",
-  "permission": "SCOPE_VIEW",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "CredentialDeliveryDistributionOperationsView"
+  "responds": "SsoProvider"
  },
- "listCredentialGenerationIssuance": {
-  "method": "GET",
-  "path": "/credential-generation-issuance",
-  "contract": "access",
-  "summary": "Credential Generation & Issuance Monitor",
-  "permission": "SCOPE_VIEW",
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CredentialGenerationIssuanceMonitorView"
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
  },
- "listCredentialReplacementReissue": {
-  "method": "GET",
-  "path": "/credential-replacement-reissue",
-  "contract": "access",
-  "summary": "Credential Replacement, Reissue, Revocation & Recovery",
-  "permission": "SCOPE_VIEW",
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "refreshToken": {
+  "method": "POST",
+  "path": "/auth/refresh",
+  "contract": "identity",
+  "summary": "Rotate the access token",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialReplacementReissueRevocationRecoveryView"
+  "responds": "TokenPair"
  },
- "listCredentialSecurityOperational": {
-  "method": "GET",
-  "path": "/credential-security-operational",
-  "contract": "access",
-  "summary": "Credential Security, Audit & Operational Evidence",
-  "permission": "SCOPE_VIEW",
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CredentialSecurityAuditOperationalEvidenceView"
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
  },
- "listCredentialUsageCross": {
-  "method": "GET",
-  "path": "/credential-usage-cross",
-  "contract": "access",
-  "summary": "Credential Usage & Cross-Media Traceability",
-  "permission": "SCOPE_VIEW",
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CredentialUsageCrossMediaTraceabilityView"
+  "responds": "GuestDevice"
  },
- "listFailedGenerationDelivery": {
-  "method": "GET",
-  "path": "/failed-generation-delivery",
-  "contract": "access",
-  "summary": "Failed Generation, Delivery & Credential Exception Management",
-  "permission": "SCOPE_VIEW",
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FailedGenerationDeliveryCredentialExceptionManagemenView"
+  "responds": null
  },
- "listTicketMedia": {
-  "method": "GET",
-  "path": "/ticket-media",
-  "contract": "access",
-  "summary": "Ticket Media Analytics & AI Operations Intelligence",
-  "permission": "SCOPE_VIEW",
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp",
+  "contract": "identity",
+  "summary": "Request a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "brand",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "media",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "provider",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "device",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TicketMediaAnalyticsAiOperationsIntelligenceView"
+  "responds": "Invitation"
  },
- "setMediaBindingActivation": {
-  "method": "PUT",
-  "path": "/media-binding-activation",
-  "contract": "access",
-  "summary": "Media Binding, Activation & Assignment Operations",
-  "permission": "ACCESS_POINT_CONFIGURE",
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "shareEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/share",
+  "contract": "orders",
+  "summary": "Let somebody else use this, without giving it away",
+  "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "MediaBindingActivationAssignmentOperationsInput",
-  "responds": "MediaBindingActivationAssignmentOperationsView"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Problem"
  },
- "setVirtualTicketCredential": {
-  "method": "PUT",
-  "path": "/virtual-ticket-credential",
-  "contract": "access",
-  "summary": "Virtual Ticket & Credential 360° Workspace",
-  "permission": "ACCESS_POINT_CONFIGURE",
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "VirtualTicketCredential360WorkspaceInput",
-  "responds": "VirtualTicketCredential360WorkspaceView"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateGuestPreferences": {
+  "method": "PUT",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateMyProfile": {
+  "method": "PATCH",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp/verify",
+  "contract": "identity",
+  "summary": "Verify a one-time code and issue a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }
 ```
@@ -2341,1586 +2570,1741 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "CredentialDeliveryDistributionOperationsView": {
+ "Cart": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Delivery & Distribution Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "orders.cart",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
   "properties": {
-   "email": {
+   "id": {
     "type": "string",
-    "description": "Email"
+    "format": "uuid"
    },
-   "smsLink": {
+   "token": {
     "type": "string",
-    "description": "SMS Link"
+    "readOnly": true,
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
    },
-   "whatsappIntegration": {
+   "venueId": {
     "type": "string",
-    "description": "WhatsApp integration"
+    "format": "uuid"
    },
-   "b2cAccount": {
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
     "type": "string",
-    "description": "B2C Account"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
    },
-   "mobileApp": {
+   "status": {
+    "$ref": "#/components/schemas/CartStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAt": {
     "type": "string",
-    "description": "Mobile App"
+    "format": "date-time",
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
    },
-   "appleWallet": {
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
     "type": "string",
-    "description": "Apple Wallet"
+    "format": "date-time"
    },
-   "googleWallet": {
+   "updatedAt": {
     "type": "string",
-    "description": "Google Wallet"
+    "format": "date-time"
+   }
+  }
+ },
+ "CartMergeResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "required": [
+   "cart"
+  ],
+  "properties": {
+   "cart": {
+    "$ref": "#/components/schemas/Cart"
    },
-   "pos": {
+   "mergedLineCount": {
+    "type": "integer"
+   },
+   "droppedLines": {
+    "type": "array",
+    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "noCapacity",
+        "expired",
+        "notSellableOnChannel",
+        "duplicate"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "ChallengeProgress": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.challenge_progress",
+  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
+  "required": [
+   "id",
+   "challengeId",
+   "subjectId",
+   "current",
+   "target"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "POS"
+    "format": "uuid"
    },
-   "boxOffice": {
+   "challengeId": {
     "type": "string",
-    "description": "Box Office"
+    "format": "uuid"
    },
-   "kiosk": {
+   "subjectId": {
     "type": "string",
-    "description": "Kiosk"
+    "format": "uuid"
    },
-   "groupPortal": {
+   "portfolioId": {
     "type": "string",
-    "description": "Group Portal"
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a family or group challenge — where the shared progress accrues."
    },
-   "api": {
+   "current": {
+    "type": "number"
+   },
+   "target": {
+    "type": "number"
+   },
+   "streakCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "completedAt": {
     "type": "string",
-    "description": "API"
+    "format": "date-time",
+    "nullable": true
    },
-   "physicalCollection": {
+   "rewardIssuedAt": {
     "type": "string",
-    "description": "Physical Collection"
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
    },
-   "statesType": {
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+   },
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   },
+   "expiresAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Entitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "access.entitlement",
+  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
+  "required": [
+   "id",
+   "templateId",
+   "productId",
+   "orderId",
+   "subjectId",
+   "status",
+   "validFrom",
+   "validTo"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "mediaCode": {
+    "type": "string",
+    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "status": {
+    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
+   },
+   "statusNote": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+   },
+   "entriesUsed": {
+    "type": "integer",
+    "default": 0,
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true
+   },
+   "lastEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "frozenDays": {
+    "type": "integer",
+    "default": 0,
+    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+   },
+   "suspendedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "isNameBound": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "sharedWithSubjectIds": {
+    "type": "array",
+    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "issuedVia": {
     "type": "string",
     "enum": [
-     "failed",
-     "bounced",
-     "expired",
-     "cancelled"
+     "sale",
+     "invitation",
+     "reissue",
+     "transfer",
+     "resale",
+     "membership",
+     "groupBooking"
     ],
-    "description": "Vocabulary listed under Alternative states."
+    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
    },
-   "virtualTicket": {
+   "supersedesEntitlementId": {
     "type": "string",
-    "description": "Virtual Ticket"
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
-   "media": {
+   "walletValueId": {
     "type": "string",
-    "description": "Media"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+   }
+  }
+ },
+ "GuestDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
    },
-   "recipient": {
+   "subjectId": {
     "type": "string",
-    "description": "Recipient"
+    "format": "uuid"
    },
-   "channel": {
+   "platform": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
    },
-   "destination": {
+   "tokenFingerprint": {
     "type": "string",
-    "description": "Destination"
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
-   "sentAt": {
+   "appVersion": {
     "type": "string",
-    "description": "Sent At"
+    "nullable": true
    },
-   "deliveredAt": {
+   "osVersion": {
     "type": "string",
-    "description": "Delivered At"
+    "nullable": true
    },
-   "openedDownloaded": {
+   "deviceModel": {
     "type": "string",
-    "description": "Opened/Downloaded"
+    "nullable": true
    },
-   "attempt": {
+   "locale": {
     "type": "string",
-    "description": "Attempt"
+    "nullable": true
    },
    "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
     "type": "integer",
-    "description": "Status"
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
    },
-   "purchaser": {
+   "registeredAt": {
     "type": "string",
-    "description": "Purchaser"
+    "format": "date-time"
    },
-   "ticketHolder": {
+   "lastSeenAt": {
     "type": "string",
-    "description": "Ticket Holder"
+    "format": "date-time",
+    "nullable": true
    },
-   "participant": {
+   "revokedAt": {
     "type": "string",
-    "description": "Participant"
-   },
-   "guardian": {
-    "type": "string",
-    "description": "Guardian"
-   },
-   "groupLeader": {
-    "type": "string",
-    "description": "Group Leader"
-   },
-   "authorizedRecipient": {
-    "type": "string",
-    "description": "Authorized recipient"
-   },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
-   },
-   "singleMultipleUse": {
-    "type": "string",
-    "description": "Single/multiple use"
-   },
-   "customerIdentity": {
-    "type": "string",
-    "description": "Customer identity"
-   },
-   "tokenSecurity": {
-    "type": "string",
-    "description": "Token security"
-   },
-   "dataMasking": {
-    "type": "string",
-    "description": "Data masking"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
- "CredentialGenerationIssuanceMonitorView": {
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Generation & Issuance Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
   "properties": {
-   "orderConfirmation": {
+   "id": {
     "type": "string",
-    "description": "Order Confirmation"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "ticketIssuance": {
+   "subjectId": {
     "type": "string",
-    "description": "Ticket Issuance"
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
-   "membershipActivation": {
+   "displayName": {
     "type": "string",
-    "description": "Membership Activation"
+    "nullable": true
    },
-   "customerRequest": {
+   "email": {
     "type": "string",
-    "description": "Customer Request"
+    "nullable": true
    },
-   "staffAction": {
+   "phone": {
     "type": "string",
-    "description": "Staff Action"
+    "nullable": true
    },
-   "rfidCollection": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "RFID Collection"
+    "nullable": true
    },
-   "walletRequest": {
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
     "type": "string",
-    "description": "Wallet Request"
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
-   "faceEnrollment": {
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
     "type": "string",
-    "description": "Face Enrollment"
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
-   "api": {
-    "type": "string",
-    "description": "API"
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "bulkOperation": {
-    "type": "string",
-    "description": "Bulk Operation"
+   "visitCount": {
+    "type": "integer"
    },
-   "scheduledProcess": {
+   "lastVisitAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Scheduled Process"
+    "nullable": true
    },
-   "requestId": {
-    "type": "string",
-    "description": "Request ID"
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
    },
-   "virtualTicket": {
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
     "type": "string",
-    "description": "Virtual Ticket"
+    "format": "uuid"
    },
-   "media": {
+   "displayName": {
     "type": "string",
-    "description": "Media"
+    "nullable": true
    },
-   "template": {
-    "type": "string",
-    "description": "Template"
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
    },
-   "templateVersion": {
-    "type": "string",
-    "description": "Template Version"
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
    },
-   "customer": {
+   "guestLinkId": {
     "type": "string",
-    "description": "Customer"
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
    },
-   "provider": {
+   "homeCellName": {
     "type": "string",
-    "description": "Provider"
+    "nullable": true
    },
-   "requestedAt": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Requested At"
+    "nullable": true
    },
-   "generatedAt": {
+   "expiresAt": {
     "type": "string",
-    "description": "Generated At"
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+   }
+  }
+ },
+ "Invitation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "token",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recipientEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "token": {
+    "type": "string",
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+   },
+   "plusOnes": {
+    "type": "integer",
+    "default": 0
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "error": {
     "type": "string",
-    "description": "Error"
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
    },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "venue": {
+   "respondedAt": {
     "type": "string",
-    "description": "Venue"
+    "format": "date-time",
+    "nullable": true
    },
-   "event": {
+   "scopePath": {
     "type": "string",
-    "description": "Event"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "customerContext": {
-    "type": "string",
-    "description": "Customer context"
-   },
-   "supportControlledBulkOperations": {
-    "type": "string",
-    "description": "Support controlled bulk operations"
-   },
-   "templateMissing": {
-    "type": "string",
-    "description": "Template missing"
-   },
-   "requiredDataMissing": {
-    "type": "string",
-    "description": "Required data missing"
-   },
-   "providerUnavailable": {
-    "type": "string",
-    "description": "Provider unavailable"
-   },
-   "invalidPayload": {
-    "type": "string",
-    "description": "Invalid payload"
-   },
-   "tokenGenerationFailure": {
-    "type": "string",
-    "description": "Token generation failure"
-   },
-   "walletGenerationFailure": {
-    "type": "string",
-    "description": "Wallet generation failure"
-   },
-   "encoderUnavailable": {
-    "type": "string",
-    "description": "Encoder unavailable"
-   },
-   "automaticRetry": {
-    "type": "string",
-    "description": "Automatic Retry"
-   },
-   "manualRetry": {
-    "type": "string",
-    "description": "Manual Retry"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
- "CredentialOperationsCommandCenterView": {
+ "LoginRequest": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "username",
+   "credential",
+   "workstationId"
+  ],
   "properties": {
-   "virtualTicketsIssued": {
+   "username": {
     "type": "string",
-    "description": "Virtual Tickets Issued"
-   },
-   "credentialsGenerated": {
-    "type": "string",
-    "description": "Credentials Generated"
-   },
-   "activeCredentials": {
-    "type": "integer",
-    "description": "Active Credentials"
-   },
-   "pendingGeneration": {
-    "type": "integer",
-    "description": "Pending Generation"
-   },
-   "pendingDelivery": {
-    "type": "integer",
-    "description": "Pending Delivery"
-   },
-   "pendingBinding": {
-    "type": "integer",
-    "description": "Pending Binding"
-   },
-   "pendingActivation": {
-    "type": "integer",
-    "description": "Pending Activation"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "revoked": {
-    "type": "string",
-    "description": "Revoked"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "failedGeneration": {
-    "type": "integer",
-    "description": "Failed Generation"
-   },
-   "failedDelivery": {
-    "type": "integer",
-    "description": "Failed Delivery"
-   },
-   "synchronizationExceptions": {
-    "type": "integer",
-    "description": "Synchronization Exceptions"
-   },
-   "multiMediaVirtualTickets": {
-    "type": "integer",
-    "description": "Multi-Media Virtual Tickets"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "pdf": {
-    "type": "string",
-    "description": "PDF"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "Google Wallet"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "RFID"
-   },
-   "nfc": {
-    "type": "string",
-    "description": "NFC"
-   },
-   "faceRecognitionReference": {
-    "type": "string",
-    "description": "Face Recognition Reference"
-   },
-   "card": {
-    "type": "string",
-    "description": "Card"
-   },
-   "wristband": {
-    "type": "string",
-    "description": "Wristband"
-   },
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "credentialId": {
-    "type": "string",
-    "description": "Credential ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media Type"
-   },
-   "customerParticipant": {
-    "type": "string",
-    "description": "Customer / Participant"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "credentialStatus": {
-    "type": "integer",
-    "description": "Credential Status"
-   },
-   "deliveryStatus": {
-    "type": "integer",
-    "description": "Delivery Status"
-   },
-   "activationStatus": {
-    "type": "integer",
-    "description": "Activation Status"
-   },
-   "bindingStatus": {
-    "type": "integer",
-    "description": "Binding Status"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "lastActivity": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Activity"
-   },
-   "exception": {
-    "type": "string",
-    "description": "Exception"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "qrGeneration9998Healthy": {
-    "type": "number",
-    "description": "QR Generation — 99.98% Healthy"
-   },
-   "rfidEncoding987Healthy": {
-    "type": "number",
-    "description": "RFID Encoding — 98.7% Healthy"
-   }
-  }
- },
- "CredentialReplacementReissueRevocationRecoveryView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Replacement, Reissue, Revocation & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "lost": {
-    "type": "string",
-    "description": "Lost"
-   },
-   "stolen": {
-    "type": "string",
-    "description": "Stolen"
-   },
-   "damaged": {
-    "type": "string",
-    "description": "Damaged"
-   },
-   "compromised": {
-    "type": "string",
-    "description": "Compromised"
-   },
-   "customerChangedPhone": {
-    "type": "string",
-    "description": "Customer changed phone"
-   },
-   "rfidFailure": {
-    "type": "string",
-    "description": "RFID failure"
-   },
-   "wristbandReplacement": {
-    "type": "string",
-    "description": "Wristband replacement"
-   },
-   "qrCompromise": {
-    "type": "string",
-    "description": "QR compromise"
-   },
-   "walletReplacement": {
-    "type": "string",
-    "description": "Wallet replacement"
-   },
-   "faceReEnrollment": {
-    "type": "string",
-    "description": "Face re-enrollment"
-   },
-   "incorrectAssignment": {
-    "type": "string",
-    "description": "Incorrect assignment"
-   },
-   "vt009821Active": {
-    "type": "integer",
-    "description": "VT-009821 — ACTIVE"
-   },
-   "rf88721Revoked": {
-    "type": "string",
-    "description": "RF-88721 — REVOKED"
-   },
-   "rf99211Active": {
-    "type": "integer",
-    "description": "RF-99211 — ACTIVE"
-   },
-   "qr": {
-    "type": "string",
-    "description": "QR"
-   },
-   "qr55128Active": {
-    "type": "integer",
-    "description": "QR-55128 — ACTIVE"
-   },
-   "theVirtualTicketRemainsUnchanged": {
-    "type": "string",
-    "description": "The Virtual Ticket remains unchanged"
-   },
-   "calculationsHere": {
-    "type": "string",
-    "description": "calculations here"
-   },
-   "immediateOldMediaRevocation": {
-    "type": "string",
-    "description": "Immediate old-media revocation"
-   },
-   "gracePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Grace period"
-   },
-   "maximumReplacements": {
-    "type": "string",
-    "description": "Maximum replacements"
-   },
-   "identityVerification": {
-    "type": "string",
-    "description": "Identity verification"
-   },
-   "supervisorApproval": {
-    "type": "string",
-    "description": "Supervisor approval"
-   },
-   "reasonCodes": {
-    "type": "string",
-    "description": "Reason codes"
-   }
-  }
- },
- "CredentialSecurityAuditOperationalEvidenceView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Security, Audit & Operational Evidence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "credentialRequested": {
-    "type": "string",
-    "description": "Credential Requested"
-   },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "bound": {
-    "type": "string",
-    "description": "Bound"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "description": "Activated"
-   },
-   "updated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated"
-   },
-   "presented": {
-    "type": "string",
-    "description": "Presented"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "reactivated": {
-    "type": "string",
-    "description": "Reactivated"
-   },
-   "replaced": {
-    "type": "string",
-    "description": "Replaced"
-   },
-   "revoked": {
-    "type": "string",
-    "description": "Revoked"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "rebound": {
-    "type": "string",
-    "description": "Rebound"
-   },
-   "regenerated": {
-    "type": "string",
-    "description": "Regenerated"
-   },
-   "deletedWhereLegallyPermissiblyApplicable": {
-    "type": "string",
-    "description": "Deleted where legally/permissibly applicable"
-   },
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
+    "maxLength": 256
    },
    "credential": {
     "type": "string",
-    "description": "Credential"
+    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "maxLength": 512
    },
-   "media": {
+   "method": {
     "type": "string",
-    "description": "Media"
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
+    "enum": [
+     "password",
+     "pin",
+     "card",
+     "rfid",
+     "sso"
+    ],
+    "default": "password"
    },
-   "action": {
+   "workstationId": {
     "type": "string",
-    "description": "Action"
+    "format": "uuid",
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
    },
-   "before": {
+   "deviceFingerprint": {
     "type": "string",
-    "description": "Before"
+    "maxLength": 256
+   }
+  }
+ },
+ "LoginResponse": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TokenPair"
    },
-   "after": {
+   {
+    "type": "object",
+    "required": [
+     "requiresRoleSelection"
+    ],
+    "properties": {
+     "requiresRoleSelection": {
+      "type": "boolean"
+     },
+     "availableRoles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RoleSummary"
+      }
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session"
+     }
+    }
+   }
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
     "type": "string",
-    "description": "After"
+    "format": "uuid"
    },
-   "actor": {
+   "programmeId": {
     "type": "string",
-    "description": "Actor"
+    "format": "uuid"
    },
-   "source": {
-    "type": "string",
-    "description": "Source"
+   "pointsBalance": {
+    "type": "integer"
    },
-   "device": {
-    "type": "string",
-    "description": "Device"
+   "lifetimePoints": {
+    "type": "integer"
    },
-   "dateTime": {
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Date/time"
-   },
-   "reason": {
+    "nullable": true
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Reason"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
    },
-   "approval": {
+   "methodId": {
     "type": "string",
-    "description": "Approval"
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once on successful verification. Not retrievable afterwards.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     }
+    }
+   }
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
    },
    "providerReference": {
     "type": "string",
-    "description": "Provider reference"
+    "nullable": true
    },
-   "relatedTransaction": {
+   "lastInquiryAt": {
     "type": "string",
-    "description": "Related transaction"
+    "format": "date-time",
+    "nullable": true
    },
-   "lost": {
+   "recordedAt": {
     "type": "string",
-    "description": "↓ Lost"
+    "format": "date-time"
    },
-   "rfid1001Revoked": {
+   "syncedAt": {
     "type": "string",
-    "description": "RFID-1001 — Revoked"
-   },
-   "replacement": {
-    "type": "string",
-    "description": "↓ Replacement"
-   },
-   "rfid1057Active": {
-    "type": "integer",
-    "description": "RFID-1057 — Active"
-   },
-   "excessiveRegeneration": {
-    "type": "string",
-    "description": "Excessive regeneration"
-   },
-   "repeatedReplacement": {
-    "type": "string",
-    "description": "Repeated replacement"
-   },
-   "suspiciousRebinding": {
-    "type": "string",
-    "description": "Suspicious rebinding"
-   },
-   "multipleCredentialAssignments": {
-    "type": "string",
-    "description": "Multiple credential assignments"
-   },
-   "unexpectedProviderTokenChanges": {
-    "type": "string",
-    "description": "Unexpected provider/token changes"
-   },
-   "unauthorizedAdministrativeActions": {
-    "type": "string",
-    "description": "Unauthorized administrative actions"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
- "CredentialUsageCrossMediaTraceabilityView": {
+ "Problem": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Usage & Cross-Media Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "RFC 9457 problem details. Every error response uses this shape.",
+  "required": [
+   "type",
+   "title",
+   "status"
+  ],
   "properties": {
-   "virtualTicket": {
+   "type": {
     "type": "string",
-    "description": "Virtual Ticket"
+    "format": "uri"
    },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
+   "title": {
+    "type": "string"
    },
-   "media": {
-    "type": "string",
-    "description": "Media"
+   "status": {
+    "type": "integer"
    },
-   "presentationTimestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Presentation timestamp"
+   "detail": {
+    "type": "string"
    },
-   "location": {
-    "type": "string",
-    "description": "Location"
+   "instance": {
+    "type": "string"
    },
-   "device": {
-    "type": "string",
-    "description": "Device"
+   "traceId": {
+    "type": "string"
    },
-   "externalSystem": {
-    "type": "string",
-    "description": "External system"
-   },
-   "transactionType": {
-    "type": "string",
-    "description": "Transaction type"
-   },
-   "result": {
-    "type": "string",
-    "description": "Result"
-   },
-   "entitlementImpact": {
-    "type": "string",
-    "description": "Entitlement impact"
-   },
-   "synchronizationStatus": {
-    "type": "string",
-    "description": "Synchronization status"
-   },
-   "where": {
-    "type": "string",
-    "description": "Where?"
-   },
-   "area16DecidesAdmission": {
-    "type": "string",
-    "description": "Area 16 decides admission"
-   },
-   "rfidRf10028Vt009821": {
-    "type": "string",
-    "description": "RFID RF-10028 → VT-009821"
+   "errors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "code"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "FailedGenerationDeliveryCredentialExceptionManagemenView": {
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Failed Generation, Delivery & Credential Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
   "properties": {
-   "generationFailed": {
-    "type": "integer",
-    "description": "Generation Failed"
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
    },
-   "bindingFailed": {
-    "type": "integer",
-    "description": "Binding Failed"
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
    },
-   "activationFailed": {
-    "type": "integer",
-    "description": "Activation Failed"
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
    },
-   "deliveryFailed": {
-    "type": "integer",
-    "description": "Delivery Failed"
+   "noticeVersion": {
+    "type": "string"
    },
-   "walletFailure": {
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
     "type": "string",
-    "description": "Wallet Failure"
-   },
-   "rfidEncodingFailure": {
-    "type": "string",
-    "description": "RFID Encoding Failure"
-   },
-   "invalidToken": {
-    "type": "string",
-    "description": "Invalid Token"
-   },
-   "providerFailure": {
-    "type": "string",
-    "description": "Provider Failure"
-   },
-   "synchronizationFailure": {
-    "type": "string",
-    "description": "Synchronization Failure"
-   },
-   "missingTemplate": {
-    "type": "string",
-    "description": "Missing Template"
-   },
-   "missingRequiredData": {
-    "type": "string",
-    "description": "Missing Required Data"
-   },
-   "expiredCredential": {
-    "type": "integer",
-    "description": "Expired Credential"
-   },
-   "mappingFailure": {
-    "type": "string",
-    "description": "Mapping Failure"
-   },
-   "unknownCredential": {
-    "type": "string",
-    "description": "Unknown Credential"
-   },
-   "severity": {
-    "type": "string",
-    "description": "Severity"
-   },
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "credential": {
-    "type": "string",
-    "description": "Credential"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "failure": {
-    "type": "string",
-    "description": "Failure"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "operationalImpact": {
-    "type": "string",
-    "description": "Operational Impact"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event proximity"
-   },
-   "customerArrivalTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Customer arrival time"
-   },
-   "numberOfAffectedTickets": {
-    "type": "integer",
-    "description": "Number of affected tickets"
-   },
-   "noAlternativeMedia": {
-    "type": "string",
-    "description": "No alternative media"
-   },
-   "vipCustomerServiceImpact": {
-    "type": "string",
-    "description": "VIP/customer-service impact"
-   },
-   "accessImpact": {
-    "type": "string",
-    "description": "Access impact"
-   },
-   "providerOutage": {
-    "type": "string",
-    "description": "Provider outage"
-   },
-   "regenerate": {
-    "type": "string",
-    "description": "Regenerate"
-   },
-   "rebind": {
-    "type": "string",
-    "description": "Rebind"
-   },
-   "switchMedia": {
-    "type": "string",
-    "description": "Switch Media"
-   },
-   "useFallback": {
-    "type": "string",
-    "description": "Use Fallback"
+    "format": "date-time"
    }
   }
  },
- "MediaBindingActivationAssignmentOperationsInput": {
+ "RegisterGuestRequest": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Media Binding, Activation & Assignment Operations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "identifier",
+   "channel"
+  ],
   "properties": {
-   "rfid": {
+   "identifier": {
     "type": "string",
-    "description": "RFID"
+    "maxLength": 256,
+    "description": "Email address or mobile number in E.164."
    },
-   "nfc": {
+   "channel": {
     "type": "string",
-    "description": "NFC"
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ]
    },
-   "wristbands": {
+   "displayName": {
     "type": "string",
-    "description": "Wristbands"
+    "maxLength": 200
    },
-   "physicalCards": {
+   "password": {
     "type": "string",
-    "description": "Physical cards"
+    "minLength": 8,
+    "maxLength": 256,
+    "description": "Optional. OTP-only accounts are supported and are the default."
    },
-   "faceRecognition": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Face recognition"
+    "pattern": "^[a-z]{2}$"
    },
-   "temporaryCredentials": {
-    "type": "string",
-    "description": "Temporary credentials"
-   },
-   "scan": {
-    "type": "string",
-    "description": "Scan"
-   },
-   "tap": {
-    "type": "string",
-    "description": "Tap"
-   },
-   "manualLookupWhereAuthorized": {
-    "type": "string",
-    "description": "Manual lookup where authorized"
-   },
-   "batchAssignment": {
-    "type": "string",
-    "description": "Batch assignment"
-   },
-   "encoderAssignment": {
-    "type": "string",
-    "description": "Encoder assignment"
-   },
-   "rawBiometricData": {
-    "type": "string",
-    "description": "raw biometric data"
-   },
-   "temporaryActivation": {
-    "type": "string",
-    "description": "Temporary Activation"
+   "consents": {
+    "type": "array",
+    "description": "Consent captured at registration, recorded with the notice version.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "type": "string"
+      },
+      "granted": {
+       "type": "boolean"
+      },
+      "noticeVersion": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "MediaBindingActivationAssignmentOperationsView": {
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Media Binding, Activation & Assignment Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
   "properties": {
-   "rfid": {
+   "id": {
     "type": "string",
-    "description": "RFID"
+    "format": "uuid"
    },
-   "nfc": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
     "type": "string",
-    "description": "NFC"
+    "format": "uuid"
    },
-   "wristbands": {
+   "principalId": {
     "type": "string",
-    "description": "Wristbands"
+    "format": "uuid"
    },
-   "physicalCards": {
+   "roleId": {
     "type": "string",
-    "description": "Physical cards"
+    "format": "uuid"
    },
-   "faceRecognition": {
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
     "type": "string",
-    "description": "Face recognition"
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
    },
-   "temporaryCredentials": {
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
     "type": "string",
-    "description": "Temporary credentials"
+    "format": "date-time"
    },
-   "virtualTicket": {
+   "expiresAt": {
     "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "customer": {
+    "format": "date-time"
+   }
+  }
+ },
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Customer"
+    "format": "uuid"
    },
-   "product": {
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
     "type": "string",
-    "description": "Product"
+    "nullable": true
    },
-   "existingMedia": {
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
     "type": "string",
-    "description": "Existing Media"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
    },
-   "newMediaType": {
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
     "type": "integer",
-    "description": "New Media Type"
-   },
-   "credentialIdUid": {
-    "type": "string",
-    "description": "Credential ID / UID"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "activation": {
-    "type": "string",
-    "description": "Activation"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "bindingRule": {
-    "type": "string",
-    "description": "Binding Rule"
-   },
-   "scan": {
-    "type": "string",
-    "description": "Scan"
-   },
-   "tap": {
-    "type": "string",
-    "description": "Tap"
-   },
-   "manualLookupWhereAuthorized": {
-    "type": "string",
-    "description": "Manual lookup where authorized"
-   },
-   "batchAssignment": {
-    "type": "string",
-    "description": "Batch assignment"
-   },
-   "encoderAssignment": {
-    "type": "string",
-    "description": "Encoder assignment"
-   },
-   "rawBiometricData": {
-    "type": "string",
-    "description": "raw biometric data"
-   },
-   "temporaryActivation": {
-    "type": "string",
-    "description": "Temporary Activation"
+    "description": "Seconds"
    }
   }
  },
- "TicketMediaAnalyticsAiOperationsIntelligenceView": {
+ "WalletPass": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Ticket Media Analytics & AI Operations Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
   "properties": {
-   "credentialsGenerated": {
+   "id": {
     "type": "string",
-    "description": "Credentials Generated"
+    "format": "uuid"
    },
-   "generationSuccess": {
-    "type": "number",
-    "description": "Generation Success %"
-   },
-   "deliverySuccess": {
-    "type": "number",
-    "description": "Delivery Success %"
-   },
-   "activation": {
-    "type": "number",
-    "description": "Activation %"
-   },
-   "walletAdoption": {
+   "entitlementId": {
     "type": "string",
-    "description": "Wallet Adoption"
+    "format": "uuid"
    },
-   "rfidAdoption": {
+   "platform": {
     "type": "string",
-    "description": "RFID Adoption"
+    "enum": [
+     "apple",
+     "google"
+    ]
    },
-   "faceCredentialAdoption": {
+   "serialNumber": {
+    "type": "string"
+   },
+   "authenticationToken": {
     "type": "string",
-    "description": "Face Credential Adoption"
-   },
-   "multiMediaAdoption": {
-    "type": "string",
-    "description": "Multi-Media Adoption"
-   },
-   "replacementRate": {
-    "type": "number",
-    "description": "Replacement Rate"
-   },
-   "revocationRate": {
-    "type": "number",
-    "description": "Revocation Rate"
-   },
-   "generationFailure": {
-    "type": "number",
-    "description": "Generation Failure %"
-   },
-   "deliveryFailure": {
-    "type": "number",
-    "description": "Delivery Failure %"
-   },
-   "averageGenerationTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Generation Time"
-   },
-   "averageResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Resolution Time"
-   },
-   "mediaUsageDistribution": {
-    "type": "string",
-    "description": "Media Usage Distribution"
-   },
-   "mobileQr78": {
-    "type": "number",
-    "description": "Mobile QR — 78%"
-   },
-   "appleWallet31": {
-    "type": "number",
-    "description": "Apple Wallet — 31%"
-   },
-   "googleWallet22": {
-    "type": "number",
-    "description": "Google Wallet — 22%"
-   },
-   "rfid18": {
-    "type": "number",
-    "description": "RFID — 18%"
-   },
-   "face12": {
-    "type": "number",
-    "description": "Face — 12%"
-   },
-   "providerUptime": {
-    "type": "string",
-    "description": "Provider uptime"
-   },
-   "generationFailures": {
-    "type": "string",
-    "description": "Generation failures"
-   },
-   "encodingFailures": {
-    "type": "string",
-    "description": "Encoding failures"
-   },
-   "deliveryFailures": {
-    "type": "string",
-    "description": "Delivery failures"
-   },
-   "synchronizationDelay": {
-    "type": "string",
-    "description": "Synchronization delay"
-   },
-   "replacementFrequency": {
-    "type": "string",
-    "description": "Replacement frequency"
-   },
-   "credentialFailureRisk": {
-    "type": "string",
-    "description": "Credential failure risk"
-   },
-   "deliveryFailureProbability": {
-    "type": "string",
-    "description": "Delivery failure probability"
-   },
-   "mediaDemandForUpcomingEvents": {
-    "type": "string",
-    "description": "Media demand for upcoming events"
-   },
-   "rfidWristbandStockRequirements": {
-    "type": "string",
-    "description": "RFID/wristband stock requirements"
-   },
-   "operationalWorkload": {
-    "type": "string",
-    "description": "Operational workload"
-   },
-   "likelyOnSiteReplacementVolumes": {
-    "type": "string",
-    "description": "Likely on-site replacement volumes"
-   },
-   "qrDynamicQr": {
-    "type": "string",
-    "description": "↙ QR / Dynamic QR"
-   },
-   "appleWallet": {
-    "type": "string",
-    "description": "↙ Apple Wallet"
-   },
-   "googleWallet": {
-    "type": "string",
-    "description": "↙ Google Wallet"
-   },
-   "rfidNfc": {
-    "type": "string",
-    "description": "↙ RFID / NFC"
-   },
-   "cardWristband": {
-    "type": "string",
-    "description": "↙ Card / Wristband"
-   },
-   "faceRecognitionReference": {
-    "type": "string",
-    "description": "↙ Face Recognition Reference"
-   },
-   "futureMedia": {
-    "type": "string",
-    "description": "↙ Future Media"
-   },
-   "sameTicket": {
-    "type": "string",
-    "description": "same ticket"
-   }
-  }
- },
- "VirtualTicketCredential360WorkspaceInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.entitlement at 9%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Virtual Ticket & Credential 360° Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each media show* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
-  "properties": {
-   "showAllAssociatedCredentials": {
-    "type": "string",
-    "description": "Show all associated credentials"
-   },
-   "al": {
-    "type": "string",
-    "description": "al"
-   },
-   "primary": {
-    "type": "string",
-    "description": "Primary"
-   },
-   "secondary": {
-    "type": "string",
-    "description": "Secondary"
-   },
-   "fallback": {
-    "type": "string",
-    "description": "Fallback"
-   },
-   "temporary": {
-    "type": "string",
-    "description": "Temporary"
-   },
-   "revokedHistoricalMedia": {
-    "type": "string",
-    "description": "Revoked historical media"
-   },
-   "bindingId": {
-    "type": "string",
-    "description": "Binding ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media type"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "issued": {
-    "type": "string",
-    "description": "Issued"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "description": "Activated"
-   },
-   "validFrom": {
-    "type": "string",
-    "description": "Valid From"
-   },
-   "validTo": {
-    "type": "string",
-    "description": "Valid To"
-   },
-   "lastUpdate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last update"
-   },
-   "lastPresentation": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last presentation"
-   },
-   "lastUse": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last use"
-   },
-   "deviceReferenceWhereAppropriate": {
-    "type": "string",
-    "description": "Device/reference where appropriate"
+    "format": "password",
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
    },
-   "bindRfid": {
+   "lastPushedAt": {
     "type": "string",
-    "description": "Bind RFID"
+    "format": "date-time",
+    "nullable": true
    },
-   "initiateFaceEnrollment": {
-    "type": "string",
-    "description": "Initiate Face Enrollment"
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
    },
-   "refresh": {
+   "scopePath": {
     "type": "string",
-    "description": "Refresh"
-   },
-   "diagnose": {
-    "type": "string",
-    "description": "Diagnose"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
-  },
-  "x-ticvai-record-definition": "For each media show"
+  }
  },
- "VirtualTicketCredential360WorkspaceView": {
+ "Wishlist": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Ticket & Credential 360° Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
   "properties": {
-   "virtualTicketId": {
+   "subjectId": {
     "type": "string",
-    "description": "Virtual Ticket ID"
+    "format": "uuid"
    },
-   "ticketHolder": {
-    "type": "string",
-    "description": "Ticket Holder"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "ticketStatus": {
-    "type": "integer",
-    "description": "Ticket Status"
-   },
-   "usageStatus": {
-    "type": "integer",
-    "description": "Usage Status"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "entitlements": {
-    "type": "integer",
-    "description": "Entitlements"
-   },
-   "showAllAssociatedCredentials": {
-    "type": "string",
-    "description": "Show all associated credentials"
-   },
-   "al": {
-    "type": "string",
-    "description": "al"
-   },
-   "dynamicQrActive": {
-    "type": "integer",
-    "description": "Dynamic QR Active (the pack shows 88721)"
-   },
-   "appleWalletActive": {
-    "type": "integer",
-    "description": "Apple Wallet Active (the pack shows 55321, 43 | Pag e)"
-   },
-   "primary": {
-    "type": "string",
-    "description": "Primary"
-   },
-   "secondary": {
-    "type": "string",
-    "description": "Secondary"
-   },
-   "fallback": {
-    "type": "string",
-    "description": "Fallback"
-   },
-   "temporary": {
-    "type": "string",
-    "description": "Temporary"
-   },
-   "revokedHistoricalMedia": {
-    "type": "string",
-    "description": "Revoked historical media"
-   },
-   "bindingId": {
-    "type": "string",
-    "description": "Binding ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media type"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "issued": {
-    "type": "string",
-    "description": "Issued"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "description": "Activated"
-   },
-   "validFrom": {
-    "type": "string",
-    "description": "Valid From"
-   },
-   "validTo": {
-    "type": "string",
-    "description": "Valid To"
-   },
-   "lastUpdate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last update"
-   },
-   "lastPresentation": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last presentation"
-   },
-   "lastUse": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last use"
-   },
-   "deviceReferenceWhereAppropriate": {
-    "type": "string",
-    "description": "Device/reference where appropriate"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "bindRfid": {
-    "type": "string",
-    "description": "Bind RFID"
-   },
-   "initiateFaceEnrollment": {
-    "type": "string",
-    "description": "Initiate Face Enrollment"
-   },
-   "refresh": {
-    "type": "string",
-    "description": "Refresh"
-   },
-   "diagnose": {
-    "type": "string",
-    "description": "Diagnose"
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  }

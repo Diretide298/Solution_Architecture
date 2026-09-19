@@ -1,13 +1,13 @@
 {
- "abandonPeriodClose": {
+ "addToWishlist": {
   "method": "POST",
-  "path": "/fiscal-periods/{periodId}/abandon-close",
-  "contract": "finance",
-  "summary": "Abandon a close in progress",
-  "permission": "LEDGER_APPROVE",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -16,36 +16,17 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Wishlist"
  },
- "applyManualDiscount": {
+ "claimCart": {
   "method": "POST",
-  "path": "/orders/{orderId}/discounts",
+  "path": "/carts/{cartId}/claim",
   "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
- },
- "approveJournalEntry": {
-  "method": "POST",
-  "path": "/journal-entries/{entryId}/approve",
-  "contract": "finance",
-  "summary": "Approve a journal entry and post it",
-  "permission": "LEDGER_APPROVE",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -54,109 +35,14 @@
    }
   ],
   "requestBody": null,
-  "responds": "JournalEntry"
+  "responds": "CartMergeResult"
  },
- "beginPeriodClose": {
+ "completeSsoAuthorization": {
   "method": "POST",
-  "path": "/fiscal-periods/{periodId}/begin-close",
-  "contract": "finance",
-  "summary": "Begin closing a period",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "closeFiscalPeriod": {
-  "method": "POST",
-  "path": "/fiscal-periods/{periodId}/close",
-  "contract": "finance",
-  "summary": "Close a period and lock postings",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PeriodCloseResult"
- },
- "createAccount": {
-  "method": "POST",
-  "path": "/accounts",
-  "contract": "finance",
-  "summary": "Create an account",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateAccountRequest",
-  "responds": "Account"
- },
- "createCostCenter": {
-  "method": "POST",
-  "path": "/cost-centers",
-  "contract": "finance",
-  "summary": "Create a cost centre",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CostCenter"
- },
- "createJournalEntry": {
-  "method": "POST",
-  "path": "/journal-entries",
-  "contract": "finance",
-  "summary": "Post a manual journal voucher",
-  "permission": "LEDGER_POST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateJournalEntryRequest",
-  "responds": "JournalEntry"
- },
- "createLegalEntity": {
-  "method": "POST",
-  "path": "/legal-entities",
-  "contract": "finance",
-  "summary": "Create a legal entity",
-  "permission": "ACCOUNT_CONFIGURE",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -167,153 +53,149 @@
     "required": null
    }
   ],
-  "requestBody": "LegalEntity",
-  "responds": "LegalEntity"
+  "requestBody": null,
+  "responds": "LoginResponse"
  },
- "createOrder": {
+ "createMfaChallenge": {
   "method": "POST",
-  "path": "/orders",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
   "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
+ "getEntitlement": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
   "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
- "createRecognitionSchedule": {
-  "method": "POST",
-  "path": "/recognition-schedules",
-  "contract": "finance",
-  "summary": "Define how a product class recognises revenue",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecognitionSchedule",
-  "responds": "RecognitionSchedule"
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Entitlement"
  },
- "createTaxCode": {
-  "method": "POST",
-  "path": "/tax-codes",
-  "contract": "finance",
-  "summary": "Create a tax code",
-  "permission": "TAX_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateTaxCodeRequest",
-  "responds": "TaxCode"
- },
- "createTaxExemption": {
-  "method": "POST",
-  "path": "/tax-exemptions",
-  "contract": "finance",
-  "summary": "DelegatedAccess a tax exemption",
-  "permission": "TAX_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TaxExemption",
-  "responds": "TaxExemption"
- },
- "exchangeOrderLines": {
-  "method": "POST",
-  "path": "/orders/{orderId}/exchanges",
-  "contract": "orders",
-  "summary": "Exchange lines for different products or dates",
-  "permission": "ORDER_EXCHANGE",
+ "getEntitlementCredential": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": null,
-    "in": null,
+    "name": "rotate",
+    "in": "query",
     "required": null
    }
   ],
-  "requestBody": "ExchangeOrderRequest",
-  "responds": "OrderExchangeResult"
- },
- "getAccount": {
-  "method": "GET",
-  "path": "/accounts/{accountId}",
-  "contract": "finance",
-  "summary": "Read an account",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [],
   "requestBody": null,
-  "responds": "Account"
+  "responds": null
  },
- "getDeferredRevenue": {
+ "getEntitlementHistory": {
   "method": "GET",
-  "path": "/deferred-revenue",
-  "contract": "finance",
-  "summary": "Deferred revenue balance and ageing",
-  "permission": "LEDGER_VIEW",
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "asAt",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DeferredRevenueReport"
- },
- "getJournalEntry": {
-  "method": "GET",
-  "path": "/journal-entries/{entryId}",
-  "contract": "finance",
-  "summary": "Read a journal entry",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
   "parameters": [],
   "requestBody": null,
-  "responds": "JournalEntry"
+  "responds": null
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChallengeProgress"
  },
  "getOrder": {
   "method": "GET",
@@ -328,103 +210,86 @@
   "requestBody": null,
   "responds": "Order"
  },
- "getOrderStatement": {
+ "getWishlist": {
   "method": "GET",
-  "path": "/orders/{orderId}/statement",
-  "contract": "orders",
-  "summary": "Full financial history of an order",
-  "permission": "ORDER_VIEW",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "subject",
   "parameters": [],
   "requestBody": null,
-  "responds": "OrderStatement"
+  "responds": "Wishlist"
  },
- "getRefundPolicy": {
-  "method": "GET",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Read a venue's refund policy",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "RefundPolicy"
- },
- "getTrialBalance": {
-  "method": "GET",
-  "path": "/ledger/trial-balance",
-  "contract": "finance",
-  "summary": "Trial balance for a period",
-  "permission": "LEDGER_VIEW",
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "fiscalPeriodId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "legalEntityId",
+    "name": "allDevices",
     "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TrialBalance"
+  "responds": null
  },
- "getVenueSettings": {
-  "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VenueSettings"
- },
- "holdOrder": {
+ "guestSocialLogin": {
   "method": "POST",
-  "path": "/orders/{orderId}/hold",
+  "path": "/auth/guest/social",
+  "contract": "identity",
+  "summary": "Sign in with Apple or Google",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "guestUaePassLogin": {
+  "method": "POST",
+  "path": "/auth/guest/uae-pass",
+  "contract": "identity",
+  "summary": "Sign in with a national identity provider",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "issueWalletPass": {
+  "method": "POST",
+  "path": "/wallet-passes",
   "contract": "orders",
-  "summary": "Park a sale and free the till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
- },
- "listAccountMappings": {
-  "method": "GET",
-  "path": "/account-mappings",
-  "contract": "finance",
-  "summary": "Which account each transaction type posts to",
-  "permission": "LEDGER_VIEW",
+  "summary": "Generate an Apple or Google wallet pass",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -432,253 +297,34 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccountMapping"
+  "responds": "WalletPass"
  },
- "listAccounts": {
-  "method": "GET",
-  "path": "/accounts",
-  "contract": "finance",
-  "summary": "List the chart of accounts",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "type",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "isPostable",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listCostCenters": {
-  "method": "GET",
-  "path": "/cost-centers",
-  "contract": "finance",
-  "summary": "List cost centres",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDeliveryLocations": {
-  "method": "GET",
-  "path": "/venues/{venueId}/delivery-locations",
-  "contract": "fnb",
-  "summary": "Where an order can be delivered",
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "servingOutletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
     "name": null,
     "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "DeliveryLocation"
+  "responds": null
  },
- "listDiningOutlets": {
+ "listConsentPurposes": {
   "method": "GET",
-  "path": "/venues/{venueId}/dining",
-  "contract": "fnb",
-  "summary": "Where a guest can eat, right now",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "openNow",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "orderingMethod",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DiningOutlet"
- },
- "listFiscalPeriods": {
-  "method": "GET",
-  "path": "/fiscal-periods",
-  "contract": "finance",
-  "summary": "List fiscal periods",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "FiscalPeriod"
- },
- "listFxRates": {
-  "method": "GET",
-  "path": "/fx-rates",
-  "contract": "finance",
-  "summary": "The rates in force",
-  "permission": "LEDGER_VIEW",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
   "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "asAt",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "purpose",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "FxRate"
- },
- "listJournalEntries": {
-  "method": "GET",
-  "path": "/journal-entries",
-  "contract": "finance",
-  "summary": "List journal entries",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "fiscalPeriodId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "source",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listLegalEntities": {
-  "method": "GET",
-  "path": "/legal-entities",
-  "contract": "finance",
-  "summary": "List legal entities",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
@@ -694,17 +340,46 @@
    }
   ],
   "requestBody": null,
-  "responds": "LegalEntity"
+  "responds": "ConsentPurposeConfig"
  },
- "listOrderRefunds": {
+ "listEntitlements": {
   "method": "GET",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "List refunds against an order",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
+  "path": "/my/entitlements/all",
+  "contract": "access",
+  "summary": "Every entitlement this guest holds, including expired",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeExpired",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -718,7 +393,83 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "GuestDevice"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
  },
  "listOrders": {
   "method": "GET",
@@ -774,70 +525,200 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listPriceVariances": {
+ "listSsoProviders": {
   "method": "GET",
-  "path": "/price-variances",
-  "contract": "finance",
-  "summary": "List price variances",
-  "permission": "LEDGER_VIEW",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "refreshToken": {
+  "method": "POST",
+  "path": "/auth/refresh",
+  "contract": "identity",
+  "summary": "Rotate the access token",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TokenPair"
+ },
+ "registerGuest": {
+  "method": "POST",
+  "path": "/auth/guest/register",
+  "contract": "identity",
+  "summary": "Create a guest account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisterGuestRequest",
+  "responds": "GuestSession"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp",
+  "contract": "identity",
+  "summary": "Request a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "exceptionsOnly",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "reviewStatus",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "occurredFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "occurredTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
     "name": null,
     "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "Invitation"
  },
- "listRecognitionSchedules": {
-  "method": "GET",
-  "path": "/recognition-schedules",
-  "contract": "finance",
-  "summary": "List revenue recognition schedules",
-  "permission": "LEDGER_VIEW",
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "subject",
   "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -845,100 +726,13 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": null
  },
- "listSettlements": {
-  "method": "GET",
-  "path": "/settlements",
-  "contract": "finance",
-  "summary": "List settlement batches",
-  "permission": "SETTLEMENT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "providerName",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTaxCodes": {
-  "method": "GET",
-  "path": "/tax-codes",
-  "contract": "finance",
-  "summary": "List tax codes",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "countryCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTaxExemptions": {
-  "method": "GET",
-  "path": "/tax-exemptions",
-  "contract": "finance",
-  "summary": "List tax exemptions",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TaxExemption"
- },
- "modifyOrder": {
+ "shareEntitlement": {
   "method": "POST",
-  "path": "/orders/{orderId}/modify",
+  "path": "/entitlements/{entitlementId}/share",
   "contract": "orders",
-  "summary": "Add or remove lines on an existing order",
+  "summary": "Let somebody else use this, without giving it away",
   "permission": "ORDER_MODIFY",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -950,55 +744,36 @@
     "required": null
    }
   ],
-  "requestBody": "ModifyOrderRequest",
-  "responds": "OrderModificationResult"
+  "requestBody": null,
+  "responds": "Problem"
  },
- "rejectJournal": {
-  "method": "POST",
-  "path": "/journal-entries/{entryId}/reject",
-  "contract": "finance",
-  "summary": "Reject a journal awaiting approval",
-  "permission": "LEDGER_APPROVE",
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": null,
-    "in": null,
-    "required": null
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
    }
   ],
   "requestBody": null,
   "responds": null
  },
- "reopenPeriod": {
+ "transferOrderTickets": {
   "method": "POST",
-  "path": "/fiscal-periods/{periodId}/reopen",
-  "contract": "finance",
-  "summary": "Reopen a closed period",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "reprintOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reprints",
+  "path": "/orders/{orderId}/transfer",
   "contract": "orders",
-  "summary": "Reprint or resend tickets",
-  "permission": "ORDER_REPRINT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1010,110 +785,15 @@
   "requestBody": null,
   "responds": null
  },
- "rescheduleOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/reschedule",
-  "contract": "orders",
-  "summary": "Move an order to another performance",
-  "permission": "ORDER_RESCHEDULE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderExchangeResult"
- },
- "resumeOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/resume",
-  "contract": "orders",
-  "summary": "Bring a parked sale back to a till",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OrderResumeResult"
- },
- "reverseJournalEntry": {
-  "method": "POST",
-  "path": "/journal-entries/{entryId}/reverse",
-  "contract": "finance",
-  "summary": "Reverse a posted entry",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "JournalEntry"
- },
- "reviewPriceVariance": {
-  "method": "POST",
-  "path": "/price-variances/{varianceId}/review",
-  "contract": "finance",
-  "summary": "Record a review decision on an exception variance",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PriceVariance"
- },
- "runRecognition": {
-  "method": "POST",
-  "path": "/recognition/run",
-  "contract": "finance",
-  "summary": "Recognise earned revenue for a period",
-  "permission": "LEDGER_POST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "RecognitionRunResult"
- },
- "setAccountMappings": {
+ "updateGuestPreferences": {
   "method": "PUT",
-  "path": "/account-mappings",
-  "contract": "finance",
-  "summary": "Set posting mappings",
-  "permission": "ACCOUNT_CONFIGURE",
+  "path": "/guests/{subjectId}/preferences",
+  "contract": "marketing-crm",
+  "summary": "The things a regular should not have to say twice",
+  "permission": "GUEST_MANAGE",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1122,74 +802,17 @@
    }
   ],
   "requestBody": null,
-  "responds": "AccountMapping"
+  "responds": null
  },
- "setFxRate": {
-  "method": "PUT",
-  "path": "/fx-rates",
-  "contract": "finance",
-  "summary": "Set a rate",
-  "permission": "LEDGER_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "FxRate",
-  "responds": "FxRate"
- },
- "setRefundPolicy": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Set a venue's refund policy",
-  "permission": "REGION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundPolicy",
-  "responds": "RefundPolicy"
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
- },
- "updateAccount": {
+ "updateMyProfile": {
   "method": "PATCH",
-  "path": "/accounts/{accountId}",
-  "contract": "finance",
-  "summary": "Rename, remap or deactivate an account",
-  "permission": "ACCOUNT_CONFIGURE",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
   "parameters": [
    {
     "name": null,
@@ -1198,36 +821,17 @@
    }
   ],
   "requestBody": null,
-  "responds": "Account"
+  "responds": "GuestProfile"
  },
- "updateTaxCode": {
-  "method": "PATCH",
-  "path": "/tax-codes/{taxCodeId}",
-  "contract": "finance",
-  "summary": "Amend a tax code",
-  "permission": "TAX_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TaxCode"
- },
- "voidOrder": {
+ "verifyGuestEmail": {
   "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -1236,6 +840,63 @@
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": null
+ },
+ "verifyGuestOtp": {
+  "method": "POST",
+  "path": "/auth/guest/otp/verify",
+  "contract": "identity",
+  "summary": "Verify a one-time code and issue a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

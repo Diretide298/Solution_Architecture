@@ -1,555 +1,75 @@
 [
  {
-  "id": "CMS-051",
-  "name": "Waiver Operations Command Center",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.1",
-   "page": 26
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/waiver-operations-command-center-cms-051",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "CMS-001"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "CMS-001",
-    "CMS-052",
-    "CMS-053",
-    "CMS-054",
-    "CMS-055",
-    "CMS-056",
-    "CMS-057",
-    "CMS-058",
-    "CMS-059",
-    "CMS-060"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "CMS-001",
-     "trigger": "Tenant Workspace",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "tenantId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-052",
-     "trigger": "Works in Participant Waiver Status & Tracking",
-     "provenance": "flow F182 step 1→2",
-     "operation": "listWaiver"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-053",
-     "trigger": "Works in Digital Signing & Collection Operations",
-     "provenance": "flow F182 step 3→4",
-     "operation": "listWaiver"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-054",
-     "trigger": "Works in Minor, Guardian & Group Consent Management",
-     "provenance": "flow F182 step 5→6",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-055",
-     "trigger": "Works in Waiver Verification & Validation Workspace",
-     "provenance": "flow F182 step 7→8",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-056",
-     "trigger": "Works in Missing, Expired & Invalid Waiver Management",
-     "provenance": "flow F182 step 9→10",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-057",
-     "trigger": "Works in On-Site Waiver & Exception Handling",
-     "provenance": "flow F182 step 11→12",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-058",
-     "trigger": "Works in Compliance Evidence, Audit & Waiver Repository",
-     "provenance": "flow F182 step 13→14",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-059",
-     "trigger": "Works in Waiver Analytics, Compliance & Operational Insights",
-     "provenance": "flow F182 step 15→16",
-     "operation": "listWaiver"
-    },
-    {
-     "to": "CMS-060",
-     "trigger": "Works in AI Waiver Compliance & Risk Intelligence Center",
-     "provenance": "flow F182 step 17→18",
-     "operation": "listWaiver"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
-  "purpose": "Provide Operations, Customer Service, Compliance and venue teams with a real-time overview of waiver completion across upcoming and active activities.",
-  "purposeNote": "Operations can identify every upcoming activity affected by incomplete waiver requirements and prioritize corrective actions before customer arrival.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search waiver operations",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Brand",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.event",
-        "WaiverOperationsCommandCenterView.product",
-        "Waiver",
-        "Date",
-        "Status",
-        "Participant Type",
-        "Booking Channel"
-       ],
-       "notes": "The pack filters this screen by brand, venue, event, product, waiver, date and 3 more — which are present is a decision the pack already made.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Waivers Required",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.waiversRequired"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Completed",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.completed"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.pending"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Partially Completed",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.partiallyCompleted"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expiring",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.expiring"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Invalid",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.invalid"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Rejected",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.rejected"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Guardian Consent Pending",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.guardianConsentPending"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Upcoming Participants Missing Waiver",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.upcomingParticipantsMissingWaiver"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Access Blocked",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.accessBlocked"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Manual Exceptions",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.manualExceptions"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Completion Rate",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Display",
-       "bindsTo": "WaiverOperationsCommandCenterView.completionRate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every waiver operations",
-       "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
-       ],
-       "bindsTo": "WaiverOperationsCommandCenterView",
-       "operation": "listWaiver",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record should show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected waiver operations",
-       "bindsTo": "WaiverOperationsCommandCenterView",
-       "columns": [
-        "WaiverOperationsCommandCenterView.eventActivity",
-        "WaiverOperationsCommandCenterView.venue",
-        "WaiverOperationsCommandCenterView.dateTime",
-        "WaiverOperationsCommandCenterView.participants",
-        "WaiverOperationsCommandCenterView.waiversRequired",
-        "WaiverOperationsCommandCenterView.completed",
-        "WaiverOperationsCommandCenterView.missing",
-        "WaiverOperationsCommandCenterView.completion",
-        "WaiverOperationsCommandCenterView.guardianPending",
-        "WaiverOperationsCommandCenterView.exceptions",
-        "WaiverOperationsCommandCenterView.operationalRisk"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Display by”, “Activity Status”, “Youth Attentio”, “Climbing”, “Session”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record should show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The waiver operations list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the waiver operations untouched.",
-   "emptyFirstRun": "No waiver operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the waiver operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listWaiver",
-    "contract": "marketing-crm",
-    "purpose": "Waiver Operations Command Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-051"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 26. 26 of 32 labels bound to a contract property; 32 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-052",
-  "name": "Participant Waiver Status & Tracking",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.2",
-   "page": 28
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/participant-waiver-status-tracking-cms-052",
-   "component": "apps/venue-management-web/src/routes/policy/ParticipantWaiverStatusTracking.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 2→3",
-     "operation": "listParticipantWaiverStatus"
-    }
-   ]
-  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide a detailed operational record of the waiver requirements for each participant.",
-  "purposeNote": "Staff can determine the complete waiver readiness of any participant from one screen.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search participant waiver status",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Search by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "ParticipantWaiverStatusTrackingView.participant",
-        "ParticipantWaiverStatusTrackingView.booking",
-        "ParticipantWaiverStatusTrackingView.ticket",
-        "Email",
-        "Mobile",
-        "ParticipantWaiverStatusTrackingView.group",
-        "Waiver ID"
-       ],
-       "notes": "The pack filters this screen by participant, booking, ticket, email, mobile, group and 1 more — which are present is a decision the pack already made.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Search by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every participant waiver status",
-       "columns": [
-        "ParticipantWaiverStatusTrackingView.participant",
-        "ParticipantWaiverStatusTrackingView.participantId",
-        "ParticipantWaiverStatusTrackingView.customerPurchaser",
-        "ParticipantWaiverStatusTrackingView.booking",
-        "ParticipantWaiverStatusTrackingView.ticket",
-        "ParticipantWaiverStatusTrackingView.product",
-        "ParticipantWaiverStatusTrackingView.event",
-        "ParticipantWaiverStatusTrackingView.visitDate",
-        "ParticipantWaiverStatusTrackingView.ageCategory",
-        "ParticipantWaiverStatusTrackingView.group",
-        "ParticipantWaiverStatusTrackingView.waiverRequirements",
-        "ParticipantWaiverStatusTrackingView.completionStatus"
-       ],
-       "bindsTo": "ParticipantWaiverStatusTrackingView",
-       "operation": "listParticipantWaiverStatus",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected participant waiver status",
-       "bindsTo": "ParticipantWaiverStatusTrackingView",
-       "columns": [
-        "ParticipantWaiverStatusTrackingView.participant",
-        "ParticipantWaiverStatusTrackingView.participantId",
-        "ParticipantWaiverStatusTrackingView.customerPurchaser",
-        "ParticipantWaiverStatusTrackingView.booking",
-        "ParticipantWaiverStatusTrackingView.ticket",
-        "ParticipantWaiverStatusTrackingView.product",
-        "ParticipantWaiverStatusTrackingView.event",
-        "ParticipantWaiverStatusTrackingView.visitDate",
-        "ParticipantWaiverStatusTrackingView.ageCategory",
-        "ParticipantWaiverStatusTrackingView.group",
-        "ParticipantWaiverStatusTrackingView.waiverRequirements",
-        "ParticipantWaiverStatusTrackingView.completionStatus"
-       ],
-       "notes": null,
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Send Waiver, Resend, Open, View, Verify, Request Correction, Replace Signatory, Record Exception, View Audit History. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 28 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The participant waiver status list.",
-   "error": "Could not load. Names which read failed and leaves the participant waiver status untouched.",
-   "emptyFirstRun": "No participant waiver status yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the participant waiver status are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listParticipantWaiverStatus",
-    "contract": "marketing-crm",
-    "purpose": "Participant Waiver Status & Tracking",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ParticipantWaiverStatusTrackingView.participant",
-    "ParticipantWaiverStatusTrackingView.participantId",
-    "ParticipantWaiverStatusTrackingView.customerPurchaser",
-    "ParticipantWaiverStatusTrackingView.booking",
-    "ParticipantWaiverStatusTrackingView.ticket",
-    "ParticipantWaiverStatusTrackingView.product"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-052"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 28. 16 of 19 labels bound to a contract property; 28 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-053",
-  "name": "Digital Signing & Collection Operations",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.3",
-   "page": 29
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/digital-signing-collection-operations-cms-053",
-   "component": "apps/venue-management-web/src/routes/policy/DigitalSigningCollectionOperations.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 4→5",
-     "operation": "listDigitalSigningCollection"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Manage the actual distribution and completion of digital waivers.",
-  "purposeNote": "channels.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -561,19 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every digital signing collection",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "DigitalSigningCollectionOperationsView.sent",
-        "DigitalSigningCollectionOperationsView.delivered",
-        "DigitalSigningCollectionOperationsView.opened",
-        "DigitalSigningCollectionOperationsView.started",
-        "DigitalSigningCollectionOperationsView.completed",
-        "DigitalSigningCollectionOperationsView.failed",
-        "DigitalSigningCollectionOperationsView.expiredLinks"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "DigitalSigningCollectionOperationsView",
-       "operation": "listDigitalSigningCollection",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Display"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -583,19 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected digital signing collection",
-       "bindsTo": "DigitalSigningCollectionOperationsView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "DigitalSigningCollectionOperationsView.sent",
-        "DigitalSigningCollectionOperationsView.delivered",
-        "DigitalSigningCollectionOperationsView.opened",
-        "DigitalSigningCollectionOperationsView.started",
-        "DigitalSigningCollectionOperationsView.completed",
-        "DigitalSigningCollectionOperationsView.failed",
-        "DigitalSigningCollectionOperationsView.expiredLinks"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Link Issued”, “For groups”, “Waiver Completed”, “Security”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Display"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -605,120 +128,413 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Email Link",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "SMS Link",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The digital signing collection list.",
-   "error": "Could not load. Names which read failed and leaves the digital signing collection untouched.",
-   "emptyFirstRun": "No digital signing collection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the digital signing collection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listDigitalSigningCollection",
-    "contract": "marketing-crm",
-    "purpose": "Digital Signing & Collection Operations",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "DigitalSigningCollectionOperationsView.sent",
-    "DigitalSigningCollectionOperationsView.delivered",
-    "DigitalSigningCollectionOperationsView.opened",
-    "DigitalSigningCollectionOperationsView.started",
-    "DigitalSigningCollectionOperationsView.completed",
-    "DigitalSigningCollectionOperationsView.failed"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-053"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 29. 7 of 7 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P13",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "CMS-054",
-  "name": "Minor, Guardian & Group Consent Management",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.4",
-   "page": 31
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/minor-guardian-group-consent-management-cms-054",
-   "component": "apps/venue-management-web/src/routes/policy/MinorGuardianGroupConsentManagement.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "CMS-051"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "CMS-051"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 6→7",
-     "operation": "listMinorGuardianGroup"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Manage complex consent relationships for minors and organized groups. This screen is particularly important for camps, academies, schools, family attractions and youth activities.",
-  "purposeNote": "purchaser, participant and legal signatory as the same person.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Send Guardian Links, Notify Group Leader, Export Missing List. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Allow"
-   }
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
   ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -728,18 +544,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every minor guardian group",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "MinorGuardianGroupConsentManagementView",
-       "operation": "listMinorGuardianGroup",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -749,18 +571,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected minor guardian group",
-       "bindsTo": "MinorGuardianGroupConsentManagementView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "MinorGuardianGroupConsentManagementView.organization",
-        "MinorGuardianGroupConsentManagementView.groupLeader",
-        "MinorGuardianGroupConsentManagementView.contact",
-        "MinorGuardianGroupConsentManagementView.groupBooking",
-        "MinorGuardianGroupConsentManagementView.responsibility",
-        "MinorGuardianGroupConsentManagementView.permittedActions"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Multiple Children”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
@@ -770,118 +588,264 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send Guardian Links",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Allow"
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
        "kind": "secondaryButton",
-       "label": "Notify Group Leader",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Allow"
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Export Missing List",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Allow"
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "The minor guardian group list.",
-   "error": "Could not load. Names which read failed and leaves the minor guardian group untouched.",
-   "emptyFirstRun": "No minor guardian group yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the minor guardian group are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listMinorGuardianGroup",
+    "operationId": "addToWishlist",
     "contract": "marketing-crm",
-    "purpose": "Minor, Guardian & Group Consent Management",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "MinorGuardianGroupConsentManagementView.organization",
-    "MinorGuardianGroupConsentManagementView.groupLeader",
-    "MinorGuardianGroupConsentManagementView.contact",
-    "MinorGuardianGroupConsentManagementView.groupBooking",
-    "MinorGuardianGroupConsentManagementView.responsibility",
-    "MinorGuardianGroupConsentManagementView.permittedActions"
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-054"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 31. 6 of 6 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P13",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "CMS-055",
-  "name": "Waiver Verification & Validation Workspace",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.5",
-   "page": 33
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/waiver-verification-validation-workspace-cms-055",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverVerificationValidationWorkspace.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "CMS-051"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "CMS-051"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 8→9",
-     "operation": "setWaiverVerificationValidation"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide authorized staff with a controlled process for reviewing waiver submissions that require verification.",
-  "purposeNote": "Waivers requiring manual verification are reviewed consistently using governed validation criteria with complete reviewer accountability.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -891,22 +855,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every waiver verification validation",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "WaiverVerificationValidationWorkspaceView.submissionId",
-        "WaiverVerificationValidationWorkspaceView.participant",
-        "WaiverVerificationValidationWorkspaceView.waiver",
-        "WaiverVerificationValidationWorkspaceView.version",
-        "WaiverVerificationValidationWorkspaceView.booking",
-        "WaiverVerificationValidationWorkspaceView.signatory",
-        "WaiverVerificationValidationWorkspaceView.submitted",
-        "WaiverVerificationValidationWorkspaceView.verificationReason",
-        "WaiverVerificationValidationWorkspaceView.risk",
-        "WaiverVerificationValidationWorkspaceView.status"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
        ],
-       "bindsTo": "WaiverVerificationValidationWorkspaceView",
-       "operation": "setWaiverVerificationValidation",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 33 §Display"
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
       }
      ]
     },
@@ -916,22 +882,531 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected waiver verification validation",
-       "bindsTo": "WaiverVerificationValidationWorkspaceView",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
        "columns": [
-        "WaiverVerificationValidationWorkspaceView.submissionId",
-        "WaiverVerificationValidationWorkspaceView.participant",
-        "WaiverVerificationValidationWorkspaceView.waiver",
-        "WaiverVerificationValidationWorkspaceView.version",
-        "WaiverVerificationValidationWorkspaceView.booking",
-        "WaiverVerificationValidationWorkspaceView.signatory",
-        "WaiverVerificationValidationWorkspaceView.submitted",
-        "WaiverVerificationValidationWorkspaceView.verificationReason",
-        "WaiverVerificationValidationWorkspaceView.risk",
-        "WaiverVerificationValidationWorkspaceView.status"
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Reviewer Actions”, “Human Governance”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 33 §Display"
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
       }
      ]
     },
@@ -942,784 +1417,157 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setWaiverVerificationValidation"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The waiver verification validation list.",
-   "error": "Could not load. Names which read failed and leaves the waiver verification validation untouched.",
-   "emptyFirstRun": "No waiver verification validation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the waiver verification validation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setWaiverVerificationValidation",
-    "contract": "marketing-crm",
-    "purpose": "Waiver Verification & Validation Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setWaiverVerificationValidation"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "WaiverVerificationValidationWorkspaceView.submissionId",
-    "WaiverVerificationValidationWorkspaceView.participant",
-    "WaiverVerificationValidationWorkspaceView.waiver",
-    "WaiverVerificationValidationWorkspaceView.version",
-    "WaiverVerificationValidationWorkspaceView.booking",
-    "WaiverVerificationValidationWorkspaceView.signatory"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-055"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 33. 10 of 10 labels bound to a contract property; 20 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-056",
-  "name": "Missing, Expired & Invalid Waiver Management",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.6",
-   "page": 34
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/missing-expired-invalid-waiver-management-cms-056",
-   "component": "apps/venue-management-web/src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 10→11",
-     "operation": "listMissingExpiredInvalid"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide a dedicated exception workspace for waiver requirements preventing operational readiness.",
-  "purposeNote": "Missing, invalid and expired waiver requirements are proactively identified and managed before they cause unnecessary admission or operational failures.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every missing expired invalid",
-       "columns": [
-        "MissingExpiredInvalidWaiverManagementView.participant",
-        "MissingExpiredInvalidWaiverManagementView.booking",
-        "MissingExpiredInvalidWaiverManagementView.event",
-        "MissingExpiredInvalidWaiverManagementView.visitTime",
-        "MissingExpiredInvalidWaiverManagementView.waiver",
-        "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
-        "MissingExpiredInvalidWaiverManagementView.accessImpact",
-        "MissingExpiredInvalidWaiverManagementView.owner",
-        "MissingExpiredInvalidWaiverManagementView.status"
-       ],
-       "bindsTo": "MissingExpiredInvalidWaiverManagementView",
-       "operation": "listMissingExpiredInvalid",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 34 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected missing expired invalid",
-       "bindsTo": "MissingExpiredInvalidWaiverManagementView",
-       "columns": [
-        "MissingExpiredInvalidWaiverManagementView.participant",
-        "MissingExpiredInvalidWaiverManagementView.booking",
-        "MissingExpiredInvalidWaiverManagementView.event",
-        "MissingExpiredInvalidWaiverManagementView.visitTime",
-        "MissingExpiredInvalidWaiverManagementView.waiver",
-        "MissingExpiredInvalidWaiverManagementView.problem",
-        "MissingExpiredInvalidWaiverManagementView.timeRemaining",
-        "MissingExpiredInvalidWaiverManagementView.accessImpact",
-        "MissingExpiredInvalidWaiverManagementView.owner",
-        "MissingExpiredInvalidWaiverManagementView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Include”, “Highest priority should consider”, “Authorized staff can”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 34 §Display"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The missing expired invalid list.",
-   "error": "Could not load. Names which read failed and leaves the missing expired invalid untouched.",
-   "emptyFirstRun": "No missing expired invalid yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the missing expired invalid are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMissingExpiredInvalid",
-    "contract": "marketing-crm",
-    "purpose": "Missing, Expired & Invalid Waiver Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "MissingExpiredInvalidWaiverManagementView.participant",
-    "MissingExpiredInvalidWaiverManagementView.booking",
-    "MissingExpiredInvalidWaiverManagementView.event",
-    "MissingExpiredInvalidWaiverManagementView.visitTime",
-    "MissingExpiredInvalidWaiverManagementView.waiver",
-    "MissingExpiredInvalidWaiverManagementView.problem"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-056"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 34. 10 of 10 labels bound to a contract property; 10 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-057",
-  "name": "On-Site Waiver & Exception Handling",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.7",
-   "page": 36
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/on-site-waiver-exception-handling-cms-057",
-   "component": "apps/venue-management-web/src/routes/policy/OnSiteWaiverExceptionHandling.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 12→13",
-     "operation": "listSiteWaiverException"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
-  "purpose": "Support customers who arrive at the venue without completing required waivers.",
-  "purposeNote": "On-site staff can efficiently resolve legitimate waiver issues while preventing unauthorized bypass of mandatory consent requirements.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Send Mobile Link",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
-       "kind": "textField",
-       "label": "Display QR for Customer",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
-       "kind": "selectField",
-       "label": "Complete on Kiosk",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
-      },
-      {
-       "kind": "textField",
-       "label": "Complete on Staff Tablet",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Contact Guardian",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Re-Sign Updated Waiver",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Request Supervisor Exception",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 36 §Depending on configuration"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The on-site waiver exception configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the on-site waiver exception untouched.",
-   "emptyFirstRun": "No on-site waiver exception configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSiteWaiverException",
-    "contract": "marketing-crm",
-    "purpose": "On-Site Waiver & Exception Handling",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-057"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-058",
-  "name": "Compliance Evidence, Audit & Waiver Repository",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.8",
-   "page": 38
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/compliance-evidence-audit-waiver-repository-cms-058",
-   "component": "apps/venue-management-web/src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 14→15",
-     "operation": "listComplianceEvidenceWaiver"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Maintain the complete evidentiary record of every waiver and consent transaction.",
-  "purposeNote": "completed waiver at the relevant point in time.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 38"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search compliance evidence audit",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 38 §Search by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Participant",
-        "Customer",
-        "Ticket",
-        "Booking",
-        "Event",
-        "Waiver",
-        "Version",
-        "Signatory",
-        "Date",
-        "Venue"
-       ],
-       "notes": "The pack filters this screen by participant, customer, ticket, booking, event, waiver and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 38 §Search by"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The compliance evidence audit list.",
-   "error": "Could not load. Names which read failed and leaves the compliance evidence audit untouched.",
-   "emptyFirstRun": "No compliance evidence audit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the compliance evidence audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listComplianceEvidenceWaiver",
-    "contract": "marketing-crm",
-    "purpose": "Compliance Evidence, Audit & Waiver Repository",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-058"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 38. 0 of 10 labels bound to a contract property; 10 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-059",
-  "name": "Waiver Analytics, Compliance & Operational Insights",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.9",
-   "page": 39
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/waiver-analytics-compliance-operational-insights-cms-059",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-051",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F182 step 16→17",
-     "operation": "listWaiverComplianceOperational"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
-  "purpose": "Analyze waiver completion, customer behavior and operational effectiveness.",
-  "purposeNote": "Management can understand waiver compliance and identify configuration or process improvements that reduce customer friction and on-site workload.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search waiver analytics compliance",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 39 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Waiver",
-        "Version",
-        "Product",
-        "Event",
-        "Venue",
-        "Customer Type",
-        "Participant Type",
-        "Channel",
-        "Language",
-        "Group"
-       ],
-       "notes": "The pack filters this screen by waiver, version, product, event, venue, customer type and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 39 §Filter by"
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "carried",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every waiver analytics compliance",
-       "columns": [
-        "WaiverAnalyticsComplianceOperationalInsightsView.waiversAssigned",
-        "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
-        "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.accessBlocks",
-        "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
-        "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
-        "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
-       ],
-       "bindsTo": "WaiverAnalyticsComplianceOperationalInsightsView",
-       "operation": "listWaiverComplianceOperational",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 39 §Analyze"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected waiver analytics compliance",
-       "bindsTo": "WaiverAnalyticsComplianceOperationalInsightsView",
-       "columns": [
-        "WaiverAnalyticsComplianceOperationalInsightsView.waiversAssigned",
-        "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-        "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
-        "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate",
-        "WaiverAnalyticsComplianceOperationalInsightsView.accessBlocks",
-        "WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness",
-        "WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays",
-        "WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions",
-        "WaiverAnalyticsComplianceOperationalInsightsView.exceptions"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Visualize”, “Abandonment Analysis”, “Reminder Analysis”.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 39 §Analyze"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The waiver analytics compliance list.",
-   "error": "Could not load. Names which read failed and leaves the waiver analytics compliance untouched.",
-   "emptyFirstRun": "No waiver analytics compliance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the waiver analytics compliance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listWaiverComplianceOperational",
-    "contract": "marketing-crm",
-    "purpose": "Waiver Analytics, Compliance & Operational Insights",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "WaiverAnalyticsComplianceOperationalInsightsView.waiversAssigned",
-    "WaiverAnalyticsComplianceOperationalInsightsView.completionRate",
-    "WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion",
-    "WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion",
-    "WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime",
-    "WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-059"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 39. 14 of 24 labels bound to a contract property; 24 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-060",
-  "name": "AI Waiver Compliance & Risk Intelligence Center",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
-   "board": "2",
-   "number": "11.2.10",
-   "page": 41
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/ai-waiver-compliance-risk-intelligence-center-cms-060",
-   "component": "apps/venue-management-web/src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-051"
-   ],
-   "exitTo": [
-    "CMS-051"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide an AI intelligence layer across the complete waiver lifecycle. This should combine Board 1 configuration data + Board 2 operational data.",
-  "purposeNote": "while preserving human/legal governance over consent and exceptions. Board 2 — Final Screen Register",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 41"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 41"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** “Which waiver version generates the most corrections?”. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 41 §Authorized users can ask"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": [
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listWaiverComplianceRisk",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The waiver compliance risk list.",
-   "error": "Could not load. Names which read failed and leaves the waiver compliance risk untouched.",
-   "emptyFirstRun": "No waiver compliance risk yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the waiver compliance risk are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listWaiverComplianceRisk",
+    "operationId": "getGuestProfile",
     "contract": "marketing-crm",
-    "purpose": "AI Waiver Compliance & Risk Intelligence Center",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "AiWaiverComplianceRiskIntelligenceCenterView.templates",
-    "AiWaiverComplianceRiskIntelligenceCenterView.versions",
-    "AiWaiverComplianceRiskIntelligenceCenterView.questions",
-    "AiWaiverComplianceRiskIntelligenceCenterView.signatoryRules",
-    "AiWaiverComplianceRiskIntelligenceCenterView.productAssociations"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-060"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 1 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P13",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

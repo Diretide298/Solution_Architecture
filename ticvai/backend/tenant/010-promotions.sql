@@ -1,4 +1,4 @@
--- promotions — 11 tables
+-- promotions — 16 tables
 -- **Derived. Do not hand-edit.**
 
 -- One component’s share, fixed or proportional
@@ -98,6 +98,21 @@ CREATE TABLE IF NOT EXISTS promotions.coupon_code (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS promotions.product_relationship (
+    id                                uuid PRIMARY KEY,
+    from_product_id                   uuid NOT NULL,
+    to_product_id                     uuid NOT NULL,
+    kind                              text NOT NULL,
+    ladder_position                   integer,
+    source                            text,
+    strength                          numeric(18,4),
+    effective_from                    date,
+    effective_to                      date,
+    scope_path                        text
+);
+
 -- A rule that changes a price, with eligibility and a budget. Evaluated at the basket rather than
 -- stored on a product
 CREATE TABLE IF NOT EXISTS promotions.promotion (
@@ -121,6 +136,69 @@ CREATE TABLE IF NOT EXISTS promotions.promotion (
     redemption_count                  integer,
     discount_given                    numeric(18,4),
     published_at                      timestamptz
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS promotions.recommendation_experiment (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text,
+    placement                         text,
+    holdout_percent                   integer,
+    primary_metric                    text,
+    minimum_sample_size               integer,
+    started_at                        timestamptz,
+    ended_at                          timestamptz,
+    status                            text,
+    winning_variant                   text,
+    scope_path                        text
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS promotions.recommendation_outcome (
+    recommendation_id                 uuid NOT NULL,
+    outcome                           text NOT NULL,
+    at                                timestamptz,
+    order_id                          uuid,
+    value                             numeric(18,4),
+    holdout                           boolean,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS promotions.recommendation_strategy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    objective                         text NOT NULL,
+    kinds                             text[],
+    placements                        text[],
+    channels                          text[],
+    max_recommendations               integer,
+    min_confidence                    numeric(18,4),
+    ranking_weights                   jsonb,
+    require_availability              boolean,
+    exclude_in_basket                 boolean,
+    guardrails                        jsonb,
+    status                            text,
+    effective_from                    date,
+    effective_to                      date,
+    scope_path                        text
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS promotions.recommendation_suppression (
+    scope_path                        text,
+    max_impressions_per_product_per_dayinteger,
+    max_impressions_per_guest_per_sessioninteger,
+    cooldown_after_dismiss_days       integer,
+    cooldown_after_accept_days        integer,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- What to offer alongside what, and where it may appear

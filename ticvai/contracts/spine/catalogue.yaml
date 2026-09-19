@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 161
+  x-ticvai-screen-count: 177
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -1554,6 +1554,7 @@ paths:
       operationId: setPrices
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
@@ -1610,6 +1611,7 @@ paths:
         - "P08 BO-016 Session Template"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-694 Event Catalogue Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6241,6 +6243,7 @@ paths:
     put:
       operationId: simulatePriceBreakdownCalculation
       x-ticvai-consumed-by:
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P09 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
       x-ticvai-audience:
         - staff
@@ -6812,6 +6815,8 @@ paths:
     get:
       operationId: listDynamicPricingStrategy
       x-ticvai-consumed-by:
+        - "P08 BO-1044 Dynamic Seat Pricing"
+        - "P08 BO-528 Dynamic Pricing & AI Recommendation"
         - "P09 ADM-088 Dynamic Pricing Strategy Command Center"
       x-ticvai-audience:
         - staff
@@ -7444,6 +7449,11 @@ paths:
     get:
       operationId: listDemandBookingCurve
       x-ticvai-consumed-by:
+        - "P08 BO-1046 Inventory Forecasting"
+        - "P08 BO-1047 Section Revenue Forecast"
+        - "P08 BO-1058 Sales Pace & Pick Curves"
+        - "P08 BO-591 Rental Forecasting & Demand Intelligence"
+        - "P08 BO-946 Demand Forecast Accuracy & Planning Performance"
         - "P09 ADM-104 AI Demand Forecasting & Booking Curve Studio"
       x-ticvai-audience:
         - staff
@@ -8025,6 +8035,8 @@ paths:
   /event-types:
     get:
       operationId: listEventTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-695 Event Type & Behaviour Configuration"
       summary: The kinds of event, and how each behaves
       description: 'Event board 1.2. **The type decides behaviour, not just a label.** A timed
         performance, an open-run exhibition, a multi-day festival and a private hire differ in whether
@@ -8053,6 +8065,8 @@ paths:
                   $ref: '#/components/schemas/EventType'
     put:
       operationId: setEventType
+      x-ticvai-consumed-by:
+        - "P08 BO-695 Event Type & Behaviour Configuration"
       summary: Define an event kind and its behaviour
       tags:
       - events
@@ -8086,6 +8100,8 @@ paths:
         format: uuid
     post:
       operationId: cloneEvent
+      x-ticvai-consumed-by:
+        - "P08 BO-696 Event Duplication & Clone Configuration"
       summary: Copy an event, choosing what comes with it
       description: 'Event board 1.3. **Most events are last year''s event**, and the question is never
         whether to clone but what to bring: the schedule, the prices, the seat map, the resource plan,
@@ -8147,6 +8163,9 @@ paths:
         format: uuid
     put:
       operationId: setEventSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-697 Event Schedule Command Center"
+        - "P08 BO-698 Dynamic Performance Duration Configuration"
       summary: Performance times, durations and turnaround
       description: 'Event boards 2.2 and 2.3. **Duration is dynamic and the boards say so.** A
         performance that overruns pushes the next one, and a schedule that cannot express a turnaround
@@ -8184,6 +8203,10 @@ paths:
         format: uuid
     post:
       operationId: rescheduleEvent
+      x-ticvai-consumed-by:
+        - "P08 BO-699 Schedule Change & Rescheduling Configuration"
+        - "P08 BO-719 Event Cancellation Workflow Configuration"
+        - "P08 BO-720 Ticket, Reservation & Customer Treatment Configuration"
       summary: Move or cancel, and decide what happens to the people who bought
       description: 'Event boards 2.3, 7.4 and 7.5. **The reschedule is the easy half.** What happens to
         existing tickets — automatically moved, offered a choice, refunded, or credited — is the
@@ -8218,6 +8241,9 @@ paths:
   /spaces:
     get:
       operationId: listSpaces
+      x-ticvai-consumed-by:
+        - "P08 BO-700 Venue & Space Command Center"
+        - "P08 BO-915 Venue & Space Allocation"
       summary: Halls, rooms and areas an event can occupy
       description: 'Event boards 3.2 and 3.3. **A space is bookable and a venue map zone is
         navigable**, and they are usually the same physical room described for two purposes.
@@ -8242,6 +8268,9 @@ paths:
                   $ref: '#/components/schemas/Space'
     put:
       operationId: setSpace
+      x-ticvai-consumed-by:
+        - "P08 BO-701 Venue Master Configuration"
+        - "P08 BO-702 Space Access Rules Configuration"
       summary: Define a space, its capacity and its access rules
       tags:
       - events
@@ -8274,6 +8303,10 @@ paths:
         format: uuid
     put:
       operationId: setEventCapacityProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-703 Seating & Capacity Command Center"
+        - "P08 BO-704 Event Capacity Profile Configuration"
+        - "P08 BO-705 Seating Mode & Reservation Configuration"
       summary: How many, in what mode, and held back for whom
       description: 'Event boards 4.2 and 4.3. **Seated, unreserved, standing, mixed and capacity-only
         are five modes**, and an event can change mode between performances — the same hall is seated
@@ -8314,6 +8347,11 @@ paths:
         format: uuid
     put:
       operationId: setEventRegistration
+      x-ticvai-consumed-by:
+        - "P08 BO-706 Registration & Attendance Command Center"
+        - "P08 BO-707 Attendee Data & Registration Form Configuration"
+        - "P08 BO-708 Accreditation & Participant Category Configuration"
+        - "P08 BO-709 Event Admission & Entry Policy Configuration"
       summary: What is captured, from whom, and what it lets them in to
       description: 'Event boards 5.2, 5.3 and 5.4. **Registration is not ticketing.** A conference
         captures dietary requirements and a job title; a sports event captures a date of birth for an
@@ -8354,6 +8392,11 @@ paths:
         format: uuid
     get:
       operationId: getEventResourcePlan
+      x-ticvai-consumed-by:
+        - "P08 BO-710 Event Resource Command Center"
+        - "P08 BO-913 Event Resource Planning Command Center"
+        - "P08 BO-920 Event Resource Cost Estimator"
+        - "P08 BO-922 Event Resource Approval & Readiness Gate"
       summary: Everything an event needs, and whether it has been secured
       description: 'Event board 6. **The plan is the thing that says an event can actually run**, and
         it spans three contracts: `resources` holds the rooms and equipment, `workforce` holds the
@@ -8379,6 +8422,12 @@ paths:
                 $ref: '#/components/schemas/EventResourcePlan'
     put:
       operationId: setEventResourcePlan
+      x-ticvai-consumed-by:
+        - "P08 BO-711 Event Resource Requirement Configuration"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-713 Contractor & External Workforce Configuration"
+        - "P08 BO-715 Resource Location & Deployment Configuration"
+        - "P08 BO-914 Event Resource Requirement Builder"
       summary: State what the event needs, by role and by kind
       tags:
       - events
@@ -8411,6 +8460,9 @@ paths:
         format: uuid
     post:
       operationId: setEventLifecycleState
+      x-ticvai-consumed-by:
+        - "P08 BO-716 Event Lifecycle & Change Command Center"
+        - "P08 BO-717 Lifecycle Transition Configuration"
       summary: Draft, planned, on sale, live, closed, cancelled
       description: 'Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale
         requires a price, a capacity and a schedule; going live requires a resource plan; cancelling
@@ -8466,6 +8518,9 @@ paths:
   /session-templates:
     get:
       operationId: listSessionTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-721 Activity Session & Slot Template Configuration"
+        - "P08 BO-725 Session Operations Command Center"
       summary: Slot templates, peak bands and walk-in rules
       description: 'Event board 8. **An activity venue sells time, not seats**, and the template is how
         a day becomes sellable slots: length, turnaround, concurrent capacity, and which bands are
@@ -8494,6 +8549,10 @@ paths:
                   $ref: '#/components/schemas/SessionTemplate'
     put:
       operationId: setSessionTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-721 Activity Session & Slot Template Configuration"
+        - "P08 BO-723 Peak, Off-Peak & Super Prime Time Configuration"
+        - "P08 BO-724 Walk-In / There-and-Then Booking Configuration"
       summary: Define slot length, capacity, bands and walk-in policy
       tags:
       - events
@@ -8519,6 +8578,8 @@ paths:
   /prepaid-minute-packages:
     put:
       operationId: setPrepaidMinutePackage
+      x-ticvai-consumed-by:
+        - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
       summary: Time bought in advance and drawn down per visit
       description: 'Event board 8.2. **Minutes are a credit type, and `wallet` already models those** —
         what is here is the product that sells them and the rule for how they are consumed: rounding,
@@ -8560,6 +8621,8 @@ paths:
         format: uuid
     post:
       operationId: assignSessionMedia
+      x-ticvai-consumed-by:
+        - "P08 BO-726 Participant Photo & Video Assignment"
       summary: Attach photos and video to the participants in a session
       description: 'Event board 9.2. **The photograph is worthless unless it reaches the right guest**,
         and a session of thirty children produces two hundred images that have to be attributed before

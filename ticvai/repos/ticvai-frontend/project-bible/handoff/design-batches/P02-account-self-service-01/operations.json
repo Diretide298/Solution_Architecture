@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "claimCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/claim",
+  "contract": "orders",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CartMergeResult"
+ },
  "completeSsoAuthorization": {
   "method": "POST",
   "path": "/auth/sso/{providerId}/callback",
@@ -37,15 +56,34 @@
   "requestBody": null,
   "responds": "LoginResponse"
  },
- "deleteGuestAccount": {
-  "method": "DELETE",
-  "path": "/auth/guest/account",
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
   "contract": "identity",
-  "summary": "Self-service account deletion",
+  "summary": "Step-up authentication for a sensitive action",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -74,25 +112,6 @@
   ],
   "requestBody": null,
   "responds": "MfaEnrolment"
- },
- "exportSubjectData": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/data-export",
-  "contract": "identity",
-  "summary": "Everything the platform holds about one guest",
-  "permission": "GUEST_VIEW_PII",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "getEntitlement": {
   "method": "GET",
@@ -139,18 +158,18 @@
   "requestBody": null,
   "responds": null
  },
- "getGuestConsents": {
+ "getGuestProfile": {
   "method": "GET",
-  "path": "/guests/{subjectId}/consents",
+  "path": "/guests/{subjectId}",
   "contract": "marketing-crm",
-  "summary": "Read a guest's consent state",
+  "summary": "Read a guest profile",
   "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ConsentState"
+  "responds": "GuestProfileDetail"
  },
  "getGuestSession": {
   "method": "GET",
@@ -164,6 +183,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GuestSession"
+ },
+ "getMyChallenges": {
+  "method": "GET",
+  "path": "/guests/me/challenges",
+  "contract": "marketing-crm",
+  "summary": "Active challenges and how far along I am",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChallengeProgress"
  },
  "getOrder": {
   "method": "GET",
@@ -286,6 +318,30 @@
   "requestBody": null,
   "responds": null
  },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
  "listEntitlements": {
   "method": "GET",
   "path": "/my/entitlements/all",
@@ -314,6 +370,30 @@
   ],
   "requestBody": null,
   "responds": "Entitlement"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
  },
  "listMfaMethods": {
   "method": "GET",
@@ -534,6 +614,25 @@
   "requestBody": "RegisterGuestRequest",
   "responds": "GuestSession"
  },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
  "removeFromWishlist": {
   "method": "DELETE",
   "path": "/guests/{subjectId}/wishlist/{itemId}",
@@ -590,6 +689,63 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "respondToInvitation": {
+  "method": "POST",
+  "path": "/invitations/{token}/respond",
+  "contract": "marketing-crm",
+  "summary": "Accept or decline",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Invitation"
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "shareEntitlement": {
+  "method": "POST",
+  "path": "/entitlements/{entitlementId}/share",
+  "contract": "orders",
+  "summary": "Let somebody else use this, without giving it away",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Problem"
  },
  "startSsoAuthorization": {
   "method": "GET",
@@ -667,15 +823,15 @@
   "requestBody": null,
   "responds": "GuestProfile"
  },
- "uploadGuestDocument": {
+ "verifyGuestEmail": {
   "method": "POST",
-  "path": "/guest-documents",
-  "contract": "marketing-crm",
-  "summary": "Store a guest photo, ID or signed document",
-  "permission": "GUEST_VIEW_PII",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -683,8 +839,8 @@
     "required": null
    }
   ],
-  "requestBody": "GuestDocument",
-  "responds": "GuestDocument"
+  "requestBody": null,
+  "responds": null
  },
  "verifyGuestOtp": {
   "method": "POST",

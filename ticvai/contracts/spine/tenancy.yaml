@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 25
+  x-ticvai-screen-count: 30
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -151,6 +151,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-420 Tenant & Organization Provisioning"
       x-ticvai-audience: [staff]
       summary: Create a scope node
       tags: [scope]
@@ -320,6 +321,7 @@ paths:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-025 Till Home"
         - "P08 BO-036 Device Registry"
+        - "P08 BO-1069 Platform Health & Observability"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
@@ -364,6 +366,7 @@ paths:
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
+        - "P08 BO-1070 Setup, Clone & Inheritance"
         - "P08 BO-123 POS Profile Management"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: What a class of workstation is configured to be
@@ -404,6 +407,7 @@ paths:
       operationId: deployConfigurationProfile
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
+        - "P08 BO-1068 Lifecycle & Environment Promotion"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-129 Software, Configuration & Version Management"
@@ -537,6 +541,7 @@ paths:
         - "P08 BO-104 Food & Beverage"
         - "P08 BO-105 Stock & Supply"
         - "P08 BO-106 People & Access Rights"
+        - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-108 Venue Operations"
         - "P08 BO-136 F&B Global Settings & Controls"
@@ -561,9 +566,11 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-065 Venue Configuration"
+        - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-136 F&B Global Settings & Controls"
         - "P08 BO-143 Retail Global Settings & Controls"
+        - "P08 BO-600 Venue, Calendar & Operational Setup"
         - "P15 KIT-009 SLA, Priority & Service Rules"
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
@@ -603,6 +610,7 @@ paths:
       operationId: getOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-1062 Tenant & Brand Context"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a scope node
@@ -662,6 +670,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getRegionSettings
+      x-ticvai-consumed-by:
+        - "P08 BO-1064 Naming, Numbering & Localization"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read region settings
@@ -683,6 +693,9 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: updateRegionSettings
+      x-ticvai-consumed-by:
+        - "P08 BO-1065 Currency, Timezone & Channels"
+        - "P09 ADM-425 Venue Template Application"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Update region settings
@@ -799,6 +812,7 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
         - "P08 BO-129 Software, Configuration & Version Management"
+        - "P08 BO-602 POS, Payment & Access Setup"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a workstation
@@ -830,7 +844,9 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P04 POS-024 Outlet Setup"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-727 F&B Command Center"
         - "P08 BO-728 Outlet Management"
+        - "P08 BO-732 POS & Device Assignment"
       x-ticvai-audience: [staff]
       summary: List outlets
       description: >
@@ -1058,6 +1074,7 @@ paths:
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-127 Hardware & Peripherals Management"
+        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1181,6 +1198,9 @@ paths:
         format: uuid
     post:
       operationId: enrolDevice
+      x-ticvai-consumed-by:
+        - "P08 BO-407 Reader Credit & Payment Configuration"
+        - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
         device you could trust.** Registration is an assertion — *this serial exists* — and enrolment is
@@ -1250,6 +1270,8 @@ paths:
         format: uuid
     put:
       operationId: setDeviceAssignment
+      x-ticvai-consumed-by:
+        - "P09 ADM-582 POS, Kiosk & Terminal Assignment Manager\t52"
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
         the package carried none of them.** A device bound to a workstation has a venue, which answers
@@ -1291,6 +1313,10 @@ paths:
         format: uuid
     get:
       operationId: getDeviceTelemetry
+      x-ticvai-consumed-by:
+        - "P08 BO-466 Reader & Device Health Monitor"
+        - "P09 ADM-584 Payment Server & Terminal Connectivity Manager\t54"
+        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       summary: Battery, performance and consumables over time
       description: '16.4.21 and 16.4.22. **The heartbeat already carries consumables and nothing kept
         them.** A point-in-time reading answers *is it alive*; the matrix asks *is it degrading*, and

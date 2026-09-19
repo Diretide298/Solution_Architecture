@@ -1,5 +1,72 @@
--- identity — 14 tables
+-- identity — 18 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.access_decision (
+    id                                uuid PRIMARY KEY,
+    effect                            text,
+    decided_at                        timestamptz,
+    decided_by                        text,
+    principal_id                      uuid,
+    permission                        text,
+    scope_path                        text,
+    observed_attributes               jsonb,
+    override_id                       uuid,
+    latency_ms                        integer,
+    scope_path_index                  text
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.access_override (
+    id                                uuid PRIMARY KEY,
+    principal_id                      uuid,
+    scope_path                        text,
+    permissions                       text[],
+    reason                            text,
+    created_by                        uuid,
+    created_at                        timestamptz,
+    expires_at                        timestamptz,
+    revoked_at                        timestamptz,
+    alerted_to                        text[]
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.access_policy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    is_template                       boolean,
+    permissions                       text[],
+    combining                         text,
+    effect                            text NOT NULL,
+    priority                          integer,
+    scope_path                        text,
+    applies_to_role_ids               text[],
+    status                            text,
+    version                           integer,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    delegated_admin_role_ids          text[]
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS identity.access_policy_version (
+    policy_id                         uuid,
+    version                           integer,
+    changed_by                        uuid,
+    changed_at                        timestamptz,
+    reason                            text,
+    approved_by                       uuid,
+    previous                          uuid,
+    current                           uuid,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches
 -- identity.principal through its keys; references identity.principal.

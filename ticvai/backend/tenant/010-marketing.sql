@@ -1,4 +1,4 @@
--- marketing — 38 tables
+-- marketing — 45 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -22,6 +22,49 @@ CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     channel                           text NOT NULL,
     interaction                       text,
     order_id                          uuid
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.audience_activation (
+    id                                uuid PRIMARY KEY,
+    segment_id                        uuid NOT NULL,
+    destination                       text NOT NULL,
+    destination_reference             text,
+    external                          boolean,
+    suppression_list_ids              text[],
+    enforce_consent                   boolean,
+    frequency_cap_per_week            integer,
+    refresh_schedule                  text,
+    expires_at                        date,
+    pre_flight                        jsonb,
+    approval_request_id               uuid,
+    status                            text,
+    last_synced_at                    timestamptz,
+    last_sync_errors                  integer,
+    scope_path                        text
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.audience_list (
+    id                                uuid PRIMARY KEY,
+    name                              text NOT NULL,
+    kind                              text,
+    asset_id                          uuid,
+    field_mapping                     jsonb,
+    rows_read                         integer,
+    matched                           integer,
+    unmatched                         integer,
+    duplicates_removed                integer,
+    rejected                          integer,
+    unmatched_handling                text,
+    source                            text,
+    owner                             uuid,
+    purpose                           text,
+    consent_basis                     text,
+    expires_at                        date,
+    scope_path                        text
 );
 
 -- A send with an audience and a schedule. Every dispatch it produces is a message_dispatch row,
@@ -188,6 +231,21 @@ CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     conversation_id                   uuid NOT NULL
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.duplicate_candidate (
+    id                                uuid PRIMARY KEY,
+    guest_ids                         text[],
+    score                             numeric(18,4),
+    band                              text,
+    matched_on                        text[],
+    linked_record_counts              jsonb,
+    status                            text,
+    decided_by                        uuid,
+    decided_at                        timestamptz,
+    scope_path                        text
+);
+
 -- A waiver, survey or capture form (CF-129). One mechanism, three uses — three implementations
 -- would drift on the version rule first
 CREATE TABLE IF NOT EXISTS marketing.form_definition (
@@ -223,6 +281,15 @@ CREATE TABLE IF NOT EXISTS marketing.form_submission (
     expires_at                        timestamptz,
     captured_at_channel               text,
     ip_address                        text
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.guest_attribute_model (
+    version                           integer,
+    published_at                      timestamptz,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- A phone or browser a guest has registered. How they revoke an old one that still holds tickets
@@ -282,6 +349,33 @@ CREATE TABLE IF NOT EXISTS marketing.guest_profile (
     membership_ids                    text[],
     notes                             text,
     segment_id                        uuid NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.guest_relationship (
+    id                                uuid PRIMARY KEY,
+    related_guest_id                  uuid NOT NULL,
+    organisation_id                   uuid,
+    kind                              text NOT NULL,
+    authorities                       text[],
+    effective_from                    date,
+    effective_to                      date,
+    shared_benefits                   boolean,
+    verified_at                       timestamptz,
+    scope_path                        text
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.identity_rules (
+    match_threshold                   numeric(18,4),
+    possible_match_threshold          numeric(18,4),
+    excluded_sources                  text[],
+    jurisdiction_restrictions         text[],
+    auto_merge_allowed                boolean,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- One addressed invitation with a single-use token (BL-150). A link forwarded to a group chat is
@@ -498,6 +592,24 @@ CREATE TABLE IF NOT EXISTS marketing.referral (
     referrer_reward_id                uuid,
     referee_reward_id                 uuid,
     expires_at                        timestamptz,
+    scope_path                        text
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.retention_policy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    data_category                     text,
+    jurisdictions                     text[],
+    purposes                          text[],
+    guest_status                      text[],
+    retain_months                     integer,
+    action                            text,
+    legal_holds_respected             boolean,
+    fraud_exception_months            integer,
+    approval_required                 boolean,
+    schedule                          text,
     scope_path                        text
 );
 

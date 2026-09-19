@@ -107,6 +107,12 @@
  "document:docs\\active\\change-log-validation-18-september.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\contract-audit-19-september.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\contract-run-plan-19-september.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\current-work.md": [
   "ai:names it"
  ],
@@ -365,6 +371,15 @@
  "screen:ANL-010": [
   "ai:calls 2"
  ],
+ "screen:ANL-019": [
+  "ai:calls 1"
+ ],
+ "screen:ANL-052": [
+  "ai:calls 2"
+ ],
+ "screen:ANL-056": [
+  "ai:calls 1"
+ ],
  "screen:BO-029": [
   "ai:calls 2"
  ],
@@ -394,6 +409,15 @@
  ],
  "screen:BO-117": [
   "ai:calls 2"
+ ],
+ "screen:BO-593": [
+  "ai:calls 1"
+ ],
+ "screen:BO-597": [
+  "ai:calls 1"
+ ],
+ "screen:BO-598": [
+  "ai:calls 1"
  ],
  "screen:EMP-019": [
   "ai:calls 3"

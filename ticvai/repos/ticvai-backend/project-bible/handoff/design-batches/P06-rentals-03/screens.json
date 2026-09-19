@@ -1,1065 +1,1573 @@
 [
  {
-  "id": "EMP-091",
-  "name": "Rental Return Command Center",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-564",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "1",
-   "page": 92
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/rental-return-command-center-emp-091",
-   "component": "apps/venue-staff-app/src/routes/rentals/RentalReturnCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-564`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Provide operators with a live operational view of all expected, in-progress, partial, overdue and completed returns.",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "gaps": [
+   {
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
+   "template": "split",
    "regions": [
     {
+     "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
-       "kind": "searchField",
-       "label": "Search rental return",
-       "provenance": "pack Rental_Management.pdf, page 92 §Filters"
-      },
-      {
+       "kind": "dataTable",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "Venue",
-        "Return Location",
-        "Product",
-        "Expected Return",
-        "Rental Status",
-        "Damage Status",
-        "Deposit Status",
-        "Group/Individual"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "notes": "The pack filters this screen by venue, return location, product, expected return, rental status, damage status and 2 more — which are present is a decision the pack already made.",
-       "provenance": "pack Rental_Management.pdf, page 92 §Filters"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
-     ],
-     "name": "contentBody",
-     "slot": "filters"
+     ]
     },
     {
+     "name": "contextPanel",
+     "slot": "selection",
      "components": [
       {
-       "kind": "metricTile",
-       "label": "Expected Returns Today",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Due Next 30 Minutes",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Return in Progress",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Overdue",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Partial Returns",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Damage Cases",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Maintenance Required",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Returns Completed Today",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Deposits Pending Settlement",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Equipment Awaiting Inspection",
-       "provenance": "pack Rental_Management.pdf, page 92 §KPI Cards"
+       "kind": "detailPanel",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
+       "columns": [
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
+       ],
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
-     ],
-     "name": "contentBody",
-     "slot": "headline"
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
+      }
+     ]
     }
-   ],
-   "template": "dashboard"
+   ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "emptyFirstRun": "No rental return yet. Carries the create action; distinct from a filter that matched nothing.",
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the rental return are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the rental return untouched.",
-   "loading": "The rental return list; the counts above it resolve separately.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 92. 0 of 8 labels bound to a contract property; 18 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apis": [
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
+   }
+  ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "Expected Returns Today",
-    "Due Next 30 Minutes",
-    "Return in Progress",
-    "Overdue",
-    "Partial Returns",
-    "Damage Cases"
-   ]
-  },
-  "navigation": {
-   "entryFrom": [
-    "EMP-003",
-    "EMP-092",
-    "EMP-093",
-    "EMP-094",
-    "EMP-095",
-    "EMP-096",
-    "EMP-097",
-    "EMP-098",
-    "EMP-099",
-    "EMP-100"
-   ],
-   "exitTo": [
-    "EMP-003",
-    "EMP-092",
-    "EMP-093",
-    "EMP-094",
-    "EMP-095",
-    "EMP-096",
-    "EMP-097",
-    "EMP-098",
-    "EMP-099",
-    "EMP-100"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Back to Home — on duty",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    },
-    {
-     "to": "EMP-092",
-     "trigger": "Return Scan & Rental Retrieval",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-093",
-     "trigger": "Return Summary & Actual Return Time",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-094",
-     "trigger": "Post-Rental Condition Inspection",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-095",
-     "trigger": "Before vs After Condition Comparison",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-096",
-     "trigger": "Damage Assessment & Charge Workflow",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-097",
-     "trigger": "Partial Return & Missing Equipment",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-098",
-     "trigger": "Late Fees, Damage Fees & Final Settlement",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-099",
-     "trigger": "Deposit Release, Capture & Customer Confirmation",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    },
-    {
-     "to": "EMP-100",
-     "trigger": "Return Completion & Equipment Disposition",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
-    }
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-091"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
     "siblings": [
-     "P07"
+     "P02",
+     "P05"
     ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "EMP-092",
-  "name": "Return Scan & Rental Retrieval",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-565",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "2",
-   "page": 93
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/return-scan-rental-retrieval-emp-092",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnScanRentalRetrieval.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-565`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Quickly identify which active rental the returned equipment belongs to. The original requirements specifically require scanning the rented item and retrieving its reservation.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No return scan rental yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the return scan rental are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the return scan rental untouched.",
-   "loading": "The return scan rental list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 93",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 93",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
-    "EMP-091"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "EMP-091"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-092"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
     "siblings": [
-     "P07"
+     "P02",
+     "P05"
     ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "EMP-093",
-  "name": "Return Summary & Actual Return Time",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-566",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "3",
-   "page": 94
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/return-summary-actual-return-time-emp-093",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnSummaryActualReturnTime.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-566`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Establish the operational return event before inspection and financial settlement.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No return summary actual yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the return summary actual are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the return summary actual untouched.",
-   "loading": "The return summary actual list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 94",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 94",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 94. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
-    "EMP-091"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "EMP-091"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-093"
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
     "siblings": [
-     "P07"
+     "P02",
+     "P05"
     ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "EMP-094",
-  "name": "Post-Rental Condition Inspection",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-567",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "4",
-   "page": 95
-  },
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
   "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/post-rental-condition-inspection-emp-094",
-   "component": "apps/venue-staff-app/src/routes/rentals/PostRentalConditionInspection.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-567`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Perform a structured inspection of returned equipment.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No post-rental condition inspection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the post-rental condition inspection are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the post-rental condition inspection untouched.",
-   "loading": "The post-rental condition inspection list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 95",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 95",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
-    "EMP-091"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "EMP-091"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
    "transitions": [
     {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-094"
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
     "siblings": [
-     "P07"
+     "P02",
+     "P05"
     ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "EMP-095",
-  "name": "Before vs After Condition Comparison",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-568",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "5",
-   "page": 96
-  },
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/before-vs-after-condition-comparison-emp-095",
-   "component": "apps/venue-staff-app/src/routes/rentals/BeforeVsAfterConditionComparison.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-568`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Use the evidence captured during Board 6 checkout to establish whether damage existed before the rental or occurred during it. This is one of the important capabilities I recommended adding.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No before after condition yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the before after condition are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the before after condition untouched.",
-   "loading": "The before after condition list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 96",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 96",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 96. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
-    "EMP-091"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "EMP-091"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
    "transitions": [
     {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-095"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
-    "siblings": [
-     "P07"
-    ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "EMP-096",
-  "name": "Damage Assessment & Charge Workflow",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-569",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "6",
-   "page": 97
-  },
-  "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/damage-assessment-charge-workflow-emp-096",
-   "component": "apps/venue-staff-app/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx",
-   "status": "notStarted"
-  },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-569`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Convert confirmed equipment damage into a controlled operational and commercial case. The source specifically recommends a formal damage assessment workflow.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No damage assessment charge yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the damage assessment charge are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the damage assessment charge untouched.",
-   "loading": "The damage assessment charge list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 97",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
    },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 97",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "EMP-091"
-   ],
-   "exitTo": [
-    "EMP-091"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-096"
-  },
-  "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
     "siblings": [
-     "P07"
+     "P02",
+     "P05"
     ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "EMP-097",
-  "name": "Partial Return & Missing Equipment",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-570",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "7",
-   "page": 98
-  },
-  "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/partial-return-missing-equipment-emp-097",
-   "component": "apps/venue-staff-app/src/routes/rentals/PartialReturnMissingEquipment.tsx",
-   "status": "notStarted"
-  },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-570`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Handle multi-item and group rentals where equipment is returned at different times. This implements the partial-return capability we added in Board 7.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No partial return missing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the partial return missing are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the partial return missing untouched.",
-   "loading": "The partial return missing list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 98",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 98",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 98. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "EMP-091"
-   ],
-   "exitTo": [
-    "EMP-091"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-097"
-  },
-  "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
-    "siblings": [
-     "P07"
-    ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "EMP-098",
-  "name": "Late Fees, Damage Fees & Final Settlement",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-571",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "8",
-   "page": 99
-  },
-  "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/late-fees-damage-fees-final-settlement-emp-098",
-   "component": "apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx",
-   "status": "notStarted"
-  },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Calculate the customer's final rental financial position. Board 8 should consume, not recreate, the commercial policies configured in Board 4.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No late fees damage yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the late fees damage are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the late fees damage untouched.",
-   "loading": "The late fees damage list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 99",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 99",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "EMP-091"
-   ],
-   "exitTo": [
-    "EMP-091"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-098"
-  },
-  "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
-    "siblings": [
-     "P07"
-    ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "EMP-099",
-  "name": "Deposit Release, Capture & Customer Confirmation",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-572",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "9",
-   "page": 100
-  },
-  "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/deposit-release-capture-customer-confirmation-emp-099",
-   "component": "apps/venue-staff-app/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx",
-   "status": "notStarted"
-  },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-572`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Complete the deposit lifecycle and provide the customer with a transparent final statement. The source requires full refund/release, partial refund and deposit forfeiture, together with transaction history.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No deposit release capture yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the deposit release capture are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the deposit release capture untouched.",
-   "loading": "The deposit release capture list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 100",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 100",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "EMP-091"
-   ],
-   "exitTo": [
-    "EMP-091"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-099"
-  },
-  "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
-    "siblings": [
-     "P07"
-    ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "EMP-100",
-  "name": "Return Completion & Equipment Disposition",
-  "module": "Rentals",
-  "requiresModule": "resources",
-  "wave": 3,
-  "source": {
-   "sameAs": "BO-573",
-   "book": "Rental_Management.pdf",
-   "board": "8",
-   "number": "10",
-   "page": 101
-  },
-  "implementation": {
-   "app": "venue-staff-app",
-   "route": "/rentals/return-completion-equipment-disposition-emp-100",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx",
-   "status": "notStarted"
-  },
-  "density": "comfortable",
-  "notes": "The staff-app form of `BO-573`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
-  "purpose": "Complete the rental while determining exactly what happens to every returned physical asset. This is extremely important because returning an item does not necessarily mean it becomes immediately available again.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "layout": {
-   "regions": [],
-   "template": "split"
-  },
-  "states": {
-   "emptyFirstRun": "No return completion equipment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "The filter narrowed it and the return completion equipment are still there. Names the active filter and offers to clear it.",
-   "error": "Could not load. Names which read failed and leaves the return completion equipment untouched.",
-   "loading": "The return completion equipment list.",
-   "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
-  },
-  "gaps": [
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 101",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 101",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
-   }
-  ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 101. 0 of 0 labels bound to a contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "EMP-091"
-   ],
-   "exitTo": [
-    "EMP-091"
-   ],
-   "transitions": [
-    {
-     "to": "EMP-091",
-     "trigger": "Back to Rental Return Command Center",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P06 Venue Staff App.dc.html#emp-100"
-  },
-  "_platform": {
-   "code": "P06",
-   "audience": "staff",
-   "formFactor": "mobileApp",
-   "shortName": "Venue Staff App",
-   "name": "Venue Staff App — Operations",
-   "app": "venue-staff-app",
-   "offlineCapable": true,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-staff-mobile",
-    "name": "TICVAI Venue Staff",
-    "shell": "mobile",
-    "siblings": [
-     "P07"
-    ],
-    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

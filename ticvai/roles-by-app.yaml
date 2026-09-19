@@ -7,10 +7,10 @@ description: '**Derived from what each app''s screens call, not decided here.** 
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
   decision and a plausible answer written here would be read as one they made.'
 theTwoVocabularies:
-  onOperations: 127
+  onOperations: 154
   inRolesYaml: 35
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 127 permission keys across 1538 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 154 permission keys across 1884 operations; `roles.yaml`
     grants 35, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -110,18 +110,21 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 540
-    permissions: 63
+    operations: 646
+    permissions: 77
     tiers:
       read:
       - AI_AUDIT_VIEW
       - APPROVAL_VIEW
       - CASE_VIEW
       - DEVELOPER_VIEW
+      - DEVICE_VIEW
       - GUEST_VIEW
+      - LEDGER_VIEW
       - MARKETING_VIEW
       - ORDER_VIEW
       - PARTNER_VIEW
+      - PAYMENT_VIEW
       - PERMISSION_VIEW
       - PLATFORM_BILLING_VIEW
       - PLATFORM_CELL_VIEW
@@ -132,20 +135,25 @@ apps:
       - PRODUCT_VIEW
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
+      - WALLET_VIEW
       - WORKFORCE_VIEW
       operate:
       - APPROVAL_ACT
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
       - CREDIT_OVERRIDE
+      - LEDGER_POST
       - ORDER_CREATE
       - ORDER_DISCOUNT
       - ORDER_EXCHANGE
       - ORDER_MODIFY
       - ORDER_REFUND
+      - ORDER_REFUND_APPROVE
       - ORDER_REPRINT
       - ORDER_RESCHEDULE
       - ORDER_VOID
+      - PAYMENT_DISPUTE
+      - PAYMENT_VOID
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_RELEASE_PROMOTE
       - PLATFORM_TENANT_TERMINATE
@@ -154,6 +162,7 @@ apps:
       - SETTLEMENT_RECONCILE
       - TICKET_LOOKUP
       configure:
+      - ACCOUNT_CONFIGURE
       - AI_CONFIGURE
       - ANNOUNCEMENT_PUBLISH
       - APPROVAL_CONFIGURE
@@ -162,8 +171,11 @@ apps:
       - CREDIT_MANAGE
       - DEVELOPER_ADMIN
       - DEVELOPER_MANAGE
+      - DEVICE_MANAGE
       - MARKETING_MANAGE
       - PARTNER_MANAGE
+      - PAYMENT_CONFIGURE
+      - PAYMENT_PROVIDER_MANAGE
       - PERMISSION_GRANT
       - PLATFORM_BILLING_MANAGE
       - PLATFORM_CELL_MANAGE
@@ -179,9 +191,12 @@ apps:
       - TENANT_CONFIGURE
       - TENANT_PUBLISH
       - USER_MANAGE
+      - WALLET_CONFIGURE
+      - WORK_ORDER_MANAGE
     operationsWithNoPermission:
     - addCartLine
     - checkoutCart
+    - createRefundRequest
     - getCart
     - getCurrentSession
     - listMfaMethods
@@ -192,7 +207,7 @@ apps:
     - removeCartLine
     - sendTransactionalMessage
     - updateCartLine
-    operationsWithNoPermissionCount: 12
+    operationsWithNoPermissionCount: 13
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -201,10 +216,11 @@ apps:
     - P13
     - P16
     screens: 1379
-    operations: 831
-    permissions: 107
+    operations: 1201
+    permissions: 136
     tiers:
       read:
+      - ACCREDITATION_VIEW
       - AI_AUDIT_VIEW
       - APPROVAL_VIEW
       - ASSET_LIBRARY_VIEW
@@ -214,10 +230,12 @@ apps:
       - DEVICE_VIEW
       - GUEST_VIEW
       - INCIDENT_VIEW
+      - INSPECTION_VIEW
       - LEDGER_VIEW
       - MARKETING_VIEW
       - ORDER_VIEW
       - PARTNER_VIEW
+      - PAYMENT_VIEW
       - PERMISSION_VIEW
       - PLATFORM_BILLING_VIEW
       - PLATFORM_CELL_VIEW
@@ -225,23 +243,33 @@ apps:
       - PRICE_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
+      - RENTAL_VIEW
+      - REPORT_EXPORT
       - RESOURCE_VIEW
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
       - VENUE_MAP_VIEW
+      - WALLET_VIEW
       - WORKFORCE_VIEW
       - WORK_ORDER_VIEW
       operate:
       - ACCESS_OVERRIDE
       - ACCESS_VALIDATE
+      - ACCREDITATION_APPLY
+      - ACCREDITATION_APPROVE
+      - ACCREDITATION_ISSUE
       - AI_APPROVE
       - AI_USE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
+      - ASSET_LIBRARY_APPROVE
+      - ASSET_LIBRARY_SHARE
       - ATTENDANCE_RECORD
       - CASH_LIFT
+      - GUEST_VIEW_PII
       - INCIDENT_REPORT
+      - INSPECTION_SUBMIT
       - LEDGER_APPROVE
       - LEDGER_POST
       - MAINTENANCE_APPROVE
@@ -261,7 +289,13 @@ apps:
       - OVERSHORT_ACCEPT
       - PLATFORM_RELEASE_PROMOTE
       - PLATFORM_TENANT_TERMINATE
+      - RENTAL_APPROVE
+      - RENTAL_BOOK
+      - RENTAL_OPERATE
+      - RENTAL_OVERRIDE
+      - RENTAL_PRICE
       - REPORT_SCHEDULE
+      - REPORT_VIEW_TENANT
       - REPORT_VIEW_VENUE
       - REPORT_VIEW_WORKSTATION
       - RESOURCE_BOOK
@@ -274,10 +308,13 @@ apps:
       - SHIFT_SUSPEND
       - TICKET_LOOKUP
       - TURNSTILE_MODE_SET
+      - WALLET_OPERATE
       - WORK_ORDER_VERIFY
       configure:
       - ACCESS_POINT_CONFIGURE
       - ACCOUNT_CONFIGURE
+      - ACCREDITATION_CONFIGURE
+      - ACCREDITATION_MANAGE
       - AI_CONFIGURE
       - ANNOUNCEMENT_PUBLISH
       - APPROVAL_CONFIGURE
@@ -285,8 +322,10 @@ apps:
       - ASSET_MANAGE
       - CAPACITY_CONFIGURE
       - CASE_MANAGE
+      - DEVELOPER_ADMIN
       - DEVELOPER_MANAGE
       - DEVICE_CONFIGURE
+      - DEVICE_MANAGE
       - EVENT_CONFIGURE
       - GUEST_MANAGE
       - INCIDENT_MANAGE
@@ -294,6 +333,7 @@ apps:
       - PARKING_CONFIGURE
       - PARTNER_MANAGE
       - PERFORMANCE_CONFIGURE
+      - PERMISSION_MANAGE
       - PLATFORM_BILLING_MANAGE
       - PLATFORM_CELL_MANAGE
       - PLATFORM_TENANT_MANAGE
@@ -301,7 +341,10 @@ apps:
       - PRODUCT_CONFIGURE
       - QUEUE_MANAGE
       - REGION_CONFIGURE
+      - RENTAL_CONFIGURE
+      - RENTAL_MANAGE
       - REPORT_MANAGE
+      - RESOURCE_CONFIGURE
       - RESOURCE_MANAGE
       - ROLE_MANAGE
       - SCOPE_MANAGE
@@ -311,17 +354,21 @@ apps:
       - USER_MANAGE
       - VENUE_MAP_MANAGE
       - VENUE_MAP_PUBLISH
+      - WALLET_CONFIGURE
       - WORKFORCE_MANAGE
       - WORKSTATION_CONFIGURE
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
     - createRefundRequest
     - getCurrentSession
+    - getGameCard
     - getGuestMenu
     - getGuestOrderStatus
+    - getLoyaltyPosition
     - getTenantAppStatus
     - getWaitTimes
     - getWishlist
+    - handoverToAgent
     - listDeliveryLocations
     - listDiningOutlets
     - listGuestDevices
@@ -329,11 +376,13 @@ apps:
     - listMyCases
     - listSsoProviders
     - login
+    - raiseMyCase
     - recordConsent
     - recordDeviceHeartbeat
     - recordGamePlay
+    - sendTransactionalMessage
     - syncGamePlays
-    operationsWithNoPermissionCount: 18
+    operationsWithNoPermissionCount: 23
   venue-pos:
     name: TICVAI POS
     platforms:

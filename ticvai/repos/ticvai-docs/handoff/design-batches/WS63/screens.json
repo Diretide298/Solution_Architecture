@@ -1,221 +1,100 @@
 [
  {
-  "id": "ADM-288",
-  "name": "Resale Operations Command Center",
-  "module": "Commercial",
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
   "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.1",
-   "page": 21
-  },
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/resale-operations-command-center-adm-288",
-   "component": "apps/ticvai-web/src/routes/commercial/ResaleOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-002",
-    "ADM-289",
-    "ADM-290",
-    "ADM-291",
-    "ADM-292",
-    "ADM-293",
-    "ADM-294",
-    "ADM-295",
-    "ADM-296",
-    "ADM-297"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "tenantId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-289",
-     "trigger": "Works in Buyer Purchase & Resale Order Management",
-     "provenance": "flow F172 step 1→2",
-     "operation": "listResale"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-290",
-     "trigger": "Works in Ticket Ownership Transfer Management",
-     "provenance": "flow F172 step 3→4",
-     "operation": "listResale"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-291",
-     "trigger": "Works in Credential Revocation & Regeneration",
-     "provenance": "flow F172 step 5→6",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-292",
-     "trigger": "Works in Resale Fraud & Duplicate Sale Protection",
-     "provenance": "flow F172 step 7→8",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-293",
-     "trigger": "Works in Capacity & Inventory Reconciliation",
-     "provenance": "flow F172 step 9→10",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-294",
-     "trigger": "Works in Seller Settlement & Payout Management",
-     "provenance": "flow F172 step 11→12",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-295",
-     "trigger": "Works in Refunds, Disputes & Resale Exceptions",
-     "provenance": "flow F172 step 13→14",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-296",
-     "trigger": "Works in Resale Audit & Ownership History",
-     "provenance": "flow F172 step 15→16",
-     "operation": "listResale"
-    },
-    {
-     "to": "ADM-297",
-     "trigger": "Works in Resale Analytics & AI Intelligence",
-     "provenance": "flow F172 step 17→18",
-     "operation": "listResale"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each resale transaction shall show) — counts over a population, then the population",
-  "purpose": "Provide operations teams with a real-time control center for all resale transactions after listings move into purchase/fulfillment.",
-  "purposeNote": "Operations can monitor every resale transaction from buyer payment through final completion and immediately identify transactions requiring intervention.",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
+  "gaps": [
+   {
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
-   "template": "dashboard",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Resale Transactions Today",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.resaleTransactionsToday"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Gross Resale Value",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.grossResaleValue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Completed Transfers",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.completedTransfers"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Transfers",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.pendingTransfers"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Transfers",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.failedTransfers"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Credential Reissues",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.credentialReissues"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Pending Seller Settlements",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.pendingSellerSettlements"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Settlement Value",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.settlementValue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Transactions Under Review",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.transactionsUnderReview"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fraud Alerts",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.fraudAlerts"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Disputes",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.disputes"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refunds",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Display",
-       "bindsTo": "ResaleOperationsCommandCenterView.refunds"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
+     "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every resale operations",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "ResaleOperationsCommandCenterView.resaleTransactionId",
-        "ResaleOperationsCommandCenterView.listingId",
-        "ResaleOperationsCommandCenterView.originalOrderId",
-        "ResaleOperationsCommandCenterView.originalTicketId",
-        "ResaleOperationsCommandCenterView.event",
-        "ResaleOperationsCommandCenterView.venue",
-        "ResaleOperationsCommandCenterView.seller",
-        "ResaleOperationsCommandCenterView.buyer",
-        "ResaleOperationsCommandCenterView.sectionRowSeat",
-        "ResaleOperationsCommandCenterView.resalePrice",
-        "ResaleOperationsCommandCenterView.buyerTotal",
-        "ResaleOperationsCommandCenterView.sellerProceeds",
-        "ResaleOperationsCommandCenterView.purchaseStatus",
-        "ResaleOperationsCommandCenterView.ownershipStatus",
-        "ResaleOperationsCommandCenterView.credentialStatus",
-        "ResaleOperationsCommandCenterView.settlementStatus",
-        "ResaleOperationsCommandCenterView.riskScore",
-        "ResaleOperationsCommandCenterView.transactionDate"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "ResaleOperationsCommandCenterView",
-       "operation": "listResale",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Each resale transaction shall show"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -225,30 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected resale operations",
-       "bindsTo": "ResaleOperationsCommandCenterView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "ResaleOperationsCommandCenterView.resaleTransactionId",
-        "ResaleOperationsCommandCenterView.listingId",
-        "ResaleOperationsCommandCenterView.originalOrderId",
-        "ResaleOperationsCommandCenterView.originalTicketId",
-        "ResaleOperationsCommandCenterView.event",
-        "ResaleOperationsCommandCenterView.venue",
-        "ResaleOperationsCommandCenterView.seller",
-        "ResaleOperationsCommandCenterView.buyer",
-        "ResaleOperationsCommandCenterView.sectionRowSeat",
-        "ResaleOperationsCommandCenterView.resalePrice",
-        "ResaleOperationsCommandCenterView.buyerTotal",
-        "ResaleOperationsCommandCenterView.sellerProceeds",
-        "ResaleOperationsCommandCenterView.purchaseStatus",
-        "ResaleOperationsCommandCenterView.ownershipStatus",
-        "ResaleOperationsCommandCenterView.credentialStatus",
-        "ResaleOperationsCommandCenterView.settlementStatus",
-        "ResaleOperationsCommandCenterView.riskScore",
-        "ResaleOperationsCommandCenterView.transactionDate"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Exception statuses”.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Each resale transaction shall show"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -257,272 +127,723 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Open transaction, Retry transfer, Hold transaction, Release transaction, Escalate, View credential, View settlement, View fraud assessment, View audit history. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 21 §Authorized users can"
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The resale operations list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the resale operations untouched.",
-   "emptyFirstRun": "No resale operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resale operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listResale",
-    "contract": "orders",
-    "purpose": "Resale Operations Command Center",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "preloaded": [
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
+   ]
+  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-288"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 21. 30 of 30 labels bound to a contract property; 39 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-289",
-  "name": "Buyer Purchase & Resale Order Management",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.2",
-   "page": 23
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/buyer-purchase-resale-order-management-adm-289",
-   "component": "apps/ticvai-web/src/routes/commercial/BuyerPurchaseResaleOrderManagement.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-288"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-288"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 2→3",
-     "operation": "listBuyerPurchaseResale"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure; Capture/reference) and no display directory — it is settings, not a population",
-  "purpose": "Manage the buyer-side purchase transaction and ensure that a resale ticket is temporarily protected while checkout occurs.",
-  "purposeNote": "A buyer can securely purchase a resale ticket without the same listing being sold concurrently to another buyer, and TICVAI retains the complete relationship to the original transaction.",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
+     "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Hold duration",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Configure"
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
-       "kind": "selectField",
-       "label": "Hold extension rules",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Configure"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
-       "kind": "selectField",
-       "label": "Payment timeout",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Configure"
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
       },
       {
-       "kind": "selectField",
-       "label": "Automatic release",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Configure"
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
       },
       {
-       "kind": "selectField",
-       "label": "Concurrent buyer handling",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Customer ID",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Name",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Email",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Membership",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Loyalty profile",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "textField",
-       "label": "Identity verification where required",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
-      },
-      {
-       "kind": "selectField",
-       "label": "Billing information",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 23 §Capture/reference"
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "The buyer purchase resale configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the buyer purchase resale untouched.",
-   "emptyFirstRun": "No buyer purchase resale configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listBuyerPurchaseResale",
-    "contract": "orders",
-    "purpose": "Buyer Purchase & Resale Order Management",
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-289"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-290",
-  "name": "Ticket Ownership Transfer Management",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.3",
-   "page": 25
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/ticket-ownership-transfer-management-adm-290",
-   "component": "apps/ticvai-web/src/routes/commercial/TicketOwnershipTransferManagement.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-288"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-288"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 4→5",
-     "operation": "listTicketOwnershipTransfer"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Securely transfer the ticket entitlement from the original seller to the resale buyer.",
-  "purposeNote": "the permanent ticket ownership history.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 25"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 25"
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -530,641 +851,274 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
      "components": [
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listTicketOwnershipTransfer",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The ticket ownership transfer list.",
-   "error": "Could not load. Names which read failed and leaves the ticket ownership transfer untouched.",
-   "emptyFirstRun": "No ticket ownership transfer yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket ownership transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
-    "operationId": "listTicketOwnershipTransfer",
-    "contract": "orders",
-    "purpose": "Ticket Ownership Transfer Management",
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
    "preloaded": [
-    "TicketOwnershipTransferManagementView.customer",
-    "TicketOwnershipTransferManagementView.originalOrder",
-    "TicketOwnershipTransferManagementView.ticket",
-    "TicketOwnershipTransferManagementView.ownershipStatus",
-    "TicketOwnershipTransferManagementView.newResaleOrder"
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-290"
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-291",
-  "name": "Credential Revocation & Regeneration",
-  "module": "Commercial",
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
   "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.4",
-   "page": 26
-  },
+  "wave": 1,
+  "capability": "C34",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/credential-revocation-regeneration-adm-291",
-   "component": "apps/ticvai-web/src/routes/commercial/CredentialRevocationRegeneration.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-288"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-288"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 6→7",
-     "operation": "listCredentialRevocationRegeneration"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Depending on TICVAI configuration; Deliver through configured channels) and no display directory — it is settings, not a population",
-  "purpose": "Ensure the seller's old ticket credential cannot continue to provide access after resale. This is one of the most important security functions in the module.",
-  "purposeNote": "Following a successful resale, the seller's credential cannot provide valid access and the buyer receives a new valid credential linked to the transferred entitlement.",
-  "layout": {
-   "template": "form",
-   "regions": [
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
     {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Static QR",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Dynamic QR",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Barcode",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "NFC",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "RFID",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile Wallet pass",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Digital ticket",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Wearable credential",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Depending on TICVAI configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "TICVAI account",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Deliver through configured channels"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile app",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Deliver through configured channels"
-      },
-      {
-       "kind": "selectField",
-       "label": "Email",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Deliver through configured channels"
-      },
-      {
-       "kind": "selectField",
-       "label": "Wallet",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Deliver through configured channels"
-      },
-      {
-       "kind": "textField",
-       "label": "Other configured delivery methods",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 26 §Deliver through configured channels"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credential revocation regeneration configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the credential revocation regeneration untouched.",
-   "emptyFirstRun": "No credential revocation regeneration configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCredentialRevocationRegeneration",
-    "contract": "orders",
-    "purpose": "Credential Revocation & Regeneration",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-291"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 13 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-292",
-  "name": "Resale Fraud & Duplicate Sale Protection",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.5",
-   "page": 28
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/resale-fraud-duplicate-sale-protection-adm-292",
-   "component": "apps/ticvai-web/src/routes/commercial/ResaleFraudDuplicateSaleProtection.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-288"
-   ],
-   "exitTo": [
-    "ADM-288"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
     {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 8→9",
-     "operation": "listResaleFraudDuplicate"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
-  "purpose": "Protect TICVAI, venues, sellers and buyers from resale abuse and fraudulent ticket activity.",
-  "purposeNote": "Potentially fraudulent resale activity is identified before or during fulfillment, with configurable intervention based on risk level.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every resale fraud duplicate",
-       "columns": [
-        "Duplicate listings",
-        "ResaleFraudDuplicateSaleProtectionView.multipleResaleAttempts",
-        "ResaleFraudDuplicateSaleProtectionView.sameTicketListedSimultaneously",
-        "ResaleFraudDuplicateSaleProtectionView.unusualSellerVolume",
-        "ResaleFraudDuplicateSaleProtectionView.highFrequencyResale",
-        "ResaleFraudDuplicateSaleProtectionView.suspiciousPricing",
-        "ResaleFraudDuplicateSaleProtectionView.multipleAccounts",
-        "ResaleFraudDuplicateSaleProtectionView.paymentAnomalies",
-        "ResaleFraudDuplicateSaleProtectionView.identityMismatch",
-        "ResaleFraudDuplicateSaleProtectionView.credentialReuse",
-        "ResaleFraudDuplicateSaleProtectionView.repeatedFailedTransactions",
-        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomaliesWherePermitted"
-       ],
-       "bindsTo": "ResaleFraudDuplicateSaleProtectionView",
-       "operation": "listResaleFraudDuplicate",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 28 §Monitor"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected resale fraud duplicate",
-       "bindsTo": "ResaleFraudDuplicateSaleProtectionView",
-       "columns": [
-        "Duplicate listings",
-        "ResaleFraudDuplicateSaleProtectionView.multipleResaleAttempts",
-        "ResaleFraudDuplicateSaleProtectionView.sameTicketListedSimultaneously",
-        "ResaleFraudDuplicateSaleProtectionView.unusualSellerVolume",
-        "ResaleFraudDuplicateSaleProtectionView.highFrequencyResale",
-        "ResaleFraudDuplicateSaleProtectionView.suspiciousPricing",
-        "ResaleFraudDuplicateSaleProtectionView.multipleAccounts",
-        "ResaleFraudDuplicateSaleProtectionView.paymentAnomalies",
-        "ResaleFraudDuplicateSaleProtectionView.identityMismatch",
-        "ResaleFraudDuplicateSaleProtectionView.credentialReuse",
-        "ResaleFraudDuplicateSaleProtectionView.repeatedFailedTransactions",
-        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomaliesWherePermitted"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Each transaction can receive”, “Detect attempted use of”, “Human Review”.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 28 §Monitor"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The resale fraud duplicate list.",
-   "error": "Could not load. Names which read failed and leaves the resale fraud duplicate untouched.",
-   "emptyFirstRun": "No resale fraud duplicate yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resale fraud duplicate are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listResaleFraudDuplicate",
-    "contract": "orders",
-    "purpose": "Resale Fraud & Duplicate Sale Protection",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Duplicate listings",
-    "ResaleFraudDuplicateSaleProtectionView.multipleResaleAttempts",
-    "ResaleFraudDuplicateSaleProtectionView.sameTicketListedSimultaneously",
-    "ResaleFraudDuplicateSaleProtectionView.unusualSellerVolume",
-    "ResaleFraudDuplicateSaleProtectionView.highFrequencyResale",
-    "ResaleFraudDuplicateSaleProtectionView.suspiciousPricing"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-292"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 28. 11 of 12 labels bound to a contract property; 19 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-293",
-  "name": "Capacity & Inventory Reconciliation",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.6",
-   "page": 29
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/capacity-inventory-reconciliation-adm-293",
-   "component": "apps/ticvai-web/src/routes/commercial/CapacityInventoryReconciliation.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-288"
-   ],
-   "exitTo": [
-    "ADM-288"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 10→11",
-     "operation": "listCapacityInventoryReconciliation"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Detect) and a per-row directory (§For each event show) — counts over a population, then the population",
-  "purpose": "Ensure resale activity never creates additional venue capacity or corrupts primary ticket inventory.",
-  "purposeNote": "The number of valid admissions and seat assignments remains consistent with configured venue/event capacity regardless of resale activity.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Duplicate active entitlement",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Seat assigned to multiple active owners",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Listing without ticket",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sold resale listing still active",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect",
-       "bindsTo": "CapacityInventoryReconciliationView.soldResaleListingStillActive"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Ownership mismatch",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect",
-       "bindsTo": "CapacityInventoryReconciliationView.ownershipMismatch"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Credential mismatch",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect",
-       "bindsTo": "CapacityInventoryReconciliationView.credentialMismatch"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Capacity discrepancy",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Detect",
-       "bindsTo": "CapacityInventoryReconciliationView.capacityDiscrepancy"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every capacity inventory reconciliation",
-       "columns": [
-        "CapacityInventoryReconciliationView.venueCapacity",
-        "CapacityInventoryReconciliationView.sellableCapacity",
-        "CapacityInventoryReconciliationView.primaryTicketsSold",
-        "CapacityInventoryReconciliationView.primaryInventoryRemaining",
-        "CapacityInventoryReconciliationView.ticketsListedForResale",
-        "CapacityInventoryReconciliationView.resaleTicketsSold",
-        "CapacityInventoryReconciliationView.holds",
-        "CapacityInventoryReconciliationView.cancelledTickets",
-        "CapacityInventoryReconciliationView.refundedTickets",
-        "CapacityInventoryReconciliationView.activeEntitlements"
-       ],
-       "bindsTo": "CapacityInventoryReconciliationView",
-       "operation": "listCapacityInventoryReconciliation",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §For each event show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected capacity inventory reconciliation",
-       "bindsTo": "CapacityInventoryReconciliationView",
-       "columns": [
-        "CapacityInventoryReconciliationView.venueCapacity",
-        "CapacityInventoryReconciliationView.sellableCapacity",
-        "CapacityInventoryReconciliationView.primaryTicketsSold",
-        "CapacityInventoryReconciliationView.primaryInventoryRemaining",
-        "CapacityInventoryReconciliationView.ticketsListedForResale",
-        "CapacityInventoryReconciliationView.resaleTicketsSold",
-        "CapacityInventoryReconciliationView.holds",
-        "CapacityInventoryReconciliationView.cancelledTickets",
-        "CapacityInventoryReconciliationView.refundedTickets",
-        "CapacityInventoryReconciliationView.activeEntitlements"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “A resale represents”, “Sold / New Owner”.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §For each event show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Investigate, Re-sync, Correct mapping, Hold ticket, Escalate, Generate reconciliation report. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 29 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The capacity inventory reconciliation list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the capacity inventory reconciliation untouched.",
-   "emptyFirstRun": "No capacity inventory reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the capacity inventory reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCapacityInventoryReconciliation",
-    "contract": "orders",
-    "purpose": "Capacity & Inventory Reconciliation",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CapacityInventoryReconciliationView.venueCapacity",
-    "CapacityInventoryReconciliationView.sellableCapacity",
-    "CapacityInventoryReconciliationView.primaryTicketsSold",
-    "CapacityInventoryReconciliationView.primaryInventoryRemaining",
-    "CapacityInventoryReconciliationView.ticketsListedForResale",
-    "CapacityInventoryReconciliationView.resaleTicketsSold"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-293"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 29. 14 of 14 labels bound to a contract property; 23 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-294",
-  "name": "Seller Settlement & Payout Management",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.7",
-   "page": 30
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/seller-settlement-payout-management-adm-294",
-   "component": "apps/ticvai-web/src/routes/commercial/SellerSettlementPayoutManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-288"
-   ],
-   "exitTo": [
-    "ADM-288"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 12→13",
-     "operation": "listSellerSettlementPayout"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Manage the financial amount owed to sellers following successful resale.",
-  "purposeNote": "Every completed resale produces an auditable seller settlement record with accurate proceeds, deductions, payout timing and settlement status.",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Manual hold, Compliance hold, Refund/dispute hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -1176,26 +1130,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every seller settlement payout",
+       "label": "Every order history",
+       "bindsTo": "Order",
        "columns": [
-        "SellerSettlementPayoutManagementView.settlementId",
-        "SellerSettlementPayoutManagementView.resaleTransaction",
-        "SellerSettlementPayoutManagementView.seller",
-        "SellerSettlementPayoutManagementView.listingPrice",
-        "SellerSettlementPayoutManagementView.sellerFee",
-        "SellerSettlementPayoutManagementView.commission",
-        "SellerSettlementPayoutManagementView.processingFee",
-        "SellerSettlementPayoutManagementView.applicableTax",
-        "SellerSettlementPayoutManagementView.adjustments",
-        "SellerSettlementPayoutManagementView.sellerProceeds",
-        "SellerSettlementPayoutManagementView.currency",
-        "SellerSettlementPayoutManagementView.payoutMethod",
-        "SellerSettlementPayoutManagementView.settlementStatus",
-        "SellerSettlementPayoutManagementView.expectedPayoutDate"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
        ],
-       "bindsTo": "SellerSettlementPayoutManagementView",
-       "operation": "listSellerSettlementPayout",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Show"
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
       }
      ]
     },
@@ -1205,26 +1157,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected seller settlement payout",
-       "bindsTo": "SellerSettlementPayoutManagementView",
+       "label": "The selected order history",
+       "bindsTo": "Order",
        "columns": [
-        "SellerSettlementPayoutManagementView.settlementId",
-        "SellerSettlementPayoutManagementView.resaleTransaction",
-        "SellerSettlementPayoutManagementView.seller",
-        "SellerSettlementPayoutManagementView.listingPrice",
-        "SellerSettlementPayoutManagementView.sellerFee",
-        "SellerSettlementPayoutManagementView.commission",
-        "SellerSettlementPayoutManagementView.processingFee",
-        "SellerSettlementPayoutManagementView.applicableTax",
-        "SellerSettlementPayoutManagementView.adjustments",
-        "SellerSettlementPayoutManagementView.sellerProceeds",
-        "SellerSettlementPayoutManagementView.currency",
-        "SellerSettlementPayoutManagementView.payoutMethod",
-        "SellerSettlementPayoutManagementView.settlementStatus",
-        "SellerSettlementPayoutManagementView.expectedPayoutDate"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Suggested”, “Exception statuses”, “A venue may prefer”, “Finance Integration”.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Show"
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
       }
      ]
     },
@@ -1234,652 +1188,386 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Manual hold",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compliance hold",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refund/dispute hold",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The seller settlement payout list.",
-   "error": "Could not load. Names which read failed and leaves the seller settlement payout untouched.",
-   "emptyFirstRun": "No seller settlement payout yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the seller settlement payout are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listSellerSettlementPayout",
+    "operationId": "transferOrderTickets",
     "contract": "orders",
-    "purpose": "Seller Settlement & Payout Management",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "SellerSettlementPayoutManagementView.settlementId",
-    "SellerSettlementPayoutManagementView.resaleTransaction",
-    "SellerSettlementPayoutManagementView.seller",
-    "SellerSettlementPayoutManagementView.listingPrice",
-    "SellerSettlementPayoutManagementView.sellerFee",
-    "SellerSettlementPayoutManagementView.commission"
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-294"
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 30. 14 of 14 labels bound to a contract property; 23 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-295",
-  "name": "Refunds, Disputes & Resale Exceptions",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.8",
-   "page": 32
-  },
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/refunds-disputes-resale-exceptions-adm-295",
-   "component": "apps/ticvai-web/src/routes/commercial/RefundsDisputesResaleExceptions.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-288"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-288"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 14→15",
-     "operation": "listRefundDisputeResale"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Handle exceptional scenarios that occur after a resale transaction.",
-  "purposeNote": "Operations can resolve resale exceptions without breaking the original order, resale transaction, ownership, credential or financial history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Failed ownership transfer, Failed credential issuance, Duplicate transaction, Ticket access issue, Incorrect ticket, Venue change, Seat change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 32"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 32"
-   }
-  ],
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
    "template": "split",
    "regions": [
     {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Failed ownership transfer",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
        "kind": "secondaryButton",
-       "label": "Failed credential issuance",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Duplicate transaction",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Ticket access issue",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Incorrect ticket",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Venue change",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seat change",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Refund buyer, Reverse settlement, Hold settlement, Reissue credential, Retry transfer, Cancel transaction, Return ownership, Provide replacement ticket, Escalate. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Depending on permission"
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The refunds disputes resale list.",
-   "error": "Could not load. Names which read failed and leaves the refunds disputes resale untouched.",
-   "emptyFirstRun": "No refunds disputes resale yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the refunds disputes resale are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listRefundDisputeResale",
-    "contract": "orders",
-    "purpose": "Refunds, Disputes & Resale Exceptions",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "RefundsDisputesResaleExceptionsView.eventCancellation",
-    "RefundsDisputesResaleExceptionsView.eventPostponement",
-    "RefundsDisputesResaleExceptionsView.buyerRefund",
-    "RefundsDisputesResaleExceptionsView.sellerDispute",
-    "RefundsDisputesResaleExceptionsView.buyerDispute"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-295"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 16 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-296",
-  "name": "Resale Audit & Ownership History",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.9",
-   "page": 34
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/resale-audit-ownership-history-adm-296",
-   "component": "apps/ticvai-web/src/routes/commercial/ResaleAuditOwnershipHistory.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-288"
-   ],
-   "exitTo": [
-    "ADM-288"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-288",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F172 step 16→17",
-     "operation": "listResaleOwnership"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
-  "purpose": "Provide complete end-to-end traceability of every ticket that enters the resale ecosystem.",
-  "purposeNote": "ownership transfer, credential replacement and financial settlement.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search resale audit ownership",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Administrators can search by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "ResaleAuditOwnershipHistoryView.ticketId",
-        "ResaleAuditOwnershipHistoryView.credential",
-        "ResaleAuditOwnershipHistoryView.order",
-        "ResaleAuditOwnershipHistoryView.resaleTransaction",
-        "ResaleAuditOwnershipHistoryView.seller",
-        "ResaleAuditOwnershipHistoryView.buyer",
-        "ResaleAuditOwnershipHistoryView.seat",
-        "ResaleAuditOwnershipHistoryView.event",
-        "ResaleAuditOwnershipHistoryView.paymentReference"
-       ],
-       "notes": "The pack filters this screen by ticket id, credential, order, resale transaction, seller, buyer and 3 more — which are present is a decision the pack already made.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Administrators can search by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Timestamp",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "User/system",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Action",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Original order",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Resale order",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Ticket",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Seller",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Buyer",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Listing",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Price",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fee",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Credential",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Ownership",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Payment",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Settlement",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Approval",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Device/channel where applicable",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 34 §Capture"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The resale audit ownership configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the resale audit ownership untouched.",
-   "emptyFirstRun": "No resale audit ownership configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoResults": "The filter narrowed it and the resale audit ownership are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listResaleOwnership",
-    "contract": "orders",
-    "purpose": "Resale Audit & Ownership History",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-296"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 34. 9 of 9 labels bound to a contract property; 26 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-297",
-  "name": "Resale Analytics & AI Intelligence",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Ticket Resale Marketplace_Reference.pdf",
-   "board": "2",
-   "number": "3.2.10",
-   "page": 35
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/resale-analytics-ai-intelligence-adm-297",
-   "component": "apps/ticvai-web/src/routes/commercial/ResaleAnalyticsAiIntelligence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-288"
-   ],
-   "exitTo": [
-    "ADM-288"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide management with commercial, operational and predictive intelligence about the resale marketplace. Board 3 defines how the end customer actually accesses, uses, sells through, and buys from The existing resale architecture already defines the backend marketplace configuration and transaction processing across Boards 1 and 2. Board 3 closes the missing experience layer: Board 1 — Configure Marketplace Eligibility → Policy → Listings → Pricing → Fees → Approval → Inventory Board 2 — Execute Resale Transaction Buyer → Payment → Ownership Transfer → Credentials → Fraud → Settlement → Audit Board 3 — Customer Experience Seller Journey → Buyer Journey → White-Label Portal → Client B2C Integration → Hosted Marketplace → Headless/API",
-  "purposeNote": "Management can evaluate the commercial and operational performance of resale and use explainable AI insights to improve primary pricing, marketplace policies and future event strategy. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search resale analytics intelligence",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Analyze by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Venue",
-        "Event",
-        "Product",
-        "Ticket type",
-        "Section",
-        "Seat category",
-        "Seller segment",
-        "Buyer segment",
-        "Sales channel",
-        "Time before event",
-        "Price range"
-       ],
-       "notes": "The pack filters this screen by venue, event, product, ticket type, section, seat category and 5 more — which are present is a decision the pack already made.",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Analyze by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Gross Resale Value",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.grossResaleValue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Resale Transactions",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.resaleTransactions"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Resale Conversion Rate",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.resaleConversionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Listing Price",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.averageListingPrice"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Sale Price",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.averageSalePrice"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Markup/Discount",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Seller Proceeds",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.sellerProceeds"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Marketplace Revenue",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.marketplaceRevenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Time to Sell",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.averageTimeToSell"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Listings-to-Sales Ratio",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.listingsToSalesRatio"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fraud Rate",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.fraudRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refund/Dispute Rate",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 35 §Display",
-       "bindsTo": "ResaleAnalyticsAiIntelligenceView.refundDisputeRate"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The resale analytics intelligence list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the resale analytics intelligence untouched.",
-   "emptyFirstRun": "No resale analytics intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resale analytics intelligence are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listResale2",
-    "contract": "orders",
-    "purpose": "Resale Analytics & AI Intelligence",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ResaleAnalyticsAiIntelligenceView.grossResaleValue",
-    "ResaleAnalyticsAiIntelligenceView.resaleTransactions",
-    "ResaleAnalyticsAiIntelligenceView.resaleConversionRate",
-    "ResaleAnalyticsAiIntelligenceView.averageListingPrice",
-    "ResaleAnalyticsAiIntelligenceView.averageSalePrice",
-    "Average Markup/Discount"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-297"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 35. 11 of 22 labels bound to a contract property; 23 of 107 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

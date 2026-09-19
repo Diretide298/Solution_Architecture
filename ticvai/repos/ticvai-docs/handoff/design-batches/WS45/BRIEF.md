@@ -1,14 +1,14 @@
-# WS45 — Promotions   Bundles Management board 1
+# P01-account-self-service-01 — P01 · Account & Self-Service
 
-**10 screens · 11 operations · 14 schemas · 3 permissions**
+**5 screens · 46 operations · 37 schemas · 5 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P01 Guest Web · ships as **guest** ·
+guest audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**guest on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `APPROVAL_DECIDE, APPROVAL_VIEW, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, MARKETING_VIEW, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listPromotions
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +61,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-138` | Promotion Command Center Dashboard | commandCentre | 2 | 0 | — |
-| `ADM-139` | Promotion & Campaign Directory | listDetail | 1 | 0 | — |
-| `ADM-140` | Promotion Overview | listDetail | 1 | 0 | — |
-| `ADM-141` | Promotion Lifecycle & Status Manager | listDetail | 1 | 0 | — |
-| `ADM-142` | Campaign Calendar & Timeline | listDetail | 1 | 0 | — |
-| `ADM-143` | Promotion Channel & Publication Monitor | commandCentre | 1 | 1 | — |
-| `ADM-144` | Promotion Alerts & Exception Center | configEditor | 1 | 1 | — |
-| `ADM-145` | Promotion Approval Inbox | approvalInbox | 3 | 1 | — |
-| `ADM-146` | Promotion Health & Performance Monitor | commandCentre | 1 | 0 | — |
-| `ADM-147` | Promotion Audit, Activity & Version History | listDetail | 1 | 0 | — |
+| `WEB-016` | Login / Register | listDetail | 20 | 1 | — |
+| `WEB-017` | My Account Dashboard | listDetail | 9 | 2 | — |
+| `WEB-018` | My Tickets | listDetail | 8 | 0 | — |
+| `WEB-019` | Order History | listDetail | 5 | 0 | — |
+| `WEB-020` | Profile & Preferences | listDetail | 6 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-140, ADM-141, ADM-142, ADM-147 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

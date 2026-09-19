@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
-  x-ticvai-screen-count: 79
+  x-ticvai-screen-count: 28
   x-ticvai-tier: satellite
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-platforms:
@@ -49,6 +49,8 @@ paths:
   /accreditation-programmes:
     get:
       operationId: listAccreditationProgrammes
+      x-ticvai-consumed-by:
+        - "P08 BO-619 Accreditation Category Management"
       summary: Programmes, their categories and their applicant types
       description: 'Boards 1.5, 1.6 and 1.7. **A programme is the thing an application is made
         against** — a season, a tournament, a venue''s standing contractor scheme — and it carries the
@@ -73,6 +75,10 @@ paths:
                   $ref: '#/components/schemas/AccreditationProgramme'
     post:
       operationId: createAccreditationProgramme
+      x-ticvai-consumed-by:
+        - "P08 BO-620 Accreditation Program Setup"
+        - "P08 BO-624 Registration Rules & Publication"
+        - "P08 BO-667 Event & Venue Accreditation Assignment"
       summary: Define a programme, its categories and its window
       tags:
       - accreditation
@@ -99,6 +105,9 @@ paths:
   /accreditation-requirements:
     put:
       operationId: setAccreditationRequirements
+      x-ticvai-consumed-by:
+        - "P08 BO-621 Applicant Type Configuration"
+        - "P08 BO-622 Application Requirements Matrix"
       summary: What each applicant type must supply and pass
       description: 'Board 1.8 — the requirements matrix. **Different applicant types are vetted
         differently, and pretending otherwise is why accreditation systems collapse into one enormous
@@ -134,6 +143,12 @@ paths:
   /accreditation-applications:
     get:
       operationId: listAccreditationApplications
+      x-ticvai-consumed-by:
+        - "P08 BO-615 Accreditation Command Center"
+        - "P08 BO-616 Accreditation Application Directory"
+        - "P08 BO-623 Accreditation Intake Monitor"
+        - "P08 BO-635 Accreditation Review Queue"
+        - "P08 BO-636 Application Review Workspace"
       summary: Applications, by state and programme
       tags:
       - accreditation
@@ -167,6 +182,8 @@ paths:
                   $ref: '#/components/schemas/AccreditationApplication'
     post:
       operationId: createAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-617 New Accreditation Application"
       summary: Apply, or apply on behalf of somebody
       description: 'Board 1.3. **Most accreditations are applied for by an organisation on behalf of
         its people**, not by the people themselves, and a model that assumes self-service leaves a
@@ -209,6 +226,9 @@ paths:
         format: uuid
     post:
       operationId: decideAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-636 Application Review Workspace"
+        - "P08 BO-640 Rejection & Resubmission Management"
       summary: Approve, reject, return for more, or escalate
       description: 'Boards 3.2 and 3.6. **Rejection must carry a reason and a route back.** An
         application refused with no explanation produces a phone call at best and a person turning up
@@ -271,6 +291,14 @@ paths:
   /accreditation-holders:
     get:
       operationId: listAccreditationHolders
+      x-ticvai-consumed-by:
+        - "P08 BO-615 Accreditation Command Center"
+        - "P08 BO-625 Accreditation Holder Directory"
+        - "P08 BO-664 Accreditation Lifecycle Command Center"
+        - "P08 BO-672 Expiry Monitor & Expiration Rules"
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
+        - "P08 BO-684 Accreditation Executive Dashboard"
+        - "P08 BO-685 Accreditation Status & Portfolio Reporting"
       summary: Everybody accredited, and what state they are in
       tags:
       - accreditation
@@ -317,6 +345,9 @@ paths:
         format: uuid
     get:
       operationId: getAccreditationHolder
+      x-ticvai-consumed-by:
+        - "P08 BO-626 Accreditation Holder Profile"
+        - "P08 BO-633 Profile Completeness & Compliance Monitor"
       summary: One holder — identity, documents, access and history
       tags:
       - accreditation
@@ -334,6 +365,10 @@ paths:
                 $ref: '#/components/schemas/AccreditationHolder'
     put:
       operationId: updateAccreditationHolder
+      x-ticvai-consumed-by:
+        - "P08 BO-627 Identity Details & Verification"
+        - "P08 BO-628 Photo Management"
+        - "P08 BO-632 Organization & Affiliation Management"
       summary: Amend identity, affiliation or contact details
       tags:
       - accreditation
@@ -359,6 +394,8 @@ paths:
   /accreditation-documents:
     post:
       operationId: submitAccreditationDocument
+      x-ticvai-consumed-by:
+        - "P08 BO-629 Document Repository"
       summary: Supply a document against a requirement
       description: 'Boards 2.5 and 2.6. **A document is submitted against a named requirement**, not
         into a folder. Otherwise a verification queue is a pile of files somebody has to open to find
@@ -401,6 +438,8 @@ paths:
         format: uuid
     post:
       operationId: verifyAccreditationDocument
+      x-ticvai-consumed-by:
+        - "P08 BO-630 Document Verification Queue"
       summary: Accept or refuse a submitted document
       description: 'Board 2.6. **The verifier is recorded and so is the refusal reason**, because a
         document refused for being unreadable and one refused for being the wrong document need
@@ -449,6 +488,8 @@ paths:
   /accreditation-identity-conflicts:
     get:
       operationId: listAccreditationIdentityConflicts
+      x-ticvai-consumed-by:
+        - "P08 BO-631 Duplicate & Identity Conflict Detection"
       summary: People who may already be accredited under another record
       description: 'Board 2.7. **The same person accredited twice with different access is the failure
         this exists to prevent** — one badge revoked and the other still opening doors.
@@ -476,6 +517,8 @@ paths:
   /accreditation-credentials:
     get:
       operationId: listAccreditationCredentials
+      x-ticvai-consumed-by:
+        - "P08 BO-645 Credential Generation Workspace"
       summary: Badges and digital credentials issued
       tags:
       - accreditation
@@ -505,6 +548,10 @@ paths:
                   $ref: '#/components/schemas/AccreditationCredential'
     post:
       operationId: issueAccreditationCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-646 Credential Media Configuration"
+        - "P08 BO-650 NFC & RFID Credential Encoding"
+        - "P08 BO-651 Credential Activation & Delivery"
       summary: Produce a badge, a mobile credential, or both
       description: 'Boards 4.2, 4.6 and 4.7. **The credential is not the accreditation.** Issuing a
         second one because the first was lost does not re-vet anybody, and revoking one does not
@@ -590,6 +637,8 @@ paths:
   /badge-templates:
     get:
       operationId: listBadgeTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-648 Badge Printing & Print Queue"
       summary: Badge designs, and what prints on each
       description: 'Board 4.4. **A badge is a security artefact as much as a printed card.** Which
         zones are shown, what colour the stripe is, whether the photograph is on it and what a
@@ -615,6 +664,9 @@ paths:
                   $ref: '#/components/schemas/BadgeTemplate'
     put:
       operationId: setBadgeTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-647 Badge Template Designer"
+        - "P08 BO-648 Badge Printing & Print Queue"
       summary: Design a badge
       tags:
       - accreditation
@@ -640,6 +692,8 @@ paths:
   /badge-print-jobs:
     get:
       operationId: listBadgePrintJobs
+      x-ticvai-consumed-by:
+        - "P08 BO-649 Digital & Mobile Credential Management"
       summary: The print queue, and what failed
       description: 'Board 4.5. **Badge printing fails in the middle of a batch and the operator needs
         to know which ones landed.** Reprinting the whole run wastes stock and produces duplicates
@@ -664,6 +718,8 @@ paths:
                   $ref: '#/components/schemas/BadgePrintJob'
     post:
       operationId: createBadgePrintJob
+      x-ticvai-consumed-by:
+        - "P08 BO-649 Digital & Mobile Credential Management"
       summary: Queue badges for printing
       tags:
       - accreditation
@@ -689,6 +745,10 @@ paths:
   /accreditation-access-profiles:
     get:
       operationId: listAccessProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-654 Accreditation Access Command Center"
+        - "P08 BO-655 Access Profile Management"
+        - "P08 BO-708 Accreditation & Participant Category Configuration"
       summary: Named bundles of zones, dates and times
       description: 'Boards 5.2 and 5.3. **A profile is how an estate stays governable.** Fifty
         photographers each given zones by hand is fifty chances to give somebody the pitch; one
@@ -713,6 +773,13 @@ paths:
                   $ref: '#/components/schemas/AccessProfile'
     put:
       operationId: setAccessProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-655 Access Profile Management"
+        - "P08 BO-656 Venue & Zone Access Matrix"
+        - "P08 BO-657 Operational Area Permission Management"
+        - "P08 BO-658 Date & Time Access Rules"
+        - "P08 BO-659 Access Schedule Management"
+        - "P08 BO-668 Multi-Venue Accreditation Management"
       summary: Define which zones, on which dates, at which times
       description: 'Boards 5.4, 5.5 and 5.6. **Zone, date and time are three dimensions and all three
         are needed.** A contractor with access to the plant room has it during the build, not during
@@ -746,6 +813,8 @@ paths:
   /accreditation-access-profiles/preview:
     post:
       operationId: previewAccessImpact
+      x-ticvai-consumed-by:
+        - "P08 BO-663 Access Rights Preview, Impact & Synchronization"
       summary: Who this change would affect, and how
       description: 'Board 5.10. **An access change is the one configuration change that can lock people
         out of a live event**, and there is no undo fast enough once a shift has started.
@@ -782,6 +851,9 @@ paths:
         format: uuid
     put:
       operationId: setHolderAccess
+      x-ticvai-consumed-by:
+        - "P08 BO-660 Holder Access Assignment"
+        - "P08 BO-661 Temporary Access & Exception Management"
       summary: Assign profiles, and any exception on top
       description: 'Boards 5.7 and 5.8. **The exception is where the real work happens.** A journalist
         who needs the tunnel for one match, a contractor who needs the roof for one morning — granted
@@ -821,6 +893,11 @@ paths:
         format: uuid
     post:
       operationId: setAccreditationStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-662 Access Revocation & Suspension"
+        - "P08 BO-665 Accreditation Status Workflow"
+        - "P08 BO-670 Suspension & Reactivation Management"
+        - "P08 BO-671 Accreditation Revocation Management"
       summary: Suspend, reactivate, revoke or expire an accreditation
       description: 'Boards 6.7, 6.8 and 6.9. **Suspension and revocation differ in whether the person
         comes back**, and the difference has to be in the record — a suspended contractor returns after
@@ -876,6 +953,10 @@ paths:
   /accreditation-validity:
     put:
       operationId: setAccreditationValidity
+      x-ticvai-consumed-by:
+        - "P08 BO-666 Validity Period Configuration"
+        - "P08 BO-669 Temporary & Seasonal Accreditation"
+        - "P08 BO-673 Accreditation Renewal Workspace"
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
         honest**, and it is the one most often configured as *never*. A venue whose contractor badges
@@ -909,6 +990,10 @@ paths:
   /accreditation-notifications:
     put:
       operationId: setAccreditationNotificationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-674 Accreditation Communications Command Center"
+        - "P08 BO-675 Notification Rule Management"
+        - "P08 BO-676 Expiry & Renewal Notification Scheduler"
       summary: Who is told what, and when
       description: 'Boards 7.2 and 7.3. **Expiry notices go to the organisation as well as the
         holder.** A freelance photographer will ignore an email; the agency that books them will not.
@@ -938,6 +1023,9 @@ paths:
   /accreditation-imports:
     post:
       operationId: importAccreditationHolders
+      x-ticvai-consumed-by:
+        - "P08 BO-680 Accreditation Bulk Import"
+        - "P08 BO-681 Import Validation & Processing Monitor"
       summary: Load a roster supplied by an organisation
       description: 'Boards 7.7 and 7.8. **This is how large events actually happen.** A broadcaster
         sends a spreadsheet of two hundred names a week before, and the alternative to importing it is
@@ -995,6 +1083,9 @@ paths:
   /accreditation-access-activity:
     get:
       operationId: listAccreditationAccessActivity
+      x-ticvai-consumed-by:
+        - "P08 BO-686 Accreditation Utilization Analytics"
+        - "P08 BO-687 Accreditation Access Activity Reporting"
       summary: Where accredited people actually went
       description: 'Board 8.4. **The difference between granted access and used access is the whole of
         the annual review.** A profile granting eight zones where holders only ever enter two is a
@@ -1042,6 +1133,13 @@ paths:
   /accreditation-audit:
     get:
       operationId: listAccreditationAudit
+      x-ticvai-consumed-by:
+        - "P08 BO-634 Profile History & Audit Timeline"
+        - "P08 BO-643 Approval Policy Validation & Publication"
+        - "P08 BO-683 Delivery, Batch & Operational History"
+        - "P08 BO-689 Accreditation Audit Reporting"
+        - "P08 BO-690 Immutable Accreditation Audit Log"
+        - "P08 BO-693 Integration & Data Exchange Monitor"
       summary: The immutable record of who granted what to whom
       description: 'Board 8.7. **Accreditation is the part of a venue most likely to be examined after
         an incident**, and the question is always the same: who gave this person access to that place,

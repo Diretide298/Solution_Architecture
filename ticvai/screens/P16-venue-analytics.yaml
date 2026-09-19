@@ -1,3 +1,4 @@
+
 platform:
   code: P16
   formFactor: web
@@ -32,8 +33,8 @@ platform:
 
 
     **A domain is a filter on an analytics screen, not a copy of it.** Building three sets means maintaining
-    one screen three times and watching them drift, and the drift is invisible until two dashboards disagree
-    about last month.
+    one screen three times and watching them drift, and the drift is invisible until two dashboards
+    disagree about last month.
 
 
     **Its own platform rather than a P08 section** because it is read rather than operated: opened on
@@ -176,15 +177,15 @@ screens:
     in which numbers fill the tiles. **Owns POS board frame(s) POS-6A** (client pack, 24 August). **Assigned
     by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced
     plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board
-    repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6a` — a frame in
-    the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen
-    Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced
-    either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom`
-    because provenance is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.**
-    When these screens were repointed from the client pack to their own board on 24 August, the status
-    stayed `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom`
-    keeps the pack frame, which is where the design came from; `status` describes the file being pointed
-    at, and those are different facts.'
+    repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6a` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer. **`wireframe.status` corrected
+    25 August.** When these screens were repointed from the client pack to their own board on 24 August,
+    the status stayed `designed` — **which claimed a client had drawn a board this package generated.**
+    `derivedFrom` keeps the pack frame, which is where the design came from; `status` describes the
+    file being pointed at, and those are different facts.'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6a
@@ -244,13 +245,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -260,8 +261,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -295,8 +296,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
     preloaded:
     - DashboardData.tileData
   wireframe:
@@ -308,16 +309,16 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6a
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
   purposeNote: Provide senior management with an immediate consolidated view of overall organizational
     performance.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall
       display
 - id: ANL-002
@@ -336,9 +337,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -351,12 +352,12 @@ screens:
         so an edge into it must carry them
   notes: '**Built 20 August. Answers 2 board screens**: Sales, Revenue & Channel Analytics; Sales, Revenue
     & Channel Analytics. **The same screen twice in the client set, word for word.** Revenue by channel
-    is revenue by channel whether the line is a burger or a t-shirt. **Board repointed 24 August.** This
-    screen pointed at `wireframes/Retail Board 6.dc.html#ret-6l` — a frame in the client pack, which is
-    where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and
-    `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both
-    shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    is revenue by channel whether the line is a burger or a t-shirt. **Board repointed 24 August.**
+    This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6l` — a frame in the client pack,
+    which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6b
@@ -390,13 +391,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -406,8 +407,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -429,8 +430,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -438,9 +439,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6L in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6l
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-003
   name: Operational Performance
   module: Analytics
@@ -457,9 +458,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -470,17 +471,17 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-  notes: '**Built 20 August. Answers 4 board screens**: Outlet, Service & Guest Performance; Store & Operational
-    Performance; Venue Operations Dashboard and 1 more. **Four board screens.** Outlet, store, venue and
-    department are the same question at four levels of `scope_path` — which is a filter, not four screens.
-    **Owns POS board frame(s) POS-6B, POS-6C, POS-6D** (client pack, 24 August). **Assigned by board purpose
-    rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
-    and a reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.**
-    This screen pointed at `wireframes/POS Board 6.dc.html#pos-6b` — a frame in the client pack, which
-    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
-    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+  notes: '**Built 20 August. Answers 4 board screens**: Outlet, Service & Guest Performance; Store &
+    Operational Performance; Venue Operations Dashboard and 1 more. **Four board screens.** Outlet,
+    store, venue and department are the same question at four levels of `scope_path` — which is a filter,
+    not four screens. **Owns POS board frame(s) POS-6B, POS-6C, POS-6D** (client pack, 24 August). **Assigned
+    by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced
+    plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board
+    repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6b` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - FnB Board 4.dc.html#fnb-4k
@@ -496,8 +497,8 @@ screens:
   purpose: Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.
   gaps:
   - operation: listDevices
-    why: '**2 declared operations reach no component on this screen**: listDevices, listPrincipals. Either
-      the screen is missing what calls them, or the declaration is residue.'
+    why: '**2 declared operations reach no component on this screen**: listDevices, listPrincipals.
+      Either the screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -545,13 +546,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -561,8 +562,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -598,8 +599,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
     preloaded:
     - DashboardData.tileData
   wireframe:
@@ -611,9 +612,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6b
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-004
   name: Product Performance
   module: Analytics
@@ -632,9 +633,9 @@ screens:
     - ANL-001
     - ANL-006
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-006
       trigger: Inventory & Waste Intelligence
@@ -651,11 +652,11 @@ screens:
   notes: '**Built 20 August. Answers 2 board screens**: Product Performance & Menu Engineering; Product,
     SKU & Merchandise Performance. **Menu engineering and SKU performance are one analysis.** Both rank
     products by margin against volume; only the vocabulary differs. **Board repointed 24 August.** This
-    screen pointed at `wireframes/Retail Board 6.dc.html#ret-6c` — a frame in the client pack, which is
-    where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and
-    `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both
-    shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    screen pointed at `wireframes/Retail Board 6.dc.html#ret-6c` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6d
@@ -710,13 +711,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -726,8 +727,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -755,8 +756,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
     preloaded:
     - DashboardData.tileData
   wireframe:
@@ -766,9 +767,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6C in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6c
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-005
   name: Cost, Margin & Profitability
   module: Analytics
@@ -786,9 +787,9 @@ screens:
     - ANL-001
     - ANL-007
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-007
       trigger: Guest & Conversion Intelligence
@@ -804,12 +805,12 @@ screens:
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
   notes: '**Built 20 August. Answers 2 board screens**: Food Cost, Margin & Profitability Intelligence;
-    Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board repointed
-    24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame in the client
-    pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
-    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board
+    repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6e
@@ -820,8 +821,8 @@ screens:
   purpose: Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.
   gaps:
   - operation: getStockValuation
-    why: '**1 declared operation reach no component on this screen**: getStockValuation. Either the screen
-      is missing what calls them, or the declaration is residue.'
+    why: '**1 declared operation reach no component on this screen**: getStockValuation. Either the
+      screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: detail
@@ -848,13 +849,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -864,8 +865,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -891,8 +892,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -900,9 +901,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6F in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6f
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-006
   name: Inventory & Waste Intelligence
   module: Analytics
@@ -920,9 +921,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -939,26 +940,28 @@ screens:
       operation: listExpiringBatches
       crossesDevice: true
       back: false
-  notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence; Inventory,
-    Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis** — a recipe
-    says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board repointed
-    24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6d` — a frame in the client
-    pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
-    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer. **Drawn 31 August** — `Retail Board 6.dc.html` frame `ret-6d`.
-    **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
-    label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Inventory
-    &amp; Stock Intelligence* matched at 0.89. **A cross-platform title match was refused**: `Outlet Management`
-    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
+  notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence;
+    Inventory, Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis**
+    — a recipe says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board
+    repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6d` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** —
+    `Retail Board 6.dc.html` frame `ret-6d`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Inventory &amp; Stock Intelligence* matched at 0.89. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6f
   - Retail Board 6.dc.html#ret-6d
   pattern: listDetail
-  patternReason: '`listExpiringBatches` reads the population and `getDashboard` reads one of them — list,
-    select, act'
-  purpose: Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.
+  patternReason: '`listExpiringBatches` reads the population and `getDashboard` reads one of them —
+    list, select, act'
+  purpose: Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by
+    domain.
   gaps:
   - operation: getCountVariance
     why: '**1 declared operation reach no component on this screen**: getCountVariance. Either the screen
@@ -1008,13 +1011,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -1024,8 +1027,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -1059,8 +1062,8 @@ screens:
     - name: reportId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
     preloaded:
     - DashboardData.tileData
   wireframe:
@@ -1069,12 +1072,12 @@ screens:
     board: wireframes/P16 Venue Analytics.dc.html#anl-006
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not
+      starting from nothing.'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6d
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-007
   name: Guest & Conversion Intelligence
   module: Analytics
@@ -1093,9 +1096,9 @@ screens:
     - ANL-001
     - ANL-004
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-004
       trigger: Product Performance
@@ -1111,12 +1114,12 @@ screens:
         so an edge into it must carry them
   notes: '**Built 20 August. Answers 2 board screens**: Guest, Conversion & Basket Intelligence; Kitchen,
     Service & Fulfilment Performance. Who bought, what else they nearly bought, and how long they waited.
-    **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at
-    `wireframes/Retail Board 6.dc.html#ret-6e` — a frame in the client pack, which is where the design
+    **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed
+    at `wireframes/Retail Board 6.dc.html#ret-6e` — a frame in the client pack, which is where the design
     came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html`
-    carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and
-    unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong
-    pointer.'
+    carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored
+    and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the
+    wrong pointer.'
   density: compact
   boardFrames:
   - Retail Board 6.dc.html#ret-6e
@@ -1176,13 +1179,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -1192,8 +1195,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -1235,8 +1238,8 @@ screens:
     - name: segmentId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not. A segment opened from the list.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not. A segment opened from the list.'
     preloaded:
     - DashboardData.tileData
   wireframe:
@@ -1246,9 +1249,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6E in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6e
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-008
   name: Demand Forecasting
   module: Analytics
@@ -1265,9 +1268,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -1319,13 +1322,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -1335,8 +1338,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -1356,8 +1359,8 @@ screens:
     - name: dashboardId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -1365,9 +1368,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6G in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6g
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-009
   name: AI Assistant & Action Center
   module: Analytics
@@ -1384,9 +1387,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -1402,18 +1405,19 @@ screens:
       provenance: flow F77 step 3→4
       crossesDevice: true
       back: false
-  notes: '**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization Center;
-    AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and 2 more. **Five
-    board screens, and the collapse is the point.** Every domain drew an AI centre and an alert centre;
-    **an alert nobody can act on from the screen showing it is a notification**, so recommendation and
-    action are one place. **Owns POS board frame(s) POS-6E** (client pack, 24 August). **Assigned by board
-    purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible
-    nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations
-    wired 24 August.** **Board repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6e`
-    — a frame in the client pack, which is where the design came from and not where this screen is drawn.
-    **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and
-    nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is
-    kept in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  notes: '**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization
+    Center; AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and
+    2 more. **Five board screens, and the collapse is the point.** Every domain drew an AI centre and
+    an alert centre; **an alert nobody can act on from the screen showing it is a notification**, so
+    recommendation and action are one place. **Owns POS board frame(s) POS-6E** (client pack, 24 August).
+    **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that
+    mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who
+    has none. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen
+    pointed at `wireframes/POS Board 6.dc.html#pos-6e` — a frame in the client pack, which is where
+    the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
+    Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
+    correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
+    worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - FnB Board 5.dc.html#fnb-5k
@@ -1504,13 +1508,13 @@ screens:
       components:
       - kind: multiSelect
         label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
         provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -1520,8 +1524,8 @@ screens:
       zeroes — a dashboard of zeroes teaches a new manager nothing.'
     emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
       today — an analytics screen opened on a Monday is asking about a period.
-    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
-      shown** rather than greyed out.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -1579,8 +1583,8 @@ screens:
     - name: actionId
       from: deepLink
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
-      Monday. The domain and the window come from the link where it carries them, and from the last view
-      where it does not. A proposed action opened from the queue or an alert.'
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not. A proposed action opened from the queue or an alert.'
     preloaded:
     - Alert.id
     - Alert.ruleId
@@ -1596,9 +1600,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6e
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-010
   name: Suggestions & Advice
   module: Analytics
@@ -1615,9 +1619,9 @@ screens:
     exitTo:
     - ANL-001
     inferred: false
-    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from
-      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
-      the other way, not a guess about the product.'
+    notes: '**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached
+      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
+      travelled the other way, not a guess about the product.'
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
@@ -1631,14 +1635,14 @@ screens:
   notes: '**Built 24 August.** The client F&B boards drew six suggestion endpoints — price, requisition,
     replenishment, scenario, SLA, demand plan. **One screen and one operation answer all six**, because
     a suggestion surface that differs per domain is six screens to change when the model changes. **Owns
-    POS board frame(s) POS-6F** (client pack, 24 August). **Assigned by board purpose rather than by operation
-    overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who
-    trusts a bad table is worse off than one who has none. **Board repointed 24 August.** This screen
-    pointed at `wireframes/POS Board 6.dc.html#pos-6f` — a frame in the client pack, which is where the
-    design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue
-    Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly
-    anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more
-    than the wrong pointer.'
+    POS board frame(s) POS-6F** (client pack, 24 August). **Assigned by board purpose rather than by
+    operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a
+    reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.**
+    This screen pointed at `wireframes/POS Board 6.dc.html#pos-6f` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
   density: compact
   boardFrames:
   - POS Board 6.dc.html#pos-6f
@@ -1691,8 +1695,8 @@ screens:
   states:
     loading: Open suggestions, newest first, grouped by kind.
     error: Could not load. **Trading is unaffected** — this advises and does not act.
-    emptyFirstRun: '**A venue with no history has nothing to suggest from**, and the screen says so rather
-      than showing a rule dressed as advice. Names when there will be enough data.'
+    emptyFirstRun: '**A venue with no history has nothing to suggest from**, and the screen says so
+      rather than showing a rule dressed as advice. Names when there will be enough data.'
     emptyNoAccess: You do not have AI permission at this venue.
   apis:
   - operationId: requestSuggestion
@@ -1710,8 +1714,8 @@ screens:
     - name: suggestionId
       from: deepLink
       optional: true
-    coldEntry: A bookmarked view opened weekly, or **a link from an alert naming one suggestion** — an
-      alert that cannot take a manager to the thing it is about is a notification.
+    coldEntry: A bookmarked view opened weekly, or **a link from an alert naming one suggestion** —
+      an alert that cannot take a manager to the thing it is about is a notification.
   wireframe:
     status: notStarted
     provenance: generated
@@ -1721,9 +1725,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6f
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: ANL-012
   name: Live Operations Dashboard
   module: Analytics
@@ -1761,11 +1765,12 @@ screens:
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
   density: compact
-  purposeNote: Authorized operations users can identify the live status of each site and immediately drill
-    into abnormal conditions.
+  purposeNote: Authorized operations users can identify the live status of each site and immediately
+    drill into abnormal conditions.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
-    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
   purpose: Provide a real-time view of what is happening across all operating locations.
   layout:
     template: dashboard
@@ -1820,10 +1825,10 @@ screens:
     error: Could not load. Names which read failed and leaves the live operations untouched.
     emptyFirstRun: No live operations yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the live operations are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the live operations are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -1888,11 +1893,12 @@ screens:
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
   density: compact
-  purposeNote: Management can identify revenue performance and drill down from consolidated revenue to
-    site → business unit → channel → product → transaction level, subject to permissions.
+  purposeNote: Management can identify revenue performance and drill down from consolidated revenue
+    to site → business unit → channel → product → transaction level, subject to permissions.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
-    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
   purpose: Provide real-time visibility into revenue generation across TICVAI.
   layout:
     template: dashboard
@@ -1943,8 +1949,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the revenue pulse are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2004,11 +2010,12 @@ screens:
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
   density: compact
-  purposeNote: Users can understand historical, current and forecast visitor volumes and drill into the
-    underlying attendance data.
+  purposeNote: Users can understand historical, current and forecast visitor volumes and drill into
+    the underlying attendance data.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
-    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
   purpose: Monitor visitor movement and attendance across venues.
   layout:
     template: dashboard
@@ -2064,12 +2071,12 @@ screens:
   states:
     loading: The attendance footfall intelligence list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the attendance footfall intelligence untouched.
-    emptyFirstRun: No attendance footfall intelligence yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the attendance footfall intelligence are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No attendance footfall intelligence yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the attendance footfall intelligence are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2172,8 +2179,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the capacity utilization are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2193,9 +2200,9 @@ screens:
     board: wireframes/P16 Venue Analytics.dc.html#anl-015
     workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-015
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 7. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    page 7. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: ANL-016
   name: Sales & Channel Performance
   module: Analytics
@@ -2285,10 +2292,10 @@ screens:
     error: Could not load. Names which read failed and leaves the sales channel performance untouched.
     emptyFirstRun: No sales channel performance yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the sales channel performance are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the sales channel performance are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2356,8 +2363,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Display
   layout:
     template: split
@@ -2367,8 +2374,8 @@ screens:
       components:
       - kind: searchField
         label: Search customer membership loyalty
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Allow filtering
-          by
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Allow
+          filtering by
       - kind: multiSelect
         label: Filter by
         columns:
@@ -2382,8 +2389,8 @@ screens:
         notes: The pack filters this screen by customer segment, membership type, geography, demographic
           group, acquisition source, visit frequency and 1 more — which are present is a decision the
           pack already made.
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Allow filtering
-          by
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Allow
+          filtering by
     - name: contentBody
       slot: collection
       components:
@@ -2439,8 +2446,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the customer membership loyalty are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -2508,8 +2515,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert Shall
       Display
   layout:
@@ -2534,8 +2541,8 @@ screens:
         - Recommended action
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert
-          Shall Display
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each
+          Alert Shall Display
     - name: contextPanel
       slot: selection
       components:
@@ -2556,8 +2563,8 @@ screens:
         - Recommended action
         notes: 'The pack groups this record''s detail under its own headings: “Alert Categories”, “Alert
           Workflow”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert
-          Shall Display
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each
+          Alert Shall Display
   states:
     loading: The alerts exception list.
     error: Could not load. Names which read failed and leaves the alerts exception untouched.
@@ -2565,8 +2572,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the alerts exception are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPromotionAlertException
     contract: promotions
@@ -2625,7 +2632,8 @@ screens:
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
   density: compact
-  purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting data.
+  purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting
+    data.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -2640,22 +2648,36 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: askReportingQuestion
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnalyticsAnomalies
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: askReportingQuestion
   states:
     loading: The insights list.
     error: Could not load. Names which read failed and leaves the insights untouched.
     emptyFirstRun: No insights yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -2733,8 +2755,8 @@ screens:
       trigger: AI Management Insights
       provenance: structural — pack board 1 wiring, 9 September 2026
   density: compact
-  purposeNote: Management can benchmark operating entities using normalized KPIs and drill into the causes
-    of performance differences.
+  purposeNote: Management can benchmark operating entities using normalized KPIs and drill into the
+    causes of performance differences.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Comparison KPIs) and no per-row directory
     — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
@@ -2804,13 +2826,14 @@ screens:
           KPIs
   states:
     loading: The multi-site performance comparison list; the counts above it resolve separately.
-    error: Could not load. Names which read failed and leaves the multi-site performance comparison untouched.
+    error: Could not load. Names which read failed and leaves the multi-site performance comparison
+      untouched.
     emptyFirstRun: No multi-site performance comparison yet. Carries the create action; distinct from
       a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the multi-site performance comparison are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getAnalyticsBenchmark
     contract: reporting
@@ -2905,8 +2928,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard
       cards/table containing
   layout:
@@ -3000,8 +3023,8 @@ screens:
     emptyFirstRun: No record yet. Carries the create action; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the record are still there. Names the active filter and
       offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listDashboards
     contract: reporting
@@ -3128,8 +3151,8 @@ screens:
     error: Could not load. Names which read failed and leaves the creation wizard untouched.
     emptyFirstRun: No creation wizard configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createDashboard
     contract: reporting
@@ -3186,14 +3209,28 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateDashboard
+        label: Save dashboard
+        notes: The act the screen exists for.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getDashboard
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateDashboard
   states:
     loading: The drag-and-drop canvas list.
     error: Could not load. Names which read failed and leaves the drag-and-drop canvas untouched.
@@ -3201,8 +3238,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the drag-and-drop canvas are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateDashboard
     contract: reporting
@@ -3225,6 +3262,10 @@ screens:
     page 16. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: dashboardId
+      from: navigation
 - id: ANL-024
   name: Widget & Visualization Library
   module: Analytics
@@ -3259,8 +3300,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
   layout:
     template: split
@@ -3279,7 +3320,8 @@ screens:
         - Progress Indicator
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI
+          Components
     - name: contextPanel
       slot: selection
       components:
@@ -3295,7 +3337,8 @@ screens:
         - Progress Indicator
         notes: 'The pack groups this record''s detail under its own headings: “Chart Components”, “Operational
           Components”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI
+          Components
   states:
     loading: The widget visualization list.
     error: Could not load. Names which read failed and leaves the widget visualization untouched.
@@ -3303,8 +3346,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the widget visualization are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -3353,8 +3396,8 @@ screens:
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation is
-    used across TICVAI dashboards.
+  purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation
+    is used across TICVAI dashboards.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Define whether) and
     no display directory — it is settings, not a population
@@ -3444,10 +3487,10 @@ screens:
   states:
     loading: The kpi configuration as saved.
     error: Could not load. Names which read failed and leaves the kpi untouched.
-    emptyFirstRun: No kpi configured yet. Carries the create action and says what the platform does in
-      the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No kpi configured yet. Carries the create action and says what the platform does
+      in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listKpis
     contract: reporting
@@ -3505,13 +3548,13 @@ screens:
   - operation: null
     why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
       If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis.
-      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
-      from the screen side rather than the contract side.'
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI
   layout:
     template: split
@@ -3532,8 +3575,8 @@ screens:
         - Evaluation Frequency
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each
-          KPI
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For
+          each KPI
     - name: contextPanel
       slot: selection
       components:
@@ -3550,8 +3593,8 @@ screens:
         - Tolerance
         - Evaluation Frequency
         notes: 'The pack groups this record''s detail under its own headings: “Capacity Utilization”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each
-          KPI
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For
+          each KPI
     - name: actionBar
       slot: rowActions
       components:
@@ -3574,12 +3617,12 @@ screens:
   states:
     loading: The targets thresholds kpi list.
     error: Could not load. Names which read failed and leaves the targets thresholds kpi untouched.
-    emptyFirstRun: No targets thresholds kpi yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the targets thresholds kpi are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No targets thresholds kpi yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoResults: The filter narrowed it and the targets thresholds kpi are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setKpiTargets
     contract: reporting
@@ -3601,6 +3644,9 @@ screens:
     - Warning Threshold
     - Critical Threshold
     - Benchmark
+    params:
+    - name: kpiId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-026
@@ -3722,8 +3768,8 @@ screens:
       does in the meantime.
     emptyNoResults: The filter narrowed it and the data filter are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -3744,6 +3790,10 @@ screens:
     page 20. 0 of 6 labels bound to a contract property; 22 of 40 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: dashboardId
+      from: navigation
 - id: ANL-028
   name: Drill-Down & Interaction Designer
   module: Analytics
@@ -3778,8 +3828,8 @@ screens:
   gaps:
   - operation: null
     why: '**Drill-Down & Interaction Designer declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
+      declared call is `none`, a read. The name promises authoring and the contract offers none, so
+      either the write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
   layout:
     template: form
@@ -3817,10 +3867,10 @@ screens:
   states:
     loading: The drill-down interaction designer configuration as saved.
     error: Could not load. Names which read failed and leaves the drill-down interaction designer untouched.
-    emptyFirstRun: No drill-down interaction designer configured yet. Carries the create action and says
-      what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No drill-down interaction designer configured yet. Carries the create action and
+      says what the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateDashboard
     contract: reporting
@@ -3836,6 +3886,10 @@ screens:
     page 22. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: dashboardId
+      from: navigation
 - id: ANL-029
   name: Dashboard Access, Publishing & Versioning
   module: Analytics
@@ -3862,16 +3916,16 @@ screens:
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Only authorized and approved dashboard configurations become available to production users,
-    with complete version history.
+  purposeNote: Only authorized and approved dashboard configurations become available to production
+    users, with complete version history.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Govern who can access dashboards and how dashboard changes reach production.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
   layout:
     template: split
@@ -3914,8 +3968,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the access publishing versioning are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateDashboard
     contract: reporting
@@ -3931,6 +3985,9 @@ screens:
     - Change Description
     - Approval Status
     - Published Version
+    params:
+    - name: dashboardId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-029
@@ -3973,8 +4030,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
   layout:
     template: split
@@ -4021,10 +4078,10 @@ screens:
     error: Could not load. Names which read failed and leaves the preview validation health untouched.
     emptyFirstRun: No preview validation health yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the preview validation health are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the preview validation health are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getDashboard
     contract: reporting
@@ -4044,6 +4101,9 @@ screens:
     - Query Performance
     - Widget Load Time
     - Failed Widgets
+    params:
+    - name: dashboardId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-030
@@ -4114,20 +4174,20 @@ screens:
       trigger: Report Preview, Test & Validation
       provenance: structural — pack board 3 wiring, 9 September 2026
   density: compact
-  purposeNote: Users can search, filter, organize and access authorized reports from one centralized report
-    library.
+  purposeNote: Users can search, filter, organize and access authorized reports from one centralized
+    report library.
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Each report shall display) and no metric
-    row
+  patternReason: the pack gives this screen a display directory (§Each report shall display) and no
+    metric row
   purpose: Provide a centralized repository containing all TICVAI standard, custom, scheduled and AI-generated
     reports.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report shall
-      display
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report
+      shall display
   layout:
     template: split
     regions:
@@ -4152,8 +4212,8 @@ screens:
         - Usage Count
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report
-          shall display
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each
+          report shall display
     - name: contextPanel
       slot: selection
       components:
@@ -4176,8 +4236,8 @@ screens:
         - Usage Count
         notes: 'The pack groups this record''s detail under its own headings: “Report Categories”, “Report
           Types”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report
-          shall display
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each
+          report shall display
   states:
     loading: The report catalogue list.
     error: Could not load. Names which read failed and leaves the report catalogue untouched.
@@ -4185,8 +4245,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the report catalogue are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReports
     contract: reporting
@@ -4245,13 +4305,13 @@ screens:
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Select one or multiple
     domains) and no display directory — it is settings, not a population
-  purpose: Guide users through creation of a new report without requiring technical knowledge. Step 1
-    — Report Information
+  purpose: Guide users through creation of a new report without requiring technical knowledge. Step
+    1 — Report Information
   gaps:
   - operation: null
-    why: '**Report Creation Wizard declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
+    why: '**Report Creation Wizard declares no operation that writes anything** — its only declared
+      call is `none`, a read. The name promises authoring and the contract offers none, so either the
+      write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
   layout:
     template: form
@@ -4291,10 +4351,10 @@ screens:
   states:
     loading: The report creation wizard configuration as saved.
     error: Could not load. Names which read failed and leaves the report creation wizard untouched.
-    emptyFirstRun: No report creation wizard configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No report creation wizard configured yet. Carries the create action and says what
+      the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createReport
     contract: reporting
@@ -4345,8 +4405,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show
   layout:
     template: split
@@ -4383,8 +4443,8 @@ screens:
         - Last Refresh
         - Data Owner
         - Security Classification
-        notes: 'The pack groups this record''s detail under its own headings: “Ticketing”, “Sales”, “Finance”,
-          “Payments”, “Access”, “Customer”.'
+        notes: 'The pack groups this record''s detail under its own headings: “Ticketing”, “Sales”,
+          “Finance”, “Payments”, “Access”, “Customer”.'
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show
   states:
     loading: The data domain dataset list.
@@ -4393,8 +4453,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the data domain dataset are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -4463,8 +4523,8 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30
   layout:
     template: split
@@ -4495,10 +4555,10 @@ screens:
     error: Could not load. Names which read failed and leaves the field column selector untouched.
     emptyFirstRun: No field column selector yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the field column selector are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the field column selector are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportFields
     contract: reporting
@@ -4552,8 +4612,8 @@ screens:
       write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 31
   layout:
     template: split
@@ -4593,8 +4653,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the filter parameter are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateReport
     contract: reporting
@@ -4612,6 +4672,10 @@ screens:
     page 31. 0 of 14 labels bound to a contract property; 14 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: reportId
+      from: navigation
 - id: ANL-036
   name: Grouping, Aggregation & Calculation Builder
   module: Analytics
@@ -4647,18 +4711,18 @@ screens:
   gaps:
   - operation: null
     why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
-      Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+      Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 32 §Support
   - operation: null
-    why: '**Grouping, Aggregation & Calculation Builder declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
+    why: '**Grouping, Aggregation & Calculation Builder declares no operation that writes anything**
+      — its only declared call is `none`, a read. The name promises authoring and the contract offers
+      none, so either the write operations are missing or this screen is a view of something another
+      screen builds.'
     source: contract — the screen's declared operations
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 32
   layout:
     template: split
@@ -4697,12 +4761,12 @@ screens:
   states:
     loading: The grouping aggregation calculation list.
     error: Could not load. Names which read failed and leaves the grouping aggregation calculation untouched.
-    emptyFirstRun: No grouping aggregation calculation yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the grouping aggregation calculation are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No grouping aggregation calculation yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the grouping aggregation calculation are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateReport
     contract: reporting
@@ -4718,6 +4782,10 @@ screens:
     page 32. 0 of 11 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: reportId
+      from: navigation
 - id: ANL-037
   name: Cross-Domain Report Composer
   module: Analytics
@@ -4750,8 +4818,8 @@ screens:
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: Allow authorized users to combine information across multiple TICVAI modules. This is one of
-    the most important capabilities of Board 3.
+  purpose: Allow authorized users to combine information across multiple TICVAI modules. This is one
+    of the most important capabilities of Board 3.
   gaps:
   - operation: null
     why: '**Cross-Domain Report Composer declares no operation that writes anything** — its only declared
@@ -4765,14 +4833,24 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 34
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 34
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateReport
+        label: Save report
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateReport
   states:
     loading: The cross-domain report composer list.
     error: Could not load. Names which read failed and leaves the cross-domain report composer untouched.
@@ -4780,8 +4858,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the cross-domain report composer are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -4802,6 +4880,10 @@ screens:
     page 34. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: reportId
+      from: navigation
 - id: ANL-038
   name: Report Layout & Formatting Designer
   module: Analytics
@@ -4837,13 +4919,13 @@ screens:
   gaps:
   - operation: null
     why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is
-      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+      TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this
+      is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
   - operation: null
     why: '**Report Layout & Formatting Designer declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
+      declared call is `none`, a read. The name promises authoring and the contract offers none, so
+      either the write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
   layout:
     template: form
@@ -4886,8 +4968,8 @@ screens:
     error: Could not load. Names which read failed and leaves the report layout formatting untouched.
     emptyFirstRun: No report layout formatting configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: updateReport
     contract: reporting
@@ -4903,6 +4985,10 @@ screens:
     page 35. 0 of 0 labels bound to a contract property; 9 of 26 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: reportId
+      from: navigation
 - id: ANL-039
   name: Report Preview, Test & Validation
   module: Analytics
@@ -4929,15 +5015,16 @@ screens:
       provenance: structural — pack board 3 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Critical data, security or calculation issues must be identified before the report is published.
+  purposeNote: Critical data, security or calculation issues must be identified before the report is
+    published.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Allow users to verify report accuracy before saving or publishing it.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display
   layout:
     template: split
@@ -4983,8 +5070,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the report preview test are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: runReport
     contract: reporting
@@ -5004,6 +5091,11 @@ screens:
     - Calculated Fields
     - Grouping
     - Totals
+    params:
+    - name: executionId
+      from: navigation
+    - name: reportId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-039
@@ -5039,8 +5131,8 @@ screens:
       back: true
   density: compact
   purposeNote: Users can execute reports interactively, analyze the results and export authorized data
-    in supported formats. AI — “Ask TICVAI to Build My Report” Board 3 should include AI throughout the
-    report-building process rather than making AI a separate disconnected feature.
+    in supported formats. AI — “Ask TICVAI to Build My Report” Board 3 should include AI throughout
+    the report-building process rather than making AI a separate disconnected feature.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display; Dashboard Designer Report
     Builder) and a per-row directory (§KPI cards/charts Rows, columns, matrices) — counts over a population,
@@ -5049,8 +5141,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI cards/charts
       Rows, columns, matrices
   layout:
@@ -5094,8 +5186,8 @@ screens:
         - Persistent dashboard layout Parameter-driven report execution
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI cards/charts
-          Rows, columns, matrices
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI
+          cards/charts Rows, columns, matrices
     - name: contextPanel
       slot: selection
       components:
@@ -5105,10 +5197,10 @@ screens:
         columns:
         - Executive/operational monitoring Analysis/reconciliation/detail
         - Persistent dashboard layout Parameter-driven report execution
-        notes: 'The pack groups this record''s detail under its own headings: “Further Actions”, “A user
-          could type”, “Visualization focused Data/report focused”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI cards/charts
-          Rows, columns, matrices
+        notes: 'The pack groups this record''s detail under its own headings: “Further Actions”, “A
+          user could type”, “Visualization focused Data/report focused”.'
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI
+          cards/charts Rows, columns, matrices
     - name: actionBar
       slot: rowActions
       components:
@@ -5124,10 +5216,10 @@ screens:
     error: Could not load. Names which read failed and leaves the save run report untouched.
     emptyFirstRun: No save run report yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the save run report are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the save run report are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: runReport
     contract: reporting
@@ -5147,6 +5239,12 @@ screens:
     page 37. 0 of 2 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: executionId
+      from: navigation
+    - name: reportId
+      from: navigation
 - id: ANL-041
   name: Reporting Governance Command Center
   module: Analytics
@@ -5218,8 +5316,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 40 §Display
   layout:
     template: split
@@ -5285,8 +5383,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the reporting governance are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportSchedules
     contract: reporting
@@ -5340,8 +5438,8 @@ screens:
       provenance: structural — pack board 4 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Authorized users can create and manage recurring report-generation schedules without technical
-    support.
+  purposeNote: Authorized users can create and manage recurring report-generation schedules without
+    technical support.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Frequency Options)
     and no display directory — it is settings, not a population
@@ -5434,8 +5532,8 @@ screens:
     error: Could not load. Names which read failed and leaves the report scheduler untouched.
     emptyFirstRun: No report scheduler configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportSchedules
     contract: reporting
@@ -5503,14 +5601,29 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 43
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 43
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listReportSubscriptions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createReportSubscription
+        label: Create report subscription
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createReportSubscription
   states:
     loading: The subscription list.
     error: Could not load. Names which read failed and leaves the subscription untouched.
@@ -5518,8 +5631,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the subscription are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportSubscriptions
     contract: reporting
@@ -5574,9 +5687,9 @@ screens:
   gaps:
   - operation: null
     why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
-      TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+      TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an
+      operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
+      screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support configurable
       channels such as
   layout:
@@ -5649,10 +5762,10 @@ screens:
   states:
     loading: The distribution delivery configuration as saved.
     error: Could not load. Names which read failed and leaves the distribution delivery untouched.
-    emptyFirstRun: No distribution delivery configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No distribution delivery configured yet. Carries the create action and says what
+      the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createReportSubscription
     contract: reporting
@@ -5703,8 +5816,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display
   layout:
     template: split
@@ -5747,18 +5860,18 @@ screens:
         - Record Count
         - Status
         - Expiration
-        notes: 'The pack groups this record''s detail under its own headings: “At minimum”, “Export Status”,
-          “Large Exports”.'
+        notes: 'The pack groups this record''s detail under its own headings: “At minimum”, “Export
+          Status”, “Large Exports”.'
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display
   states:
     loading: The export download list.
     error: Could not load. Names which read failed and leaves the export download untouched.
     emptyFirstRun: No export download yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the export download are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the export download are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: exportReportResult
     contract: reporting
@@ -5778,6 +5891,11 @@ screens:
     - Site
     - Format
     - Requested Time
+    params:
+    - name: executionId
+      from: navigation
+    - name: exportId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-045
@@ -5822,8 +5940,8 @@ screens:
   gaps:
   - operation: null
     why: '**Report API & Data Delivery Manager declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
+      declared call is `none`, a read. The name promises authoring and the contract offers none, so
+      either the write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
   layout:
     template: form
@@ -5866,8 +5984,8 @@ screens:
     error: Could not load. Names which read failed and leaves the report api data untouched.
     emptyFirstRun: No report api data configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportSubscriptions
     contract: reporting
@@ -5933,23 +6051,28 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAccessPolicies
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The report access sharing list.
     error: Could not load. Names which read failed and leaves the report access sharing untouched.
     emptyFirstRun: No report access sharing yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the report access sharing are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the report access sharing are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAccessPolicies
     contract: identity
@@ -5994,7 +6117,8 @@ screens:
     reviewing technical server logs.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Monitor scheduled report execution and distribution and provide operational management of failures.
+  purpose: Monitor scheduled report execution and distribution and provide operational management of
+    failures.
   gaps:
   - operation: null
     why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -6004,8 +6128,8 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Actions
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Display
   layout:
     template: split
@@ -6074,18 +6198,18 @@ screens:
     component: confirmDialog
     trigger: Cancel
     body: '**Cancel on a delivery monitoring failure is not reversible from this screen.** Names what
-      it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so
-      the dialog states that it is recorded.'
+      it affects and what it leaves alone. The pack requires the decision to reach the audit trail,
+      so the dialog states that it is recorded.'
     provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Actions
   states:
     loading: The delivery monitoring failure list.
     error: Could not load. Names which read failed and leaves the delivery monitoring failure untouched.
     emptyFirstRun: No delivery monitoring failure yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the delivery monitoring failure are still there. The pack's
-      own statuses are Running — the state names which is selected.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the delivery monitoring failure are still there. The
+      pack's own statuses are Running — the state names which is selected.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportDeliveries
     contract: reporting
@@ -6162,8 +6286,8 @@ screens:
         - Business Unit
         - Export Type
         - Status
-        notes: The pack filters this screen by user, report, action, date, site, business unit and 2 more
-          — which are present is a decision the pack already made.
+        notes: The pack filters this screen by user, report, action, date, site, business unit and 2
+          more — which are present is a decision the pack already made.
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 49 §Filter
           audit history by
     - name: contentBody
@@ -6214,12 +6338,12 @@ screens:
   states:
     loading: The report audit trail configuration as saved.
     error: Could not load. Names which read failed and leaves the report audit trail untouched.
-    emptyFirstRun: No report audit trail configured yet. Carries the create action and says what the platform
-      does in the meantime.
+    emptyFirstRun: No report audit trail configured yet. Carries the create action and says what the
+      platform does in the meantime.
     emptyNoResults: The filter narrowed it and the report audit trail are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReportDeliveries
     contract: reporting
@@ -6328,8 +6452,8 @@ screens:
     error: Could not load. Names which read failed and leaves the retention archive governance untouched.
     emptyFirstRun: No retention archive governance configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setApprovalRetentionPolicy
     contract: approvals
@@ -6416,8 +6540,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 109 §Display
   layout:
     template: split
@@ -6483,11 +6607,12 @@ screens:
   states:
     loading: The analytics list.
     error: Could not load. Names which read failed and leaves the analytics untouched.
-    emptyFirstRun: No analytics yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No analytics yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoResults: The filter narrowed it and the analytics are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsAnomalies
     contract: reporting
@@ -6536,8 +6661,8 @@ screens:
       provenance: structural — pack board 9 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Authorized business users can obtain governed analytics without knowing report names, database
-    fields, SQL, or Power BI.
+  purposeNote: Authorized business users can obtain governed analytics without knowing report names,
+    database fields, SQL, or Power BI.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -6552,23 +6677,32 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 110
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 110
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: askReportingQuestion
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: askReportingQuestion
   states:
     loading: The ask ticvai natural list.
     error: Could not load. Names which read failed and leaves the ask ticvai natural untouched.
-    emptyFirstRun: No ask ticvai natural yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No ask ticvai natural yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the ask ticvai natural are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -6588,6 +6722,10 @@ screens:
     page 110. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: conversationId
+      from: navigation
 - id: ANL-053
   name: AI-Generated Dashboard Studio
   module: Analytics
@@ -6633,14 +6771,24 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 111
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 111
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: createDashboard
+        label: Create dashboard
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createDashboard
   states:
     loading: The ai-generated list.
     error: Could not load. Names which read failed and leaves the ai-generated untouched.
@@ -6648,8 +6796,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the ai-generated are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createDashboard
     contract: reporting
@@ -6691,16 +6839,16 @@ screens:
       provenance: structural — pack board 9 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: AI-generated reports use the same approved semantic model, permissions, calculations and
-    governance rules as manually created reports.
+  purposeNote: AI-generated reports use the same approved semantic model, permissions, calculations
+    and governance rules as manually created reports.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Generate detailed reports from natural-language instructions.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 112 §Show
   layout:
     template: split
@@ -6745,8 +6893,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the report generator are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createReport
     contract: reporting
@@ -6804,8 +6952,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly
       Displays
   layout:
@@ -6855,12 +7003,12 @@ screens:
   states:
     loading: The anomaly detection list.
     error: Could not load. Names which read failed and leaves the anomaly detection untouched.
-    emptyFirstRun: No anomaly detection yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No anomaly detection yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the anomaly detection are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsAnomalies
     contract: reporting
@@ -6925,14 +7073,28 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114
   layout:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAnalyticsAnomalies
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: askReportingQuestion
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: askReportingQuestion
   states:
     loading: The root-cause analysis list.
     error: Could not load. Names which read failed and leaves the root-cause analysis untouched.
@@ -6940,8 +7102,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the root-cause analysis are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsAnomalies
     contract: reporting
@@ -7000,10 +7162,10 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts
       for
   - operation: null
-    why: '**Forecasting & Predictive Analytics Studio declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
+    why: '**Forecasting & Predictive Analytics Studio declares no operation that writes anything** —
+      its only declared call is `none`, a read. The name promises authoring and the contract offers
+      none, so either the write operations are missing or this screen is a view of something another
+      screen builds.'
     source: contract — the screen's declared operations
   layout:
     template: form
@@ -7070,10 +7232,10 @@ screens:
   states:
     loading: The forecasting predictive analytics configuration as saved.
     error: Could not load. Names which read failed and leaves the forecasting predictive analytics untouched.
-    emptyFirstRun: No forecasting predictive analytics configured yet. Carries the create action and says
-      what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No forecasting predictive analytics configured yet. Carries the create action and
+      says what the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getKpiValues
     contract: reporting
@@ -7114,8 +7276,8 @@ screens:
       provenance: structural — pack board 9 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Recommendations are prioritized, explainable and measurable rather than presented as generic
-    AI suggestions.
+  purposeNote: Recommendations are prioritized, explainable and measurable rather than presented as
+    generic AI suggestions.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -7129,8 +7291,8 @@ screens:
       it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117
   layout:
     template: split
@@ -7145,12 +7307,12 @@ screens:
   states:
     loading: The recommendation next-best-action list.
     error: Could not load. Names which read failed and leaves the recommendation next-best-action untouched.
-    emptyFirstRun: No recommendation next-best-action yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the recommendation next-best-action are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No recommendation next-best-action yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the recommendation next-best-action are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsAnomalies
     contract: reporting
@@ -7222,8 +7384,8 @@ screens:
     error: Could not load. Names which read failed and leaves the insight history evidence untouched.
     emptyFirstRun: No insight history evidence configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsAnomalies
     contract: reporting
@@ -7267,12 +7429,13 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Track) and no metric row
   purpose: Provide administrators with centralized control over how AI may access and use TICVAI analytics.
-    This screen is critical because Board 9 should not give an LLM unrestricted access to the TICVAI database.
+    This screen is critical because Board 9 should not give an LLM unrestricted access to the TICVAI
+    database.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
   layout:
     template: split
@@ -7336,10 +7499,10 @@ screens:
     error: Could not load. Names which read failed and leaves the analytics governance model untouched.
     emptyFirstRun: No analytics governance model yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the analytics governance model are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the analytics governance model are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis: []
   entryState:
     preloaded:
@@ -7429,8 +7592,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component
       shall show
   layout:
@@ -7504,8 +7667,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics administration are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getAnalyticsUsage
     contract: reporting
@@ -7552,15 +7715,15 @@ screens:
       back: true
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric
-    row
-  purpose: Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because
-    every dashboard must use the same definition of a metric.
+  patternReason: the pack gives this screen a display directory (§KPI Categories; KPI Status) and no
+    metric row
+  purpose: Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential
+    because every dashboard must use the same definition of a metric.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
   layout:
     template: split
@@ -7587,7 +7750,8 @@ screens:
         - Resources
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI
+          Categories
     - name: contextPanel
       slot: selection
       components:
@@ -7610,16 +7774,17 @@ screens:
         - Inventory
         - Resources
         notes: 'The pack groups this record''s detail under its own headings: “Formula”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI
+          Categories
   states:
     loading: The enterprise kpi list.
     error: Could not load. Names which read failed and leaves the enterprise kpi untouched.
     emptyFirstRun: No enterprise kpi yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the enterprise kpi are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the enterprise kpi are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listKpis
     contract: reporting
@@ -7719,10 +7884,10 @@ screens:
   states:
     loading: The kpi targets thresholds configuration as saved.
     error: Could not load. Names which read failed and leaves the kpi targets thresholds untouched.
-    emptyFirstRun: No kpi targets thresholds configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No kpi targets thresholds configured yet. Carries the create action and says what
+      the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setKpiTargets
     contract: reporting
@@ -7743,6 +7908,10 @@ screens:
     page 125. 0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: kpiId
+      from: navigation
 - id: ANL-064
   name: Benchmark & Comparative Analytics Configuration
   module: Analytics
@@ -7811,12 +7980,12 @@ screens:
   states:
     loading: The benchmark comparative analytics list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the benchmark comparative analytics untouched.
-    emptyFirstRun: No benchmark comparative analytics yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the benchmark comparative analytics are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No benchmark comparative analytics yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the benchmark comparative analytics are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getAnalyticsBenchmark
     contract: reporting
@@ -7865,16 +8034,16 @@ screens:
       provenance: structural — pack board 10 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Administrators can identify every source feeding BI and understand its current status and
-    ownership.
+  purposeNote: Administrators can identify every source feeding BI and understand its current status
+    and ownership.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Maintain a centralized catalogue of data sources feeding the analytics platform.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display
   layout:
     template: split
@@ -7920,12 +8089,12 @@ screens:
   states:
     loading: The data source integration list.
     error: Could not load. Names which read failed and leaves the data source integration untouched.
-    emptyFirstRun: No data source integration yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No data source integration yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the data source integration are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsPipelines
     contract: reporting
@@ -7974,17 +8143,17 @@ screens:
       provenance: structural — pack board 10 wiring, 9 September 2026
       back: true
   density: compact
-  purposeNote: Dashboards, reports and AI operate against a consistent governed business-data model rather
-    than independently querying raw tables.
+  purposeNote: Dashboards, reports and AI operate against a consistent governed business-data model
+    rather than independently querying raw tables.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Detect) and no metric row
-  purpose: Create the governed business layer between raw data and dashboards/AI. This is one of the most
-    important technical screens in Board 10.
+  purpose: Create the governed business layer between raw data and dashboards/AI. This is one of the
+    most important technical screens in Board 10.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect
   layout:
     template: split
@@ -8021,12 +8190,12 @@ screens:
   states:
     loading: The semantic model business list.
     error: Could not load. Names which read failed and leaves the semantic model business untouched.
-    emptyFirstRun: No semantic model business yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No semantic model business yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the semantic model business are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -8091,8 +8260,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor
   layout:
     template: dashboard
@@ -8102,25 +8271,32 @@ screens:
       components:
       - kind: metricTile
         label: Pipelines Running
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Successful Refreshes
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Failed Refreshes
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Average Refresh Duration
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Data Latency
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Stale Datasets
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
       - kind: metricTile
         label: Records Processed
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI
+          Cards
     - name: contentBody
       slot: moduleTiles
       components:
@@ -8159,10 +8335,10 @@ screens:
     error: Could not load. Names which read failed and leaves the data refresh pipeline untouched.
     emptyFirstRun: No data refresh pipeline yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the data refresh pipeline are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the data refresh pipeline are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAnalyticsPipelines
     contract: reporting
@@ -8248,8 +8424,8 @@ screens:
     error: Could not load. Names which read failed and leaves the embedded tenant administration untouched.
     emptyFirstRun: No embedded tenant administration configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listDashboards
     contract: reporting
@@ -8291,14 +8467,14 @@ screens:
       back: true
   density: compact
   pattern: commandCentre
-  patternReason: the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and
-    a per-row directory (§Identify) — counts over a population, then the population
+  patternReason: the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs)
+    and a per-row directory (§Identify) — counts over a population, then the population
   purpose: Monitor BI adoption, system performance, capacity consumption and analytical operating costs.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify
   layout:
     template: dashboard
@@ -8400,8 +8576,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics performance usage are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getAnalyticsUsage
     contract: reporting
@@ -8458,8 +8634,8 @@ screens:
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the
+      response shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
   layout:
     template: split
@@ -8514,18 +8690,18 @@ screens:
         - Model Errors
         - Low-Confidence Answers
         - User Feedback
-        notes: 'The pack groups this record''s detail under its own headings: “The desired structure is”,
-          “Unified Data Integration Layer”, “Analytics Data Platform”, “Instead”, “Board 10 Benchmarking”.'
+        notes: 'The pack groups this record''s detail under its own headings: “The desired structure
+          is”, “Unified Data Integration Layer”, “Analytics Data Platform”, “Instead”, “Board 10 Benchmarking”.'
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
   states:
     loading: The analytics governance security list.
     error: Could not load. Names which read failed and leaves the analytics governance security untouched.
-    emptyFirstRun: No analytics governance security yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No analytics governance security yet. Carries the create action; distinct from a
+      filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance security are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listSecurityDetectionGovernance
     contract: access

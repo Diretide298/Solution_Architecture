@@ -1,676 +1,75 @@
 [
  {
-  "id": "ADM-248",
-  "name": "Workflow Operations Command Center",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.1",
-   "page": 23
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/workflow-operations-command-center-adm-248",
-   "component": "apps/ticvai-web/src/routes/platform/WorkflowOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-002",
-    "ADM-249",
-    "ADM-250",
-    "ADM-251",
-    "ADM-252",
-    "ADM-253",
-    "ADM-254",
-    "ADM-255",
-    "ADM-256",
-    "ADM-257"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "tenantId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-249",
-     "trigger": "Works in Unified Approval Inbox & Decision Workspace",
-     "provenance": "flow F165 step 1→2",
-     "operation": "listWorkflow"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-250",
-     "trigger": "Works in Workflow Instance Monitor & Process Timeline",
-     "provenance": "flow F165 step 3→4",
-     "operation": "listWorkflow"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "ADM-251",
-     "trigger": "Works in Workflow Exception, Failure & Recovery Center",
-     "provenance": "flow F165 step 5→6",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-252",
-     "trigger": "Works in SLA, Escalation & Bottleneck Monitor",
-     "provenance": "flow F165 step 7→8",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-253",
-     "trigger": "Works in Automation Execution & Autonomous Action Monitor",
-     "provenance": "flow F165 step 9→10",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-254",
-     "trigger": "Works in Cross-Module Orchestration Monitor",
-     "provenance": "flow F165 step 11→12",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-255",
-     "trigger": "Works in Workflow Analytics & Process Performance",
-     "provenance": "flow F165 step 13→14",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-256",
-     "trigger": "Works in Process Optimization & Automation Opportunity Center",
-     "provenance": "flow F165 step 15→16",
-     "operation": "listWorkflow"
-    },
-    {
-     "to": "ADM-257",
-     "trigger": "Works in AI Workflow Intelligence & Autonomous Governance Center",
-     "provenance": "flow F165 step 17→18",
-     "operation": "listWorkflow"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide administrators and operational managers with a real-time view of all workflow activity across TICVAI.",
-  "purposeNote": "Authorized users can understand the real-time state and health of workflow execution across the entire TICVAI platform.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every workflow operations",
-       "columns": [
-        "WorkflowOperationsCommandCenterView.workflowsRunning",
-        "WorkflowOperationsCommandCenterView.startedToday",
-        "WorkflowOperationsCommandCenterView.completedToday",
-        "WorkflowOperationsCommandCenterView.pendingApprovals",
-        "WorkflowOperationsCommandCenterView.waitingTasks",
-        "WorkflowOperationsCommandCenterView.slaAtRisk",
-        "WorkflowOperationsCommandCenterView.slaBreached",
-        "WorkflowOperationsCommandCenterView.failedWorkflows",
-        "WorkflowOperationsCommandCenterView.escalated",
-        "WorkflowOperationsCommandCenterView.automatedExecutions",
-        "WorkflowOperationsCommandCenterView.averageCompletionTime",
-        "WorkflowOperationsCommandCenterView.automationSuccessRate",
-        "WorkflowOperationsCommandCenterView.workflowInstanceId",
-        "WorkflowOperationsCommandCenterView.workflow",
-        "WorkflowOperationsCommandCenterView.module",
-        "WorkflowOperationsCommandCenterView.businessObject",
-        "WorkflowOperationsCommandCenterView.initiatedBy",
-        "WorkflowOperationsCommandCenterView.started",
-        "WorkflowOperationsCommandCenterView.currentStep",
-        "WorkflowOperationsCommandCenterView.owner",
-        "WorkflowOperationsCommandCenterView.priority",
-        "WorkflowOperationsCommandCenterView.sla",
-        "WorkflowOperationsCommandCenterView.status"
-       ],
-       "bindsTo": "WorkflowOperationsCommandCenterView",
-       "operation": "listWorkflow",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 23 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected workflow operations",
-       "bindsTo": "WorkflowOperationsCommandCenterView",
-       "columns": [
-        "WorkflowOperationsCommandCenterView.workflowsRunning",
-        "WorkflowOperationsCommandCenterView.startedToday",
-        "WorkflowOperationsCommandCenterView.completedToday",
-        "WorkflowOperationsCommandCenterView.pendingApprovals",
-        "WorkflowOperationsCommandCenterView.waitingTasks",
-        "WorkflowOperationsCommandCenterView.slaAtRisk",
-        "WorkflowOperationsCommandCenterView.slaBreached",
-        "WorkflowOperationsCommandCenterView.failedWorkflows",
-        "WorkflowOperationsCommandCenterView.escalated",
-        "WorkflowOperationsCommandCenterView.automatedExecutions",
-        "WorkflowOperationsCommandCenterView.averageCompletionTime",
-        "WorkflowOperationsCommandCenterView.automationSuccessRate",
-        "WorkflowOperationsCommandCenterView.workflowInstanceId",
-        "WorkflowOperationsCommandCenterView.workflow",
-        "WorkflowOperationsCommandCenterView.module",
-        "WorkflowOperationsCommandCenterView.businessObject",
-        "WorkflowOperationsCommandCenterView.initiatedBy",
-        "WorkflowOperationsCommandCenterView.started",
-        "WorkflowOperationsCommandCenterView.currentStep",
-        "WorkflowOperationsCommandCenterView.owner",
-        "WorkflowOperationsCommandCenterView.priority",
-        "WorkflowOperationsCommandCenterView.sla",
-        "WorkflowOperationsCommandCenterView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Show activity originating from”, “Use”, “Refund Approval Workflow”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 23 §Display"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The workflow operations list.",
-   "error": "Could not load. Names which read failed and leaves the workflow operations untouched.",
-   "emptyFirstRun": "No workflow operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workflow operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listWorkflow",
-    "contract": "approvals",
-    "purpose": "Workflow Operations Command Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "WorkflowOperationsCommandCenterView.workflowsRunning",
-    "WorkflowOperationsCommandCenterView.startedToday",
-    "WorkflowOperationsCommandCenterView.completedToday",
-    "WorkflowOperationsCommandCenterView.pendingApprovals",
-    "WorkflowOperationsCommandCenterView.waitingTasks",
-    "WorkflowOperationsCommandCenterView.slaAtRisk"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-248"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 23. 23 of 23 labels bound to a contract property; 23 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-249",
-  "name": "Unified Approval Inbox & Decision Workspace",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.2",
-   "page": 25
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/unified-approval-inbox-decision-workspace-adm-249",
-   "component": "apps/ticvai-web/src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-248"
-   ],
-   "exitTo": [
-    "ADM-248"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 2→3",
-     "operation": "approveUnifiedDecision"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service for another.",
-  "purposeNote": "Authorized approvers can review and action approval requests from all TICVAI modules through one governed inbox.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every unified approval decision",
-       "columns": [
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-        "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-        "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
-        "UnifiedApprovalInboxDecisionWorkspaceView.priority",
-        "UnifiedApprovalInboxDecisionWorkspaceView.submitted",
-        "UnifiedApprovalInboxDecisionWorkspaceView.slaRemaining",
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalLevel",
-        "UnifiedApprovalInboxDecisionWorkspaceView.status"
-       ],
-       "bindsTo": "UnifiedApprovalInboxDecisionWorkspaceView",
-       "operation": "approveUnifiedDecision",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 25 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected unified approval decision",
-       "bindsTo": "UnifiedApprovalInboxDecisionWorkspaceView",
-       "columns": [
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-        "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-        "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
-        "UnifiedApprovalInboxDecisionWorkspaceView.priority",
-        "UnifiedApprovalInboxDecisionWorkspaceView.submitted",
-        "UnifiedApprovalInboxDecisionWorkspaceView.slaRemaining",
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalLevel",
-        "UnifiedApprovalInboxDecisionWorkspaceView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Pricing”, “Customer Service”, “Procurement”, “Resource Management”, “Request”, “Context”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 25 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Approve",
-       "provenance": "contract operation approveUnifiedDecision"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The unified approval decision list.",
-   "error": "Could not load. Names which read failed and leaves the unified approval decision untouched.",
-   "emptyFirstRun": "No unified approval decision yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the unified approval decision are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "approveUnifiedDecision",
-    "contract": "approvals",
-    "purpose": "Unified Approval Inbox & Decision Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveUnifiedDecision"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-    "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-    "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-    "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-    "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
-    "UnifiedApprovalInboxDecisionWorkspaceView.priority"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-249"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 25. 10 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-250",
-  "name": "Workflow Instance Monitor & Process Timeline",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.3",
-   "page": 27
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/workflow-instance-monitor-process-timeline-adm-250",
-   "component": "apps/ticvai-web/src/routes/platform/WorkflowInstanceMonitorProcessTimeline.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-248"
-   ],
-   "exitTo": [
-    "ADM-248"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 4→5",
-     "operation": "listWorkflowInstanceProcess"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§For each step show) — counts over a population, then the population",
-  "purpose": "Allow administrators to inspect exactly what is happening inside an individual running workflow.",
-  "purposeNote": "Administrators can reconstruct exactly how a workflow reached its current state and why every major decision or action occurred.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Workflow Instance",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.workflowInstance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workflow Name",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.workflowName"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Version",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.version"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Source Module",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.sourceModule"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Business Object",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.businessObject"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Initiated By",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.initiatedBy"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Start Time",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.startTime"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Current Status",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.currentStatus"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Current Step",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.currentStep"
-      },
-      {
-       "kind": "metricTile",
-       "label": "SLA",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Display",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView.sla"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every workflow instance process",
-       "columns": [
-        "WorkflowInstanceMonitorProcessTimelineView.step",
-        "WorkflowInstanceMonitorProcessTimelineView.type",
-        "WorkflowInstanceMonitorProcessTimelineView.started",
-        "WorkflowInstanceMonitorProcessTimelineView.completed",
-        "WorkflowInstanceMonitorProcessTimelineView.assignedTo",
-        "WorkflowInstanceMonitorProcessTimelineView.input",
-        "WorkflowInstanceMonitorProcessTimelineView.output",
-        "WorkflowInstanceMonitorProcessTimelineView.decision",
-        "WorkflowInstanceMonitorProcessTimelineView.duration",
-        "WorkflowInstanceMonitorProcessTimelineView.status"
-       ],
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView",
-       "operation": "listWorkflowInstanceProcess",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §For each step show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected workflow instance process",
-       "bindsTo": "WorkflowInstanceMonitorProcessTimelineView",
-       "columns": [
-        "WorkflowInstanceMonitorProcessTimelineView.step",
-        "WorkflowInstanceMonitorProcessTimelineView.type",
-        "WorkflowInstanceMonitorProcessTimelineView.started",
-        "WorkflowInstanceMonitorProcessTimelineView.completed",
-        "WorkflowInstanceMonitorProcessTimelineView.assignedTo",
-        "WorkflowInstanceMonitorProcessTimelineView.input",
-        "WorkflowInstanceMonitorProcessTimelineView.output",
-        "WorkflowInstanceMonitorProcessTimelineView.decision",
-        "WorkflowInstanceMonitorProcessTimelineView.duration",
-        "WorkflowInstanceMonitorProcessTimelineView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Execute Refund”, “Notify Customer”, “Show all”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §For each step show"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Reassign, Retry Step, Skip Step where explicitly allowed, Cancel Workflow, Resume, Escalate, Open Source Record. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Subject to permissions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The workflow instance process list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the workflow instance process untouched.",
-   "emptyFirstRun": "No workflow instance process yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workflow instance process are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listWorkflowInstanceProcess",
-    "contract": "approvals",
-    "purpose": "Workflow Instance Monitor & Process Timeline",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-250"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 27. 20 of 20 labels bound to a contract property; 27 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-251",
-  "name": "Workflow Exception, Failure & Recovery Center",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.4",
-   "page": 28
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/workflow-exception-failure-recovery-center-adm-251",
-   "component": "apps/ticvai-web/src/routes/platform/WorkflowExceptionFailureRecoveryCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-248"
-   ],
-   "exitTo": [
-    "ADM-248"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 6→7",
-     "operation": "listWorkflowExceptionFailure"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide one controlled workspace for failed workflow executions.",
-  "purposeNote": "Failed workflows can be identified, investigated, recovered or safely compensated without losing business context or audit history.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Business Rule Failure, Duplicate Event, Configuration Error, Retry, Retry From Step, Resume, Cancel, Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -682,23 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every workflow exception failure",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "WorkflowExceptionFailureRecoveryCenterView.exceptionId",
-        "WorkflowExceptionFailureRecoveryCenterView.workflow",
-        "WorkflowExceptionFailureRecoveryCenterView.instance",
-        "WorkflowExceptionFailureRecoveryCenterView.module",
-        "WorkflowExceptionFailureRecoveryCenterView.failedStep",
-        "WorkflowExceptionFailureRecoveryCenterView.errorType",
-        "WorkflowExceptionFailureRecoveryCenterView.time",
-        "Retry Count",
-        "WorkflowExceptionFailureRecoveryCenterView.businessImpact",
-        "WorkflowExceptionFailureRecoveryCenterView.priority",
-        "WorkflowExceptionFailureRecoveryCenterView.owner"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "WorkflowExceptionFailureRecoveryCenterView",
-       "operation": "listWorkflowExceptionFailure",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Display"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -708,23 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected workflow exception failure",
-       "bindsTo": "WorkflowExceptionFailureRecoveryCenterView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "WorkflowExceptionFailureRecoveryCenterView.exceptionId",
-        "WorkflowExceptionFailureRecoveryCenterView.workflow",
-        "WorkflowExceptionFailureRecoveryCenterView.instance",
-        "WorkflowExceptionFailureRecoveryCenterView.module",
-        "WorkflowExceptionFailureRecoveryCenterView.failedStep",
-        "WorkflowExceptionFailureRecoveryCenterView.errorType",
-        "WorkflowExceptionFailureRecoveryCenterView.time",
-        "Retry Count",
-        "WorkflowExceptionFailureRecoveryCenterView.businessImpact",
-        "WorkflowExceptionFailureRecoveryCenterView.priority",
-        "WorkflowExceptionFailureRecoveryCenterView.owner"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Dead-Letter Handling”, “Compensation Actions”, “Possible compensation”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Display"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -734,43 +128,99 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Business Rule Failure",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Duplicate Event",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Configuration Error",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
       },
       {
        "kind": "secondaryButton",
-       "label": "Retry",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
       },
       {
        "kind": "secondaryButton",
-       "label": "Retry From Step",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
@@ -778,109 +228,313 @@
   },
   "overlays": [
    {
-    "id": "confirmCancel",
+    "id": "confirmRemoveMfaMethod",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Cancel on a workflow exception failure is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
    }
   ],
   "states": {
-   "loading": "The workflow exception failure list.",
-   "error": "Could not load. Names which read failed and leaves the workflow exception failure untouched.",
-   "emptyFirstRun": "No workflow exception failure yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workflow exception failure are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listWorkflowExceptionFailure",
-    "contract": "approvals",
-    "purpose": "Workflow Exception, Failure & Recovery Center",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "WorkflowExceptionFailureRecoveryCenterView.exceptionId",
-    "WorkflowExceptionFailureRecoveryCenterView.workflow",
-    "WorkflowExceptionFailureRecoveryCenterView.instance",
-    "WorkflowExceptionFailureRecoveryCenterView.module",
-    "WorkflowExceptionFailureRecoveryCenterView.failedStep",
-    "WorkflowExceptionFailureRecoveryCenterView.errorType"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-251"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 28. 10 of 11 labels bound to a contract property; 19 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-252",
-  "name": "SLA, Escalation & Bottleneck Monitor",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.5",
-   "page": 30
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/sla-escalation-bottleneck-monitor-adm-252",
-   "component": "apps/ticvai-web/src/routes/platform/SlaEscalationBottleneckMonitor.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-248"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-248"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 8→9",
-     "operation": "listSlaEscalationBottleneck"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
-  "purpose": "Monitor workflows approaching or exceeding configured time limits.",
-  "purposeNote": "Management can identify and resolve workflow bottlenecks before they materially impact business operations.",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -890,33 +544,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every sla escalation bottleneck",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "SlaEscalationBottleneckMonitorView.withinSla",
-        "SlaEscalationBottleneckMonitorView.atRisk",
-        "SlaEscalationBottleneckMonitorView.breached",
-        "SlaEscalationBottleneckMonitorView.escalated",
-        "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-        "SlaEscalationBottleneckMonitorView.averageApprovalTime",
-        "SlaEscalationBottleneckMonitorView.longestWaitingStep",
-        "SlaEscalationBottleneckMonitorView.workflow",
-        "SlaEscalationBottleneckMonitorView.instance",
-        "SlaEscalationBottleneckMonitorView.currentStep",
-        "SlaEscalationBottleneckMonitorView.owner",
-        "SlaEscalationBottleneckMonitorView.started",
-        "SlaEscalationBottleneckMonitorView.target",
-        "SlaEscalationBottleneckMonitorView.timeRemaining",
-        "SlaEscalationBottleneckMonitorView.risk",
-        "SlaEscalationBottleneckMonitorView.escalationLevel",
-        "SlaEscalationBottleneckMonitorView.firstReminder",
-        "SlaEscalationBottleneckMonitorView.secondReminder",
-        "SlaEscalationBottleneckMonitorView.managerEscalation",
-        "SlaEscalationBottleneckMonitorView.executiveEscalation",
-        "SlaEscalationBottleneckMonitorView.finalOutcome"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "SlaEscalationBottleneckMonitorView",
-       "operation": "listSlaEscalationBottleneck",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 30 §Display"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -926,210 +571,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sla escalation bottleneck",
-       "bindsTo": "SlaEscalationBottleneckMonitorView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "SlaEscalationBottleneckMonitorView.withinSla",
-        "SlaEscalationBottleneckMonitorView.atRisk",
-        "SlaEscalationBottleneckMonitorView.breached",
-        "SlaEscalationBottleneckMonitorView.escalated",
-        "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-        "SlaEscalationBottleneckMonitorView.averageApprovalTime",
-        "SlaEscalationBottleneckMonitorView.longestWaitingStep",
-        "SlaEscalationBottleneckMonitorView.workflow",
-        "SlaEscalationBottleneckMonitorView.instance",
-        "SlaEscalationBottleneckMonitorView.currentStep",
-        "SlaEscalationBottleneckMonitorView.owner",
-        "SlaEscalationBottleneckMonitorView.started",
-        "SlaEscalationBottleneckMonitorView.target",
-        "SlaEscalationBottleneckMonitorView.timeRemaining",
-        "SlaEscalationBottleneckMonitorView.risk",
-        "SlaEscalationBottleneckMonitorView.escalationLevel",
-        "SlaEscalationBottleneckMonitorView.firstReminder",
-        "SlaEscalationBottleneckMonitorView.secondReminder",
-        "SlaEscalationBottleneckMonitorView.managerEscalation",
-        "SlaEscalationBottleneckMonitorView.executiveEscalation",
-        "SlaEscalationBottleneckMonitorView.finalOutcome"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Purchase Order Approval”, “Breakdown”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 30 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Reassign, Escalate, Extend SLA, Add Backup Approver, Change Priority. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 30 §Authorized users can"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The sla escalation bottleneck list.",
-   "error": "Could not load. Names which read failed and leaves the sla escalation bottleneck untouched.",
-   "emptyFirstRun": "No sla escalation bottleneck yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the sla escalation bottleneck are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSlaEscalationBottleneck",
-    "contract": "approvals",
-    "purpose": "SLA, Escalation & Bottleneck Monitor",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "SlaEscalationBottleneckMonitorView.withinSla",
-    "SlaEscalationBottleneckMonitorView.atRisk",
-    "SlaEscalationBottleneckMonitorView.breached",
-    "SlaEscalationBottleneckMonitorView.escalated",
-    "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-    "SlaEscalationBottleneckMonitorView.averageApprovalTime"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-252"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 30. 21 of 21 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-253",
-  "name": "Automation Execution & Autonomous Action Monitor",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.6",
-   "page": 31
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/automation-execution-autonomous-action-monitor-adm-253",
-   "component": "apps/ticvai-web/src/routes/platform/AutomationExecutionAutonomousActionMonitor.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-248"
-   ],
-   "exitTo": [
-    "ADM-248"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 10→11",
-     "operation": "createAutomationAutonomouAction"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide visibility and governance over actions executed automatically by TICVAI. This becomes especially important as TICVAI becomes more AI-driven.",
-  "purposeNote": "immediate suspension where required.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every automation execution autonomous",
-       "columns": [
-        "AutomationExecutionAutonomousActionMonitorView.automatedActionsToday",
-        "AutomationExecutionAutonomousActionMonitorView.successful",
-        "AutomationExecutionAutonomousActionMonitorView.failed",
-        "AutomationExecutionAutonomousActionMonitorView.humanConfirmationRequired",
-        "AutomationExecutionAutonomousActionMonitorView.reversed",
-        "AutomationExecutionAutonomousActionMonitorView.suspended",
-        "AutomationExecutionAutonomousActionMonitorView.estimatedManualActionsAvoided",
-        "AutomationExecutionAutonomousActionMonitorView.estimatedTimeSaved",
-        "AutomationExecutionAutonomousActionMonitorView.automation",
-        "Trigger",
-        "AutomationExecutionAutonomousActionMonitorView.businessObject",
-        "AutomationExecutionAutonomousActionMonitorView.rule",
-        "AutomationExecutionAutonomousActionMonitorView.action",
-        "AutomationExecutionAutonomousActionMonitorView.result",
-        "AutomationExecutionAutonomousActionMonitorView.confidenceWhereAiAssisted",
-        "AutomationExecutionAutonomousActionMonitorView.executionTime",
-        "AutomationExecutionAutonomousActionMonitorView.status"
-       ],
-       "bindsTo": "AutomationExecutionAutonomousActionMonitorView",
-       "operation": "createAutomationAutonomouAction",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 31 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected automation execution autonomous",
-       "bindsTo": "AutomationExecutionAutonomousActionMonitorView",
-       "columns": [
-        "AutomationExecutionAutonomousActionMonitorView.automatedActionsToday",
-        "AutomationExecutionAutonomousActionMonitorView.successful",
-        "AutomationExecutionAutonomousActionMonitorView.failed",
-        "AutomationExecutionAutonomousActionMonitorView.humanConfirmationRequired",
-        "AutomationExecutionAutonomousActionMonitorView.reversed",
-        "AutomationExecutionAutonomousActionMonitorView.suspended",
-        "AutomationExecutionAutonomousActionMonitorView.estimatedManualActionsAvoided",
-        "AutomationExecutionAutonomousActionMonitorView.estimatedTimeSaved",
-        "AutomationExecutionAutonomousActionMonitorView.automation",
-        "Trigger",
-        "AutomationExecutionAutonomousActionMonitorView.businessObject",
-        "AutomationExecutionAutonomousActionMonitorView.rule",
-        "AutomationExecutionAutonomousActionMonitorView.action",
-        "AutomationExecutionAutonomousActionMonitorView.result",
-        "AutomationExecutionAutonomousActionMonitorView.confidenceWhereAiAssisted",
-        "AutomationExecutionAutonomousActionMonitorView.executionTime",
-        "AutomationExecutionAutonomousActionMonitorView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Waiver Reminder Automation”, “Authorized administrators can”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 31 §Display"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
@@ -1139,122 +588,262 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "provenance": "contract operation createAutomationAutonomouAction"
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "The automation execution autonomous list.",
-   "error": "Could not load. Names which read failed and leaves the automation execution autonomous untouched.",
-   "emptyFirstRun": "No automation execution autonomous yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the automation execution autonomous are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "createAutomationAutonomouAction",
-    "contract": "approvals",
-    "purpose": "Automation Execution & Autonomous Action Monitor",
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
     "trigger": "onAction",
     "invalidates": [
-     "createAutomationAutonomouAction"
+     "listGuestDevices"
     ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "AutomationExecutionAutonomousActionMonitorView.automatedActionsToday",
-    "AutomationExecutionAutonomousActionMonitorView.successful",
-    "AutomationExecutionAutonomousActionMonitorView.failed",
-    "AutomationExecutionAutonomousActionMonitorView.humanConfirmationRequired",
-    "AutomationExecutionAutonomousActionMonitorView.reversed",
-    "AutomationExecutionAutonomousActionMonitorView.suspended"
+    "Wishlist.subjectId",
+    "Wishlist.items"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-253"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 31. 16 of 17 labels bound to a contract property; 17 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-254",
-  "name": "Cross-Module Orchestration Monitor",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.7",
-   "page": 33
-  },
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/cross-module-orchestration-monitor-adm-254",
-   "component": "apps/ticvai-web/src/routes/platform/CrossModuleOrchestrationMonitor.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-248"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-248"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 12→13",
-     "operation": "listCrossModuleOrchestration"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Monitor complex workflows involving multiple TICVAI services. Example — Group Booking Confirmation",
-  "purposeNote": "Complex cross-module business processes can be monitored as one business workflow rather than requiring administrators to inspect individual microservices independently.",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 33"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 33"
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -1262,328 +851,276 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
      "components": [
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listCrossModuleOrchestration",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The cross-module orchestration list.",
-   "error": "Could not load. Names which read failed and leaves the cross-module orchestration untouched.",
-   "emptyFirstRun": "No cross-module orchestration yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cross-module orchestration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
-    "operationId": "listCrossModuleOrchestration",
-    "contract": "approvals",
-    "purpose": "Cross-Module Orchestration Monitor",
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CrossModuleOrchestrationMonitorView.bookingConfirmed",
-    "CrossModuleOrchestrationMonitorView.reserve420Tickets",
-    "CrossModuleOrchestrationMonitorView.reserve4Guides",
-    "CrossModuleOrchestrationMonitorView.reserve420Meals",
-    "CrossModuleOrchestrationMonitorView.service"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-254"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-255",
-  "name": "Workflow Analytics & Process Performance",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.8",
-   "page": 34
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/workflow-analytics-process-performance-adm-255",
-   "component": "apps/ticvai-web/src/routes/platform/WorkflowAnalyticsProcessPerformance.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-248"
-   ],
-   "exitTo": [
-    "ADM-248"
-   ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
+   "params": [
     {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 14→15",
-     "operation": "listWorkflowProcessPerformance"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Analyze; Measure; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Measure how effectively TICVAI's business workflows are performing.",
-  "purposeNote": "Management can quantitatively evaluate whether workflows and automation are improving operational efficiency.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search workflow analytics process",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze By"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Workflow",
-        "Module",
-        "Venue",
-        "Brand",
-        "Business Process",
-        "Department",
-        "Approver",
-        "User",
-        "Date",
-        "Transaction Value"
-       ],
-       "notes": "The pack filters this screen by workflow, module, venue, brand, business process, department and 4 more — which are present is a decision the pack already made.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze By"
-      }
-     ]
+     "name": "entitlementId",
+     "from": "deepLink"
     },
     {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Workflow Volume",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.workflowVolume"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Completion Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.completionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failure Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.failureRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Completion Time",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.averageCompletionTime"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Approval Time",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.approvalTime"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Automation Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.automationRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Escalation Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.escalationRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Rejection Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.rejectionRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Rework Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.reworkRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "SLA Compliance",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Analyze",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.slaCompliance"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Approval Time",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Measure",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.averageApprovalTime"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Approval Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Measure",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.approvalRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Request Changes Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Measure",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.requestChangesRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Delegation Rate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Measure",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.delegationRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workflow v1.4 vs v1.5",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Compare",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.workflowV14VsV15"
-      }
-     ]
+     "name": "orderId",
+     "from": "deepLink"
     }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
    ]
   },
-  "states": {
-   "loading": "The workflow analytics process list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the workflow analytics process untouched.",
-   "emptyFirstRun": "No workflow analytics process yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workflow analytics process are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listWorkflowProcessPerformance",
-    "contract": "approvals",
-    "purpose": "Workflow Analytics & Process Performance",
-    "trigger": "onLoad"
-   }
-  ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-255"
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 34. 15 of 25 labels bound to a contract property; 25 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-256",
-  "name": "Process Optimization & Automation Opportunity Center",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.9",
-   "page": 36
-  },
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/process-optimization-automation-opportunity-center-adm-256",
-   "component": "apps/ticvai-web/src/routes/platform/ProcessOptimizationAutomationOpportunityCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-248"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-248"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 16→17",
-     "operation": "listProcessAutomationOpportunity"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Identify; Display) and no metric row",
-  "purpose": "Identify business processes that should be simplified, redesigned or automated. This is where TICVAI moves beyond simply running workflows.",
-  "purposeNote": "operational evidence rather than assumptions.",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1593,30 +1130,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every process optimization automation",
+       "label": "Every order history",
+       "bindsTo": "Order",
        "columns": [
-        "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-        "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-        "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
-        "Duplicate Steps",
-        "ProcessOptimizationAutomationOpportunityCenterView.highFailureRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.lowRiskManualAction",
-        "ProcessOptimizationAutomationOpportunityCenterView.processBottleneck",
-        "ProcessOptimizationAutomationOpportunityCenterView.process",
-        "ProcessOptimizationAutomationOpportunityCenterView.module",
-        "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
-        "ProcessOptimizationAutomationOpportunityCenterView.currentSteps",
-        "ProcessOptimizationAutomationOpportunityCenterView.averageDuration",
-        "ProcessOptimizationAutomationOpportunityCenterView.manualSteps",
-        "ProcessOptimizationAutomationOpportunityCenterView.approvalRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.estimatedOpportunity"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
        ],
-       "bindsTo": "ProcessOptimizationAutomationOpportunityCenterView",
-       "operation": "listProcessAutomationOpportunity",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 36 §Identify"
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
       }
      ]
     },
@@ -1626,123 +1157,203 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected process optimization automation",
-       "bindsTo": "ProcessOptimizationAutomationOpportunityCenterView",
+       "label": "The selected order history",
+       "bindsTo": "Order",
        "columns": [
-        "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-        "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-        "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
-        "Duplicate Steps",
-        "ProcessOptimizationAutomationOpportunityCenterView.highFailureRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.lowRiskManualAction",
-        "ProcessOptimizationAutomationOpportunityCenterView.processBottleneck",
-        "ProcessOptimizationAutomationOpportunityCenterView.process",
-        "ProcessOptimizationAutomationOpportunityCenterView.module",
-        "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
-        "ProcessOptimizationAutomationOpportunityCenterView.currentSteps",
-        "ProcessOptimizationAutomationOpportunityCenterView.averageDuration",
-        "ProcessOptimizationAutomationOpportunityCenterView.manualSteps",
-        "ProcessOptimizationAutomationOpportunityCenterView.approvalRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.estimatedOpportunity"
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Low-Value Refund Approval”, “Before changing anything”, “Estimated result”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 36 §Identify"
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The process optimization automation list.",
-   "error": "Could not load. Names which read failed and leaves the process optimization automation untouched.",
-   "emptyFirstRun": "No process optimization automation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the process optimization automation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listProcessAutomationOpportunity",
-    "contract": "approvals",
-    "purpose": "Process Optimization & Automation Opportunity Center",
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-    "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-    "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-    "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-    "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
-    "Duplicate Steps"
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-256"
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 36. 17 of 18 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "ADM-257",
-  "name": "AI Workflow Intelligence & Autonomous Governance Center",
-  "module": "Platform",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
-   "board": "2",
-   "number": "13.2.10",
-   "page": 37
-  },
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/platform/ai-workflow-intelligence-autonomous-governance-center-adm-257",
-   "component": "apps/ticvai-web/src/routes/platform/AiWorkflowIntelligenceAutonomousGovernanceCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-248"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "ADM-248"
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
    ],
-   "inferred": false,
-   "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
   },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
-  "purpose": "Create the AI intelligence layer across TICVAI's entire rules, workflow and automation ecosystem. This is the management-level AI brain for Area 13.",
-  "purposeNote": "explainability, human governance, version control and immediate operational control. Board 2 — Final Screen Register",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1752,23 +1363,19 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every workflow intelligence autonomous",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
        "columns": [
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.automation",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.processPerformance",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approverBehavior",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.moduleActivity",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.businessOutcomes"
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
        ],
-       "bindsTo": "AiWorkflowIntelligenceAutonomousGovernanceCenterView",
-       "operation": "listWorkflowAutonomouGovernance",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 37 §Analyze"
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
       }
      ]
     },
@@ -1778,79 +1385,189 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected workflow intelligence autonomous",
-       "bindsTo": "AiWorkflowIntelligenceAutonomousGovernanceCenterView",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
        "columns": [
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.automation",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.processPerformance",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approverBehavior",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.moduleActivity",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.businessOutcomes"
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Natural-Language Questions”, “Actual common process”, “Automation”, “Approval Simplification”, “SLA”, “Workflow Redesign”.",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 37 §Analyze"
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The workflow intelligence autonomous list.",
-   "error": "Could not load. Names which read failed and leaves the workflow intelligence autonomous untouched.",
-   "emptyFirstRun": "No workflow intelligence autonomous yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the workflow intelligence autonomous are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listWorkflowAutonomouGovernance",
-    "contract": "approvals",
-    "purpose": "AI Workflow Intelligence & Autonomous Governance Center",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-257"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 37. 11 of 11 labels bound to a contract property; 12 of 108 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

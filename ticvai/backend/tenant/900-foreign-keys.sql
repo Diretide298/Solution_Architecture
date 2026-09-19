@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 545 of 589 declared references. The ones that reach the
+-- 547 of 591 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -136,6 +136,8 @@ ALTER TABLE games.redemption ADD CONSTRAINT fk_redemption_issued_by_principal_id
 ALTER TABLE games.redemption ADD CONSTRAINT fk_redemption_venue_id FOREIGN KEY (venue_id) REFERENCES platform.org_unit(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT fk_redemption_line_prize_id FOREIGN KEY (prize_id) REFERENCES games.prize(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT fk_redemption_line_redemption_id FOREIGN KEY (redemption_id) REFERENCES games.redemption(id);
+ALTER TABLE identity.access_policy_version ADD CONSTRAINT fk_access_policy_version_current FOREIGN KEY (current) REFERENCES identity.access_policy(id);
+ALTER TABLE identity.access_policy_version ADD CONSTRAINT fk_access_policy_version_previous FOREIGN KEY (previous) REFERENCES identity.access_policy(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT fk_authz_audit_actor_principal_id FOREIGN KEY (actor_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT fk_authz_audit_subject_principal_id FOREIGN KEY (subject_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_created_by_principal_id FOREIGN KEY (created_by_principal_id) REFERENCES identity.principal(id);

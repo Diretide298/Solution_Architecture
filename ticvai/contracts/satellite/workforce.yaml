@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 13
+  x-ticvai-screen-count: 23
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -73,6 +73,8 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+        - "P08 BO-883 Workforce Roster Command Center"
       x-ticvai-audience: [staff]
       summary: The rota
       description: >
@@ -115,6 +117,9 @@ paths:
         - "P04 POS-009 Staff Roster"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+        - "P08 BO-917 Event Staff & Personnel Allocation"
       x-ticvai-audience: [staff]
       summary: Put someone on the rota
       description: >
@@ -250,6 +255,7 @@ paths:
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-939 Shift Change, Swap, Pickup & Release"
       x-ticvai-audience: [staff]
       summary: Ask someone to take your shift
       description: >
@@ -290,6 +296,7 @@ paths:
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
+        - "P08 BO-888 Attendance & Live Workforce Command Center"
       x-ticvai-audience: [staff]
       summary: Who was here
       description: >
@@ -329,6 +336,8 @@ paths:
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
+        - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
+        - "P08 BO-936 Mobile Staff Check-In & Check-Out"
       x-ticvai-audience: [staff]
       summary: Clock in, clock out, or take a break
       description: >
@@ -391,6 +400,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-024 Clock in / out"
         - "P08 BO-056 Time & Attendance"
+        - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
       x-ticvai-audience: [staff]
       summary: A supervisor corrects a record
       description: >
@@ -431,6 +441,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+        - "P08 BO-941 Operational Notifications & Live Alerts"
         - "P09 ADM-036 Platform Notification Broadcast"
       x-ticvai-audience: [staff]
       summary: What staff have been told
@@ -591,6 +602,7 @@ paths:
       operationId: listShiftSwapRequests
       x-ticvai-consumed-by:
         - "P06 EMP-023 Swap request"
+        - "P08 BO-939 Shift Change, Swap, Pickup & Release"
       x-ticvai-audience:
       - staff
       summary: Swap requests and their state
@@ -616,6 +628,8 @@ paths:
   /shift-templates:
     get:
       operationId: listShiftTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
       summary: Named shift patterns a rota is built from
       description: 'Resource board 3.7. **`createRotaAssignment` placed one person in one slot and
         nothing described the slot.** A rota built assignment by assignment is a rota typed out every
@@ -641,6 +655,9 @@ paths:
                   $ref: '#/components/schemas/ShiftTemplate'
     put:
       operationId: setShiftTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-879 Shift Template & Assignment Configuration"
       summary: Define a shift pattern, its breaks and its qualifications
       tags:
       - workforce
@@ -666,6 +683,9 @@ paths:
   /staffing-rules:
     put:
       operationId: setStaffingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-881 Overtime & Working-Hour Rules"
+        - "P08 BO-885 Minimum Staffing & Coverage Rule Configuration"
       summary: Minimum cover, working-hour limits and overtime
       description: 'Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a
         cost rule.** A ride that requires two operators cannot run with one, and a rota that allows it
@@ -699,6 +719,11 @@ paths:
   /staffing-coverage:
     get:
       operationId: getStaffingCoverage
+      x-ticvai-consumed-by:
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-883 Workforce Roster Command Center"
+        - "P08 BO-886 Staffing Gap & Coverage Control Center"
+        - "P08 BO-892 AI Workforce Planner & Roster Optimization"
       summary: Where the rota is short, and by how much
       description: 'Resource board 4.4. **The gap is the product.** A rota screen showing who is on
         shows nothing a manager cannot see; a screen showing that the north gate is one short at
@@ -745,6 +770,8 @@ paths:
   /leave-requests:
     get:
       operationId: listLeaveRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: Leave, absence and their effect on cover
       tags:
       - workforce
@@ -769,6 +796,8 @@ paths:
                   $ref: '#/components/schemas/LeaveRequest'
     post:
       operationId: requestLeave
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: Ask for time off, against the cover it would cost
       description: 'Resource board 3.8. **Approving leave without seeing the resulting gap is how a
         venue discovers in July that four supervisors booked the same week.**
@@ -801,6 +830,8 @@ paths:
   /labour-cost:
     get:
       operationId: getLabourCost
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
       summary: Rostered and actual labour cost against budget
       description: 'Resource board 4.9. **Rostered cost and actual cost diverge every single day**, and
         the difference is overtime, no-shows and cover. A venue that only sees one of them cannot
@@ -852,6 +883,9 @@ paths:
   /workforce-compliance:
     get:
       operationId: validateWorkforceCompliance
+      x-ticvai-consumed-by:
+        - "P08 BO-876 Certification & Expiry Management"
+        - "P08 BO-890 Workforce Compliance Validation Center"
       summary: Where the rota breaks a rule
       description: 'Resource board 4.8. **Expired qualifications, exceeded hours, missed breaks,
         under-age rostering and minimum-rest breaches** — checked against the rota before it is
@@ -891,6 +925,8 @@ paths:
   /shift-marketplace:
     get:
       operationId: listOpenShifts
+      x-ticvai-consumed-by:
+        - "P08 BO-887 Shift Marketplace & Workforce Requests"
       summary: Shifts offered back, and who may take them
       description: 'Resource board 4.6. **`requestShiftSwap` needed a counterparty and there was
         nowhere to find one.** An open-shift marketplace lets somebody release a shift and somebody
@@ -920,6 +956,8 @@ paths:
                   $ref: '#/components/schemas/OpenShift'
     post:
       operationId: claimOpenShift
+      x-ticvai-consumed-by:
+        - "P08 BO-887 Shift Marketplace & Workforce Requests"
       summary: Pick up a released shift
       tags:
       - workforce

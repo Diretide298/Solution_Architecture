@@ -1,4 +1,4 @@
--- reporting — 12 tables
+-- reporting — 19 tables
 -- **Derived. Do not hand-edit.**
 
 -- A rule that fired. Acknowledged rather than dismissed — an alert that disappears when clicked
@@ -36,6 +36,22 @@ CREATE TABLE IF NOT EXISTS reporting.alert_rule (
     scope_path                        text
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.anomaly (
+    id                                uuid PRIMARY KEY,
+    kpi_id                            uuid,
+    metric                            text,
+    scope_path                        text,
+    detected_at                       timestamptz,
+    observed                          numeric(18,4),
+    expected                          numeric(18,4),
+    deviation_sigma                   numeric(18,4),
+    severity                          text,
+    acknowledged_by                   uuid,
+    acknowledged_at                   timestamptz
+);
+
 -- An arrangement of tiles, each resolving its own source
 CREATE TABLE IF NOT EXISTS reporting.dashboard (
     name                              text,
@@ -58,6 +74,21 @@ CREATE TABLE IF NOT EXISTS reporting.dashboard_tile (
     parameters                        jsonb,
     refresh_seconds                   integer,
     position                          jsonb NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.delivery (
+    id                                uuid PRIMARY KEY,
+    subscription_id                   uuid,
+    report_id                         uuid,
+    attempted_at                      timestamptz,
+    status                            text,
+    recipient_count                   integer,
+    failure_reason                    text,
+    retry_count                       integer,
+    contained_personal_data           boolean,
+    scope_path                        text
 );
 
 -- One run of a report definition. The result set is cached in object storage, not here
@@ -92,6 +123,54 @@ CREATE TABLE IF NOT EXISTS reporting.export (
     requested_by_principal_id         uuid NOT NULL,
     requested_at                      timestamptz NOT NULL,
     expires_at                        timestamptz
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.kpi_definition (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    domain                            text,
+    formula                           text,
+    unit                              text,
+    higher_is_better                  boolean,
+    default_period                    text,
+    owner                             uuid,
+    scope_path                        text,
+    is_active                         boolean
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.kpi_target (
+    kpi_id                            uuid,
+    scope_path                        text,
+    period                            text,
+    target                            numeric(18,4),
+    amber_at                          numeric(18,4),
+    red_at                            numeric(18,4),
+    stretch                           numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.pipeline (
+    id                                uuid PRIMARY KEY,
+    name                              text,
+    source_kind                       text,
+    datasets                          text[],
+    schedule                          text,
+    last_run_at                       timestamptz,
+    last_success_at                   timestamptz,
+    freshness_minutes                 integer,
+    expected_freshness_minutes        integer,
+    status                            text,
+    last_error                        text,
+    rows_last_run                     integer,
+    scope_path                        text
 );
 
 -- One column of a definition, with its aggregation
@@ -157,7 +236,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_parameter (
 
 -- When a report runs and who receives it. Hangs off: reaches reporting.report_definition through
 -- its keys; references identity.principal, reporting.report_definition. Reached by: 4 operations
--- read it and 3 write it; 1 tables reference it.
+-- read it and 3 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS reporting.schedule (
     report_id                         uuid,
     name                              text,
@@ -182,5 +261,28 @@ CREATE TABLE IF NOT EXISTS reporting.schedule_recipient (
     address                           text NOT NULL,
     principal_id                      uuid,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.semantic_model (
+    version                           integer,
+    published_at                      timestamptz,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS reporting.subscription (
+    id                                uuid PRIMARY KEY,
+    report_id                         uuid NOT NULL,
+    schedule_id                       uuid,
+    channel                           text,
+    format                            text,
+    includes_personal_data            boolean,
+    runs_as_principal_id              uuid,
+    active                            boolean,
+    scope_path                        text
 );
 

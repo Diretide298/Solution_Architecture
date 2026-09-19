@@ -40079,5 +40079,8055 @@
    "postgres",
    "redis"
   ]
+ },
+ "activateAudience": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/audience-activations",
+  "reads": [
+   "marketing.audience_activation"
+  ],
+  "writes": [
+   "marketing.audience_activation"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Push an audience to a campaign, journey or external platform",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "addCapacityPack": {
+  "contract": "subscription",
+  "verb": "POST",
+  "path": "/capacity-packs",
+  "reads": [
+   "subscription.capacity_pack"
+  ],
+  "writes": [
+   "subscription.capacity_pack"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_BILLING_MANAGE",
+  "offline": false,
+  "summary": "Buy headroom without changing tier",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "allocateGroupSeats": {
+  "contract": "seating",
+  "verb": "POST",
+  "path": "/group-seat-requests/{requestId}/allocate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Find and hold the best contiguous block for a group",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "allocateResources": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-allocations",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [
+   "resources.resource_requirement"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_BOOK",
+  "offline": false,
+  "summary": "Fill a requirement from the pool, rotating rather than repeating",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "analyseMediaAsset": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media-assets/{assetId}/analyse",
+  "reads": [
+   "assets.tag"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Auto-tag, describe and classify an asset",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "assessRentalDamage": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/damage",
+  "reads": [
+   "rental.damage_assessment"
+  ],
+  "writes": [
+   "rental.damage_assessment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": false,
+  "summary": "Price the damage, and say who approved it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "assignRentalEquipment": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/equipment",
+  "reads": [
+   "rental.equipment_assignment"
+  ],
+  "writes": [
+   "rental.equipment_assignment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": true,
+  "summary": "Bind specific assets to the booking, by scan where required",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "assignSessionMedia": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/sessions/{sessionId}/media",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Attach photos and video to the participants in a session",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "authoriseGameplay": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/gameplay-authorisations",
+  "reads": [
+   "games.authorisation"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCESS_VALIDATE",
+  "offline": true,
+  "summary": "Decide a tap, now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "bulkUpdateMediaAssets": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media-assets/bulk",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Retag, reclassify, move or archive many assets at once",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cancelResourceBooking": {
+  "contract": "resources",
+  "verb": "DELETE",
+  "path": "/resource-bookings/{bookingId}",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_BOOK",
+  "offline": false,
+  "summary": "Cancel one occurrence, or the whole series",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "checkOutRental": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/check-out",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": true,
+  "summary": "Hand it over, with the deposit held and the condition recorded",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "claimOpenShift": {
+  "contract": "workforce",
+  "verb": "POST",
+  "path": "/shift-marketplace",
+  "reads": [
+   "workforce.open_shift"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Pick up a released shift",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cloneEvent": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/events/{eventId}/clone",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Copy an event, choosing what comes with it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cloneResource": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resources/{resourceId}/clone",
+  "reads": [
+   "resources.resource"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Copy a resource and its configuration into new ones",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "concludeRecommendationExperiment": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendation-experiments/{experimentId}/conclude",
+  "reads": [
+   "promotions.recommendation_experiment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Declare a winner and roll it out",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createAccessPolicy": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-policies",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [
+   "identity.access_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Write a policy without writing code",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-applications",
+  "reads": [
+   "accreditation.application"
+  ],
+  "writes": [
+   "accreditation.application"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Apply, or apply on behalf of somebody",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createAccreditationProgramme": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-programmes",
+  "reads": [
+   "accreditation.programme"
+  ],
+  "writes": [
+   "accreditation.programme"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Define a programme, its categories and its window",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createApprovalEvidencePackage": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-evidence-packages",
+  "reads": [
+   "approvals.evidence_package"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "Assemble what an auditor asked for",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createB2bCreditAccount": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/b2b-credit-accounts",
+  "reads": [
+   "payments.credit_account"
+  ],
+  "writes": [
+   "payments.credit_account"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "CREDIT_MANAGE",
+  "offline": false,
+  "summary": "Open an on-account relationship",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createBadgePrintJob": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/badge-print-jobs",
+  "reads": [
+   "accreditation.print_job"
+  ],
+  "writes": [
+   "accreditation.print_job"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_ISSUE",
+  "offline": false,
+  "summary": "Queue badges for printing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createCreditType": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/credit-types",
+  "reads": [
+   "wallet.credit_type"
+  ],
+  "writes": [
+   "wallet.credit_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Define a kind of credit, without a release",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createEmergencyAccessOverride": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-overrides",
+  "reads": [
+   "identity.access_override"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Bypass the policy, loudly",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createGameEntitlement": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/game-entitlements",
+  "reads": [
+   "games.entitlement"
+  ],
+  "writes": [
+   "games.entitlement"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a pass, package or per-game entitlement",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createGroupSeatRequest": {
+  "contract": "seating",
+  "verb": "POST",
+  "path": "/group-seat-requests",
+  "reads": [
+   "seating.group_request"
+  ],
+  "writes": [
+   "seating.group_request"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Take a group enquiry before any seat is held",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createKpi": {
+  "contract": "reporting",
+  "verb": "POST",
+  "path": "/kpis",
+  "reads": [
+   "reporting.kpi_definition"
+  ],
+  "writes": [
+   "reporting.kpi_definition"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "REPORT_MANAGE",
+  "offline": false,
+  "summary": "Define a KPI once, for everywhere",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "createMediaShare": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media-shares",
+  "reads": [
+   "assets.share"
+  ],
+  "writes": [
+   "assets.share"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_SHARE",
+  "offline": false,
+  "summary": "Share assets with somebody outside the platform, on terms",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createPaymentMethod": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-methods",
+  "reads": [
+   "payments.method"
+  ],
+  "writes": [
+   "payments.method"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Add a payment method to the catalogue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createPaymentProviderConnection": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-providers",
+  "reads": [
+   "payments.provider_connection"
+  ],
+  "writes": [
+   "payments.provider_connection"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_PROVIDER_MANAGE",
+  "offline": false,
+  "summary": "Connect a provider",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createRecommendationExperiment": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendation-experiments",
+  "reads": [
+   "promotions.recommendation_experiment"
+  ],
+  "writes": [
+   "promotions.recommendation_experiment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Split traffic between strategies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createRecommendationStrategy": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendation-strategies",
+  "reads": [
+   "promotions.recommendation_strategy"
+  ],
+  "writes": [
+   "promotions.recommendation_strategy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Define objective, placements, ranking and guardrails",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createRentalBlackout": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-blackouts",
+  "reads": [
+   "rental.blackout"
+  ],
+  "writes": [
+   "rental.blackout"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_MANAGE",
+  "offline": false,
+  "summary": "Close a product, location or window",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createRentalBooking": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_BOOK",
+  "offline": false,
+  "summary": "Reserve a rental",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createRentalCategory": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-categories",
+  "reads": [
+   "rental.category"
+  ],
+  "writes": [
+   "rental.category"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Define a category and its defaults",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createRentalPricingProfile": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-pricing-profiles",
+  "reads": [
+   "rental.pricing_profile"
+  ],
+  "writes": [
+   "rental.pricing_profile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_PRICE",
+  "offline": false,
+  "summary": "Define how a rental is priced",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createRentalProduct": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-products",
+  "reads": [
+   "rental.product"
+  ],
+  "writes": [
+   "rental.product"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Define a rental product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createReportSubscription": {
+  "contract": "reporting",
+  "verb": "POST",
+  "path": "/report-subscriptions",
+  "reads": [
+   "reporting.subscription"
+  ],
+  "writes": [
+   "reporting.subscription"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "REPORT_SCHEDULE",
+  "offline": false,
+  "summary": "Send a report to somebody, on terms",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "createResourceAttribute": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-attributes",
+  "reads": [
+   "resources.attribute_definition"
+  ],
+  "writes": [
+   "resources.attribute_definition"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define a customer attribute",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createResourceBlock": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-blocks",
+  "reads": [
+   "resources.resource_block"
+  ],
+  "writes": [
+   "resources.resource_block"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Take a resource out of service for a window, with a reason",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createResourceCategory": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-categories",
+  "reads": [
+   "resources.resource_category"
+  ],
+  "writes": [
+   "resources.resource_category"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Add a category or subcategory",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createResourcePackage": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-packages",
+  "reads": [
+   "resources.resource_package"
+  ],
+  "writes": [
+   "resources.resource_package"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define a reusable combination",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createResourceType": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-types",
+  "reads": [
+   "resources.resource_type"
+  ],
+  "writes": [
+   "resources.resource_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define a class of resource",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createSeatHoldPool": {
+  "contract": "seating",
+  "verb": "POST",
+  "path": "/seat-hold-pools",
+  "reads": [
+   "seating.hold_pool"
+  ],
+  "writes": [
+   "seating.hold_pool"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Take a set of seats out of sale, for a reason, until a date",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createSharedWallet": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/shared-wallets",
+  "reads": [
+   "wallet.shared_wallet"
+  ],
+  "writes": [
+   "wallet.shared_wallet"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Set up a family, household or corporate wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createVoucherType": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/voucher-types",
+  "reads": [
+   "wallet.voucher_type"
+  ],
+  "writes": [
+   "wallet.voucher_type"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Define a voucher or benefit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "createWalletType": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-types",
+  "reads": [
+   "wallet.wallet_type"
+  ],
+  "writes": [
+   "wallet.wallet_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Define a kind of wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "decideAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-applications/{applicationId}/decide",
+  "reads": [
+   "accreditation.application"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPROVE",
+  "offline": false,
+  "summary": "Approve, reject, return for more, or escalate",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "decideDuplicateCandidate": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/duplicate-candidates/{candidateId}/decide",
+  "reads": [
+   "marketing.duplicate_candidate"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Merge, reject or split",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "deployReaderConfiguration": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/readers/{readerId}/deploy",
+  "reads": [
+   "games.reader_deployment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_CONFIGURE",
+  "offline": false,
+  "summary": "Push configuration and the offline rule package to a reader",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "enrolDevice": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/devices/{deviceId}/enrolment",
+  "reads": [
+   "platform.device"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Take a registered device through enrolment to activation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "evaluateAccess": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-decisions",
+  "reads": [
+   "identity.access_decision"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Decide, now, and say why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "expireCreditLots": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/credit-lots/expire",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Expire, extend or forfeit credit that has run out of time",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "explainRecommendation": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendations/explain",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Why this was offered, and what was suppressed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "explainRentalPrice": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-price/explain",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "Why the price is what it is, rule by rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "extendRental": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/extend",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": false,
+  "summary": "Keep it longer, if it is free and the guest accepts the price",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "findSimilarMediaAssets": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-assets/similar",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "Visually similar, near-duplicate and related assets",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAccessPolicy": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policies/{policyId}",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "One policy, at a version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAccessPolicyBundle": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policies/bundle",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": true,
+  "summary": "The policies a device needs to decide for itself",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAccessibleSeating": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/accessible-seating",
+  "reads": [
+   "seating.accessible"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Accessible seats, their routes and who may buy them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAccreditationHolder": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-holders/{holderId}",
+  "reads": [
+   "accreditation.holder"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "One holder — identity, documents, access and history",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getAnalyticsBenchmark": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/analytics-benchmarks",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "One site against another, on a like-for-like basis",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getAnalyticsUsage": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/analytics-usage",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "Which dashboards and reports are actually used, and what they cost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getApprovalRecord": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-requests/{requestId}/record",
+  "reads": [
+   "approvals.decision_record"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "The immutable decision record, and whether it is intact",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAudienceOverlap": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/audience-overlap",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "How much audiences overlap, and how many are reachable",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getBillingReconciliation": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/billing-reconciliation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "Metered consumption against what was invoiced",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getCreditConsumptionPolicy": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/credit-consumption-policy",
+  "reads": [
+   "wallet.consumption_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Which credit is spent first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getDeviceTelemetry": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/devices/{deviceId}/telemetry",
+  "reads": [
+   "tenancy.device_telemetry"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Battery, performance and consumables over time",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getEventResourcePlan": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/events/{eventId}/resource-plan",
+  "reads": [
+   "catalogue.event_resource_plan"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Everything an event needs, and whether it has been secured",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getExperienceResourceRequirements": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "reads": [
+   "resources.resource_requirement"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "What an experience needs before it can run",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGameEligibility": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/game-eligibility",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What this guest can play right now, and what it would cost",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGamePricing": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/game-pricing",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRICE_VIEW",
+  "offline": false,
+  "summary": "The effective price at a reader, and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGameplaySyncStatus": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/gameplay-sync-status",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What readers took offline and have not sent",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGameplayValidationRules": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/gameplay-validation-rules",
+  "reads": [
+   "games.validation_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What a tap is checked against, and in what order",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGoLiveReadiness": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/go-live-readiness",
+  "reads": [
+   "subscription.go_live_readiness"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_TENANT_MANAGE",
+  "offline": false,
+  "summary": "Everything that must pass before a tenant can sell",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getGuestAttributeModel": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guest-attribute-model",
+  "reads": [
+   "marketing.guest_attribute_model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "The shared guest data model",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestIntelligence": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guests/{guestId}/intelligence",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Value, engagement, churn and propensity, with their reasons",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestRelationships": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guests/{guestId}/relationships",
+  "reads": [
+   "marketing.guest_relationship"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Household, guardians, corporate and group links",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestTimeline": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guests/{guestId}/timeline",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Everything this guest did, in order, across the platform",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getIdentityResolutionRules": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/identity-resolution-rules",
+  "reads": [
+   "marketing.identity_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "How duplicates are detected and a master is chosen",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getKpiValues": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/kpi-values",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_VENUE",
+  "offline": false,
+  "summary": "Current values, against target, with movement",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getLabourCost": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/labour-cost",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Rostered and actual labour cost against budget",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getLicenceEnforcement": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/licence-enforcement",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "Where a tenant stands against its entitlements, and what happens next",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getMediaDistribution": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-distribution",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "Where an asset is used and how it is delivered",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMediaTaxonomy": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-taxonomy",
+  "reads": [
+   "assets.taxonomy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "The categories, metadata fields and controlled vocabularies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMediaUsageAnalytics": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-usage",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "Downloads, views, shares and library health",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMixedTenderRules": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/mixed-tender-rules",
+  "reads": [
+   "payments.mixed_tender_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Which tenders may be combined, and in what order",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getPaymentPerformance": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-performance",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Authorisation rate, conversion and where payments are lost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getPaymentProviderEconomics": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-providers/economics",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "What each provider actually costs",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getPaymentProviderHealth": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-providers/health",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Authorisation rate, latency and availability, per provider",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getProductAffinity": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/product-affinity",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What is actually bought together",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getRecommendationPerformance": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/recommendation-performance",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Impressions, acceptance, revenue and incremental lift",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getRentalAvailability": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-availability",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "What can be rented, when, with turnaround already subtracted",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getRentalBooking": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "One booking, its timeline and its readiness",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getRentalProduct": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-products/{productId}",
+  "reads": [
+   "rental.product"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "The master configuration of one rental product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getResource": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}",
+  "reads": [
+   "resources.resource"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "One resource, with every configured section",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceAllocationPolicy": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-allocation-policy",
+  "reads": [
+   "resources.allocation_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "How the platform chooses between equally valid resources",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceAuditTrail": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}/audit",
+  "reads": [
+   "resources.resource_audit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Every material change, with who and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceCalendar": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-calendar",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Every resource against time, with conflicts already marked",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceDependencies": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}/dependencies",
+  "reads": [
+   "resources.resource_dependency"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "What this resource requires, conflicts with, or substitutes for",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceHierarchy": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}/hierarchy",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "What this resource contains, and what contains it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceSchedule": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}/schedule",
+  "reads": [
+   "resources.resource_schedule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "The pattern of when it is normally available",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceUtilisation": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-utilisation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "How much of each resource's available time was used",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSeatInventory": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-inventory",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Every seat's state for a performance, in one read",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSeatRecommendationRules": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-recommendation-rules",
+  "reads": [
+   "seating.recommendation_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "What \"best\" means at this venue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSeatReconciliation": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-reconciliation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "The map against the orders, seat by seat",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSeatRules": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-rules",
+  "reads": [
+   "seating.seat_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Kill, buffer, companion and accessibility rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSemanticModel": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/semantic-model",
+  "reads": [
+   "reporting.semantic_model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "The business data catalogue reports are built from",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getStaffingCoverage": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/staffing-coverage",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Where the rota is short, and by how much",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVsiModel": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/vsi-models",
+  "reads": [
+   "subscription.vsi_model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "How a customer's scale is scored into a tier",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getWalletFundingRules": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-funding-rules",
+  "reads": [
+   "wallet.funding_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "How a wallet may be topped up",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getWalletLiability": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-liability",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "What is outstanding, and what is breakage",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getWalletReconciliation": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-reconciliation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The wallet sub-ledger against the general ledger and the acquirer",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "importAccreditationHolders": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-imports",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Load a roster supplied by an organisation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "importAudienceList": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/audience-lists",
+  "reads": [
+   "marketing.audience_list"
+  ],
+  "writes": [
+   "marketing.audience_list"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Load a supplied list, matched against the guest master",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "importRentalCatalogue": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-products/import",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Load a client's rental items and inventory at onboarding",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "issueAccreditationCredential": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-credentials",
+  "reads": [
+   "accreditation.credential"
+  ],
+  "writes": [
+   "accreditation.credential"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_ISSUE",
+  "offline": false,
+  "summary": "Produce a badge, a mobile credential, or both",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "issueDeviceCredential": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/devices/{deviceId}/credentials",
+  "reads": [
+   "tenancy.device_credential"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Give the device an identity it can prove",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "linkWalletCredential": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-credentials",
+  "reads": [
+   "wallet.credential"
+  ],
+  "writes": [
+   "wallet.credential"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": true,
+  "summary": "Bind a wristband, card or device to a wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccessDecisions": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-decisions/audit",
+  "reads": [
+   "identity.access_decision"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "What was decided, for whom, where and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccessPolicies": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policies",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Attribute-based access policies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccessPolicyHistory": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policies/{policyId}/history",
+  "reads": [
+   "identity.access_policy_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Every version, who changed it and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccessPolicyTemplates": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policy-templates",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Reusable policy shapes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccessProfiles": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-access-profiles",
+  "reads": [
+   "accreditation.access_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Named bundles of zones, dates and times",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationAccessActivity": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-access-activity",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Where accredited people actually went",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationApplications": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-applications",
+  "reads": [
+   "accreditation.application"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Applications, by state and programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationAudit": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-audit",
+  "reads": [
+   "accreditation.audit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "The immutable record of who granted what to whom",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationCredentials": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-credentials",
+  "reads": [
+   "accreditation.credential"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Badges and digital credentials issued",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationHolders": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-holders",
+  "reads": [
+   "accreditation.holder"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Everybody accredited, and what state they are in",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationIdentityConflicts": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-identity-conflicts",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "People who may already be accredited under another record",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationProgrammes": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-programmes",
+  "reads": [
+   "accreditation.programme"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Programmes, their categories and their applicant types",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAnalyticsAnomalies": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/analytics-anomalies",
+  "reads": [
+   "reporting.anomaly"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_VENUE",
+  "offline": false,
+  "summary": "Numbers that moved more than they should have",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listAnalyticsPipelines": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/analytics-pipelines",
+  "reads": [
+   "reporting.pipeline"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "Data sources, refresh state and freshness",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listApprovalControlPolicies": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-control-policies",
+  "reads": [
+   "approvals.control_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "Segregation of duties, four-eyes and dual control",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAttractionTypes": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/attraction-types",
+  "reads": [
+   "games.attraction_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The classes of game and ride",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAudienceActivations": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/audience-activations",
+  "reads": [
+   "marketing.audience_activation"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Where audiences are being used, and whether they are still in sync",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAudienceLists": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/audience-lists",
+  "reads": [
+   "marketing.audience_list"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Static and imported audiences",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listB2bCreditAccounts": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/b2b-credit-accounts",
+  "reads": [
+   "payments.credit_account"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "On-account customers, their limits and their exposure",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listBadgePrintJobs": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/badge-print-jobs",
+  "reads": [
+   "accreditation.print_job"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_ISSUE",
+  "offline": false,
+  "summary": "The print queue, and what failed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listBadgeTemplates": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/badge-templates",
+  "reads": [
+   "accreditation.badge_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Badge designs, and what prints on each",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listCreditLots": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/credit-lots",
+  "reads": [
+   "wallet.credit_lot"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The tranches behind a balance, with their expiry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listCreditTypes": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/credit-types",
+  "reads": [
+   "wallet.credit_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The kinds of value that may sit in a wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listDeviceAuditRecords": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/devices/{deviceId}/audit",
+  "reads": [
+   "tenancy.device_audit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "What was done to this device, and what it did",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDeviceFirmware": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/device-firmware",
+  "reads": [
+   "tenancy.device_firmware"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Firmware and software versions, and what is running where",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDeviceTamperEvents": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/device-tamper-events",
+  "reads": [
+   "tenancy.device_tamper_event"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Devices that report having been interfered with",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDuplicateCandidates": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/duplicate-candidates",
+  "reads": [
+   "marketing.duplicate_candidate"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Suspected duplicates awaiting a decision",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listEventTypes": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/event-types",
+  "reads": [
+   "catalogue.event_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "The kinds of event, and how each behaves",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listGameEntitlements": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/game-entitlements",
+  "reads": [
+   "games.entitlement"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Passes, packages and per-game entitlements",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listGameplayTransactions": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/gameplay-transactions",
+  "reads": [
+   "games.gameplay_transaction"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Taps, decisions and what they cost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listGroupSeatRequests": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/group-seat-requests",
+  "reads": [
+   "seating.group_request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "Group bookings, their status and their deposits",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listKpis": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/kpis",
+  "reads": [
+   "reporting.kpi_definition"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "The enterprise KPI library",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listLeaveRequests": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/leave-requests",
+  "reads": [
+   "workforce.leave_request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Leave, absence and their effect on cover",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listLicensingModels": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/licensing-models",
+  "reads": [
+   "subscription.licensing_model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Billable units, minimum guarantees and overage",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listMediaAssetAudit": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-assets/{assetId}/audit",
+  "reads": [
+   "assets.audit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "Who did what to this asset, and who received it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMediaAssetVersions": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-assets/{assetId}/versions",
+  "reads": [
+   "assets.asset_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "Every revision, and what replacing it would affect",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMediaRenditions": {
+  "contract": "assets",
+  "verb": "GET",
+  "path": "/media-assets/{assetId}/renditions",
+  "reads": [
+   "assets.rendition"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_VIEW",
+  "offline": false,
+  "summary": "The derived sizes and formats, and whether they are ready",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMerchantAccounts": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/merchant-accounts",
+  "reads": [
+   "payments.merchant_account"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Merchant accounts, settlement calendars and payout routing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listModuleCatalogue": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/module-catalogue",
+  "reads": [
+   "subscription.module_listing"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Modules, their dependencies and their commercial treatment",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listOpenShifts": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/shift-marketplace",
+  "reads": [
+   "workforce.open_shift"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": true,
+  "summary": "Shifts offered back, and who may take them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listOverdueRentals": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-bookings/overdue",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "What is late, by how long, and what it is accruing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPaymentMethods": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-methods",
+  "reads": [
+   "payments.method"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "The methods this tenant can offer, and where",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPaymentProviderConnections": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-providers",
+  "reads": [
+   "payments.provider_connection"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Gateways, PSPs and acquirers, and what each can do",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPaymentRoutingRules": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-routing-rules",
+  "reads": [
+   "payments.routing_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Which provider takes which transaction",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPaymentTerminals": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-terminals",
+  "reads": [
+   "payments.terminal"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Terminals, and the payment configuration on each",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listProductRelationships": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/product-relationships",
+  "reads": [
+   "promotions.product_relationship"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Upgrade ladders, cross-sells, affinities and substitutes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listReaders": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/readers",
+  "reads": [
+   "games.reader"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Readers, their attractions and their health",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listRecommendationExperiments": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/recommendation-experiments",
+  "reads": [
+   "promotions.recommendation_experiment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A/B tests on placements and strategies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listRecommendationStrategies": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/recommendation-strategies",
+  "reads": [
+   "promotions.recommendation_strategy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The strategies deciding what gets offered where",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listReconciliationSources": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/reconciliation-sources",
+  "reads": [
+   "payments.reconciliation_source"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "The files and feeds reconciliation is run against",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listRentalBookings": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-bookings",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "Reservations across venues and locations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listRentalCategories": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-categories",
+  "reads": [
+   "rental.category"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "Reusable categories, with the defaults products inherit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listRentalPricingProfiles": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-pricing-profiles",
+  "reads": [
+   "rental.pricing_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "Pricing profiles, and the products with none",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listRentalProducts": {
+  "contract": "rental",
+  "verb": "GET",
+  "path": "/rental-products",
+  "reads": [
+   "rental.product"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "Rental products across venues and locations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listReportDeliveries": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/report-deliveries",
+  "reads": [
+   "reporting.delivery"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "What was sent, to whom, and what failed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listReportSubscriptions": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/report-subscriptions",
+  "reads": [
+   "reporting.subscription"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_VENUE",
+  "offline": false,
+  "summary": "Who receives what, and by which route",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listResourceAttributes": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-attributes",
+  "reads": [
+   "resources.attribute_definition"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "The customer-defined fields on a resource",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listResourceBlocks": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-blocks",
+  "reads": [
+   "resources.resource_block"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Operational, setup and maintenance blocks",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listResourceBookings": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-bookings",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Bookings, filtered",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listResourceCategories": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-categories",
+  "reads": [
+   "resources.resource_category"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "The classification tree beneath the types",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listResourcePackages": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-packages",
+  "reads": [
+   "resources.resource_package"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Predefined combinations assigned as one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listResourceTypes": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-types",
+  "reads": [
+   "resources.resource_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "The classes of resource this organisation supports",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSeatHoldPools": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-hold-pools",
+  "reads": [
+   "seating.hold_pool"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Held seats, by pool, with what is left and when it releases",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSeatHoldTypes": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-hold-types",
+  "reads": [
+   "seating.hold_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "The kinds of hold a venue places, and who may release them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSessionTemplates": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/session-templates",
+  "reads": [
+   "catalogue.session_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Slot templates, peak bands and walk-in rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSharedWallets": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/shared-wallets",
+  "reads": [
+   "wallet.shared_wallet"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Family, household and corporate structures",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listShiftTemplates": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/shift-templates",
+  "reads": [
+   "workforce.shift_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Named shift patterns a rota is built from",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSpaces": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/spaces",
+  "reads": [
+   "catalogue.space"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Halls, rooms and areas an event can occupy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listStoredForwardTransactions": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-terminals/{terminalId}/forwarded",
+  "reads": [
+   "payments.stored_forward"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "What a terminal took offline and has not yet sent",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listVoucherTypes": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/voucher-types",
+  "reads": [
+   "wallet.voucher_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Voucher, coupon and benefit definitions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listWalletDisputes": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-disputes",
+  "reads": [
+   "wallet.dispute"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Contested transactions and operational exceptions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listWalletTypes": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-types",
+  "reads": [
+   "wallet.wallet_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The kinds of wallet that may exist — who owns one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "previewAccessImpact": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-access-profiles/preview",
+  "reads": [],
+  "writes": [
+   "accreditation.access_profile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Who this change would affect, and how",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "publishRentalProduct": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-products/{productId}/publish",
+  "reads": [
+   "rental.product"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_APPROVE",
+  "offline": false,
+  "summary": "Move a product through draft, review, approval and activation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "publishWalletConfiguration": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-configuration/publish",
+  "reads": [
+   "wallet.configuration_version"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Validate and publish the wallet configuration as a version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "quoteRentalPrice": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-price",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_VIEW",
+  "offline": false,
+  "summary": "What this rental would cost, and the deposit it would hold",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "raiseWalletDispute": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-disputes",
+  "reads": [
+   "wallet.dispute"
+  ],
+  "writes": [
+   "wallet.dispute"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "A guest contests a wallet transaction",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "reassignSeats": {
+  "contract": "seating",
+  "verb": "POST",
+  "path": "/seat-reassignment",
+  "reads": [
+   "seating.reassignment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Move a booked party, and tell them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordDeviceTamperEvent": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/device-tamper-events",
+  "reads": [
+   "tenancy.device_tamper_event"
+  ],
+  "writes": [
+   "tenancy.device_tamper_event"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": true,
+  "summary": "A device reports interference",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordRecommendationOutcome": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendations/outcomes",
+  "reads": [],
+  "writes": [
+   "promotions.recommendation_outcome"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "Shown, clicked, accepted or dismissed",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordRentalInspection": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/inspection",
+  "reads": [
+   "rental.inspection"
+  ],
+  "writes": [
+   "rental.inspection"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": true,
+  "summary": "Condition before or after, with evidence",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "releaseResourceBlock": {
+  "contract": "resources",
+  "verb": "DELETE",
+  "path": "/resource-blocks/{blockId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Put it back into service",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "releaseSeatHoldPool": {
+  "contract": "seating",
+  "verb": "POST",
+  "path": "/seat-hold-pools/{poolId}/release",
+  "reads": [
+   "seating.hold_pool"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Put held seats back on sale, convert them, or reassign them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "replaceAccreditationCredential": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-credentials/{credentialId}/replace",
+  "reads": [
+   "accreditation.credential"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_ISSUE",
+  "offline": false,
+  "summary": "Reissue after loss, damage or a name change",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "replaceResourceAllocation": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-allocations/{bookingId}/replace",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_BOOK",
+  "offline": false,
+  "summary": "Swap in a substitute when the allocated resource falls through",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "reportRentalIncident": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-incidents",
+  "reads": [
+   "rental.incident"
+  ],
+  "writes": [
+   "rental.incident"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": true,
+  "summary": "Something happened during a rental",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "requestLeave": {
+  "contract": "workforce",
+  "verb": "POST",
+  "path": "/leave-requests",
+  "reads": [
+   "workforce.leave_request"
+  ],
+  "writes": [
+   "workforce.leave_request"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Ask for time off, against the cover it would cost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "requestMediaRendition": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media-assets/{assetId}/renditions",
+  "reads": [
+   "assets.rendition"
+  ],
+  "writes": [
+   "assets.rendition"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Generate a size or format",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "requestRentalCommercialOverride": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-overrides",
+  "reads": [
+   "rental.override"
+  ],
+  "writes": [
+   "rental.override"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OVERRIDE",
+  "offline": false,
+  "summary": "Deviate from policy, with a reason and an approver",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "rescheduleEvent": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/events/{eventId}/reschedule",
+  "reads": [
+   "catalogue.event_reschedule"
+  ],
+  "writes": [
+   "catalogue.event_reschedule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Move or cancel, and decide what happens to the people who bought",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "returnRental": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/return",
+  "reads": [
+   "rental.settlement"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": true,
+  "summary": "Take it back, inspect it, and settle everything at once",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "reverseWalletFunding": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-funding/reversals",
+  "reads": [
+   "wallet.adjustment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Undo a top-up, in full or in part",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "revokeDeviceCredential": {
+  "contract": "tenancy",
+  "verb": "DELETE",
+  "path": "/devices/{deviceId}/credentials",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Cut a device off now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "rollbackDeviceFirmware": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/device-firmware/rollouts/{rolloutId}/rollback",
+  "reads": [
+   "tenancy.device_rollout"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Put the fleet back on the previous version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "runDataRetention": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/retention-runs",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Preview or execute a retention pass",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "runGoLiveValidation": {
+  "contract": "subscription",
+  "verb": "POST",
+  "path": "/go-live-readiness/run",
+  "reads": [
+   "subscription.go_live_readiness"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_TENANT_MANAGE",
+  "offline": false,
+  "summary": "Run the validation plan against a tenant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "scoreVsiAssessment": {
+  "contract": "subscription",
+  "verb": "POST",
+  "path": "/vsi-assessments",
+  "reads": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Score a prospect's answers into a tier and a package",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setAccessPolicyState": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-policies/{policyId}/state",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Submit, approve, activate or retire a policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccessProfile": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-access-profiles",
+  "reads": [
+   "accreditation.access_profile"
+  ],
+  "writes": [
+   "accreditation.access_profile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Define which zones, on which dates, at which times",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setAccessibleSeating": {
+  "contract": "seating",
+  "verb": "PUT",
+  "path": "/accessible-seating",
+  "reads": [
+   "seating.accessible"
+  ],
+  "writes": [
+   "seating.accessible"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Define accessible seats, routes and eligibility",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccreditationNotificationRules": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-notifications",
+  "reads": [
+   "accreditation.notification_rules"
+  ],
+  "writes": [
+   "accreditation.notification_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Who is told what, and when",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setAccreditationRequirements": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-requirements",
+  "reads": [
+   "accreditation.requirements"
+  ],
+  "writes": [
+   "accreditation.requirements"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "What each applicant type must supply and pass",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setAccreditationStatus": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-holders/{holderId}/status",
+  "reads": [
+   "accreditation.holder"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Suspend, reactivate, revoke or expire an accreditation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setAccreditationValidity": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-validity",
+  "reads": [
+   "accreditation.validity"
+  ],
+  "writes": [
+   "accreditation.validity"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Validity periods, renewal windows and expiry behaviour",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setApprovalControlPolicy": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-control-policies",
+  "reads": [
+   "approvals.control_policy"
+  ],
+  "writes": [
+   "approvals.control_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "Require a second, independent pair of eyes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setApprovalRetentionPolicy": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-retention",
+  "reads": [
+   "approvals.retention_policy"
+  ],
+  "writes": [
+   "approvals.retention_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "How long decision records are kept, and what survives",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setApprovalSlaPolicy": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-sla-policies",
+  "reads": [
+   "approvals.sla_policy"
+  ],
+  "writes": [
+   "approvals.sla_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "How long a decision may take, and what happens when it does not",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setApproverAvailability": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-delegations/availability",
+  "reads": [
+   "approvals.approver_availability"
+  ],
+  "writes": [
+   "approvals.approver_availability"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_DECIDE",
+  "offline": false,
+  "summary": "Out of office, and who decides instead",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAttractionType": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/attraction-types",
+  "reads": [
+   "games.attraction_type"
+  ],
+  "writes": [
+   "games.attraction_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a class of attraction",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setB2bPaymentTerms": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/b2b-credit-accounts/{accountId}/terms",
+  "reads": [
+   "payments.payment_terms"
+  ],
+  "writes": [
+   "payments.payment_terms"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "CREDIT_MANAGE",
+  "offline": false,
+  "summary": "Limit, terms, billing cycle and what happens at the limit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setBadgeTemplate": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/badge-templates",
+  "reads": [
+   "accreditation.badge_template"
+  ],
+  "writes": [
+   "accreditation.badge_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Design a badge",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setCreditConsumptionPolicy": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/credit-consumption-policy",
+  "reads": [
+   "wallet.consumption_policy"
+  ],
+  "writes": [
+   "wallet.consumption_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "The order credit is drawn down in",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setCreditEligibilityRules": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/credit-types/{creditTypeId}/eligibility",
+  "reads": [
+   "wallet.credit_eligibility"
+  ],
+  "writes": [
+   "wallet.credit_eligibility"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Where this credit may be spent, and on what",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setDataRetentionPolicy": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/retention-policies",
+  "reads": [
+   "marketing.retention_policy"
+  ],
+  "writes": [
+   "marketing.retention_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "How long guest data is kept, and what happens at expiry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDeviceAssignment": {
+  "contract": "tenancy",
+  "verb": "PUT",
+  "path": "/devices/{deviceId}/assignment",
+  "reads": [
+   "tenancy.device_assignment"
+  ],
+  "writes": [
+   "tenancy.device_assignment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Who owns it, who holds it, and where it is",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventCapacityProfile": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/events/{eventId}/capacity-profile",
+  "reads": [
+   "catalogue.event_capacity_profile"
+  ],
+  "writes": [
+   "catalogue.event_capacity_profile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "How many, in what mode, and held back for whom",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventLifecycleState": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/events/{eventId}/lifecycle",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Draft, planned, on sale, live, closed, cancelled",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventRegistration": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/events/{eventId}/registration",
+  "reads": [
+   "catalogue.event_registration"
+  ],
+  "writes": [
+   "catalogue.event_registration"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "What is captured, from whom, and what it lets them in to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventResourcePlan": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/events/{eventId}/resource-plan",
+  "reads": [
+   "catalogue.event_resource_plan"
+  ],
+  "writes": [
+   "catalogue.event_resource_plan"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "State what the event needs, by role and by kind",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventSchedule": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/events/{eventId}/schedule",
+  "reads": [
+   "catalogue.event_schedule"
+  ],
+  "writes": [
+   "catalogue.event_schedule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Performance times, durations and turnaround",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventType": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/event-types",
+  "reads": [
+   "catalogue.event_type"
+  ],
+  "writes": [
+   "catalogue.event_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Define an event kind and its behaviour",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setExperienceResourceRequirements": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/experiences/{experienceId}/resource-requirements",
+  "reads": [
+   "resources.resource_requirement"
+  ],
+  "writes": [
+   "resources.resource_requirement"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Bind resource requirements to an experience",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGameCardExpiryRules": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/game-card-expiry-rules",
+  "reads": [
+   "games.card_expiry_rules"
+  ],
+  "writes": [
+   "games.card_expiry_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "When a card lapses, and what warns the guest first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGameCardLifecycle": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/game-cards/{cardId}/lifecycle",
+  "reads": [
+   "games.card"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Block, suspend, reactivate, replace or expire a card",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGameKioskConfiguration": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/game-kiosk-config",
+  "reads": [
+   "games.kiosk_config"
+  ],
+  "writes": [
+   "games.kiosk_config"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The self-service journey, its theme and its languages",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGameOperationalConfiguration": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/games/{gameId}/operations",
+  "reads": [
+   "games.operational_config"
+  ],
+  "writes": [
+   "games.operational_config"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Capacity, cycle time, restrictions and staffing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGamePricing": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/game-pricing",
+  "reads": [
+   "games.pricing"
+  ],
+  "writes": [
+   "games.pricing"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRICE_CONFIGURE",
+  "offline": false,
+  "summary": "Standard, group, peak, VIP, retry and calendar prices",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGameplayValidationRules": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/gameplay-validation-rules",
+  "reads": [
+   "games.validation_rules"
+  ],
+  "writes": [
+   "games.validation_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Deduction priority and the order of checks",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGiftCardProduct": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/gift-card-products",
+  "reads": [
+   "wallet.gift_card_product"
+  ],
+  "writes": [
+   "wallet.gift_card_product"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Denominations, validity, activation and distribution",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setGroupSeatRoster": {
+  "contract": "seating",
+  "verb": "PUT",
+  "path": "/group-seat-requests/{requestId}/roster",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Who sits where, when the names arrive",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGuestAttributeModel": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/guest-attribute-model",
+  "reads": [
+   "marketing.guest_attribute_model"
+  ],
+  "writes": [
+   "marketing.guest_attribute_model"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Change the model, as a version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGuestRelationships": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/guests/{guestId}/relationships",
+  "reads": [
+   "marketing.guest_relationship"
+  ],
+  "writes": [
+   "marketing.guest_relationship"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Link people without merging them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setHolderAccess": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-holders/{holderId}/access",
+  "reads": [
+   "accreditation.holder_access"
+  ],
+  "writes": [
+   "accreditation.holder_access"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Assign profiles, and any exception on top",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setHostedCheckoutConfiguration": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/hosted-checkout-config",
+  "reads": [
+   "payments.hosted_checkout"
+  ],
+  "writes": [
+   "payments.hosted_checkout"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Redirect, return and the journey back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setIdentityResolutionRules": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/identity-resolution-rules",
+  "reads": [
+   "marketing.identity_rules"
+  ],
+  "writes": [
+   "marketing.identity_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Matching weights, thresholds and survivorship",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setKpiTargets": {
+  "contract": "reporting",
+  "verb": "PUT",
+  "path": "/kpis/{kpiId}/targets",
+  "reads": [
+   "reporting.kpi_target"
+  ],
+  "writes": [
+   "reporting.kpi_target"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "REPORT_MANAGE",
+  "offline": false,
+  "summary": "Targets, thresholds and what red means",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setLicenceEnforcementPolicy": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/licence-enforcement",
+  "reads": [
+   "subscription.enforcement_policy"
+  ],
+  "writes": [
+   "subscription.enforcement_policy"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "What happens at each threshold",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setLicensingModel": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/licensing-models",
+  "reads": [
+   "subscription.licensing_model"
+  ],
+  "writes": [
+   "subscription.licensing_model"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Define the billable unit and what happens at the edges",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setMediaAssetApproval": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media-assets/{assetId}/approval",
+  "reads": [
+   "assets.approval"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_APPROVE",
+  "offline": false,
+  "summary": "Submit, approve, reject or publish an asset",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaAssetRights": {
+  "contract": "assets",
+  "verb": "PUT",
+  "path": "/media-assets/{assetId}/rights",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Licence, permitted use and expiry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaAssetTags": {
+  "contract": "assets",
+  "verb": "PUT",
+  "path": "/media-assets/{assetId}/tags",
+  "reads": [
+   "assets.tag"
+  ],
+  "writes": [
+   "assets.tag"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Tags and keywords, whoever or whatever supplied them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaDistributionChannels": {
+  "contract": "assets",
+  "verb": "PUT",
+  "path": "/media-distribution/channels",
+  "reads": [
+   "assets.distribution_channel"
+  ],
+  "writes": [
+   "assets.distribution_channel"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "CDN, delivery URLs, fallbacks and expiry behaviour",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaTaxonomy": {
+  "contract": "assets",
+  "verb": "PUT",
+  "path": "/media-taxonomy",
+  "reads": [
+   "assets.taxonomy"
+  ],
+  "writes": [
+   "assets.taxonomy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "ASSET_LIBRARY_MANAGE",
+  "offline": false,
+  "summary": "Define categories, fields and keyword vocabularies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMerchantAccount": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/merchant-accounts",
+  "reads": [
+   "payments.merchant_account"
+  ],
+  "writes": [
+   "payments.merchant_account"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Bind a merchant account to entities, venues and a calendar",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setMixedTenderRules": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/mixed-tender-rules",
+  "reads": [
+   "payments.mixed_tender_rules"
+  ],
+  "writes": [
+   "payments.mixed_tender_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Split payment, tender sequence and restrictions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setModuleListing": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/module-catalogue",
+  "reads": [
+   "subscription.module_listing"
+  ],
+  "writes": [
+   "subscription.module_listing"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Define a module's dependencies, incompatibilities and price",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setPaymentAuthenticationPolicy": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-authentication-policy",
+  "reads": [
+   "payments.authentication_policy"
+  ],
+  "writes": [
+   "payments.authentication_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "3-D Secure, tokenisation and recurring mandates",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setPaymentFailoverPolicy": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-failover-policy",
+  "reads": [
+   "payments.failover_policy"
+  ],
+  "writes": [
+   "payments.failover_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "What happens when a provider fails, and when to stop trying",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setPaymentRiskRules": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-risk-rules",
+  "reads": [
+   "payments.risk_rules"
+  ],
+  "writes": [
+   "payments.risk_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Velocity, behaviour, lists and what a hit does",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setPaymentRoutingRules": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-routing-rules",
+  "reads": [
+   "payments.routing_rule"
+  ],
+  "writes": [
+   "payments.routing_rule"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Route by method, currency, venue, amount, cost or share",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setPaymentTerminalConfiguration": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-terminals",
+  "reads": [
+   "payments.terminal"
+  ],
+  "writes": [
+   "payments.terminal"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Merchant account, acquirer, EMV and offline behaviour",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setPrepaidMinutePackage": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/prepaid-minute-packages",
+  "reads": [
+   "catalogue.prepaid_minutes"
+  ],
+  "writes": [
+   "catalogue.prepaid_minutes"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRICE_CONFIGURE",
+  "offline": false,
+  "summary": "Time bought in advance and drawn down per visit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrizeCost": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/prizes/{prizeId}/cost",
+  "reads": [
+   "games.prize_cost"
+  ],
+  "writes": [
+   "games.prize_cost"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "What a prize costs in tickets, and what it costs the venue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setProductRelationships": {
+  "contract": "promotions",
+  "verb": "PUT",
+  "path": "/product-relationships",
+  "reads": [
+   "promotions.product_relationship"
+  ],
+  "writes": [
+   "promotions.product_relationship"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Declare what upgrades to, pairs with or replaces what",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setReaderConfiguration": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/readers/{readerId}",
+  "reads": [
+   "games.reader"
+  ],
+  "writes": [
+   "games.reader"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_CONFIGURE",
+  "offline": false,
+  "summary": "What this reader charges, opens, shows and refuses",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setRecommendationSuppression": {
+  "contract": "promotions",
+  "verb": "PUT",
+  "path": "/recommendation-suppressions",
+  "reads": [
+   "promotions.recommendation_suppression"
+  ],
+  "writes": [
+   "promotions.recommendation_suppression"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Fatigue limits, frequency caps and hard exclusions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setReconciliationMatchingRules": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/reconciliation-rules",
+  "reads": [
+   "payments.matching_rules"
+  ],
+  "writes": [
+   "payments.matching_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "How a platform transaction is matched to a settled one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setReconciliationSource": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/reconciliation-sources",
+  "reads": [
+   "payments.reconciliation_source"
+  ],
+  "writes": [
+   "payments.reconciliation_source"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a settlement or statement feed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRedemptionRules": {
+  "contract": "games",
+  "verb": "PUT",
+  "path": "/redemption-rules",
+  "reads": [
+   "games.redemption_rules"
+  ],
+  "writes": [
+   "games.redemption_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "How tickets are earned, held and spent",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setRentalAgreementRequirements": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/agreement",
+  "reads": [
+   "rental.agreement_rules"
+  ],
+  "writes": [
+   "rental.agreement_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "The agreement, waiver and signature a rental needs",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalAvailabilityRules": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/availability-rules",
+  "reads": [
+   "rental.availability_rules"
+  ],
+  "writes": [
+   "rental.availability_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Operating hours, rental windows, buffers and release rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalDepositPolicy": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-deposit-policies",
+  "reads": [
+   "rental.deposit_policy"
+  ],
+  "writes": [
+   "rental.deposit_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_PRICE",
+  "offline": false,
+  "summary": "How much is held, how, and what happens to it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalDurationRules": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/duration",
+  "reads": [
+   "rental.duration_rules"
+  ],
+  "writes": [
+   "rental.duration_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Minimum, maximum, increment, extension and turnaround",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalFeePolicy": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-fee-policies",
+  "reads": [
+   "rental.fee_policy"
+  ],
+  "writes": [
+   "rental.fee_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_PRICE",
+  "offline": false,
+  "summary": "Grace period, late fees and extension pricing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalInventoryModel": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/inventory-model",
+  "reads": [
+   "rental.inventory_model"
+  ],
+  "writes": [
+   "rental.inventory_model"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Pooled, serialised or hybrid",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalOperationalRules": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/rules",
+  "reads": [
+   "rental.operational_rules"
+  ],
+  "writes": [
+   "rental.operational_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Who may rent it, how many, and what must happen at the counter",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setRentalProductLocations": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}/locations",
+  "reads": [
+   "rental.location_rule"
+  ],
+  "writes": [
+   "rental.location_rule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Where it can be collected, and where it can be returned",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setResourceAllocationPolicy": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resource-allocation-policy",
+  "reads": [
+   "resources.allocation_policy"
+  ],
+  "writes": [
+   "resources.allocation_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Rotation, priority and scoring",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceDependencies": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resources/{resourceId}/dependencies",
+  "reads": [
+   "resources.resource_dependency"
+  ],
+  "writes": [
+   "resources.resource_dependency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define what must come with it, and what cannot",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceHierarchy": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resources/{resourceId}/hierarchy",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Re-parent a resource, or attach children to it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceLifecycleState": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resources/{resourceId}/state",
+  "reads": [
+   "resources.resource"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Move a resource through its lifecycle, with a reason",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceSchedule": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resources/{resourceId}/schedule",
+  "reads": [
+   "resources.resource_schedule"
+  ],
+  "writes": [
+   "resources.resource_schedule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Operating hours, working pattern and bookable slots",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceSelectionPolicy": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resource-selection-policy",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Whether the guest may choose the resource, per ticket type",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceVenueAssignment": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resources/{resourceId}/venues",
+  "reads": [
+   "resources.venue_assignment"
+  ],
+  "writes": [
+   "resources.venue_assignment"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Where it may operate, and whether it travels",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSeatHoldType": {
+  "contract": "seating",
+  "verb": "PUT",
+  "path": "/seat-hold-types",
+  "reads": [
+   "seating.hold_type"
+  ],
+  "writes": [
+   "seating.hold_type"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Define a hold kind, its owner and its release rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSeatRecommendationRules": {
+  "contract": "seating",
+  "verb": "PUT",
+  "path": "/seat-recommendation-rules",
+  "reads": [
+   "seating.recommendation_rules"
+  ],
+  "writes": [
+   "seating.recommendation_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Scoring for best seat, best value, closest, family and accessible",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSeatRules": {
+  "contract": "seating",
+  "verb": "PUT",
+  "path": "/seat-rules",
+  "reads": [
+   "seating.seat_rules"
+  ],
+  "writes": [
+   "seating.seat_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Which seats are killed, buffered, paired or reserved for access",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSemanticModel": {
+  "contract": "reporting",
+  "verb": "PUT",
+  "path": "/semantic-model",
+  "reads": [
+   "reporting.semantic_model"
+  ],
+  "writes": [
+   "reporting.semantic_model"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "REPORT_MANAGE",
+  "offline": false,
+  "summary": "Publish the catalogue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setSessionTemplate": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/session-templates",
+  "reads": [
+   "catalogue.session_template"
+  ],
+  "writes": [
+   "catalogue.session_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define slot length, capacity, bands and walk-in policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSharedWalletMembers": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/shared-wallets/{sharedWalletId}/members",
+  "reads": [
+   "wallet.shared_wallet_member"
+  ],
+  "writes": [
+   "wallet.shared_wallet_member"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Allowances, budgets and what each member may spend on",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setShiftTemplate": {
+  "contract": "workforce",
+  "verb": "PUT",
+  "path": "/shift-templates",
+  "reads": [
+   "workforce.shift_template"
+  ],
+  "writes": [
+   "workforce.shift_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_MANAGE",
+  "offline": false,
+  "summary": "Define a shift pattern, its breaks and its qualifications",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSpace": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/spaces",
+  "reads": [
+   "catalogue.space"
+  ],
+  "writes": [
+   "catalogue.space"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a space, its capacity and its access rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setStaffingRules": {
+  "contract": "workforce",
+  "verb": "PUT",
+  "path": "/staffing-rules",
+  "reads": [
+   "workforce.staffing_rules"
+  ],
+  "writes": [
+   "workforce.staffing_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_MANAGE",
+  "offline": false,
+  "summary": "Minimum cover, working-hour limits and overtime",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTrialConfiguration": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/trial-configurations",
+  "reads": [
+   "subscription.trial_config"
+  ],
+  "writes": [
+   "subscription.trial_config"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "What a trial includes, how long it lasts and how it converts",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setVsiModel": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/vsi-models",
+  "reads": [
+   "subscription.vsi_model"
+  ],
+  "writes": [
+   "subscription.vsi_model"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Weights, thresholds and the tiers they map to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setWalletAccountingMapping": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-accounting",
+  "reads": [
+   "wallet.accounting_mapping"
+  ],
+  "writes": [
+   "wallet.accounting_mapping"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Which ledger account each credit type sits in",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletChannelRules": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-channel-rules",
+  "reads": [
+   "wallet.channel_rules"
+  ],
+  "writes": [
+   "wallet.channel_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Where a wallet may be used, on what, and when it may not",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletFundingRules": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-funding-rules",
+  "reads": [
+   "wallet.funding_rules"
+  ],
+  "writes": [
+   "wallet.funding_rules"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Amounts, channels, bonuses, limits and velocity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletRefundPolicy": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-refund-policy",
+  "reads": [
+   "wallet.refund_policy"
+  ],
+  "writes": [
+   "wallet.refund_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "What a refund puts back, and where",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletRestriction": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-restrictions",
+  "reads": [
+   "wallet.restriction"
+  ],
+  "writes": [
+   "wallet.restriction"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Block, freeze or restrict a wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletRiskRules": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-risk-rules",
+  "reads": [
+   "wallet.risk_rules"
+  ],
+  "writes": [
+   "wallet.risk_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Velocity, behaviour and what happens when a rule trips",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setWalletTransferRules": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-transfer-rules",
+  "reads": [
+   "wallet.transfer_rules"
+  ],
+  "writes": [
+   "wallet.transfer_rules"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Whether guests may move money to each other, and on what terms",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "signApprovalDecision": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-requests/{requestId}/signature",
+  "reads": [
+   "approvals.signature"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_DECIDE",
+  "offline": false,
+  "summary": "Sign a decision, so it can be proved later",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "signRentalAgreement": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/agreement",
+  "reads": [
+   "rental.agreement_signature"
+  ],
+  "writes": [
+   "rental.agreement_signature"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_BOOK",
+  "offline": false,
+  "summary": "Capture the signature, against a version",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "simulateAccessPolicy": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-policies/simulate",
+  "reads": [
+   "identity.access_decision"
+  ],
+  "writes": [
+   "identity.access_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "What this policy would decide, before it decides anything",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulateCommercialPackage": {
+  "contract": "subscription",
+  "verb": "POST",
+  "path": "/package-simulations",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "What this package would cost, and what it would provision",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "simulateCreditConsumption": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/credit-consumption/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Which credit this purchase would actually use",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "simulateGameplayAuthorisation": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/gameplay-authorisations/simulate",
+  "reads": [
+   "games.authorisation"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "What would happen if this card tapped this reader",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulatePaymentConfiguration": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-configuration/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "What a guest would be offered, and what it would cost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "simulatePaymentRouting": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-routing/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Where would this transaction go, and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "simulateRecommendationStrategy": {
+  "contract": "promotions",
+  "verb": "POST",
+  "path": "/recommendation-simulations",
+  "reads": [],
+  "writes": [
+   "promotions.recommendation_strategy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Replay a strategy against history before it goes live",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulateRentalPricing": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-price/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_PRICE",
+  "offline": false,
+  "summary": "Test a commercial configuration before publishing it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "startDeviceFirmwareRollout": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/device-firmware/rollouts",
+  "reads": [
+   "tenancy.device_rollout"
+  ],
+  "writes": [
+   "tenancy.device_rollout"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Push an update to a fleet, in waves",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "submitAccreditationDocument": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-documents",
+  "reads": [
+   "accreditation.document"
+  ],
+  "writes": [
+   "accreditation.document"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Supply a document against a requirement",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "submitChargebackEvidence": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/chargebacks/{chargebackId}/evidence",
+  "reads": [
+   "payments.chargeback_evidence"
+  ],
+  "writes": [
+   "payments.chargeback_evidence"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_DISPUTE",
+  "offline": false,
+  "summary": "Assemble and send a representment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "suggestResources": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-suggestions",
+  "reads": [
+   "resources.resource"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Resources matching a requirement, by attribute",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "swapRentalEquipment": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-bookings/{bookingId}/swap",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_OPERATE",
+  "offline": false,
+  "summary": "Replace a faulty item mid-rental",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "testPaymentProviderConnection": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-providers/{connectionId}/test",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_PROVIDER_MANAGE",
+  "offline": false,
+  "summary": "Prove the connection works before anybody pays through it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "testReader": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/readers/{readerId}/test",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_CONFIGURE",
+  "offline": false,
+  "summary": "Prove a reader works before a guest finds out it does not",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateAccessPolicy": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/access-policies/{policyId}",
+  "reads": [
+   "identity.access_policy"
+  ],
+  "writes": [
+   "identity.access_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Change a policy, as a new version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateAccreditationHolder": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-holders/{holderId}",
+  "reads": [
+   "accreditation.holder"
+  ],
+  "writes": [
+   "accreditation.holder"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Amend identity, affiliation or contact details",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateCreditType": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/credit-types/{creditTypeId}",
+  "reads": [
+   "wallet.credit_type"
+  ],
+  "writes": [
+   "wallet.credit_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Change a kind of credit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updatePaymentMethod": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-methods/{methodId}",
+  "reads": [
+   "payments.method"
+  ],
+  "writes": [
+   "payments.method"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Change availability, fees and eligibility",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateRecommendationStrategy": {
+  "contract": "promotions",
+  "verb": "PUT",
+  "path": "/recommendation-strategies/{strategyId}",
+  "reads": [
+   "promotions.recommendation_strategy"
+  ],
+  "writes": [
+   "promotions.recommendation_strategy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Change a strategy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateRentalBooking": {
+  "contract": "rental",
+  "verb": "PATCH",
+  "path": "/rental-bookings/{bookingId}",
+  "reads": [
+   "rental.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_BOOK",
+  "offline": false,
+  "summary": "Modify, cancel or mark a no-show",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateRentalPricingProfile": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-pricing-profiles/{profileId}",
+  "reads": [
+   "rental.pricing_profile"
+  ],
+  "writes": [
+   "rental.pricing_profile"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_PRICE",
+  "offline": false,
+  "summary": "Change a pricing profile",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateRentalProduct": {
+  "contract": "rental",
+  "verb": "PUT",
+  "path": "/rental-products/{productId}",
+  "reads": [
+   "rental.product"
+  ],
+  "writes": [
+   "rental.product"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "Change a rental product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateResource": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resources/{resourceId}",
+  "reads": [
+   "resources.resource"
+  ],
+  "writes": [
+   "resources.resource"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_MANAGE",
+  "offline": false,
+  "summary": "Change a resource",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateResourceBooking": {
+  "contract": "resources",
+  "verb": "PATCH",
+  "path": "/resource-bookings/{bookingId}",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_BOOK",
+  "offline": false,
+  "summary": "Extend, shorten or reassign a booking",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateResourceCategory": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resource-categories/{categoryId}",
+  "reads": [
+   "resources.resource_category"
+  ],
+  "writes": [
+   "resources.resource_category"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Change a category",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateResourcePackage": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resource-packages/{packageId}",
+  "reads": [
+   "resources.resource_package"
+  ],
+  "writes": [
+   "resources.resource_package"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Change a combination",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateResourceType": {
+  "contract": "resources",
+  "verb": "PUT",
+  "path": "/resource-types/{resourceTypeId}",
+  "reads": [
+   "resources.resource_type"
+  ],
+  "writes": [
+   "resources.resource_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "RESOURCE_CONFIGURE",
+  "offline": false,
+  "summary": "Change a class of resource",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateWalletType": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-types/{walletTypeId}",
+  "reads": [
+   "wallet.wallet_type"
+  ],
+  "writes": [
+   "wallet.wallet_type"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Change a kind of wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "RetailService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "validateRentalProduct": {
+  "contract": "rental",
+  "verb": "POST",
+  "path": "/rental-products/{productId}/validate",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RENTAL_CONFIGURE",
+  "offline": false,
+  "summary": "What is still missing before this can be sold",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "validateSeatCompliance": {
+  "contract": "seating",
+  "verb": "GET",
+  "path": "/seat-compliance",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Whether the map still meets its obligations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "validateWorkforceCompliance": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/workforce-compliance",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Where the rota breaks a rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "verifyAccreditationDocument": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-documents/{documentId}/verify",
+  "reads": [
+   "accreditation.document"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPROVE",
+  "offline": false,
+  "summary": "Accept or refuse a submitted document",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres"
+  ]
  }
 }

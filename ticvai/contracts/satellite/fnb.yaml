@@ -3629,6 +3629,8 @@ paths:
         - "P08 BO-045 Menu Management"
         - "P08 BO-104 Food & Beverage"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
+        - "P08 BO-729 Create / Edit Outlet"
+        - "P08 BO-730 Outlet Types & Templates"
         - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
@@ -4722,6 +4724,7 @@ paths:
         - "P04 POS-022 Send to Kitchen"
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-046 Kitchen Display"
+        - "P08 BO-731 Operating Hours & Service Periods"
         - "P15 KIT-001 Kitchen Operations Command Center"
         - "P15 KIT-002 Kitchen Display System (KDS)"
         - "P15 KIT-004 Active Order Management & Fulfilment Journey"

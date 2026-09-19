@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 46
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -226,6 +226,8 @@ paths:
   /password-policy:
     put:
       operationId: setPasswordPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-421 Venue & Operational Structure Creation"
       summary: Length, breach check, lockout and step-up
       description: 'BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition,
         and `requireBreachCheck` stops more account takeovers than every composition rule combined.
@@ -261,6 +263,8 @@ paths:
   /segregation-rules:
     put:
       operationId: setSegregationRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-340 Segregation of Duties Policy Manager"
       x-ticvai-config-scope: tenant
       summary: Which permissions may not be held together
       description: 'BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the conflict
@@ -706,6 +710,7 @@ paths:
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-053 Staff Directory"
         - "P08 BO-057 Training & Certification"
+        - "P08 BO-873 Staff Resource Directory"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
         - "P13 CMS-019 User Access"
@@ -753,6 +758,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
         - "P09 ADM-020 Platform User Directory"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
         - "P10 PTR-003 Profile & Company Details"
       x-ticvai-audience:
       - staff
@@ -799,6 +805,7 @@ paths:
       operationId: getPrincipal
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
+        - "P08 BO-874 Staff Resource Profile"
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
       x-ticvai-audience:
@@ -2253,6 +2260,12 @@ paths:
   /access-policies:
     get:
       operationId: listAccessPolicies
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+        - "P08 BO-1177 API Security, Access & Integration Permissions"
+        - "P09 ADM-356 Integration Security & Access Control"
+        - "P13 CMS-086 Role-Based Asset Access & Permission Management"
+        - "P16 ANL-047 Report Access & Sharing Control"
       summary: Attribute-based access policies
       description: '3.3.1. **`Grant` is principal → role → scope, and forty-two matrix rows ask for
         something it cannot express.** *"Allows permissions to be granted dynamically based on attributes
@@ -2293,6 +2306,9 @@ paths:
                   $ref: '#/components/schemas/AccessPolicy'
     post:
       operationId: createAccessPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+        - "P13 CMS-086 Role-Based Asset Access & Permission Management"
       summary: Write a policy without writing code
       description: '3.3.5. *"Administrators shall configure access policies without software
         development."* **That sentence is the whole requirement and it decides the shape.** A policy is

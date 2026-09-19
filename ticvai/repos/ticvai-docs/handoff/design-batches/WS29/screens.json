@@ -1,115 +1,75 @@
 [
  {
-  "id": "BO-284",
-  "name": "Membership & Annual Pass Command Center",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.1",
-   "page": 4
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-annual-pass-command-center-bo-284",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipAnnualPassCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "BO-100"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "BO-100",
-    "BO-285",
-    "BO-286",
-    "BO-287",
-    "BO-288",
-    "BO-289",
-    "BO-290",
-    "BO-291",
-    "BO-292",
-    "BO-293"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "BO-100",
-     "trigger": "Venue Home",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "venueId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "BO-285",
-     "trigger": "Works in Membership Product & Tier Builder",
-     "provenance": "flow F138 step 1→2",
-     "operation": "listMembershipAnnualPass"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-286",
-     "trigger": "Works in Membership Eligibility & Qualification Rule Builder",
-     "provenance": "flow F138 step 3→4",
-     "operation": "listMembershipAnnualPass"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "BO-287",
-     "trigger": "Works in Validity, Activation & Expiry Configuration",
-     "provenance": "flow F138 step 5→6",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-288",
-     "trigger": "Works in Membership Entitlement & Admission Benefit Builder",
-     "provenance": "flow F138 step 7→8",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-289",
-     "trigger": "Works in Membership Usage, Visit & Consumption Rules",
-     "provenance": "flow F138 step 9→10",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-290",
-     "trigger": "Works in Family, Household & Dependent Membership Configuration",
-     "provenance": "flow F138 step 11→12",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-291",
-     "trigger": "Works in Membership Commercial, Pricing & Channel Association",
-     "provenance": "flow F138 step 13→14",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-292",
-     "trigger": "Works in Renewal, Auto-Renewal & Membership Continuity Configuration",
-     "provenance": "flow F138 step 15→16",
-     "operation": "listMembershipAnnualPass"
-    },
-    {
-     "to": "BO-293",
-     "trigger": "Works in Membership Product Validation, Approval, Publication & Versioning",
-     "provenance": "flow F138 step 17→18",
-     "operation": "listMembershipAnnualPass"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display; Identify) and no metric row",
-  "purpose": "Provide administrators with a centralized view of all membership, annual pass, season pass and subscription-style admission products.",
-  "purposeNote": "Administrators can view, search and manage the complete portfolio of membership and annual-pass products from one workspace.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Monthly Membership, Fixed-Term Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP Membership, Custom Membership …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -121,41 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every membership annual pass",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-        "MembershipAnnualPassCommandCenterView.annualPassProducts",
-        "MembershipAnnualPassCommandCenterView.draftProducts",
-        "MembershipAnnualPassCommandCenterView.activeMembers",
-        "MembershipAnnualPassCommandCenterView.familyMemberships",
-        "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon",
-        "MembershipAnnualPassCommandCenterView.renewalEnabledProducts",
-        "MembershipAnnualPassCommandCenterView.suspendedProducts",
-        "MembershipAnnualPassCommandCenterView.productsWithConfigurationIssues",
-        "MembershipAnnualPassCommandCenterView.averageMembershipDuration",
-        "MembershipAnnualPassCommandCenterView.productId",
-        "MembershipAnnualPassCommandCenterView.membershipName",
-        "MembershipAnnualPassCommandCenterView.type",
-        "MembershipAnnualPassCommandCenterView.tier",
-        "MembershipAnnualPassCommandCenterView.venueAttraction",
-        "MembershipAnnualPassCommandCenterView.validity",
-        "MembershipAnnualPassCommandCenterView.activationMethod",
-        "MembershipAnnualPassCommandCenterView.renewal",
-        "MembershipAnnualPassCommandCenterView.familyIndividual",
-        "MembershipAnnualPassCommandCenterView.currentMembers",
-        "MembershipAnnualPassCommandCenterView.effectiveDates",
-        "MembershipAnnualPassCommandCenterView.status",
-        "MembershipAnnualPassCommandCenterView.owner",
-        "MembershipAnnualPassCommandCenterView.missingEntitlements",
-        "MembershipAnnualPassCommandCenterView.missingPricingAssociation",
-        "MembershipAnnualPassCommandCenterView.missingValidity",
-        "MembershipAnnualPassCommandCenterView.invalidEligibility",
-        "MembershipAnnualPassCommandCenterView.conflictingRules",
-        "MembershipAnnualPassCommandCenterView.missingRenewalPolicy"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "MembershipAnnualPassCommandCenterView",
-       "operation": "listMembershipAnnualPass",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Display"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -165,41 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected membership annual pass",
-       "bindsTo": "MembershipAnnualPassCommandCenterView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-        "MembershipAnnualPassCommandCenterView.annualPassProducts",
-        "MembershipAnnualPassCommandCenterView.draftProducts",
-        "MembershipAnnualPassCommandCenterView.activeMembers",
-        "MembershipAnnualPassCommandCenterView.familyMemberships",
-        "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon",
-        "MembershipAnnualPassCommandCenterView.renewalEnabledProducts",
-        "MembershipAnnualPassCommandCenterView.suspendedProducts",
-        "MembershipAnnualPassCommandCenterView.productsWithConfigurationIssues",
-        "MembershipAnnualPassCommandCenterView.averageMembershipDuration",
-        "MembershipAnnualPassCommandCenterView.productId",
-        "MembershipAnnualPassCommandCenterView.membershipName",
-        "MembershipAnnualPassCommandCenterView.type",
-        "MembershipAnnualPassCommandCenterView.tier",
-        "MembershipAnnualPassCommandCenterView.venueAttraction",
-        "MembershipAnnualPassCommandCenterView.validity",
-        "MembershipAnnualPassCommandCenterView.activationMethod",
-        "MembershipAnnualPassCommandCenterView.renewal",
-        "MembershipAnnualPassCommandCenterView.familyIndividual",
-        "MembershipAnnualPassCommandCenterView.currentMembers",
-        "MembershipAnnualPassCommandCenterView.effectiveDates",
-        "MembershipAnnualPassCommandCenterView.status",
-        "MembershipAnnualPassCommandCenterView.owner",
-        "MembershipAnnualPassCommandCenterView.missingEntitlements",
-        "MembershipAnnualPassCommandCenterView.missingPricingAssociation",
-        "MembershipAnnualPassCommandCenterView.missingValidity",
-        "MembershipAnnualPassCommandCenterView.invalidEligibility",
-        "MembershipAnnualPassCommandCenterView.conflictingRules",
-        "MembershipAnnualPassCommandCenterView.missingRenewalPolicy"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": null,
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Display"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -209,1627 +128,1446 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Monthly Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Fixed-Term Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Corporate Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
       },
       {
        "kind": "secondaryButton",
-       "label": "Family Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
       },
       {
        "kind": "secondaryButton",
-       "label": "Individual Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
-       "label": "Student Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
       },
       {
        "kind": "secondaryButton",
-       "label": "VIP Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
       },
       {
        "kind": "secondaryButton",
-       "label": "Custom Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The membership annual pass list.",
-   "error": "Could not load. Names which read failed and leaves the membership annual pass untouched.",
-   "emptyFirstRun": "No membership annual pass yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the membership annual pass are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listMembershipAnnualPass",
-    "contract": "subscription",
-    "purpose": "Membership & Annual Pass Command Center",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "MembershipAnnualPassCommandCenterView.activeMembershipProducts",
-    "MembershipAnnualPassCommandCenterView.annualPassProducts",
-    "MembershipAnnualPassCommandCenterView.draftProducts",
-    "MembershipAnnualPassCommandCenterView.activeMembers",
-    "MembershipAnnualPassCommandCenterView.familyMemberships",
-    "MembershipAnnualPassCommandCenterView.membershipsExpiringSoon"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-284"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 4. 29 of 29 labels bound to a contract property; 45 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "BO-285",
-  "name": "Membership Product & Tier Builder",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.2",
-   "page": 5
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-product-tier-builder-bo-285",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipProductTierBuilder.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "BO-284"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "BO-284"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 2→3",
-     "operation": "setMembershipProductTier"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Capture; Define; Configure) and no display directory — it is settings, not a population",
-  "purpose": "Configure the fundamental definition and hierarchy of a membership/pass.",
-  "purposeNote": "Administrators can create and version membership products and tiers with clear relationships to the central TICVAI product catalogue.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Membership Name",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Membership Code",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Description",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Membership Type",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Brand",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Attraction",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Market",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency Context",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective From",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective To",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Tier Level",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Display Order",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Upgrade Path",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Downgrade Path",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Parent Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "selectField",
-       "label": "Replacement Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
-      },
-      {
-       "kind": "textField",
-       "label": "Individual / Family / Corporate",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Named / Transferable",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Physical / Digital",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Renewable / Non-Renewable",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Auto-Renew Eligible",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "Admission-Based / Benefit-Based / Hybrid",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Configure"
-      }
-     ]
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setMembershipProductTier"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The membership product tier configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership product tier untouched.",
-   "emptyFirstRun": "No membership product tier configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setMembershipProductTier",
-    "contract": "subscription",
-    "purpose": "Membership Product & Tier Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMembershipProductTier"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-285"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 23 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-286",
-  "name": "Membership Eligibility & Qualification Rule Builder",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.3",
-   "page": 7
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-eligibility-qualification-rule-builder-bo-286",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipEligibilityQualificationRuleBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 4→5",
-     "operation": "setMembershipEligibilityQualification"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether qualification requires) and no display directory — it is settings, not a population",
-  "purpose": "Determine who is allowed to purchase, activate, hold or renew a particular membership.",
-  "purposeNote": "rules and returns an explainable result.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Multiple Memberships Allowed",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "One Membership per Customer",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mutually Exclusive Memberships",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Prerequisite Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Existing Tier Requirement",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "No Verification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      },
-      {
-       "kind": "selectField",
-       "label": "Customer Declaration",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      },
-      {
-       "kind": "selectField",
-       "label": "Document Verification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      },
-      {
-       "kind": "selectField",
-       "label": "Identity Verification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      },
-      {
-       "kind": "selectField",
-       "label": "Staff Verification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      },
-      {
-       "kind": "selectField",
-       "label": "External Verification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 7 §Configure whether qualification requires"
-      }
-     ]
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setMembershipEligibilityQualification"
-      }
-     ]
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
-  "states": {
-   "loading": "The membership eligibility qualification configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership eligibility qualification untouched.",
-   "emptyFirstRun": "No membership eligibility qualification configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setMembershipEligibilityQualification",
-    "contract": "subscription",
-    "purpose": "Membership Eligibility & Qualification Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMembershipEligibilityQualification"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-286"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 11 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-287",
-  "name": "Validity, Activation & Expiry Configuration",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.4",
-   "page": 8
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/validity-activation-expiry-configuration-bo-287",
-   "component": "apps/venue-management-web/src/routes/sell/ValidityActivationExpiryConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 6→7",
-     "operation": "setValidityActivationExpiry"
-    }
-   ]
-  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define exactly when a membership becomes valid, how long it remains valid and how it expires.",
-  "gaps": [
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 8"
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
    },
    {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 8"
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
    "template": "split",
    "regions": [
     {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setValidityActivationExpiry"
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
     {
      "name": "contentBody",
+     "slot": "carried",
      "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setValidityActivationExpiry"
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The validity activation expiry list.",
-   "error": "Could not load. Names which read failed and leaves the validity activation expiry untouched.",
-   "emptyFirstRun": "No validity activation expiry yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the validity activation expiry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "setValidityActivationExpiry",
-    "contract": "subscription",
-    "purpose": "Validity, Activation & Expiry Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setValidityActivationExpiry"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-287"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 5 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-288",
-  "name": "Membership Entitlement & Admission Benefit Builder",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.5",
-   "page": 9
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-entitlement-admission-benefit-builder-bo-288",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipEntitlementAdmissionBenefitBuilder.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 8→9",
-     "operation": "setMembershipEntitlementAdmission"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Define exactly what the member receives. This is the heart of the membership product.",
-  "purposeNote": "Administrators can define the complete admission and benefit package associated with every membership tier.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Guest Tickets, Booking Privileges. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Venue",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Attraction",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Event Type",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Admission Type",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Number of Visits",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Period",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Days",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Times",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Timeslots",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Per Day",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Per Week",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Per Month",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Per Membership Year",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Lifetime of Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Guest Tickets",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Booking Privileges",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The membership entitlement admission configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership entitlement admission untouched.",
-   "emptyFirstRun": "No membership entitlement admission configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setMembershipEntitlementAdmission",
-    "contract": "subscription",
-    "purpose": "Membership Entitlement & Admission Benefit Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setMembershipEntitlementAdmission"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-288"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 16 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-289",
-  "name": "Membership Usage, Visit & Consumption Rules",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.6",
-   "page": 11
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-usage-visit-consumption-rules-bo-289",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipUsageVisitConsumptionRules.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 10→11",
-     "operation": "listMembershipUsageVisit"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Maintain counters such as) and no metric row",
-  "purpose": "Control how membership entitlements may actually be consumed. Screen 13.1.5 defines what the member receives. Screen 13.1.6 defines how it may be used.",
-  "purposeNote": "Membership entitlement usage is governed consistently across reservation, ticketing and access-control channels.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every membership usage visit",
-       "columns": [
-        "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
-       ],
-       "bindsTo": "MembershipUsageVisitConsumptionRulesView",
-       "operation": "listMembershipUsageVisit",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected membership usage visit",
-       "bindsTo": "MembershipUsageVisitConsumptionRulesView",
-       "columns": [
-        "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Unlimited annual visits”, “Access Integration”.",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The membership usage visit list.",
-   "error": "Could not load. Names which read failed and leaves the membership usage visit untouched.",
-   "emptyFirstRun": "No membership usage visit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the membership usage visit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMembershipUsageVisit",
-    "contract": "subscription",
-    "purpose": "Membership Usage, Visit & Consumption Rules",
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "MembershipUsageVisitConsumptionRulesView.parking12UsesThisYear"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-289"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 11. 1 of 1 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P08",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P12",
-     "P13",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-290",
-  "name": "Family, Household & Dependent Membership Configuration",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.7",
-   "page": 12
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/family-household-dependent-membership-configuration-bo-290",
-   "component": "apps/venue-management-web/src/routes/sell/FamilyHouseholdDependentMembershipConfiguration.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 12→13",
-     "operation": "setFamilyHouseholdDependent"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure; Possible configured action) and no display directory — it is settings, not a population",
-  "purpose": "Support memberships covering more than one person while preserving individual identities and entitlements.",
-  "purposeNote": "roles, eligibility and shared/individual entitlements.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Primary Member",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Secondary Adult",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Dependent",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Child",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Guardian",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Authorized Manager",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Minimum Age",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Maximum Age",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Relationship Requirement",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Verification Requirement",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "Same Household Requirement where applicable",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Allowed",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Date",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Frequency",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fee",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Approval",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Eligibility Revalidation",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Grace Period",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Possible configured action"
-      },
-      {
-       "kind": "selectField",
-       "label": "Upgrade Required",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Possible configured action"
-      },
-      {
-       "kind": "selectField",
-       "label": "Renewal Correction",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Possible configured action"
-      },
-      {
-       "kind": "selectField",
-       "label": "Manual Review",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 12 §Possible configured action"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setFamilyHouseholdDependent"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The family household dependent configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the family household dependent untouched.",
-   "emptyFirstRun": "No family household dependent configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setFamilyHouseholdDependent",
-    "contract": "subscription",
-    "purpose": "Family, Household & Dependent Membership Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFamilyHouseholdDependent"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-290"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-291",
-  "name": "Membership Commercial, Pricing & Channel Association",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.8",
-   "page": 14
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-commercial-pricing-channel-association-bo-291",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipCommercialPricingChannelAssociation.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 14→15",
-     "operation": "listMembershipCommercialPricing"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure sale through; Configure) and no display directory — it is settings, not a population",
-  "purpose": "Connect the membership contract to TICVAI's central commercial engines without duplicating pricing configuration.",
-  "purposeNote": "Membership products can be commercially sold across authorized channels using centrally governed pricing, tax, fee and payment services.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "B2C",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile App",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "POS",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Call Center",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Box Office",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Kiosk",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "B2B",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Corporate",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reseller",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "API",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
-      },
-      {
-       "kind": "selectField",
-       "label": "Always Available",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Fixed Sales Window",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Seasonal Sale",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Invitation Only",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Capacity Limited",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The membership commercial pricing configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership commercial pricing untouched.",
-   "emptyFirstRun": "No membership commercial pricing configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMembershipCommercialPricing",
-    "contract": "subscription",
-    "purpose": "Membership Commercial, Pricing & Channel Association",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-291"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 15 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-292",
-  "name": "Renewal, Auto-Renewal & Membership Continuity Configuration",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.9",
-   "page": 15
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/renewal-auto-renewal-membership-continuity-configuration-bo-292",
-   "component": "apps/venue-management-web/src/routes/sell/RenewalAutoRenewalMembershipContinuityConfigurat.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "BO-284",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F138 step 16→17",
-     "operation": "setRenewalAutoMembership"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure; At renewal, configure whether) and no display directory — it is settings, not a population",
-  "purpose": "Define how a membership moves from one validity period into the next.",
-  "purposeNote": "continuity, commercial terms and required customer consent.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Customer Self-Service Renewal. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
-   }
-  ],
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "60 days before expiry",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Eligible Products",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Consent Requirement",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Payment Method Requirement",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Pre-Renewal Notification",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Retry Policy",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Failure Handling",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Same Tier Only",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §At renewal, configure whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Upgrade Allowed",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §At renewal, configure whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Downgrade Allowed",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §At renewal, configure whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Suggested Tier",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §At renewal, configure whether"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Customer Self-Service Renewal",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 15 §Support"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The renewal auto-renewal membership configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the renewal auto-renewal membership untouched.",
-   "emptyFirstRun": "No renewal auto-renewal membership configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setRenewalAutoMembership",
-    "contract": "subscription",
-    "purpose": "Renewal, Auto-Renewal & Membership Continuity Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRenewalAutoMembership"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-292"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-293",
-  "name": "Membership Product Validation, Approval, Publication & Versioning",
-  "module": "Sell",
-  "requiresModule": "membership",
-  "wave": 3,
-  "source": {
-   "pack": "Membership___Annual_Pass_Management_Reference.pdf",
-   "board": "1",
-   "number": "13.1.10",
-   "page": 17
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/membership-product-validation-approval-publication-versi-bo-293",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipProductValidationApprovalPublicationVe.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-284"
-   ],
-   "exitTo": [
-    "BO-284"
-   ],
-   "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population",
-  "purpose": "Provide the final governance layer before a membership/pass configuration becomes commercially available.",
-  "purposeNote": "Only validated, approved and correctly versioned membership configurations can become commercially active, with complete impact and audit history. Board 1 — Final Screen Register # Backend Screen Core Responsibility 13.1. Membership & Annual Pass Command Center Portfolio management 1 13.1. Membership Product & Tier Builder Product/tier definition 2 13.1. Membership Eligibility & Qualification Rule Builder Member eligibility 3 13.1. Validity, Activation & Expiry Configuration Membership lifecycle 4 13.1. Benefits and Membership Entitlement & Admission Benefit Builder 5 entitlements 13.1. Member",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "B2C",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "POS",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mobile App",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Call Center",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "B2B",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Access Control",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Ticketing",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      },
-      {
-       "kind": "selectField",
-       "label": "Other dependent services",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 17 §Synchronize relevant configuration with"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Approve",
-       "provenance": "contract operation approveMembershipProductValidation"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The membership product validation configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the membership product validation untouched.",
-   "emptyFirstRun": "No membership product validation configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "approveMembershipProductValidation",
-    "contract": "subscription",
-    "purpose": "Membership Product Validation, Approval, Publication & Versioning",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveMembershipProductValidation"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-293"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

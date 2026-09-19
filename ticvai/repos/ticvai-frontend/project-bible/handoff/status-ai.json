@@ -46,9 +46,9 @@
   "states": 11,
   "events": 11,
   "tables": 51,
-  "screens": 34,
+  "screens": 40,
   "flows": 11,
-  "documents": 27,
+  "documents": 29,
   "openConflicts": 1
  },
  "metrics": {
@@ -98,7 +98,7 @@
  },
  "waves": {
   "wave2": 15,
-  "wave3": 13,
+  "wave3": 19,
   "wave1": 6
  },
  "reachedOutsideTheContract": [
@@ -184,6 +184,16 @@
   {
    "file": "docs\\active\\change-log-validation-18-september.md",
    "title": "Validating the developer team's Change Log",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\contract-audit-19-september.md",
+   "title": "Contract audit \u2014 every contract against the four things that must agree with it",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\contract-run-plan-19-september.md",
+   "title": "The contract run \u2014 plan",
    "status": ""
   },
   {

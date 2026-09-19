@@ -1,4 +1,4 @@
--- workforce — 6 tables
+-- workforce — 10 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
@@ -51,10 +51,46 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
     exception                         text
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.leave_request (
+    id                                uuid PRIMARY KEY,
+    principal_id                      uuid NOT NULL,
+    kind                              text NOT NULL,
+    "from"                            date NOT NULL,
+    "to"                              date NOT NULL,
+    half_day                          boolean,
+    reason                            text,
+    status                            text,
+    approval_request_id               uuid,
+    scope_path                        text
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.open_shift (
+    id                                uuid PRIMARY KEY,
+    rota_assignment_id                uuid,
+    shift_template_id                 uuid,
+    venue_id                          uuid,
+    position_code                     text,
+    "from"                            timestamptz,
+    "to"                              timestamptz,
+    released_by                       uuid,
+    reason                            text,
+    required_qualifications           text[],
+    eligible_principal_count          integer,
+    incentive_rate_multiplier         numeric(18,4),
+    status                            text,
+    claimed_by                        uuid,
+    claimed_at                        timestamptz,
+    scope_path                        text
+);
+
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
 -- on a rota never touch a till Hangs off: a root — nothing above it in its schema; references
 -- identity.principal, identity.role, platform.org_unit. Reached by: 6 operations read it and 2
--- write it; 2 tables reference it.
+-- write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     overtime_minutes                  integer,
     rest_period_before                integer,
@@ -88,6 +124,35 @@ CREATE TABLE IF NOT EXISTS workforce.shift_swap (
     approval_request_id               text,
     reason                            text,
     requested_at                      timestamptz
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.shift_template (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    kind                              text,
+    starts_at                         text,
+    ends_at                           text,
+    required_qualifications           text[],
+    role_code                         text,
+    cost_centre                       text,
+    hourly_rate                       numeric(18,4),
+    scope_path                        text
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.staffing_rules (
+    maximum_hours_per_day             integer,
+    maximum_hours_per_week            integer,
+    minimum_rest_hours                integer,
+    maximum_consecutive_days          integer,
+    overtime                          jsonb,
+    minimum_age_for_night_shift       integer,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

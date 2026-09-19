@@ -1,4 +1,4 @@
--- approvals — 8 tables
+-- approvals — 15 tables
 -- **Derived. Do not hand-edit.**
 
 -- The badge an approved accreditation actually issues, held apart from the request that granted
@@ -15,6 +15,38 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
     issued_at                         timestamptz,
     expires_at                        timestamptz,
     revoked_reason                    text
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.approver_availability (
+    principal_id                      uuid,
+    unavailable_from                  timestamptz,
+    unavailable_to                    timestamptz,
+    substitute_principal_id           uuid,
+    delegation_id                     uuid,
+    reason                            text,
+    applies_to_request_kinds          text[],
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.control_policy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text,
+    applies_to_request_kinds          text[],
+    applies_above_value               numeric(18,4),
+    control                           text NOT NULL,
+    required_approver_group_ids       text[],
+    minimum_approvers                 integer,
+    requires_step_up                  boolean,
+    requires_signature                boolean,
+    break_glass_allowed               boolean,
+    scope_path                        text,
+    is_active                         boolean
 );
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
@@ -36,9 +68,26 @@ CREATE TABLE IF NOT EXISTS approvals.decision (
     request_id                        text NOT NULL
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.decision_record (
+    request_id                        uuid,
+    sequence                          integer,
+    recorded_at                       timestamptz,
+    decision                          text,
+    decided_by                        uuid,
+    comment                           text,
+    payload_hash                      text,
+    previous_record_hash              text,
+    record_hash                       text,
+    integrity                         text,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody
 -- remembers Hangs off: reaches approvals.request through its keys; references identity.principal.
--- Reached by: 4 operations read it and 2 write it.
+-- Reached by: 4 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.delegation (
     id                                uuid PRIMARY KEY,
     delegator_principal_id            uuid NOT NULL,
@@ -59,6 +108,22 @@ CREATE TABLE IF NOT EXISTS approvals.escalation (
     request_id                        text NOT NULL
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.evidence_package (
+    id                                uuid PRIMARY KEY,
+    requested_by                      uuid,
+    requested_at                      timestamptz,
+    "from"                            timestamptz,
+    "to"                              timestamptz,
+    request_count                     integer,
+    integrity_failures                integer,
+    status                            text,
+    asset_id                          uuid,
+    expires_at                        timestamptz,
+    scope_path                        text
+);
+
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
 -- raised under Hangs off: reaches approvals.request through its keys. Reached by: 4 operations
 -- read it and 1 write it; 1 tables reference it.
@@ -73,8 +138,8 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
 -- off: a root — nothing above it in its schema; references identity.principal, pii.subject.
--- Reached by: 6 operations read it and 8 write it; 8 tables reference it; written by 3 contracts —
--- approvals, subscription, workforce.
+-- Reached by: 6 operations read it and 8 write it; 16 tables reference it; written by 3 contracts
+-- — approvals, subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
@@ -104,6 +169,20 @@ CREATE TABLE IF NOT EXISTS approvals.request (
     completed_at                      timestamptz
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.retention_policy (
+    id                                uuid PRIMARY KEY,
+    applies_to_request_kinds          text[],
+    retain_years                      integer,
+    retain_signatures                 boolean,
+    retain_attachments                boolean,
+    on_expiry                         text,
+    overrides_privacy_deletion        boolean,
+    legal_basis                       text,
+    scope_path                        text
+);
+
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 5
 -- operations read it and 1 write it; 1 tables reference it.
@@ -125,6 +204,36 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     escalate_to_role_ids              text[],
     expires_after_minutes             integer,
     matrix_id                         uuid NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.signature (
+    id                                uuid PRIMARY KEY,
+    request_id                        uuid,
+    signed_by                         uuid,
+    signed_at                         timestamptz,
+    method                            text,
+    payload_hash                      text,
+    signature                         text,
+    certificate_subject               text,
+    step_up_verified                  boolean,
+    scope_path                        text
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS approvals.sla_policy (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    applies_to_request_kinds          text[],
+    target_minutes                    integer,
+    business_hours_only               boolean,
+    calendar_id                       uuid,
+    on_breach                         text,
+    auto_action_allowed               boolean,
+    escalation_group_id               uuid,
+    scope_path                        text
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

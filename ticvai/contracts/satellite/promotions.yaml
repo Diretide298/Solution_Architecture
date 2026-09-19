@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 119
+  x-ticvai-screen-count: 133
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -201,6 +201,7 @@ paths:
     post:
       operationId: getRecommendations
       x-ticvai-consumed-by:
+        - "P08 BO-1048 Seat Upsell Recommendations"
         - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
       summary: What else this guest might want
       description: 'BL-068. **Rule-based recommendation exists; profile-and-cart-driven does not**, and
@@ -5685,6 +5686,13 @@ paths:
   /recommendation-strategies:
     get:
       operationId: listRecommendationStrategies
+      x-ticvai-consumed-by:
+        - "P09 ADM-639 Recommendation Command Center"
+        - "P09 ADM-640 Recommendation Strategy Manager"
+        - "P09 ADM-647 Recommendation Policy, AI Control & Governance"
+        - "P09 ADM-670 Customer Journey Map & Touchpoint Designer"
+        - "P09 ADM-676 Omnichannel Recommendation Synchronization"
+        - "P09 ADM-695 Recommendation Governance & Deployment Control"
       summary: The strategies deciding what gets offered where
       description: 'Upsell board 1. **A strategy is the unit, not an individual recommendation.** The
         board asks for objectives, placements, channels, ranking, suppression and guardrails — six things
@@ -5719,6 +5727,8 @@ paths:
                   $ref: '#/components/schemas/RecommendationStrategy'
     post:
       operationId: createRecommendationStrategy
+      x-ticvai-consumed-by:
+        - "P09 ADM-640 Recommendation Strategy Manager"
       summary: Define objective, placements, ranking and guardrails
       description: 'Upsell boards 1.3 and 1.8. **The objective and the guardrail are stated together
         because one without the other is dangerous.** *Maximise attach revenue* with no cap produces a
@@ -5757,6 +5767,27 @@ paths:
         format: uuid
     put:
       operationId: updateRecommendationStrategy
+      x-ticvai-consumed-by:
+        - "P09 ADM-640 Recommendation Strategy Manager"
+        - "P09 ADM-641 Recommendation Objective & KPI Configuration"
+        - "P09 ADM-643 Recommendation Placement & Touchpoint Manager"
+        - "P09 ADM-644 Channel & Journey Strategy Manager"
+        - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P09 ADM-646 Recommendation Guardrails & Business Controls"
+        - "P09 ADM-651 Upsell Eligibility & Qualification Rules"
+        - "P09 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
+        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P09 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
+        - "P09 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
+        - "P09 ADM-671 Real-Time Context Rule Engine"
+        - "P09 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
+        - "P09 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
+        - "P09 ADM-674 In-Venue & Location-Aware Recommendation Engine"
+        - "P09 ADM-675 Visit State, Itinerary & Time-Aware Recommendation"
+        - "P09 ADM-681 Customer Feature & Signal Configuration"
+        - "P09 ADM-683 Next-Best-Offer Decision Studio"
+        - "P09 ADM-684 Personalized Ranking & Decision Policy Builder"
+        - "P09 ADM-695 Recommendation Governance & Deployment Control"
       summary: Change a strategy
       tags:
       - recommendations
@@ -5782,6 +5813,9 @@ paths:
   /product-relationships:
     get:
       operationId: listProductRelationships
+      x-ticvai-consumed-by:
+        - "P09 ADM-642 Recommendation Type & Product Relationship Manager"
+        - "P09 ADM-650 Upgrade Path & Product Ladder Builder"
       summary: Upgrade ladders, cross-sells, affinities and substitutes
       description: 'Upsell boards 2.2, 3.2 and 3.3. **One table, because they are one kind of fact.** An
         upgrade ladder is an ordered relationship between two products; a cross-sell is an unordered one;
@@ -5820,6 +5854,12 @@ paths:
                   $ref: '#/components/schemas/ProductRelationship'
     put:
       operationId: setProductRelationships
+      x-ticvai-consumed-by:
+        - "P09 ADM-642 Recommendation Type & Product Relationship Manager"
+        - "P09 ADM-650 Upgrade Path & Product Ladder Builder"
+        - "P09 ADM-660 Cross-Sell Relationship Builder"
+        - "P09 ADM-663 Cross-Category Recommendation Manager"
+        - "P09 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
       summary: Declare what upgrades to, pairs with or replaces what
       tags:
       - recommendations
@@ -5854,6 +5894,10 @@ paths:
   /product-affinity:
     get:
       operationId: getProductAffinity
+      x-ticvai-consumed-by:
+        - "P09 ADM-661 Product Affinity Matrix & Relationship Map"
+        - "P09 ADM-662 Frequently Bought Together & Basket Pattern Engine"
+        - "P09 ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine"
       summary: What is actually bought together
       description: 'Upsell boards 3.3 and 3.4. **Measured from baskets, not declared.** *Frequently bought
         together* is a fact about what happened, and a merchandiser''s intuition about what should pair
@@ -5899,6 +5943,14 @@ paths:
   /recommendations/explain:
     post:
       operationId: explainRecommendation
+      x-ticvai-consumed-by:
+        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
+        - "P09 ADM-680 Customer Recommendation Profile"
+        - "P09 ADM-683 Next-Best-Offer Decision Studio"
+        - "P09 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
+        - "P09 ADM-687 AI Explainability, Confidence & Model Governance"
+        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
+        - "P09 ADM-697 Recommendation Audit, Decision Trace & Investigation"
       summary: Why this was offered, and what was suppressed
       description: 'Upsell boards 4.10 and 6.9. **The decision trace, including what did not make the
         list.** A merchandiser asking *why are we not offering the parking upsell* is asking about a
@@ -5958,6 +6010,11 @@ paths:
   /upgrade-offers:
     post:
       operationId: quoteUpgrade
+      x-ticvai-consumed-by:
+        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P09 ADM-654 Membership & Pass Upgrade Engine"
+        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
       summary: What upgrading this order or ticket would cost
       description: 'Upsell boards 2.4, 2.5 and 2.6. **The price difference, not the new price.** A guest
         upgrading from standard to VIP pays the gap, and computing that gap needs the original paid
@@ -6022,6 +6079,9 @@ paths:
   /recommendation-experiments:
     get:
       operationId: listRecommendationExperiments
+      x-ticvai-consumed-by:
+        - "P09 ADM-691 Recommendation Experiment & A/B Test Studio"
+        - "P09 ADM-692 Experiment Results & Winner Decision Workspace"
       summary: A/B tests on placements and strategies
       tags:
       - recommendations
@@ -6041,6 +6101,8 @@ paths:
                   $ref: '#/components/schemas/RecommendationExperiment'
     post:
       operationId: createRecommendationExperiment
+      x-ticvai-consumed-by:
+        - "P09 ADM-691 Recommendation Experiment & A/B Test Studio"
       summary: Split traffic between strategies
       description: 'Upsell boards 6.3 and 6.4. **The allocation is fixed at creation and the winner is
         declared explicitly.** An experiment whose split drifts is not an experiment, and one that is
@@ -6081,6 +6143,8 @@ paths:
         format: uuid
     post:
       operationId: concludeRecommendationExperiment
+      x-ticvai-consumed-by:
+        - "P09 ADM-692 Experiment Results & Winner Decision Workspace"
       summary: Declare a winner and roll it out
       tags:
       - recommendations
@@ -6117,6 +6181,18 @@ paths:
   /recommendation-performance:
     get:
       operationId: getRecommendationPerformance
+      x-ticvai-consumed-by:
+        - "P09 ADM-639 Recommendation Command Center"
+        - "P09 ADM-649 Upsell & Upgrade Command Center"
+        - "P09 ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine"
+        - "P09 ADM-659 Cross-Sell Command Center"
+        - "P09 ADM-669 Journey & Context Command Center"
+        - "P09 ADM-679 Personalization & NBO Command Center"
+        - "P09 ADM-682 Propensity Model & Customer Intent Manager"
+        - "P09 ADM-689 Recommendation Performance Command Center"
+        - "P09 ADM-690 Recommendation Strategy & Placement Analytics"
+        - "P09 ADM-693 Recommendation Attribution & Incrementality Analytics"
+        - "P09 ADM-694 AI Model Performance & Drift Monitor"
       summary: Impressions, acceptance, revenue and incremental lift
       description: 'Upsell boards 6.1, 6.2 and 6.5. **Attributed revenue and incremental revenue are
         reported apart**, because the first flatters and the second is true. A strategy that shows an
@@ -6163,6 +6239,10 @@ paths:
   /recommendation-suppressions:
     put:
       operationId: setRecommendationSuppression
+      x-ticvai-consumed-by:
+        - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P09 ADM-677 Contextual Trigger, Frequency & Experience Controls"
+        - "P09 ADM-685 Customer Preference, Fatigue & Suppression Intelligence"
       summary: Fatigue limits, frequency caps and hard exclusions
       description: 'Upsell boards 1.7 and 5.7. **Fatigue is the reason a good recommender stops working.**
         A guest offered the same parking upsell at every touchpoint for three visits has learned to
@@ -6196,6 +6276,13 @@ paths:
   /recommendation-simulations:
     post:
       operationId: simulateRecommendationStrategy
+      x-ticvai-consumed-by:
+        - "P09 ADM-648 Recommendation Strategy Simulator & AI Advisor"
+        - "P09 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
+        - "P09 ADM-668 Cross-Sell Simulator & AI Opportunity Advisor"
+        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
+        - "P09 ADM-688 Personalization Simulator & Next-Best-Offer Lab"
+        - "P09 ADM-698 AI Optimization & Recommendation Intelligence Lab"
       summary: Replay a strategy against history before it goes live
       description: 'Upsell boards 1.10, 2.10, 3.10 and 4.10 — **four boards ask for a simulator, which is
         the pack telling us something.** Recommendation changes are invisible until they are live and

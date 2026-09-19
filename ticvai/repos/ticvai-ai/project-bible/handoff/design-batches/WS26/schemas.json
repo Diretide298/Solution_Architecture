@@ -1,783 +1,1200 @@
 {
- "AgentWorkloadAvailabilityWorkforceControlView": {
+ "Cart": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Agent Workload, Availability & Workforce Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "orders.cart",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
   "properties": {
-   "available": {
+   "id": {
     "type": "string",
-    "description": "Available"
+    "format": "uuid"
    },
-   "busy": {
+   "token": {
     "type": "string",
-    "description": "Busy"
+    "readOnly": true,
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
    },
-   "onCall": {
+   "venueId": {
     "type": "string",
-    "description": "On Call"
+    "format": "uuid"
    },
-   "chatting": {
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
     "type": "string",
-    "description": "Chatting"
-   },
-   "afterCallWork": {
-    "type": "string",
-    "description": "After Call Work"
-   },
-   "break": {
-    "type": "string",
-    "description": "Break"
-   },
-   "training": {
-    "type": "string",
-    "description": "Training"
-   },
-   "offline": {
-    "type": "integer",
-    "description": "Offline"
-   },
-   "agent": {
-    "type": "string",
-    "description": "Agent"
-   },
-   "team": {
-    "type": "string",
-    "description": "Team"
-   },
-   "skills": {
-    "type": "integer",
-    "description": "Skills"
-   },
-   "languages": {
-    "type": "integer",
-    "description": "Languages"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "$ref": "#/components/schemas/CartStatus"
    },
-   "activeCases": {
-    "type": "integer",
-    "description": "Active Cases"
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
    },
-   "chats": {
-    "type": "integer",
-    "description": "Chats"
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
    },
-   "calls": {
-    "type": "integer",
-    "description": "Calls"
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "queue": {
-    "type": "string",
-    "description": "Queue"
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "slaRiskCases": {
-    "type": "integer",
-    "description": "SLA Risk Cases"
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "averageHandleTime": {
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Average Handle Time"
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
    },
-   "resolutionRate": {
-    "type": "number",
-    "description": "Resolution Rate"
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
    },
-   "utilization": {
-    "type": "number",
-    "description": "Utilization"
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true
    },
-   "reassignCases": {
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
     "type": "string",
-    "description": "Reassign Cases"
+    "format": "date-time"
    },
-   "changeAvailability": {
+   "updatedAt": {
     "type": "string",
-    "description": "Change Availability"
-   },
-   "requestAssistance": {
-    "type": "string",
-    "description": "Request Assistance"
-   },
-   "managementWhereApplicable": {
-    "type": "string",
-    "description": "Management where applicable"
+    "format": "date-time"
    }
   }
  },
- "AiContactCenterIntelligenceAutomationStudioView": {
+ "CartMergeResult": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What AI Contact Center Intelligence & Automation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — computed",
+  "required": [
+   "cart"
+  ],
   "properties": {
-   "cases": {
-    "type": "string",
-    "description": "Cases"
+   "cart": {
+    "$ref": "#/components/schemas/Cart"
    },
-   "interactions": {
-    "type": "string",
-    "description": "Interactions"
+   "mergedLineCount": {
+    "type": "integer"
    },
-   "queues": {
-    "type": "string",
-    "description": "Queues"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "agentPerformance": {
-    "type": "string",
-    "description": "Agent Performance"
-   },
-   "qa": {
-    "type": "string",
-    "description": "QA"
-   },
-   "customerFeedback": {
-    "type": "string",
-    "description": "Customer Feedback"
-   },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
-   },
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
-   },
-   "payments": {
-    "type": "string",
-    "description": "Payments"
-   },
-   "products": {
-    "type": "string",
-    "description": "Products"
-   },
-   "events": {
-    "type": "string",
-    "description": "Events"
-   },
-   "systemIncidents": {
-    "type": "string",
-    "description": "System Incidents"
-   },
-   "contactVolume": {
-    "type": "integer",
-    "description": "Contact Volume"
-   },
-   "queueDemand": {
-    "type": "string",
-    "description": "Queue Demand"
-   },
-   "requiredAgents": {
-    "type": "string",
-    "description": "Required Agents"
-   },
-   "slaRisk": {
-    "type": "string",
-    "description": "SLA Risk"
-   },
-   "expectedComplaints": {
-    "type": "string",
-    "description": "Expected Complaints"
-   },
-   "eventDaySupportDemand": {
-    "type": "string",
-    "description": "Event-Day Support Demand"
-   },
-   "level1RecommendOnly": {
-    "type": "string",
-    "description": "Level 1 — Recommend Only"
-   },
-   "aiSuggestsAction": {
-    "type": "string",
-    "description": "AI suggests action"
-   },
-   "level2AgentConfirmation": {
-    "type": "string",
-    "description": "Level 2 — Agent Confirmation"
-   },
-   "aiPreparesActionAgentApproves": {
-    "type": "string",
-    "description": "AI prepares action; agent approves"
-   },
-   "level3SupervisorGovernedAutomation": {
-    "type": "string",
-    "description": "Level 3 — Supervisor-Governed Automation"
-   },
-   "approvedLowRiskWorkflowsExecuteAutomatically": {
-    "type": "integer",
-    "description": "Approved low-risk workflows execute automatically"
-   },
-   "onlySpecificallyApprovedScenarios": {
-    "type": "string",
-    "description": "Only specifically approved scenarios"
-   },
-   "estimatedAutomationConfidence964": {
-    "type": "number",
-    "description": "Estimated automation confidence: 96.4%"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
-   },
-   "scope": {
-    "type": "string",
-    "description": "Scope"
-   },
-   "allowedActions": {
-    "type": "string",
-    "description": "Allowed Actions"
-   },
-   "confidenceThreshold": {
-    "type": "integer",
-    "description": "Confidence Threshold"
-   },
-   "exceptionHandling": {
-    "type": "string",
-    "description": "Exception Handling"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "auditTrail": {
-    "type": "string",
-    "description": "Audit Trail"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
-   },
-   "killSwitch": {
-    "type": "string",
-    "description": "Kill Switch"
-   },
-   "management": {
-    "type": "string",
-    "description": "management"
+   "droppedLines": {
+    "type": "array",
+    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "noCapacity",
+        "expired",
+        "notSellableOnChannel",
+        "duplicate"
+       ]
+      }
+     }
+    }
    }
   }
  },
- "ContactCenterOperationsCommandCenterView": {
+ "ChallengeProgress": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Contact Center Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.challenge_progress",
+  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
+  "required": [
+   "id",
+   "challengeId",
+   "subjectId",
+   "current",
+   "target"
+  ],
   "properties": {
-   "casesToday": {
+   "id": {
     "type": "string",
-    "description": "Cases Today"
+    "format": "uuid"
    },
-   "unassignedCases": {
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "portfolioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a family or group challenge — where the shared progress accrues."
+   },
+   "current": {
+    "type": "number"
+   },
+   "target": {
+    "type": "number"
+   },
+   "streakCount": {
     "type": "integer",
-    "description": "Unassigned Cases"
+    "nullable": true
    },
-   "customersWaiting": {
-    "type": "string",
-    "description": "Customers Waiting"
-   },
-   "criticalCases": {
-    "type": "integer",
-    "description": "Critical Cases"
-   },
-   "slaAtRisk": {
-    "type": "string",
-    "description": "SLA At Risk"
-   },
-   "slaBreached": {
-    "type": "string",
-    "description": "SLA Breached"
-   },
-   "casesResolvedToday": {
-    "type": "string",
-    "description": "Cases Resolved Today"
-   },
-   "firstResponseTime": {
+   "completedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "First Response Time"
+    "nullable": true
    },
-   "averageResolutionTime": {
+   "rewardIssuedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Average Resolution Time"
+    "nullable": true
+   }
+  }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
    },
-   "firstContactResolution": {
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
     "type": "string",
-    "description": "First Contact Resolution"
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
    },
-   "csat": {
-    "type": "string",
-    "description": "CSAT"
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
    },
-   "activeAgents": {
+   "expiresAfterMonths": {
     "type": "integer",
-    "description": "Active Agents"
+    "nullable": true
+   }
+  }
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
    },
-   "agentUtilization": {
-    "type": "number",
-    "description": "Agent Utilization"
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Entitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "access.entitlement",
+  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
+  "required": [
+   "id",
+   "templateId",
+   "productId",
+   "orderId",
+   "subjectId",
+   "status",
+   "validFrom",
+   "validTo"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "mediaCode": {
+    "type": "string",
+    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "status": {
+    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
+   },
+   "statusNote": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+   },
+   "entriesUsed": {
+    "type": "integer",
+    "default": 0,
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true
+   },
+   "lastEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "frozenDays": {
+    "type": "integer",
+    "default": 0,
+    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+   },
+   "suspendedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "isNameBound": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "sharedWithSubjectIds": {
+    "type": "array",
+    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "issuedVia": {
+    "type": "string",
+    "enum": [
+     "sale",
+     "invitation",
+     "reissue",
+     "transfer",
+     "resale",
+     "membership",
+     "groupBooking"
+    ],
+    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
+   },
+   "supersedesEntitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
+   },
+   "walletValueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+   }
+  }
+ },
+ "GuestDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "tokenFingerprint": {
+    "type": "string",
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "appVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "osVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
    },
    "email": {
     "type": "string",
-    "description": "Email"
+    "nullable": true
    },
    "phone": {
     "type": "string",
-    "description": "Phone"
+    "nullable": true
    },
-   "liveChat": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Live Chat"
+    "nullable": true
    },
-   "whatsapp": {
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
     "type": "string",
-    "description": "WhatsApp"
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
-   "webForm": {
-    "type": "string",
-    "description": "Web Form"
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "b2cPortal": {
-    "type": "string",
-    "description": "B2C Portal"
-   },
-   "socialChannelsWhereIntegrated": {
-    "type": "string",
-    "description": "Social channels where integrated"
-   },
-   "frontDesk": {
-    "type": "string",
-    "description": "Front Desk"
-   },
-   "frontPos": {
+   "engagementScore": {
     "type": "integer",
-    "description": "Front POS"
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
-   "nNgRiskTs": {
+   "engagementTier": {
     "type": "string",
-    "description": "n ng Risk ts"
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
-   "ng": {
-    "type": "string",
-    "description": "ng"
-   }
-  }
- },
- "CustomerSatisfactionFeedbackVoiceOfCustomerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Customer Satisfaction, Feedback & Voice of Customer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "csat": {
-    "type": "string",
-    "description": "CSAT"
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "serviceRating": {
-    "type": "string",
-    "description": "Service Rating"
+   "visitCount": {
+    "type": "integer"
    },
-   "npsWhereUsed": {
-    "type": "string",
-    "description": "NPS where used"
-   },
-   "postCaseSurvey": {
-    "type": "string",
-    "description": "Post-Case Survey"
-   },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
-   },
-   "appFeedback": {
-    "type": "string",
-    "description": "App Feedback"
-   },
-   "webFeedback": {
-    "type": "string",
-    "description": "Web Feedback"
-   },
-   "directCustomerComment": {
-    "type": "string",
-    "description": "Direct Customer Comment"
-   },
-   "surveyResponseRate": {
-    "type": "number",
-    "description": "Survey Response Rate"
-   },
-   "positive": {
-    "type": "number",
-    "description": "Positive %"
-   },
-   "neutral": {
-    "type": "number",
-    "description": "Neutral %"
-   },
-   "negative": {
-    "type": "number",
-    "description": "Negative %"
-   },
-   "complaints": {
-    "type": "integer",
-    "description": "Complaints"
-   },
-   "repeatContactRate": {
-    "type": "number",
-    "description": "Repeat Contact Rate"
-   },
-   "customerEffortWhereMeasured": {
-    "type": "string",
-    "description": "Customer Effort where measured"
-   },
-   "agent": {
-    "type": "string",
-    "description": "Agent"
-   },
-   "team": {
-    "type": "string",
-    "description": "Team"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "caseType": {
-    "type": "string",
-    "description": "Case Type"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "sentiment": {
-    "type": "string",
-    "description": "Sentiment"
-   },
-   "topic": {
-    "type": "string",
-    "description": "Topic"
-   },
-   "case": {
-    "type": "string",
-    "description": "Case"
-   },
-   "productEvent": {
-    "type": "string",
-    "description": "Product/Event"
-   },
-   "rating": {
-    "type": "string",
-    "description": "Rating"
-   },
-   "followUpCase": {
-    "type": "string",
-    "description": "Follow-up Case"
-   },
-   "supervisorTask": {
-    "type": "string",
-    "description": "Supervisor Task"
-   },
-   "complaintReview": {
-    "type": "string",
-    "description": "Complaint Review"
-   }
-  }
- },
- "EscalationCriticalCaseMonitorView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Escalation & Critical Case Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "escalatedCases": {
-    "type": "integer",
-    "description": "Escalated Cases"
-   },
-   "criticalCases": {
-    "type": "integer",
-    "description": "Critical Cases"
-   },
-   "slaBreaches": {
-    "type": "integer",
-    "description": "SLA Breaches"
-   },
-   "vipEscalations": {
-    "type": "integer",
-    "description": "VIP Escalations"
-   },
-   "financialEscalations": {
-    "type": "integer",
-    "description": "Financial Escalations"
-   },
-   "eventDayEscalations": {
-    "type": "integer",
-    "description": "Event-Day Escalations"
-   },
-   "managementEscalations": {
-    "type": "integer",
-    "description": "Management Escalations"
-   },
-   "technicalEscalations": {
-    "type": "integer",
-    "description": "Technical Escalations"
-   },
-   "case": {
-    "type": "string",
-    "description": "Case"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "transactionValue": {
-    "type": "string",
-    "description": "Transaction Value"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "assignedAgent": {
-    "type": "string",
-    "description": "Assigned Agent"
-   },
-   "escalatedTo": {
-    "type": "string",
-    "description": "Escalated To"
-   },
-   "escalationTime": {
+   "lastVisitAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Escalation Time"
+    "nullable": true
    },
-   "sla": {
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
     "type": "string",
-    "description": "SLA"
+    "format": "uuid"
    },
-   "currentStatus": {
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+   }
+  }
+ },
+ "Invitation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "token",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recipientEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "token": {
+    "type": "string",
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+   },
+   "plusOnes": {
     "type": "integer",
-    "description": "Current Status"
+    "default": 0
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
+   },
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "respondedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
- "IntelligentRoutingSkillsAssignmentEngineInput": {
+ "LoginRequest": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.message_trigger at 11%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Intelligent Routing, Skills & Assignment Engine submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "username",
+   "credential",
+   "workstationId"
+  ],
   "properties": {
-   "caseCategory": {
+   "username": {
     "type": "string",
-    "description": "Case Category"
+    "maxLength": 256
    },
-   "subcategory": {
+   "credential": {
     "type": "string",
-    "description": "Subcategory"
+    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "maxLength": 512
    },
-   "channel": {
+   "method": {
     "type": "string",
-    "description": "Channel"
-   },
-   "customerLanguage": {
-    "type": "string",
-    "description": "Customer Language"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership Tier"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent Skill"
-   },
-   "agentAvailability": {
-    "type": "string",
-    "description": "Agent Availability"
-   },
-   "currentWorkload": {
-    "type": "string",
-    "description": "Current Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
-   },
-   "caseTicketReschedule": {
-    "type": "string",
-    "description": "Case: Ticket reschedule"
-   },
-   "languageArabic": {
-    "type": "string",
-    "description": "Language: Arabic"
-   },
-   "priorityHigh": {
-    "type": "string",
-    "description": "Priority: High"
-   },
-   "type": {
-    "type": "string",
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
     "enum": [
-     "arabicSkill",
-     "ticketingSkill",
-     "currentWorkload62",
-     "slaCapability"
+     "password",
+     "pin",
+     "card",
+     "rfid",
+     "sso"
     ],
-    "description": "Vocabulary listed under Reason."
+    "default": "password"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
+   },
+   "deviceFingerprint": {
+    "type": "string",
+    "maxLength": 256
    }
   }
  },
- "IntelligentRoutingSkillsAssignmentEngineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Intelligent Routing, Skills & Assignment Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "caseCategory": {
-    "type": "string",
-    "description": "Case Category"
+ "LoginResponse": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TokenPair"
    },
-   "subcategory": {
-    "type": "string",
-    "description": "Subcategory"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "customerLanguage": {
-    "type": "string",
-    "description": "Customer Language"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership Tier"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent Skill"
-   },
-   "agentAvailability": {
-    "type": "string",
-    "description": "Agent Availability"
-   },
-   "currentWorkload": {
-    "type": "string",
-    "description": "Current Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
-   },
-   "caseTicketReschedule": {
-    "type": "string",
-    "description": "Case: Ticket reschedule"
-   },
-   "languageArabic": {
-    "type": "string",
-    "description": "Language: Arabic"
-   },
-   "priorityHigh": {
-    "type": "string",
-    "description": "Priority: High"
-   },
-   "type": {
-    "type": "string",
-    "enum": [
-     "arabicSkill",
-     "ticketingSkill",
-     "currentWorkload62",
-     "slaCapability"
+   {
+    "type": "object",
+    "required": [
+     "requiresRoleSelection"
     ],
-    "description": "Vocabulary listed under Reason."
+    "properties": {
+     "requiresRoleSelection": {
+      "type": "boolean"
+     },
+     "availableRoles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RoleSummary"
+      }
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session"
+     }
+    }
+   }
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once on successful verification. Not retrievable afterwards.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     }
+    }
+   }
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -798,343 +1215,525 @@
    }
   }
  },
- "QualityManagementAgentEvaluationView": {
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Quality Management & Agent Evaluation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
   "properties": {
-   "greeting": {
-    "type": "string",
-    "description": "Greeting"
+   "id": {
+    "type": "string"
    },
-   "customerVerification": {
-    "type": "string",
-    "description": "Customer Verification"
+   "orderId": {
+    "type": "string"
    },
-   "understanding": {
-    "type": "string",
-    "description": "Understanding"
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
    },
-   "accuracy": {
+   "tenderCurrency": {
     "type": "string",
-    "description": "Accuracy"
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
    },
-   "policyCompliance": {
-    "type": "string",
-    "description": "Policy Compliance"
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
-   "communicationQuality": {
-    "type": "string",
-    "description": "Communication Quality"
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
-   "empathy": {
+   "fxRateSource": {
     "type": "string",
-    "description": "Empathy"
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
    },
-   "resolution": {
+   "changeCurrency": {
     "type": "string",
-    "description": "Resolution"
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
    },
-   "documentation": {
-    "type": "string",
-    "description": "Documentation"
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "closing": {
-    "type": "string",
-    "description": "Closing"
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "call": {
+   "status": {
     "type": "string",
-    "description": "Call"
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
    },
-   "chat": {
+   "providerName": {
     "type": "string",
-    "description": "Chat"
+    "nullable": true
    },
-   "email": {
+   "providerReference": {
     "type": "string",
-    "description": "Email"
+    "nullable": true
    },
-   "whatsapp": {
+   "lastInquiryAt": {
     "type": "string",
-    "description": "WhatsApp"
+    "format": "date-time",
+    "nullable": true
    },
-   "case": {
+   "recordedAt": {
     "type": "string",
-    "description": "Case"
+    "format": "date-time"
    },
-   "complaint": {
+   "syncedAt": {
     "type": "string",
-    "description": "Complaint"
-   },
-   "policyAdherence": {
-    "type": "string",
-    "description": "Policy adherence"
-   },
-   "requiredStatements": {
-    "type": "string",
-    "description": "Required statements"
-   },
-   "tone": {
-    "type": "string",
-    "description": "Tone"
-   },
-   "resolutionQuality": {
-    "type": "string",
-    "description": "Resolution quality"
-   },
-   "missingCaseDocumentation": {
-    "type": "string",
-    "description": "Missing case documentation"
-   },
-   "productTraining": {
-    "type": "string",
-    "description": "Product Training"
-   },
-   "policyTraining": {
-    "type": "string",
-    "description": "Policy Training"
-   },
-   "communicationCoaching": {
-    "type": "string",
-    "description": "Communication Coaching"
-   },
-   "systemTraining": {
-    "type": "string",
-    "description": "System Training"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
- "ServiceAnalyticsRootCauseIntelligenceView": {
+ "Problem": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Service Analytics & Root-Cause Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "description": "RFC 9457 problem details. Every error response uses this shape.",
+  "required": [
+   "type",
+   "title",
+   "status"
+  ],
   "properties": {
-   "contactVolume": {
-    "type": "integer",
-    "description": "Contact Volume"
-   },
-   "cases": {
+   "type": {
     "type": "string",
-    "description": "Cases"
+    "format": "uri"
    },
-   "firstResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "First Response Time"
+   "title": {
+    "type": "string"
    },
-   "resolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Resolution Time"
+   "status": {
+    "type": "integer"
    },
-   "firstContactResolution": {
-    "type": "string",
-    "description": "First Contact Resolution"
+   "detail": {
+    "type": "string"
    },
-   "reopenRate": {
-    "type": "number",
-    "description": "Reopen Rate"
+   "instance": {
+    "type": "string"
    },
-   "escalationRate": {
-    "type": "number",
-    "description": "Escalation Rate"
+   "traceId": {
+    "type": "string"
    },
-   "slaCompliance": {
-    "type": "string",
-    "description": "SLA Compliance"
-   },
-   "costPerCaseWhereAvailable": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per Case where available"
-   },
-   "csat": {
-    "type": "string",
-    "description": "CSAT"
-   },
-   "complaintRate": {
-    "type": "number",
-    "description": "Complaint Rate"
-   },
-   "todayVsYesterday": {
-    "type": "string",
-    "description": "Today vs Yesterday"
-   },
-   "weekVsWeek": {
-    "type": "string",
-    "description": "Week vs Week"
-   },
-   "monthVsMonth": {
-    "type": "string",
-    "description": "Month vs Month"
-   },
-   "eventVsEvent": {
-    "type": "string",
-    "description": "Event vs Event"
-   },
-   "venueVsVenue": {
-    "type": "string",
-    "description": "Venue vs Venue"
-   },
-   "productVsProduct": {
-    "type": "string",
-    "description": "Product vs Product"
-   },
-   "betterB2cInformation": {
-    "type": "string",
-    "description": "Better B2C information"
-   },
-   "selfService": {
-    "type": "string",
-    "description": "Self-service"
-   },
-   "productConfiguration": {
-    "type": "string",
-    "description": "Product configuration"
-   },
-   "improvedNotifications": {
-    "type": "string",
-    "description": "Improved notifications"
-   },
-   "technicalFixes": {
-    "type": "string",
-    "description": "Technical fixes"
-   },
-   "betterTicketDelivery": {
-    "type": "string",
-    "description": "Better ticket delivery"
+   "errors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "code"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "SlaPolicyServiceLevelManagementView": {
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What SLA Policy & Service-Level Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
   "properties": {
-   "firstResponseSla": {
-    "type": "string",
-    "description": "First Response SLA"
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
    },
-   "nextResponseSla": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Next Response SLA"
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
    },
-   "resolutionSla": {
-    "type": "string",
-    "description": "Resolution SLA"
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
    },
-   "internalEscalationSla": {
-    "type": "string",
-    "description": "Internal Escalation SLA"
+   "noticeVersion": {
+    "type": "string"
    },
-   "complaintResolutionSla": {
-    "type": "string",
-    "description": "Complaint Resolution SLA"
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
    },
-   "caseType": {
+   "recordedAt": {
     "type": "string",
-    "description": "Case Type"
-   },
-   "priority": {
+    "format": "date-time"
+   }
+  }
+ },
+ "RegisterGuestRequest": {
+  "type": "object",
+  "required": [
+   "identifier",
+   "channel"
+  ],
+  "properties": {
+   "identifier": {
     "type": "string",
-    "description": "Priority"
+    "maxLength": 256,
+    "description": "Email address or mobile number in E.164."
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ]
    },
-   "customerTier": {
+   "displayName": {
     "type": "string",
-    "description": "Customer Tier"
+    "maxLength": 200
    },
-   "brand": {
+   "password": {
     "type": "string",
-    "description": "Brand"
+    "minLength": 8,
+    "maxLength": 256,
+    "description": "Optional. OTP-only accounts are supported and are the default."
    },
-   "venue": {
+   "preferredLanguage": {
     "type": "string",
-    "description": "Venue"
+    "pattern": "^[a-z]{2}$"
    },
-   "event": {
+   "consents": {
+    "type": "array",
+    "description": "Consent captured at registration, recorded with the notice version.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "type": "string"
+      },
+      "granted": {
+       "type": "boolean"
+      },
+      "noticeVersion": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Event"
+    "format": "uuid"
    },
-   "market": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
     "type": "string",
-    "description": "Market"
+    "format": "uuid"
    },
-   "partner": {
+   "principalId": {
     "type": "string",
-    "description": "Partner"
+    "format": "uuid"
    },
-   "groupCustomer": {
+   "roleId": {
     "type": "string",
-    "description": "Group Customer"
+    "format": "uuid"
    },
-   "firstResponse5Minutes": {
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
     "type": "string",
-    "description": "First Response: 5 minutes"
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
    },
-   "resolutionTarget30Minutes": {
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
     "type": "string",
-    "description": "Resolution Target: 30 minutes"
+    "format": "date-time"
    },
-   "firstResponse4Hours": {
+   "expiresAt": {
     "type": "string",
-    "description": "First Response: 4 hours"
-   },
-   "resolutionTarget24Hours": {
+    "format": "date-time"
+   }
+  }
+ },
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Resolution Target: 24 hours"
+    "format": "uuid"
    },
-   "calendarTime": {
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google"
+    ]
+   },
+   "serialNumber": {
+    "type": "string"
+   },
+   "authenticationToken": {
+    "type": "string",
+    "format": "password",
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Calendar time"
+    "nullable": true
    },
-   "businessHours": {
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
     "type": "string",
-    "description": "Business hours"
-   },
-   "venueOperatingHours": {
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Wishlist": {
+  "type": "object",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
+  "properties": {
+   "subjectId": {
     "type": "string",
-    "description": "Venue operating hours"
+    "format": "uuid"
    },
-   "pausedStates": {
-    "type": "string",
-    "description": "Paused states"
-   },
-   "holidayCalendars": {
-    "type": "string",
-    "description": "Holiday calendars"
-   },
-   "withinSla": {
-    "type": "string",
-    "description": "Within SLA"
-   },
-   "atRisk": {
-    "type": "string",
-    "description": "At Risk"
-   },
-   "breached": {
-    "type": "string",
-    "description": "Breached"
-   },
-   "averageResponse": {
-    "type": "number",
-    "description": "Average Response"
-   },
-   "averageResolution": {
-    "type": "number",
-    "description": "Average Resolution"
-   },
-   "slaCompliance": {
-    "type": "number",
-    "description": "SLA Compliance %"
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  }

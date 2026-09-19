@@ -1,594 +1,75 @@
 [
  {
-  "id": "CMS-031",
-  "name": "Privacy Operations Command Center",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.1",
-   "page": 21
-  },
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/privacy-operations-command-center-cms-031",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyOperationsCommandCenter.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "CMS-001"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "CMS-001",
-    "CMS-032",
-    "CMS-033",
-    "CMS-034",
-    "CMS-035",
-    "CMS-036",
-    "CMS-037",
-    "CMS-038",
-    "CMS-039",
-    "CMS-040"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "CMS-001",
-     "trigger": "Tenant Workspace",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "tenantId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-032",
-     "trigger": "Works in Customer Privacy, Consent & Preference 360°",
-     "provenance": "flow F151 step 1→2",
-     "operation": "listPrivacy"
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-033",
-     "trigger": "Works in Consent Evidence, History & Withdrawal Management",
-     "provenance": "flow F151 step 3→4",
-     "operation": "listPrivacy"
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     },
     {
-     "to": "CMS-034",
-     "trigger": "Works in Data Subject / Customer Privacy Request Management",
-     "provenance": "flow F151 step 5→6",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-035",
-     "trigger": "Works in Data Discovery, Access, Export & Correction Workspace",
-     "provenance": "flow F151 step 7→8",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-036",
-     "trigger": "Works in Deletion, Anonymization & Restriction Operations",
-     "provenance": "flow F151 step 9→10",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-037",
-     "trigger": "Works in Data Retention, Expiry & Legal Hold Operations",
-     "provenance": "flow F151 step 11→12",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-038",
-     "trigger": "Works in Privacy Compliance, Exception & Investigation Workspace",
-     "provenance": "flow F151 step 13→14",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-039",
-     "trigger": "Works in Privacy Audit, Evidence & Compliance Reporting",
-     "provenance": "flow F151 step 15→16",
-     "operation": "listPrivacy"
-    },
-    {
-     "to": "CMS-040",
-     "trigger": "Works in Privacy Analytics & AI Compliance Intelligence",
-     "provenance": "flow F151 step 17→18",
-     "operation": "listPrivacy"
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide Privacy, Compliance and authorized operational teams with a centralized real-time overview of privacy operations across TICVAI.",
-  "purposeNote": "Authorized users can understand the current operational privacy position and identify actions requiring attention from one command center.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search privacy operations",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 21 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Tenant",
-        "Brand",
-        "Country",
-        "Customer",
-        "Request Type",
-        "Consent Purpose",
-        "Channel",
-        "Status",
-        "Risk",
-        "Date",
-        "Owner"
-       ],
-       "notes": "The pack filters this screen by tenant, brand, country, customer, request type, consent purpose and 5 more — which are present is a decision the pack already made.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 21 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every privacy operations",
-       "columns": [
-        "PrivacyOperationsCommandCenterView.totalCustomerPrivacyProfiles",
-        "PrivacyOperationsCommandCenterView.activeConsentRecords",
-        "PrivacyOperationsCommandCenterView.withdrawnConsents",
-        "PrivacyOperationsCommandCenterView.marketingOptIns",
-        "PrivacyOperationsCommandCenterView.marketingOptOuts",
-        "PrivacyOperationsCommandCenterView.pendingDataRightsRequests",
-        "PrivacyOperationsCommandCenterView.overdueRequests",
-        "PrivacyOperationsCommandCenterView.pendingDeletionActions",
-        "PrivacyOperationsCommandCenterView.pendingAnonymization",
-        "PrivacyOperationsCommandCenterView.retentionActionsDue",
-        "PrivacyOperationsCommandCenterView.consentEvidenceExceptions",
-        "PrivacyOperationsCommandCenterView.privacyIncidentsExceptions",
-        "PrivacyOperationsCommandCenterView.policyReAcceptancePending"
-       ],
-       "bindsTo": "PrivacyOperationsCommandCenterView",
-       "operation": "listPrivacy",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 21 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected privacy operations",
-       "bindsTo": "PrivacyOperationsCommandCenterView",
-       "columns": [
-        "PrivacyOperationsCommandCenterView.totalCustomerPrivacyProfiles",
-        "PrivacyOperationsCommandCenterView.activeConsentRecords",
-        "PrivacyOperationsCommandCenterView.withdrawnConsents",
-        "PrivacyOperationsCommandCenterView.marketingOptIns",
-        "PrivacyOperationsCommandCenterView.marketingOptOuts",
-        "PrivacyOperationsCommandCenterView.pendingDataRightsRequests",
-        "PrivacyOperationsCommandCenterView.overdueRequests",
-        "PrivacyOperationsCommandCenterView.pendingDeletionActions",
-        "PrivacyOperationsCommandCenterView.pendingAnonymization",
-        "PrivacyOperationsCommandCenterView.retentionActionsDue",
-        "PrivacyOperationsCommandCenterView.consentEvidenceExceptions",
-        "PrivacyOperationsCommandCenterView.privacyIncidentsExceptions",
-        "PrivacyOperationsCommandCenterView.policyReAcceptancePending"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Show breakdown by”, “Provide visibility into”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 21 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Search Customer, Open Privacy Profile, Create Privacy Request, Review Withdrawal, Run Retention, Investigate Evidence, Export Compliance Report. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 21 §Authorized users may"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The privacy operations list.",
-   "error": "Could not load. Names which read failed and leaves the privacy operations untouched.",
-   "emptyFirstRun": "No privacy operations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the privacy operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPrivacy",
-    "contract": "marketing-crm",
-    "purpose": "Privacy Operations Command Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "PrivacyOperationsCommandCenterView.totalCustomerPrivacyProfiles",
-    "PrivacyOperationsCommandCenterView.activeConsentRecords",
-    "PrivacyOperationsCommandCenterView.withdrawnConsents",
-    "PrivacyOperationsCommandCenterView.marketingOptIns",
-    "PrivacyOperationsCommandCenterView.marketingOptOuts",
-    "PrivacyOperationsCommandCenterView.pendingDataRightsRequests"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-031"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 21. 13 of 24 labels bound to a contract property; 31 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-032",
-  "name": "Customer Privacy, Consent & Preference 360°",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.2",
-   "page": 22
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/customer-privacy-consent-preference-360-cms-032",
-   "component": "apps/venue-management-web/src/routes/policy/CustomerPrivacyConsentPreference360.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 2→3",
-     "operation": "listCustomerPrivacyConsent"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide one authoritative privacy view for an individual customer or participant. This becomes the privacy equivalent of the customer 360° workspace. n ed el",
-  "purposeNote": "An authorized user can reconstruct the customer's complete privacy relationship with TICVAI from one governed workspace.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every customer privacy consent",
-       "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
-       ],
-       "bindsTo": "CustomerPrivacyConsentPreference360View",
-       "operation": "listCustomerPrivacyConsent",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected customer privacy consent",
-       "bindsTo": "CustomerPrivacyConsentPreference360View",
-       "columns": [
-        "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-        "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-        "CustomerPrivacyConsentPreference360View.biometricNotice",
-        "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-        "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Display appropriate information such as”, “Email Consente”, “SMS Withdraw”, “Consente”, “Personalizatio”, “Show current”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The customer privacy consent list.",
-   "error": "Could not load. Names which read failed and leaves the customer privacy consent untouched.",
-   "emptyFirstRun": "No customer privacy consent yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the customer privacy consent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCustomerPrivacyConsent",
-    "contract": "marketing-crm",
-    "purpose": "Customer Privacy, Consent & Preference 360°",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CustomerPrivacyConsentPreference360View.privacyPolicyVersion",
-    "CustomerPrivacyConsentPreference360View.cookieNoticeVersion",
-    "CustomerPrivacyConsentPreference360View.biometricNotice",
-    "CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice",
-    "CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-032"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 22. 5 of 5 labels bound to a contract property; 5 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-033",
-  "name": "Consent Evidence, History & Withdrawal Management",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.3",
-   "page": 24
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/consent-evidence-history-withdrawal-management-cms-033",
-   "component": "apps/venue-management-web/src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 4→5",
-     "operation": "listConsentEvidenceWithdrawal"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Maintain legally and operationally useful evidence of every consent event and manage subsequent withdrawals.",
-  "purposeNote": "current privacy state and propagate to dependent systems.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every consent evidence history",
-       "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
-       ],
-       "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
-       "operation": "listConsentEvidenceWithdrawal",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected consent evidence history",
-       "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
-       "columns": [
-        "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-        "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-        "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-        "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-        "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-        "Retry Required"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Consent Evidence Record”, “Evidence Principle”, “Withdrawal”, “Central Consent Engine”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The consent evidence history list.",
-   "error": "Could not load. Names which read failed and leaves the consent evidence history untouched.",
-   "emptyFirstRun": "No consent evidence history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the consent evidence history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listConsentEvidenceWithdrawal",
-    "contract": "marketing-crm",
-    "purpose": "Consent Evidence, History & Withdrawal Management",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ConsentEvidenceHistoryWithdrawalManagementView.requested",
-    "ConsentEvidenceHistoryWithdrawalManagementView.processed",
-    "ConsentEvidenceHistoryWithdrawalManagementView.propagated",
-    "ConsentEvidenceHistoryWithdrawalManagementView.acknowledged",
-    "ConsentEvidenceHistoryWithdrawalManagementView.failed",
-    "Retry Required"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-033"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 24. 5 of 6 labels bound to a contract property; 6 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-034",
-  "name": "Data Subject / Customer Privacy Request Management",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.4",
-   "page": 26
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/data-subject-customer-privacy-request-management-cms-034",
-   "component": "apps/venue-management-web/src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 6→7",
-     "operation": "listDataSubjectCustomer"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Provide a governed case-management workflow for customer privacy requests.",
-  "purposeNote": "Every customer privacy request can be received, verified, assigned, tracked and completed through a governed case workflow.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: ID Review where permitted. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
    }
   ],
   "layout": {
@@ -600,16 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every data subject customer",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "DataSubjectCustomerPrivacyRequestManagementView.daysRemaining",
-        "DataSubjectCustomerPrivacyRequestManagementView.atRisk",
-        "Overdue",
-        "Escalated"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "bindsTo": "DataSubjectCustomerPrivacyRequestManagementView",
-       "operation": "listDataSubjectCustomer",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Show"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -619,16 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected data subject customer",
-       "bindsTo": "DataSubjectCustomerPrivacyRequestManagementView",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "DataSubjectCustomerPrivacyRequestManagementView.daysRemaining",
-        "DataSubjectCustomerPrivacyRequestManagementView.atRisk",
-        "Overdue",
-        "Escalated"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Configurable request types may include”, “Guardian / Representative”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Show"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -638,116 +128,413 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Customer Portal",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Customer Service",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "ID Review where permitted",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 26 §Support configurable methods such as"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "The data subject customer list.",
-   "error": "Could not load. Names which read failed and leaves the data subject customer untouched.",
-   "emptyFirstRun": "No data subject customer yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the data subject customer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listDataSubjectCustomer",
-    "contract": "marketing-crm",
-    "purpose": "Data Subject / Customer Privacy Request Management",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "DataSubjectCustomerPrivacyRequestManagementView.daysRemaining",
-    "DataSubjectCustomerPrivacyRequestManagementView.atRisk",
-    "Overdue",
-    "Escalated"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-034"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 26. 2 of 4 labels bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P13",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "CMS-035",
-  "name": "Data Discovery, Access, Export & Correction Workspace",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.5",
-   "page": 28
-  },
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/data-discovery-access-export-correction-workspace-cms-035",
-   "component": "apps/venue-management-web/src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "CMS-031"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "CMS-031"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
    "transitions": [
     {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 8→9",
-     "operation": "setDataDiscoveryAccess"
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
-  "purpose": "Allow authorized privacy teams to locate customer data across TICVAI and connected systems when fulfilling access, export or correction requests.",
-  "purposeNote": "Authorized teams can discover applicable customer data, prepare a controlled access/export response and route correction to the authoritative data owner.",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -757,17 +544,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every data discovery access",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
-       "operation": "setDataDiscoveryAccess",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -777,17 +571,842 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected data discovery access",
-       "bindsTo": "DataDiscoveryAccessExportCorrectionWorkspaceView",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-        "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Search using”, “Potential sources”, “Export Package”, “Correction”, “Before release”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
       }
      ]
     },
@@ -798,943 +1417,157 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
-       "provenance": "contract operation setDataDiscoveryAccess"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The data discovery access list.",
-   "error": "Could not load. Names which read failed and leaves the data discovery access untouched.",
-   "emptyFirstRun": "No data discovery access yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the data discovery access are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setDataDiscoveryAccess",
-    "contract": "marketing-crm",
-    "purpose": "Data Discovery, Access, Export & Correction Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDataDiscoveryAccess"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records",
-    "DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-035"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 28. 5 of 5 labels bound to a contract property; 13 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-036",
-  "name": "Deletion, Anonymization & Restriction Operations",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.6",
-   "page": 29
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/deletion-anonymization-restriction-operations-cms-036",
-   "component": "apps/venue-management-web/src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 10→11",
-     "operation": "listDeletionAnonymizationRestriction"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Govern privacy requests or policies requiring personal data to be deleted, anonymized or restricted. This screen requires strong controls because deletion may affect financial, ticketing, fraud, legal and operational records.",
-  "purposeNote": "are legitimately configured for retention and provides evidence of the result.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Remove Biometric Reference. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Delete",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Remove Biometric Reference",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmDelete",
-    "component": "confirmDialog",
-    "trigger": "Delete",
-    "body": "**Delete on a deletion anonymization restriction is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
-   },
-   {
-    "id": "confirmRemoveBiometricReference",
-    "component": "confirmDialog",
-    "trigger": "Remove Biometric Reference",
-    "body": "**Remove Biometric Reference on a deletion anonymization restriction is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29 §Support"
-   }
-  ],
-  "states": {
-   "loading": "The deletion anonymization restriction list.",
-   "error": "Could not load. Names which read failed and leaves the deletion anonymization restriction untouched.",
-   "emptyFirstRun": "No deletion anonymization restriction yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the deletion anonymization restriction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDeletionAnonymizationRestriction",
-    "contract": "marketing-crm",
-    "purpose": "Deletion, Anonymization & Restriction Operations",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DeletionAnonymizationRestrictionOperationsView.anonymize",
-    "DeletionAnonymizationRestrictionOperationsView.pseudonymizeWhereConfigured",
-    "DeletionAnonymizationRestrictionOperationsView.restrictProcessing",
-    "DeletionAnonymizationRestrictionOperationsView.suppressMarketing",
-    "DeletionAnonymizationRestrictionOperationsView.disconnectThirdPartyProfile"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-036"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 2 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-037",
-  "name": "Data Retention, Expiry & Legal Hold Operations",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.7",
-   "page": 30
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/data-retention-expiry-legal-hold-operations-cms-037",
-   "component": "apps/venue-management-web/src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 12→13",
-     "operation": "listDataRetentionExpiry"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Operationalize retention policies associated with Board 1 processing purposes and data categories.",
-  "purposeNote": "preserving controlled holds, approvals and complete processing evidence.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Review, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every data retention expiry",
-       "columns": [
-        "DataRetentionExpiryLegalHoldOperationsView.recordsApproachingExpiry",
-        "DataRetentionExpiryLegalHoldOperationsView.eligibleForDeletion",
-        "DataRetentionExpiryLegalHoldOperationsView.eligibleForAnonymization",
-        "DataRetentionExpiryLegalHoldOperationsView.underLegalHold",
-        "DataRetentionExpiryLegalHoldOperationsView.processingFailures",
-        "DataRetentionExpiryLegalHoldOperationsView.retentionExceptions"
-       ],
-       "bindsTo": "DataRetentionExpiryLegalHoldOperationsView",
-       "operation": "listDataRetentionExpiry",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected data retention expiry",
-       "bindsTo": "DataRetentionExpiryLegalHoldOperationsView",
-       "columns": [
-        "DataRetentionExpiryLegalHoldOperationsView.recordsApproachingExpiry",
-        "DataRetentionExpiryLegalHoldOperationsView.eligibleForDeletion",
-        "DataRetentionExpiryLegalHoldOperationsView.eligibleForAnonymization",
-        "DataRetentionExpiryLegalHoldOperationsView.underLegalHold",
-        "DataRetentionExpiryLegalHoldOperationsView.processingFailures",
-        "DataRetentionExpiryLegalHoldOperationsView.retentionExceptions"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Hold information includes”, “Retention jobs may run”, “Dry Run”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "slot": "carried",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Review",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Delete",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Archive",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Place Hold",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release Hold",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
-  "overlays": [
+  "states": {
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
    {
-    "id": "confirmDelete",
-    "component": "confirmDialog",
-    "trigger": "Delete",
-    "body": "**Delete on a data retention expiry is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
    },
    {
-    "id": "confirmArchive",
-    "component": "confirmDialog",
-    "trigger": "Archive",
-    "body": "**Archive on a data retention expiry is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
-   }
-  ],
-  "states": {
-   "loading": "The data retention expiry list.",
-   "error": "Could not load. Names which read failed and leaves the data retention expiry untouched.",
-   "emptyFirstRun": "No data retention expiry yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the data retention expiry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDataRetentionExpiry",
+    "operationId": "updateMyProfile",
     "contract": "marketing-crm",
-    "purpose": "Data Retention, Expiry & Legal Hold Operations",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DataRetentionExpiryLegalHoldOperationsView.recordsApproachingExpiry",
-    "DataRetentionExpiryLegalHoldOperationsView.eligibleForDeletion",
-    "DataRetentionExpiryLegalHoldOperationsView.eligibleForAnonymization",
-    "DataRetentionExpiryLegalHoldOperationsView.underLegalHold",
-    "DataRetentionExpiryLegalHoldOperationsView.processingFailures",
-    "DataRetentionExpiryLegalHoldOperationsView.retentionExceptions"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-037"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 30. 6 of 6 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-038",
-  "name": "Privacy Compliance, Exception & Investigation Workspace",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.8",
-   "page": 32
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/privacy-compliance-exception-investigation-workspace-cms-038",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 14→15",
-     "operation": "setPrivacyComplianceException"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide a centralized workspace for privacy configuration and operational exceptions requiring investigation.",
-  "purposeNote": "Privacy-related exceptions can be centrally investigated, assigned, resolved and audited.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Security, Data Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every privacy compliance exception",
-       "columns": [
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
-       ],
-       "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
-       "operation": "setPrivacyComplianceException",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected privacy compliance exception",
-       "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
-       "columns": [
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.country",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.owner",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.sla",
-        "PrivacyComplianceExceptionInvestigationWorkspaceView.status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Provide”, “Workflow”, “Important Boundary”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Security",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Data Owner",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to appropriate"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The privacy compliance exception list.",
-   "error": "Could not load. Names which read failed and leaves the privacy compliance exception untouched.",
-   "emptyFirstRun": "No privacy compliance exception yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the privacy compliance exception are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setPrivacyComplianceException",
-    "contract": "marketing-crm",
-    "purpose": "Privacy Compliance, Exception & Investigation Workspace",
+    "purpose": "A guest correcting their own details",
     "trigger": "onAction",
     "invalidates": [
-     "setPrivacyComplianceException"
+     "listConsentPurposes"
     ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.exception",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.customer",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.brand",
-    "PrivacyComplianceExceptionInvestigationWorkspaceView.country"
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-038"
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 32. 10 of 10 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P13",
-   "audience": "staff",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
-   "operator": "venue",
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P08",
-     "P12",
-     "P16"
+     "P02",
+     "P05"
     ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-039",
-  "name": "Privacy Audit, Evidence & Compliance Reporting",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.9",
-   "page": 33
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/privacy-audit-evidence-compliance-reporting-cms-039",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "CMS-031",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F151 step 16→17",
-     "operation": "listPrivacyEvidenceCompliance"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Capture significant activities such as) and no display directory — it is settings, not a population",
-  "purpose": "Provide immutable auditability and management/compliance reporting across privacy operations.",
-  "purposeNote": "performed it, what rule/version applied and what evidence supports it.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Consent Granted",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Consent Withdrawn",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Preference Changed",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Policy Accepted",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Privacy Request Created",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Identity Verified",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Data Export Generated",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Correction Requested",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Deletion Approved",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Anonymization Executed",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Retention Action",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Legal Hold",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Administrative Override",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      },
-      {
-       "kind": "selectField",
-       "label": "Configuration Change",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 33 §Capture significant activities such as"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The privacy audit evidence configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the privacy audit evidence untouched.",
-   "emptyFirstRun": "No privacy audit evidence configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPrivacyEvidenceCompliance",
-    "contract": "marketing-crm",
-    "purpose": "Privacy Audit, Evidence & Compliance Reporting",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-039"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 14 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "CMS-040",
-  "name": "Privacy Analytics & AI Compliance Intelligence",
-  "module": "Policy",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
-   "board": "2",
-   "number": "17.2.10",
-   "page": 35
-  },
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/policy/privacy-analytics-ai-compliance-intelligence-cms-040",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "CMS-031"
-   ],
-   "exitTo": [
-    "CMS-031"
-   ],
-   "inferred": false,
-   "notes": "**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
-  "purpose": "Provide executives, Privacy Officers and Compliance teams with actionable privacy analytics and AI-assisted risk detection. This should be the intelligence layer across both Privacy Boards.",
-  "purposeNote": "resolve compliance risks while keeping legally significant decisions under governed human control. Board 2 — Final Screen Register # Backend Screen Core Responsibility 17.2. Privacy Operations Command Center Overall privacy operations 1 17.2. Customer Privacy, Consent & Preference Complete customer privacy 2 360° view 17.2. Consent Evidence, History & Withdrawal Consent evidence and 3 Management withdrawal 17.2. Data Subject / Customer Privacy Request",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search privacy analytics compliance",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 35 §Analyze by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Tenant",
-        "Brand",
-        "Country",
-        "Venue",
-        "Channel",
-        "Consent Purpose",
-        "Customer Segment",
-        "Product",
-        "Policy Version",
-        "Language",
-        "Time Period"
-       ],
-       "notes": "The pack filters this screen by tenant, brand, country, venue, channel, consent purpose and 5 more — which are present is a decision the pack already made.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 35 §Analyze by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every privacy analytics compliance",
-       "columns": [
-        "PrivacyAnalyticsAiComplianceIntelligenceView.consentRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
-       ],
-       "bindsTo": "PrivacyAnalyticsAiComplianceIntelligenceView",
-       "operation": "listPrivacyCompliance",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 35 §Analyze"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected privacy analytics compliance",
-       "bindsTo": "PrivacyAnalyticsAiComplianceIntelligenceView",
-       "columns": [
-        "PrivacyAnalyticsAiComplianceIntelligenceView.consentRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions",
-        "PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Privacy request cases”, “Locate/export/correct data”, “Final Area 17 Architecture”, “Compliance”.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 35 §Analyze"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** “Show overdue deletion requests.”, “Show minors with incomplete guardian privacy consent.”. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 35 §Authorized users may ask"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The privacy analytics compliance list.",
-   "error": "Could not load. Names which read failed and leaves the privacy analytics compliance untouched.",
-   "emptyFirstRun": "No privacy analytics compliance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the privacy analytics compliance are still there. The pack's own statuses are 7 Operations — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listPrivacyCompliance",
-    "contract": "marketing-crm",
-    "purpose": "Privacy Analytics & AI Compliance Intelligence",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "PrivacyAnalyticsAiComplianceIntelligenceView.consentRate",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests",
-    "PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P13 Venue CMS.dc.html#cms-040"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 35. 13 of 24 labels bound to a contract property; 31 of 107 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P13",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue CMS",
-   "name": "Venue CMS — White Label",
-   "app": "venue-management-web",
-   "offlineCapable": false,
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P08",
-     "P12",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

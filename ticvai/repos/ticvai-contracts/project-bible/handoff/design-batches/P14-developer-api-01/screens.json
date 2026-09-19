@@ -1,875 +1,74 @@
 [
  {
-  "id": "DEV-001",
-  "name": "API Reference",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
+  "id": "WEB-016",
+  "name": "Login / Register",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/reference",
-   "component": "apps/developer-portal-web/src/routes/developer/ApiReference.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "DEV-002",
-    "DEV-004"
-   ],
-   "isEntryPoint": true,
-   "transitions": [
-    {
-     "to": "DEV-002",
-     "trigger": "They register their organisation",
-     "provenance": "flow F27 step 1→2",
-     "operation": "listApiVersions"
-    },
-    {
-     "to": "DEV-004",
-     "trigger": "Sandbox",
-     "provenance": "structural — DEV-001 is P14's home screen and its exits are its launcher"
-    }
-   ]
-  },
-  "notes": "CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listApiVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Read the contract, and call it without leaving the page.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every api reference",
-       "bindsTo": "ApiVersion",
-       "columns": [
-        "ApiVersion.status",
-        "ApiVersion.releasedAt",
-        "ApiVersion.deprecatedAt",
-        "ApiVersion.sunsetAt",
-        "ApiVersion.minimumNoticeMonths",
-        "ApiVersion.migrationGuideUrl",
-        "ApiVersion.activeClientCount"
-       ],
-       "operation": "listApiVersions",
-       "provenance": "contract public-api.yaml GET /api-versions"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected api reference",
-       "bindsTo": "ApiVersion",
-       "columns": [
-        "ApiVersion.status",
-        "ApiVersion.releasedAt",
-        "ApiVersion.deprecatedAt",
-        "ApiVersion.sunsetAt",
-        "ApiVersion.minimumNoticeMonths",
-        "ApiVersion.migrationGuideUrl",
-        "ApiVersion.activeClientCount"
-       ],
-       "operation": "listApiVersions",
-       "provenance": "contract public-api.yaml GET /api-versions"
-      }
-     ]
-    },
-    {
-     "name": "sideNav",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search operations",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "treeNav",
-       "bindsTo": "contracts",
-       "notes": "Grouped by contract, not by tag. **A developer thinks in domains** — ticketing, access, F&B — and the contracts already are the domains.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "bindsTo": "operation",
-       "notes": "Request, response, scopes and error codes. **The error codes are what a developer comes back for**, and they are the section most documentation buries.\n",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "codeBlock",
-       "notes": "A working example per language. **Copy-paste that runs** — an example with a placeholder token teaches nothing about auth, which is where integrations fail.\n",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Try it",
-       "notes": "Runs against the sandbox, never production. **The environment is stated on the button**, because a try-it that quietly hits production is how somebody refunds a real order while reading the docs.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The operation list; the current version renders first.",
-   "error": "Could not load the reference. **Names which contract failed** — 28 files load independently and one missing does not mean the API is down.\n",
-   "emptyFirstRun": "**Never empty in practice** — the contracts are the documentation and they ship with the platform. An empty reference means the artefacts did not load, which is an error rather than a first run.\n",
-   "emptyNoResults": "No operation matches this search. **Search covers the summary and the description**, not just the operationId, because a developer looking for *\"how do I refund\"* does not know it is called `createRefund`.\n",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listApiVersions",
-    "contract": "public-api",
-    "purpose": "Which versions exist and which is current",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "ApiVersion.status",
-    "ApiVersion.releasedAt",
-    "ApiVersion.deprecatedAt",
-    "ApiVersion.sunsetAt",
-    "ApiVersion.minimumNoticeMonths"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-001"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-002",
-  "name": "Register & Organisation",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/organisation",
-   "component": "apps/developer-portal-web/src/routes/developer/OrganisationForm.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/login-register",
+   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "DEV-001"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "DEV-003"
+    "WEB-001",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "DEV-003",
-     "trigger": "They create a sandbox client and take the secret",
-     "provenance": "flow F27 step 2→3",
-     "operation": "registerDeveloper"
-    }
-   ]
-  },
-  "notes": "13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR.\n",
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`registerDeveloper`, `setDeveloperMembers`) and no read of a population — it is settings, not a list",
-  "purpose": "Sign up as an organisation, and manage who at it may do what.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "DeveloperAccount.id",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "organisationName",
-       "bindsTo": "DeveloperAccount.organisationName",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "contactEmail",
-       "bindsTo": "DeveloperAccount.contactEmail",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "websiteUrl",
-       "bindsTo": "DeveloperAccount.websiteUrl",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "countryCode",
-       "bindsTo": "DeveloperAccount.countryCode",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "partnerId",
-       "bindsTo": "DeveloperAccount.partnerId",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "status",
-       "bindsTo": "DeveloperAccount.status",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "textField",
-       "label": "verifiedAt",
-       "bindsTo": "DeveloperAccount.verifiedAt",
-       "provenance": "contract public-api.yaml POST /developers"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Register",
-       "operation": "registerDeveloper",
-       "provenance": "contract public-api.yaml POST /developers"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setDeveloperMembers",
-       "provenance": "contract public-api.yaml PUT /developers/{developerId}/members"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Organisation name",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "textField",
-       "label": "Contact email",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "bindsTo": "members",
-       "notes": "Role per member — owner, admin, developer, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Invite",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The organisation and its members.",
-   "error": "Could not load. Your credentials are unaffected.",
-   "emptyFirstRun": "**You are the first member and you are the owner.** An integration outlives the engineer who built it, so this is an organisation rather than a personal account — and the invite action is the point of the state.\n",
-   "emptyNoAccess": "**You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken.\n"
-  },
-  "apis": [
-   {
-    "operationId": "registerDeveloper",
-    "contract": "public-api",
-    "purpose": "Register",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setDeveloperMembers",
-    "contract": "public-api",
-    "purpose": "Manage members",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "developerId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `developerId`."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-002"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-003",
-  "name": "Clients & Credentials",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/clients",
-   "component": "apps/developer-portal-web/src/routes/developer/ClientList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "DEV-002"
-   ],
-   "exitTo": [
-    "DEV-004",
-    "DEV-005"
-   ],
-   "transitions": [
-    {
-     "to": "DEV-004",
-     "trigger": "They provision a sandbox and build against it",
-     "provenance": "flow F27 step 3→4",
-     "operation": "createApiClient"
-    },
-    {
-     "to": "DEV-005",
-     "trigger": "Webhooks",
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
      "carries": [
-      "subscriptionId"
+      "deviceId",
+      "itemId",
+      "subjectId"
      ],
-     "provenance": "derived — DEV-005 declares entryState.params subscriptionId, so an edge into it must carry them"
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-039",
+     "trigger": "They set a profile",
+     "provenance": "flow F56 step 3→4",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
-  "notes": "CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for when a secret has leaked, and a grace period defeats it.\n",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed. **The screen was calling the staff identity surface because nothing checked that a guest platform only calls guest operations.**",
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "`listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Create a client, choose its scopes, and rotate its secret without an outage.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every clients credentials",
-       "bindsTo": "ApiClient",
-       "columns": [
-        "ApiClient.id",
-        "ApiClient.developerId",
-        "ApiClient.name",
-        "ApiClient.clientId",
-        "ApiClient.environment",
-        "ApiClient.scopes",
-        "ApiClient.allowedTenantIds",
-        "ApiClient.ipAllowList",
-        "ApiClient.status",
-        "ApiClient.lastUsedAt"
-       ],
-       "operation": "listApiClients",
-       "provenance": "contract public-api.yaml GET /api-clients"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected clients credentials",
-       "bindsTo": "ApiClient",
-       "columns": [
-        "ApiClient.id",
-        "ApiClient.developerId",
-        "ApiClient.name",
-        "ApiClient.clientId",
-        "ApiClient.environment",
-        "ApiClient.scopes",
-        "ApiClient.allowedTenantIds",
-        "ApiClient.ipAllowList",
-        "ApiClient.status",
-        "ApiClient.lastUsedAt"
-       ],
-       "operation": "listApiClients",
-       "provenance": "contract public-api.yaml GET /api-clients"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createApiClient",
-       "provenance": "contract public-api.yaml POST /api-clients"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Rotate",
-       "operation": "rotateApiCredential",
-       "provenance": "contract public-api.yaml POST /api-clients/{clientId}/credentials"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeApiCredential",
-       "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "bindsTo": "ApiClient[]",
-       "notes": "Environment is a column and not a badge. **A sandbox key and a production key that look alike is how somebody uses the wrong one**, and the difference must survive a glance.\n",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Create client",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "banner",
-       "notes": "**The secret is shown once.** The banner says so before it is generated, not after — a system that can show you a secret later is a system that stores one.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmRevokeApiCredential",
-    "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence rather than the verb. A clients credentials this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
-   }
-  ],
-  "states": {
-   "loading": "Clients, sandbox first.",
-   "error": "Could not load clients. Existing credentials keep working.",
-   "emptyFirstRun": "**No clients yet. Create a sandbox one** — the action says sandbox because a first client should never be a production client, and defaulting the other way is how a first API call hits a live venue.\n",
-   "emptyNoResults": "No client matches this environment or scope.",
-   "emptyNoAccess": "You are a read-only member. Credentials are hidden, not absent."
-  },
-  "apis": [
-   {
-    "operationId": "listApiClients",
-    "contract": "public-api",
-    "purpose": "Clients with their environment and scopes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createApiClient",
-    "contract": "public-api",
-    "purpose": "Create one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApiClients"
-    ]
-   },
-   {
-    "operationId": "rotateApiCredential",
-    "contract": "public-api",
-    "purpose": "New secret with an overlap",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApiClients"
-    ]
-   },
-   {
-    "operationId": "revokeApiCredential",
-    "contract": "public-api",
-    "purpose": "Revoke now",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApiClients"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "clientId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `clientId`.",
-   "preloaded": [
-    "ApiClient.id",
-    "ApiClient.developerId",
-    "ApiClient.name",
-    "ApiClient.clientId",
-    "ApiClient.environment"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-003"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-004",
-  "name": "Sandbox",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/sandbox",
-   "component": "apps/developer-portal-web/src/routes/developer/SandboxList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "DEV-001",
-    "DEV-003"
-   ],
-   "exitTo": [
-    "DEV-005"
-   ],
-   "transitions": [
-    {
-     "to": "DEV-005",
-     "trigger": "They subscribe to the events they need and watch the deliveries",
-     "provenance": "flow F27 step 4→5"
-    }
-   ]
-  },
-  "notes": "Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL and DESC exposure entirely. Tenant-specific validation runs on per-customer staging.\n",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listSandboxes` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Test against synthetic data, and reset to a known state.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every sandbox",
-       "bindsTo": "Sandbox",
-       "columns": [
-        "Sandbox.id",
-        "Sandbox.name",
-        "Sandbox.developerId",
-        "Sandbox.status",
-        "Sandbox.dataProfile",
-        "Sandbox.containsProductionData",
-        "Sandbox.expiresAt",
-        "Sandbox.lastResetAt"
-       ],
-       "operation": "listSandboxes",
-       "provenance": "contract public-api.yaml GET /sandboxes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected sandbox",
-       "bindsTo": "Sandbox",
-       "columns": [
-        "Sandbox.id",
-        "Sandbox.name",
-        "Sandbox.developerId",
-        "Sandbox.status",
-        "Sandbox.dataProfile",
-        "Sandbox.containsProductionData",
-        "Sandbox.expiresAt",
-        "Sandbox.lastResetAt"
-       ],
-       "operation": "listSandboxes",
-       "provenance": "contract public-api.yaml GET /sandboxes"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createSandbox",
-       "provenance": "contract public-api.yaml POST /sandboxes"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Reset",
-       "operation": "resetSandbox",
-       "provenance": "contract public-api.yaml POST /sandboxes/{sandboxId}/reset"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "Sandbox[]",
-       "notes": "Venue kind, record counts, expiry.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Provision sandbox",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reset",
-       "notes": "Confirms by naming what goes. **\"Reset — 5,000 guests and 12 months of orders will be regenerated\"** rather than \"are you sure\", because a developer mid-test needs to know what they are about to lose.\n",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "banner",
-       "notes": "**Expiry, counted in days.** A sandbox that vanishes with no warning is a developer who thinks the platform broke.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "overlays": [
-   {
-    "id": "confirmResetSandbox",
-    "component": "confirmDialog",
-    "trigger": "Reset",
-    "body": "**Names what `resetSandbox` changes and what it leaves alone**, in the consequence rather than the verb. A sandbox this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract public-api.yaml POST /sandboxes/{sandboxId}/reset"
-   }
-  ],
-  "states": {
-   "loading": "Sandboxes with their data profile.",
-   "error": "Could not load. A running sandbox is unaffected.",
-   "emptyFirstRun": "**No sandbox yet. Provisioning takes a few minutes and the data is generated, not copied** — no production data is ever cloned or masked into it, which is the decision the whole environment rests on.\n",
-   "emptyNoResults": "No sandbox matches.",
-   "emptyNoAccess": "You do not have DEVELOPER_MANAGE."
-  },
-  "apis": [
-   {
-    "operationId": "listSandboxes",
-    "contract": "public-api",
-    "purpose": "Sandboxes and their expiry",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createSandbox",
-    "contract": "public-api",
-    "purpose": "Provision one",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSandboxes"
-    ]
-   },
-   {
-    "operationId": "resetSandbox",
-    "contract": "public-api",
-    "purpose": "Back to clean",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSandboxes"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "sandboxId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `sandboxId`.",
-   "preloaded": [
-    "Sandbox.id",
-    "Sandbox.name",
-    "Sandbox.developerId",
-    "Sandbox.status",
-    "Sandbox.dataProfile"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-004"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-005",
-  "name": "Webhooks",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/webhooks",
-   "component": "apps/developer-portal-web/src/routes/developer/WebhookList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "DEV-003",
-    "DEV-004"
-   ],
-   "exitTo": [
-    "DEV-006"
-   ],
-   "transitions": [
-    {
-     "to": "DEV-006",
-     "trigger": "They go live, and watch whether it is healthy",
-     "provenance": "flow F27 step 5→6"
-    }
-   ]
-  },
-  "notes": "13.1.26 to 13.1.30, 13.3.17 to 13.3.23. **The 29 events already existed and nothing outside could receive one.**\n",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listWebhookSubscriptions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Subscribe to events, see every delivery, and replay what was missed.",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared.",
   "gaps": [
    {
-    "operation": "listWebhookDeliveries",
-    "why": "**1 declared operation reach no component on this screen**: listWebhookDeliveries. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -882,21 +81,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every webhooks",
-       "bindsTo": "WebhookSubscription",
+       "label": "Every login register",
+       "bindsTo": "MfaMethod",
        "columns": [
-        "WebhookSubscription.id",
-        "WebhookSubscription.clientId",
-        "WebhookSubscription.endpointUrl",
-        "WebhookSubscription.eventTypes",
-        "WebhookSubscription.filters",
-        "WebhookSubscription.signingSecret",
-        "WebhookSubscription.status",
-        "WebhookSubscription.consecutiveFailures",
-        "WebhookSubscription.disabledReason"
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
        ],
-       "operation": "listWebhookSubscriptions",
-       "provenance": "contract public-api.yaml GET /webhook-subscriptions"
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
       }
      ]
     },
@@ -906,21 +104,21 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected webhooks",
-       "bindsTo": "WebhookSubscription",
+       "label": "The selected login register",
+       "bindsTo": "GuestSession",
        "columns": [
-        "WebhookSubscription.id",
-        "WebhookSubscription.clientId",
-        "WebhookSubscription.endpointUrl",
-        "WebhookSubscription.eventTypes",
-        "WebhookSubscription.filters",
-        "WebhookSubscription.signingSecret",
-        "WebhookSubscription.status",
-        "WebhookSubscription.consecutiveFailures",
-        "WebhookSubscription.disabledReason"
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
        ],
-       "operation": "listWebhookSubscriptions",
-       "provenance": "contract public-api.yaml GET /webhook-subscriptions"
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       }
      ]
     },
@@ -930,296 +128,413 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createWebhookSubscription",
-       "provenance": "contract public-api.yaml POST /webhook-subscriptions"
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
       },
       {
        "kind": "secondaryButton",
-       "label": "Replay",
-       "operation": "replayEvents",
-       "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay"
-      }
-     ]
-    },
-    {
-     "name": "sideNav",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "WebhookSubscription[]",
-       "notes": "Failing subscriptions sort first and carry the consecutive-failure count. **A developer is told before it is disabled, not after.**\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "bindsTo": "WebhookDelivery[]",
-       "notes": "Status, attempts, response code and an excerpt of the receiver's own error. **The excerpt is what makes the log useful** — a 500 with their own message in it answers the question without a support conversation.\n",
-       "provenance": "carried from the previous definition"
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       },
       {
        "kind": "secondaryButton",
-       "label": "Replay from…",
-       "notes": "Bounded by retention, and the replay is marked in the payload. **A consumer that cannot tell a replay from a live event will double-count.**\n",
-       "provenance": "carried from the previous definition"
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A login register this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "states": {
-   "loading": "Subscriptions; failing ones first.",
-   "error": "Could not load. Deliveries continue regardless of this screen.",
-   "emptyFirstRun": "**No subscriptions. Twenty-nine business events are available** — and the state names a few, because a developer who does not know what exists cannot subscribe to it.\n",
-   "emptyNoResults": "No delivery matches this window or status.",
-   "emptyNoAccess": "You do not have DEVELOPER_VIEW."
+   "loading": "The login register list.",
+   "error": "Could not load. Names which read failed and leaves the login register untouched.",
+   "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "listWebhookSubscriptions",
-    "contract": "public-api",
-    "purpose": "Subscriptions",
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "from page inventory",
     "trigger": "onLoad"
    },
    {
-    "operationId": "createWebhookSubscription",
-    "contract": "public-api",
-    "purpose": "Subscribe",
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
     "trigger": "onAction",
     "invalidates": [
-     "listWebhookSubscriptions"
+     "listMfaMethods"
     ]
    },
    {
-    "operationId": "listWebhookDeliveries",
-    "contract": "public-api",
-    "purpose": "The delivery log",
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
     "trigger": "onAction",
     "invalidates": [
-     "listWebhookSubscriptions"
+     "listMfaMethods"
     ]
    },
    {
-    "operationId": "replayEvents",
-    "contract": "public-api",
-    "purpose": "Re-deliver from a point in time",
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
     "trigger": "onAction",
     "invalidates": [
-     "listWebhookSubscriptions"
+     "listMfaMethods"
     ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "Request a one-time code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "claimCart",
+    "contract": "orders",
+    "purpose": "Attach an anonymous cart to a guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor at sign-in",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "subscriptionId",
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `subscriptionId`.",
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
    "preloaded": [
-    "WebhookSubscription.id",
-    "WebhookSubscription.clientId",
-    "WebhookSubscription.endpointUrl",
-    "WebhookSubscription.eventTypes",
-    "WebhookSubscription.filters"
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-005"
+   "board": "wireframes/P01 Guest Web.dc.html#web-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P14",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }
  },
  {
-  "id": "DEV-006",
-  "name": "Usage & Limits",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
+  "id": "WEB-017",
+  "name": "My Account Dashboard",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
   "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/usage",
-   "component": "apps/developer-portal-web/src/routes/developer/UsageDashboard.tsx",
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-account-dashboard",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "DEV-005"
+    "WEB-001"
    ],
+   "inferred": true,
    "exitTo": [
-    "DEV-001",
-    "DEV-007"
+    "WEB-001",
+    "WEB-016",
+    "WEB-018",
+    "WEB-019"
    ],
    "transitions": [
     {
-     "to": "DEV-007",
-     "trigger": "They submit the integration for certification and listing",
-     "provenance": "flow F27 step 6→7",
-     "operation": "getApiUsage"
-    }
-   ]
-  },
-  "notes": "13.1.16 to 13.1.20 and 13.1.41 to 13.1.45. **One screen for five requirements, because they are one question asked five ways.**\n",
-  "density": "compact",
-  "pattern": "statusTracker",
-  "patternReason": "`getApiUsage` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See whether the integration is healthy, and whose fault it is when it is not.",
-  "layout": {
-   "template": "detail",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "record",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected usage limits",
-       "bindsTo": "ApiUsageSummary",
-       "columns": [
-        "ApiUsageSummary.totalCalls",
-        "ApiUsageSummary.successRate",
-        "ApiUsageSummary.clientErrorRate",
-        "ApiUsageSummary.serverErrorRate",
-        "ApiUsageSummary.p50LatencyMs",
-        "ApiUsageSummary.p95LatencyMs",
-        "ApiUsageSummary.p99LatencyMs",
-        "ApiUsageSummary.quotaBreaches",
-        "ApiUsageSummary.byOperation"
-       ],
-       "operation": "getApiUsage",
-       "provenance": "contract public-api.yaml GET /api-usage"
-      }
-     ]
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "metricTile",
-       "notes": "Calls, success rate, p95 latency, quota headroom.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "bindsTo": "ApiUsageSummary",
-       "notes": "**Client errors and server errors on separate series.** A 4xx is the integrator's problem and a 5xx is ours, and one combined error rate lets both sides blame the other.\n",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "bindsTo": "byOperation",
-       "notes": "Per operation, sorted by error rate rather than by volume.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
     }
    ]
   },
-  "states": {
-   "loading": "Call volume; the current window renders first.",
-   "error": "Could not load usage. Your quota is unaffected.",
-   "emptyFirstRun": "**No calls yet.** The state links to the reference rather than sitting blank — a developer who has registered and not called anything is a developer who needs a first request.\n",
-   "emptyNoResults": "No calls in this window.",
-   "emptyNoAccess": "You do not have DEVELOPER_VIEW."
-  },
-  "apis": [
-   {
-    "operationId": "getApiUsage",
-    "contract": "public-api",
-    "purpose": "Calls, errors, latency",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-006"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-007",
-  "name": "Marketplace Listing",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 3,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/marketplace",
-   "component": "apps/developer-portal-web/src/routes/developer/ListingList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "DEV-006"
-   ],
-   "exitTo": [
-    "DEV-006"
-   ],
-   "inferred": false,
-   "notes": "**Returns to DEV-006.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
-  },
-  "notes": "13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs on the developer's own infrastructure, and third-party code does not execute inside TICVAI.\n",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
   "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#web-017"
+  ],
   "pattern": "listDetail",
-  "patternReason": "`listIntegrationListings` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Submit an integration for certification, and see where it is in review.",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1229,23 +544,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every marketplace listing",
-       "bindsTo": "IntegrationListing",
+       "label": "Every account",
+       "bindsTo": "GuestDevice",
        "columns": [
-        "IntegrationListing.id",
-        "IntegrationListing.developerId",
-        "IntegrationListing.name",
-        "IntegrationListing.category",
-        "IntegrationListing.description",
-        "IntegrationListing.integrationUrl",
-        "IntegrationListing.requiredScopes",
-        "IntegrationListing.status",
-        "IntegrationListing.certifiedUntil",
-        "IntegrationListing.certifiedAgainstVersion",
-        "IntegrationListing.listingFeeModel"
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
        ],
-       "operation": "listIntegrationListings",
-       "provenance": "contract public-api.yaml GET /listings"
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       }
      ]
     },
@@ -1255,23 +571,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected marketplace listing",
-       "bindsTo": "IntegrationListing",
+       "label": "The selected account",
+       "bindsTo": "Wishlist",
        "columns": [
-        "IntegrationListing.id",
-        "IntegrationListing.developerId",
-        "IntegrationListing.name",
-        "IntegrationListing.category",
-        "IntegrationListing.description",
-        "IntegrationListing.integrationUrl",
-        "IntegrationListing.requiredScopes",
-        "IntegrationListing.status",
-        "IntegrationListing.certifiedUntil",
-        "IntegrationListing.certifiedAgainstVersion",
-        "IntegrationListing.listingFeeModel"
+        "Wishlist.subjectId",
+        "Wishlist.items"
        ],
-       "operation": "listIntegrationListings",
-       "provenance": "contract public-api.yaml GET /listings"
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
@@ -1281,308 +588,986 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Submit",
-       "operation": "submitIntegrationListing",
-       "provenance": "contract public-api.yaml POST /listings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Submit for certification",
-       "provenance": "carried from the previous definition"
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
-       "kind": "banner",
-       "notes": "**Certification expires, and the date is shown.** An integration certified against v1 and still listed after v3 is Softlabs vouching for something nobody has looked at in two years.\n",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
   "states": {
-   "loading": "Listings with their certification status.",
-   "error": "Could not load listings.",
-   "emptyFirstRun": "**Nothing submitted. Certification gates the listing, not API access** — the state says so, because a developer who thinks they need certifying to make a call will not make one.\n",
-   "emptyNoResults": "No listing matches this category or status.",
-   "emptyNoAccess": "You do not have DEVELOPER_MANAGE."
+   "loading": "Tiles skeleton",
+   "error": "Partial. Each tile fails independently",
+   "emptyFirstRun": "A new account with no orders — offers what to do next",
+   "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "listIntegrationListings",
-    "contract": "public-api",
-    "purpose": "Published integrations",
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
     "trigger": "onLoad"
    },
    {
-    "operationId": "submitIntegrationListing",
-    "contract": "public-api",
-    "purpose": "Submit for review",
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
     "trigger": "onAction",
     "invalidates": [
-     "listIntegrationListings"
+     "listGuestDevices"
     ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "IntegrationListing.id",
-    "IntegrationListing.developerId",
-    "IntegrationListing.name",
-    "IntegrationListing.category",
-    "IntegrationListing.description"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-007"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P14",
-   "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
-   "offlineCapable": false,
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "DEV-008",
-  "name": "Programme Administration",
-  "module": "Developer & API",
-  "requiresModule": "developerApi",
-  "wave": 2,
-  "implementation": {
-   "app": "developer-portal-web",
-   "route": "/developer/admin",
-   "component": "apps/developer-portal-web/src/routes/developer/ProgrammeAdmin.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "DEV-001"
-   ],
-   "exitTo": [
-    "DEV-001"
-   ],
-   "inferred": false,
-   "notes": "**Returns to DEV-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
-  },
-  "notes": "**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota.\n\n**Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s.",
-  "density": "compact",
-  "audience": "staff",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`setApiQuota`, `certifyIntegration`, `setApiLicensing`) and no read of a population — it is settings, not a list",
-  "purpose": "Set quotas, certify integrations and configure licensing.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ApiQuota.id",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "clientId",
-       "bindsTo": "ApiQuota.clientId",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "sustainedPerMinute",
-       "bindsTo": "ApiQuota.sustainedPerMinute",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "burstPerSecond",
-       "bindsTo": "ApiQuota.burstPerSecond",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "dailyCap",
-       "bindsTo": "ApiQuota.dailyCap",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "perOperationOverrides",
-       "bindsTo": "ApiQuota.perOperationOverrides",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "textField",
-       "label": "onBreach",
-       "bindsTo": "ApiQuota.onBreach",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setApiQuota",
-       "provenance": "contract public-api.yaml PUT /api-quotas"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Certify",
-       "operation": "certifyIntegration",
-       "provenance": "contract public-api.yaml POST /listings/{listingId}/certify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setApiLicensing",
-       "provenance": "contract public-api.yaml PUT /api-licensing"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Deprecate",
-       "operation": "deprecateApiVersion",
-       "provenance": "contract public-api.yaml POST /api-versions/{version}/deprecate"
-      }
-     ]
-    },
-    {
-     "name": "sideNav",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "treeNav",
-       "notes": "Quotas · Certification queue · Licensing · Versions.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Approve",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reject",
-       "notes": "Requires a reason the developer can act on, never a bare rejection.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "banner",
-       "notes": "**Deprecating a version names how many clients call it and which operations they use.** A generic \"v1 is retiring\" to somebody using three of two hundred endpoints is a message they will ignore.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "Pending certifications first.",
-   "error": "Could not load.",
-   "emptyFirstRun": "Nothing awaiting review.",
-   "emptyNoAccess": "**This is a Softlabs screen and you are a developer.** Said plainly — a blank administration page shown to a partner is worse than a refusal, because they will file a support ticket about it.\n"
-  },
-  "apis": [
-   {
-    "operationId": "setApiQuota",
-    "contract": "public-api",
-    "purpose": "Rate limits per client",
-    "trigger": "onAction"
    },
    {
-    "operationId": "certifyIntegration",
-    "contract": "public-api",
-    "purpose": "Certify, reject or revoke",
-    "trigger": "onAction"
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
    },
    {
-    "operationId": "setApiLicensing",
-    "contract": "public-api",
-    "purpose": "Which modules a tenant licenses",
-    "trigger": "onAction"
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
    },
    {
-    "operationId": "deprecateApiVersion",
-    "contract": "public-api",
-    "purpose": "Announce a sunset",
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMyChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Outstanding security challenges",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "respondToInvitation",
+    "contract": "marketing-crm",
+    "purpose": "Accept or decline an invitation",
     "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "listingId",
+     "name": "deviceId",
      "from": "deepLink"
     },
     {
-     "name": "version",
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "token",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`."
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P14 Developer.dc.html#dev-008"
+   "board": "wireframes/P01 Guest Web.dc.html#web-017",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-018",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/my-tickets",
+   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-019"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived from the screen name and its operations on 17 August, not from a requirement. The read surface Deep asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMyEntitlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Tickets load",
+   "error": "Could not load",
+   "emptyFirstRun": "No tickets — distinguishes never bought from all past",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Add the ticket to a phone wallet from the desktop",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "shareEntitlement",
+    "contract": "orders",
+    "purpose": "Send a ticket to somebody",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C34",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/order-history",
+   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history for this venue.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyOrders"
+    ]
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Ask for a refund",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-019"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
-   "code": "P14",
+   "code": "P01",
+   "audience": "guest",
    "formFactor": "web",
-   "app": "developer-portal-web",
-   "operator": "partner",
-   "name": "Developer Portal",
-   "shortName": "Developer",
-   "audience": "partner",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "guest",
+    "name": "TICVAI Guest",
     "shell": "web",
     "siblings": [
-     "P09",
-     "P10",
-     "P11",
-     "P17"
+     "P02",
+     "P05"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-020",
+  "name": "Profile & Preferences",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C36",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/account-and-self-service/profile-and-preferences",
+   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "cartId",
+      "challengeId",
+      "methodId",
+      "providerId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Profile and Preferences. **Wishlist and device operations removed; profile, consent and email verification added.** Deep listed exactly these. **Rewired on the 20 August review.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
+  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile preferences",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.consents"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "label": "Save my profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPurposes",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateMyProfile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Profile and consents",
+   "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Send a verification link, or consume one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "Change contact and consent preferences",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "GuestProfileDetail.id",
+    "GuestProfileDetail.subjectId",
+    "GuestProfileDetail.displayName",
+    "GuestProfileDetail.email",
+    "GuestProfileDetail.phone"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
     "decided": "10 September 2026"
    }
   }

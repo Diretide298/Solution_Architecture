@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS ai.message (
 
 -- What the assistant may do, which roles may use it, what is masked. Resolves tenant then venue
 -- (ADR-0018) Hangs off: reaches ai.index_source through its keys; references ai.provider,
--- platform.tenant. Reached by: 12 operations read it and 2 write it.
+-- platform.tenant. Reached by: 12 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.policy (
     id                                uuid PRIMARY KEY,
     scope_level                       text NOT NULL,

@@ -1,4 +1,4 @@
--- catalogue — 18 tables
+-- catalogue — 27 tables
 -- **Derived. Do not hand-edit.**
 
 -- Another way to name the same product — a barcode, a supplier code, a legacy id
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS catalogue.channel_capacity (
 );
 
 -- Fixed, free or round-up. Posts to a liability account, not revenue — money collected for a
--- charity is not the venue’s to recognise Hangs off: reaches catalogue.product through its keys;
+-- charity is not the venue’s to recognise Hangs off: reaches catalogue.event through its keys;
 -- references ledger.account, platform.org_unit. Reached by: 2 operations read it and 2 write it; 1
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
@@ -114,9 +114,94 @@ CREATE TABLE IF NOT EXISTS catalogue.event (
     is_active                         boolean
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_capacity_profile (
+    event_id                          uuid,
+    performance_id                    uuid,
+    mode                              text,
+    safe_maximum                      integer,
+    sellable                          integer,
+    held                              integer,
+    accessible_provision              integer,
+    companion_seats                   integer,
+    overbook_percent                  numeric(18,4),
+    seat_map_id                       uuid,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_registration (
+    event_id                          uuid,
+    required                          boolean,
+    form_id                           uuid,
+    capture_per_attendee              boolean,
+    admission_policy                  jsonb,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_reschedule (
+    id                                uuid PRIMARY KEY,
+    kind                              text NOT NULL,
+    performance_ids                   text[],
+    new_starts_at                     timestamptz,
+    new_space_id                      uuid,
+    reason                            text NOT NULL,
+    ticket_treatment                  text,
+    refund_fees                       boolean,
+    notify_guests                     boolean,
+    notification_template_id          uuid,
+    affected_orders                   integer,
+    affected_guests                   integer,
+    approval_request_id               uuid,
+    scope_path                        text
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_resource_plan (
+    event_id                          uuid,
+    readiness                         text,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_schedule (
+    event_id                          uuid,
+    duration_is_dynamic               boolean,
+    maximum_overrun_minutes           integer,
+    cascade_overrun                   boolean,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.event_type (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    has_performances                  boolean,
+    capacity_basis                    text,
+    ticket_names_date                 boolean,
+    multi_day                         boolean,
+    requires_registration             boolean,
+    requires_accreditation            boolean,
+    seating_modes_allowed             text[],
+    default_lifecycle                 text[],
+    scope_path                        text
+);
+
 -- Two-phase catalogue import (BL-057), following seating.ImportJob. A job that parses zero
--- products is not a parsed job. Hangs off: reaches catalogue.product through its keys. Reached by:
--- 1 operations read it and 2 write it.
+-- products is not a parsed job. Hangs off: reaches catalogue.event through its keys. Reached by: 1
+-- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL,
@@ -161,6 +246,24 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
     admission_rules_id                uuid,
     seat_map_id                       uuid,
     admission_profile_id              uuid NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.prepaid_minutes (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text,
+    minutes                           integer NOT NULL,
+    price                             numeric(18,4),
+    credit_type_id                    uuid,
+    rounding_minutes                  integer,
+    minimum_draw_minutes              integer,
+    band_multipliers_apply            boolean,
+    validity_months                   integer,
+    transferable_within_household     boolean,
+    applicable_space_ids              text[],
+    scope_path                        text
 );
 
 -- What something costs on one price list. A change here never rewrites what somebody already paid
@@ -253,6 +356,39 @@ CREATE TABLE IF NOT EXISTS catalogue.published_bundle (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.session_template (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text,
+    space_id                          uuid,
+    slot_minutes                      integer,
+    turnaround_minutes                integer,
+    concurrent_capacity               integer,
+    walk_in                           jsonb,
+    scope_path                        text
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.space (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    venue_id                          uuid,
+    venue_map_zone_id                 uuid,
+    resource_id                       uuid,
+    parent_space_id                   uuid,
+    maximum_capacity                  integer,
+    safe_capacity                     integer,
+    setup_minutes                     integer,
+    teardown_minutes                  integer,
+    access_rules                      jsonb,
+    bookable                          boolean,
+    scope_path                        text
+);
+
 -- One sellable configuration of a product — a size, a colour, a tier. Varies along the dimensions
 -- in catalogue.variant_dimension
 CREATE TABLE IF NOT EXISTS catalogue.variant (
@@ -273,9 +409,8 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
 );
 
 -- Who asked to be told when a sold-out session frees up. Not a queue — a queue is people standing
--- at a ride Hangs off: reaches catalogue.product through its keys; references
--- catalogue.performance, catalogue.variant, pii.subject. Reached by: 3 operations read it and 3
--- write it.
+-- at a ride Hangs off: reaches catalogue.event through its keys; references catalogue.performance,
+-- catalogue.variant, pii.subject. Reached by: 3 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS catalogue.waitlist_entry (
     id                                uuid PRIMARY KEY,
     performance_id                    uuid NOT NULL,

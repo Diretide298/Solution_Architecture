@@ -1,5 +1,61 @@
--- assets — 4 tables
+-- assets — 12 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.approval (
+    asset_id                          uuid,
+    state                             text,
+    approved_by                       uuid,
+    comment                           text,
+    at                                timestamptz,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.asset_version (
+    asset_id                          uuid,
+    version                           integer,
+    file_name                         text,
+    size_bytes                        integer,
+    checksum                          text,
+    created_by                        uuid,
+    created_at                        timestamptz,
+    note                              text,
+    is_current                        boolean,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.audit (
+    id                                uuid PRIMARY KEY,
+    asset_id                          uuid,
+    at                                timestamptz,
+    action                            text,
+    actor_id                          uuid,
+    recipient                         text,
+    detail                            text,
+    scope_path                        text
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.distribution_channel (
+    code                              text NOT NULL,
+    name                              text,
+    cdn_base_url                      text,
+    signed_urls                       boolean,
+    signed_url_ttl_seconds            integer,
+    default_rendition                 text,
+    fallback_asset_id                 uuid,
+    on_rights_expiry                  text,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
 
 -- An image, video or document with a licence and a lifecycle. Referenced everywhere and owned by
 -- one service, so a takedown is one delete
@@ -59,5 +115,58 @@ CREATE TABLE IF NOT EXISTS assets.media_usage (
     label                             text,
     is_live                           boolean,
     asset_id                          uuid NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.rendition (
+    id                                uuid PRIMARY KEY,
+    preset                            text NOT NULL,
+    format                            text,
+    width                             integer,
+    height                            integer,
+    size_bytes                        integer,
+    status                            text,
+    failure_reason                    text,
+    url                               text,
+    scope_path                        text
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.share (
+    id                                uuid PRIMARY KEY,
+    asset_ids                         text[] NOT NULL,
+    recipient_email                   text,
+    recipient_organisation            text,
+    allow_download                    boolean,
+    allowed_renditions                text[],
+    password_protected                boolean,
+    expires_at                        timestamptz NOT NULL,
+    revoked_at                        timestamptz,
+    url                               text,
+    opened_count                      integer,
+    scope_path                        text
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.tag (
+    value                             text NOT NULL,
+    vocabulary                        text,
+    source                            text,
+    confidence                        numeric(18,4),
+    accepted                          boolean,
+    added_by                          uuid,
+    added_at                          timestamptz,
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 2 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS assets.taxonomy (
+    scope_path                        text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 

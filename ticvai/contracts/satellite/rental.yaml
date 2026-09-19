@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Rental
   version: 1.0.0
-  x-ticvai-screen-count: 100
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -60,6 +60,8 @@ paths:
   /rental-products:
     get:
       operationId: listRentalProducts
+      x-ticvai-consumed-by:
+        - "P08 BO-494 Rental Product Command Center"
       summary: Rental products across venues and locations
       description: 'Board 1.1. Filterable by tenant, venue, rental location, category, status, **tracking
         model** and configuration status — the tracking model is a filter because it changes what the
@@ -112,6 +114,8 @@ paths:
                   $ref: '#/components/schemas/RentalProduct'
     post:
       operationId: createRentalProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-495 Create Rental Product Wizard"
       summary: Define a rental product
       description: 'Board 1.2. **Created as a draft and published separately.** The wizard has seven
         steps and a product half-configured is not sellable — `publishRentalProduct` is where the
@@ -151,6 +155,9 @@ paths:
         format: uuid
     get:
       operationId: getRentalProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-496 Rental Product Profile"
+        - "P08 BO-904 Rental Resource Configuration"
       summary: The master configuration of one rental product
       description: 'Board 1.3. **The profile is the master reference every downstream board reads** —
         inventory, availability, pricing, booking and checkout all resolve their rules from here, so it
@@ -173,6 +180,8 @@ paths:
                 $ref: '#/components/schemas/RentalProduct'
     put:
       operationId: updateRentalProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-496 Rental Product Profile"
       summary: Change a rental product
       tags:
       - rental
@@ -205,6 +214,9 @@ paths:
         format: uuid
     post:
       operationId: validateRentalProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-495 Create Rental Product Wizard"
+        - "P08 BO-503 Product Validation, Approval & Publication"
       summary: What is still missing before this can be sold
       description: 'Board 1.10 and 4.10. **The board draws this as a checklist and that is exactly what
         it is** — basic information, category, location, inventory model, duration, rules, customer
@@ -241,6 +253,9 @@ paths:
         format: uuid
     post:
       operationId: publishRentalProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-494 Rental Product Command Center"
+        - "P08 BO-503 Product Validation, Approval & Publication"
       summary: Move a product through draft, review, approval and activation
       description: 'Board 1.10. *Draft → Configuration Review → Approval → Active → Suspended.*
 
@@ -303,6 +318,8 @@ paths:
   /rental-categories:
     get:
       operationId: listRentalCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-497 Rental Category & Classification Setup"
       summary: Reusable categories, with the defaults products inherit
       description: 'Board 1.4. **Configure categories rather than hard-coding rental types.** A category
         carries a default inventory model, duration, turnaround, customer requirements, waiver and
@@ -328,6 +345,8 @@ paths:
                   $ref: '#/components/schemas/RentalCategory'
     post:
       operationId: createRentalCategory
+      x-ticvai-consumed-by:
+        - "P08 BO-497 Rental Category & Classification Setup"
       summary: Define a category and its defaults
       tags:
       - rental
@@ -360,6 +379,8 @@ paths:
         format: uuid
     put:
       operationId: setRentalProductLocations
+      x-ticvai-consumed-by:
+        - "P08 BO-499 Rental Location Assignment"
       summary: Where it can be collected, and where it can be returned
       description: 'Board 1.6. **Pickup and return are configured separately and the board shows why** —
         *Adventure Zone: available ✓, pickup ✓, return —*. A station that hands out kayaks and has no way
@@ -410,6 +431,9 @@ paths:
         format: uuid
     put:
       operationId: setRentalDurationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-500 Rental Duration & Turnaround Configuration"
+        - "P08 BO-517 Timeslot & Duration Availability Setup"
       summary: Minimum, maximum, increment, extension and turnaround
       description: 'Board 1.7. **The turnaround buffer feeds availability automatically** — *rental
         10:00–11:00, turnaround 11:00–11:15, next available 11:15.* A venue that has to remember to
@@ -451,6 +475,8 @@ paths:
         format: uuid
     put:
       operationId: setRentalOperationalRules
+      x-ticvai-consumed-by:
+        - "P08 BO-501 Rental Rules & Operational Policy"
       summary: Who may rent it, how many, and what must happen at the counter
       description: 'Board 1.8. Age, height, weight, ID, guardian, membership, driving licence and safety
         briefing on the customer side; scan, inspection and photo requirements on the operational side.
@@ -491,6 +517,8 @@ paths:
         format: uuid
     put:
       operationId: setRentalAgreementRequirements
+      x-ticvai-consumed-by:
+        - "P08 BO-502 Customer Requirements, Agreement & Waiver"
       summary: The agreement, waiver and signature a rental needs
       description: 'Board 1.9. **The signed agreement is linked to the booking and the version is kept.**
         A waiver is only a defence if it can be shown that *this* guest signed *that* text, and a venue
@@ -532,6 +560,9 @@ paths:
         format: uuid
     put:
       operationId: setRentalInventoryModel
+      x-ticvai-consumed-by:
+        - "P08 BO-498 Inventory Tracking Model"
+        - "P08 BO-904 Rental Resource Configuration"
       summary: Pooled, serialised or hybrid
       description: 'Board 1.5, and **the single most load-bearing choice in this contract.**
 
@@ -626,6 +657,14 @@ paths:
   /rental-availability:
     get:
       operationId: getRentalAvailability
+      x-ticvai-consumed-by:
+        - "P08 BO-514 Availability Command Center"
+        - "P08 BO-518 Real-Time Availability Calendar"
+        - "P08 BO-521 Overlap & Conflict Engine"
+        - "P08 BO-523 Availability Intelligence & AI Forecasting"
+        - "P08 BO-536 Availability Selection & Alternative Options"
+        - "P08 BO-556 Rental Extension Request"
+        - "P08 BO-905 Rental Inventory & Availability Control"
       summary: What can be rented, when, with turnaround already subtracted
       description: 'Board 3. **Free windows, not a booking list for the caller to subtract from.** A
         client computing this itself will forget the turnaround buffer, and a bike returned at 11:00 with
@@ -691,6 +730,11 @@ paths:
         format: uuid
     put:
       operationId: setRentalAvailabilityRules
+      x-ticvai-consumed-by:
+        - "P08 BO-515 Availability Rule Configuration"
+        - "P08 BO-516 Operating Hours & Rental Windows"
+        - "P08 BO-522 Inventory Holds, Buffers & Release Rules"
+        - "P08 BO-905 Rental Inventory & Availability Control"
       summary: Operating hours, rental windows, buffers and release rules
       description: 'Boards 3.2, 3.3 and 3.9. **The buffer and the hold-release rule are the two that get
         forgotten.** An inventory buffer keeps a reserve back from online sale so the counter always has
@@ -722,6 +766,8 @@ paths:
   /rental-blackouts:
     post:
       operationId: createRentalBlackout
+      x-ticvai-consumed-by:
+        - "P08 BO-520 Blackout, Closure & Capacity Blocking"
       summary: Close a product, location or window
       description: 'Board 3.7. **Closure and capacity reduction are the same act at different strengths**
         — a lake closed for weather and a lake down to half capacity both come from one operational
@@ -759,6 +805,8 @@ paths:
   /rental-pricing-profiles:
     get:
       operationId: listRentalPricingProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-524 Rental Pricing Command Center"
       summary: Pricing profiles, and the products with none
       description: 'Board 4.1. **Products without pricing is a KPI on the board and therefore a filter
         here** — an unpriced published product is the failure this screen exists to catch.
@@ -792,6 +840,8 @@ paths:
                   $ref: '#/components/schemas/RentalPricingProfile'
     post:
       operationId: createRentalPricingProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-525 Pricing Profile Builder"
       summary: Define how a rental is priced
       description: 'Board 4.2. Flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic
         or hybrid, scoped by venue, location, channel, segment and effective dates.
@@ -832,6 +882,10 @@ paths:
         format: uuid
     put:
       operationId: updateRentalPricingProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-525 Pricing Profile Builder"
+        - "P08 BO-526 Duration & Tiered Pricing Configuration"
+        - "P08 BO-527 Calendar, Peak & Seasonal Pricing"
       summary: Change a pricing profile
       tags:
       - rental
@@ -857,6 +911,10 @@ paths:
   /rental-price:
     post:
       operationId: quoteRentalPrice
+      x-ticvai-consumed-by:
+        - "P08 BO-535 New Rental Booking Wizard"
+        - "P08 BO-540 Booking Commercial Summary & Payment"
+        - "P08 BO-557 Extension Pricing & Confirmation"
       summary: What this rental would cost, and the deposit it would hold
       description: 'Board 4.10. **One quote covers both numbers and they are not the same kind of
         money.** *Base 2 × AED 120 = 240, peak +40, deposit 2 × 300.* The board is explicit that **the
@@ -888,6 +946,8 @@ paths:
   /rental-price/explain:
     post:
       operationId: explainRentalPrice
+      x-ticvai-consumed-by:
+        - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
       summary: Why the price is what it is, rule by rule
       description: '**Board 4.10 asks for this in as many words** — *"the system should show why the
         price was calculated. This is important for customer service and auditability."*
@@ -921,6 +981,10 @@ paths:
   /rental-deposit-policies:
     put:
       operationId: setRentalDepositPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-529 Deposit & Security Hold Policy"
+        - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
+        - "P08 BO-909 Deposit & Rental Financial Control"
       summary: How much is held, how, and what happens to it
       description: 'Boards 4.6 and 4.7. Fixed or percentage, with minimum and maximum, by
         pre-authorisation, card charge, cash or wallet.
@@ -958,6 +1022,9 @@ paths:
   /rental-fee-policies:
     put:
       operationId: setRentalFeePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
+        - "P08 BO-909 Deposit & Rental Financial Control"
       summary: Grace period, late fees and extension pricing
       description: 'Board 4.8. *Expected 14:00, actual 15:12, grace 15 minutes, chargeable 57 minutes.*
 
@@ -993,6 +1060,8 @@ paths:
   /rental-price/simulate:
     post:
       operationId: simulateRentalPricing
+      x-ticvai-consumed-by:
+        - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
       summary: Test a commercial configuration before publishing it
       description: 'Board 4.10. **Rental pricing is the stack most likely to be wrong in a way nobody
         notices** — duration, calendar, location, deposit and dynamic pricing all compose — so it is
@@ -1030,6 +1099,8 @@ paths:
   /rental-overrides:
     post:
       operationId: requestRentalCommercialOverride
+      x-ticvai-consumed-by:
+        - "P08 BO-532 Commercial Exceptions, Waivers & Overrides"
       summary: Deviate from policy, with a reason and an approver
       description: 'Board 4.9. Price override, complimentary rental, deposit waiver or reduction, late-fee
         waiver, damage-fee waiver, extension-fee waiver, manual refund, goodwill.
@@ -1066,6 +1137,14 @@ paths:
   /rental-bookings:
     get:
       operationId: listRentalBookings
+      x-ticvai-consumed-by:
+        - "P08 BO-534 Rental Booking Command Center"
+        - "P08 BO-544 Rental Checkout Command Center"
+        - "P08 BO-554 Active Rental Operations Command Center"
+        - "P08 BO-564 Rental Return Command Center"
+        - "P08 BO-584 Rental Executive Command Center"
+        - "P08 BO-588 Rental Duration, Extension & Return Analytics"
+        - "P08 BO-589 Damage, Loss, Deposit & Exception Analytics"
       summary: Reservations across venues and locations
       description: 'Board 5.1. Today''s, upcoming, awaiting arrival, checked out, completed, cancelled,
         no-shows and group bookings — **the status set the command centre counts, which is why it is an
@@ -1110,6 +1189,9 @@ paths:
                   $ref: '#/components/schemas/RentalBooking'
     post:
       operationId: createRentalBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-535 New Rental Booking Wizard"
+        - "P08 BO-538 Group Rental & Participant Management"
       summary: Reserve a rental
       description: 'Board 5.2. **Reserves capacity, not an asset.** Even for a serialised product the
         specific bike is chosen at the counter by `assignRentalEquipment` — deciding it days ahead means
@@ -1158,6 +1240,15 @@ paths:
         format: uuid
     get:
       operationId: getRentalBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-541 Reservation Confirmation & QR Voucher"
+        - "P08 BO-543 Reservation Detail, Timeline & Readiness"
+        - "P08 BO-545 Voucher Scan & Reservation Retrieval"
+        - "P08 BO-546 Checkout Readiness Validation"
+        - "P08 BO-555 Active Rental Detail & Live Timeline"
+        - "P08 BO-562 Active Group Rental Management"
+        - "P08 BO-565 Return Scan & Rental Retrieval"
+        - "P08 BO-906 Resource Checkout Workspace"
       summary: One booking, its timeline and its readiness
       description: 'Board 5.10. **Readiness is computed, not stored** — agreement signed, requirements
         captured, deposit authorised, equipment available. A counter that discovers an unsigned waiver
@@ -1180,6 +1271,9 @@ paths:
                 $ref: '#/components/schemas/RentalBooking'
     patch:
       operationId: updateRentalBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-537 Customer & Participant Information"
+        - "P08 BO-542 Reservation Modification, Cancellation & No-Show"
       summary: Modify, cancel or mark a no-show
       description: 'Board 5.9. **A no-show is not a cancellation** and the money differs — a cancellation
         may be refundable under policy and a no-show generally is not. Keeping them as one status with a
@@ -1238,6 +1332,8 @@ paths:
         format: uuid
     post:
       operationId: signRentalAgreement
+      x-ticvai-consumed-by:
+        - "P08 BO-539 Rental Agreement & Waiver Completion"
       summary: Capture the signature, against a version
       description: 'Boards 1.9 and 5.6. **The version signed is stored with the signature.** A venue that
         updates its liability wording has otherwise changed the text under every signature already given,
@@ -1279,6 +1375,11 @@ paths:
         format: uuid
     post:
       operationId: checkOutRental
+      x-ticvai-consumed-by:
+        - "P08 BO-550 Safety & Handover Checklist"
+        - "P08 BO-551 Deposit & Financial Handover Validation"
+        - "P08 BO-553 Checkout Confirmation & Rental Activation"
+        - "P08 BO-906 Resource Checkout Workspace"
       summary: Hand it over, with the deposit held and the condition recorded
       description: 'Board 6. **The readiness gate is enforced here and not on the screen before it.** A
         checkout that proceeds without the signed agreement, the captured requirements or the authorised
@@ -1332,6 +1433,11 @@ paths:
         format: uuid
     post:
       operationId: assignRentalEquipment
+      x-ticvai-consumed-by:
+        - "P08 BO-547 Equipment Assignment Workspace"
+        - "P08 BO-548 Equipment Scan & Validation"
+        - "P08 BO-552 Group & Multi-Item Checkout"
+        - "P08 BO-907 Guest & Resource Assignment"
       summary: Bind specific assets to the booking, by scan where required
       description: 'Boards 6.4 and 6.5. **This is the moment a serialised rental stops being a quantity.**
         Until now the booking held *two mountain bikes*; now it holds BIKE-014 and BIKE-022, and every
@@ -1388,6 +1494,9 @@ paths:
         format: uuid
     post:
       operationId: extendRental
+      x-ticvai-consumed-by:
+        - "P08 BO-557 Extension Pricing & Confirmation"
+        - "P08 BO-908 Rental Duration, Extension & Return Management"
       summary: Keep it longer, if it is free and the guest accepts the price
       description: '**Board 4.10 traces this end to end and the order matters:** *"Can I keep the bike
         another hour?"* → availability check → **if it is reserved for somebody else the extension cannot
@@ -1448,6 +1557,8 @@ paths:
         format: uuid
     post:
       operationId: swapRentalEquipment
+      x-ticvai-consumed-by:
+        - "P08 BO-558 Equipment Swap / Replacement"
       summary: Replace a faulty item mid-rental
       description: 'Board 7.5. **The rental continues; only the asset changes.** The deposit, the
         agreement and the clock stay where they are, and the returned item goes to `maintenance` with the
@@ -1501,6 +1612,13 @@ paths:
         format: uuid
     post:
       operationId: returnRental
+      x-ticvai-consumed-by:
+        - "P08 BO-566 Return Summary & Actual Return Time"
+        - "P08 BO-570 Partial Return & Missing Equipment"
+        - "P08 BO-571 Late Fees, Damage Fees & Final Settlement"
+        - "P08 BO-572 Deposit Release, Capture & Customer Confirmation"
+        - "P08 BO-573 Return Completion & Equipment Disposition"
+        - "P08 BO-908 Rental Duration, Extension & Return Management"
       summary: Take it back, inspect it, and settle everything at once
       description: 'Board 8, and **this is the operation the whole contract is shaped around.**
 
@@ -1548,6 +1666,11 @@ paths:
         format: uuid
     post:
       operationId: recordRentalInspection
+      x-ticvai-consumed-by:
+        - "P08 BO-549 Pre-Rental Condition Inspection"
+        - "P08 BO-567 Post-Rental Condition Inspection"
+        - "P08 BO-568 Before vs After Condition Comparison"
+        - "P08 BO-911 Inspection, Condition & Compliance Management"
       summary: Condition before or after, with evidence
       description: 'Boards 6.5 and 8.4. **Before and after are the same record with a different phase**,
         which is what makes board 8.5 — the before/after comparison — possible at all. Two differently
@@ -1586,6 +1709,8 @@ paths:
         format: uuid
     post:
       operationId: assessRentalDamage
+      x-ticvai-consumed-by:
+        - "P08 BO-569 Damage Assessment & Charge Workflow"
       summary: Price the damage, and say who approved it
       description: 'Board 8.6. **A damage charge is a commercial decision taken under pressure at a
         counter**, which is why it carries an assessor, an approver above the configured threshold, the
@@ -1619,6 +1744,11 @@ paths:
   /rental-bookings/overdue:
     get:
       operationId: listOverdueRentals
+      x-ticvai-consumed-by:
+        - "P08 BO-554 Active Rental Operations Command Center"
+        - "P08 BO-560 Due Soon & Customer Notification Management"
+        - "P08 BO-561 Overdue Rental Management"
+        - "P08 BO-563 Active Rental Intelligence & Operational Alerts"
       summary: What is late, by how long, and what it is accruing
       description: 'Boards 7.7 and 7.8. **Due-soon and overdue are one query at two thresholds**, because
         the venue''s action is the same — contact the guest — and only the tone changes.
@@ -1656,6 +1786,8 @@ paths:
   /rental-incidents:
     post:
       operationId: reportRentalIncident
+      x-ticvai-consumed-by:
+        - "P08 BO-559 Rental Incident & Operational Exception"
       summary: Something happened during a rental
       description: 'Board 7.6. Injury, loss, theft, a complaint, an equipment failure. **Distinct from
         damage**, which is assessed at return against a deposit — an incident may have no charge attached

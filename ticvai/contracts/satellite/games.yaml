@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 8
+  x-ticvai-screen-count: 34
   x-ticvai-tier: satellite
   x-ticvai-module: 10 — Games & F&B Integration
   x-ticvai-requirements: 25
@@ -98,6 +98,8 @@ paths:
       operationId: setReaderProfile
       x-ticvai-consumed-by:
         - "P08 BO-406 Reader Profile & Device Setup"
+        - "P08 BO-475 Reader Manufacturer & Model Profile"
+        - "P08 BO-476 Communication Protocol Configuration"
       summary: How a reader behaves and what it shows
       description: 'BL-153. **A guest at an arcade machine cannot read a message, they can only see a
         light.**
@@ -142,6 +144,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-026 Retail / Merchandise"
+        - "P08 BO-396 Attraction Profile"
+        - "P08 BO-454 Card Lifecycle Command Center"
+        - "P08 BO-455 Card / Credential Profile"
+        - "P08 BO-457 Last Recharge & Last Activity Tracking"
+        - "P08 BO-462 Customer Balance & Credential Status View"
+        - "P08 BO-486 Customer Card / Wallet Identification"
       x-ticvai-audience:
       - guest
       x-ticvai-read-routing: primary
@@ -299,6 +307,8 @@ paths:
       operationId: listGames
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+        - "P08 BO-394 Game & Ride Operations Dashboard"
+        - "P08 BO-395 Game & Ride Directory"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -370,6 +380,7 @@ paths:
       operationId: updateGame
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+        - "P08 BO-396 Attraction Profile"
       x-ticvai-audience:
       - staff
       summary: Amend a game
@@ -531,6 +542,10 @@ paths:
   /prizes:
     get:
       operationId: listPrizes
+      x-ticvai-consumed-by:
+        - "P08 BO-445 Redemption Credit Rule Configuration"
+        - "P08 BO-450 Prize Catalogue & Credit Cost Configuration"
+        - "P08 BO-491 Redemption Balance & Prize Discovery"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -574,6 +589,8 @@ paths:
                         $ref: '#/components/schemas/Prize'
     post:
       operationId: createPrize
+      x-ticvai-consumed-by:
+        - "P08 BO-451 Prize Inventory Integration"
       x-ticvai-audience:
       - staff
       summary: Add a prize
@@ -605,6 +622,8 @@ paths:
   /prize-redemptions:
     post:
       operationId: redeemPrize
+      x-ticvai-consumed-by:
+        - "P08 BO-450 Prize Catalogue & Credit Cost Configuration"
       x-ticvai-audience:
       - staff
       summary: Redeem points for a prize
@@ -723,6 +742,8 @@ paths:
   /attraction-types:
     get:
       operationId: listAttractionTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-397 Attraction Type Configuration"
       summary: The classes of game and ride
       description: 'Board 1.4. **A type decides which operational settings apply.** A ride has a height
         restriction and a cycle time; a redemption game has a ticket payout; a crane has both a payout
@@ -748,6 +769,8 @@ paths:
                   $ref: '#/components/schemas/AttractionType'
     put:
       operationId: setAttractionType
+      x-ticvai-consumed-by:
+        - "P08 BO-397 Attraction Type Configuration"
       summary: Define a class of attraction
       tags:
       - games
@@ -781,6 +804,8 @@ paths:
         format: uuid
     put:
       operationId: setGameOperationalConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-398 Game & Ride Operational Configuration"
       summary: Capacity, cycle time, restrictions and staffing
       description: 'Board 1.5. **Cycle time is the number everything else derives from.** Throughput,
         queue estimates, staffing and the capacity a ticket is sold against all come from *how long one
@@ -815,6 +840,12 @@ paths:
   /readers:
     get:
       operationId: listReaders
+      x-ticvai-consumed-by:
+        - "P08 BO-400 Attraction / Reader Mapping"
+        - "P08 BO-404 Reader Management Dashboard"
+        - "P08 BO-405 Reader Directory"
+        - "P08 BO-466 Reader & Device Health Monitor"
+        - "P08 BO-474 Reader Integration Command Center"
       summary: Readers, their attractions and their health
       description: 'Boards 2.2 and 8.3. **A reader is a `tenancy` device with a game configuration.**
         Enrolment, firmware, credentials and tamper state live there as of 19 September; what lives here
@@ -857,6 +888,17 @@ paths:
         format: uuid
     put:
       operationId: setReaderConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-400 Attraction / Reader Mapping"
+        - "P08 BO-407 Reader Credit & Payment Configuration"
+        - "P08 BO-408 Reader / Attraction Assignment"
+        - "P08 BO-409 Retap Delay & Transaction Protection"
+        - "P08 BO-410 Free Game Glow & Reader Display Rules"
+        - "P08 BO-411 Reader Theme & Experience Configuration"
+        - "P08 BO-412 Real-Time Tap Validation & Reader Response"
+        - "P08 BO-477 Reader Command & Event Mapping"
+        - "P08 BO-479 Game Trigger & I/O Control Mapping"
+        - "P08 BO-480 Reader Screen, LED & Sound Output Mapping"
       summary: What this reader charges, opens, shows and refuses
       description: 'Boards 2.3 to 2.8. **The retap delay is the setting that stops a guest paying twice
         for one go.** A wristband held against a reader for a second and a half is two taps to the
@@ -899,6 +941,9 @@ paths:
         format: uuid
     post:
       operationId: deployReaderConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-478 Reader Configuration Deployment & Synchronization"
+        - "P08 BO-481 Edge Cache & Offline Rule Package"
       summary: Push configuration and the offline rule package to a reader
       description: 'Boards 9.5 and 9.8. **A reader decides on its own.** It has to authorise a tap in
         under a second, which means the rules — prices, entitlements, retap delay, restrictions — are
@@ -933,6 +978,9 @@ paths:
         format: uuid
     post:
       operationId: testReader
+      x-ticvai-consumed-by:
+        - "P08 BO-413 Balance Check Reader & Device Test Console"
+        - "P08 BO-482 Device Diagnostics & Integration Logs"
       summary: Prove a reader works before a guest finds out it does not
       description: 'Boards 2.10 and 9.9. Tap, balance check, display, I/O trigger and the return path —
         each reported separately, because *the reader is fine and the game did not start* and *the
@@ -955,6 +1003,11 @@ paths:
   /game-entitlements:
     get:
       operationId: listGameEntitlements
+      x-ticvai-consumed-by:
+        - "P08 BO-401 Game Package & Entitlement Association"
+        - "P08 BO-421 Free Game & Ride Credit Management"
+        - "P08 BO-430 Game Package Builder"
+        - "P08 BO-470 Entitlement & Free-Play Consumption Monitor"
       summary: Passes, packages and per-game entitlements
       description: 'Board 4. **Four shapes that look alike and behave differently:** an all-games pass,
         unlimited play on one game, a limited number of plays on one game, and a package of several.
@@ -982,6 +1035,14 @@ paths:
                   $ref: '#/components/schemas/GameEntitlement'
     post:
       operationId: createGameEntitlement
+      x-ticvai-consumed-by:
+        - "P08 BO-401 Game Package & Entitlement Association"
+        - "P08 BO-421 Free Game & Ride Credit Management"
+        - "P08 BO-427 All Games & Rides Pass Configuration"
+        - "P08 BO-428 Specific Game/Ride Unlimited Entitlement"
+        - "P08 BO-429 Specific Game/Ride Limited Entitlement"
+        - "P08 BO-430 Game Package Builder"
+        - "P08 BO-431 Entitlement Validity & Activation Rules"
       summary: Define a pass, package or per-game entitlement
       tags:
       - games
@@ -1007,6 +1068,8 @@ paths:
   /gameplay-validation-rules:
     get:
       operationId: getGameplayValidationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-424 Gameplay Validation Command Center"
       summary: What a tap is checked against, and in what order
       tags:
       - games
@@ -1024,6 +1087,9 @@ paths:
                 $ref: '#/components/schemas/GameplayValidationRules'
     put:
       operationId: setGameplayValidationRules
+      x-ticvai-consumed-by:
+        - "P08 BO-425 Gameplay Validation Rule Configuration"
+        - "P08 BO-426 Deduction Priority & Funding Source Rules"
       summary: Deduction priority and the order of checks
       description: 'Boards 4.2 and 4.3. **The deduction order decides who pays, and the guest never
         sees it happen.** Entitlement before bonus before promotional before cash is the usual answer
@@ -1058,6 +1124,9 @@ paths:
   /gameplay-authorisations:
     post:
       operationId: authoriseGameplay
+      x-ticvai-consumed-by:
+        - "P08 BO-432 Real-Time Gameplay Authorization"
+        - "P08 BO-459 Card Expiry Runtime Validation"
       summary: Decide a tap, now
       description: 'Board 4.9. **Under a second, or the queue notices.** Card valid, not expired, not
         blocked; restrictions met; entitlement available or funds sufficient; retap window clear.
@@ -1095,6 +1164,10 @@ paths:
   /gameplay-authorisations/simulate:
     post:
       operationId: simulateGameplayAuthorisation
+      x-ticvai-consumed-by:
+        - "P08 BO-402 Configuration Health & Validation"
+        - "P08 BO-433 Validation Simulator & Exception Analysis"
+        - "P08 BO-467 Tap Validation & Decision Trace"
       summary: What would happen if this card tapped this reader
       description: 'Board 4.10. **The configuration is five layers deep and fails silently.** An
         entitlement that does not cover the game, a price rule nobody published, a restriction on the
@@ -1125,6 +1198,9 @@ paths:
   /game-pricing:
     get:
       operationId: getGamePricing
+      x-ticvai-consumed-by:
+        - "P08 BO-434 Game & Ride Pricing Command Center"
+        - "P08 BO-442 Effective Pricing & Reader Price Preview"
       summary: The effective price at a reader, and why
       description: 'Boards 5.9 and 5.8. **Standard, group, peak, VIP, retry and calendar exceptions all
         apply to the same tap**, and the operator''s question is always *what will this actually
@@ -1168,6 +1244,13 @@ paths:
                 $ref: '#/components/schemas/GamePriceResolution'
     put:
       operationId: setGamePricing
+      x-ticvai-consumed-by:
+        - "P08 BO-435 Standard Game & Ride Price Configuration"
+        - "P08 BO-436 Group Pricing Configuration"
+        - "P08 BO-437 Peak / Non-Peak Dynamic Pricing"
+        - "P08 BO-438 Pricing Calendar & Exception Dates"
+        - "P08 BO-439 Normal & VIP Pricing Configuration"
+        - "P08 BO-440 Retry Price Configuration"
       summary: Standard, group, peak, VIP, retry and calendar prices
       description: 'Board 5. **Retry pricing is the one that is easy to miss and hard to explain
         afterwards.** A second go at a crane priced below the first is a deliberate commercial
@@ -1202,6 +1285,10 @@ paths:
   /redemption-rules:
     put:
       operationId: setRedemptionRules
+      x-ticvai-consumed-by:
+        - "P08 BO-446 Ticket-Based Redemption / Ticket-Eater Integration"
+        - "P08 BO-447 Ticketless Redemption Game Integration"
+        - "P08 BO-449 Redemption Counter / Prize Checkout"
       summary: How tickets are earned, held and spent
       description: 'Boards 6.2, 6.3 and 6.4. **Ticket-based and ticketless redemption are the same
         currency arriving two ways.** A ticket-eater counts paper; a ticketless game credits the card
@@ -1243,6 +1330,9 @@ paths:
         format: uuid
     put:
       operationId: setPrizeCost
+      x-ticvai-consumed-by:
+        - "P08 BO-451 Prize Inventory Integration"
+        - "P08 BO-453 Redemption Transaction Ledger, Reconciliation & Audit"
       summary: What a prize costs in tickets, and what it costs the venue
       description: 'Boards 6.7 and 6.8. **Two numbers, and only one of them is on the shelf.** The
         ticket price is what the guest pays; the unit cost is what the venue paid, and the ratio between
@@ -1283,6 +1373,9 @@ paths:
         format: uuid
     post:
       operationId: setGameCardLifecycle
+      x-ticvai-consumed-by:
+        - "P08 BO-460 Card Block, Suspend & Reactivation Control"
+        - "P08 BO-461 Card Replacement & Wallet Relinking"
       summary: Block, suspend, reactivate, replace or expire a card
       description: 'Boards 7.7 and 7.8. **Replacement moves the balance and the card does not carry
         it.** A guest who has lost a wristband has not lost their credit, and the relink is the whole
@@ -1331,6 +1424,9 @@ paths:
   /game-card-expiry-rules:
     put:
       operationId: setGameCardExpiryRules
+      x-ticvai-consumed-by:
+        - "P08 BO-456 Card Expiry Rule Configuration"
+        - "P08 BO-458 Expiry Monitoring & Upcoming Expiration"
       summary: When a card lapses, and what warns the guest first
       description: 'Boards 7.3 to 7.6. **Expiry measured from last activity rather than from issue is
         the difference between a loyalty mechanic and a complaint.** A guest who visits every month
@@ -1364,6 +1460,15 @@ paths:
   /gameplay-transactions:
     get:
       operationId: listGameplayTransactions
+      x-ticvai-consumed-by:
+        - "P08 BO-394 Game & Ride Operations Dashboard"
+        - "P08 BO-403 Attraction Audit, Dependencies & Governed Actions"
+        - "P08 BO-424 Gameplay Validation Command Center"
+        - "P08 BO-463 Card Lifecycle Audit & History"
+        - "P08 BO-464 Game & Ride Operations Control Center"
+        - "P08 BO-465 Live Gameplay Transaction Monitor"
+        - "P08 BO-468 Rejected Transaction & Reason Analysis"
+        - "P08 BO-492 Customer Game & Wallet Transaction History"
       summary: Taps, decisions and what they cost
       description: 'Boards 8.2, 8.4 and 8.5. **Every tap, accepted or refused, with the reason and the
         rule that produced it.** The refused ones are the valuable half: a reader refusing 40% of taps
@@ -1404,6 +1509,10 @@ paths:
   /gameplay-sync-status:
     get:
       operationId: getGameplaySyncStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-471 Offline, Synchronization & Recovery Monitor"
+        - "P08 BO-473 Operational Analytics & Reconciliation Dashboard"
+        - "P08 BO-942 Mobile Operations Control & Offline Sync"
       summary: What readers took offline and have not sent
       description: 'Board 8.8. **The gaming equivalent of store-and-forward, and the same risk.** Plays
         authorised offline are revenue the platform has not seen, entitlement consumption it has not
@@ -1431,6 +1540,10 @@ paths:
   /game-eligibility:
     get:
       operationId: getGameEligibility
+      x-ticvai-consumed-by:
+        - "P08 BO-484 Self-Service Experience Command Center"
+        - "P08 BO-489 Bonus, Free Game & Benefit View"
+        - "P08 BO-490 Game & Ride Eligibility / “What Can I Play?”"
       summary: What this guest can play right now, and what it would cost
       description: 'Board 10.7 — *"What Can I Play?"*, and it is the most useful screen in the pack.
 
@@ -1479,6 +1592,9 @@ paths:
   /game-kiosk-config:
     put:
       operationId: setGameKioskConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-485 Self-Service Kiosk Profile & Channel Configuration"
+        - "P08 BO-493 Self-Service UI Theme, Language & Journey Configuration"
       summary: The self-service journey, its theme and its languages
       description: 'Boards 10.2 and 10.10. **A kiosk in an arcade is used by a child holding a
         wristband**, and the configuration that matters is which steps appear, in what language, and

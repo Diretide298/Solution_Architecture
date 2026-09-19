@@ -561,6 +561,14 @@ screens:
 - P02:GST-057 Accessibility Information
 - P05:KSK-002 Language Select
 - P08:BO-243 Policy Approval, Audit, Analytics & AI Optimization
+- P08:BO-599 Manual Configuration Center
+- P08:BO-834 Digital Experience Center
+- P08:BO-835 Site, Brand & Domain Setup
+- P08:BO-836 Design System & Components
+- P08:BO-837 Page & Landing Builder
+- P08:BO-839 Dynamic Product Pages
+- P08:BO-840 Mobile App CMS
+- P08:BO-843 Publishing, Analytics & Audit
 - P09:ADM-016 White-Label Branding Management
 - P09:ADM-017 Domain & Certificate Management
 - P09:ADM-018 Localisation & Language Pack

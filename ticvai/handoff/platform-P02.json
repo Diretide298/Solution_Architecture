@@ -15,7 +15,7 @@
   "contracts": 16,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 0
+  "operationsWithNoScreen": 1
  },
  "waves": {
   "wave1": 20,
@@ -202,11 +202,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -852,7 +852,14 @@
   }
  ],
  "gaps": {
-  "operationsWithNoScreen": [],
+  "operationsWithNoScreen": [
+   {
+    "operation": "recordRecommendationOutcome",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Shown, clicked, accepted or dismissed"
+   }
+  ],
   "modulesSplitAcrossWaves": [
    {
     "module": "Account & Self-Service",

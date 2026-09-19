@@ -1,0 +1,465 @@
+id: LLD-rental
+title: rental — 40 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: assessRentalDamage
+  verb: POST
+  path: /rental-bookings/{bookingId}/damage
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.damage_assessment
+  writes:
+  - rental.damage_assessment
+- operation: assignRentalEquipment
+  verb: POST
+  path: /rental-bookings/{bookingId}/equipment
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - rental.equipment_assignment
+  writes:
+  - rental.equipment_assignment
+- operation: checkOutRental
+  verb: POST
+  path: /rental-bookings/{bookingId}/check-out
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - rental.booking
+  writes: []
+- operation: createRentalBlackout
+  verb: POST
+  path: /rental-blackouts
+  scope: venue
+  permission: RENTAL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.blackout
+  writes:
+  - rental.blackout
+- operation: createRentalBooking
+  verb: POST
+  path: /rental-bookings
+  scope: venue
+  permission: RENTAL_BOOK
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: createRentalCategory
+  verb: POST
+  path: /rental-categories
+  scope: tenant
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.category
+  writes:
+  - rental.category
+- operation: createRentalPricingProfile
+  verb: POST
+  path: /rental-pricing-profiles
+  scope: venue
+  permission: RENTAL_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.pricing_profile
+  writes:
+  - rental.pricing_profile
+- operation: createRentalProduct
+  verb: POST
+  path: /rental-products
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.product
+  writes:
+  - rental.product
+- operation: explainRentalPrice
+  verb: POST
+  path: /rental-price/explain
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: extendRental
+  verb: POST
+  path: /rental-bookings/{bookingId}/extend
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: getRentalAvailability
+  verb: GET
+  path: /rental-availability
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes: []
+- operation: getRentalBooking
+  verb: GET
+  path: /rental-bookings/{bookingId}
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: getRentalProduct
+  verb: GET
+  path: /rental-products/{productId}
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.product
+  writes: []
+- operation: importRentalCatalogue
+  verb: POST
+  path: /rental-products/import
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOverdueRentals
+  verb: GET
+  path: /rental-bookings/overdue
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: listRentalBookings
+  verb: GET
+  path: /rental-bookings
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: listRentalCategories
+  verb: GET
+  path: /rental-categories
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.category
+  writes: []
+- operation: listRentalPricingProfiles
+  verb: GET
+  path: /rental-pricing-profiles
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.pricing_profile
+  writes: []
+- operation: listRentalProducts
+  verb: GET
+  path: /rental-products
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.product
+  writes: []
+- operation: publishRentalProduct
+  verb: POST
+  path: /rental-products/{productId}/publish
+  scope: venue
+  permission: RENTAL_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.product
+  writes: []
+- operation: quoteRentalPrice
+  verb: POST
+  path: /rental-price
+  scope: venue
+  permission: RENTAL_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes: []
+- operation: recordRentalInspection
+  verb: POST
+  path: /rental-bookings/{bookingId}/inspection
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - rental.inspection
+  writes:
+  - rental.inspection
+- operation: reportRentalIncident
+  verb: POST
+  path: /rental-incidents
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - rental.incident
+  writes:
+  - rental.incident
+- operation: requestRentalCommercialOverride
+  verb: POST
+  path: /rental-overrides
+  scope: venue
+  permission: RENTAL_OVERRIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.override
+  writes:
+  - rental.override
+- operation: returnRental
+  verb: POST
+  path: /rental-bookings/{bookingId}/return
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - rental.settlement
+  writes: []
+- operation: setRentalAgreementRequirements
+  verb: PUT
+  path: /rental-products/{productId}/agreement
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.agreement_rules
+  writes:
+  - rental.agreement_rules
+- operation: setRentalAvailabilityRules
+  verb: PUT
+  path: /rental-products/{productId}/availability-rules
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.availability_rules
+  writes:
+  - rental.availability_rules
+- operation: setRentalDepositPolicy
+  verb: PUT
+  path: /rental-deposit-policies
+  scope: venue
+  permission: RENTAL_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.deposit_policy
+  writes:
+  - rental.deposit_policy
+- operation: setRentalDurationRules
+  verb: PUT
+  path: /rental-products/{productId}/duration
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.duration_rules
+  writes:
+  - rental.duration_rules
+- operation: setRentalFeePolicy
+  verb: PUT
+  path: /rental-fee-policies
+  scope: venue
+  permission: RENTAL_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.fee_policy
+  writes:
+  - rental.fee_policy
+- operation: setRentalInventoryModel
+  verb: PUT
+  path: /rental-products/{productId}/inventory-model
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.inventory_model
+  writes:
+  - rental.inventory_model
+- operation: setRentalOperationalRules
+  verb: PUT
+  path: /rental-products/{productId}/rules
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.operational_rules
+  writes:
+  - rental.operational_rules
+- operation: setRentalProductLocations
+  verb: PUT
+  path: /rental-products/{productId}/locations
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.location_rule
+  writes:
+  - rental.location_rule
+- operation: signRentalAgreement
+  verb: POST
+  path: /rental-bookings/{bookingId}/agreement
+  scope: venue
+  permission: RENTAL_BOOK
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - rental.agreement_signature
+  writes:
+  - rental.agreement_signature
+- operation: simulateRentalPricing
+  verb: POST
+  path: /rental-price/simulate
+  scope: venue
+  permission: RENTAL_PRICE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: swapRentalEquipment
+  verb: POST
+  path: /rental-bookings/{bookingId}/swap
+  scope: venue
+  permission: RENTAL_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: updateRentalBooking
+  verb: PATCH
+  path: /rental-bookings/{bookingId}
+  scope: venue
+  permission: RENTAL_BOOK
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.booking
+  writes: []
+- operation: updateRentalPricingProfile
+  verb: PUT
+  path: /rental-pricing-profiles/{profileId}
+  scope: venue
+  permission: RENTAL_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.pricing_profile
+  writes:
+  - rental.pricing_profile
+- operation: updateRentalProduct
+  verb: PUT
+  path: /rental-products/{productId}
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - rental.product
+  writes:
+  - rental.product
+- operation: validateRentalProduct
+  verb: POST
+  path: /rental-products/{productId}/validate
+  scope: venue
+  permission: RENTAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []

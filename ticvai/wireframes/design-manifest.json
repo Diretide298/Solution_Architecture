@@ -1742,6 +1742,28 @@
    "status": "pending"
   },
   {
+   "id": "WS150",
+   "kind": "workshop",
+   "label": "Payment Payment Orchestration board 4",
+   "platform": "P09",
+   "screens": [
+    "ADM-589",
+    "ADM-590",
+    "ADM-591",
+    "ADM-592",
+    "ADM-593",
+    "ADM-594",
+    "ADM-595",
+    "ADM-596",
+    "ADM-597",
+    "ADM-598"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS190",
    "kind": "workshop",
    "label": "Wallet Configuration Backend Structure v1.0 board 5",
@@ -2165,6 +2187,28 @@
    "status": "pending"
   },
   {
+   "id": "WS78",
+   "kind": "workshop",
+   "label": "Game and Ride board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-394",
+    "BO-395",
+    "BO-396",
+    "BO-397",
+    "BO-398",
+    "BO-399",
+    "BO-400",
+    "BO-401",
+    "BO-402",
+    "BO-403"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS125",
    "kind": "workshop",
    "label": "Event Management Configuration Backend Structure v1.0 board 1",
@@ -2240,28 +2284,6 @@
     "ADM-566",
     "ADM-567",
     "ADM-568"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS150",
-   "kind": "workshop",
-   "label": "Payment Payment Orchestration board 4",
-   "platform": "P09",
-   "screens": [
-    "ADM-589",
-    "ADM-590",
-    "ADM-591",
-    "ADM-592",
-    "ADM-593",
-    "ADM-594",
-    "ADM-595",
-    "ADM-596",
-    "ADM-597",
-    "ADM-598"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2350,6 +2372,28 @@
     "ADM-676",
     "ADM-677",
     "ADM-678"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS185",
+   "kind": "workshop",
+   "label": "Upsell,CrossSellEngine board 6",
+   "platform": "P09",
+   "screens": [
+    "ADM-689",
+    "ADM-690",
+    "ADM-691",
+    "ADM-692",
+    "ADM-693",
+    "ADM-694",
+    "ADM-695",
+    "ADM-696",
+    "ADM-697",
+    "ADM-698"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2599,21 +2643,21 @@
    "status": "pending"
   },
   {
-   "id": "WS78",
+   "id": "WS75",
    "kind": "workshop",
-   "label": "Game and Ride board 1",
-   "platform": "P08",
+   "label": "Digital Asset Management DAM board 2",
+   "platform": "P13",
    "screens": [
-    "BO-394",
-    "BO-395",
-    "BO-396",
-    "BO-397",
-    "BO-398",
-    "BO-399",
-    "BO-400",
-    "BO-401",
-    "BO-402",
-    "BO-403"
+    "CMS-071",
+    "CMS-072",
+    "CMS-073",
+    "CMS-074",
+    "CMS-075",
+    "CMS-076",
+    "CMS-077",
+    "CMS-078",
+    "CMS-079",
+    "CMS-080"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2850,28 +2894,6 @@
    "status": "pending"
   },
   {
-   "id": "WS185",
-   "kind": "workshop",
-   "label": "Upsell,CrossSellEngine board 6",
-   "platform": "P09",
-   "screens": [
-    "ADM-689",
-    "ADM-690",
-    "ADM-691",
-    "ADM-692",
-    "ADM-693",
-    "ADM-694",
-    "ADM-695",
-    "ADM-696",
-    "ADM-697",
-    "ADM-698"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P02-engagement-support-01",
    "kind": "module",
    "label": "P02 · Engagement & Support (1 of 2)",
@@ -3063,28 +3085,6 @@
     "ANL-028",
     "ANL-029",
     "ANL-030"
-   ],
-   "drawable": 5,
-   "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS75",
-   "kind": "workshop",
-   "label": "Digital Asset Management DAM board 2",
-   "platform": "P13",
-   "screens": [
-    "CMS-071",
-    "CMS-072",
-    "CMS-073",
-    "CMS-074",
-    "CMS-075",
-    "CMS-076",
-    "CMS-077",
-    "CMS-078",
-    "CMS-079",
-    "CMS-080"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3606,6 +3606,28 @@
     "BO-541",
     "BO-542",
     "BO-543"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS96",
+   "kind": "workshop",
+   "label": "Rental Management board 9",
+   "platform": "P08",
+   "screens": [
+    "BO-574",
+    "BO-575",
+    "BO-576",
+    "BO-577",
+    "BO-578",
+    "BO-579",
+    "BO-580",
+    "BO-581",
+    "BO-582",
+    "BO-583"
    ],
    "drawable": 4,
    "thin": 6,
@@ -4204,28 +4226,6 @@
     "BO-521",
     "BO-522",
     "BO-523"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS96",
-   "kind": "workshop",
-   "label": "Rental Management board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-574",
-    "BO-575",
-    "BO-576",
-    "BO-577",
-    "BO-578",
-    "BO-579",
-    "BO-580",
-    "BO-581",
-    "BO-582",
-    "BO-583"
    ],
    "drawable": 3,
    "thin": 7,

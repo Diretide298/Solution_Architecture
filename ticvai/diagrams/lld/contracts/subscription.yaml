@@ -1,10 +1,22 @@
 id: LLD-subscription
-title: subscription — 112 operations
+title: subscription — 127 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: PlatformService
 operations:
+- operation: addCapacityPack
+  verb: POST
+  path: /capacity-packs
+  scope: platform
+  permission: PLATFORM_BILLING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.capacity_pack
+  writes:
+  - subscription.capacity_pack
 - operation: addLicenceAddOn
   verb: POST
   path: /tenants/{tenantId}/licences/add-ons
@@ -274,6 +286,16 @@ operations:
   writes:
   - cache:idempotency
   - control.invoice
+- operation: getBillingReconciliation
+  verb: GET
+  path: /billing-reconciliation
+  scope: platform
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getCell
   verb: GET
   path: /cells/{cellId}
@@ -336,6 +358,27 @@ operations:
   - control.licence_add_on
   - control.usage_record
   writes: []
+- operation: getGoLiveReadiness
+  verb: GET
+  path: /go-live-readiness
+  scope: platform
+  permission: PLATFORM_TENANT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.go_live_readiness
+  writes: []
+- operation: getLicenceEnforcement
+  verb: GET
+  path: /licence-enforcement
+  scope: platform
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getPlan
   verb: GET
   path: /plans/{planId}
@@ -395,6 +438,17 @@ operations:
   reads:
   - control.subscription
   - control.usage_record
+  writes: []
+- operation: getVsiModel
+  verb: GET
+  path: /vsi-models
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.vsi_model
   writes: []
 - operation: launchCellCluster
   verb: POST
@@ -525,6 +579,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listLicensingModels
+  verb: GET
+  path: /licensing-models
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.licensing_model
+  writes: []
 - operation: listMember
   verb: GET
   path: /member
@@ -624,6 +689,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listModuleCatalogue
+  verb: GET
+  path: /module-catalogue
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - subscription.module_listing
   writes: []
 - operation: listPartner
   verb: GET
@@ -1081,6 +1158,29 @@ operations:
   writes:
   - cache:idempotency
   - control.tenant_migration
+- operation: runGoLiveValidation
+  verb: POST
+  path: /go-live-readiness/run
+  scope: platform
+  permission: PLATFORM_TENANT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.go_live_readiness
+  writes: []
+- operation: scoreVsiAssessment
+  verb: POST
+  path: /vsi-assessments
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes:
+  - subscription.vsi_assessment
 - operation: setAgreementContractTerm
   verb: PUT
   path: /agreement-contract-term
@@ -1117,6 +1217,30 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setLicenceEnforcementPolicy
+  verb: PUT
+  path: /licence-enforcement
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.enforcement_policy
+  writes:
+  - subscription.enforcement_policy
+- operation: setLicensingModel
+  verb: PUT
+  path: /licensing-models
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.licensing_model
+  writes:
+  - subscription.licensing_model
 - operation: setMemberMembershipAccount
   verb: PUT
   path: /member-membership-account
@@ -1157,6 +1281,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setModuleListing
+  verb: PUT
+  path: /module-catalogue
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.module_listing
+  writes:
+  - subscription.module_listing
 - operation: setPartnerBrandVenue
   verb: PUT
   path: /partner-brand-venue
@@ -1221,6 +1357,18 @@ operations:
   writes:
   - cache:idempotency
   - control.subscription
+- operation: setTrialConfiguration
+  verb: PUT
+  path: /trial-configurations
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.trial_config
+  writes:
+  - subscription.trial_config
 - operation: setValidityActivationExpiry
   verb: PUT
   path: /validity-activation-expiry
@@ -1231,6 +1379,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setVsiModel
+  verb: PUT
+  path: /vsi-models
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.vsi_model
+  writes:
+  - subscription.vsi_model
 - operation: settleAiUsage
   verb: POST
   path: /ai-usage/settle
@@ -1248,6 +1408,17 @@ operations:
   writes:
   - cache:idempotency
   - control.usage_record
+- operation: simulateCommercialPackage
+  verb: POST
+  path: /package-simulations
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: submitOnboardingApplication
   verb: POST
   path: /onboarding-applications
