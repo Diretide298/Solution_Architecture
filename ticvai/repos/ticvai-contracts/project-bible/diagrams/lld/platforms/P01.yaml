@@ -50,12 +50,14 @@ servicesCalled:
   operationCalls: 18
 - service: VenueOpsService
   operationCalls: 15
-- service: RetailService
-  operationCalls: 11
 - service: AccessService
   operationCalls: 10
 - service: WhiteLabelService
   operationCalls: 7
+- service: RetailService
+  operationCalls: 7
+- service: WalletService
+  operationCalls: 4
 - service: AiService
   operationCalls: 4
 - service: LedgerService

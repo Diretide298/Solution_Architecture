@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | Screens | 46 |
-| Operations | 154 |
-| Contracts | 16 |
+| Operations | 153 |
+| Contracts | 17 |
 | Modules | 13 |
 | Undrawn | 0 |
 | Operations with no screen | 1 |
@@ -84,7 +84,7 @@
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 1 | yes |
 | `WEB-030` | Ticket Transfer | Ticketing | 1 | 4 | yes |
-| `WEB-031` | My Reservations | Ticketing | 2 | 7 | yes |
+| `WEB-031` | My Reservations | Ticketing | 2 | 6 | yes |
 | `WEB-032` | Offers & Promotions | Promotions | 2 | 3 | yes |
 | `WEB-033` | Shop | Retail | 2 | 4 | yes |
 | `WEB-034` | Lost & Found | Support | 3 | 3 | yes |

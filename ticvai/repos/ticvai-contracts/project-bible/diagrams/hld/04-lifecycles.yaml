@@ -620,7 +620,7 @@ stateModels:
 - entity: Game card
   contract: games
   owner: games
-  service: VenueOpsService
+  service: WalletService
   states: null
   transitions: 4
   initial:
@@ -650,9 +650,9 @@ stateModels:
   guarded: 7
   ref: diagrams/lld/lifecycles/game.yaml
 - entity: Gift card
-  contract: retail
-  owner: retail
-  service: RetailService
+  contract: wallet
+  owner: wallet
+  service: WalletService
   states: null
   transitions: 9
   initial:
@@ -2041,9 +2041,9 @@ stateModels:
   guarded: 6
   ref: diagrams/lld/lifecycles/wallet-pass.yaml
 - entity: Guest wallet
-  contract: retail
-  owner: retail
-  service: RetailService
+  contract: wallet
+  owner: wallet
+  service: WalletService
   states: null
   transitions: 4
   initial:

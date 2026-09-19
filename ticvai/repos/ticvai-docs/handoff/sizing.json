@@ -41,9 +41,10 @@
    "LedgerService": 2.2,
    "WhiteLabelService": 1.7,
    "ReportingService": 1.3,
-   "RetailService": 1.3,
+   "RetailService": 1.2,
    "AiService": 1.1,
-   "CrossRegionService": 0.2
+   "CrossRegionService": 0.2,
+   "WalletService": 0.1
   },
   "cells": {
    "small cell": {
@@ -155,14 +156,14 @@
      },
      "VenueOpsService": {
       "share": 3.5,
-      "rpsAtLoad": 13.5,
+      "rpsAtLoad": 13.3,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.023,
+      "utilisationAtSteady": 0.022,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -238,15 +239,15 @@
       "drivenBy": "survivability floor"
      },
      "RetailService": {
-      "share": 1.3,
-      "rpsAtLoad": 5.1,
+      "share": 1.2,
+      "rpsAtLoad": 4.8,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.009,
+      "utilisationAtSteady": 0.008,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -278,10 +279,24 @@
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
+     },
+     "WalletService": {
+      "share": 0.1,
+      "rpsAtLoad": 0.6,
+      "rpsPerReplica": 400,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "max": null,
+      "targetUtilisation": 0.6,
+      "utilisationAtSteady": 0.001,
+      "scaleOutAt": 240,
+      "stepAddsAt": 260,
+      "drivenBy": "survivability floor"
      }
     },
-    "replicasAtFloor": 32,
-    "replicasAtPeak": 32,
+    "replicasAtFloor": 34,
+    "replicasAtPeak": 34,
     "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
    },
    "medium cell": {
@@ -393,14 +408,14 @@
      },
      "VenueOpsService": {
       "share": 3.5,
-      "rpsAtLoad": 80.2,
+      "rpsAtLoad": 79.1,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.134,
+      "utilisationAtSteady": 0.132,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -476,15 +491,15 @@
       "drivenBy": "survivability floor"
      },
      "RetailService": {
-      "share": 1.3,
-      "rpsAtLoad": 30.5,
+      "share": 1.2,
+      "rpsAtLoad": 28.2,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.051,
+      "utilisationAtSteady": 0.047,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -516,10 +531,24 @@
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
+     },
+     "WalletService": {
+      "share": 0.1,
+      "rpsAtLoad": 3.4,
+      "rpsPerReplica": 400,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "max": null,
+      "targetUtilisation": 0.6,
+      "utilisationAtSteady": 0.004,
+      "scaleOutAt": 240,
+      "stepAddsAt": 260,
+      "drivenBy": "survivability floor"
      }
     },
-    "replicasAtFloor": 32,
-    "replicasAtPeak": 34,
+    "replicasAtFloor": 34,
+    "replicasAtPeak": 36,
     "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
    },
    "large cell": {
@@ -631,14 +660,14 @@
      },
      "VenueOpsService": {
       "share": 3.5,
-      "rpsAtLoad": 249.0,
+      "rpsAtLoad": 245.5,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.415,
+      "utilisationAtSteady": 0.409,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -714,15 +743,15 @@
       "drivenBy": "survivability floor"
      },
      "RetailService": {
-      "share": 1.3,
-      "rpsAtLoad": 94.7,
+      "share": 1.2,
+      "rpsAtLoad": 87.7,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.158,
+      "utilisationAtSteady": 0.146,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
@@ -754,10 +783,24 @@
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
+     },
+     "WalletService": {
+      "share": 0.1,
+      "rpsAtLoad": 10.5,
+      "rpsPerReplica": 400,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "max": null,
+      "targetUtilisation": 0.6,
+      "utilisationAtSteady": 0.013,
+      "scaleOutAt": 240,
+      "stepAddsAt": 260,
+      "drivenBy": "survivability floor"
      }
     },
-    "replicasAtFloor": 32,
-    "replicasAtPeak": 48,
+    "replicasAtFloor": 34,
+    "replicasAtPeak": 50,
     "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
    }
   }

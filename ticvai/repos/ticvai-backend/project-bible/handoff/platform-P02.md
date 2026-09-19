@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | Screens | 71 |
-| Operations | 155 |
-| Contracts | 16 |
+| Operations | 154 |
+| Contracts | 17 |
 | Modules | 16 |
 | Undrawn | 0 |
 | Operations with no screen | 1 |
@@ -125,7 +125,7 @@
 | `GST-067` | Refunds & Resale | Account & Self-Service | 2 | 3 | yes |
 | `GST-068` | Help & My Cases | Engagement & Support | 2 | 3 | yes |
 | `GST-069` | Face Pass | Account & Self-Service | 2 | 3 | yes |
-| `GST-070` | Reserve a Table or Cabana | In-venue Services | 2 | 7 | yes |
+| `GST-070` | Reserve a Table or Cabana | In-venue Services | 2 | 6 | yes |
 | `GST-071` | Payment Methods | Account & Self-Service | 2 | 5 | yes |
 | `GST-072` | Share & Group Booking | Booking & Selection | 2 | 5 | yes |
 | `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 5 | yes |

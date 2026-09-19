@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**170 conflicts raised — CF-01 to CF-167, plus CF-33a and one screen-level item.**
+**175 conflicts raised — CF-01 to CF-172, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **11** |
+| OPEN — client | **16** |
 | OPEN — Softlabs | **1** |
 | CLOSED | **152** |
 | WITHDRAWN | **6** |
-| **Total** | **170** |
+| **Total** | **175** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**12 open, 152 closed.**
+**17 open, 152 closed.**
 
 
-## Open — needs a client decision — 11
+## Open — needs a client decision — 16
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -33,6 +33,11 @@ register.
 | **CF-165** | Consent, retention and archival were walked in the 20 August CRM session and the package has consent only. `recordConsent` exists, CF-160 settled that | Allam |
 | **CF-166** | Seat map reuse and comparison — three of four gaps closed, and the fourth was never a gap. The 21 August decision reads: *"full and partial (section-l |  |
 | **CF-167** | The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region. Two sources want it in two places | Chinmay + Dinesh |
+| **CF-168** | A region may now hold more than one Postgres instance, and nothing decides which one a new tenant lands on. ADR-0040 removed the ceiling by letting a  | Chinmay + Dinesh |
+| **CF-169** | Three places where the data model was built and no screen was ever written, and one where the reverse is true. ADR-0041 turns 57 command centres into  | Chinmay + Dinesh |
+| **CF-170** | Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.  | Chinmay + Dinesh |
+| **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 | Chinmay + Qossai |
+| **CF-172** | The identity contract said both that an unverified guest buys and that it cannot. `verifyGuestEmail`: *"Unverified accounts still buy. Blocking purcha | Chinmay |
 
 ## Open — Softlabs to resolve — 1
 
@@ -212,7 +217,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-167, no gaps
+- **Numbering:** CF-01 to CF-172, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

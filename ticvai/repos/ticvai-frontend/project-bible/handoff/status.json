@@ -61,9 +61,9 @@
    },
    {
     "name": "Contracts touched by a flow",
-    "done": 28,
+    "done": 29,
     "total": 32,
-    "percent": 88,
+    "percent": 91,
     "note": "Every contract appears in at least one journey."
    },
    {
@@ -82,9 +82,9 @@
    },
    {
     "name": "Screens with operations",
-    "done": 2265,
+    "done": 2319,
     "total": 2427,
-    "percent": 93,
+    "percent": 96,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {

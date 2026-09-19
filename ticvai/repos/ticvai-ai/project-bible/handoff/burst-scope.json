@@ -3,7 +3,7 @@
  "basis": "flows F43, F58, F59 plus the discovery path",
  "note": "**What a flash-sale environment runs, derived rather than chosen.** Weighted by how many times a single buyer calls each operation — two services carry most of the load and everything else is on the path without being the load.\n\n**Services with `deployed: false` are shown deliberately.** A viewer that shows what is absent is more useful than one showing only what is present, and the absence is the point: six services see no part of a ticket sale.",
  "totals": {
-  "services": 16,
+  "services": 17,
   "deployed": 3,
   "operations": 34,
   "ofTotalOperations": 1981,
@@ -16,7 +16,7 @@
    {
     "name": "normal",
     "target": "shared cell",
-    "services": 16,
+    "services": 17,
     "operations": 1947,
     "tables": 556,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
@@ -207,6 +207,15 @@
   {
    "name": "CrossRegionService",
    "tier": "platform",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "WalletService",
+   "tier": "commerce",
    "onBurstPath": false,
    "weightedShare": 0.0,
    "deployed": false,

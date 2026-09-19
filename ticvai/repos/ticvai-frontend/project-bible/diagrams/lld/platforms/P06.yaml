@@ -43,7 +43,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 122
+  operationCalls: 121
 - service: OrderService
   operationCalls: 69
 - service: FnbService
@@ -2509,7 +2509,6 @@ screens:
   density: comfortable
   operations:
   - listOverdueRentals
-  - returnRental
   - sendTransactionalMessage
   states:
   - emptyFirstRun

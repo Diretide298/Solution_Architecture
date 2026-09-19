@@ -58407,12 +58407,12 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: The game credit balance
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Recent movement
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -58614,7 +58614,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: Account and balance
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -59144,7 +59144,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: adjustWallet
-    contract: retail
+    contract: wallet
     purpose: Refund, adjust or grant bonus
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -59224,7 +59224,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: The credit ledger
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -61577,7 +61577,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: Redemption balance
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -63708,7 +63708,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Wallet transaction history
     trigger: onLoad
   wireframe:
@@ -65405,7 +65405,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: Balance summary
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -65493,7 +65493,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: topUpWallet
-    contract: retail
+    contract: wallet
     purpose: Self-service top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -72437,6 +72437,16 @@ screens:
         impliedBy: listOverdueRentals
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: sendTransactionalMessage
+        label: Send transactional message
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendTransactionalMessage
   states:
     loading: The overdue rental list.
     error: Could not load. Names which read failed and leaves the overdue rental untouched.
@@ -123048,7 +123058,7 @@ screens:
       somebody concluding the record does not exist'
   apis:
   - operationId: getWallet
-    contract: retail
+    contract: wallet
     purpose: The wallet and its owner
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -124003,7 +124013,7 @@ screens:
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Recent funding
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -125157,7 +125167,7 @@ screens:
       data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: The funding audit trail
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -126845,7 +126855,7 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates: *id080
   - operationId: transferWalletBalance
-    contract: retail
+    contract: wallet
     purpose: Move value between them
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -127406,7 +127416,7 @@ screens:
       somebody concluding the record does not exist'
   apis:
   - operationId: transferWalletBalance
-    contract: retail
+    contract: wallet
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -128038,12 +128048,12 @@ screens:
       somebody concluding the record does not exist'
   apis:
   - operationId: issueGiftCard
-    contract: retail
+    contract: wallet
     purpose: Issue
     trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: activateGiftCard
-    contract: retail
+    contract: wallet
     purpose: Activate
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -130191,7 +130201,7 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Monitor and audit
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -130388,7 +130398,7 @@ screens:
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listWalletTransactions
-    contract: retail
+    contract: wallet
     purpose: Recent activity
     trigger: onLoad
     provenance: board reading, 19 September 2026
@@ -131104,7 +131114,7 @@ screens:
       somebody concluding the record does not exist'
   apis:
   - operationId: adjustWallet
-    contract: retail
+    contract: wallet
     purpose: Administrative adjustment
     trigger: onAction
     provenance: board reading, 19 September 2026
@@ -133499,7 +133509,7 @@ screens:
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: adjustWallet
-    contract: retail
+    contract: wallet
     purpose: Correct one
     trigger: onAction
     provenance: board reading, 19 September 2026

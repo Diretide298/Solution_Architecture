@@ -1,14 +1,14 @@
 # Gift card — state model
-# Contract: retail.GiftCard.status
+# Contract: wallet.GiftCard.status
 # Checked by tools/check-states.py.
 
 entity: Gift card
-contract: retail
+contract: wallet
 enum: GiftCard.status
 enumKind: inline
 enumSchema: GiftCard
 enumProperty: status
-owner: retail
+owner: wallet
 initial:
 - issued
 terminal:

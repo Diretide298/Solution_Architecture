@@ -33,7 +33,7 @@ hld:
   title: 125 state models and 29 events
 lld:
 - set: services
-  files: 16
+  files: 17
   folder: diagrams/lld/services/
 - set: platforms
   files: 16

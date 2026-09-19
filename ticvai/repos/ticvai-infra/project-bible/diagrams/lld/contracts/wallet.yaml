@@ -1,10 +1,81 @@
 id: LLD-wallet
-title: wallet — 33 operations
+title: wallet — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: RetailService
+service: WalletService
 operations:
+- operation: activateGiftCard
+  verb: POST
+  path: /gift-cards/{giftCardId}/activate
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.gift_card
+  writes:
+  - cache:idempotency
+  - wallet.gift_card
+- operation: adjustGameCard
+  verb: POST
+  path: /game-cards/{cardCode}/adjust
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
+- operation: adjustWallet
+  verb: POST
+  path: /wallets/{subjectId}/adjust
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.wallet
+- operation: blockGiftCard
+  verb: POST
+  path: /gift-cards/{cardCode}/block
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.gift_card
+  writes:
+  - cache:idempotency
+  - wallet.gift_card
+- operation: closeWallet
+  verb: POST
+  path: /wallets/{walletId}/close
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.wallet
+  - wallet.wallet_transaction
+  writes:
+  - cache:idempotency
+  - wallet.wallet
 - operation: createCreditType
   verb: POST
   path: /credit-types
@@ -74,6 +145,30 @@ operations:
   reads:
   - wallet.consumption_policy
   writes: []
+- operation: getGiftCard
+  verb: GET
+  path: /gift-cards/{cardCode}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.gift_card
+  writes: []
+- operation: getWallet
+  verb: GET
+  path: /wallets/{subjectId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.wallet
+  writes: []
 - operation: getWalletFundingRules
   verb: GET
   path: /wallet-funding-rules
@@ -105,6 +200,20 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: issueGiftCard
+  verb: POST
+  path: /gift-cards
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.gift_card
+  writes:
+  - cache:idempotency
+  - wallet.gift_card
 - operation: linkWalletCredential
   verb: POST
   path: /wallet-credentials
@@ -172,6 +281,18 @@ operations:
   reads:
   - wallet.dispute
   writes: []
+- operation: listWalletTransactions
+  verb: GET
+  path: /wallets/{subjectId}/transactions
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.wallet_transaction
+  writes: []
 - operation: listWalletTypes
   verb: GET
   path: /wallet-types
@@ -183,6 +304,20 @@ operations:
   reads:
   - wallet.wallet_type
   writes: []
+- operation: loadGameCredits
+  verb: POST
+  path: /game-cards/{cardCode}/load
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
 - operation: publishWalletConfiguration
   verb: POST
   path: /wallet-configuration/publish
@@ -206,6 +341,35 @@ operations:
   - wallet.dispute
   writes:
   - wallet.dispute
+- operation: redeemGiftCard
+  verb: POST
+  path: /gift-cards/{giftCardId}/redeem
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.gift_card
+  writes:
+  - cache:idempotency
+  - wallet.gift_card
+  - wallet.wallet_transaction
+- operation: reinstateWallet
+  verb: POST
+  path: /wallets/{walletId}/reinstate
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.wallet
 - operation: reverseWalletFunding
   verb: POST
   path: /wallet-funding/reversals
@@ -360,6 +524,51 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: suspendWallet
+  verb: POST
+  path: /wallets/{walletId}/suspend
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.wallet
+- operation: topUpWallet
+  verb: POST
+  path: /wallets/{subjectId}/top-ups
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.wallet
+- operation: transferWalletBalance
+  verb: POST
+  path: /wallets/{walletId}/transfer
+  scope: venue
+  permission: WALLET_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - wallet.wallet
+  - wallet.wallet_transaction
 - operation: updateCreditType
   verb: PUT
   path: /credit-types/{creditTypeId}

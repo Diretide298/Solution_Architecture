@@ -30,8 +30,8 @@ apps:
     - P02
     - P05
     screens: 134
-    operations: 156
-    permissions: 23
+    operations: 155
+    permissions: 24
     tiers:
       read:
       - CASE_VIEW
@@ -44,6 +44,7 @@ apps:
       - QUEUE_VIEW
       - RESOURCE_VIEW
       - VENUE_MAP_VIEW
+      - WALLET_VIEW
       operate:
       - AI_USE
       - GUEST_VIEW_PII
@@ -52,7 +53,7 @@ apps:
       - ORDER_CREATE
       - ORDER_MODIFY
       - ORDER_REPRINT
-      - RESOURCE_BOOK
+      - WALLET_OPERATE
       configure:
       - ACCESS_POINT_CONFIGURE
       - CASE_MANAGE
@@ -390,7 +391,7 @@ apps:
     - P15
     screens: 40
     operations: 155
-    permissions: 44
+    permissions: 45
     tiers:
       read:
       - APPROVAL_VIEW
@@ -429,6 +430,7 @@ apps:
       - SHIFT_OPEN
       - SHIFT_REOPEN
       - SHIFT_SUSPEND
+      - WALLET_OPERATE
       configure:
       - ACCESS_POINT_CONFIGURE
       - PERFORMANCE_CONFIGURE
@@ -455,11 +457,12 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 190
-    permissions: 55
+    operations: 206
+    permissions: 59
     tiers:
       read:
       - ASSET_LIBRARY_VIEW
+      - ASSET_VIEW
       - CASE_VIEW
       - DEVICE_VIEW
       - GUEST_VIEW
@@ -469,6 +472,7 @@ apps:
       - PERMISSION_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
+      - RENTAL_VIEW
       - SCOPE_VIEW
       - VENUE_MAP_VIEW
       - WORKFORCE_VIEW
@@ -493,6 +497,7 @@ apps:
       - ORDER_RESCHEDULE
       - ORDER_VOID
       - OVERSHORT_ACCEPT
+      - RENTAL_OPERATE
       - REPORT_VIEW_VENUE
       - REPORT_VIEW_WORKSTATION
       - SHIFT_APPROVE_OPEN
@@ -505,6 +510,7 @@ apps:
       - WORK_ORDER_VERIFY
       configure:
       - ANNOUNCEMENT_PUBLISH
+      - ASSET_MANAGE
       - CAPACITY_CONFIGURE
       - CASE_MANAGE
       - DEVICE_CONFIGURE
@@ -527,4 +533,5 @@ apps:
     - login
     - logout
     - selectRole
-    operationsWithNoPermissionCount: 10
+    - sendTransactionalMessage
+    operationsWithNoPermissionCount: 11

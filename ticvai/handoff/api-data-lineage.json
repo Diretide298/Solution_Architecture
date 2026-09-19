@@ -11714,7 +11714,7 @@
   "verb": "GET",
   "path": "/wallets/{subjectId}",
   "reads": [
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [],
   "routing": "primary",
@@ -11738,11 +11738,11 @@
   "path": "/wallets/{subjectId}/top-ups",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "workstation",
@@ -11764,7 +11764,7 @@
   "verb": "GET",
   "path": "/wallets/{subjectId}/transactions",
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "routing": "primary",
@@ -11788,11 +11788,11 @@
   "path": "/wallets/{subjectId}/adjust",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -11815,11 +11815,11 @@
   "path": "/gift-cards",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "workstation",
@@ -11841,7 +11841,7 @@
   "verb": "GET",
   "path": "/gift-cards/{cardCode}",
   "reads": [
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [],
   "routing": "primary",
@@ -11865,11 +11865,11 @@
   "path": "/gift-cards/{cardCode}/block",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "venue",
@@ -19526,11 +19526,11 @@
   "path": "/gift-cards/{giftCardId}/activate",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "venue",
@@ -19553,12 +19553,12 @@
   "path": "/gift-cards/{giftCardId}/redeem",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card",
-   "retail.wallet_transaction"
+   "wallet.gift_card",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -19581,11 +19581,11 @@
   "path": "/wallets/{walletId}/suspend",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -19608,11 +19608,11 @@
   "path": "/wallets/{walletId}/reinstate",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -19635,12 +19635,12 @@
   "path": "/wallets/{walletId}/close",
   "reads": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -20457,8 +20457,8 @@
   "path": "/stored-value/authorisations",
   "reads": [
    "promotions.voucher",
-   "retail.gift_card",
-   "retail.wallet"
+   "wallet.gift_card",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
@@ -20492,7 +20492,7 @@
   "writes": [
    "cache:idempotency",
    "orders.stored_value_authorisation",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -21872,7 +21872,7 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "routing": "analytical",
@@ -24196,12 +24196,12 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",

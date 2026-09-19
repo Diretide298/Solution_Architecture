@@ -8,8 +8,8 @@
 |---|---|
 | Screens | P01 46 · P02 71 |
 | Capability groups | 53 — appOnly 7 · folded 3 · paired 42 · webOnly 1 |
-| Operations | web 154 · app 155 · shared 154 |
-| Findings | high 26 · medium 111 · low 197 · info 4 |
+| Operations | web 153 · app 154 · shared 153 |
+| Findings | high 26 · medium 116 · low 197 · info 4 |
 
 ## By dimension
 
@@ -24,9 +24,9 @@
 | flows |  | 12 |  |  |
 | cross-shell handover |  | 8 |  |  |
 | contracts |  | 7 |  |  |
+| design bundles |  | 7 |  |  |
 | overlays |  | 3 |  |  |
 | states |  | 3 |  |  |
-| design bundles |  | 2 |  |  |
 | design |  | 1 |  |  |
 | documents |  | 1 | 3 |  |
 | events |  | 1 |  |  |
@@ -86,7 +86,7 @@
 | wave | virtual-queue (WEB-040 ↔ GST-023) | ships in wave 2 on the web and wave 3 on the app | one wave for both, or record why one shell waits |
 | wave | waiting-room (WEB-015 ↔ GST-046) | ships in wave 2 on the web and wave 1 on the app | one wave for both, or record why one shell waits |
 
-## Medium — 111
+## Medium — 116
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -112,7 +112,12 @@
 | cross-shell handover | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | WEB-030 hands the guest to GST-014 on the app — "The friend claims it in the app" (flow F55 step 4→5) | a twin exists on the same shell; hand over only where the device matters |
 | design | Claude Design | web 13/13 batches drawn, app 0/18 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames | draw the app batches against the web's house style, or decide which system is the guest's |
 | design bundles | P01-cart-checkout-01 | 1 of 5 screens differ from the YAML (WEB-010) | python3 tools/export-design-batch.py P01-cart-checkout-01 |
+| design bundles | P01-membership-loyalty-value-01 | 1 of 5 screens differ from the YAML (WEB-021) | python3 tools/export-design-batch.py P01-membership-loyalty-value-01 |
+| design bundles | P01-ticketing-01 | 1 of 3 screens differ from the YAML (WEB-031) | python3 tools/export-design-batch.py P01-ticketing-01 |
+| design bundles | P02-account-self-service-02 | 1 of 4 screens differ from the YAML (GST-071) | python3 tools/export-design-batch.py P02-account-self-service-02 |
 | design bundles | P02-cart-checkout-01 | 1 of 3 screens differ from the YAML (GST-041) | python3 tools/export-design-batch.py P02-cart-checkout-01 |
+| design bundles | P02-in-venue-services-01 | 1 of 10 screens differ from the YAML (GST-070) | python3 tools/export-design-batch.py P02-in-venue-services-01 |
+| design bundles | P02-membership-loyalty-value-01 | 1 of 3 screens differ from the YAML (GST-011) | python3 tools/export-design-batch.py P02-membership-loyalty-value-01 |
 | documents | docs/active/mom-digest.md:3903 | "can differ in functionality" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client | confirm with the client |
 | entry parameters | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web opens with ['conversationId', 'outletId'], app with ['cartId', 'conversationId', 'orderId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | cart (WEB-010 ↔ GST-041) | web opens with ['cartId', 'code', 'lineId'], app with ['cartId', 'lineId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
@@ -176,7 +181,7 @@
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the web calls addToWishlist, getFacePassEnrolment, getWaiverStatus, getWishlist, grantDelegation, listDelegations, recordConsent, removeFromWishlist, revokeFacePass here; the app calls addToWishlist on GST-020; getFacePassEnrolment on GST-069; getWaiverStatus on GST-067; getWishlist on GST-020; grantDelegation on GST-015; listDelegations on GST-015; recordConsent on GST-039/GST-065; removeFromWishlist on GST-020; revokeFacePass on GST-069 | same operations on the same capability, so a guest finds it in the same place |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the app calls createMfaChallenge, updateGuestPreferences, uploadGuestDocument, verifyGuestEmail here; the web calls createMfaChallenge on WEB-016; updateGuestPreferences on WEB-020; uploadGuestDocument on WEB-011; verifyGuestEmail on WEB-020 | same operations on the same capability, so a guest finds it in the same place |
 | operations | profile (WEB-020 ↔ GST-039) | the web calls getGuestProfile, listConsentPurposes, updateGuestPreferences, verifyGuestEmail here; the app calls getGuestProfile on GST-001; listConsentPurposes on GST-065; updateGuestPreferences on GST-066; verifyGuestEmail on GST-073 | same operations on the same capability, so a guest finds it in the same place |
-| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls bookResource, getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls bookResource on GST-070; getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070 | same operations on the same capability, so a guest finds it in the same place |
+| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070 | same operations on the same capability, so a guest finds it in the same place |
 | operations | search (WEB-003 ↔ GST-063) | the web calls listProducts here; the app calls listProducts on GST-002/GST-003/GST-005/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-054/GST-058/GST-059 | same operations on the same capability, so a guest finds it in the same place |
 | operations | shop (WEB-033 ↔ GST-026) | the web calls addCartLine here; the app calls addCartLine on GST-032/GST-048/GST-050/GST-053/GST-056 | same operations on the same capability, so a guest finds it in the same place |
 | operations | shop (WEB-033 ↔ GST-026) | the app calls getGameCard here; the web calls getGameCard on WEB-021 | same operations on the same capability, so a guest finds it in the same place |

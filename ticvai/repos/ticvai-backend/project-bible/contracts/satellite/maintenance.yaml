@@ -263,6 +263,7 @@ paths:
     get:
       operationId: lookupAsset
       x-ticvai-consumed-by:
+        - "P06 EMP-075 Equipment Scan & Validation"
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-509 QR / Barcode Equipment Identification"
@@ -303,6 +304,7 @@ paths:
     put:
       operationId: setAssetStatus
       x-ticvai-consumed-by:
+        - "P06 EMP-100 Return Completion & Equipment Disposition"
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-508 Equipment Status & Condition Management"

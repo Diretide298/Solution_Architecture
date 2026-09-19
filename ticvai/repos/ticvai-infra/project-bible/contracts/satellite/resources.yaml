@@ -223,8 +223,6 @@ paths:
     post:
       operationId: bookResource
       x-ticvai-consumed-by:
-        - "P01 WEB-031 My Reservations"
-        - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
         - "P08 BO-864 Resource Calendar Command Center"
         - "P08 BO-868 Advance Reservation Management"

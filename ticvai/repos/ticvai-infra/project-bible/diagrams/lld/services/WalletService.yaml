@@ -1,0 +1,713 @@
+id: LLD-WalletService
+title: WalletService — 48 operations, 23 tables
+generatedBy: tools/derive-diagrams.py
+tier: commerce
+index: diagrams/hld/02-services.yaml
+why: '**Eight domains need a wallet and none of them owns it.** A Gold Membership issues F&B credit,
+  parking credits and ride credits into the same wallet, so subscription, games and F&B all read it;
+  `getWalletLiability` aggregates outstanding value across every credit type, so it has to see all of
+  them. The 13 wallet types in the client''s library are compositions of owner, credit type and scope
+  rather than thirteen kinds, which is only expressible in one place. **Split out of `retail` on 19
+  September**, where 13 of retail''s 37 operations were the entire wallet runtime while `wallet.yaml`
+  held only its rules.'
+scale: 'Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on
+  top-up. **Latency-critical in a way LedgerService is not**, which is why the two are separate: the
+  ledger is append-only and batch-tolerant, a balance check is neither.'
+ifDown: '**It holds a liability owed to a customer.** A wallet that double-spends is a financial loss,
+  not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
+  per caller.'
+coverage:
+  operations: 48
+  inAFlow: 0
+  percent: 0%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: wallet
+  tables: 23
+  stores:
+  - postgres
+  largestTable: wallet.wallet_type
+operationsByContract:
+- contract: wallet
+  count: 48
+  operations:
+  - operation: activateGiftCard
+    verb: POST
+    path: /gift-cards/{giftCardId}/activate
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: adjustGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: adjustWallet
+    verb: POST
+    path: /wallets/{subjectId}/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: blockGiftCard
+    verb: POST
+    path: /gift-cards/{cardCode}/block
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeWallet
+    verb: POST
+    path: /wallets/{walletId}/close
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createCreditType
+    verb: POST
+    path: /credit-types
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createSharedWallet
+    verb: POST
+    path: /shared-wallets
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createVoucherType
+    verb: POST
+    path: /voucher-types
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createWalletType
+    verb: POST
+    path: /wallet-types
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: expireCreditLots
+    verb: POST
+    path: /credit-lots/expire
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getCreditConsumptionPolicy
+    verb: GET
+    path: /credit-consumption-policy
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGiftCard
+    verb: GET
+    path: /gift-cards/{cardCode}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWallet
+    verb: GET
+    path: /wallets/{subjectId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWalletFundingRules
+    verb: GET
+    path: /wallet-funding-rules
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWalletLiability
+    verb: GET
+    path: /wallet-liability
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getWalletReconciliation
+    verb: GET
+    path: /wallet-reconciliation
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: issueGiftCard
+    verb: POST
+    path: /gift-cards
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: linkWalletCredential
+    verb: POST
+    path: /wallet-credentials
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: true
+    reads: 1
+    writes: 1
+  - operation: listCreditLots
+    verb: GET
+    path: /credit-lots
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCreditTypes
+    verb: GET
+    path: /credit-types
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSharedWallets
+    verb: GET
+    path: /shared-wallets
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listVoucherTypes
+    verb: GET
+    path: /voucher-types
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWalletDisputes
+    verb: GET
+    path: /wallet-disputes
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWalletTransactions
+    verb: GET
+    path: /wallets/{subjectId}/transactions
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWalletTypes
+    verb: GET
+    path: /wallet-types
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: loadGameCredits
+    verb: POST
+    path: /game-cards/{cardCode}/load
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: publishWalletConfiguration
+    verb: POST
+    path: /wallet-configuration/publish
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: raiseWalletDispute
+    verb: POST
+    path: /wallet-disputes
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: redeemGiftCard
+    verb: POST
+    path: /gift-cards/{giftCardId}/redeem
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: reinstateWallet
+    verb: POST
+    path: /wallets/{walletId}/reinstate
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reverseWalletFunding
+    verb: POST
+    path: /wallet-funding/reversals
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setCreditConsumptionPolicy
+    verb: PUT
+    path: /credit-consumption-policy
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setCreditEligibilityRules
+    verb: PUT
+    path: /credit-types/{creditTypeId}/eligibility
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGiftCardProduct
+    verb: PUT
+    path: /gift-card-products
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setSharedWalletMembers
+    verb: PUT
+    path: /shared-wallets/{sharedWalletId}/members
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletAccountingMapping
+    verb: PUT
+    path: /wallet-accounting
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletChannelRules
+    verb: PUT
+    path: /wallet-channel-rules
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletFundingRules
+    verb: PUT
+    path: /wallet-funding-rules
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletRefundPolicy
+    verb: PUT
+    path: /wallet-refund-policy
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletRestriction
+    verb: POST
+    path: /wallet-restrictions
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletRiskRules
+    verb: PUT
+    path: /wallet-risk-rules
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletTransferRules
+    verb: PUT
+    path: /wallet-transfer-rules
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: simulateCreditConsumption
+    verb: POST
+    path: /credit-consumption/simulate
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: suspendWallet
+    verb: POST
+    path: /wallets/{walletId}/suspend
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: topUpWallet
+    verb: POST
+    path: /wallets/{subjectId}/top-ups
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: transferWalletBalance
+    verb: POST
+    path: /wallets/{walletId}/transfer
+    scope: venue
+    permission: WALLET_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateCreditType
+    verb: PUT
+    path: /credit-types/{creditTypeId}
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateWalletType
+    verb: PUT
+    path: /wallet-types/{walletTypeId}
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: wallet.accounting_mapping
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.adjustment
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: wallet.channel_rules
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.configuration_version
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: wallet.consumption_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.credential
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.credit_eligibility
+  columns: 11
+  store: postgres
+  parent: wallet.credit_type
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.credit_lot
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: wallet.credit_type
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.dispute
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.funding_rules
+  columns: 11
+  store: postgres
+  parent: wallet.wallet_type
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.gift_card
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.gift_card_product
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.refund_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.restriction
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.risk_rules
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.shared_wallet
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.shared_wallet_member
+  columns: 11
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.transfer_rules
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.voucher_type
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.wallet
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.wallet_transaction
+  columns: 10
+  store: postgres
+  parent: wallet.wallet
+  writtenBy:
+  - orders
+  - wallet
+  foreignWriters:
+  - orders
+- table: wallet.wallet_type
+  columns: 24
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+readsFrom: []
+writesOutside: []
+screens:
+- P01:WEB-021 Wallet & Gift Cards
+- P02:GST-011 Wallet Overview
+- P02:GST-071 Payment Methods
+- P04:POS-002 Sell — Ticket Catalogue
+- P08:BO-1083 Wallet Command Center
+- P08:BO-1084 Wallet Type Library
+- P08:BO-1085 Wallet Creation & Provisioning Rules
+- P08:BO-1086 Wallet Ownership & Account Association
+- P08:BO-1087 Wallet Currency & Monetary Configuration
+- P08:BO-1088 Credit & Balance Type Configuration
+- P08:BO-1089 Wallet Feature Profile
+- P08:BO-1090 Wallet Lifecycle Configuration
+- P08:BO-1091 Wallet Numbering, Identity & Digital Credentials
+- P08:BO-1092 Wallet Configuration Preview, Validation & Publication
+- P08:BO-1093 Funding Command Center
+- P08:BO-1094 Funding Method Configuration
+- P08:BO-1095 Top-Up Rule Configuration
+- P08:BO-1096 Channel & Funding Source Mapping
+- P08:BO-1097 Auto-Reload Configuration
+- P08:BO-1098 Recurring Funding Schedule
+- P08:BO-1099 Funding Authorization & Approval Rules
+- P08:BO-1100 Funding Reversal & Correction Management
+- P08:BO-1101 Funding Limits & Velocity Controls
+- P08:BO-1102 Funding Transaction Audit & Reconciliation
+- P08:BO-1103 Stored Value & Credit Command Center
+- P08:BO-1104 Credit Type Definition Studio
+- P08:BO-1105 Credit Issuance Rule Configuration
+- P08:BO-1106 Credit Usage & Eligibility Rules
+- P08:BO-1107 Consumption Priority Engine
+- P08:BO-1108 Expiry & Validity Policy Configuration
+- P08:BO-1109 FEFO & Credit Lot Management
+- P08:BO-1110 Split Tender & Multi-Credit Consumption
+- P08:BO-1111 Credit Expiry, Extension & Forfeiture Operations
+- P08:BO-1112 Consumption Simulator, Validation & Rule Publication
+- P08:BO-1113 Shared Wallet Command Center
+- P08:BO-1114 Shared Wallet Model Configuration
+- P08:BO-1115 Family & Household Structure Configuration
+- P08:BO-1116 Parent–Child Stored Value Distribution
+- P08:BO-1117 Allowance & Budget Allocation Engine
+- P08:BO-1118 Member Spending Controls & Permissions
+- P08:BO-1119 Corporate Wallet & Organizational Hierarchy
+- P08:BO-1120 Corporate Budget, Policy & Approval Rules
+- P08:BO-1121 Shared Wallet Transfers & Balance Reallocation
+- P08:BO-1122 Shared Wallet Simulator, Monitoring & Audit
+- P08:BO-1123 Gift Card & Digital Benefit Command Center
+- P08:BO-1124 Gift Card Product Configuration
+- P08:BO-1125 Gift Card Issuance, Activation & Distribution
+- P08:BO-1126 Voucher & Coupon Type Configuration
+- P08:BO-1127 Voucher Eligibility & Redemption Rule Studio
+- P08:BO-1128 Membership Benefits & Entitlement Mapping
+- P08:BO-1129 Benefit Packaging & Digital Wallet Presentation
+- P08:BO-1130 Gift Card & Voucher Expiry Management
+- P08:BO-1131 Gift Card Balance, Liability & Breakage Control
+- P08:BO-1132 Gift Card & Voucher Simulator, Validation & Publication
+- P08:BO-1133 Wallet Usage & Channel Command Center
+- P08:BO-1134 Wallet Channel Configuration
+- P08:BO-1135 Wallet Payment & Redemption Policy
+- P08:BO-1136 Wearable & Credential Type Configuration
+- P08:BO-1137 Wearable Linking & Wallet Association Rules
+- P08:BO-1138 NFC, RFID & QR Interaction Rules
+- P08:BO-1139 Digital Key & Wallet Authentication Policy
+- P08:BO-1140 Offline Wallet & Degraded Mode Configuration
+- P08:BO-1141 Device, Terminal & Acceptance Point Mapping
+- P08:BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit
+- P08:BO-1143 Wallet Operations Command Center
+- P08:BO-1144 Peer-to-Peer Transfer Configuration
+- P08:BO-1145 Transfer Eligibility, Limits & Approval Rules
+- P08:BO-1146 Refund-to-Wallet Policy Configuration
+- P08:BO-1147 Refund Routing & Credit Restoration Engine
+- P08:BO-1148 Reversal & Transaction Correction Management
+- P08:BO-1149 Administrative Balance Adjustment Studio
+- P08:BO-1150 Wallet Block, Freeze & Restriction Management
+- P08:BO-1151 Wallet Disputes & Operational Exception Queue
+- P08:BO-1152 Operations Simulator, Approval & Audit Trail
+- P08:BO-1153 Wallet Security & Risk Command Center
+- P08:BO-1154 Wallet Risk Policy Configuration
+- P08:BO-1155 Transaction Risk Scoring Engine
+- P08:BO-1156 Velocity & Behavioral Rule Configuration
+- P08:BO-1157 Device, Credential & Account Security
+- P08:BO-1158 AI Fraud & Anomaly Detection Studio
+- P08:BO-1159 Automated Security Action Orchestration
+- P08:BO-1160 Fraud Alert & Investigation Case Management
+- P08:BO-1161 Security Rules Testing, Simulation & AI Sandbox
+- P08:BO-1162 Security Governance, Audit & Rule Publication
+- P08:BO-1163 Wallet Finance & Liability Command Center
+- P08:BO-1164 Wallet Financial Classification & Accounting Mapping
+- P08:BO-1165 Wallet Sub-Ledger & Balance Control
+- P08:BO-1166 Multi-Source Reconciliation Configuration
+- P08:BO-1167 Reconciliation Exception & Resolution Workbench
+- P08:BO-1168 Gift Card Liability Management
+- P08:BO-1169 Breakage & Revenue Recognition Policy
+- P08:BO-1170 Wallet Financial Period & Closing Controls
+- P08:BO-1171 Wallet Analytics & Management Reporting
+- P08:BO-1172 Finance Validation, Reporting & Audit Center
+- P08:BO-1173 Wallet Integration Command Center
+- P08:BO-1174 Wallet API Catalogue & Endpoint Configuration
+- P08:BO-1175 Integration Profile & System Mapping
+- P08:BO-1176 Wallet Events, Webhooks & Notification Orchestration
+- P08:BO-1178 Synchronization, Retry & Resilience Configuration
+- P08:BO-1179 Integration Monitoring & Exception Workbench
+- P08:BO-1180 Wallet Configuration Governance & Version Control
+- P08:BO-1181 Approval, Publication & Change Management
+- P08:BO-1182 Wallet Platform Health, Audit & Administration Center
+- P08:BO-399 Wallet & Credit Acceptance Mapping
+- P08:BO-414 Wallet & Credit Management Dashboard
+- P08:BO-415 Wallet & Credit Type Configuration
+- P08:BO-416 Wallet Account & Balance View
+- P08:BO-417 Top-Up Configuration
+- P08:BO-418 Top-Up Bonus Rule Configuration
+- P08:BO-419 Bonus Usage Restrictions
+- P08:BO-420 Bonus Validity & Expiry Configuration
+- P08:BO-422 Refund, Adjustment & Manual Bonus Control
+- P08:BO-423 Wallet Credit Transaction Ledger & Audit
+- P08:BO-448 Redemption Wallet & Balance View
+- P08:BO-461 Card Replacement & Wallet Relinking
+- P08:BO-469 Wallet & Deduction Transaction Monitor
+- P08:BO-487 Customer Wallet & Balance Summary
+- P08:BO-488 Self-Service Wallet Top-Up
+- P08:BO-722 Prepaid Minute Package & Customer Balance Configuration
+- P09:ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97
+- P09:ADM-612 Refund Allocation & Original Tender Manager\t119
+flows:
+- F18 A guest plays an arcade game
+- F53 A guest earns, sees and spends loyalty

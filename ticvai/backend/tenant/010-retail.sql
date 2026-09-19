@@ -1,4 +1,4 @@
--- retail — 15 tables
+-- retail — 12 tables
 -- **Derived. Do not hand-edit.**
 
 -- Goods swapped rather than returned, which settles differently
@@ -11,21 +11,6 @@ CREATE TABLE IF NOT EXISTS retail.exchange (
     replacement_value                 numeric(18,4),
     difference                        numeric(18,4) NOT NULL,
     created_at                        timestamptz
-);
-
--- Stored value somebody bought for somebody else. Has a code, a face value, and can be blocked
-CREATE TABLE IF NOT EXISTS retail.gift_card (
-    card_code                         text NOT NULL,
-    kind                              text,
-    face_value                        numeric(18,4) NOT NULL,
-    balance                           numeric(18,4) NOT NULL,
-    status                            text NOT NULL,
-    blocked_reason                    text,
-    issued_at                         timestamptz NOT NULL,
-    activated_at                      timestamptz,
-    expires_at                        timestamptz,
-    id                                uuid PRIMARY KEY NOT NULL,
-    subject_id                        uuid NOT NULL
 );
 
 -- A product a venue sells as goods, joined to the catalogue rather than duplicating it
@@ -190,33 +175,5 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     requires_permission               text,
     enabled                           boolean,
     updated_at                        timestamptz
-);
-
--- A guest balance, holding money they paid in and bonus the venue gave them separately — the two
--- refund differently
-CREATE TABLE IF NOT EXISTS retail.wallet (
-    id                                uuid PRIMARY KEY,
-    subject_id                        uuid NOT NULL,
-    balance                           numeric(18,4) NOT NULL,
-    bonus_balance                     numeric(18,4),
-    currency                          text NOT NULL,
-    status                            text NOT NULL,
-    home_cell_name                    text,
-    expires_at                        timestamptz,
-    last_activity_at                  timestamptz
-);
-
--- Every movement on a wallet, with the balance after. Append-only
-CREATE TABLE IF NOT EXISTS retail.wallet_transaction (
-    id                                text PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
-    amount                            numeric(18,4) NOT NULL,
-    balance_after                     numeric(18,4) NOT NULL,
-    order_id                          text,
-    venue_id                          uuid,
-    reason                            text,
-    principal_id                      uuid,
-    recorded_at                       timestamptz NOT NULL,
-    subject_id                        uuid
 );
 

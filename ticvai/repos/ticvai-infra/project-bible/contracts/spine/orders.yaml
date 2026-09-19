@@ -1195,6 +1195,7 @@ paths:
       operationId: setPaymentProvider
       x-ticvai-consumed-by:
         - "P09 ADM-412 Payment Method & Settlement Setup"
+        - "P17 SGN-021 Payment Method & Settlement Setup"
       summary: Configure a gateway and its routing
       description: 'CF-131. **Network International and Stripe for Phase 1** — two gateways, which is
         the number that makes routing a real question rather than a future one.
@@ -1608,7 +1609,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-lock: rowExclusive
       x-ticvai-lock-excludes:
-      - retail.wallet_transaction
+      - wallet.wallet_transaction
       x-ticvai-lock-excludes-note: 'ADR-0037. **Resolved before the transaction opens, never inside the
         lock.** A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
         was a Redis r ound trip and a read the decision does not use. **A lock held across a hop is a

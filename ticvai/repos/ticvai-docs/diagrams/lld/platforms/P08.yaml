@@ -56,16 +56,16 @@ servicesCalled:
   operationCalls: 437
 - service: CatalogueService
   operationCalls: 352
-- service: AccessService
-  operationCalls: 273
+- service: TenancyService
+  operationCalls: 272
 - service: OrderService
   operationCalls: 221
-- service: TenancyService
-  operationCalls: 202
+- service: AccessService
+  operationCalls: 203
 - service: MarketingService
-  operationCalls: 189
-- service: RetailService
-  operationCalls: 159
+  operationCalls: 190
+- service: WalletService
+  operationCalls: 143
 - service: InventoryService
   operationCalls: 79
 - service: FnbService
@@ -76,6 +76,8 @@ servicesCalled:
   operationCalls: 58
 - service: LedgerService
   operationCalls: 57
+- service: RetailService
+  operationCalls: 16
 - service: IdentityService
   operationCalls: 16
 - service: AiService
@@ -14409,6 +14411,7 @@ screens:
   density: compact
   operations:
   - listOverdueRentals
+  - sendTransactionalMessage
   states:
   - emptyFirstRun
   - emptyNoAccess

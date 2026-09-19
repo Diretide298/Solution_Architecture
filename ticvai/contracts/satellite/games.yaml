@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 34
+  x-ticvai-screen-count: 33
   x-ticvai-tier: satellite
   x-ticvai-module: 10 — Games & F&B Integration
   x-ticvai-requirements: 25

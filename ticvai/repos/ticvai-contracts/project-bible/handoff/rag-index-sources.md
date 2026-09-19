@@ -68,20 +68,47 @@ subject is an erasure that did not happen.**
 assistant answering from a half-built index, which is worse than a stale one — stale is wrong
 in a knowable way.
 
-## Six events these sources need and that do not exist yet
+## The seven events they need now all exist
 
-| | Publisher |
-|---|---|
-| `whitelabel.contentPublished` | white-label |
-| `fnb.menuPublished` | fnb |
-| `retail.merchandisePublished` | retail |
-| `maintenance.templatePublished` | maintenance |
-| `marketing.caseClosed` | marketing-crm |
-| `reporting.definitionPublished` | reporting |
-| `assets.documentIndexed` | assets |
+**Closed since this file was written.** Every invalidating event named in the table above is
+declared in `events/`, and `catalogue.productPublished` is no longer the only model:
 
-**Seven, and none is AI-specific.** Each is a fact the owning service should publish anyway —
-a published page, a closed case — and other consumers will want them. Writing them for
-indexing gets them written for everything else.
+| Event | File | Publisher |
+|---|---|---|
+| `whitelabel.contentPublished` | `events/whitelabel-contentPublished.yaml` | white-label |
+| `fnb.menuPublished` | `events/fnb-menuPublished.yaml` | fnb |
+| `retail.merchandisePublished` | `events/retail-merchandisePublished.yaml` | retail |
+| `maintenance.templatePublished` | `events/maintenance-templatePublished.yaml` | maintenance |
+| `marketing.caseClosed` | `events/marketing-caseClosed.yaml` | marketing-crm |
+| `reporting.definitionPublished` | `events/reporting-definitionPublished.yaml` | reporting |
+| `assets.documentIndexed` | `events/assets-documentIndexed.yaml` | assets |
 
-`catalogue.productPublished` already exists and is the model to follow.
+**None of them is AI-specific and that was the argument for writing them** — each is a fact the
+owning service should publish anyway, and other consumers want them. 29 events are now declared.
+
+## What is still missing: six of the eleven text fields
+
+**The tables all exist. Six of them do not have the column this file says to embed.** Checked
+against `handoff/schema-reference.json`:
+
+| Source | Declared | Present | Absent |
+|---|---|---|---|
+| `whitelabel.policy` | title, body | `body` | **`title`** |
+| `catalogue.entitlement_template` | name, description | `name` | **`description`** |
+| `retail.merchandise` | name, description | `name` | **`description`** |
+| `maintenance.inspection_template` | name, instructions | `name` | **`instructions`** |
+| `marketing.case` | subject, resolution | `subject` | **`resolution`** |
+| `assets.media_asset` | title, extractedText | `title` | **`extractedText`** |
+
+**These are contract gaps, not errors in this file, and two of them are load-bearing.**
+`marketing.case` has no `resolution` column, so the source whose whole value is "how was the
+last one resolved" can only embed the subject line. `assets.media_asset` has no
+`extractedText`, so the generic path for anything a tenant uploads has nothing to index until
+extraction has somewhere to write.
+
+The other four are prose the contract describes but never gave a field:
+`maintenance.inspection_template.instructions` is the staff-assistant source that matters most
+and is the clearest of the four.
+
+**Indexing a column that does not exist is not a silent failure — it is a missing source.**
+Until the contracts declare these six, those sources index their name and nothing else.

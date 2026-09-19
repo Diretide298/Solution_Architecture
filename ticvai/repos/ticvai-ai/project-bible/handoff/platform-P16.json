@@ -39,11 +39,11 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
+   "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "inventory",
+   "contract": "marketing-crm",
    "operations": 3
   },
   {
@@ -51,7 +51,7 @@
    "operations": 2
   },
   {
-   "contract": "orders",
+   "contract": "promotions",
    "operations": 1
   },
   {
@@ -59,19 +59,19 @@
    "operations": 1
   },
   {
+   "contract": "orders",
+   "operations": 1
+  },
+  {
    "contract": "approvals",
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "tenancy",
    "operations": 1
   },
   {
    "contract": "catalogue",
-   "operations": 1
-  },
-  {
-   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -253,7 +253,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-library-anl-021",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {

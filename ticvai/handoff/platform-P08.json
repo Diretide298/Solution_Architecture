@@ -166,12 +166,12 @@
    "operations": 43
   },
   {
-   "contract": "rental",
-   "operations": 39
+   "contract": "wallet",
+   "operations": 40
   },
   {
-   "contract": "wallet",
-   "operations": 33
+   "contract": "rental",
+   "operations": 39
   },
   {
    "contract": "games",
@@ -210,10 +210,6 @@
    "operations": 19
   },
   {
-   "contract": "retail",
-   "operations": 17
-  },
-  {
    "contract": "shift",
    "operations": 14
   },
@@ -222,11 +218,15 @@
    "operations": 13
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 10
   },
   {
    "contract": "identity",
+   "operations": 10
+  },
+  {
+   "contract": "venue-map",
    "operations": 10
   },
   {
@@ -246,11 +246,11 @@
    "operations": 3
   },
   {
-   "contract": "payments",
+   "contract": "platform-ops",
    "operations": 1
   },
   {
-   "contract": "platform-ops",
+   "contract": "payments",
    "operations": 1
   }
  ],
@@ -6948,7 +6948,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/overdue-rental-management-bo-561",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11215,12 +11215,6 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "adjustGameCard",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Manually adjust credits or points"
-   },
-   {
     "operation": "createGame",
     "contract": "games",
     "verb": "POST",
@@ -11581,22 +11575,10 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "blockGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Block a gift card"
-   },
-   {
     "operation": "cancelMerchandiseReservation",
     "contract": "retail",
     "verb": "POST",
     "summary": "Release a reservation"
-   },
-   {
-    "operation": "closeWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Close a wallet"
    },
    {
     "operation": "collectMerchandiseReservation",
@@ -11633,24 +11615,6 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
-   },
-   {
-    "operation": "redeemGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Spend against a card"
-   },
-   {
-    "operation": "reinstateWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Unfreeze a wallet"
-   },
-   {
-    "operation": "suspendWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Freeze a wallet"
    },
    {
     "operation": "releaseSeatBlock",
@@ -11825,6 +11789,42 @@
     "contract": "venue-map",
     "verb": "POST",
     "summary": "Accept or reject proposed walkways"
+   },
+   {
+    "operation": "adjustGameCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Manually adjust credits or points"
+   },
+   {
+    "operation": "blockGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Block a gift card"
+   },
+   {
+    "operation": "closeWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Close a wallet"
+   },
+   {
+    "operation": "redeemGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Spend against a card"
+   },
+   {
+    "operation": "reinstateWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "suspendWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Freeze a wallet"
    },
    {
     "operation": "createBanner",

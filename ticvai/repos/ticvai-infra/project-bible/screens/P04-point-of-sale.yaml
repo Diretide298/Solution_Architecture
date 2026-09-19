@@ -1325,7 +1325,7 @@ screens:
     invalidates:
     - listProducts
   - operationId: loadGameCredits
-    contract: games
+    contract: wallet
     purpose: Load credits onto a card
     trigger: onAction
     invalidates:

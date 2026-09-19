@@ -148,8 +148,8 @@ operations:
   offline: false
   reads:
   - promotions.voucher
-  - retail.gift_card
-  - retail.wallet
+  - wallet.gift_card
+  - wallet.wallet
   writes:
   - cache:idempotency
   - orders.stored_value_authorisation
@@ -199,7 +199,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.stored_value_authorisation
-  - retail.wallet_transaction
+  - wallet.wallet_transaction
 - operation: checkoutCart
   verb: POST
   path: /carts/{cartId}/checkout

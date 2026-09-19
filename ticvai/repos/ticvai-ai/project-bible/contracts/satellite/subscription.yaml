@@ -70,6 +70,7 @@ paths:
       operationId: submitOnboardingApplication
       x-ticvai-consumed-by:
         - "P09 ADM-380 Customer & Organization Registration"
+        - "P17 SGN-002 Customer & Organization Registration"
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.
@@ -1084,6 +1085,7 @@ paths:
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-392 Subscription Tier Configuration"
         - "P09 ADM-400 Commercial Model & Tier Selection"
+        - "P17 SGN-012 Commercial Model & Tier Selection"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1251,6 +1253,8 @@ paths:
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P13 CMS-001 Tenant Workspace"
+        - "P17 SGN-019 Contract & Billing Cycle Selection"
+        - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       x-ticvai-audience:
       - staff
       summary: Assign or change a subscription
@@ -1308,6 +1312,7 @@ paths:
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P13 CMS-001 Tenant Workspace"
+        - "P17 SGN-022 Order & Commercial Pricing Review"
       x-ticvai-audience:
       - staff
       summary: Preview the effect of a plan change
@@ -4354,6 +4359,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
+        - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
       x-ticvai-audience:
       - partner
       x-ticvai-provisional: true
@@ -5238,11 +5244,21 @@ paths:
         - "P09 ADM-379 Welcome & Start Your TICVAI Journey"
         - "P09 ADM-381 Venue Type & Business Profile"
         - "P09 ADM-382 Visitor, Capacity & Operational Scale"
+        - "P09 ADM-383 Sales Channel Assessment"
         - "P09 ADM-384 Ticketing & Product Requirements"
         - "P09 ADM-385 Access, Queue & Visitor Experience Assessment"
         - "P09 ADM-386 Additional Business Module Assessment"
         - "P09 ADM-387 Integration, Payment & Technical Readiness"
         - "P09 ADM-388 AI Assessment Summary & Handoff"
+        - "P17 SGN-001 Welcome & Start Your TICVAI Journey"
+        - "P17 SGN-003 Venue Type & Business Profile"
+        - "P17 SGN-004 Visitor, Capacity & Operational Scale"
+        - "P17 SGN-005 Sales Channel Assessment"
+        - "P17 SGN-006 Ticketing & Product Requirements"
+        - "P17 SGN-007 Access, Queue & Visitor Experience Assessment"
+        - "P17 SGN-008 Additional Business Module Assessment"
+        - "P17 SGN-009 Integration, Payment & Technical Readiness"
+        - "P17 SGN-010 AI Assessment Summary & Handoff"
       summary: Score a prospect's answers into a tier and a package
       description: 'Board 2, all ten screens of it — venue type, visitor scale, channels, ticketing
         needs, access and queue, additional modules, integrations.
@@ -5345,6 +5361,11 @@ paths:
         - "P09 ADM-403 Module Detail & Commercial Treatment"
         - "P09 ADM-404 Module Dependency & Compatibility Manager"
         - "P09 ADM-423 License & Entitlement Activation"
+        - "P17 SGN-008 Additional Business Module Assessment"
+        - "P17 SGN-013 Module Marketplace"
+        - "P17 SGN-014 AI Module & Package Recommendations"
+        - "P17 SGN-015 Module Detail & Commercial Treatment"
+        - "P17 SGN-016 Module Dependency & Compatibility Manager"
       summary: Modules, their dependencies and their commercial treatment
       description: 'Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells
         combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map;
@@ -5374,6 +5395,7 @@ paths:
       operationId: setModuleListing
       x-ticvai-consumed-by:
         - "P09 ADM-404 Module Dependency & Compatibility Manager"
+        - "P17 SGN-016 Module Dependency & Compatibility Manager"
       summary: Define a module's dependencies, incompatibilities and price
       tags:
       - subscription
@@ -5409,6 +5431,8 @@ paths:
         - "P09 ADM-416 Payment, Contract & Commercial Validation"
         - "P09 ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing"
         - "P09 ADM-466 Commercial Scenario Simulator"
+        - "P17 SGN-011 Recommended Package Overview"
+        - "P17 SGN-012 Commercial Model & Tier Selection"
       summary: What this package would cost, and what it would provision
       description: 'Boards 3.9, 4.8 and 10.8. **Four boards ask for a simulator, which is the pack
         saying the model is too complex to hold in a head.** Tier, allowances, billable unit, minimum
@@ -5447,6 +5471,7 @@ paths:
         - "P09 ADM-374 Trial & Conversion Monitor"
         - "P09 ADM-409 Purchase / Trial Journey Selection"
         - "P09 ADM-413 Trial Configuration & Conversion Rules"
+        - "P17 SGN-018 Purchase / Trial Journey Selection"
       summary: What a trial includes, how long it lasts and how it converts
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of a
         customer''s real data that nobody can bill.** So the configuration states the conversion
@@ -5639,6 +5664,7 @@ paths:
         - "P09 ADM-396 Overage Pricing & Capacity Packs"
         - "P09 ADM-405 Add-Ons, Capacity & Commercial Options"
         - "P09 ADM-455 Overage, Capacity & Temporary Exception Management"
+        - "P17 SGN-017 Add-Ons, Capacity & Commercial Options"
       summary: Buy headroom without changing tier
       description: 'Board 3.8. **A venue having an unexpectedly good season should not have to
         renegotiate a contract to keep selling.** A capacity pack is a bounded, priced increment on one

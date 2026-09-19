@@ -4195,6 +4195,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-258 Sales Channel Command Center"
         - "P09 ADM-383 Sales Channel Assessment"
+        - "P17 SGN-005 Sales Channel Assessment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

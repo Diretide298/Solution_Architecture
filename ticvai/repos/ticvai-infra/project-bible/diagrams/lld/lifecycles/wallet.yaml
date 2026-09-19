@@ -4,12 +4,12 @@ generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/wallet.yaml
 entity: Guest wallet
-contract: retail
+contract: wallet
 enum: Wallet.status
 enumKind: inline
 enumSchema: Wallet
 enumProperty: status
-owner: retail
+owner: wallet
 initial:
 - active
 terminal:

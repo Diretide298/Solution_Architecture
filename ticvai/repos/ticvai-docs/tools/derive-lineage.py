@@ -80,16 +80,22 @@ NEW_CONTRACT_SERVICE = {
     # Rental is venue floor operations — check-out, condition, return — beside `resources`,
     # `maintenance` and `games`, which are all VenueOps.
     "rental": "VenueOpsService",
-    # Wallet configuration is stored value, which is Retail's: `retail` already owns the balance,
-    # the transactions and the gift cards, and splitting the configuration onto another service
-    # would put the rules a different side of a network boundary from the money.
-    "wallet": "RetailService",
+    # **Wallet is its own service as of 19 September.** The first cut sent it to Retail on the
+    # grounds that retail owned the balance — it did, and that was the bug: 13 of retail's 37
+    # operations were the wallet runtime while `wallet.yaml` held only the rules. They are now
+    # together in `wallet.yaml`, and the reason it is not inside Retail either is that eight
+    # domains need a wallet. A Gold Membership issues F&B credit, parking credits and ride
+    # credits into one wallet, so subscription, games and F&B all read it.
+    "wallet": "WalletService",
     # Payment orchestration routes and settles, which is the Order service's existing work —
     # `createPayment` and `capturePayment` are already there.
     "payments": "OrderService",
-    # Accreditation grants places and times and is enforced at gates, so it sits with `access`
-    # rather than with identity: the read that matters happens at a turnstile.
-    "accreditation": "AccessService",
+    # **Not AccessService, though the read does happen at a turnstile.** AccessService is
+    # "read-heavy, extreme latency sensitivity, edge-cached" — 30 operations on the scan path.
+    # Accreditation is a back-office apply/review/approve/issue workflow whose writes would
+    # invalidate those caches and whose deploys would restart the gates. TenancyService already
+    # holds `workforce` and `approvals`; accreditation is an approvals workflow about people.
+    "accreditation": "TenancyService",
 }
 
 
@@ -101,13 +107,34 @@ def service_by_contract(stored: dict) -> dict:
     Every contract in the package already has operations assigned to a service, so the answer is
     the service its neighbours use; a contract with no stored entry at all is in
     `NEW_CONTRACT_SERVICE` above.
+
+    **`handoff/service-decomposition.json` is the authority, and learning is the fallback.**
+    The first version learned the mapping from the entries that already existed, which reads
+    well until a contract moves service: the stored entries say the old service, the learned
+    map agrees with them because they *are* the training data, and the answer is stable and
+    wrong forever. On 19 September `wallet` became its own service and all 48 of its operations
+    went on reporting `RetailService`, because every one of them voted for it.
+
+    So the decomposition — which is where the deployment decision is actually recorded — is read
+    first. Learning still covers any contract it has not heard of, and `NEW_CONTRACT_SERVICE`
+    covers a contract with no neighbours at all.
     """
     import collections
+    out = {}
+    try:
+        dec = json.loads((ROOT / "handoff" / "service-decomposition.json")
+                         .read_text(encoding="utf-8"))
+        for name, s in (dec.get("services") or {}).items():
+            for c in (s.get("contracts") or []):
+                out[c] = name
+    except Exception:
+        pass
     by = collections.defaultdict(collections.Counter)
     for v in stored.values():
         if v.get("service"):
             by[v.get("contract")][v["service"]] += 1
-    out = {c: n.most_common(1)[0][0] for c, n in by.items()}
+    for c, n in by.items():
+        out.setdefault(c, n.most_common(1)[0][0])
     for c, s in NEW_CONTRACT_SERVICE.items():
         out.setdefault(c, s)
     return out
@@ -210,7 +237,17 @@ def main() -> int:
     # So a null `service` or empty `stores` is repairable in place. Nothing else is: a stored value
     # that disagrees with the contract is a judgement somebody made, and `--audit` reports it
     # rather than overwriting it.
-    repaired = 0
+    #
+    # **One more thing is a fact rather than a judgement: which contract defines an operation.**
+    # On 19 September 15 operations moved from `retail.yaml` and `games.yaml` into `wallet.yaml`
+    # — the wallet runtime, which had been living apart from the wallet rules. Their stored
+    # entries still said `retail`, and therefore still said `RetailService`, and no amount of
+    # re-running would have changed either: the key was present, so `--apply` left it. An
+    # operation's owning contract is read straight off the file that declares it, so when the
+    # two disagree the stored one is simply out of date, and the service inferred from it with
+    # it. A hand-narrowed `audience` or a deliberate service override is still left alone.
+    repaired = moved = rehomed = 0
+    svc = service_by_contract(stored)
     if a.apply:
         for o in sorted(set(stored) & set(fresh)):
             if not stored[o].get("service") and fresh[o].get("service"):
@@ -218,13 +255,35 @@ def main() -> int:
                 repaired += 1
             if not stored[o].get("stores") and fresh[o].get("stores"):
                 stored[o]["stores"] = fresh[o]["stores"]
+            # **A service named in the decomposition is a decision, not a guess.** An operation
+            # whose contract has not moved can still change service, because the service it
+            # deploys to is recorded in `service-decomposition.json` and that file is edited by
+            # a person. When the two disagree, the file wins — otherwise the 33 configuration
+            # operations already in `wallet.yaml` would keep reporting `RetailService` while
+            # the 15 that moved into it reported `WalletService`, and one contract would be
+            # split across two services in the diagrams.
+            want = svc.get(fresh[o].get("contract") or stored[o].get("contract"))
+            if want and stored[o].get("service") not in (None, want):
+                stored[o]["service"] = want
+                rehomed += 1
+            if fresh[o].get("contract") and stored[o].get("contract") != fresh[o]["contract"]:
+                print("     moved %-28s %s -> %s" % (o, stored[o].get("contract"),
+                                                     fresh[o]["contract"]))
+                stored[o]["contract"] = fresh[o]["contract"]
+                if fresh[o].get("service"):
+                    stored[o]["service"] = fresh[o]["service"]
+                moved += 1
     if repaired:
         print("  repaired %d entry(s) that had no service" % repaired)
+    if moved:
+        print("  re-attributed %d operation(s) that changed contract" % moved)
+    if rehomed:
+        print("  moved %d operation(s) to the service the decomposition names" % rehomed)
 
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    if not missing and not repaired:
+    if not missing and not repaired and not moved and not rehomed:
         print("  nothing to add")
         return 0
     for o in missing:

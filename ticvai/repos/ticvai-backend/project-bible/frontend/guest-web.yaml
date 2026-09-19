@@ -35,6 +35,7 @@ contracts:
 - retail
 - seating
 - venue-map
+- wallet
 - white-label
 deployment:
   target: browser

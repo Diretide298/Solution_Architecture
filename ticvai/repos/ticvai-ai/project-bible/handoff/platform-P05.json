@@ -42,19 +42,19 @@
    "operations": 7
   },
   {
-   "contract": "retail",
-   "operations": 4
-  },
-  {
    "contract": "catalogue",
    "operations": 4
   },
   {
-   "contract": "white-label",
-   "operations": 2
+   "contract": "retail",
+   "operations": 4
   },
   {
    "contract": "fnb",
+   "operations": 2
+  },
+  {
+   "contract": "white-label",
    "operations": 2
   },
   {
@@ -62,11 +62,11 @@
    "operations": 2
   },
   {
-   "contract": "promotions",
+   "contract": "ai",
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "promotions",
    "operations": 1
   }
  ],

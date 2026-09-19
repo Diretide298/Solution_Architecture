@@ -1,24 +1,10 @@
 id: LLD-games
-title: games — 37 operations
+title: games — 35 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: VenueOpsService
 operations:
-- operation: adjustGameCard
-  verb: POST
-  path: /game-cards/{cardCode}/adjust
-  scope: venue
-  permission: LEDGER_POST
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - games.card
-  writes:
-  - cache:idempotency
-  - games.card
 - operation: authoriseGameplay
   verb: POST
   path: /gameplay-authorisations
@@ -215,20 +201,6 @@ operations:
   reads:
   - games.reader
   writes: []
-- operation: loadGameCredits
-  verb: POST
-  path: /game-cards/{cardCode}/load
-  scope: workstation
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - games.card
-  writes:
-  - cache:idempotency
-  - games.card
 - operation: recordGamePlay
   verb: POST
   path: /game-plays

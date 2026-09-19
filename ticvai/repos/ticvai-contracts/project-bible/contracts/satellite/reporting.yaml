@@ -1070,6 +1070,7 @@ paths:
       operationId: createDashboard
       x-ticvai-consumed-by:
         - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-022 Dashboard Creation Wizard"
         - "P16 ANL-053 AI-Generated Dashboard Studio"
       x-ticvai-audience:
@@ -1130,6 +1131,7 @@ paths:
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-007 Guest & Conversion Intelligence"
         - "P16 ANL-008 Demand Forecasting"
+        - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-030 Dashboard Preview, Validation & Health"
       x-ticvai-audience:

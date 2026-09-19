@@ -3,7 +3,7 @@ title: accreditation — 29 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: AccessService
+service: TenancyService
 operations:
 - operation: createAccreditationApplication
   verb: POST

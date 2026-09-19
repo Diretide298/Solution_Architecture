@@ -290,7 +290,7 @@ operations:
   - ledger.posting
   - ledger.settlement
   - orders.payment
-  - retail.wallet_transaction
+  - wallet.wallet_transaction
   writes: []
 - operation: ingestFxRates
   verb: POST

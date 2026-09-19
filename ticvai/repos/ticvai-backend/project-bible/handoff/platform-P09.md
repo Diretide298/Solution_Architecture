@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 141 |
+| Operations with no screen | 147 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 141 operations with no screen here
+### 147 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| … | | | 101 more |
+| … | | | 107 more |
 
 ### 4 modules split across waves
 
@@ -475,7 +475,7 @@
 | `ADM-380` | Customer & Organization Registration | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-381` | Venue Type & Business Profile | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-382` | Visitor, Capacity & Operational Scale | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-383` | Sales Channel Assessment | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-383` | Sales Channel Assessment | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-384` | Ticketing & Product Requirements | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-385` | Access, Queue & Visitor Experience Assessment | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-386` | Additional Business Module Assessment | Tenants & Licensing | 3 | 2 | yes |

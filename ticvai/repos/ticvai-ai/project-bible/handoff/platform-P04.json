@@ -12,7 +12,7 @@
  "counts": {
   "screens": 30,
   "operations": 139,
-  "contracts": 19,
+  "contracts": 20,
   "modules": 4,
   "undrawn": 0,
   "operationsWithNoScreen": 124
@@ -83,11 +83,11 @@
    "operations": 7
   },
   {
-   "contract": "seating",
+   "contract": "identity",
    "operations": 6
   },
   {
-   "contract": "identity",
+   "contract": "seating",
    "operations": 6
   },
   {
@@ -103,11 +103,11 @@
    "operations": 3
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 3
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 3
   },
   {
@@ -115,11 +115,7 @@
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 2
-  },
-  {
-   "contract": "assets",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -127,7 +123,15 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "assets",
+   "operations": 1
+  },
+  {
+   "contract": "wallet",
    "operations": 1
   }
  ],
@@ -658,12 +662,6 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "adjustGameCard",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Manually adjust credits or points"
-   },
-   {
     "operation": "createGame",
     "contract": "games",
     "verb": "POST",
@@ -1012,22 +1010,10 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "blockGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Block a gift card"
-   },
-   {
     "operation": "cancelMerchandiseReservation",
     "contract": "retail",
     "verb": "POST",
     "summary": "Release a reservation"
-   },
-   {
-    "operation": "closeWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Close a wallet"
    },
    {
     "operation": "collectMerchandiseReservation",
@@ -1064,24 +1050,6 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
-   },
-   {
-    "operation": "redeemGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Spend against a card"
-   },
-   {
-    "operation": "reinstateWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Unfreeze a wallet"
-   },
-   {
-    "operation": "suspendWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Freeze a wallet"
    },
    {
     "operation": "releaseSeatBlock",
@@ -1142,6 +1110,42 @@
     "contract": "tenancy",
     "verb": "POST",
     "summary": "Push an update to a fleet, in waves"
+   },
+   {
+    "operation": "adjustGameCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Manually adjust credits or points"
+   },
+   {
+    "operation": "blockGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Block a gift card"
+   },
+   {
+    "operation": "closeWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Close a wallet"
+   },
+   {
+    "operation": "redeemGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Spend against a card"
+   },
+   {
+    "operation": "reinstateWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "suspendWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Freeze a wallet"
    },
    {
     "operation": "broadcastToGuests",

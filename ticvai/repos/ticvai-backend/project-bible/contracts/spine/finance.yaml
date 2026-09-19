@@ -2246,6 +2246,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
         - "P09 ADM-411 Billing & Legal Entity Information"
+        - "P17 SGN-020 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity

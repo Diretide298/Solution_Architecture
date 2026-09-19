@@ -6,7 +6,7 @@
 |---|---|
 | Screens | 30 |
 | Operations | 139 |
-| Contracts | 19 |
+| Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 124 |

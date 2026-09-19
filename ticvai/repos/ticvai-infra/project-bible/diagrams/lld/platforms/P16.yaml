@@ -633,7 +633,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-001
   - ANL-022

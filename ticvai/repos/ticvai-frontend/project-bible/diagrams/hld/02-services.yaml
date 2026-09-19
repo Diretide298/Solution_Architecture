@@ -16,7 +16,7 @@ tiers:
     Identity and 289 tables anchor on `platform.org_unit`.
   services:
   - service: TenancyService
-    operations: 107
+    operations: 136
     tables: 50
     schemas:
     - platform
@@ -26,6 +26,7 @@ tiers:
     - tenancy
     - workforce
     - approvals
+    - accreditation
     flowCoverage: 62%
     scale: Read-heavy and highly cacheable. Config changes are rare.
     ifDown: Same as identity — nothing runs without a scope.
@@ -69,12 +70,13 @@ tiers:
     contracts:
     - orders
     - shift
+    - payments
     flowCoverage: 55%
     scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
-    operations: 206
+    operations: 177
     tables: 8
     schemas:
     - access
@@ -97,12 +99,27 @@ tiers:
     ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
       one that is briefly wrong is not.'
     ref: diagrams/lld/services/LedgerService.yaml
+  - service: WalletService
+    operations: 48
+    tables: 23
+    schemas:
+    - wallet
+    contracts:
+    - wallet
+    flowCoverage: 0%
+    scale: 'Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy
+      on top-up. **Latency-critical in a way LedgerService is not**, which is why the two are separate:
+      the ledger is append-only and batch-tolerant, a balance check is neither.'
+    ifDown: '**It holds a liability owed to a customer.** A wallet that double-spends is a financial
+      loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once,
+      rather than per caller.'
+    ref: diagrams/lld/services/WalletService.yaml
 - tier: operations
   meaning: What a venue does with what it sold. **Licensed per module** — a venue that bought none of
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 220
+    operations: 218
     tables: 65
     schemas:
     - queue
@@ -118,6 +135,7 @@ tiers:
     - venue-map
     - assets
     - games
+    - rental
     flowCoverage: 47%
     scale: Low and steady. Queue readings are the only frequent write.
     ifDown: Down degrades venue operations. Selling and admitting continue.
@@ -133,17 +151,6 @@ tiers:
     scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
     ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
     ref: diagrams/lld/services/FnbService.yaml
-  - service: RetailService
-    operations: 70
-    tables: 15
-    schemas:
-    - retail
-    contracts:
-    - retail
-    flowCoverage: 43%
-    scale: Follows the sale. Nothing unusual.
-    ifDown: Down means the shop stops; the gates and the restaurant do not.
-    ref: diagrams/lld/services/RetailService.yaml
   - service: InventoryService
     operations: 50
     tables: 19
@@ -155,6 +162,17 @@ tiers:
     scale: Mixed. Counting is bursty; procurement is not.
     ifDown: Down blocks receiving and counting; selling continues from the till's cache.
     ref: diagrams/lld/services/InventoryService.yaml
+  - service: RetailService
+    operations: 24
+    tables: 12
+    schemas:
+    - retail
+    contracts:
+    - retail
+    flowCoverage: 43%
+    scale: Follows the sale. Nothing unusual.
+    ifDown: Down means the shop stops; the gates and the restaurant do not.
+    ref: diagrams/lld/services/RetailService.yaml
 - tier: engagement
   meaning: Guests and intelligence. **Nothing that takes money depends on these**, which is a deliberate
     property and one that should be tested rather than assumed.
@@ -357,6 +375,11 @@ crossServiceWrites:
   writes: 2
   reads: 0
   kind: ordinary
+- from: WalletService
+  to: VenueOpsService
+  writes: 2
+  reads: 2
+  kind: ordinary
 - from: AccessService
   to: TenancyService
   writes: 1
@@ -403,7 +426,7 @@ crossServiceWrites:
   reads: 2
   kind: ordinary
 - from: OrderService
-  to: RetailService
+  to: WalletService
   writes: 1
   reads: 2
   kind: ordinary

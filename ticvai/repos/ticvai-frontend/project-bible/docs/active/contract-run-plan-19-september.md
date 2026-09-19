@@ -127,3 +127,56 @@ decided is **one**:
 
 All seven are wired to the same `setMapZones`, so the binding is right either way. **Six ids retire
 if the collapse is taken**, and nothing rendered is lost — all seven carry zero components.
+
+---
+
+# Carried forward — do these before any frontend work
+
+Added 19 September, after the coverage audit. **Each one changes a number the frontend reads**,
+so doing them afterwards means rebuilding whatever was built on the old figure.
+
+## 1. The reference graph is undercounting by about a fifth
+
+`derive-schema` resolves 955 edges — 596 declared, 359 by convention — and leaves **234 columns
+that are plainly keys with no target**, across **105 of 564 tables that show no outbound
+reference at all**. That cannot be true of a venue-scoped schema where nearly every table carries
+`venue_id`.
+
+The misses are concentrated in exactly the hubs the schema-viewer notes are about:
+
+| column | missed | should resolve to |
+|---|---:|---|
+| `venue_id` | 16 | `platform.org_unit` |
+| `order_id` | 14 | `orders.sales_order` |
+| `organisation_id` | 6 | `platform.org_unit` |
+| `partner_id` | 4 | `platform.org_unit` |
+| `parent_id` | 5 | the table itself |
+| `*_ids` (`venue_ids`, `seat_ids`, `entitlement_ids`, `allowed_venue_ids`, `cell_ids`, …) | 19 | one-to-many — **a model change, not a lookup** |
+| `*_ref` (`image_asset_ref`, `icon_asset_ref`, `credential_ref`, `signature_ref`) | 12 | soft reference by convention |
+
+**The machinery already exists** — 359 edges are resolved by convention today — so the singular
+cases are a lookup table away. The plural ones are not: a column holding many ids is a
+one-to-many edge and the graph has no kind for it.
+
+**True edge count is nearer 1,190 than 955, and hub concentration goes up rather than down**,
+because 30 of the misses are `venue_id` and `order_id`. Every artefact built on the current
+figure — the schema viewer, `relationship-graph.json`, the diagrams — is drawing a sparser graph
+than the data supports.
+
+## 2. Navigation the module structure implies
+
+There will not be a button for every edge, but **module structure determines which edges are
+worth offering as navigation** and that is derivable rather than authored. Do this after (1),
+because it reads the corrected graph.
+
+## 3. The three authored inputs still stale
+
+`contract-backlog.json`, `backlog-clusters.json` and `traceability.json` are ring 4 and need a
+walk, not a rewrite. `tools/check-authored-inputs.py` reports them on every refresh.
+
+## 4. The seven ghost lineage entries
+
+`releaseChannelAllocation`, `releaseCustomDomain`, `releaseInventoryHold`, `releaseSeatBlock`,
+`releaseSeatHold`, `releaseStoredValue`, `releaseWalletAuthorisation` — orphaned by the
+8 September `relinquish*` rename. `derive-lineage --apply` never removes, so they persist:
+1,981 entries against 1,974 real operations. **Deletion is a decision, not a repair.**

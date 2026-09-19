@@ -1918,8 +1918,8 @@
   ],
   "services": [
    "OrderService",
-   "RetailService",
-   "VenueOpsService"
+   "VenueOpsService",
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -1933,16 +1933,16 @@
    "orders.payment_provider",
    "orders.payment_token",
    "pii.subject",
-   "retail.gift_card",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.gift_card",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
    "marketing.consent_record",
    "orders.payment_token",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -2696,7 +2696,6 @@
    "listReservations",
    "getReservation",
    "cancelReservation",
-   "bookResource",
    "getGroupBooking",
    "getResourceAvailability",
    "updateTableReservation"
@@ -2724,8 +2723,7 @@
   "writes": [
    "cache:idempotency",
    "fnb.table_reservation",
-   "orders.reservation",
-   "resources.booking"
+   "orders.reservation"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -4401,14 +4399,14 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -8863,7 +8861,6 @@
   "operations": [
    "createTableReservation",
    "updateTableReservation",
-   "bookResource",
    "getResourceAvailability",
    "joinRestaurantWaitlist",
    "joinWaitlist",
@@ -8894,8 +8891,7 @@
    "cache:idempotency",
    "catalogue.waitlist_entry",
    "fnb.table_reservation",
-   "fnb.waitlist_entry",
-   "resources.booking"
+   "fnb.waitlist_entry"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -8946,7 +8942,7 @@
   "services": [
    "MarketingService",
    "OrderService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -8960,8 +8956,8 @@
    "orders.payment_provider",
    "orders.payment_token",
    "pii.subject",
-   "retail.gift_card",
-   "retail.wallet"
+   "wallet.gift_card",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
@@ -8969,8 +8965,8 @@
    "marketing.loyalty_position",
    "orders.payment_token",
    "orders.stored_value_authorisation",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -9498,7 +9494,8 @@
    "OrderService",
    "RetailService",
    "TenancyService",
-   "VenueOpsService"
+   "VenueOpsService",
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -19787,10 +19784,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/rental-checkout-command-center-emp-071",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listRentalBookings"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -19892,10 +19897,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/voucher-scan-reservation-retrieval-emp-072",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getRentalBooking"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -19934,10 +19947,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/checkout-readiness-validation-emp-073",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getRentalBooking"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -19976,11 +19997,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/equipment-assignment-workspace-emp-074",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "assignRentalEquipment"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.equipment_assignment"
+  ],
+  "writes": [
+   "rental.equipment_assignment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20018,11 +20049,25 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/equipment-scan-validation-emp-075",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "assignRentalEquipment",
+   "lookupAsset"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "maintenance.asset",
+   "maintenance.maintenance_plan",
+   "maintenance.work_order",
+   "rental.equipment_assignment"
+  ],
+  "writes": [
+   "rental.equipment_assignment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20060,11 +20105,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/pre-rental-condition-inspection-emp-076",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "recordRentalInspection"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.inspection"
+  ],
+  "writes": [
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20102,10 +20157,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/safety-handover-checklist-emp-077",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "checkOutRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20144,10 +20207,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/deposit-financial-handover-validation-emp-078",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "checkOutRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20186,11 +20257,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/group-multi-item-checkout-emp-079",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "assignRentalEquipment"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.equipment_assignment"
+  ],
+  "writes": [
+   "rental.equipment_assignment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20228,10 +20309,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/checkout-confirmation-rental-activation-emp-080",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "checkOutRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20270,10 +20359,19 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/active-rental-operations-command-center-emp-081",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listRentalBookings",
+   "listOverdueRentals"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20375,10 +20473,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/active-rental-detail-live-timeline-emp-082",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getRentalBooking"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20417,9 +20523,15 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/rental-extension-request-emp-083",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "getRentalAvailability"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -20459,10 +20571,19 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/extension-pricing-confirmation-emp-084",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "quoteRentalPrice",
+   "extendRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20501,10 +20622,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/equipment-swap-replacement-emp-085",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "swapRentalEquipment"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20543,11 +20672,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/rental-incident-operational-exception-emp-086",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "reportRentalIncident"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.incident"
+  ],
+  "writes": [
+   "rental.incident"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20585,10 +20724,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/due-soon-customer-notification-management-emp-087",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listOverdueRentals"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20627,11 +20774,27 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/overdue-rental-management-emp-088",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "listOverdueRentals",
+   "sendTransactionalMessage"
+  ],
+  "services": [
+   "MarketingService",
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "marketing.message_dispatch",
+   "rental.booking"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20669,10 +20832,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/active-group-rental-management-emp-089",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getRentalBooking"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20711,10 +20882,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/active-rental-intelligence-operational-alerts-emp-090",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listOverdueRentals"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20753,10 +20932,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/rental-return-command-center-emp-091",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listRentalBookings"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20858,10 +21045,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/return-scan-rental-retrieval-emp-092",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "getRentalBooking"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.booking"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20900,10 +21095,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/return-summary-actual-return-time-emp-093",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "returnRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.settlement"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -20942,11 +21145,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/post-rental-condition-inspection-emp-094",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "recordRentalInspection"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.inspection"
+  ],
+  "writes": [
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -20984,11 +21197,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/before-vs-after-condition-comparison-emp-095",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "recordRentalInspection"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.inspection"
+  ],
+  "writes": [
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21026,11 +21249,21 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/damage-assessment-charge-workflow-emp-096",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "assessRentalDamage"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.damage_assessment"
+  ],
+  "writes": [
+   "rental.damage_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21068,10 +21301,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/partial-return-missing-equipment-emp-097",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "returnRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.settlement"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -21110,10 +21351,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/late-fees-damage-fees-final-settlement-emp-098",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "returnRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.settlement"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -21152,10 +21401,18 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/deposit-release-capture-customer-confirmation-emp-099",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "returnRental"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres"
+  ],
+  "reads": [
+   "rental.settlement"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -21194,11 +21451,26 @@
   "operator": "venue",
   "app": "venue-staff-app",
   "route": "/rentals/return-completion-equipment-disposition-emp-100",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "returnRental",
+   "setAssetStatus"
+  ],
+  "services": [
+   "VenueOpsService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "maintenance.asset",
+   "rental.settlement"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "maintenance.asset"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -32125,8 +32397,8 @@
    "promotions.voucher",
    "resources.booking",
    "resources.resource",
-   "retail.gift_card",
-   "retail.wallet"
+   "wallet.gift_card",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
@@ -50834,7 +51106,7 @@
    "setCreditEligibilityRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -51680,14 +51952,14 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -51785,7 +52057,7 @@
    "createCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -51837,14 +52109,14 @@
    "listCreditLots"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet",
-   "wallet.credit_lot"
+   "wallet.credit_lot",
+   "wallet.wallet"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -51887,7 +52159,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -51938,7 +52210,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -51989,7 +52261,7 @@
    "setCreditEligibilityRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -52040,7 +52312,7 @@
    "updateCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -52144,7 +52416,7 @@
    "adjustWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -52152,11 +52424,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -52198,13 +52470,13 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -53639,13 +53911,13 @@
    "getWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -54389,8 +54661,8 @@
    "linkWalletCredential"
   ],
   "services": [
-   "RetailService",
-   "VenueOpsService"
+   "VenueOpsService",
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -54850,13 +55122,13 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -55872,13 +56144,13 @@
    "getWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -55921,7 +56193,7 @@
    "topUpWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -55929,11 +56201,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -59999,18 +60271,26 @@
   "app": "venue-management-web",
   "route": "/rentals/overdue-rental-management-bo-561",
   "operations": [
-   "listOverdueRentals"
+   "listOverdueRentals",
+   "sendTransactionalMessage"
   ],
   "services": [
+   "MarketingService",
    "VenueOpsService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
+   "cache:idempotency",
+   "marketing.message_dispatch",
    "rental.booking"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -63153,7 +63433,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63257,7 +63537,7 @@
    "listAccreditationApplications"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63306,7 +63586,7 @@
    "createAccreditationApplication"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63412,7 +63692,7 @@
    "listAccreditationProgrammes"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63461,7 +63741,7 @@
    "createAccreditationProgramme"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63512,7 +63792,7 @@
    "setAccreditationRequirements"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63563,7 +63843,7 @@
    "setAccreditationRequirements"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63614,7 +63894,7 @@
    "listAccreditationApplications"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63663,7 +63943,7 @@
    "createAccreditationProgramme"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63714,7 +63994,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63817,7 +64097,7 @@
    "getAccreditationHolder"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63866,7 +64146,7 @@
    "updateAccreditationHolder"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63917,7 +64197,7 @@
    "updateAccreditationHolder"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -63968,7 +64248,7 @@
    "submitAccreditationDocument"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64019,7 +64299,7 @@
    "verifyAccreditationDocument"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64068,7 +64348,7 @@
    "listAccreditationIdentityConflicts"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64115,7 +64395,7 @@
    "updateAccreditationHolder"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64166,7 +64446,7 @@
    "getAccreditationHolder"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64215,7 +64495,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64264,7 +64544,7 @@
    "listAccreditationApplications"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64362,7 +64642,7 @@
    "listAccreditationApplications"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64562,7 +64842,7 @@
    "decideAccreditationApplication"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64715,7 +64995,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64866,7 +65146,7 @@
    "listAccreditationCredentials"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64915,7 +65195,7 @@
    "issueAccreditationCredential"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -64966,7 +65246,7 @@
    "setBadgeTemplate"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65018,7 +65298,7 @@
    "setBadgeTemplate"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65070,7 +65350,7 @@
    "listBadgePrintJobs"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65121,7 +65401,7 @@
    "issueAccreditationCredential"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65172,7 +65452,7 @@
    "issueAccreditationCredential"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65319,7 +65599,7 @@
    "listAccessProfiles"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65423,7 +65703,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65474,7 +65754,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65525,7 +65805,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65576,7 +65856,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65627,7 +65907,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65678,7 +65958,7 @@
    "setHolderAccess"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65729,7 +66009,7 @@
    "setHolderAccess"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65780,7 +66060,7 @@
    "setAccreditationStatus"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65829,7 +66109,7 @@
    "previewAccessImpact"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65878,7 +66158,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -65981,7 +66261,7 @@
    "setAccreditationStatus"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66030,7 +66310,7 @@
    "setAccreditationValidity"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66081,7 +66361,7 @@
    "createAccreditationProgramme"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66132,7 +66412,7 @@
    "setAccessProfile"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66183,7 +66463,7 @@
    "setAccreditationValidity"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66234,7 +66514,7 @@
    "setAccreditationStatus"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66283,7 +66563,7 @@
    "setAccreditationStatus"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66332,7 +66612,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66381,7 +66661,7 @@
    "setAccreditationValidity"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66432,7 +66712,7 @@
    "setAccreditationNotificationRules"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66537,7 +66817,7 @@
    "setAccreditationNotificationRules"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66588,7 +66868,7 @@
    "setAccreditationNotificationRules"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66790,7 +67070,7 @@
    "importAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66837,7 +67117,7 @@
    "importAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66884,7 +67164,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66933,7 +67213,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -66982,7 +67262,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67085,7 +67365,7 @@
    "listAccreditationHolders"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67134,7 +67414,7 @@
    "listAccreditationAccessActivity"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67181,7 +67461,7 @@
    "listAccreditationAccessActivity"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67278,7 +67558,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67327,7 +67607,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -67474,7 +67754,7 @@
    "listAccreditationAudit"
   ],
   "services": [
-   "AccessService"
+   "TenancyService"
   ],
   "stores": [
    "postgres"
@@ -68310,8 +68590,8 @@
    "listAccessProfiles"
   ],
   "services": [
-   "AccessService",
-   "CatalogueService"
+   "CatalogueService",
+   "TenancyService"
   ],
   "stores": [
    "postgres",
@@ -69119,7 +69399,7 @@
   ],
   "services": [
    "CatalogueService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -89724,7 +90004,7 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -89827,7 +90107,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -89931,7 +90211,7 @@
    "createWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -89983,7 +90263,7 @@
    "updateWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90035,13 +90315,13 @@
    "updateWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet",
+   "wallet.wallet",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -90087,7 +90367,7 @@
    "updateWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90140,7 +90420,7 @@
    "updateCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90191,7 +90471,7 @@
    "updateWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90242,7 +90522,7 @@
    "updateWalletType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90294,7 +90574,7 @@
    "linkWalletCredential"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90347,7 +90627,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90397,14 +90677,14 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction",
-   "wallet.funding_rules"
+   "wallet.funding_rules",
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -90501,7 +90781,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90552,7 +90832,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90603,7 +90883,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90654,7 +90934,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90705,7 +90985,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90756,7 +91036,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90807,7 +91087,7 @@
    "reverseWalletFunding"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90856,7 +91136,7 @@
    "setWalletFundingRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -90908,13 +91188,13 @@
    "getWalletReconciliation"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -90958,7 +91238,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91062,7 +91342,7 @@
    "updateCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91113,7 +91393,7 @@
    "updateCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91164,7 +91444,7 @@
    "setCreditEligibilityRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91216,7 +91496,7 @@
    "getCreditConsumptionPolicy"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91267,7 +91547,7 @@
    "updateCreditType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91318,7 +91598,7 @@
    "listCreditLots"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91368,7 +91648,7 @@
    "simulateCreditConsumption"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91419,7 +91699,7 @@
    "expireCreditLots"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91467,7 +91747,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91516,7 +91796,7 @@
    "listSharedWallets"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91627,7 +91907,7 @@
    "createSharedWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91678,7 +91958,7 @@
    "setSharedWalletMembers"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91730,7 +92010,7 @@
    "transferWalletBalance"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -91739,14 +92019,14 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "retail.wallet",
-   "wallet.shared_wallet_member"
+   "wallet.shared_wallet_member",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction",
-   "wallet.shared_wallet_member"
+   "wallet.shared_wallet_member",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -91788,7 +92068,7 @@
    "setSharedWalletMembers"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91839,7 +92119,7 @@
    "setSharedWalletMembers"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91891,7 +92171,7 @@
    "listSharedWallets"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91942,7 +92222,7 @@
    "setSharedWalletMembers"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -91993,7 +92273,7 @@
    "transferWalletBalance"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -92002,12 +92282,12 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -92050,7 +92330,7 @@
    "listSharedWallets"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92099,7 +92379,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92200,7 +92480,7 @@
    "setGiftCardProduct"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92252,7 +92532,7 @@
    "activateGiftCard"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -92260,11 +92540,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -92307,7 +92587,7 @@
    "createVoucherType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92358,7 +92638,7 @@
    "createVoucherType"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92409,7 +92689,7 @@
    "listVoucherTypes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92458,7 +92738,7 @@
    "listVoucherTypes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92507,7 +92787,7 @@
    "expireCreditLots"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92554,7 +92834,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92601,7 +92881,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92650,7 +92930,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92755,7 +93035,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92806,7 +93086,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92857,7 +93137,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92908,7 +93188,7 @@
    "linkWalletCredential"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -92959,7 +93239,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93010,7 +93290,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93061,7 +93341,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93114,7 +93394,7 @@
   ],
   "services": [
    "OrderService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93167,13 +93447,13 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -93217,14 +93497,14 @@
    "listWalletTransactions"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
-   "retail.wallet_transaction",
-   "wallet.dispute"
+   "wallet.dispute",
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -93321,7 +93601,7 @@
    "setWalletTransferRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93372,7 +93652,7 @@
    "setWalletTransferRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93425,7 +93705,7 @@
   ],
   "services": [
    "OrderService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -93484,7 +93764,7 @@
   ],
   "services": [
    "OrderService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -93545,7 +93825,7 @@
    "reverseWalletFunding"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93594,7 +93874,7 @@
    "adjustWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -93602,11 +93882,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -93648,7 +93928,7 @@
    "setWalletRestriction"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93729,7 +94009,7 @@
    "raiseWalletDispute"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93780,7 +94060,7 @@
    "listWalletDisputes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93829,7 +94109,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93934,7 +94214,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -93985,7 +94265,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94036,7 +94316,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94088,7 +94368,7 @@
    "listWalletDisputes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94140,7 +94420,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94192,7 +94472,7 @@
    "setWalletRestriction"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94245,7 +94525,7 @@
    "listWalletDisputes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94294,7 +94574,7 @@
    "simulateCreditConsumption"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94341,7 +94621,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94398,7 +94678,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94499,7 +94779,7 @@
    "setWalletAccountingMapping"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94550,7 +94830,7 @@
    "getWalletReconciliation"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94597,7 +94877,7 @@
    "getWalletReconciliation"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94645,7 +94925,7 @@
    "adjustWallet"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -94653,11 +94933,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -94699,7 +94979,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94746,7 +95026,7 @@
    "setWalletAccountingMapping"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94799,7 +95079,7 @@
   ],
   "services": [
    "LedgerService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94848,7 +95128,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94895,7 +95175,7 @@
    "getWalletReconciliation"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -94942,7 +95222,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95053,7 +95333,7 @@
    "listWalletTypes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95102,7 +95382,7 @@
    "setWalletChannelRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95153,7 +95433,7 @@
    "setWalletRiskRules"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95254,7 +95534,7 @@
    "getWalletReconciliation"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95301,7 +95581,7 @@
    "listWalletDisputes"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95358,7 +95638,7 @@
    "publishWalletConfiguration"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -95408,8 +95688,8 @@
    "createApprovalRequest"
   ],
   "services": [
-   "RetailService",
-   "TenancyService"
+   "TenancyService",
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -95467,7 +95747,7 @@
    "getWalletLiability"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -118033,17 +118313,22 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/sales-channel-assessment-adm-383",
   "operations": [
-   "listSaleChannel"
+   "listSaleChannel",
+   "scoreVsiAssessment"
   ],
   "services": [
-   "CatalogueService"
+   "CatalogueService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -128521,7 +128806,7 @@
   ],
   "services": [
    "OrderService",
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -128997,7 +129282,7 @@
    "setWalletRefundPolicy"
   ],
   "services": [
-   "RetailService"
+   "WalletService"
   ],
   "stores": [
    "postgres"
@@ -129850,7 +130135,7 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -129902,7 +130187,7 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -148729,19 +149014,27 @@
   "app": "venue-management-web",
   "route": "/analytics/dashboard-library-anl-021",
   "operations": [
-   "listDashboards"
+   "listDashboards",
+   "getDashboard",
+   "createDashboard"
   ],
   "services": [
    "ReportingService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "reporting.dashboard",
    "reporting.dashboard_tile"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "reporting.dashboard",
+   "reporting.dashboard_tile"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151711,11 +152004,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/welcome-start-your-ticvai-journey-sgn-001",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151751,11 +152054,25 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/customer-organization-registration-sgn-002",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "submitOnboardingApplication"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "control.subscription_plan",
+   "control.venue_type_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.onboarding_application"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151799,11 +152116,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/venue-type-business-profile-sgn-003",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151847,11 +152174,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/visitor-capacity-operational-scale-sgn-004",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151895,11 +152232,23 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/sales-channel-assessment-sgn-005",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "listSaleChannel",
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "CatalogueService",
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151943,11 +152292,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/ticketing-product-requirements-sgn-006",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -151991,11 +152350,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/access-queue-visitor-experience-assessment-sgn-007",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152039,11 +152408,24 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/additional-business-module-assessment-sgn-008",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "listModuleCatalogue",
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.module_listing"
+  ],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152087,11 +152469,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/integration-payment-technical-readiness-sgn-009",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152135,11 +152527,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/onboarding-assessment/ai-assessment-summary-handoff-sgn-010",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "scoreVsiAssessment"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
-  "writes": [],
+  "writes": [
+   "subscription.vsi_assessment"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152183,9 +152585,17 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/recommended-package-overview-sgn-011",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "simulateCommercialPackage"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -152273,10 +152683,21 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/commercial-model-tier-selection-sgn-012",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listPlans",
+   "simulateCommercialPackage"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "control.subscription_plan"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -152314,10 +152735,20 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/module-marketplace-sgn-013",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listModuleCatalogue"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.module_listing"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -152355,10 +152786,20 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/ai-module-package-recommendations-sgn-014",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listModuleCatalogue"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.module_listing"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -152396,10 +152837,20 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/module-detail-commercial-treatment-sgn-015",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
+  "operations": [
+   "listModuleCatalogue"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.module_listing"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -152437,11 +152888,24 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/module-dependency-compatibility-manager-sgn-016",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "setModuleListing",
+   "listModuleCatalogue"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.module_listing"
+  ],
+  "writes": [
+   "subscription.module_listing"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152478,11 +152942,23 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/package-builder/add-ons-capacity-commercial-options-sgn-017",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "addCapacityPack"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.capacity_pack"
+  ],
+  "writes": [
+   "subscription.capacity_pack"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152519,11 +152995,23 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/purchase-trial-journey-selection-sgn-018",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "setTrialConfiguration"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "reads": [
+   "subscription.trial_config"
+  ],
+  "writes": [
+   "subscription.trial_config"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152567,11 +153055,24 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/contract-billing-cycle-selection-sgn-019",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "setSubscription"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "control.subscription"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.subscription"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152615,11 +153116,24 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/billing-legal-entity-information-sgn-020",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "createLegalEntity"
+  ],
+  "services": [
+   "LedgerService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "ledger.legal_entity"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.legal_entity"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152663,11 +153177,25 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/payment-method-settlement-setup-sgn-021",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "setPaymentProvider"
+  ],
+  "services": [
+   "OrderService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "orders.payment_provider"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.payment_provider",
+   "orders.payment_routing"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152711,11 +153239,25 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/order-commercial-pricing-review-sgn-022",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "previewSubscriptionChange"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "control.subscription",
+   "control.subscription_plan",
+   "platform.tenant"
+  ],
+  "writes": [
+   "cache:idempotency"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -152759,9 +153301,17 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/commercial-agreement-billable-definition-customer-accept-sgn-023",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "setAgreementContractTerm"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -152806,11 +153356,24 @@
   "operator": "public",
   "app": "signup-web",
   "route": "/purchase-activation/subscription-confirmation-commercial-activation-sgn-024",
-  "operations": [],
-  "services": [],
-  "stores": [],
-  "reads": [],
-  "writes": [],
+  "operations": [
+   "setSubscription"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "reads": [
+   "cache:idempotency",
+   "control.subscription"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.subscription"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,

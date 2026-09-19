@@ -24,7 +24,7 @@ scale:
   - cache:resolution
   - qdrant:knowledge
   schemas: 32
-  services: 16
+  services: 17
   platforms: 16
   apps: 13
   screens: 2427
@@ -112,6 +112,7 @@ surfaces:
   - OrderService
   - RetailService
   - VenueOpsService
+  - WalletService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P01.yaml
 - platform: P02
@@ -144,6 +145,7 @@ surfaces:
   - OrderService
   - RetailService
   - VenueOpsService
+  - WalletService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P02.yaml
 - platform: P04
@@ -174,6 +176,7 @@ surfaces:
   - RetailService
   - TenancyService
   - VenueOpsService
+  - WalletService
   ref: diagrams/lld/platforms/P04.yaml
 - platform: P05
   name: Guest Kiosk — Self-Service
@@ -289,6 +292,7 @@ surfaces:
   - RetailService
   - TenancyService
   - VenueOpsService
+  - WalletService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P08.yaml
 - platform: P09
@@ -316,9 +320,9 @@ surfaces:
   - OrderService
   - PlatformService
   - ReportingService
-  - RetailService
   - TenancyService
   - VenueOpsService
+  - WalletService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P09.yaml
 - platform: P10
@@ -466,7 +470,7 @@ surfaces:
   - PlatformService
   ref: diagrams/lld/platforms/P17.yaml
 services:
-  count: 16
+  count: 17
   view: diagrams/hld/02-services.yaml
   note: Sixteen deployable services in five tiers. **The data boundary decides where they split** —
     no service spans a schema it does not own.
@@ -479,6 +483,7 @@ services:
     - CatalogueService
     - LedgerService
     - OrderService
+    - WalletService
     operations:
     - FnbService
     - InventoryService
@@ -498,22 +503,20 @@ stores:
   usedBy:
   - service: CatalogueService
     operations: 393
-  - service: VenueOpsService
-    operations: 220
   - service: OrderService
     operations: 218
-  - service: AccessService
-    operations: 206
+  - service: VenueOpsService
+    operations: 218
   - service: MarketingService
     operations: 183
   - service: PlatformService
     operations: 182
+  - service: AccessService
+    operations: 177
   - service: TenancyService
-    operations: 107
+    operations: 136
   - service: FnbService
     operations: 96
-  - service: RetailService
-    operations: 70
   - service: LedgerService
     operations: 56
   - service: IdentityService
@@ -522,10 +525,14 @@ stores:
     operations: 51
   - service: InventoryService
     operations: 50
+  - service: WalletService
+    operations: 48
   - service: ReportingService
     operations: 41
   - service: AiService
     operations: 26
+  - service: RetailService
+    operations: 24
   - service: CrossRegionService
     operations: 17
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
@@ -542,7 +549,7 @@ stores:
   - service: MarketingService
     operations: 151
   - service: VenueOpsService
-    operations: 144
+    operations: 142
   - service: PlatformService
     operations: 135
   - service: TenancyService
@@ -559,11 +566,13 @@ stores:
     operations: 30
   - service: ReportingService
     operations: 28
-  - service: RetailService
-    operations: 26
   - service: AiService
     operations: 21
+  - service: RetailService
+    operations: 16
   - service: CrossRegionService
+    operations: 12
+  - service: WalletService
     operations: 12
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.

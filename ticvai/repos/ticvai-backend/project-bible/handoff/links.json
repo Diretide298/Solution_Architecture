@@ -2017,7 +2017,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.wallet",
+   "frm": "wallet.wallet",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -2026,7 +2026,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.wallet_transaction",
+   "frm": "wallet.wallet_transaction",
    "col": "order_id",
    "to": "orders.sales_order",
    "how": "declared",
@@ -2035,7 +2035,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.wallet_transaction",
+   "frm": "wallet.wallet_transaction",
    "col": "venue_id",
    "to": "platform.org_unit",
    "how": "declared",
@@ -2044,7 +2044,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.wallet_transaction",
+   "frm": "wallet.wallet_transaction",
    "col": "principal_id",
    "to": "identity.principal",
    "how": "declared",
@@ -2053,16 +2053,16 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.wallet_transaction",
+   "frm": "wallet.wallet_transaction",
    "col": "subject_id",
-   "to": "retail.wallet",
+   "to": "wallet.wallet",
    "how": "declared",
    "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "retail.gift_card",
+   "frm": "wallet.gift_card",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -7721,9 +7721,9 @@
    "viaOperation": "recordSettlement"
   },
   {
-   "frm": "retail.gift_card",
+   "frm": "wallet.gift_card",
    "col": "",
-   "to": "retail.wallet_transaction",
+   "to": "wallet.wallet_transaction",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -7823,7 +7823,7 @@
   {
    "frm": "orders.stored_value_authorisation",
    "col": "",
-   "to": "retail.wallet_transaction",
+   "to": "wallet.wallet_transaction",
    "how": "lineage",
    "cross": "yes",
    "required": "",
@@ -8161,9 +8161,9 @@
    "viaOperation": "deprecateApiVersion"
   },
   {
-   "frm": "retail.wallet",
+   "frm": "wallet.wallet",
    "col": "",
-   "to": "retail.wallet_transaction",
+   "to": "wallet.wallet_transaction",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -13286,7 +13286,7 @@
     "PUT"
    ]
   ],
-  "retail.wallet": [
+  "wallet.wallet": [
    [
     "getWallet",
     "GET"
@@ -13320,7 +13320,7 @@
     "POST"
    ]
   ],
-  "retail.wallet_transaction": [
+  "wallet.wallet_transaction": [
    [
     "listWalletTransactions",
     "GET"
@@ -13346,7 +13346,7 @@
     "POST"
    ]
   ],
-  "retail.gift_card": [
+  "wallet.gift_card": [
    [
     "issueGiftCard",
     "POST"
@@ -19044,12 +19044,12 @@
    "WEB-002",
    "WEB-003"
   ],
-  "retail.wallet": [
+  "wallet.wallet": [
    "GST-011",
    "BO-097",
    "WEB-021"
   ],
-  "retail.wallet_transaction": [
+  "wallet.wallet_transaction": [
    "GST-011",
    "WEB-021"
   ],
@@ -19468,7 +19468,7 @@
    "BO-096",
    "BO-097"
   ],
-  "retail.gift_card": [
+  "wallet.gift_card": [
    "BO-097",
    "WEB-021"
   ],

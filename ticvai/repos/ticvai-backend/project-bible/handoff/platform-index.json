@@ -5,8 +5,8 @@
   "operator": "guest",
   "counts": {
    "screens": 46,
-   "operations": 154,
-   "contracts": 16,
+   "operations": 153,
+   "contracts": 17,
    "modules": 13,
    "undrawn": 0,
    "operationsWithNoScreen": 1
@@ -23,8 +23,8 @@
   "operator": "guest",
   "counts": {
    "screens": 71,
-   "operations": 155,
-   "contracts": 16,
+   "operations": 154,
+   "contracts": 17,
    "modules": 16,
    "undrawn": 0,
    "operationsWithNoScreen": 1
@@ -42,7 +42,7 @@
   "counts": {
    "screens": 30,
    "operations": 139,
-   "contracts": 19,
+   "contracts": 20,
    "modules": 4,
    "undrawn": 0,
    "operationsWithNoScreen": 124
@@ -74,11 +74,11 @@
   "operator": "venue",
   "counts": {
    "screens": 96,
-   "operations": 183,
-   "contracts": 17,
+   "operations": 199,
+   "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 107
+   "operationsWithNoScreen": 103
   },
   "waves": {
    "wave1": 25,
@@ -130,7 +130,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 141
+   "operationsWithNoScreen": 147
   },
   "waves": {
    "wave1": 12,
@@ -260,8 +260,8 @@
   "operator": "public",
   "counts": {
    "screens": 24,
-   "operations": 0,
-   "contracts": 0,
+   "operations": 14,
+   "contracts": 4,
    "modules": 3,
    "undrawn": 0,
    "operationsWithNoScreen": 0

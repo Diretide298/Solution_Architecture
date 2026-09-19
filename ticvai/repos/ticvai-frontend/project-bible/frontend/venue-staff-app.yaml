@@ -32,6 +32,7 @@ contracts:
 - marketing-crm
 - orders
 - queue
+- rental
 - reporting
 - retail
 - shift

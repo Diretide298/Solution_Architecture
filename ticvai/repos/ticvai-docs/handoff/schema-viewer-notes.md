@@ -4,17 +4,21 @@
 
 ## The cause is the data, not the viewer
 
-`platform.org_unit` is referenced by **64 tables**. `identity.principal` by **69**.
-`pii.subject` by 25.
+`identity.principal` is referenced by **108 tables**. `platform.org_unit` by **72**.
+`pii.subject` by **55**. (Re-measured 19 September against 564 tables; the previous figures —
+69, 64 and 25 — were taken when the schema was 378 tables. **The order of the three has not
+changed and neither has the shape of the problem.**)
 
 Every table that belongs to a venue carries `venue_id`. Every table that records who did
 something carries a `*_by_principal_id`. Those are correct, and they mean **three tables are
 connected to almost everything**. On a force-directed graph they become gravity wells: the
-layout collapses toward them, and following any edge from a catalogue table has a 40% chance of
+layout collapses toward them, and following any edge from a catalogue table has roughly a one-in-three chance of
 landing in `platform` or `identity`.
 
-**163 of 406 edges point at one of four hub tables.** Hiding them removes the reason every
-schema appears connected to every other.
+**306 of 953 edges point at one of four hub tables** — `identity.principal`,
+`platform.org_unit`, `pii.subject` and `maintenance.asset`. Hiding them removes the reason every
+schema appears connected to every other. The proportion has eased from 40% to 32% as the schema
+grew, which changes nothing: a third of all edges still terminate in four places.
 
 ## The fix: three kinds of edge
 

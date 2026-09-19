@@ -11710,11 +11710,11 @@
   ]
  },
  "getWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "GET",
   "path": "/wallets/{subjectId}",
   "reads": [
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [],
   "routing": "primary",
@@ -11723,7 +11723,7 @@
   "offline": false,
   "summary": "Read a guest wallet",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ],
@@ -11733,16 +11733,16 @@
   ]
  },
  "topUpWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{subjectId}/top-ups",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "workstation",
@@ -11750,7 +11750,7 @@
   "offline": false,
   "summary": "Add value to a wallet",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -11760,11 +11760,11 @@
   ]
  },
  "listWalletTransactions": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "GET",
   "path": "/wallets/{subjectId}/transactions",
   "reads": [
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "routing": "primary",
@@ -11773,7 +11773,7 @@
   "offline": false,
   "summary": "Wallet transaction history",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ],
@@ -11783,16 +11783,16 @@
   ]
  },
  "adjustWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{subjectId}/adjust",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -11800,7 +11800,7 @@
   "offline": false,
   "summary": "Manually adjust a wallet balance",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -11810,16 +11810,16 @@
   ]
  },
  "issueGiftCard": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/gift-cards",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "workstation",
@@ -11827,7 +11827,7 @@
   "offline": false,
   "summary": "Issue or activate a gift card",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -11837,11 +11837,11 @@
   ]
  },
  "getGiftCard": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "GET",
   "path": "/gift-cards/{cardCode}",
   "reads": [
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [],
   "routing": "primary",
@@ -11850,7 +11850,7 @@
   "offline": false,
   "summary": "Check a gift card balance",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ],
@@ -11860,16 +11860,16 @@
   ]
  },
  "blockGiftCard": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/gift-cards/{cardCode}/block",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "venue",
@@ -11877,7 +11877,7 @@
   "offline": false,
   "summary": "Block a gift card",
   "source": "derived",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -16098,7 +16098,7 @@
   ]
  },
  "loadGameCredits": {
-  "contract": "games",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/game-cards/{cardCode}/load",
   "reads": [
@@ -16115,7 +16115,7 @@
   "offline": false,
   "summary": "Load credits onto a card",
   "source": "derived",
-  "service": "VenueOpsService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -16359,7 +16359,7 @@
   ]
  },
  "adjustGameCard": {
-  "contract": "games",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/game-cards/{cardCode}/adjust",
   "reads": [
@@ -16376,7 +16376,7 @@
   "offline": false,
   "summary": "Manually adjust credits or points",
   "source": "derived",
-  "service": "VenueOpsService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -19521,16 +19521,16 @@
   ]
  },
  "activateGiftCard": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/gift-cards/{giftCardId}/activate",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "routing": "",
   "scope": "venue",
@@ -19538,7 +19538,7 @@
   "offline": false,
   "summary": "Activate a card at the point of sale",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -19548,17 +19548,17 @@
   ]
  },
  "redeemGiftCard": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/gift-cards/{giftCardId}/redeem",
   "reads": [
    "cache:idempotency",
-   "retail.gift_card"
+   "wallet.gift_card"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.gift_card",
-   "retail.wallet_transaction"
+   "wallet.gift_card",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -19566,7 +19566,7 @@
   "offline": false,
   "summary": "Spend against a card",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -19576,16 +19576,16 @@
   ]
  },
  "suspendWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{walletId}/suspend",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -19593,7 +19593,7 @@
   "offline": false,
   "summary": "Freeze a wallet",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -19603,16 +19603,16 @@
   ]
  },
  "reinstateWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{walletId}/reinstate",
   "reads": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -19620,7 +19620,7 @@
   "offline": false,
   "summary": "Unfreeze a wallet",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -19630,17 +19630,17 @@
   ]
  },
  "closeWallet": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{walletId}/close",
   "reads": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "routing": "",
   "scope": "venue",
@@ -19648,7 +19648,7 @@
   "offline": false,
   "summary": "Close a wallet",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -20457,8 +20457,8 @@
   "path": "/stored-value/authorisations",
   "reads": [
    "promotions.voucher",
-   "retail.gift_card",
-   "retail.wallet"
+   "wallet.gift_card",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
@@ -20492,7 +20492,7 @@
   "writes": [
    "cache:idempotency",
    "orders.stored_value_authorisation",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -21872,7 +21872,7 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
-   "retail.wallet_transaction"
+   "wallet.wallet_transaction"
   ],
   "writes": [],
   "routing": "analytical",
@@ -24190,18 +24190,18 @@
   ]
  },
  "transferWalletBalance": {
-  "contract": "retail",
+  "contract": "wallet",
   "verb": "POST",
   "path": "/wallets/{walletId}/transfer",
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "retail.wallet"
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
-   "retail.wallet",
-   "retail.wallet_transaction"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "routing": "",
   "scope": "venue",
@@ -24209,7 +24209,7 @@
   "offline": false,
   "summary": "Send balance to another guest",
   "source": "hand-mapped",
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"
@@ -40493,7 +40493,7 @@
    "staff",
    "guest"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -40517,7 +40517,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -40588,7 +40588,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -40612,7 +40612,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -41155,7 +41155,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -41179,7 +41179,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -41203,7 +41203,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -41225,7 +41225,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -41337,7 +41337,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -41510,7 +41510,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -41644,7 +41644,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -42613,7 +42613,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -42633,7 +42633,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -42653,7 +42653,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -42673,7 +42673,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42742,7 +42742,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42789,7 +42789,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -42903,7 +42903,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42923,7 +42923,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42945,7 +42945,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42967,7 +42967,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -42989,7 +42989,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43011,7 +43011,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43031,7 +43031,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43053,7 +43053,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43239,7 +43239,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43261,7 +43261,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -43283,7 +43283,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -43305,7 +43305,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44291,7 +44291,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44381,7 +44381,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44403,7 +44403,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44425,7 +44425,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44447,7 +44447,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -44491,7 +44491,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44536,7 +44536,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -44698,7 +44698,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -44888,7 +44888,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -45049,7 +45049,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45098,7 +45098,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45122,7 +45122,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45144,7 +45144,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45168,7 +45168,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45341,7 +45341,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -45365,7 +45365,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -45389,7 +45389,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -45782,7 +45782,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -45877,7 +45877,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -47025,7 +47025,7 @@
    "staff",
    "guest"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47176,7 +47176,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47200,7 +47200,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47224,7 +47224,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47248,7 +47248,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47272,7 +47272,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47296,7 +47296,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47320,7 +47320,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47436,7 +47436,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -47592,7 +47592,7 @@
    "staff",
    "guest"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -47751,7 +47751,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]
@@ -47775,7 +47775,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -48041,7 +48041,7 @@
   "audience": [
    "staff"
   ],
-  "service": "RetailService",
+  "service": "WalletService",
   "stores": [
    "postgres"
   ]
@@ -48125,7 +48125,7 @@
   "audience": [
    "staff"
   ],
-  "service": "AccessService",
+  "service": "TenancyService",
   "stores": [
    "postgres"
   ]

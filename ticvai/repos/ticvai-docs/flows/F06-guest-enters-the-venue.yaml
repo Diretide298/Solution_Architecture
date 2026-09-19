@@ -68,13 +68,13 @@ steps:
 branches:
 - at: 5
   condition: Entitlement already fully consumed
-  behaviour: SCN-005 shows denied with the reason and the time of the previous scan. **The reason matters
+  behaviour: SCN-003 shows denied with the reason and the time of the previous scan. **The reason matters
     more than the denial** — a steward facing a guest needs to say what happened, not just no.
   severity: recoverable
-  resolvedBy: Steward explains, or escalates to SCN-006
+  resolvedBy: Steward explains, or escalates to a supervisor override on SCN-003
 - at: 5
   condition: Guest is blacklisted
-  behaviour: 'SCN-010. Handled differently from an ordinary denial: no override offered on the device,
+  behaviour: 'SCN-003, handled differently from an ordinary denial: no override offered on the device,
     and a supervisor is summoned.'
   severity: requiresStaff
   resolvedBy: Supervisor
@@ -92,13 +92,13 @@ branches:
   resolvedBy: Steward
 - at: 5
   condition: Steward believes the denial is wrong
-  behaviour: SCN-006 override, which requires a permission a steward may not hold and records who, why
+  behaviour: Supervisor override on SCN-003, which requires a permission a steward may not hold and records who, why
     and against which scan.
   severity: requiresStaff
   resolvedBy: Supervisor
 - at: 4
   condition: No network at shift start
-  behaviour: SCN-012. The bundle from the previous sync is used and its age is shown. **An old bundle
+  behaviour: SCN-003 offline. The bundle from the previous sync is used and its age is shown. **An old bundle
     is better than no gate**, and the steward must be able to see how old.
   severity: recoverable
   resolvedBy: Automatic

@@ -4409,6 +4409,28 @@
    "status": "pending"
   },
   {
+   "id": "WS167",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 3",
+   "platform": "P08",
+   "screens": [
+    "BO-973",
+    "BO-974",
+    "BO-975",
+    "BO-976",
+    "BO-977",
+    "BO-978",
+    "BO-979",
+    "BO-980",
+    "BO-981",
+    "BO-982"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS182",
    "kind": "workshop",
    "label": "Upsell,CrossSellEngine board 3",
@@ -5088,6 +5110,28 @@
    "status": "pending"
   },
   {
+   "id": "WS137",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 3",
+   "platform": "P08",
+   "screens": [
+    "BO-754",
+    "BO-755",
+    "BO-756",
+    "BO-757",
+    "BO-758",
+    "BO-759",
+    "BO-760",
+    "BO-761",
+    "BO-762",
+    "BO-763"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS162",
    "kind": "workshop",
    "label": "Resource Management Configuration board 8",
@@ -5103,6 +5147,50 @@
     "BO-930",
     "BO-931",
     "BO-932"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS165",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-953",
+    "BO-954",
+    "BO-955",
+    "BO-956",
+    "BO-957",
+    "BO-958",
+    "BO-959",
+    "BO-960",
+    "BO-961",
+    "BO-962"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS172",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-1023",
+    "BO-1024",
+    "BO-1025",
+    "BO-1026",
+    "BO-1027",
+    "BO-1028",
+    "BO-1029",
+    "BO-1030",
+    "BO-1031",
+    "BO-1032"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5235,28 +5323,6 @@
     "BO-751",
     "BO-752",
     "BO-753"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS137",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 3",
-   "platform": "P08",
-   "screens": [
-    "BO-754",
-    "BO-755",
-    "BO-756",
-    "BO-757",
-    "BO-758",
-    "BO-759",
-    "BO-760",
-    "BO-761",
-    "BO-762",
-    "BO-763"
    ],
    "drawable": 0,
    "thin": 10,
@@ -5462,28 +5528,6 @@
    "status": "pending"
   },
   {
-   "id": "WS165",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-953",
-    "BO-954",
-    "BO-955",
-    "BO-956",
-    "BO-957",
-    "BO-958",
-    "BO-959",
-    "BO-960",
-    "BO-961",
-    "BO-962"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS166",
    "kind": "workshop",
    "label": "Seat Management Venue Mapping Reference v1.0 board 2",
@@ -5499,28 +5543,6 @@
     "BO-970",
     "BO-971",
     "BO-972"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS167",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 3",
-   "platform": "P08",
-   "screens": [
-    "BO-973",
-    "BO-974",
-    "BO-975",
-    "BO-976",
-    "BO-977",
-    "BO-978",
-    "BO-979",
-    "BO-980",
-    "BO-981",
-    "BO-982"
    ],
    "drawable": 0,
    "thin": 10,
@@ -5609,28 +5631,6 @@
     "BO-1020",
     "BO-1021",
     "BO-1022"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS172",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-1023",
-    "BO-1024",
-    "BO-1025",
-    "BO-1026",
-    "BO-1027",
-    "BO-1028",
-    "BO-1029",
-    "BO-1030",
-    "BO-1031",
-    "BO-1032"
    ],
    "drawable": 0,
    "thin": 10,

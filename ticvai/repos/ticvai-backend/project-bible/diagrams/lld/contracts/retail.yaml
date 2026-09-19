@@ -1,52 +1,10 @@
 id: LLD-retail
-title: retail — 37 operations
+title: retail — 24 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: RetailService
 operations:
-- operation: activateGiftCard
-  verb: POST
-  path: /gift-cards/{giftCardId}/activate
-  scope: venue
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.gift_card
-  writes:
-  - cache:idempotency
-  - retail.gift_card
-- operation: adjustWallet
-  verb: POST
-  path: /wallets/{subjectId}/adjust
-  scope: venue
-  permission: LEDGER_POST
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.wallet
-  writes:
-  - cache:idempotency
-  - retail.wallet
-- operation: blockGiftCard
-  verb: POST
-  path: /gift-cards/{cardCode}/block
-  scope: venue
-  permission: PRICE_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.gift_card
-  writes:
-  - cache:idempotency
-  - retail.gift_card
 - operation: cancelMerchandiseReservation
   verb: POST
   path: /merchandise-reservations/{reservationId}/cancel
@@ -61,21 +19,6 @@ operations:
   writes:
   - cache:idempotency
   - inventory.movement
-- operation: closeWallet
-  verb: POST
-  path: /wallets/{walletId}/close
-  scope: venue
-  permission: ORDER_MODIFY
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.wallet
-  - retail.wallet_transaction
-  writes:
-  - cache:idempotency
-  - retail.wallet
 - operation: collectMerchandiseReservation
   verb: POST
   path: /merchandise-reservations/{reservationId}/collect
@@ -188,18 +131,6 @@ operations:
   writes:
   - cache:idempotency
   - retail.shop_and_drop
-- operation: getGiftCard
-  verb: GET
-  path: /gift-cards/{cardCode}
-  scope: venue
-  permission: ORDER_VIEW
-  audience:
-  - staff
-  - guest
-  offline: false
-  reads:
-  - retail.gift_card
-  writes: []
 - operation: getOutletStock
   verb: GET
   path: /outlets/{outletId}/stock-check
@@ -235,32 +166,6 @@ operations:
   - retail.return_policy
   writes:
   - cache:resolution
-- operation: getWallet
-  verb: GET
-  path: /wallets/{subjectId}
-  scope: venue
-  permission: ORDER_VIEW
-  audience:
-  - staff
-  - guest
-  offline: false
-  reads:
-  - retail.wallet
-  writes: []
-- operation: issueGiftCard
-  verb: POST
-  path: /gift-cards
-  scope: workstation
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.gift_card
-  writes:
-  - cache:idempotency
-  - retail.gift_card
 - operation: listMerchandise
   verb: GET
   path: /merchandise
@@ -306,18 +211,6 @@ operations:
   reads:
   - retail.store_rule
   writes: []
-- operation: listWalletTransactions
-  verb: GET
-  path: /wallets/{subjectId}/transactions
-  scope: venue
-  permission: ORDER_VIEW
-  audience:
-  - staff
-  - guest
-  offline: false
-  reads:
-  - retail.wallet_transaction
-  writes: []
 - operation: lookupMerchandise
   verb: GET
   path: /merchandise/lookup
@@ -353,35 +246,6 @@ operations:
   reads:
   - retail.shop_and_drop
   writes: []
-- operation: redeemGiftCard
-  verb: POST
-  path: /gift-cards/{giftCardId}/redeem
-  scope: venue
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.gift_card
-  writes:
-  - cache:idempotency
-  - retail.gift_card
-  - retail.wallet_transaction
-- operation: reinstateWallet
-  verb: POST
-  path: /wallets/{walletId}/reinstate
-  scope: venue
-  permission: ORDER_MODIFY
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.wallet
-  writes:
-  - cache:idempotency
-  - retail.wallet
 - operation: reprintReceipt
   verb: POST
   path: /retail-sales/{saleId}/reprint
@@ -438,51 +302,6 @@ operations:
   - retail.store_rule
   writes:
   - retail.store_rule
-- operation: suspendWallet
-  verb: POST
-  path: /wallets/{walletId}/suspend
-  scope: venue
-  permission: ORDER_MODIFY
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.wallet
-  writes:
-  - cache:idempotency
-  - retail.wallet
-- operation: topUpWallet
-  verb: POST
-  path: /wallets/{subjectId}/top-ups
-  scope: workstation
-  permission: ORDER_CREATE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - retail.wallet
-  writes:
-  - cache:idempotency
-  - retail.wallet
-- operation: transferWalletBalance
-  verb: POST
-  path: /wallets/{walletId}/transfer
-  scope: venue
-  permission: WALLET_MANAGE
-  audience:
-  - staff
-  - guest
-  offline: false
-  reads:
-  - cache:idempotency
-  - pii.subject
-  - retail.wallet
-  writes:
-  - cache:idempotency
-  - retail.wallet
-  - retail.wallet_transaction
 - operation: updateMerchandise
   verb: PATCH
   path: /merchandise/{merchandiseId}

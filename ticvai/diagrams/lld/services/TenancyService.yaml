@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 107 operations, 50 tables
+title: TenancyService — 136 operations, 50 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 107
+  operations: 136
   inAFlow: 32
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -712,6 +712,241 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+- contract: accreditation
+  count: 29
+  operations:
+  - operation: createAccreditationApplication
+    verb: POST
+    path: /accreditation-applications
+    scope: venue
+    permission: ACCREDITATION_APPLY
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createAccreditationProgramme
+    verb: POST
+    path: /accreditation-programmes
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createBadgePrintJob
+    verb: POST
+    path: /badge-print-jobs
+    scope: venue
+    permission: ACCREDITATION_ISSUE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: decideAccreditationApplication
+    verb: POST
+    path: /accreditation-applications/{applicationId}/decide
+    scope: venue
+    permission: ACCREDITATION_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAccreditationHolder
+    verb: GET
+    path: /accreditation-holders/{holderId}
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: importAccreditationHolders
+    verb: POST
+    path: /accreditation-imports
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: issueAccreditationCredential
+    verb: POST
+    path: /accreditation-credentials
+    scope: venue
+    permission: ACCREDITATION_ISSUE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: listAccessProfiles
+    verb: GET
+    path: /accreditation-access-profiles
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccreditationAccessActivity
+    verb: GET
+    path: /accreditation-access-activity
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccreditationApplications
+    verb: GET
+    path: /accreditation-applications
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccreditationAudit
+    verb: GET
+    path: /accreditation-audit
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccreditationCredentials
+    verb: GET
+    path: /accreditation-credentials
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccreditationHolders
+    verb: GET
+    path: /accreditation-holders
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccreditationIdentityConflicts
+    verb: GET
+    path: /accreditation-identity-conflicts
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccreditationProgrammes
+    verb: GET
+    path: /accreditation-programmes
+    scope: venue
+    permission: ACCREDITATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listBadgePrintJobs
+    verb: GET
+    path: /badge-print-jobs
+    scope: venue
+    permission: ACCREDITATION_ISSUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listBadgeTemplates
+    verb: GET
+    path: /badge-templates
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: previewAccessImpact
+    verb: POST
+    path: /accreditation-access-profiles/preview
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 1
+  - operation: replaceAccreditationCredential
+    verb: POST
+    path: /accreditation-credentials/{credentialId}/replace
+    scope: venue
+    permission: ACCREDITATION_ISSUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setAccessProfile
+    verb: PUT
+    path: /accreditation-access-profiles
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setAccreditationNotificationRules
+    verb: PUT
+    path: /accreditation-notifications
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setAccreditationRequirements
+    verb: PUT
+    path: /accreditation-requirements
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setAccreditationStatus
+    verb: POST
+    path: /accreditation-holders/{holderId}/status
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setAccreditationValidity
+    verb: PUT
+    path: /accreditation-validity
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setBadgeTemplate
+    verb: PUT
+    path: /badge-templates
+    scope: venue
+    permission: ACCREDITATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setHolderAccess
+    verb: PUT
+    path: /accreditation-holders/{holderId}/access
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: submitAccreditationDocument
+    verb: POST
+    path: /accreditation-documents
+    scope: venue
+    permission: ACCREDITATION_APPLY
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateAccreditationHolder
+    verb: PUT
+    path: /accreditation-holders/{holderId}
+    scope: venue
+    permission: ACCREDITATION_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: verifyAccreditationDocument
+    verb: POST
+    path: /accreditation-documents/{documentId}/verify
+    scope: venue
+    permission: ACCREDITATION_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
 - contract: workforce
   count: 24
   operations:
@@ -1430,9 +1665,74 @@ screens:
 - P08:BO-466 Reader & Device Health Monitor
 - P08:BO-600 Venue, Calendar & Operational Setup
 - P08:BO-602 POS, Payment & Access Setup
+- P08:BO-615 Accreditation Command Center
+- P08:BO-616 Accreditation Application Directory
+- P08:BO-617 New Accreditation Application
+- P08:BO-619 Accreditation Category Management
+- P08:BO-620 Accreditation Program Setup
+- P08:BO-621 Applicant Type Configuration
+- P08:BO-622 Application Requirements Matrix
+- P08:BO-623 Accreditation Intake Monitor
+- P08:BO-624 Registration Rules & Publication
+- P08:BO-625 Accreditation Holder Directory
+- P08:BO-626 Accreditation Holder Profile
+- P08:BO-627 Identity Details & Verification
+- P08:BO-628 Photo Management
+- P08:BO-629 Document Repository
+- P08:BO-630 Document Verification Queue
+- P08:BO-631 Duplicate & Identity Conflict Detection
+- P08:BO-632 Organization & Affiliation Management
+- P08:BO-633 Profile Completeness & Compliance Monitor
+- P08:BO-634 Profile History & Audit Timeline
+- P08:BO-635 Accreditation Review Queue
+- P08:BO-636 Application Review Workspace
 - P08:BO-638 Approval Rules & Conditions
 - P08:BO-639 Reviewer Assignment & Delegation
+- P08:BO-640 Rejection & Resubmission Management
 - P08:BO-641 Escalation & Exception Management
+- P08:BO-643 Approval Policy Validation & Publication
+- P08:BO-645 Credential Generation Workspace
+- P08:BO-646 Credential Media Configuration
+- P08:BO-647 Badge Template Designer
+- P08:BO-648 Badge Printing & Print Queue
+- P08:BO-649 Digital & Mobile Credential Management
+- P08:BO-650 NFC & RFID Credential Encoding
+- P08:BO-651 Credential Activation & Delivery
+- P08:BO-654 Accreditation Access Command Center
+- P08:BO-655 Access Profile Management
+- P08:BO-656 Venue & Zone Access Matrix
+- P08:BO-657 Operational Area Permission Management
+- P08:BO-658 Date & Time Access Rules
+- P08:BO-659 Access Schedule Management
+- P08:BO-660 Holder Access Assignment
+- P08:BO-661 Temporary Access & Exception Management
+- P08:BO-662 Access Revocation & Suspension
+- P08:BO-663 Access Rights Preview, Impact & Synchronization
+- P08:BO-664 Accreditation Lifecycle Command Center
+- P08:BO-665 Accreditation Status Workflow
+- P08:BO-666 Validity Period Configuration
+- P08:BO-667 Event & Venue Accreditation Assignment
+- P08:BO-668 Multi-Venue Accreditation Management
+- P08:BO-669 Temporary & Seasonal Accreditation
+- P08:BO-670 Suspension & Reactivation Management
+- P08:BO-671 Accreditation Revocation Management
+- P08:BO-672 Expiry Monitor & Expiration Rules
+- P08:BO-673 Accreditation Renewal Workspace
+- P08:BO-674 Accreditation Communications Command Center
+- P08:BO-675 Notification Rule Management
+- P08:BO-676 Expiry & Renewal Notification Scheduler
+- P08:BO-680 Accreditation Bulk Import
+- P08:BO-681 Import Validation & Processing Monitor
+- P08:BO-682 Accreditation Export & Data Extract Center
+- P08:BO-683 Delivery, Batch & Operational History
+- P08:BO-684 Accreditation Executive Dashboard
+- P08:BO-685 Accreditation Status & Portfolio Reporting
+- P08:BO-686 Accreditation Utilization Analytics
+- P08:BO-687 Accreditation Access Activity Reporting
+- P08:BO-689 Accreditation Audit Reporting
+- P08:BO-690 Immutable Accreditation Audit Log
+- P08:BO-693 Integration & Data Exchange Monitor
+- P08:BO-708 Accreditation & Participant Category Configuration
 - P08:BO-712 Staff & Role Assignment Configuration
 - P08:BO-714 Event Shift & Roster Configuration
 - P08:BO-718 Event Change Request Configuration

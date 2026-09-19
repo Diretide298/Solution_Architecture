@@ -54,7 +54,7 @@ servicesCalled:
   operationCalls: 4
 - service: CrossRegionService
   operationCalls: 3
-- service: RetailService
+- service: WalletService
   operationCalls: 2
 - service: VenueOpsService
   operationCalls: 1

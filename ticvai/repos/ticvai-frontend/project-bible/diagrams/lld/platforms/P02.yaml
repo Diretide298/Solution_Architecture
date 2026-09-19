@@ -56,10 +56,12 @@ servicesCalled:
   operationCalls: 17
 - service: AiService
   operationCalls: 10
-- service: RetailService
-  operationCalls: 8
 - service: WhiteLabelService
   operationCalls: 7
+- service: WalletService
+  operationCalls: 4
+- service: RetailService
+  operationCalls: 4
 - service: LedgerService
   operationCalls: 1
 coverage:

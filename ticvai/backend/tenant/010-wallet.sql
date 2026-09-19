@@ -1,4 +1,4 @@
--- wallet — 20 tables
+-- wallet — 23 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -161,6 +161,22 @@ CREATE TABLE IF NOT EXISTS wallet.funding_rules (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS wallet.gift_card (
+    card_code                         text NOT NULL,
+    kind                              text,
+    face_value                        numeric(18,4) NOT NULL,
+    balance                           numeric(18,4) NOT NULL,
+    status                            text NOT NULL,
+    blocked_reason                    text,
+    issued_at                         timestamptz NOT NULL,
+    activated_at                      timestamptz,
+    expires_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid NOT NULL
+);
+
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
@@ -272,6 +288,35 @@ CREATE TABLE IF NOT EXISTS wallet.voucher_type (
     scope_path                        text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS wallet.wallet (
+    id                                uuid PRIMARY KEY,
+    subject_id                        uuid NOT NULL,
+    balance                           numeric(18,4) NOT NULL,
+    bonus_balance                     numeric(18,4),
+    currency                          text NOT NULL,
+    status                            text NOT NULL,
+    home_cell_name                    text,
+    expires_at                        timestamptz,
+    last_activity_at                  timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS wallet.wallet_transaction (
+    id                                text PRIMARY KEY NOT NULL,
+    kind                              text NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    balance_after                     numeric(18,4) NOT NULL,
+    order_id                          text,
+    venue_id                          uuid,
+    reason                            text,
+    principal_id                      uuid,
+    recorded_at                       timestamptz NOT NULL,
+    subject_id                        uuid NOT NULL
+);
+
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.wallet_type (
@@ -279,6 +324,16 @@ CREATE TABLE IF NOT EXISTS wallet.wallet_type (
     code                              text NOT NULL,
     name                              text NOT NULL,
     owner_kind                        text,
+    stored_value_capability           boolean,
+    top_up_capability                 boolean,
+    transfer_capability               boolean,
+    refund_capability                 boolean,
+    gift_card_support                 boolean,
+    voucher_support                   boolean,
+    membership_credit_support         boolean,
+    wearable_support                  boolean,
+    usage_channels                    text[],
+    preset_name                       text,
     holder_may_differ_from_owner      boolean,
     requires_identification           boolean,
     maximum_balance                   numeric(18,4),

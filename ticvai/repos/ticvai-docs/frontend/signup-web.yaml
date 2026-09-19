@@ -19,7 +19,11 @@ packages:
 - design-tokens
 - ui
 - api-client
-contracts: []
+contracts:
+- catalogue
+- finance
+- orders
+- subscription
 deployment:
   target: browser
   distribution: public, served from the Control Plane

@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 141
+  "operationsWithNoScreen": 147
  },
  "waves": {
   "wave1": 12,
@@ -170,11 +170,11 @@
    "operations": 12
   },
   {
-   "contract": "finance",
+   "contract": "tenancy",
    "operations": 7
   },
   {
-   "contract": "tenancy",
+   "contract": "finance",
    "operations": 7
   },
   {
@@ -3642,7 +3642,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/sales-channel-assessment-adm-383",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7019,6 +7019,42 @@
     "contract": "tenancy",
     "verb": "POST",
     "summary": "Push an update to a fleet, in waves"
+   },
+   {
+    "operation": "adjustGameCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Manually adjust credits or points"
+   },
+   {
+    "operation": "blockGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Block a gift card"
+   },
+   {
+    "operation": "closeWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Close a wallet"
+   },
+   {
+    "operation": "redeemGiftCard",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Spend against a card"
+   },
+   {
+    "operation": "reinstateWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "suspendWallet",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Freeze a wallet"
    },
    {
     "operation": "createBanner",

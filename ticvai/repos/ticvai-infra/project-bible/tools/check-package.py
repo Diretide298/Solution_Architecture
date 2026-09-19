@@ -599,7 +599,10 @@ def main() -> int:
     CURRENCY_OK = {
         "orders.payment", "inventory.supplier", "ledger.account", "ledger.legal_entity",
         "control.partner_agreement", "platform.region_settings", "platform.denomination",
-        "retail.wallet",
+        # **A stored-value balance is denominated and the denomination is part of the balance.**
+        # Renamed from `retail.wallet` on 19 September when the wallet runtime left `retail.yaml`
+        # for `wallet.yaml`; the allowlist entry moved with the table, and the reason is unchanged.
+        "wallet.wallet",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

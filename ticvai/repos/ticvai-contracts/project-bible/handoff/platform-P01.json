@@ -11,8 +11,8 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 46,
-  "operations": 154,
-  "contracts": 16,
+  "operations": 153,
+  "contracts": 17,
   "modules": 13,
   "undrawn": 0,
   "operationsWithNoScreen": 1
@@ -148,10 +148,6 @@
    "operations": 10
   },
   {
-   "contract": "retail",
-   "operations": 8
-  },
-  {
    "contract": "promotions",
    "operations": 6
   },
@@ -160,7 +156,15 @@
    "operations": 5
   },
   {
+   "contract": "retail",
+   "operations": 4
+  },
+  {
    "contract": "white-label",
+   "operations": 4
+  },
+  {
+   "contract": "wallet",
    "operations": 4
   },
   {
@@ -172,19 +176,19 @@
    "operations": 3
   },
   {
-   "contract": "resources",
-   "operations": 2
-  },
-  {
    "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 1
   },
   {
    "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -465,7 +469,7 @@
    "module": "Ticketing",
    "wave": 2,
    "route": "/my-reservations",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {

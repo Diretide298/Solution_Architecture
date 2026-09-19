@@ -13,7 +13,7 @@
  },
  "severity": {
   "high": 26,
-  "medium": 111,
+  "medium": 116,
   "low": 197,
   "info": 4
  },
@@ -357,9 +357,44 @@
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P01-membership-loyalty-value-01",
+   "detail": "1 of 5 screens differ from the YAML (WEB-021)",
+   "fix": "python3 tools/export-design-batch.py P01-membership-loyalty-value-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-ticketing-01",
+   "detail": "1 of 3 screens differ from the YAML (WEB-031)",
+   "fix": "python3 tools/export-design-batch.py P01-ticketing-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-account-self-service-02",
+   "detail": "1 of 4 screens differ from the YAML (GST-071)",
+   "fix": "python3 tools/export-design-batch.py P02-account-self-service-02"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-cart-checkout-01",
    "detail": "1 of 3 screens differ from the YAML (GST-041)",
    "fix": "python3 tools/export-design-batch.py P02-cart-checkout-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-in-venue-services-01",
+   "detail": "1 of 10 screens differ from the YAML (GST-070)",
+   "fix": "python3 tools/export-design-batch.py P02-in-venue-services-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-membership-loyalty-value-01",
+   "detail": "1 of 3 screens differ from the YAML (GST-011)",
+   "fix": "python3 tools/export-design-batch.py P02-membership-loyalty-value-01"
   },
   {
    "severity": "medium",
@@ -806,7 +841,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "the web calls bookResource, getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls bookResource on GST-070; getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070",
+   "detail": "the web calls getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {

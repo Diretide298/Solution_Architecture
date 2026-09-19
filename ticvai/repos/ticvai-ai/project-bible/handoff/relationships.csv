@@ -810,7 +810,7 @@ orders.shift,principal_id,identity.principal,reference,declared,yes,yes
 orders.shift,venue_id,platform.org_unit,reference,declared,yes,yes
 orders.shift,via acceptShiftVariance,platform.outbox,ambient,lineage,yes,
 orders.shift,workstation_id,platform.workstation,reference,declared,yes,yes
-orders.stored_value_authorisation,via captureStoredValue,retail.wallet_transaction,ambient,lineage,yes,
+orders.stored_value_authorisation,via captureStoredValue,wallet.wallet_transaction,ambient,lineage,yes,
 orders.stored_value_authorisation,via checkInResource,resources.booking,ambient,lineage,yes,
 orders.stored_value_authorisation,via checkInResource,resources.resource,ambient,lineage,yes,
 orders.stored_value_authorisation,via checkOutResource,resources.booking,ambient,lineage,yes,
@@ -1005,8 +1005,6 @@ resources.session_participant,subject_id,pii.subject,reference,declared,yes,yes
 retail.exchange,new_sale_id,retail.sale,reference,declared,,yes
 retail.exchange,return_id,retail.return,reference,declared,,yes
 retail.exchange,sale_id,retail.sale,reference,declared,,yes
-retail.gift_card,subject_id,pii.subject,reference,declared,yes,yes
-retail.gift_card,via redeemGiftCard,retail.wallet_transaction,ambient,lineage,,
 retail.merchandise,category_id,rental.category,reference,convention,yes,yes
 retail.merchandise,inventory_item_id,inventory.item,reference,declared,yes,yes
 retail.merchandise,outlet_id,platform.outlet,reference,declared,yes,yes
@@ -1039,12 +1037,6 @@ retail.shop_and_drop_line,drop_id,retail.shop_and_drop,child,declared,,yes
 retail.shop_and_drop_line,merchandise_id,retail.merchandise,reference,declared,,yes
 retail.shop_and_drop_line,shop_and_drop_id,retail.shop_and_drop,child,declared,,yes
 retail.store_rule,outlet_id,platform.outlet,reference,convention,yes,yes
-retail.wallet,subject_id,pii.subject,reference,declared,yes,yes
-retail.wallet,via transferWalletBalance,retail.wallet_transaction,ambient,lineage,,
-retail.wallet_transaction,order_id,orders.sales_order,reference,declared,yes,yes
-retail.wallet_transaction,principal_id,identity.principal,reference,declared,yes,yes
-retail.wallet_transaction,subject_id,retail.wallet,child,declared,,yes
-retail.wallet_transaction,venue_id,platform.org_unit,reference,declared,yes,yes
 seating.accessible,seat_map_id,seating.seat_map,reference,convention,,yes
 seating.group_request,performance_id,catalogue.performance,reference,convention,yes,yes
 seating.hold_pool,hold_type_id,seating.hold_type,reference,convention,,yes
@@ -1105,21 +1097,29 @@ venuemap.point,access_point_id,access.access_point,reference,declared,yes,yes
 venuemap.point,map_id,venuemap.map,reference,declared,,yes
 venuemap.point,outlet_id,platform.outlet,reference,declared,yes,yes
 venuemap.point,product_id,catalogue.product,reference,declared,yes,yes
-wallet.adjustment,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.adjustment,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.credential,replaced_by_credential_id,accreditation.credential,reference,convention,yes,yes
-wallet.credential,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.credential,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.credit_eligibility,credit_type_id,wallet.credit_type,reference,convention,,yes
 wallet.credit_lot,credit_type_id,wallet.credit_type,reference,convention,,yes
-wallet.credit_lot,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.credit_lot,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.dispute,adjustment_id,wallet.adjustment,reference,convention,,yes
-wallet.dispute,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.dispute,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.funding_rules,wallet_type_id,wallet.wallet_type,reference,convention,,yes
+wallet.gift_card,subject_id,pii.subject,reference,declared,yes,yes
+wallet.gift_card,via redeemGiftCard,wallet.wallet_transaction,ambient,lineage,,
 wallet.gift_card_product,credit_type_id,wallet.credit_type,reference,convention,,yes
 wallet.refund_policy,wallet_refund_credit_type_id,wallet.credit_type,reference,convention,,yes
-wallet.restriction,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.restriction,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.shared_wallet,owner_principal_id,identity.principal,reference,convention,yes,yes
-wallet.shared_wallet,wallet_id,retail.wallet,reference,convention,yes,yes
+wallet.shared_wallet,wallet_id,wallet.wallet,reference,convention,,yes
 wallet.shared_wallet_member,subject_id,pii.subject,reference,convention,yes,yes
+wallet.wallet,subject_id,pii.subject,reference,declared,yes,yes
+wallet.wallet,via transferWalletBalance,wallet.wallet_transaction,ambient,lineage,,
+wallet.wallet_transaction,order_id,orders.sales_order,reference,declared,yes,yes
+wallet.wallet_transaction,principal_id,identity.principal,reference,declared,yes,yes
+wallet.wallet_transaction,subject_id,wallet.wallet,child,declared,,yes
+wallet.wallet_transaction,venue_id,platform.org_unit,reference,declared,yes,yes
 whitelabel.banner,tenant_config_id,whitelabel.tenant_config,reference,declared,,yes
 whitelabel.config_version,published_by_principal_id,identity.principal,reference,declared,yes,yes
 whitelabel.custom_domain,tenant_id,platform.tenant,reference,convention,yes,yes

@@ -3042,6 +3042,9 @@ screens:
     - Business Domain
     - Owner
     - Sites/Venues
+    params:
+    - name: dashboardId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-021

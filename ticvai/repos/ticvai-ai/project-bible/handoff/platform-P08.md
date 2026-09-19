@@ -840,7 +840,7 @@
 | `BO-558` | Equipment Swap / Replacement | Rentals | 3 | 1 | yes |
 | `BO-559` | Rental Incident & Operational Exception | Rentals | 3 | 1 | yes |
 | `BO-560` | Due Soon & Customer Notification Management | Rentals | 3 | 1 | yes |
-| `BO-561` | Overdue Rental Management | Rentals | 3 | 1 | yes |
+| `BO-561` | Overdue Rental Management | Rentals | 3 | 2 | yes |
 | `BO-562` | Active Group Rental Management | Rentals | 3 | 1 | yes |
 | `BO-563` | Active Rental Intelligence & Operational Alerts | Rentals | 3 | 1 | yes |
 | `BO-564` | Rental Return Command Center | Rentals | 3 | 1 | yes |

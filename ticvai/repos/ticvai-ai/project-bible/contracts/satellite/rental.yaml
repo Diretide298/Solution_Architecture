@@ -658,6 +658,7 @@ paths:
     get:
       operationId: getRentalAvailability
       x-ticvai-consumed-by:
+        - "P06 EMP-083 Rental Extension Request"
         - "P08 BO-514 Availability Command Center"
         - "P08 BO-518 Real-Time Availability Calendar"
         - "P08 BO-521 Overlap & Conflict Engine"
@@ -912,6 +913,7 @@ paths:
     post:
       operationId: quoteRentalPrice
       x-ticvai-consumed-by:
+        - "P06 EMP-084 Extension Pricing & Confirmation"
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-540 Booking Commercial Summary & Payment"
         - "P08 BO-557 Extension Pricing & Confirmation"
@@ -1138,6 +1140,9 @@ paths:
     get:
       operationId: listRentalBookings
       x-ticvai-consumed-by:
+        - "P06 EMP-071 Rental Checkout Command Center"
+        - "P06 EMP-081 Active Rental Operations Command Center"
+        - "P06 EMP-091 Rental Return Command Center"
         - "P08 BO-534 Rental Booking Command Center"
         - "P08 BO-544 Rental Checkout Command Center"
         - "P08 BO-554 Active Rental Operations Command Center"
@@ -1241,6 +1246,11 @@ paths:
     get:
       operationId: getRentalBooking
       x-ticvai-consumed-by:
+        - "P06 EMP-072 Voucher Scan & Reservation Retrieval"
+        - "P06 EMP-073 Checkout Readiness Validation"
+        - "P06 EMP-082 Active Rental Detail & Live Timeline"
+        - "P06 EMP-089 Active Group Rental Management"
+        - "P06 EMP-092 Return Scan & Rental Retrieval"
         - "P08 BO-541 Reservation Confirmation & QR Voucher"
         - "P08 BO-543 Reservation Detail, Timeline & Readiness"
         - "P08 BO-545 Voucher Scan & Reservation Retrieval"
@@ -1376,6 +1386,9 @@ paths:
     post:
       operationId: checkOutRental
       x-ticvai-consumed-by:
+        - "P06 EMP-077 Safety & Handover Checklist"
+        - "P06 EMP-078 Deposit & Financial Handover Validation"
+        - "P06 EMP-080 Checkout Confirmation & Rental Activation"
         - "P08 BO-550 Safety & Handover Checklist"
         - "P08 BO-551 Deposit & Financial Handover Validation"
         - "P08 BO-553 Checkout Confirmation & Rental Activation"
@@ -1434,6 +1447,9 @@ paths:
     post:
       operationId: assignRentalEquipment
       x-ticvai-consumed-by:
+        - "P06 EMP-074 Equipment Assignment Workspace"
+        - "P06 EMP-075 Equipment Scan & Validation"
+        - "P06 EMP-079 Group & Multi-Item Checkout"
         - "P08 BO-547 Equipment Assignment Workspace"
         - "P08 BO-548 Equipment Scan & Validation"
         - "P08 BO-552 Group & Multi-Item Checkout"
@@ -1495,6 +1511,7 @@ paths:
     post:
       operationId: extendRental
       x-ticvai-consumed-by:
+        - "P06 EMP-084 Extension Pricing & Confirmation"
         - "P08 BO-557 Extension Pricing & Confirmation"
         - "P08 BO-908 Rental Duration, Extension & Return Management"
       summary: Keep it longer, if it is free and the guest accepts the price
@@ -1558,6 +1575,7 @@ paths:
     post:
       operationId: swapRentalEquipment
       x-ticvai-consumed-by:
+        - "P06 EMP-085 Equipment Swap / Replacement"
         - "P08 BO-558 Equipment Swap / Replacement"
       summary: Replace a faulty item mid-rental
       description: 'Board 7.5. **The rental continues; only the asset changes.** The deposit, the
@@ -1613,6 +1631,11 @@ paths:
     post:
       operationId: returnRental
       x-ticvai-consumed-by:
+        - "P06 EMP-093 Return Summary & Actual Return Time"
+        - "P06 EMP-097 Partial Return & Missing Equipment"
+        - "P06 EMP-098 Late Fees, Damage Fees & Final Settlement"
+        - "P06 EMP-099 Deposit Release, Capture & Customer Confirmation"
+        - "P06 EMP-100 Return Completion & Equipment Disposition"
         - "P08 BO-566 Return Summary & Actual Return Time"
         - "P08 BO-570 Partial Return & Missing Equipment"
         - "P08 BO-571 Late Fees, Damage Fees & Final Settlement"
@@ -1667,6 +1690,9 @@ paths:
     post:
       operationId: recordRentalInspection
       x-ticvai-consumed-by:
+        - "P06 EMP-076 Pre-Rental Condition Inspection"
+        - "P06 EMP-094 Post-Rental Condition Inspection"
+        - "P06 EMP-095 Before vs After Condition Comparison"
         - "P08 BO-549 Pre-Rental Condition Inspection"
         - "P08 BO-567 Post-Rental Condition Inspection"
         - "P08 BO-568 Before vs After Condition Comparison"
@@ -1710,6 +1736,7 @@ paths:
     post:
       operationId: assessRentalDamage
       x-ticvai-consumed-by:
+        - "P06 EMP-096 Damage Assessment & Charge Workflow"
         - "P08 BO-569 Damage Assessment & Charge Workflow"
       summary: Price the damage, and say who approved it
       description: 'Board 8.6. **A damage charge is a commercial decision taken under pressure at a
@@ -1745,6 +1772,10 @@ paths:
     get:
       operationId: listOverdueRentals
       x-ticvai-consumed-by:
+        - "P06 EMP-081 Active Rental Operations Command Center"
+        - "P06 EMP-087 Due Soon & Customer Notification Management"
+        - "P06 EMP-088 Overdue Rental Management"
+        - "P06 EMP-090 Active Rental Intelligence & Operational Alerts"
         - "P08 BO-554 Active Rental Operations Command Center"
         - "P08 BO-560 Due Soon & Customer Notification Management"
         - "P08 BO-561 Overdue Rental Management"
@@ -1787,6 +1818,7 @@ paths:
     post:
       operationId: reportRentalIncident
       x-ticvai-consumed-by:
+        - "P06 EMP-086 Rental Incident & Operational Exception"
         - "P08 BO-559 Rental Incident & Operational Exception"
       summary: Something happened during a rental
       description: 'Board 7.6. Injury, loss, theft, a complaint, an equipment failure. **Distinct from

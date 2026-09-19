@@ -221,6 +221,19 @@ contracts:
   offlineCapable: 4
   events: null
   ref: diagrams/lld/contracts/resources.yaml
+- contract: wallet
+  tier: satellite
+  operations: 48
+  holds: null
+  service: WalletService
+  verbs:
+    POST: 23
+    GET: 13
+    PUT: 12
+  guestCallable: 5
+  offlineCapable: 1
+  events: null
+  ref: diagrams/lld/contracts/wallet.yaml
 - contract: approvals
   tier: spine
   operations: 45
@@ -282,35 +295,6 @@ contracts:
   offlineCapable: 7
   events: null
   ref: diagrams/lld/contracts/tenancy.yaml
-- contract: games
-  tier: satellite
-  operations: 37
-  holds: null
-  service: VenueOpsService
-  verbs:
-    POST: 15
-    GET: 11
-    PUT: 10
-    PATCH: 1
-  guestCallable: 2
-  offlineCapable: 5
-  events: null
-  ref: diagrams/lld/contracts/games.yaml
-- contract: retail
-  tier: satellite
-  operations: 37
-  holds: null
-  service: RetailService
-  verbs:
-    POST: 21
-    GET: 13
-    PUT: 2
-    PATCH: 1
-  guestCallable: 8
-  offlineCapable: 2
-  events:
-  - retail-merchandisePublished
-  ref: diagrams/lld/contracts/retail.yaml
 - contract: maintenance
   tier: satellite
   operations: 36
@@ -328,6 +312,20 @@ contracts:
   - maintenance-templatePublished
   - maintenance-workOrderCompleted
   ref: diagrams/lld/contracts/maintenance.yaml
+- contract: games
+  tier: satellite
+  operations: 35
+  holds: null
+  service: VenueOpsService
+  verbs:
+    POST: 13
+    GET: 11
+    PUT: 10
+    PATCH: 1
+  guestCallable: 2
+  offlineCapable: 5
+  events: null
+  ref: diagrams/lld/contracts/games.yaml
 - contract: platform-ops
   tier: satellite
   operations: 33
@@ -341,19 +339,6 @@ contracts:
   offlineCapable: 0
   events: null
   ref: diagrams/lld/contracts/platform-ops.yaml
-- contract: wallet
-  tier: satellite
-  operations: 33
-  holds: null
-  service: RetailService
-  verbs:
-    PUT: 12
-    POST: 11
-    GET: 10
-  guestCallable: 1
-  offlineCapable: 1
-  events: null
-  ref: diagrams/lld/contracts/wallet.yaml
 - contract: ai
   tier: satellite
   operations: 31
@@ -386,7 +371,7 @@ contracts:
   tier: satellite
   operations: 29
   holds: null
-  service: AccessService
+  service: TenancyService
   verbs:
     POST: 11
     GET: 11
@@ -411,6 +396,21 @@ contracts:
   events:
   - assets-documentIndexed
   ref: diagrams/lld/contracts/assets.yaml
+- contract: retail
+  tier: satellite
+  operations: 24
+  holds: null
+  service: RetailService
+  verbs:
+    POST: 11
+    GET: 10
+    PUT: 2
+    PATCH: 1
+  guestCallable: 4
+  offlineCapable: 2
+  events:
+  - retail-merchandisePublished
+  ref: diagrams/lld/contracts/retail.yaml
 - contract: workforce
   tier: satellite
   operations: 24

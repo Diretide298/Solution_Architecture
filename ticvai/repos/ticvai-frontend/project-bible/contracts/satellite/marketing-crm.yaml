@@ -3918,6 +3918,8 @@ paths:
     post:
       operationId: sendTransactionalMessage
       x-ticvai-consumed-by:
+        - "P06 EMP-088 Overdue Rental Management"
+        - "P08 BO-561 Overdue Rental Management"
         - "P08 BO-679 Manual & Bulk Communication Center"
         - "P10 PTR-004 Notifications"
       x-ticvai-audience:

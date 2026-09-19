@@ -315,6 +315,13 @@ The splice now refuses on a collision and **verifies each new `operationId` is p
 `paths`** — presence in the document, not the file looking plausible. Same principle as the intake
 trap: verify by path.
 
+> **The blast radius of a contract edit is its own runbook:**
+> [`docs/contract-change-runbook.md`](contract-change-runbook.md). It carries the four rings a
+> change travels through and, in ring 4, **the nine authored files that look derived, are read by
+> the pipeline and the viewer, and that no tool in `tools/` rebuilds** — chief among them
+> `handoff/service-decomposition.json`, still describing 28 contracts and 378 tables when there
+> are now 32 and 556.
+
 ## 10–12 — Refresh, design, checks
 
 ```

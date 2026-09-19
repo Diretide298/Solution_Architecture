@@ -591,21 +591,21 @@ CREATE INDEX IF NOT EXISTS ix_path_from_point_id ON venuemap.path (from_point_id
 CREATE INDEX IF NOT EXISTS ix_path_restricted_by_point_id ON venuemap.path (restricted_by_point_id);
 -- convention, not declared: venuemap.path.to_point_id -> venuemap.point
 CREATE INDEX IF NOT EXISTS ix_path_to_point_id ON venuemap.path (to_point_id);
--- convention, not declared: wallet.adjustment.wallet_id -> retail.wallet
+-- convention, not declared: wallet.adjustment.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_adjustment_wallet_id ON wallet.adjustment (wallet_id);
 -- convention, not declared: wallet.credential.replaced_by_credential_id -> accreditation.credential
 CREATE INDEX IF NOT EXISTS ix_credential_replaced_by_credential_id ON wallet.credential (replaced_by_credential_id);
--- convention, not declared: wallet.credential.wallet_id -> retail.wallet
+-- convention, not declared: wallet.credential.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_credential_wallet_id ON wallet.credential (wallet_id);
 -- convention, not declared: wallet.credit_eligibility.credit_type_id -> wallet.credit_type
 CREATE INDEX IF NOT EXISTS ix_credit_eligibility_credit_type_id ON wallet.credit_eligibility (credit_type_id);
 -- convention, not declared: wallet.credit_lot.credit_type_id -> wallet.credit_type
 CREATE INDEX IF NOT EXISTS ix_credit_lot_credit_type_id ON wallet.credit_lot (credit_type_id);
--- convention, not declared: wallet.credit_lot.wallet_id -> retail.wallet
+-- convention, not declared: wallet.credit_lot.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_credit_lot_wallet_id ON wallet.credit_lot (wallet_id);
 -- convention, not declared: wallet.dispute.adjustment_id -> wallet.adjustment
 CREATE INDEX IF NOT EXISTS ix_dispute_adjustment_id ON wallet.dispute (adjustment_id);
--- convention, not declared: wallet.dispute.wallet_id -> retail.wallet
+-- convention, not declared: wallet.dispute.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_dispute_wallet_id ON wallet.dispute (wallet_id);
 -- convention, not declared: wallet.funding_rules.wallet_type_id -> wallet.wallet_type
 CREATE INDEX IF NOT EXISTS ix_funding_rules_wallet_type_id ON wallet.funding_rules (wallet_type_id);
@@ -613,11 +613,11 @@ CREATE INDEX IF NOT EXISTS ix_funding_rules_wallet_type_id ON wallet.funding_rul
 CREATE INDEX IF NOT EXISTS ix_gift_card_product_credit_type_id ON wallet.gift_card_product (credit_type_id);
 -- convention, not declared: wallet.refund_policy.wallet_refund_credit_type_id -> wallet.credit_type
 CREATE INDEX IF NOT EXISTS ix_refund_policy_wallet_refund_credit_type_id ON wallet.refund_policy (wallet_refund_credit_type_id);
--- convention, not declared: wallet.restriction.wallet_id -> retail.wallet
+-- convention, not declared: wallet.restriction.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_restriction_wallet_id ON wallet.restriction (wallet_id);
 -- convention, not declared: wallet.shared_wallet.owner_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_shared_wallet_owner_principal_id ON wallet.shared_wallet (owner_principal_id);
--- convention, not declared: wallet.shared_wallet.wallet_id -> retail.wallet
+-- convention, not declared: wallet.shared_wallet.wallet_id -> wallet.wallet
 CREATE INDEX IF NOT EXISTS ix_shared_wallet_wallet_id ON wallet.shared_wallet (wallet_id);
 -- convention, not declared: wallet.shared_wallet_member.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_shared_wallet_member_subject_id ON wallet.shared_wallet_member (subject_id);

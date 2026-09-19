@@ -91,7 +91,7 @@
 | `ANL-018` | Alerts & Exception Center | Analytics | 3 | 1 | yes |
 | `ANL-019` | AI Management Insights | Analytics | 3 | 2 | yes |
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 1 | yes |
-| `ANL-021` | Dashboard Library | Analytics | 3 | 1 | yes |
+| `ANL-021` | Dashboard Library | Analytics | 3 | 3 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
 | `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 2 | yes |
 | `ANL-024` | Widget & Visualization Library | Analytics | 3 | 1 | yes |

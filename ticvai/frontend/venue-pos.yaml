@@ -39,6 +39,7 @@ contracts:
 - seating
 - shift
 - tenancy
+- wallet
 - workforce
 deployment:
   target: POS terminal — Windows or Android

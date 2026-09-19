@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 183,
-  "contracts": 17,
+  "operations": 199,
+  "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 107
+  "operationsWithNoScreen": 103
  },
  "waves": {
   "wave1": 25,
@@ -61,7 +61,7 @@
   },
   {
    "contract": "maintenance",
-   "operations": 25
+   "operations": 27
   },
   {
    "contract": "orders",
@@ -80,12 +80,20 @@
    "operations": 13
   },
   {
+   "contract": "rental",
+   "operations": 13
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 11
+  },
+  {
    "contract": "workforce",
    "operations": 11
   },
   {
-   "contract": "marketing-crm",
-   "operations": 10
+   "contract": "queue",
+   "operations": 7
   },
   {
    "contract": "identity",
@@ -96,19 +104,15 @@
    "operations": 7
   },
   {
-   "contract": "queue",
-   "operations": 7
-  },
-  {
    "contract": "ai",
    "operations": 4
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -116,7 +120,7 @@
    "operations": 2
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 2
   },
   {
@@ -725,7 +729,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-checkout-command-center-emp-071",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -734,7 +738,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/voucher-scan-reservation-retrieval-emp-072",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -743,7 +747,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/checkout-readiness-validation-emp-073",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -752,7 +756,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-assignment-workspace-emp-074",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -761,7 +765,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-scan-validation-emp-075",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -770,7 +774,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/pre-rental-condition-inspection-emp-076",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -779,7 +783,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/safety-handover-checklist-emp-077",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -788,7 +792,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-financial-handover-validation-emp-078",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -797,7 +801,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/group-multi-item-checkout-emp-079",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -806,7 +810,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/checkout-confirmation-rental-activation-emp-080",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -815,7 +819,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-operations-command-center-emp-081",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -824,7 +828,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-detail-live-timeline-emp-082",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -833,7 +837,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-extension-request-emp-083",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -842,7 +846,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/extension-pricing-confirmation-emp-084",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -851,7 +855,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/equipment-swap-replacement-emp-085",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -860,7 +864,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-incident-operational-exception-emp-086",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -869,7 +873,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/due-soon-customer-notification-management-emp-087",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -878,7 +882,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/overdue-rental-management-emp-088",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -887,7 +891,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-group-rental-management-emp-089",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -896,7 +900,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/active-rental-intelligence-operational-alerts-emp-090",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -905,7 +909,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/rental-return-command-center-emp-091",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -914,7 +918,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-scan-rental-retrieval-emp-092",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -923,7 +927,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-summary-actual-return-time-emp-093",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -932,7 +936,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/post-rental-condition-inspection-emp-094",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -941,7 +945,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/before-vs-after-condition-comparison-emp-095",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -950,7 +954,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/damage-assessment-charge-workflow-emp-096",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -959,7 +963,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/partial-return-missing-equipment-emp-097",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -968,7 +972,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/late-fees-damage-fees-final-settlement-emp-098",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -977,7 +981,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/deposit-release-capture-customer-confirmation-emp-099",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -986,7 +990,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/return-completion-equipment-disposition-emp-100",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   }
  ],
@@ -1479,6 +1483,12 @@
     "summary": "Admit a party at the ride"
    },
    {
+    "operation": "importRentalCatalogue",
+    "contract": "rental",
+    "verb": "POST",
+    "summary": "Load a client's rental items and inventory at onboarding"
+   },
+   {
     "operation": "cancelReportExecution",
     "contract": "reporting",
     "verb": "DELETE",
@@ -1503,22 +1513,10 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "blockGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Block a gift card"
-   },
-   {
     "operation": "cancelMerchandiseReservation",
     "contract": "retail",
     "verb": "POST",
     "summary": "Release a reservation"
-   },
-   {
-    "operation": "closeWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Close a wallet"
    },
    {
     "operation": "collectMerchandiseReservation",
@@ -1555,24 +1553,6 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
-   },
-   {
-    "operation": "redeemGiftCard",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Spend against a card"
-   },
-   {
-    "operation": "reinstateWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Unfreeze a wallet"
-   },
-   {
-    "operation": "suspendWallet",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Freeze a wallet"
    },
    {
     "operation": "issueDeviceCredential",
