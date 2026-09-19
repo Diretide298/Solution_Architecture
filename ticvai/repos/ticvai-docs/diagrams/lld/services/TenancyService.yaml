@@ -1452,13 +1452,6 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
-- table: platform.org_unit
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy:
-  - tenancy
-  foreignWriters: null
 - table: platform.outbox
   columns: 11
   store: postgres
@@ -1537,6 +1530,13 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: platform.scope
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: platform.tenant
   columns: 2

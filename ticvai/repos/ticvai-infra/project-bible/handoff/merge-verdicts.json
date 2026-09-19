@@ -1,0 +1,894 @@
+{
+ "access.access_change": [
+  "ADDITIVE",
+  "audits access replacement during an upgrade"
+ ],
+ "access.accreditation": [
+  "KEEP OURS",
+  "our accreditation.holder"
+ ],
+ "access.accreditation_access": [
+  "KEEP OURS",
+  "our accreditation.holder_access"
+ ],
+ "access.accreditation_credential": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "access.accreditation_document": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "access.accreditation_status_history": [
+  "KEEP OURS",
+  "our accreditation.audit"
+ ],
+ "access.accreditation_type": [
+  "KEEP OURS",
+  "our accreditation.programme"
+ ],
+ "access.entry_rule": [
+  "EITHER",
+  "was declined on 37 points. On the rubric it is a coin toss held hostage by our own undecided singular/plural convention: theirs is singular and pairs with the entry_rule_point we accepted, ours carries the domain word. Settle the convention, then this answers itself"
+ ],
+ "access.entry_rule_point": [
+  "ADDITIVE",
+  "join between admission_rules and access_point; we imply it and never store it"
+ ],
+ "access.parking_pass": [
+  "DECLINE",
+  "our access.parking_entitlement, beside access.entitlement"
+ ],
+ "access.scan": [
+  "TAKE BODY",
+  "ours is access.scan_event and scan alone is the act, not the record; take the widening \u2014 one scanner validating ticket, accreditation, membership and parking"
+ ],
+ "access.ticket_access": [
+  "DECLINE",
+  "our access.entitlement. Their own purpose says \"ticket, pass, membership access right, or other entitlement\" \u2014 ticket_access is narrower than the rows it holds"
+ ],
+ "ai.action_request": [
+  "DECLINE",
+  "our ai.proposed_action; proposed carries that it is AI-originated, which is the fact that matters about the row"
+ ],
+ "ai.activity": [
+  "TAKE THEIRS",
+  "reversed. 57 change points is an effort argument, not a quality one, and on readability their purpose line settles it: \"any AI request, including non-chat calls\". An interaction reads as a conversation and most of these rows are not one"
+ ],
+ "ai.indexing_job": [
+  "EITHER",
+  "indexing_job reads better than our index_job and costs 6 points; concede if they care"
+ ],
+ "ai.knowledge_group": [
+  "TAKE EITHER",
+  "their \"searchable knowledge base\" is our knowledge_collection; a vocabulary choice"
+ ],
+ "ai.knowledge_item": [
+  "DECLINE",
+  "their purpose says \"document metadata\" \u2014 our ai.knowledge_document"
+ ],
+ "ai.suggestion_result": [
+  "DECLINE",
+  "our ai.suggestion_outcome; their own purpose uses \"result\" for the value inside the row"
+ ],
+ "ai.usage_policy": [
+  "DECLINE",
+  "ours is richer, 26 columns against their 17"
+ ],
+ "approvals.approval_decision": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_delegation": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_escalation": [
+  "TAKE BODY",
+  "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "approvals.approval_matrix": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_request": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "approvals.approval_rule": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "catalogue.membership_benefit": [
+  "ADDITIVE",
+  "Decision 9: taken. Benefits are columns on entitlement_template today, so a new benefit is a schema change. Its 15 operations and 34 screens read 34 columns to get three"
+ ],
+ "catalogue.membership_plan": [
+  "TAKE BODY",
+  "our catalogue.entitlement_template is the plan \u2014 validity kind, entries, transferability, eligibility, stored value. It has no renewal rules; take those"
+ ],
+ "catalogue.membership_program": [
+  "ADDITIVE",
+  "Decision 9: taken, the level above the plan. membership_plan stays as our entitlement_template plus their renewal rules"
+ ],
+ "catalogue.plan_benefit": [
+  "ADDITIVE",
+  "maps benefits to a plan with usage limits"
+ ],
+ "catalogue.product_media": [
+  "DECLINE",
+  "our assets.media_usage. Media is one schema for us \u2014 an image is uploaded once and used by a product, a venue map or a campaign; a per-domain media table duplicates the asset"
+ ],
+ "catalogue.product_recommendation": [
+  "NO MATCH",
+  "matched catalogue.variant on noise; upsell lives in promotions for us"
+ ],
+ "catalogue.product_variant": [
+  "DECLINE",
+  "pairs with variant_dimension; 11 inbound FKs"
+ ],
+ "catalogue.rental_product_config": [
+  "DECLINE",
+  "our rental.inventory_model. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
+ ],
+ "catalogue.rental_rate": [
+  "DECLINE",
+  "our rental.pricing_profile. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
+ ],
+ "catalogue.rental_requirement": [
+  "DECLINE",
+  "our rental.agreement_rules. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
+ ],
+ "catalogue.rental_rule": [
+  "DECLINE",
+  "our rental.operational_rules. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
+ ],
+ "catalogue.upgrade_rule": [
+  "NO MATCH",
+  "matched catalogue.variant on noise; we serve upgrades by operation, not a rule table"
+ ],
+ "control.api_application": [
+  "DECLINE",
+  "our control.api_client"
+ ],
+ "control.api_limit": [
+  "TAKE THEIRS",
+  "\"rate limits and usage limits\"; our api_quota covers only the second. 3 change points"
+ ],
+ "control.channel": [
+  "NO MATCH",
+  "matched cell_instance on noise; a sales-channel table needs its own check"
+ ],
+ "control.channel_item": [
+  "NO MATCH",
+  "matched cell_instance on noise; channel-to-item mapping"
+ ],
+ "control.webhook": [
+  "DECLINE",
+  "our control.webhook_subscription; an endpoint that selects events is a subscription"
+ ],
+ "control.webhook_log": [
+  "DECLINE",
+  "our control.webhook_delivery"
+ ],
+ "fnb.dining_table": [
+  "TAKE THEIRS",
+  "dining_ disambiguates; fnb.table alone is vague next to reservation_table"
+ ],
+ "fnb.food_safety_action": [
+  "DECLINE",
+  "their purpose includes \"operational failures\", which are not food safety; our fnb.corrective_action is the wider name"
+ ],
+ "fnb.ingredient_substitute": [
+  "ADDITIVE",
+  "approved substitutions for a recipe"
+ ],
+ "fnb.kitchen_order": [
+  "DECLINE",
+  "our fnb.kitchen_ticket \u2014 their own purpose calls it a ticket"
+ ],
+ "fnb.kitchen_order_item": [
+  "DECLINE",
+  "our fnb.kitchen_ticket_line"
+ ],
+ "fnb.menu_item_modifier": [
+  "ADDITIVE",
+  "join between menu_item and modifier group"
+ ],
+ "fnb.order": [
+  "TAKE THEIRS",
+  "ours is fnb.fnb_order, which repeats its schema \u2014 the exact fault we are asking them to fix in approvals.approval_matrix. 45 change points and we cannot argue the principle while holding this"
+ ],
+ "fnb.order_item": [
+  "MERGE",
+  "their prefix removal and our word: fnb.order_line. Ours is fnb.fnb_order_line, theirs is order_item, and a line is what an order has. 0 change points \u2014 nothing references it yet"
+ ],
+ "fnb.price": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.price_list": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.product": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.product_category": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "fnb.product_recommendation": [
+  "ADDITIVE",
+  "F&B upsell; ours lives in promotions and not per product"
+ ],
+ "fnb.recipe_item": [
+  "DECLINE",
+  "their purpose says \"ingredients and quantities\" \u2014 our fnb.recipe_ingredient"
+ ],
+ "fnb.reservation_table": [
+  "ADDITIVE",
+  "maps tables to a reservation; a join table we do not have"
+ ],
+ "fnb.sold_out_item": [
+  "TAKE THEIRS",
+  "ours is fnb.eighty_six_event. \"86\" is US restaurant jargon and this platform ships in the Gulf. 2 change points"
+ ],
+ "fnb.temperature_check": [
+  "DECLINE",
+  "our fnb.temperature_log, beside fnb.cold_chain_event"
+ ],
+ "fnb.variant": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "identity.benefit_usage": [
+  "ADDITIVE",
+  "use of a membership benefit against its allowance"
+ ],
+ "identity.customer": [
+  "DECLINE",
+  "ours is marketing.guest_profile plus pii.subject. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
+ ],
+ "identity.customer_address": [
+  "DECLINE",
+  "ours is pii.subject_contact. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
+ ],
+ "identity.customer_contact": [
+  "DECLINE",
+  "our pii.subject_contact"
+ ],
+ "identity.customer_extra_field": [
+  "ADDITIVE",
+  "admin-defined fields on the guest form. marketing.form_definition could hold the shape, but a form_submission blob cannot answer \"every guest whose jersey size is L\". Belongs beside guest_profile, not in identity"
+ ],
+ "identity.customer_extra_option": [
+  "ADDITIVE",
+  "customer extra-field choices; we have no extensible profile fields"
+ ],
+ "identity.customer_extra_value": [
+  "ADDITIVE",
+  "the value side of the pair; same placement"
+ ],
+ "identity.customer_membership": [
+  "ADDITIVE",
+  "the membership a customer holds; we have entitlement_template and no holder record"
+ ],
+ "identity.enabled_module": [
+  "DECLINE",
+  "our whitelabel.module_enablement. Closed by whitelabel.module_setting: theirs is what is VISIBLE, enabled_module is what the tenant BOUGHT, subscription.module_listing is the catalogue. Three facts, not three homes"
+ ],
+ "identity.family": [
+  "DECLINE",
+  "ours is marketing.guest_relationship. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
+ ],
+ "identity.family_member": [
+  "DECLINE",
+  "ours is marketing.guest_relationship. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
+ ],
+ "identity.membership_history": [
+  "ADDITIVE",
+  "status history for a membership"
+ ],
+ "identity.module": [
+  "ADDITIVE",
+  "a registry of authorisation modules; ours live in contracts/shared/permissions.yaml, not a table"
+ ],
+ "identity.otp": [
+  "TAKE BODY",
+  "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "identity.permission": [
+  "ADDITIVE",
+  "same \u2014 the permission vocabulary is a contract file for us, not data"
+ ],
+ "identity.refresh_token": [
+  "ADDITIVE",
+  "we hold session but no refresh-token rotation record"
+ ],
+ "identity.user_access": [
+  "ADDITIVE",
+  "assigns a role to a principal in a scope \u2014 we have role_permission and delegated_access but no grant table"
+ ],
+ "identity.user_account": [
+  "DECLINE",
+  "principal is ours and covers person, service and device, which their own purpose describes"
+ ],
+ "identity.user_login": [
+  "DECLINE",
+  "our identity.principal_credential"
+ ],
+ "inventory.stock_count": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_count_line": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_movement": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_reservation": [
+  "ADDITIVE",
+  "catalogue.inventory_hold is ticket channel capacity, not physical stock, and a movement is a completed move. We cannot reserve stock for an order"
+ ],
+ "inventory.stock_transfer": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.stock_transfer_line": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "inventory.supplier_contract": [
+  "ADDITIVE",
+  "purchasing agreement and terms with a supplier"
+ ],
+ "inventory.wastage": [
+  "DECLINE",
+  "our inventory.movement with kind and reason. It already carries unit_cost, cost_center_id and journal_entry_id, so wastage posts to the ledger by the same path as every other movement. A separate table splits the stock ledger in two"
+ ],
+ "ledger.company": [
+  "DECLINE",
+  "our ledger.legal_entity, the accounting term and unambiguous next to control.tenant"
+ ],
+ "ledger.journal": [
+  "DECLINE",
+  "their journal is the header; ours is journal_entry with journal_line beneath it"
+ ],
+ "ledger.journal_item": [
+  "DECLINE",
+  "our ledger.journal_line"
+ ],
+ "ledger.settlement_issue": [
+  "DECLINE",
+  "our ledger.settlement_exception; exception is the term of art for a reconciliation break"
+ ],
+ "maintenance.preventive_plan": [
+  "TAKE THEIRS",
+  "our maintenance_plan repeats the schema; theirs is more specific"
+ ],
+ "maintenance.rental_damage_assessment": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "marketing.badge": [
+  "ADDITIVE",
+  "the badge master. Ours is one column, marketing.challenge.badge_asset_id \u2014 an image with no definition behind it. Pairs with marketing.customer_badge, already accepted"
+ ],
+ "marketing.campaign_response": [
+  "TAKE BODY",
+  "our marketing.attribution_touch already carries journey_id. Their optional journey_enrollment_id is the finer grain \u2014 the run, not the journey \u2014 and is worth taking if a guest can re-enter a journey"
+ ],
+ "marketing.campaign_target": [
+  "ADDITIVE",
+  "links a campaign to what it promotes"
+ ],
+ "marketing.case_comment": [
+  "DECLINE",
+  "our marketing.case_message"
+ ],
+ "marketing.customer_badge": [
+  "ADDITIVE",
+  "badges awarded; we have challenge and challenge_progress and no badge"
+ ],
+ "marketing.customer_challenge_progress": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "marketing.customer_consent": [
+  "TAKE BODY",
+  "ours is marketing.consent_record and consent is not only a customer's; take their provenance fields, which trace a consent back to registration, waiver, campaign or survey"
+ ],
+ "marketing.customer_segment": [
+  "DECLINE",
+  "customer_ repeats the marketing schema"
+ ],
+ "marketing.customer_segment_rule": [
+  "DECLINE",
+  "segment_criterion is ours and customer_ repeats the schema"
+ ],
+ "marketing.data_subject_request": [
+  "DECLINE",
+  "our platform.dsar_request. Decision 11: a subject-access request spans every service. Ours is TenancyService and walks guest_link; theirs would be MarketingService, which owns one of the dozen schemas a DSAR has to reach"
+ ],
+ "marketing.do_not_contact": [
+  "DECLINE",
+  "our marketing.suppression; a suppression list is the standard word and theirs names a flag, not a list"
+ ],
+ "marketing.journey_enrollment": [
+  "TAKE THEIRS",
+  "enrollment is the clearer word; journey_entrant reads as a person, not a state"
+ ],
+ "marketing.journey_step": [
+  "ADDITIVE",
+  "we hold journey and journey_entrant and no steps"
+ ],
+ "marketing.loyalty_campaign": [
+  "ADDITIVE",
+  "links a campaign to loyalty bonuses; a different table, not a rename"
+ ],
+ "marketing.loyalty_points": [
+  "ADDITIVE",
+  "the points ledger; we hold loyalty_position and no transaction history"
+ ],
+ "marketing.loyalty_program": [
+  "DECLINE",
+  "our marketing.loyalty_programme. En-GB throughout the package - programme, organisation, authorisation, serialised. A convention, not a table"
+ ],
+ "marketing.loyalty_rule": [
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take the rule set, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
+ ],
+ "marketing.points_earning_rule": [
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take earning, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
+ ],
+ "marketing.points_redemption_rule": [
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take redemption, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
+ ],
+ "marketing.review_response": [
+  "ADDITIVE",
+  "staff replies to a review; we hold review alone"
+ ],
+ "marketing.reward": [
+  "ADDITIVE",
+  "we hold loyalty_programme, _tier and _position but no reward"
+ ],
+ "marketing.reward_assignment": [
+  "ADDITIVE",
+  "which reward went to whom; pairs with marketing.reward"
+ ],
+ "marketing.sla_policy": [
+  "ADDITIVE",
+  "support-case SLA, not an approvals SLA"
+ ],
+ "marketing.support_case": [
+  "DECLINE",
+  "ours already means support cases only"
+ ],
+ "marketing.survey": [
+  "DECLINE",
+  "our marketing.form_definition - it carries kind, score_scale, version and status, so NPS and CSAT are shapes of one form"
+ ],
+ "marketing.survey_question": [
+  "DECLINE",
+  "our marketing.form_definition covers surveys and waivers as one shape"
+ ],
+ "marketing.survey_response": [
+  "DECLINE",
+  "our marketing.form_submission"
+ ],
+ "marketing.waiver_signature": [
+  "ADDITIVE",
+  "signature against an immutable waiver version; form_submission does not pin the version"
+ ],
+ "marketing.waiver_template": [
+  "DECLINE",
+  "our marketing.form_definition again: requires_signature, signature_kind, legal_reviewed_by, valid_for_months, minimum_age and version. The version column is why we take their waiver_signature"
+ ],
+ "orders.cash_count": [
+  "DECLINE",
+  "ours rolls cash_count_line up to the shift; theirs is the session header"
+ ],
+ "orders.currency_rule": [
+  "ADDITIVE",
+  "settlement currency and rounding exist nowhere in our package, and a rounding rule is venue-wide, not per method. Belongs in payments, not orders"
+ ],
+ "orders.deposit": [
+  "ADDITIVE",
+  "rental security deposit, not a till deposit"
+ ],
+ "orders.deposit_activity": [
+  "ADDITIVE",
+  "authorise, hold, capture, release, forfeit, refund. We hold stored_value_authorisation and the net figures on rental.settlement, and no history between them. A forfeited deposit is a dispute waiting to happen. Belongs in payments"
+ ],
+ "orders.discount": [
+  "TAKE THEIRS",
+  "ours is orders.order_discount, which repeats its schema. 2 change points. Note the bound on that rule: strip the prefix only where what is left still names the thing - orders.order_line does not become orders.line"
+ ],
+ "orders.membership_renewal": [
+  "ADDITIVE",
+  "renewal attempts and their result"
+ ],
+ "orders.order": [
+  "DECLINE",
+  "our orders.sales_order, 223 change points and 41 inbound foreign keys - the third most connected table in the package. sales_order also distinguishes it from an F&B order and a purchase order"
+ ],
+ "orders.order_fee": [
+  "ADDITIVE",
+  "the fee snapshot on the order. Pairs with their payment_fee_rule, which we also take: the rule lives in payments, the snapshot on the order, the same way order_discount snapshots a promotion"
+ ],
+ "orders.payment_eligibility_rule": [
+  "ADDITIVE",
+  "when a method is allowed for a given transaction \u2014 no gift card for a wallet top-up, no credit under 18. payments.risk_rules is fraud, not eligibility. Belongs in payments"
+ ],
+ "orders.payment_fee_rule": [
+  "ADDITIVE",
+  "we hold surcharge as a jsonb blob on payments.method. A blob cannot be scoped, versioned or approved \u2014 this is the table that blob wants to be. Belongs in payments, not orders"
+ ],
+ "orders.payment_gateway": [
+  "DECLINE",
+  "our payments.provider_connection. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
+ ],
+ "orders.payment_method": [
+  "DECLINE",
+  "our payments.method. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
+ ],
+ "orders.payment_method_config": [
+  "TAKE THEIRS",
+  "reversed on the rubric. Ours is currencies[], channels[], venue_ids[] on payments.method. Optimised access: \"which methods are live at this venue, in AED, on web\" is an array containment scan, not an index lookup. DB strain: enabling one method at one venue rewrites the whole row and every array on it. Maintainability: adding a venue to 40 methods is 40 row rewrites against 40 inserts. We already took entry_rule_point, menu_item_modifier, seat_block_item and plan_benefit for this same reason"
+ ],
+ "orders.payment_policy": [
+  "DECLINE",
+  "our payments.payment_terms. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
+ ],
+ "orders.payment_route": [
+  "DECLINE",
+  "our payments.routing_rule, and it maps onto our duplicate orders.payment_routing as well - we collapse those two. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
+ ],
+ "orders.payment_terminal": [
+  "DECLINE",
+  "our payments.terminal. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
+ ],
+ "orders.pos_shift": [
+  "TAKE THEIRS",
+  "pos_ disambiguates from workforce.shift, which they also have"
+ ],
+ "orders.recommendation_activity": [
+  "DECLINE",
+  "our promotions.recommendation_outcome, beside recommendation_experiment and _suppression. Belongs in promotions, not orders"
+ ],
+ "orders.upgrade": [
+  "ADDITIVE",
+  "the upgrade transaction - original line, upgraded line, amount. We serve upgrades by operation and keep no record of one, so what a guest held before an upgrade is unrecoverable"
+ ],
+ "platform.cash_denomination": [
+  "EITHER",
+  "cash_ is meaningful but we hold no other denomination; concede if useful"
+ ],
+ "platform.cell": [
+  "DECLINE",
+  "ours is in control with 20 columns and 19 inbound FKs"
+ ],
+ "platform.cell_endpoint": [
+  "ADDITIVE",
+  "how one cell reaches another; we have no endpoint record"
+ ],
+ "platform.device_profile": [
+  "DECLINE",
+  "our platform.configuration_profile with scope_path, version, settings and deployed_count. Their own purpose says \"a scope or workstation\", and ours covers both"
+ ],
+ "platform.region_setting": [
+  "EITHER",
+  "singular vs plural only; settle our own convention first"
+ ],
+ "platform.scope": [
+  "TAKE THEIRS",
+  "Decision 4. Their name, our table. platform.org_unit stays as one self-referencing hierarchy - flattening it into five typed tables makes adding a level a new table - but scope is the word 58 of our configuration profiles already address by, and org_unit appears nowhere else in our language"
+ ],
+ "platform.subscription_tier": [
+  "DECLINE",
+  "our control.subscription_plan. Decision 3: both move into our subscription schema, which is the same service. Theirs would put billing in TenancyService and licensing in PlatformService, so a plan lookup becomes a cross-service call"
+ ],
+ "platform.tenant_subscription": [
+  "DECLINE",
+  "our control.subscription. Decision 3: both move into our subscription schema, which is the same service. Theirs would put billing in TenancyService and licensing in PlatformService, so a plan lookup becomes a cross-service call"
+ ],
+ "platform.tier_allowance": [
+  "ADDITIVE",
+  "what a tier includes. Our subscription.capacity_pack is a pack a tenant buys on top, with a price and an invoice; the included allowance is one column, control.subscription_plan.included_ai_tokens. Belongs in subscription"
+ ],
+ "platform.tier_module": [
+  "TAKE THEIRS",
+  "reversed on the rubric. Ours is subscription.module_listing.included_in_tiers[]. \"Which modules are in PRO\" scans every module row; the join table is one indexed read. Same argument as payment_method_config, and it belongs in subscription"
+ ],
+ "platform.venue_setting": [
+  "DECLINE",
+  "our platform.configuration_profile is scope-addressed"
+ ],
+ "pricing.dynamic_price_action": [
+  "ADDITIVE",
+  "Decision 5: taken, its actions. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
+ ],
+ "pricing.dynamic_price_condition": [
+  "ADDITIVE",
+  "Decision 5: taken, its conditions. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
+ ],
+ "pricing.dynamic_price_rule": [
+  "ADDITIVE",
+  "Decision 5: taken, the rule. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
+ ],
+ "queue.entry": [
+  "TAKE THEIRS",
+  "their purpose says \"a customer or party\"; our queue.waiting_guest misnames a party of six as a guest. 40 change points, worth it"
+ ],
+ "reporting.report": [
+  "DECLINE",
+  "our reporting.report_definition: data_source, required_permission, max_date_range_days, version - their purpose line column for column"
+ ],
+ "reporting.report_execution": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "reporting.report_file": [
+  "DECLINE",
+  "our reporting.export: format, download_url, size_bytes, expires_at"
+ ],
+ "reporting.report_input": [
+  "DECLINE",
+  "parameter is the domain word"
+ ],
+ "reporting.report_schedule": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "resources.rental_agreement": [
+  "TAKE THEIRS",
+  "reversed. We hold rental.agreement_rules and rental.agreement_signature and NO agreement: the signature references participant_id plus an agreement_version string, so it signs a version number rather than a document, and rental.participant carries no booking reference at all. Their rental_agreement is the record both of ours are missing. Take it into rental; rental.booking keeps the commercial reservation and the agreement carries the operational contract, which is the split our own two tables already imply"
+ ],
+ "resources.rental_agreement_item": [
+  "MERGE",
+  "with the agreement taken, their item is the line on the contract and our rental.equipment_assignment is how a physical asset is attached to a line. Keep both roles, one table: their per-item status and quantity path for non-serialised items, our asset_id, serial_number, scanned_code and returned_at"
+ ],
+ "resources.rental_inspection": [
+  "KEEP OURS",
+  "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "resources.rental_inspection_item": [
+  "ADDITIVE",
+  "our rental.inspection is one row per asset per phase with a single condition. Theirs is the checklist line under it \u2014 per component, structured. Belongs in rental"
+ ],
+ "resources.rental_product_mapping": [
+  "DECLINE",
+  "our rental.product.catalogue_product_id, a column. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
+ ],
+ "resources.resource_booking": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "retail.price": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.price_list": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.product": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.product_category": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "retail.product_recommendation": [
+  "ADDITIVE",
+  "retail upsell, same shape"
+ ],
+ "retail.reservation_item": [
+  "DECLINE",
+  "our retail.reservation_line, beside sale_line and return_line"
+ ],
+ "retail.return_item": [
+  "DECLINE",
+  "our retail.return_line, which already holds condition and refund_amount. Take one thing: our disposition is a boolean, was_restocked, and scrap and return-to-vendor are not restocking"
+ ],
+ "retail.variant": [
+  "ADDITIVE",
+  "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
+ ],
+ "seating.seat_block_item": [
+  "ADDITIVE",
+  "our seating.seat_block holds seat_ids as an array, so a seat released on its own cannot be tracked. The array wants to be a table, the same as their fee rule and their tier modules"
+ ],
+ "seating.seat_hold_item": [
+  "ADDITIVE",
+  "the seats inside a hold; we hold seat_hold and hold_pool only"
+ ],
+ "seating.seat_rule": [
+  "DECLINE",
+  "our seating.seating_rules, beside seating.recommendation_rules. Both plural, which is our convention problem"
+ ],
+ "seating.seat_section_row": [
+  "DECLINE",
+  "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "sync.cell_connection": [
+  "ADDITIVE",
+  "which cell may talk to which; we have no permit record"
+ ],
+ "sync.cross_cell_rejection": [
+  "DECLINE",
+  "cross_cell_ repeats the sync schema"
+ ],
+ "sync.cross_cell_request": [
+  "ADDITIVE",
+  "the request itself; we hold only sync.rejection"
+ ],
+ "sync.guest_link": [
+  "DECLINE",
+  "Decision 10, reversed. platform.dsar_request.guest_link_id points at platform.guest_link and both are TenancyService; sync is CrossRegionService. Moving the link alone puts a DSAR fan-out across a service boundary on its hottest path. Either both go or neither does, and a DSAR is a tenancy obligation rather than a synchronisation mechanism"
+ ],
+ "venue.department": [
+  "DECLINE",
+  "corrected. department is one of nine ScopeLevel values in contracts/shared/common.yaml - tenant, brand, region, venue, department, subDepartment, workstation, outlet, subject - and ADR-0011 makes the hierarchy binding. platform.org_unit holds a department as a row with level=department, and platform.workstation.department_id points at it. We had this as a dangling reference and a gap; it is neither. Their five venue tables are five of our nine levels flattened into tables, which is the decision-4 argument applied to the one table we had conceded"
+ ],
+ "venue.outlet": [
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
+ ],
+ "venue.space": [
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
+ ],
+ "venue.venue": [
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
+ ],
+ "venue.zone": [
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
+ ],
+ "venuemap.layout": [
+  "DECLINE",
+  "our venuemap.map"
+ ],
+ "venuemap.route": [
+  "EITHER",
+  "was declined as not worth the rename, which is a cost dodge. Their purpose is \"a navigable connection between two points\", which is an edge -- route and path both oversell it and neither is better. The right name is probably segment or link; concede theirs if they care"
+ ],
+ "wallet.access": [
+  "DECLINE",
+  "our wallet.shared_wallet_member says who may spend and up to what"
+ ],
+ "wallet.account": [
+  "RECLASSIFY",
+  "their stored-value wallet master = our wallet.wallet, not ledger.account"
+ ],
+ "wallet.balance": [
+  "MERGE",
+  "our wallet.wallet carries the balance; take their available/held split"
+ ],
+ "wallet.hold": [
+  "ADDITIVE",
+  "reserves wallet money mid-order; we authorise and never record the hold"
+ ],
+ "wallet.transaction": [
+  "DECLINE",
+  "our wallet.wallet_transaction, same table"
+ ],
+ "whitelabel.brand_setting": [
+  "DECLINE",
+  "our whitelabel.config_version and the branding fields on it"
+ ],
+ "whitelabel.brand_version": [
+  "EITHER",
+  "config_version vs brand_version; concede, it costs nothing"
+ ],
+ "whitelabel.faq": [
+  "DECLINE",
+  "their purpose says \"individual\" questions \u2014 our whitelabel.faq_entry; faq alone is a collection"
+ ],
+ "whitelabel.feature_setting": [
+  "DECLINE",
+  "our whitelabel.feature_toggle"
+ ],
+ "whitelabel.home_section": [
+  "DECLINE",
+  "their purpose says \"branded homepage\" \u2014 our homepage_section"
+ ],
+ "whitelabel.menu_item": [
+  "RECLASSIFY",
+  "branded nav menu, not fnb.menu_item"
+ ],
+ "whitelabel.module_setting": [
+  "DECLINE",
+  "our whitelabel.module_enablement - and this settles the three-homes question. Their purpose is \"VISIBLE in the branded experience\", while identity.enabled_module is what the tenant has bought. Bought, shown and the catalogue of what can be bought are three facts, not one duplicated three times. Nothing to collapse"
+ ],
+ "whitelabel.page": [
+  "DECLINE",
+  "our whitelabel.content_page"
+ ],
+ "whitelabel.promotion_block": [
+  "EITHER",
+  "ours is whitelabel.promo_block; theirs spells it out. 5 change points, concede if they care"
+ ],
+ "whitelabel.redirect": [
+  "ADDITIVE",
+  "branded URL redirects"
+ ],
+ "whitelabel.seo_setting": [
+  "ADDITIVE",
+  "SEO and social metadata per page"
+ ],
+ "workforce.employee": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". matrix 1.2.83 validates certifications and working-hour limits, and 1.2.84 costs labour by department - both need an employee record here, synchronised from HRMS."
+ ],
+ "workforce.employment": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". employment terms, for the working-hour and overtime limits in 1.2.83."
+ ],
+ "workforce.job_title": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". role coverage rules in 1.2.82 need a job definition."
+ ],
+ "workforce.leave_balance": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". the Staff Eligibility Engine on Board 3 evaluates Leave alongside availability, skills and certifications."
+ ],
+ "workforce.leave_type": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". matrix 1.2.37 says INTEGRATE approved leave requests, so the categories come from outside and are held here to evaluate eligibility."
+ ],
+ "workforce.pay_component": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a pay component."
+ ],
+ "workforce.payroll_employee": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold an employee on a payroll run."
+ ],
+ "workforce.payroll_line": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a line on a payroll run."
+ ],
+ "workforce.payroll_run": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a payroll run."
+ ],
+ "workforce.payslip": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a payslip."
+ ],
+ "workforce.roster": [
+  "DECLINE",
+  "our workforce.rota_assignment"
+ ],
+ "workforce.salary": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a salary."
+ ],
+ "workforce.salary_component": [
+  "DECLINE",
+  "Decision 6, closed on evidence rather than by asking. Resource_Management_Configuration_Reference.pdf, Board 3 page 45, 'Workforce Integration & Synchronization Center': \"Connect TICVAI Resource Management with EXTERNAL HR, workforce management, payroll, identity, and employee systems\", and its Integration Sources list names HRMS, Workforce Management, Payroll, Time & Attendance and external staffing agencies. Board 10 lists Payroll again as an integration to MONITOR, with sync status and failed records. The requirement matrix has ZERO rows mentioning payroll, payslip, salary, wage, HRMS or HR system across all five sheets. The nearest requirement, 1.2.84, is \"calculate labor costs, staffing budgets, overtime costs... by venue, department, attraction\" - costing a roster, not paying anybody. TICVAI does not run payroll, so it does not hold a salary component."
+ ],
+ "workforce.shift": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". their shift record beside our shift_template and open_shift; matrix 1.2.33 says the system shall manage employee shifts."
+ ],
+ "workforce.work_assignment": [
+  "ADDITIVE",
+  "Decision 6. Taken, but as an externally mastered projection rather than an HR master: Board 3 requires an External System Master per field, \"which prevents conflicting updates\", and lists conflict cases such as \"employee exists in HR but not TICVAI\" and \"employee terminated externally but has future TICVAI assignments\". assigns an employee to a job and a location; Board 4 converts these into rosters."
+ ],
+ "workforce.work_time": [
+  "DECLINE",
+  "our workforce.attendance"
+ ]
+}

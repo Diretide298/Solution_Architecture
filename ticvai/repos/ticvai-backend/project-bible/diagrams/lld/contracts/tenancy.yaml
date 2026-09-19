@@ -31,11 +31,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - cache:resolution
-  - platform.org_unit
+  - platform.scope
 - operation: createOutlet
   verb: POST
   path: /outlets
@@ -112,7 +112,7 @@ operations:
   offline: false
   reads:
   - cache:resolution
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:resolution
 - operation: getRegionSettings
@@ -188,7 +188,7 @@ operations:
   - cache:idempotency
   - identity.principal
   - platform.audit_record
-  - platform.org_unit
+  - platform.scope
   writes:
   - platform.audit_read
 - operation: listDeviceAuditRecords
@@ -245,7 +245,7 @@ operations:
   offline: false
   reads:
   - cache:resolution
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:resolution
 - operation: listOutlets
@@ -454,11 +454,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - cache:resolution
-  - platform.org_unit
+  - platform.scope
 - operation: updateOutlet
   verb: PATCH
   path: /outlets/{outletId}

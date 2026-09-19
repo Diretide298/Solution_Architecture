@@ -99,11 +99,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription
   - control.tenant
+  - subscription.contract
   writes:
   - cache:idempotency
-  - control.subscription
+  - subscription.contract
 - operation: createPartnerAgreement
   verb: POST
   path: /partner-agreements
@@ -145,7 +145,7 @@ operations:
   - cache:idempotency
   - control.partner_agreement
   - identity.principal
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - control.partner_user
@@ -159,10 +159,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription_plan
+  - subscription.plan
   writes:
   - cache:idempotency
-  - control.subscription_plan
+  - subscription.plan
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
@@ -173,10 +173,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription_plan
+  - subscription.plan
   writes:
   - cache:idempotency
-  - control.subscription_plan
+  - subscription.plan
 - operation: createTenant
   verb: POST
   path: /tenants
@@ -388,7 +388,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.subscription_plan
+  - subscription.plan
   writes: []
 - operation: getSubscription
   verb: GET
@@ -399,7 +399,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.subscription
+  - subscription.contract
   writes: []
 - operation: getTenant
   verb: GET
@@ -411,8 +411,8 @@ operations:
   offline: false
   reads:
   - control.cell
-  - control.subscription
   - control.tenant
+  - subscription.contract
   writes: []
 - operation: getTenantLicences
   verb: GET
@@ -424,8 +424,8 @@ operations:
   offline: true
   reads:
   - control.licence_add_on
-  - control.subscription
-  - control.subscription_plan
+  - subscription.contract
+  - subscription.plan
   writes: []
 - operation: getUsageMetering
   verb: GET
@@ -436,8 +436,8 @@ operations:
   - staff
   offline: false
   reads:
-  - control.subscription
   - control.usage_record
+  - subscription.contract
   writes: []
 - operation: getVsiModel
   verb: GET
@@ -887,7 +887,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.subscription_plan
+  - subscription.plan
   writes: []
 - operation: listRenewalAuto
   verb: GET
@@ -1008,9 +1008,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription
-  - control.subscription_plan
   - platform.tenant
+  - subscription.contract
+  - subscription.plan
   writes:
   - cache:idempotency
 - operation: provisionCell
@@ -1082,7 +1082,7 @@ operations:
   - service
   offline: false
   reads:
-  - ai.interaction
+  - ai.activity
   - cache:idempotency
   - control.usage_record
   writes:
@@ -1116,7 +1116,7 @@ operations:
   writes:
   - cache:idempotency
   - control.licence_add_on
-  - control.subscription
+  - subscription.contract
 - operation: requestBurstEnvironment
   verb: POST
   path: /burst-environments
@@ -1353,10 +1353,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription
+  - subscription.contract
   writes:
   - cache:idempotency
-  - control.subscription
+  - subscription.contract
 - operation: setTrialConfiguration
   verb: PUT
   path: /trial-configurations
@@ -1400,11 +1400,11 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.interaction
+  - ai.activity
   - ai.policy
   - cache:idempotency
-  - control.subscription
-  - control.subscription_plan
+  - subscription.contract
+  - subscription.plan
   writes:
   - cache:idempotency
   - control.usage_record
@@ -1429,8 +1429,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription_plan
   - control.venue_type_template
+  - subscription.plan
   writes:
   - cache:idempotency
   - control.onboarding_application
@@ -1459,12 +1459,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.subscription
   - control.tenant
+  - subscription.contract
   writes:
   - cache:idempotency
-  - control.subscription
   - control.tenant
+  - subscription.contract
 - operation: updateCellTier
   verb: PATCH
   path: /cells/{cellId}

@@ -590,7 +590,7 @@ operations:
   - identity.principal
   - identity.role
   - identity.role_permission
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - cache:resolution

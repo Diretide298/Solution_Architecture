@@ -33,12 +33,12 @@
   }
  ],
  "stores": {
-  "postgres": 41,
   "postgres-analytical": 5,
+  "postgres": 41,
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-19",
+ "generated": "2026-09-20",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,
@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 29,
+  "documents": 31,
   "openConflicts": 1
  },
  "metrics": {
@@ -154,15 +154,15 @@
  ],
  "governedOperations": {
   "count": 10,
-  "note": "Operations that call a model and write an ai.interaction (8.3.55)."
+  "note": "Operations that call a model and write an ai.activity (8.3.55)."
  },
  "guestCallable": {
   "count": 0,
   "operations": []
  },
  "storage": {
-  "postgres": 41,
   "postgres-analytical": 5,
+  "postgres": 41,
   "redis": 4,
   "qdrant": 1
  },
@@ -239,6 +239,16 @@
   {
    "file": "docs\\active\\phase0-identity-pass-all-clusters.md",
    "title": "Phase 0 \u2014 identity pass, all clusters",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\rename-worklist-20-september.md",
+   "title": "Their workbook, every change in it, and what it means for us \u2014 20 September",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\schema-merge-decision-log.md",
+   "title": "Schema merge \u2014 the decision log",
    "status": ""
   },
   {

@@ -225,7 +225,7 @@ def main() -> int:
             if isinstance(body, dict):
                 table = persistence_of(body)
                 if isinstance(table, str) and "." in table and "—" not in table:
-                    # A schema may name a parent and a child — `fnb.fnb_order + fnb.fnb_order_line`.
+                    # A schema may name a parent and a child — `fnb.service_order + fnb.service_order_line`.
                     # **The properties belong to the parent**; the child comes from the nested array,
                     # which this tool deliberately skips rather than flattening. Taking the whole
                     # string as a table name created 25 tables that do not exist.
@@ -416,7 +416,7 @@ def main() -> int:
         cols = []
         for prop, spec in properties_of(body, all_schemas).items():
             # **`x-ticvai-persisted: false` is a field that travels and is not stored.** 24 August:
-            # `currency` and `currencyScale` sat on `orders.shift`, `orders.sales_order`,
+            # `currency` and `currencyScale` sat on `orders.pos_shift`, `orders.sales_order`,
             # `platform.workstation` and `catalogue.price_list` — four tables whose value can only
             # ever be the region's (ADR-0018). **Storing AED against nine million rows in a UAE
             # region is nine million copies of a fact that cannot differ**, and a workstation with
@@ -638,7 +638,7 @@ def main() -> int:
     # **A scan event pointing at the template says every guest holding that product was scanned.**
     MISTARGETED = {
         ("access.scan_event", "ticket_id"): "access.entitlement",
-        ("queue.waiting_guest", "entitlement_id"): "access.entitlement",
+        ("queue.entry", "entitlement_id"): "access.entitlement",
         ("retail.shop_and_drop", "entitlement_id"): "access.entitlement",
         ("platform.cross_region_entitlement", "ticket_id"): "access.entitlement",
         ("ledger.inter_entity_obligation", "entitlement_id"): "access.entitlement",

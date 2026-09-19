@@ -878,24 +878,12 @@ tables:
   parent: fnb.delivery_location
   writtenBy: []
   foreignWriters: null
-- table: fnb.eighty_six_event
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.fnb_order
-  columns: 14
+- table: fnb.dining_table
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
   - fnb
-  foreignWriters: null
-- table: fnb.fnb_order_line
-  columns: 11
-  store: postgres
-  parent: fnb.fnb_order
-  writtenBy: []
   foreignWriters: null
 - table: fnb.guest_note
   columns: 0
@@ -1005,6 +993,25 @@ tables:
   parent: fnb.recipe
   writtenBy: []
   foreignWriters: null
+- table: fnb.service_order
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.service_order_line
+  columns: 12
+  store: postgres
+  parent: fnb.service_order
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.sold_out_item
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.sub_bill
   columns: 11
   store: postgres
@@ -1013,13 +1020,6 @@ tables:
   foreignWriters: null
 - table: fnb.substitution_rule
   columns: 9
-  store: postgres
-  parent: null
-  writtenBy:
-  - fnb
-  foreignWriters: null
-- table: fnb.table
-  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1035,14 +1035,14 @@ tables:
 - table: fnb.table_session
   columns: 9
   store: postgres
-  parent: fnb.table
+  parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.table_visit
   columns: 13
   store: postgres
-  parent: fnb.table
+  parent: null
   writtenBy:
   - fnb
   foreignWriters: null

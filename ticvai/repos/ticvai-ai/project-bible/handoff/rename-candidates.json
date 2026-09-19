@@ -1,0 +1,1064 @@
+{
+ "ambiguous": {
+  "access.parking_pass": [
+   [
+    0.67,
+    8,
+    "access.parking_entitlement"
+   ],
+   [
+    0.44,
+    8,
+    "access.entitlement"
+   ]
+  ],
+  "access.ticket_access": [
+   [
+    0.58,
+    14,
+    "access.entitlement"
+   ],
+   [
+    0.5,
+    6,
+    "access.parking_entitlement"
+   ]
+  ],
+  "catalogue.membership_benefit": [
+   [
+    0.5,
+    2,
+    "catalogue.variant_dimension"
+   ],
+   [
+    0.4,
+    2,
+    "catalogue.variant"
+   ]
+  ],
+  "catalogue.membership_plan": [
+   [
+    1.0,
+    4,
+    "catalogue.variant_dimension"
+   ],
+   [
+    0.6,
+    3,
+    "catalogue.variant"
+   ],
+   [
+    0.43,
+    3,
+    "catalogue.alternative_code"
+   ]
+  ],
+  "catalogue.membership_program": [
+   [
+    0.75,
+    3,
+    "catalogue.variant_dimension"
+   ],
+   [
+    0.4,
+    4,
+    "catalogue.donation_campaign"
+   ],
+   [
+    0.4,
+    2,
+    "catalogue.variant"
+   ]
+  ],
+  "catalogue.product_media": [
+   [
+    0.6,
+    3,
+    "catalogue.variant"
+   ],
+   [
+    0.5,
+    2,
+    "catalogue.variant_dimension"
+   ]
+  ],
+  "catalogue.rental_product_config": [
+   [
+    0.6,
+    3,
+    "catalogue.variant"
+   ],
+   [
+    0.5,
+    2,
+    "catalogue.variant_dimension"
+   ]
+  ],
+  "control.api_application": [
+   [
+    0.6,
+    6,
+    "control.api_client"
+   ],
+   [
+    0.57,
+    4,
+    "control.cell_instance"
+   ]
+  ],
+  "control.webhook": [
+   [
+    0.67,
+    6,
+    "control.webhook_subscription"
+   ],
+   [
+    0.43,
+    3,
+    "control.cell_instance"
+   ]
+  ],
+  "control.webhook_log": [
+   [
+    0.9,
+    9,
+    "control.webhook_delivery"
+   ],
+   [
+    0.43,
+    3,
+    "control.cell_instance"
+   ]
+  ],
+  "fnb.kitchen_order": [
+   [
+    0.67,
+    2,
+    "fnb.delivery_location_outlet"
+   ],
+   [
+    0.57,
+    8,
+    "fnb.kitchen_ticket"
+   ],
+   [
+    0.5,
+    3,
+    "fnb.production_plan"
+   ]
+  ],
+  "fnb.kitchen_order_item": [
+   [
+    0.45,
+    5,
+    "fnb.kitchen_ticket_line"
+   ],
+   [
+    0.45,
+    5,
+    "fnb.fnb_order_line"
+   ]
+  ],
+  "fnb.order": [
+   [
+    0.71,
+    10,
+    "fnb.fnb_order"
+   ],
+   [
+    0.67,
+    2,
+    "fnb.delivery_location_outlet"
+   ],
+   [
+    0.5,
+    7,
+    "fnb.kitchen_ticket"
+   ]
+  ],
+  "fnb.order_item": [
+   [
+    0.91,
+    10,
+    "fnb.fnb_order_line"
+   ],
+   [
+    0.45,
+    5,
+    "fnb.kitchen_ticket_line"
+   ]
+  ],
+  "fnb.sold_out_item": [
+   [
+    1.0,
+    7,
+    "fnb.eighty_six_event"
+   ],
+   [
+    0.67,
+    2,
+    "fnb.delivery_location_outlet"
+   ]
+  ],
+  "fnb.temperature_check": [
+   [
+    0.91,
+    10,
+    "fnb.temperature_log"
+   ],
+   [
+    0.44,
+    4,
+    "fnb.cold_chain_event"
+   ]
+  ],
+  "inventory.stock_reservation": [
+   [
+    0.7,
+    7,
+    "inventory.movement"
+   ],
+   [
+    0.5,
+    3,
+    "inventory.quotation_line"
+   ],
+   [
+    0.44,
+    4,
+    "inventory.serialised_item"
+   ]
+  ],
+  "inventory.wastage": [
+   [
+    0.5,
+    3,
+    "inventory.quotation_line"
+   ],
+   [
+    0.47,
+    7,
+    "inventory.movement"
+   ]
+  ],
+  "ledger.company": [
+   [
+    0.67,
+    4,
+    "ledger.cost_center"
+   ],
+   [
+    0.55,
+    6,
+    "ledger.legal_entity"
+   ],
+   [
+    0.42,
+    5,
+    "ledger.tax_code"
+   ]
+  ],
+  "ledger.journal_item": [
+   [
+    0.75,
+    6,
+    "ledger.journal_line"
+   ],
+   [
+    0.5,
+    6,
+    "ledger.posting"
+   ]
+  ],
+  "marketing.badge": [
+   [
+    0.57,
+    4,
+    "marketing.loyalty_programme"
+   ],
+   [
+    0.44,
+    4,
+    "marketing.segment"
+   ]
+  ],
+  "marketing.campaign_response": [
+   [
+    0.62,
+    5,
+    "marketing.attribution_touch"
+   ],
+   [
+    0.5,
+    4,
+    "marketing.touch_point"
+   ]
+  ],
+  "marketing.loyalty_program": [
+   [
+    0.86,
+    6,
+    "marketing.loyalty_programme"
+   ],
+   [
+    0.44,
+    4,
+    "marketing.segment"
+   ]
+  ],
+  "marketing.survey": [
+   [
+    0.44,
+    4,
+    "marketing.segment"
+   ],
+   [
+    0.43,
+    3,
+    "marketing.loyalty_programme"
+   ]
+  ],
+  "marketing.waiver_template": [
+   [
+    0.5,
+    2,
+    "marketing.guest_attribute_model"
+   ],
+   [
+    0.43,
+    3,
+    "marketing.loyalty_programme"
+   ]
+  ],
+  "orders.deposit": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "orders.deposit_activity": [
+   [
+    1.0,
+    2,
+    "orders.payment_tip"
+   ],
+   [
+    0.44,
+    4,
+    "orders.chargeback"
+   ],
+   [
+    0.43,
+    3,
+    "orders.credit_override"
+   ]
+  ],
+  "orders.discount": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "orders.order": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "orders.order_fee": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "orders.recommendation_activity": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "orders.upgrade": [
+   [
+    1.0,
+    2,
+    "orders.order_media_link"
+   ],
+   [
+    1.0,
+    2,
+    "orders.order_discount"
+   ],
+   [
+    0.67,
+    2,
+    "orders.donation_line"
+   ]
+  ],
+  "platform.cell": [
+   [
+    0.5,
+    3,
+    "platform.sale_board"
+   ],
+   [
+    0.5,
+    2,
+    "platform.sale_board_page"
+   ],
+   [
+    0.43,
+    3,
+    "platform.dsar_request"
+   ]
+  ],
+  "platform.device_profile": [
+   [
+    0.67,
+    6,
+    "platform.configuration_profile"
+   ],
+   [
+    0.5,
+    2,
+    "platform.sale_board_page"
+   ],
+   [
+    0.43,
+    3,
+    "platform.dsar_request"
+   ]
+  ],
+  "platform.scope": [
+   [
+    0.75,
+    6,
+    "platform.org_unit"
+   ],
+   [
+    0.67,
+    4,
+    "platform.sale_board"
+   ],
+   [
+    0.5,
+    2,
+    "platform.sale_board_page"
+   ]
+  ],
+  "platform.subscription_tier": [
+   [
+    0.67,
+    4,
+    "platform.sale_board"
+   ],
+   [
+    0.5,
+    4,
+    "platform.org_unit"
+   ],
+   [
+    0.5,
+    2,
+    "platform.sale_board_page"
+   ]
+  ],
+  "reporting.report": [
+   [
+    0.62,
+    10,
+    "reporting.report_definition"
+   ],
+   [
+    0.5,
+    2,
+    "reporting.semantic_model"
+   ]
+  ],
+  "reporting.report_file": [
+   [
+    0.64,
+    7,
+    "reporting.export"
+   ],
+   [
+    0.42,
+    5,
+    "reporting.execution"
+   ]
+  ],
+  "retail.reservation_item": [
+   [
+    0.8,
+    4,
+    "retail.reservation_line"
+   ],
+   [
+    0.5,
+    4,
+    "retail.shop_and_drop_line"
+   ]
+  ],
+  "retail.return_item": [
+   [
+    0.67,
+    6,
+    "retail.return_line"
+   ],
+   [
+    0.6,
+    3,
+    "retail.reservation_line"
+   ]
+  ],
+  "seating.seat_block_item": [
+   [
+    0.4,
+    2,
+    "seating.seat_map_template"
+   ],
+   [
+    0.4,
+    2,
+    "seating.import_job"
+   ]
+  ],
+  "seating.seat_rule": [
+   [
+    0.78,
+    7,
+    "seating.seating_rules"
+   ],
+   [
+    0.4,
+    2,
+    "seating.accessible"
+   ]
+  ],
+  "whitelabel.feature_setting": [
+   [
+    0.86,
+    6,
+    "whitelabel.feature_toggle"
+   ],
+   [
+    0.57,
+    4,
+    "whitelabel.module_enablement"
+   ]
+  ],
+  "whitelabel.module_setting": [
+   [
+    0.86,
+    6,
+    "whitelabel.module_enablement"
+   ],
+   [
+    0.57,
+    4,
+    "whitelabel.feature_toggle"
+   ]
+  ],
+  "whitelabel.page": [
+   [
+    0.73,
+    8,
+    "whitelabel.content_page"
+   ],
+   [
+    0.43,
+    3,
+    "whitelabel.module_enablement"
+   ],
+   [
+    0.43,
+    3,
+    "whitelabel.feature_toggle"
+   ]
+  ],
+  "whitelabel.promotion_block": [
+   [
+    0.73,
+    8,
+    "whitelabel.promo_block"
+   ],
+   [
+    0.67,
+    2,
+    "whitelabel.homepage_section"
+   ],
+   [
+    0.45,
+    5,
+    "whitelabel.content_page"
+   ]
+  ]
+ },
+ "band0": {
+  "ai.usage_policy": "ai.policy",
+  "approvals.approval_decision": "approvals.decision",
+  "approvals.approval_delegation": "approvals.delegation",
+  "approvals.approval_escalation": "approvals.escalation",
+  "approvals.approval_matrix": "approvals.matrix",
+  "approvals.approval_request": "approvals.request",
+  "approvals.approval_rule": "approvals.rule",
+  "catalogue.product_variant": "catalogue.variant",
+  "fnb.dining_table": "fnb.table",
+  "fnb.reservation_table": "fnb.table",
+  "inventory.stock_count": "inventory.count",
+  "inventory.stock_count_line": "inventory.count_line",
+  "inventory.stock_movement": "inventory.movement",
+  "inventory.stock_transfer": "inventory.transfer",
+  "inventory.stock_transfer_line": "inventory.transfer_line",
+  "marketing.customer_challenge_progress": "marketing.challenge_progress",
+  "marketing.customer_segment": "marketing.segment",
+  "marketing.loyalty_campaign": "marketing.campaign",
+  "marketing.support_case": "marketing.case",
+  "orders.pos_shift": "orders.shift",
+  "platform.cash_denomination": "platform.denomination",
+  "reporting.report_execution": "reporting.execution",
+  "reporting.report_schedule": "reporting.schedule",
+  "resources.resource_booking": "resources.booking",
+  "seating.seat_section_row": "seating.section_row"
+ },
+ "nocandidate": [
+  "access.access_change",
+  "access.accreditation",
+  "access.accreditation_access",
+  "access.accreditation_credential",
+  "access.accreditation_document",
+  "access.accreditation_status_history",
+  "access.accreditation_type",
+  "access.entry_rule_point",
+  "catalogue.plan_benefit",
+  "fnb.ingredient_substitute",
+  "fnb.menu_item_modifier",
+  "fnb.price",
+  "fnb.product_category",
+  "fnb.product_recommendation",
+  "identity.benefit_usage",
+  "identity.customer",
+  "identity.customer_address",
+  "identity.customer_contact",
+  "identity.customer_extra_field",
+  "identity.customer_extra_value",
+  "identity.customer_membership",
+  "identity.family",
+  "identity.family_member",
+  "identity.membership_history",
+  "identity.module",
+  "identity.otp",
+  "identity.permission",
+  "identity.user_login",
+  "inventory.supplier_contract",
+  "maintenance.rental_damage_assessment",
+  "marketing.campaign_target",
+  "marketing.case_comment",
+  "marketing.customer_badge",
+  "marketing.data_subject_request",
+  "marketing.loyalty_points",
+  "marketing.loyalty_rule",
+  "marketing.review_response",
+  "marketing.reward_assignment",
+  "marketing.survey_question",
+  "marketing.survey_response",
+  "marketing.waiver_signature",
+  "orders.cash_count",
+  "orders.currency_rule",
+  "orders.membership_renewal",
+  "orders.payment_eligibility_rule",
+  "orders.payment_fee_rule",
+  "orders.payment_method_config",
+  "orders.payment_route",
+  "platform.tier_allowance",
+  "platform.tier_module",
+  "platform.venue_setting",
+  "pricing.dynamic_price_action",
+  "pricing.dynamic_price_condition",
+  "pricing.dynamic_price_rule",
+  "resources.rental_agreement",
+  "resources.rental_agreement_item",
+  "resources.rental_inspection",
+  "resources.rental_inspection_item",
+  "retail.price",
+  "retail.product_recommendation",
+  "seating.seat_hold_item",
+  "sync.cell_connection",
+  "sync.cross_cell_rejection",
+  "sync.cross_cell_request",
+  "sync.guest_link",
+  "venue.department",
+  "venue.outlet",
+  "venue.space",
+  "venue.venue",
+  "venue.zone",
+  "venuemap.layout",
+  "wallet.access",
+  "wallet.account",
+  "wallet.balance",
+  "wallet.hold",
+  "wallet.transaction",
+  "whitelabel.brand_setting",
+  "whitelabel.redirect",
+  "whitelabel.seo_setting",
+  "workforce.employee",
+  "workforce.employment",
+  "workforce.job_title",
+  "workforce.leave_balance",
+  "workforce.leave_type",
+  "workforce.pay_component",
+  "workforce.payroll_employee",
+  "workforce.payroll_line",
+  "workforce.payroll_run",
+  "workforce.payslip",
+  "workforce.roster",
+  "workforce.salary",
+  "workforce.salary_component",
+  "workforce.shift",
+  "workforce.work_assignment",
+  "workforce.work_time"
+ ],
+ "review": {
+  "ai.knowledge_group": [
+   0.5,
+   6,
+   "ai.knowledge_collection"
+  ],
+  "catalogue.product_recommendation": [
+   0.4,
+   2,
+   "catalogue.variant"
+  ],
+  "catalogue.rental_rate": [
+   0.4,
+   2,
+   "catalogue.variant"
+  ],
+  "catalogue.rental_requirement": [
+   0.4,
+   2,
+   "catalogue.variant"
+  ],
+  "catalogue.rental_rule": [
+   0.4,
+   2,
+   "catalogue.variant"
+  ],
+  "catalogue.upgrade_rule": [
+   0.4,
+   2,
+   "catalogue.variant"
+  ],
+  "control.channel": [
+   0.43,
+   3,
+   "control.cell_instance"
+  ],
+  "control.channel_item": [
+   0.43,
+   3,
+   "control.cell_instance"
+  ],
+  "fnb.price_list": [
+   0.43,
+   3,
+   "fnb.combo"
+  ],
+  "fnb.product": [
+   0.43,
+   3,
+   "fnb.combo"
+  ],
+  "fnb.variant": [
+   0.43,
+   3,
+   "fnb.combo"
+  ],
+  "identity.customer_extra_option": [
+   0.4,
+   2,
+   "identity.principal"
+  ],
+  "identity.enabled_module": [
+   0.45,
+   5,
+   "identity.delegated_access"
+  ],
+  "identity.refresh_token": [
+   0.4,
+   4,
+   "identity.access_override"
+  ],
+  "identity.user_access": [
+   0.54,
+   7,
+   "identity.delegated_access"
+  ],
+  "identity.user_account": [
+   0.44,
+   4,
+   "identity.principal"
+  ],
+  "ledger.journal": [
+   0.56,
+   9,
+   "ledger.journal_entry"
+  ],
+  "marketing.customer_segment_rule": [
+   0.5,
+   3,
+   "marketing.segment_criterion"
+  ],
+  "marketing.journey_enrollment": [
+   0.5,
+   5,
+   "marketing.journey_entrant"
+  ],
+  "marketing.journey_step": [
+   0.43,
+   3,
+   "marketing.loyalty_programme"
+  ],
+  "marketing.points_earning_rule": [
+   0.43,
+   3,
+   "marketing.loyalty_programme"
+  ],
+  "marketing.points_redemption_rule": [
+   0.43,
+   3,
+   "marketing.loyalty_programme"
+  ],
+  "marketing.reward": [
+   0.57,
+   4,
+   "marketing.loyalty_programme"
+  ],
+  "marketing.sla_policy": [
+   0.57,
+   4,
+   "marketing.loyalty_programme"
+  ],
+  "orders.payment_gateway": [
+   0.43,
+   3,
+   "orders.fraud_rule"
+  ],
+  "orders.payment_method": [
+   0.43,
+   3,
+   "orders.fraud_rule"
+  ],
+  "orders.payment_policy": [
+   0.5,
+   3,
+   "orders.reservation"
+  ],
+  "orders.payment_terminal": [
+   0.5,
+   3,
+   "orders.reservation"
+  ],
+  "platform.cell_endpoint": [
+   0.43,
+   3,
+   "platform.dsar_request"
+  ],
+  "platform.tenant_subscription": [
+   0.43,
+   3,
+   "platform.dsar_request"
+  ],
+  "reporting.report_input": [
+   0.43,
+   3,
+   "reporting.report_parameter"
+  ],
+  "resources.rental_product_mapping": [
+   0.5,
+   3,
+   "resources.resource_relation"
+  ],
+  "retail.price_list": [
+   0.4,
+   2,
+   "retail.reservation_line"
+  ],
+  "retail.product": [
+   0.4,
+   2,
+   "retail.reservation_line"
+  ],
+  "retail.product_category": [
+   0.4,
+   2,
+   "retail.reservation_line"
+  ],
+  "retail.variant": [
+   0.4,
+   2,
+   "retail.reservation_line"
+  ],
+  "whitelabel.brand_version": [
+   0.4,
+   4,
+   "whitelabel.config_version"
+  ]
+ },
+ "strong": {
+  "access.entry_rule": [
+   0.8,
+   8,
+   "access.admission_rules"
+  ],
+  "access.scan": [
+   0.6,
+   9,
+   "access.scan_event"
+  ],
+  "ai.action_request": [
+   0.69,
+   9,
+   "ai.proposed_action"
+  ],
+  "ai.activity": [
+   0.72,
+   13,
+   "ai.interaction"
+  ],
+  "ai.indexing_job": [
+   0.64,
+   9,
+   "ai.index_job"
+  ],
+  "ai.knowledge_item": [
+   0.78,
+   7,
+   "ai.knowledge_document"
+  ],
+  "ai.suggestion_result": [
+   0.88,
+   7,
+   "ai.suggestion_outcome"
+  ],
+  "control.api_limit": [
+   0.71,
+   5,
+   "control.api_quota"
+  ],
+  "fnb.food_safety_action": [
+   0.64,
+   7,
+   "fnb.corrective_action"
+  ],
+  "fnb.recipe_item": [
+   0.83,
+   5,
+   "fnb.recipe_ingredient"
+  ],
+  "ledger.settlement_issue": [
+   0.7,
+   7,
+   "ledger.settlement_exception"
+  ],
+  "maintenance.preventive_plan": [
+   0.82,
+   9,
+   "maintenance.maintenance_plan"
+  ],
+  "marketing.customer_consent": [
+   0.67,
+   6,
+   "marketing.consent_record"
+  ],
+  "marketing.do_not_contact": [
+   0.86,
+   6,
+   "marketing.suppression"
+  ],
+  "platform.region_setting": [
+   0.73,
+   8,
+   "platform.region_settings"
+  ],
+  "queue.entry": [
+   0.69,
+   9,
+   "queue.waiting_guest"
+  ],
+  "venuemap.route": [
+   0.8,
+   8,
+   "venuemap.path"
+  ],
+  "whitelabel.faq": [
+   1.0,
+   6,
+   "whitelabel.faq_entry"
+  ],
+  "whitelabel.home_section": [
+   0.67,
+   2,
+   "whitelabel.homepage_section"
+  ],
+  "whitelabel.menu_item": [
+   0.67,
+   2,
+   "whitelabel.homepage_section"
+  ]
+ }
+}

@@ -13,7 +13,7 @@ decision: docs/adr/0028-service-decomposition.md
 tiers:
 - tier: foundation
   meaning: Read by everything, reads nothing above. **Deploys first and alone** — twelve contracts read
-    Identity and 289 tables anchor on `platform.org_unit`.
+    Identity and 289 tables anchor on `platform.scope`.
   services:
   - service: TenancyService
     operations: 136

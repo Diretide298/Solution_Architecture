@@ -78,14 +78,14 @@ SCHEMA_WHY = {
     "pii": ("Names, phones, emails, documents. **Separate from `identity` deliberately** (ADR-0023): "
             "a principal is who may act, a subject is who they are. **One writer only** — which is "
             "what makes a subject-access export and a deletion request answerable at all."),
-    "platform": ("Tenants, venues, workstations, devices, scope nodes. **`platform.org_unit` is "
+    "platform": ("Tenants, venues, workstations, devices, scope nodes. **`platform.scope` is "
                  "reached by 289 of 379 tables** — the tenancy spine, and the terminal anchor for "
                  "almost everything in the package."),
     "catalogue": ("Products, variants, prices, performances, inventory leases. **What is for sale.** "
                   "Separate from `orders` because a product outlives every order against it, and a "
                   "catalogue that lived in the order schema could not be published as a bundle."),
     "orders": ("Carts, orders, lines, payments, refunds, shifts, cash. **The transactional core and "
-               "the highest write rate in the platform.** Also holds `orders.shift` and the cash "
+               "the highest write rate in the platform.** Also holds `orders.pos_shift` and the cash "
                "tables — a till session is an order-side artefact, not a workforce one."),
     "access": ("Entitlements, scans, access points, admission profiles. **A gate decision in under "
                "300ms**, made forty times a minute per lane. Separate because it is the only schema "
@@ -251,7 +251,7 @@ def main() -> int:
                           "one mechanism, three callers.",
         "inventory.movement": "**Every stock change is a movement.** Waste from F&B and adjustment from "
                               "inventory are the same act with a different reason.",
-        "ai.interaction": "**The governed reporting pair** (ADR-0020). `reporting` may write an AI "
+        "ai.activity": "**The governed reporting pair** (ADR-0020). `reporting` may write an AI "
                           "interaction because a natural-language query is one.",
     }
     w2 = defaultdict(lambda: defaultdict(int))
@@ -277,7 +277,7 @@ def main() -> int:
     seq = [
         (1, "foundation", "IdentityService, TenancyService",
          "**First and alone.** Twelve contracts read identity and 289 tables anchor on "
-         "`platform.org_unit` — a restart here is an outage everywhere."),
+         "`platform.scope` — a restart here is an outage everywhere."),
         (2, "commerce", "CatalogueService, LedgerService, AccessService, OrderService",
          "**Catalogue before Order**, because a till pulls a bundle before it sells. **Access last "
          "of the four** — it runs at the edge with a local cache and can lag the others safely."),
@@ -305,7 +305,7 @@ def main() -> int:
     ws5 = wb.create_sheet("Scope hierarchy")
     ws5["A1"] = "Eight levels, and why each one exists"
     ws5["A1"].font = Font(name="Arial", size=13, bold=True, color="0B1324")
-    ws5["A2"] = ("platform.org_unit is reached by 289 of 379 tables — the tenancy spine. "
+    ws5["A2"] = ("platform.scope is reached by 289 of 379 tables — the tenancy spine. "
                  "Configuration resolves by walking the path upward until something answers.")
     ws5["A2"].font = Font(name="Arial", size=10, italic=True, color="5A6577")
     head(ws5, ["Level", "Branch", "Ops", "Configs", "What it owns", "Why it exists at this height"],

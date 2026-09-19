@@ -15,10 +15,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
 - operation: amendFnbOrder
   verb: PATCH
   path: /fnb-orders/{orderId}
@@ -29,10 +29,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
 - operation: applyMenuActions
   verb: POST
   path: /menus/{menuId}/actions
@@ -93,10 +93,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
 - operation: chaseStation
   verb: POST
   path: /kitchen-stations/{stationId}/chase
@@ -150,10 +150,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   writes:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
 - operation: closeCorrectiveAction
   verb: POST
   path: /food-safety/corrective-actions/{actionId}/close
@@ -179,11 +179,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
 - operation: compItem
   verb: POST
@@ -243,10 +243,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
 - operation: createGuestFnbOrder
   verb: POST
   path: /guest-orders
@@ -262,8 +262,8 @@ operations:
   - inventory.stock_level
   writes:
   - cache:idempotency
-  - fnb.fnb_order
   - fnb.kitchen_ticket
+  - fnb.service_order
 - operation: createMenu
   verb: POST
   path: /menus
@@ -309,7 +309,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
-  - fnb.table
+  - fnb.dining_table
 - operation: createTableReservation
   verb: POST
   path: /table-reservations
@@ -320,7 +320,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_reservation
   writes:
   - cache:idempotency
@@ -377,7 +377,7 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_session
   - orders.payment
   writes: []
@@ -390,7 +390,7 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.fnb_order
+  - fnb.service_order
   writes: []
 - operation: getGuestBill
   verb: GET
@@ -401,7 +401,7 @@ operations:
   - guest
   offline: false
   reads:
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_session
   - orders.payment
   writes: []
@@ -426,8 +426,8 @@ operations:
   offline: false
   reads:
   - fnb.delivery_location
-  - fnb.fnb_order
   - fnb.kitchen_ticket
+  - fnb.service_order
   writes: []
 - operation: getHaccpStatus
   verb: GET
@@ -477,7 +477,7 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.table
+  - fnb.dining_table
   writes: []
 - operation: getTableVisit
   verb: GET
@@ -488,7 +488,7 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
   writes: []
 - operation: holdCourse
@@ -516,7 +516,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   - platform.outlet
   writes:
   - cache:idempotency
@@ -530,8 +530,8 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.eighty_six_event
   - fnb.menu_item
+  - fnb.sold_out_item
   writes: []
 - operation: listDeliveryLocations
   verb: GET
@@ -553,8 +553,8 @@ operations:
   - guest
   offline: false
   reads:
-  - fnb.fnb_order
   - fnb.menu
+  - fnb.service_order
   - platform.outlet
   writes: []
 - operation: listFnbOrders
@@ -566,7 +566,7 @@ operations:
   - staff
   offline: false
   reads:
-  - fnb.fnb_order
+  - fnb.service_order
   writes: []
 - operation: listKitchenStations
   verb: GET
@@ -647,7 +647,7 @@ operations:
   - staff
   offline: true
   reads:
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_reservation
   writes: []
 - operation: logColdChain
@@ -691,7 +691,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.temperature_log
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - fnb.corrective_action
@@ -706,12 +706,12 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
   - fnb.kitchen_ticket
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
   - fnb.kitchen_ticket
+  - fnb.service_order
 - operation: mergeTableVisits
   verb: POST
   path: /table-visits/{visitId}/merge
@@ -722,11 +722,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
 - operation: moveTableVisit
   verb: POST
@@ -738,8 +738,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.dining_table
   - fnb.kitchen_ticket
-  - fnb.table
   - fnb.table_visit
   writes:
   - cache:idempotency
@@ -784,11 +784,11 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
 - operation: planProductionRun
   verb: POST
@@ -858,7 +858,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_visit
   writes:
   - cache:idempotency
@@ -932,10 +932,10 @@ operations:
   reads:
   - cache:idempotency
   - fnb.delivery_location
-  - fnb.fnb_order
+  - fnb.service_order
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
 - operation: recordWaste
   verb: POST
   path: /outlets/{outletId}/waste
@@ -1017,7 +1017,7 @@ operations:
   - staff
   offline: false
   reads:
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_reservation
   - fnb.table_visit
   writes: []
@@ -1061,7 +1061,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_reservation
   writes:
   - cache:idempotency
@@ -1094,7 +1094,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - pii.subject
   writes:
   - cache:idempotency
@@ -1225,11 +1225,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   writes:
   - cache:idempotency
   - cache:resolution
-  - fnb.table
+  - fnb.dining_table
 - operation: setServiceStage
   verb: PUT
   path: /table-visits/{visitId}/stage
@@ -1269,11 +1269,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   writes:
   - cache:idempotency
   - cache:resolution
-  - fnb.table
+  - fnb.dining_table
 - operation: setTableLayout
   verb: PUT
   path: /outlets/{outletId}/tables
@@ -1284,10 +1284,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   writes:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
 - operation: signCorrectiveAction
   verb: POST
   path: /food-safety/corrective-actions/{actionId}/sign
@@ -1376,12 +1376,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - fnb.table
+  - fnb.dining_table
   - fnb.table_visit
   writes:
   - cache:idempotency
   - cache:resolution
-  - fnb.table
+  - fnb.dining_table
 - operation: updateTableReservation
   verb: PATCH
   path: /table-reservations/{reservationId}
@@ -1406,11 +1406,11 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
   writes:
   - cache:idempotency
-  - fnb.fnb_order
+  - fnb.service_order
   - fnb.table_visit
 - operation: verifyAllergens
   verb: POST

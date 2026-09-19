@@ -12214,7 +12214,7 @@ components:
           type: string
           format: date-time
     LoyaltyProgramme:
-      x-ticvai-persistence: marketing.loyalty_programme + marketing.loyalty_tier
+      x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule
       type: object
       required:
       - id

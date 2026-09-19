@@ -213,7 +213,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.role
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - workforce.announcement

@@ -15,7 +15,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - inventory.movement
@@ -29,7 +29,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - inventory.movement

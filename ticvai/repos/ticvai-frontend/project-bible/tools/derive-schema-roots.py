@@ -6,7 +6,7 @@ derive from it.** The relationship graph knows every edge and nothing said which
 is *about*.
 
 The root is not simply the most-referenced table. `identity.principal` is referenced by 69 tables
-across the package and is still the root of `identity`; `platform.org_unit` is referenced by 64
+across the package and is still the root of `identity`; `platform.scope` is referenced by 64
 and is the root of `platform`. But **`access.access_point` has more inbound edges inside `access`
 than `access.entitlement` does, and the schema is about entitlements** — a gate is equipment, and
 the thing being admitted is the point.
@@ -53,7 +53,7 @@ OVERRIDE = {
     "promotions": ("promotions.promotion",
                    "**`bundle` scores higher because bundle lines point at it.** A bundle is one "
                    "kind of promotion, not the thing promotions are about."),
-    "fnb": ("fnb.fnb_order",
+    "fnb": ("fnb.service_order",
             "**`table_visit` scores higher and not every F&B order has a table** — a kiosk order, "
             "a lounger delivery and a collection order have none. The order is the constant."),
 }
@@ -83,7 +83,7 @@ def main() -> int:
     # `identity.role`, because `principal` points at `role` rather than the other way round.
     #
     # A table's real anchor is where its own outbound keys stop. Following them to a fixed point
-    # gives 42 terminal tables, and **`platform.org_unit` is reached by 289 of 353** — which is
+    # gives 42 terminal tables, and **`platform.scope` is reached by 289 of 353** — which is
     # the honest shape of the package: a tenancy spine with everything hanging off it.
     outbound_to: dict = defaultdict(set)
     for r in hard:
@@ -113,7 +113,7 @@ def main() -> int:
     for t, n in anchor_counts.most_common(10):
         spine.append(f"| `{t}` | {n} |")
     spine += ["",
-              "`platform.org_unit` is reached by 289 of 353 — **the tenancy spine, and almost",
+              "`platform.scope` is reached by 289 of 353 — **the tenancy spine, and almost",
               "everything hangs off it.** `identity.role` at 207 is the authorisation spine.",
               "",
               "**A first pass walked the other way** — asking who points *at* a root — and left 222",
@@ -234,7 +234,7 @@ def main() -> int:
                 "schemaRoot": root,
                 "isSchemaRoot": t == root,
                 # **Where this table's own keys ultimately stop**, following them across schemas.
-                # A table anchored only on `platform.org_unit` is tenancy-scoped and owns
+                # A table anchored only on `platform.scope` is tenancy-scoped and owns
                 # nothing else; one anchored on several sits at a join between them.
                 "anchors": term,
                 "isAnchor": t in term and len(term) == 1,

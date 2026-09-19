@@ -35,7 +35,7 @@ Checks:
      passed because each value was individually plausible.
  10. AI isolation holds in the lineage, not just in prose: no AI operation writes outside its
      own stores, no other contract writes an AI table, and every model-calling operation writes
-     an `ai.interaction`. Both halves were breached on 17 August with every checker passing.
+     an `ai.activity`. Both halves were breached on 17 August with every checker passing.
  10. No document names a platform code that no longer exists. The kiosk was renumbered P03 to
      P05 and `platform-deployment.md`, two contracts and the tooltips kept the old code for
      days — every checker passed, because a stale code in prose resolves to nothing and breaks
@@ -807,9 +807,9 @@ def main() -> int:
     # **Three tables are genuinely global** and named rather than inferred, because "no scope" and
     # "not scoped yet" look identical from here.
     GLOBAL_TABLES = {
-        "control.subscription_plan",   # the plan catalogue the platform sells
+        "subscription.plan",   # the plan catalogue the platform sells
         "control.api_version",         # the API the platform publishes
-        "platform.org_unit",           # the root of the tree — it *is* the scope
+        "platform.scope",           # the root of the tree — it *is* the scope
         # **`pii.subject` is deliberately unscoped and it is the most important exemption here.**
         # A guest is not a venue's guest — they buy at one venue and are admitted at another, and
         # ADR-0023 keeps the subject isolated so a data-subject request has one place to answer
@@ -955,7 +955,7 @@ def main() -> int:
     # 12. AI isolation, from ADR-0020. Two breaches existed on the day that ADR was written and
     # every validator passed, because each operation existed and resolved to a real table.
     # `generateVenueLayout` wrote into `seating.import_job` — AI writing into a transactional
-    # contract — and `askReportingQuestion` wrote no `ai.interaction` despite being brought under
+    # contract — and `askReportingQuestion` wrote no `ai.activity` despite being brought under
     # governance the same day.
     lin_path = H / "api-data-lineage.json"
     if lin_path.exists():
@@ -982,8 +982,8 @@ def main() -> int:
             elif ai_writes and op not in GOVERNED_OUTSIDE_AI:
                 ERRORS.append(f"{op} ({v.get('contract')}) writes {ai_writes} — only the AI contract "
                               "and the governed reporting pair may write an AI table")
-            if op in CALLS_A_MODEL and "ai.interaction" not in writes:
-                ERRORS.append(f"{op} calls a model and writes no ai.interaction — requirement 8.3.55 "
+            if op in CALLS_A_MODEL and "ai.activity" not in writes:
+                ERRORS.append(f"{op} calls a model and writes no ai.activity — requirement 8.3.55 "
                               "is satisfied in prose and not in the data")
 
     # 17. A table documented as a read-only projection must have no writers. `platform.tenant`

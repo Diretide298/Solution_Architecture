@@ -560,7 +560,7 @@ operations:
   reads:
   - marketing.attribution_touch
   - marketing.journey
-  - marketing.journey_entrant
+  - marketing.journey_enrollment
   - marketing.message_dispatch
   writes: []
 - operation: getLostItemMatches

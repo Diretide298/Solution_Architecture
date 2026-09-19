@@ -35,7 +35,7 @@ OUT = ROOT / "diagrams"
 TIER_ORDER = ["foundation", "commerce", "operations", "engagement", "platform"]
 TIER_NOTE = {
     "foundation": ("Read by everything, reads nothing above. **Deploys first and alone** — twelve "
-                   "contracts read Identity and 289 tables anchor on `platform.org_unit`."),
+                   "contracts read Identity and 289 tables anchor on `platform.scope`."),
     "commerce": "The sale path. Highest availability and the highest write rate in the platform.",
     "operations": ("What a venue does with what it sold. **Licensed per module** — a venue that "
                    "bought none of these runs none of them."),
@@ -124,13 +124,13 @@ def write_hierarchy(lin, contract_configs):
             "at four different heights, and flattening them means either every venue configures "
             "everything from scratch or one change at the top breaks a venue that needed to "
             "differ.\n\n"
-            "`platform.org_unit` is the answer. A node has a `level`, a `parent_id` and a "
+            "`platform.scope` is the answer. A node has a `level`, a `parent_id` and a "
             "materialised `path`; **configuration resolves by walking that path upward until "
             "something answers.**"),
         "decisions": ["docs/adr/0011-hierarchy-is-binding.md",
                       "docs/adr/0018-configuration-scope.md"],
         "spine": {
-            "table": "platform.org_unit",
+            "table": "platform.scope",
             "columns": ["id", "level", "parent_id", "path", "code", "name", "is_active",
                         "child_count"],
             "note": ('**The tenancy spine.** **304 of 379 tables anchor on it** and 71 reference it directly — the terminal anchor for almost everything in the package, and the reason a scope walk answers nearly every configuration question.'),
@@ -330,12 +330,12 @@ def write_project_hld(services, lin, schema, real, owner):
             {"system": "Queue systems", "via": "VenueOpsService",
              "note": ("**Adaptor-first** (ADR-0012). The platform holds what the venue's own queue "
                       "system reports.")},
-            {"system": "AI providers", "via": reached_by("ai.interaction"),
-             "reachedThrough": "ai.interaction",
+            {"system": "AI providers", "via": reached_by("ai.activity"),
+             "reachedThrough": "ai.activity",
              "note": ("BYOK, budgeted and metered. **Read-only against the transactional core** "
                       "(ADR-0020).\n\n"
                       "**Reporting reaches it too** — the governed pair. A natural-language query "
-                      "*is* an AI interaction, which is why `reporting` may write `ai.interaction` "
+                      "*is* an AI interaction, which is why `reporting` may write `ai.activity` "
                       "and nothing else outside AiService may.")},
             {"system": "Webhooks out", "via": reached_by("control.webhook_subscription"),
              "reachedThrough": "control.webhook_subscription",

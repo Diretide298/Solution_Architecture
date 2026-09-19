@@ -2,7 +2,7 @@
 """Give every table a note saying what it holds, what it hangs off, and what reaches it.
 
 **165 of 368 tables carried a note and the distribution was backwards.** `ai.index_entry` — an
-obscure mapping table — had a good one; **`platform.org_unit`, the single most-referenced table in
+obscure mapping table — had a good one; **`platform.scope`, the single most-referenced table in
 the package, had none.** Notes went where somebody happened to be working rather than where a
 reader needs them.
 
@@ -92,7 +92,7 @@ WHAT = {
         "are the states in order: provisioned, live, drained, reconciled, decommissioned. "
         "**`sequence_high` is what the merge back reads**, because the sale issued order numbers "
         "the origin cell never saw."),
-    "platform.org_unit": (
+    "platform.scope": (
         "**One unit of the venue structure** — a tenant, a brand, a region, a venue, a department, "
         "a sub-department, a workstation or an outlet. Every row has a level, a parent and a "
         "materialised `path`, and **configuration resolves by walking that path upward until "
@@ -118,7 +118,7 @@ WHAT = {
         "**One side of a double-entry movement.** Renamed from `entry`, which sat beside "
         "`journal_entry` and `journal_line` — **three things called entry in one schema is a "
         "schema nobody reads twice.**"),
-    "queue.waiting_guest": (
+    "queue.entry": (
         "**A person in a virtual queue**, with their position and their window. Renamed from "
         "`entry`: it is somebody waiting, not a row in a log."),
     "access.admission_rules": (
@@ -128,7 +128,7 @@ WHAT = {
         "**Something bought in one jurisdiction and honoured in another.** ADR-0010: the guest does "
         "not move, a pseudonymous link does. Renamed from `cross_region_entitlement` — a right to redeem "
         "what, and where?"),
-    "control.subscription_plan": (
+    "subscription.plan": (
         "**What a tenant pays for** — the modules, the limits, the price. Renamed from `plan`, "
         "which sat beside `migration_plan` and `production_plan`."),
     # **Written 31 August, ranked by reach.** 200 of 369 tables carried a note saying no
@@ -219,7 +219,7 @@ WHAT = {
     "orders.order_line": (
         "**One thing bought on one order**, priced at the moment of sale. A price list changing "
         "afterwards does not change what somebody paid."),
-    "orders.shift": (
+    "orders.pos_shift": (
         "**A cash session at a workstation** — opened with a float, closed with a count and a "
         "variance. Moved to OrderService on 24 August because all its data is in `orders`."),
     "assets.media_asset": (
@@ -229,7 +229,7 @@ WHAT = {
         "**A customer of the platform** — the root of the org tree. `platform.tenant` is a "
         "one-column projection of this, so a cell can resolve its own tenant without reaching "
         "across a residency boundary."),
-    "fnb.fnb_order": (
+    "fnb.service_order": (
         "**Food and drink ordered**, wherever from — a counter, a table, a lounger, the app. The "
         "kitchen ticket is what the pass sees; this is what the guest bought."),
     "fnb.menu_item": (
@@ -241,7 +241,7 @@ WHAT = {
     "catalogue.event": (
         "**A named thing on at a venue**, grouping performances. A concert is an event; each "
         "showing is a performance."),
-    "fnb.table": (
+    "fnb.dining_table": (
         "**A physical table with a capacity and a position.** What may combine with what is "
         "declared rather than inferred \u2014 a pillar or a service run means two adjacent tables "
         "sometimes cannot."),
@@ -318,7 +318,7 @@ WHAT = {
     "control.environment": "**Dev, staging, production — and which cells are in each.** Promotion may require approval and a soak period.",
     "control.rollout": "**One release reaching cells**, in waves, with a canary first.",
     "control.migration": "**A schema change with a version.** Plans group them; runs record what happened per cell.",
-    "control.subscription": "**What a tenant is paying for**, and which modules that licenses.",
+    "subscription.contract": "**What a tenant is paying for**, and which modules that licenses.",
     "control.invoice": "**A bill to a tenant.** Lines are children.",
     "control.usage_record": "**What a tenant consumed**, which is what an invoice is computed from.",
     "whitelabel.feature_toggle": "**A switch a tenant may throw**, distinct from a module they have licensed.",
@@ -344,7 +344,7 @@ WHAT = {
     "platform.region_settings": "**Currency, scale, timezone, fiscal year.** Region-scoped and not overridable below.",
     "maintenance.incident": "**Something that happened and needs recording** \u2014 distinct from a work order, which is something to do.",
     "maintenance.inspection": "**A completed check against a template.** The responses are children.",
-    "maintenance.maintenance_plan": "**What should be inspected, how often.** Generates work orders rather than being one.",
+    "maintenance.preventive_plan": "**What should be inspected, how often.** Generates work orders rather than being one.",
     "reporting.execution": "**One run of a report definition.** The result set is cached in object storage, not here.",
     "reporting.schedule": "**When a report runs and who receives it.**",
     "reporting.export": "**A file somebody asked for**, with an expiry.",
@@ -366,7 +366,7 @@ WHAT = {
     "control.support_notice": "**Something the platform is telling tenants**, scheduled or in progress.",
     "control.upgrade_schedule": "**When a tenant has agreed to be upgraded.** Not every tenant takes a release the day it ships.",
     "fnb.bill_split": "**How one table\u2019s bill was divided.** A party of six paying separately is the ordinary case.",
-    "fnb.fnb_order_line": "**One item on a food order**, with its modifiers resolved at the moment of sale.",
+    "fnb.service_order_line": "**One item on a food order**, with its modifiers resolved at the moment of sale.",
     "fnb.kitchen_station": "**Where a ticket is routed** — grill, cold, bar, pass.",
     "fnb.kitchen_ticket_line": "**One item the kitchen is making**, bumped independently.",
     "fnb.location_session": "**A guest claim on a delivery location** — a lounger, a cabana. The equivalent of a table session away from a table.",

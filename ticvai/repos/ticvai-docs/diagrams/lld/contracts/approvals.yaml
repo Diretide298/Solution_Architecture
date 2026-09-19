@@ -146,7 +146,7 @@ operations:
   - approvals.rule
   - cache:idempotency
   - identity.delegated_access
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
 - operation: getApprovalAnalytics

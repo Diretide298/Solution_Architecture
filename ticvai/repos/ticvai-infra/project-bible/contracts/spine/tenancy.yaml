@@ -2303,7 +2303,7 @@ components:
       enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
 
     OrgUnit:
-      x-ticvai-persistence: "platform.org_unit"
+      x-ticvai-persistence: "platform.scope"
       type: object
       required: [id, level, path, code, name, isActive]
       properties:

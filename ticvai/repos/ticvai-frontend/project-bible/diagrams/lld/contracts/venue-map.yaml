@@ -48,7 +48,7 @@ operations:
   reads:
   - assets.media_asset
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   - venuemap.map
   writes:
   - cache:idempotency
@@ -94,7 +94,7 @@ operations:
   offline: false
   reads:
   - access.scan_event
-  - queue.waiting_guest
+  - queue.entry
   - venuemap.map
   - venuemap.point
   writes: []

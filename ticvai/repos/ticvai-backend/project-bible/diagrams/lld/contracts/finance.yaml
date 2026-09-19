@@ -239,7 +239,7 @@ operations:
   reads:
   - ledger.fx_rate
   - orders.payment
-  - orders.shift
+  - orders.pos_shift
   writes: []
 - operation: getJournalEntry
   verb: GET

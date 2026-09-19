@@ -137,8 +137,8 @@ def main() -> int:
     #     mention it, applied to the columns that name it and declare nothing.
     #
     # **The stem rules cannot see a domain alias and should not guess one.** A venue is
-    # `platform.org_unit`, so `venue_id` matches no stem and 15 columns carrying it stayed
-    # unlinked — while 59 others declared `platform.org_unit` explicitly. `order_id` is the
+    # `platform.scope`, so `venue_id` matches no stem and 15 columns carrying it stayed
+    # unlinked — while 59 others declared `platform.scope` explicitly. `order_id` is the
     # opposite problem: `order` is a suffix of `sales_order`, `work_order` and
     # `purchase_order`, so the ambiguity rule correctly refuses it, and 12 declared columns
     # say which one is meant.

@@ -1013,7 +1013,7 @@ components:
 
     ApiQuota:
       type: object
-      x-ticvai-persistence: "control.api_quota"
+      x-ticvai-persistence: "control.api_limit"
       description: >
         13.1.36 and 13.1.37. **A quota protects the venue, not the developer.**
       required: [clientId, sustainedPerMinute]

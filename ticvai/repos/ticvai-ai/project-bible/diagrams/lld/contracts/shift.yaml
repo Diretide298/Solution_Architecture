@@ -15,10 +15,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   writes:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   - platform.outbox
 - operation: adjustDepositBoxFloat
   verb: POST
@@ -61,10 +61,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   writes:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
 - operation: closeDepositBoxes
   verb: POST
   path: /deposit-boxes/close
@@ -96,13 +96,13 @@ operations:
   - orders.cash_count_line
   - orders.cash_movement
   - orders.payment
-  - orders.shift
+  - orders.pos_shift
   - platform.venue_settings
   writes:
   - cache:idempotency
   - ledger.journal_entry
   - orders.cash_count_line
-  - orders.shift
+  - orders.pos_shift
 - operation: createCashMovement
   verb: POST
   path: /shifts/{shiftId}/cash-movements
@@ -128,7 +128,7 @@ operations:
   - staff
   offline: true
   reads:
-  - orders.shift
+  - orders.pos_shift
   writes: []
 - operation: getShift
   verb: GET
@@ -139,7 +139,7 @@ operations:
   - staff
   offline: true
   reads:
-  - orders.shift
+  - orders.pos_shift
   writes: []
 - operation: listCashMovements
   verb: GET
@@ -186,7 +186,7 @@ operations:
   - staff
   offline: false
   reads:
-  - orders.shift
+  - orders.pos_shift
   writes: []
 - operation: openShift
   verb: POST
@@ -200,13 +200,13 @@ operations:
   - cache:idempotency
   - identity.principal
   - orders.cash_count_line
-  - orders.shift
+  - orders.pos_shift
   - platform.venue_settings
   - platform.workstation
   writes:
   - cache:idempotency
   - orders.cash_count_line
-  - orders.shift
+  - orders.pos_shift
 - operation: recordNoSale
   verb: POST
   path: /shifts/{shiftId}/no-sale
@@ -231,10 +231,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   writes:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
 - operation: resumeShift
   verb: POST
   path: /shifts/{shiftId}/resume
@@ -245,10 +245,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   writes:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
 - operation: suspendShift
   verb: POST
   path: /shifts/{shiftId}/suspend
@@ -259,10 +259,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
   writes:
   - cache:idempotency
-  - orders.shift
+  - orders.pos_shift
 - operation: withdrawFromDepositBox
   verb: POST
   path: /deposit-boxes/{boxId}/withdraw

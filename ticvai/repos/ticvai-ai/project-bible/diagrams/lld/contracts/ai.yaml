@@ -49,7 +49,7 @@ operations:
   - ai.proposed_action
   - cache:idempotency
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.proposed_action
   - cache:idempotency
 - operation: generateConfiguration
@@ -74,8 +74,8 @@ operations:
   - catalogue.product
   - catalogue.variant_dimension
   - marketing.loyalty_programme
-  - platform.org_unit
   - platform.region_settings
+  - platform.scope
   - promotions.promotion
   - qdrant:knowledge
   - seating.seat
@@ -84,7 +84,7 @@ operations:
   - seating.seating_rules
   - seating.section
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.proposed_action
   - cache:idempotency
   - qdrant:knowledge
@@ -101,7 +101,7 @@ operations:
   - assets.media_asset
   - cache:idempotency
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.layout_draft
   - cache:idempotency
 - operation: getAiPolicy
@@ -124,7 +124,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.interaction
+  - ai.activity
   writes: []
 - operation: ingestKnowledgeDocument
   verb: POST
@@ -166,7 +166,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.interaction
+  - ai.activity
   writes: []
 - operation: listAiProviders
   verb: GET
@@ -251,7 +251,7 @@ operations:
   - cache:idempotency
   - control.content_block
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.proposed_action
   - cache:idempotency
 - operation: proposeVenueLabels
@@ -270,7 +270,7 @@ operations:
   - venuemap.import_job
   - venuemap.point
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.proposed_action
   - cache:idempotency
 - operation: proposeWalkways
@@ -289,7 +289,7 @@ operations:
   - venuemap.import_job
   - venuemap.map
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.proposed_action
   - cache:idempotency
 - operation: recordSuggestionOutcome
@@ -367,7 +367,7 @@ operations:
   - ai.suggestion
   - cache:idempotency
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.suggestion
   - cache:idempotency
 - operation: semanticSearch
@@ -387,7 +387,7 @@ operations:
   - catalogue.product
   - qdrant:knowledge
   writes:
-  - ai.interaction
+  - ai.activity
   - cache:answer
   - cache:idempotency
   - qdrant:knowledge
@@ -412,7 +412,7 @@ operations:
   - cache:idempotency
   - qdrant:knowledge
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.message
   - ai.proposed_action
   - cache:answer
@@ -503,6 +503,6 @@ operations:
   - ai.provider
   - cache:idempotency
   writes:
-  - ai.interaction
+  - ai.activity
   - ai.provider
   - cache:idempotency

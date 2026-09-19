@@ -27,12 +27,12 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 34
+  tables: 32
   stores:
   - postgres
-  largestTable: orders.shift
+  largestTable: orders.pos_shift
 - schema: payments
-  tables: 16
+  tables: 18
   stores:
   - postgres
   largestTable: payments.method
@@ -1934,13 +1934,6 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
-- table: orders.payment_provider
-  columns: 14
-  store: postgres
-  parent: null
-  writtenBy:
-  - orders
-  foreignWriters: null
 - table: orders.payment_routing
   columns: 6
   store: postgres
@@ -1954,12 +1947,12 @@ tables:
   parent: orders.payment
   writtenBy: []
   foreignWriters: null
-- table: orders.payment_token
-  columns: 9
+- table: orders.pos_shift
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
-  - orders
+  - shift
   foreignWriters: null
 - table: orders.refund
   columns: 17
@@ -2005,13 +1998,6 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
-  foreignWriters: null
-- table: orders.shift
-  columns: 19
-  store: postgres
-  parent: null
-  writtenBy:
-  - shift
   foreignWriters: null
 - table: orders.stored_value_authorisation
   columns: 9
@@ -2114,6 +2100,13 @@ tables:
   writtenBy:
   - payments
   foreignWriters: null
+- table: payments.provider
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
 - table: payments.provider_connection
   columns: 11
   store: postgres
@@ -2154,6 +2147,13 @@ tables:
   parent: platform.device
   writtenBy:
   - payments
+  foreignWriters: null
+- table: payments.token
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
   foreignWriters: null
 readsFrom:
 - service: CatalogueService

@@ -20,12 +20,12 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 51
+  tables: 49
   stores:
   - postgres
   largestTable: control.partner_agreement
 - schema: subscription
-  tables: 9
+  tables: 11
   stores:
   - postgres
   largestTable: subscription.module_listing
@@ -1524,7 +1524,7 @@ tables:
   writtenBy:
   - public-api
   foreignWriters: null
-- table: control.api_quota
+- table: control.api_limit
   columns: 7
   store: postgres
   parent: null
@@ -1767,20 +1767,6 @@ tables:
   - marketing-crm
   foreignWriters:
   - marketing-crm
-- table: control.subscription
-  columns: 11
-  store: postgres
-  parent: platform.tenant
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: control.subscription_plan
-  columns: 13
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
 - table: control.support_notice
   columns: 8
   store: postgres
@@ -1865,6 +1851,13 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: subscription.contract
+  columns: 11
+  store: postgres
+  parent: platform.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: subscription.enforcement_policy
   columns: 3
   store: postgres
@@ -1894,6 +1887,13 @@ tables:
   foreignWriters: null
 - table: subscription.partner_quote
   columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.plan
+  columns: 13
   store: postgres
   parent: null
   writtenBy:

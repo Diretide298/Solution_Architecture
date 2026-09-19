@@ -168,9 +168,9 @@
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -300,9 +300,9 @@
    "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -821,7 +821,7 @@
    "orders.cart",
    "orders.cart_line",
    "pii.subject",
-   "platform.org_unit",
+   "platform.scope",
    "promotions.coupon_code",
    "promotions.promotion"
   ],
@@ -1252,10 +1252,10 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment_link",
-   "orders.payment_provider",
    "orders.reservation",
    "orders.sales_order",
-   "platform.org_unit"
+   "payments.provider",
+   "platform.scope"
   ],
   "writes": [
    "access.entitlement",
@@ -1318,13 +1318,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -1933,8 +1933,8 @@
    "games.card",
    "games.credit_ledger",
    "marketing.consent_record",
-   "orders.payment_provider",
-   "orders.payment_token",
+   "payments.provider",
+   "payments.token",
    "pii.subject",
    "wallet.gift_card",
    "wallet.wallet",
@@ -1943,7 +1943,7 @@
   "writes": [
    "cache:idempotency",
    "marketing.consent_record",
-   "orders.payment_token",
+   "payments.token",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -3041,13 +3041,13 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu",
    "fnb.menu_item",
    "fnb.modifier_group",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
    "inventory.stock_level",
@@ -3055,9 +3055,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.waitlist_entry"
@@ -3151,8 +3151,8 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "fnb.table_session",
    "orders.payment"
   ],
@@ -3206,9 +3206,9 @@
   "reads": [
    "assets.media_asset",
    "cache:resolution",
+   "queue.entry",
    "queue.queue",
    "queue.reading",
-   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -3267,14 +3267,14 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.waitlist_entry",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.waitlist_entry",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -3508,8 +3508,8 @@
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.activity",
    "ai.conversation",
-   "ai.interaction",
    "ai.message",
    "ai.proposed_action",
    "ai.suggestion",
@@ -3817,9 +3817,9 @@
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -3897,9 +3897,9 @@
    "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -4242,11 +4242,11 @@
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
-   "orders.payment_provider",
    "orders.reservation",
    "orders.sales_order",
    "orders.ticket_transfer",
-   "platform.org_unit",
+   "payments.provider",
+   "platform.scope",
    "platform.workstation",
    "promotions.promotion"
   ],
@@ -5205,9 +5205,9 @@
    "assets.media_asset",
    "cache:resolution",
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
    "queue.reading",
-   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -5288,9 +5288,9 @@
    "postgres"
   ],
   "reads": [
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -5373,13 +5373,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -5458,21 +5458,21 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.service_order",
    "fnb.table_session",
    "inventory.stock_level",
    "platform.outlet"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.service_order",
    "fnb.table_session"
   ],
   "storedProcedures": [],
@@ -5553,8 +5553,8 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "fnb.table_session",
    "orders.payment"
   ],
@@ -5882,8 +5882,8 @@
   ],
   "reads": [
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.menu",
+   "fnb.service_order",
    "platform.outlet"
   ],
   "writes": [],
@@ -6048,8 +6048,8 @@
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.activity",
    "ai.conversation",
-   "ai.interaction",
    "ai.message",
    "ai.proposed_action",
    "ai.suggestion",
@@ -6157,10 +6157,10 @@
    "catalogue.performance",
    "catalogue.variant",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu_item",
+   "fnb.service_order",
    "inventory.stock_level",
    "marketing.agent_availability",
    "marketing.conversation",
@@ -6170,14 +6170,14 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
    "catalogue.inventory_hold",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "marketing.conversation",
    "marketing.conversation_message",
    "orders.cart",
@@ -6270,7 +6270,7 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -6636,9 +6636,9 @@
   ],
   "reads": [
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
    "queue.reading",
-   "queue.waiting_guest",
    "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
@@ -7279,13 +7279,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -7642,9 +7642,9 @@
   ],
   "reads": [
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -7726,7 +7726,7 @@
    "catalogue.published_bundle"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "cache:idempotency"
   ],
@@ -7812,9 +7812,9 @@
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -7909,12 +7909,12 @@
    "cache:idempotency",
    "catalogue.product",
    "qdrant:knowledge",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.message",
    "ai.proposed_action",
    "ai.suggestion",
@@ -8282,12 +8282,12 @@
    "ai.suggestion",
    "cache:idempotency",
    "catalogue.product",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "cache:idempotency"
   ],
@@ -8883,7 +8883,7 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.waitlist_entry",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation",
    "maintenance.work_order",
    "platform.outlet",
@@ -8956,8 +8956,8 @@
    "marketing.consent_record",
    "marketing.loyalty_position",
    "marketing.loyalty_programme",
-   "orders.payment_provider",
-   "orders.payment_token",
+   "payments.provider",
+   "payments.token",
    "pii.subject",
    "wallet.gift_card",
    "wallet.wallet"
@@ -8966,8 +8966,8 @@
    "cache:idempotency",
    "marketing.consent_record",
    "marketing.loyalty_position",
-   "orders.payment_token",
    "orders.stored_value_authorisation",
+   "payments.token",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -9284,7 +9284,7 @@
    "orders.deposit_box",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.denomination",
    "platform.device",
    "platform.device_heartbeat",
@@ -9300,7 +9300,7 @@
    "orders.cash_movement",
    "orders.deposit_box",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -9533,8 +9533,8 @@
    "orders.refund",
    "orders.sales_order",
    "pii.subject",
-   "platform.org_unit",
    "platform.sale_board",
+   "platform.scope",
    "promotions.promotion",
    "retail.merchandise",
    "retail.return",
@@ -10091,7 +10091,7 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "platform.org_unit",
+   "platform.scope",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_hold"
@@ -10592,7 +10592,7 @@
    "orders.deposit_box",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.denomination",
    "platform.region_settings",
    "platform.venue_settings",
@@ -10607,7 +10607,7 @@
    "orders.cash_movement",
    "orders.deposit_box",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox",
    "retail.sale"
   ],
@@ -10839,7 +10839,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -10965,7 +10965,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.device",
    "platform.venue_settings",
    "platform.workstation",
@@ -10978,7 +10978,7 @@
    "ledger.journal_entry",
    "orders.cash_count_line",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox",
    "workforce.rota_assignment"
   ],
@@ -11377,13 +11377,13 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "identity.principal",
    "orders.cash_count_line",
    "orders.deposit_box",
    "orders.order_line",
+   "orders.pos_shift",
    "orders.sales_order",
-   "orders.shift",
    "platform.denomination",
    "platform.region_settings",
    "platform.venue_settings",
@@ -11392,11 +11392,11 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.deposit_box",
-   "orders.shift",
+   "orders.pos_shift",
    "retail.reservation"
   ],
   "storedProcedures": [],
@@ -12009,7 +12009,7 @@
    "access.access_point",
    "cache:idempotency",
    "cache:resolution",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings"
   ],
   "writes": [
@@ -12270,13 +12270,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -12466,17 +12466,17 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.dining_table",
    "fnb.menu",
    "fnb.menu_item",
    "fnb.menu_section",
-   "fnb.table",
    "platform.outlet"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.menu_item",
-   "fnb.table"
+   "fnb.dining_table",
+   "fnb.menu_item"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -12548,7 +12548,7 @@
    "postgres"
   ],
   "reads": [
-   "orders.shift",
+   "orders.pos_shift",
    "platform.device",
    "platform.device_heartbeat",
    "platform.sale_board",
@@ -12806,17 +12806,17 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.kitchen_ticket",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.kitchen_ticket",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.table_visit"
@@ -12895,10 +12895,10 @@
    "postgres"
   ],
   "reads": [
-   "fnb.fnb_order",
+   "fnb.service_order",
+   "queue.entry",
    "queue.feed",
-   "queue.queue",
-   "queue.waiting_guest"
+   "queue.queue"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -13780,7 +13780,7 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -13848,8 +13848,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -14150,7 +14150,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -14160,7 +14160,7 @@
    "maintenance.incident",
    "orders.cash_count_line",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -14557,7 +14557,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -14567,7 +14567,7 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -15565,7 +15565,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -15655,11 +15655,11 @@
    "cache:idempotency",
    "orders.cash_count_line",
    "orders.cash_movement",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -15760,8 +15760,8 @@
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.activity",
    "ai.conversation",
-   "ai.interaction",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -15859,8 +15859,8 @@
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.activity",
    "ai.conversation",
-   "ai.interaction",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -15957,9 +15957,9 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -16045,9 +16045,9 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -16536,7 +16536,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -16621,7 +16621,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -16706,7 +16706,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -16963,7 +16963,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
-   "orders.shift",
+   "orders.pos_shift",
    "workforce.rota_assignment"
   ],
   "writes": [
@@ -17670,10 +17670,10 @@
    "access.scan_event",
    "assets.media_asset",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.menu",
+   "fnb.service_order",
    "platform.outlet",
-   "queue.waiting_guest",
+   "queue.entry",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -17761,7 +17761,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -17851,7 +17851,7 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:answer",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -17939,7 +17939,7 @@
    "workforce.training_record"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:answer",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -18457,8 +18457,8 @@
    "postgres"
   ],
   "reads": [
-   "fnb.fnb_order",
-   "fnb.table",
+   "fnb.dining_table",
+   "fnb.service_order",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18515,11 +18515,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -18573,11 +18573,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -18628,7 +18628,7 @@
    "postgres"
   ],
   "reads": [
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18686,7 +18686,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation",
    "marketing.guest_profile",
    "pii.subject"
@@ -18746,7 +18746,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "platform.outlet"
   ],
   "writes": [
@@ -18889,9 +18889,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.kitchen_ticket",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_visit",
    "identity.principal",
@@ -18901,9 +18901,9 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.kitchen_ticket",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.table_visit",
@@ -18987,7 +18987,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.bill_split",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_session",
    "fnb.table_visit",
    "ledger.fx_rate",
@@ -18998,7 +18998,7 @@
   "writes": [
    "cache:idempotency",
    "fnb.bill_split",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit",
    "ledger.journal_entry",
    "ledger.posting",
@@ -19071,7 +19071,7 @@
    "postgres"
   ],
   "reads": [
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -19205,7 +19205,7 @@
    "inventory.item",
    "inventory.location",
    "inventory.stock_level",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -19548,8 +19548,8 @@
    "fnb.temperature_log",
    "identity.principal",
    "inventory.movement",
-   "platform.org_unit",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -20068,7 +20068,7 @@
   ],
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order",
    "rental.equipment_assignment"
   ],
@@ -21543,8 +21543,8 @@
    "identity.role_permission",
    "identity.session",
    "identity.sso_provider",
-   "orders.shift",
-   "platform.org_unit"
+   "orders.pos_shift",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -22649,10 +22649,10 @@
    "cache:idempotency",
    "catalogue.event",
    "catalogue.performance",
+   "queue.entry",
    "queue.feed",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -22754,9 +22754,9 @@
   "reads": [
    "cache:idempotency",
    "catalogue.performance",
+   "queue.entry",
    "queue.queue",
    "queue.reading",
-   "queue.waiting_guest",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_hold"
@@ -22950,9 +22950,9 @@
   "reads": [
    "cache:idempotency",
    "orders.refund",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -23063,9 +23063,9 @@
    "marketing.campaign",
    "marketing.message_delivery",
    "marketing.segment_criterion",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -24662,15 +24662,15 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_station",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -24740,12 +24740,12 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -25581,7 +25581,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -25800,7 +25800,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -26197,7 +26197,7 @@
    "orders.sales_order",
    "pii.subject",
    "platform.audit_record",
-   "platform.org_unit",
+   "platform.scope",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -26330,7 +26330,7 @@
    "platform.configuration_profile",
    "platform.device",
    "platform.device_heartbeat",
-   "platform.org_unit",
+   "platform.scope",
    "platform.workstation",
    "reporting.alert",
    "reporting.alert_rule"
@@ -26569,9 +26569,9 @@
   ],
   "reads": [
    "cache:idempotency",
+   "queue.entry",
    "queue.queue",
-   "queue.reading",
-   "queue.waiting_guest"
+   "queue.reading"
   ],
   "writes": [
    "cache:idempotency",
@@ -26673,7 +26673,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -26683,7 +26683,7 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -26797,7 +26797,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -26807,7 +26807,7 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -26927,7 +26927,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -26937,7 +26937,7 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -27051,7 +27051,7 @@
    "orders.cash_movement",
    "orders.no_sale_event",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -27061,7 +27061,7 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.no_sale_event",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -27278,10 +27278,10 @@
    "cache:resolution",
    "fnb.cold_chain_event",
    "fnb.corrective_action",
-   "fnb.fnb_order",
+   "fnb.dining_table",
    "fnb.menu_item",
    "fnb.modifier_group",
-   "fnb.table",
+   "fnb.service_order",
    "fnb.temperature_log",
    "identity.principal",
    "platform.outlet",
@@ -27293,7 +27293,7 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.corrective_action",
-   "fnb.table",
+   "fnb.dining_table",
    "inventory.movement",
    "platform.outlet",
    "retail.reservation",
@@ -28691,7 +28691,7 @@
    "reporting.schedule_recipient"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -28826,7 +28826,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -28965,7 +28965,7 @@
   ],
   "writes": [
    "access.scan_event",
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "cache:resolution",
    "platform.outbox",
@@ -29095,7 +29095,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -29204,8 +29204,8 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.menu",
+   "fnb.service_order",
    "orders.refund_policy",
    "platform.outlet"
   ],
@@ -29421,13 +29421,13 @@
    "access.access_point",
    "cache:idempotency",
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "access.access_point",
    "cache:idempotency",
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -29518,8 +29518,8 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.delivery_location",
-   "fnb.fnb_order",
    "fnb.menu",
+   "fnb.service_order",
    "orders.refund_policy",
    "platform.outlet",
    "platform.venue_settings"
@@ -29613,7 +29613,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -29804,7 +29804,7 @@
    "identity.role",
    "identity.role_permission",
    "platform.audit_record",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -29903,7 +29903,7 @@
    "games.game",
    "games.play",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -30110,13 +30110,13 @@
    "identity.role_permission",
    "identity.segregation_rule",
    "maintenance.asset",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "identity.role_permission",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "platform.audit_record"
   ],
   "storedProcedures": [],
@@ -31463,7 +31463,7 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "approvals.decision",
@@ -32014,8 +32014,8 @@
    "redis"
   ],
   "reads": [
+   "ai.activity",
    "ai.index_failure",
-   "ai.interaction",
    "ai.policy",
    "cache:idempotency"
   ],
@@ -32082,7 +32082,7 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "platform.org_unit",
+   "platform.scope",
    "venuemap.map"
   ],
   "writes": [
@@ -32159,7 +32159,7 @@
    "venuemap.point"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency",
    "venuemap.import_job",
@@ -32281,7 +32281,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.org_unit",
+   "platform.scope",
    "resources.resource"
   ],
   "writes": [
@@ -32584,7 +32584,7 @@
   ],
   "reads": [
    "cache:resolution",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings"
   ],
   "writes": [],
@@ -35229,7 +35229,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "cache:idempotency",
    "cache:resolution",
@@ -35396,9 +35396,9 @@
    "catalogue.product",
    "catalogue.variant_dimension",
    "marketing.loyalty_programme",
-   "platform.org_unit",
    "platform.region_settings",
    "platform.sale_board",
+   "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -35408,7 +35408,7 @@
    "seating.section"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "ai.suggestion",
    "cache:idempotency",
@@ -35857,8 +35857,8 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
-   "platform.org_unit",
    "platform.sale_board",
+   "platform.scope",
    "platform.workstation"
   ],
   "writes": [
@@ -36013,8 +36013,8 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
-   "platform.org_unit",
    "platform.sale_board",
+   "platform.scope",
    "platform.workstation",
    "reporting.execution",
    "reporting.report_definition",
@@ -36483,7 +36483,7 @@
    "identity.principal",
    "identity.role",
    "platform.audit_record",
-   "platform.org_unit",
+   "platform.scope",
    "reporting.alert",
    "reporting.alert_rule",
    "reporting.execution",
@@ -49350,7 +49350,7 @@
    "approvals.rule",
    "cache:idempotency",
    "identity.delegated_access",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency"
@@ -56727,10 +56727,10 @@
    "postgres"
   ],
   "reads": [
-   "rental.category"
+   "maintenance.asset_category"
   ],
   "writes": [
-   "rental.category"
+   "maintenance.asset_category"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -57252,7 +57252,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -57368,7 +57368,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -57422,7 +57422,7 @@
   ],
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [],
@@ -59597,7 +59597,7 @@
   ],
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order",
    "rental.equipment_assignment"
   ],
@@ -61012,7 +61012,7 @@
   ],
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [],
@@ -61120,11 +61120,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -61176,7 +61176,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -61563,7 +61563,7 @@
   ],
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -62117,7 +62117,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -62405,8 +62405,8 @@
    "catalogue.product",
    "catalogue.variant_dimension",
    "marketing.loyalty_programme",
-   "platform.org_unit",
    "platform.region_settings",
+   "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -62416,7 +62416,7 @@
    "seating.section"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -62483,8 +62483,8 @@
    "catalogue.product",
    "catalogue.variant_dimension",
    "marketing.loyalty_programme",
-   "platform.org_unit",
    "platform.region_settings",
+   "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -62494,7 +62494,7 @@
    "seating.section"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -72847,7 +72847,7 @@
   "reads": [
    "marketing.attribution_touch",
    "marketing.journey",
-   "marketing.journey_entrant",
+   "marketing.journey_enrollment",
    "marketing.message_dispatch"
   ],
   "writes": [],
@@ -77206,7 +77206,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.org_unit",
+   "platform.scope",
    "resources.resource"
   ],
   "writes": [
@@ -80261,7 +80261,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order",
    "resources.resource_block"
   ],
@@ -88956,7 +88956,7 @@
   ],
   "reads": [
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:resolution"
@@ -95934,12 +95934,12 @@
    "access.entitlement",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -96352,7 +96352,7 @@
    "postgres-analytical"
   ],
   "reads": [
-   "ai.interaction"
+   "ai.activity"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -96451,22 +96451,22 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
    "control.tenant",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.outbox"
+   "platform.outbox",
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -96585,19 +96585,19 @@
    "cache:resolution",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.org_unit"
+   "platform.scope",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "control.tenant",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -96686,17 +96686,17 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "control.licence_add_on",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -96814,22 +96814,22 @@
    "control.invoice",
    "control.licence_add_on",
    "control.partner_agreement",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
    "ledger.fx_rate",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "approvals.request",
    "cache:idempotency",
    "control.invoice",
    "control.partner_agreement",
-   "control.subscription",
-   "control.subscription_plan"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -96920,12 +96920,12 @@
    "control.cell",
    "control.invoice",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -97008,12 +97008,12 @@
    "access.entitlement",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -97099,18 +97099,18 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "control.licence_add_on",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -97215,12 +97215,12 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -97513,17 +97513,17 @@
    "control.api_client",
    "control.cell",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.api_quota"
+   "control.api_limit"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -97870,11 +97870,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -99359,7 +99359,7 @@
    "cache:idempotency",
    "control.support_notice",
    "identity.role",
-   "platform.org_unit",
+   "platform.scope",
    "workforce.announcement",
    "workforce.announcement_receipt"
   ],
@@ -99445,7 +99445,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.provider",
    "cache:idempotency"
   ],
@@ -115752,7 +115752,7 @@
    "approvals.rule",
    "cache:idempotency",
    "identity.delegated_access",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency"
@@ -117525,8 +117525,8 @@
    "postgres"
   ],
   "reads": [
-   "control.subscription",
-   "control.tenant"
+   "control.tenant",
+   "subscription.contract"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -117681,8 +117681,8 @@
   "reads": [
    "access.entitlement",
    "control.licence_add_on",
-   "control.subscription",
-   "control.usage_record"
+   "control.usage_record",
+   "subscription.contract"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -118189,8 +118189,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan",
-   "control.venue_type_template"
+   "control.venue_type_template",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -118870,11 +118870,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119188,11 +119188,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119346,7 +119346,7 @@
    "redis"
   ],
   "reads": [
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -119915,11 +119915,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120023,12 +120023,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.payment_provider"
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.payment_provider",
-   "orders.payment_routing"
+   "orders.payment_routing",
+   "payments.provider"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120131,9 +120131,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription",
-   "control.subscription_plan",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency"
@@ -120284,11 +120284,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120336,7 +120336,7 @@
    "postgres"
   ],
   "reads": [
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -120489,12 +120489,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120603,8 +120603,8 @@
   "reads": [
    "cache:idempotency",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -121019,8 +121019,8 @@
   ],
   "reads": [
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -121069,8 +121069,8 @@
    "postgres"
   ],
   "reads": [
-   "control.subscription",
-   "control.usage_record"
+   "control.usage_record",
+   "subscription.contract"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -121423,8 +121423,8 @@
    "postgres"
   ],
   "reads": [
-   "control.subscription",
-   "control.usage_record"
+   "control.usage_record",
+   "subscription.contract"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -121738,13 +121738,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription",
-   "control.subscription_plan",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -128145,8 +128145,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.payment_provider",
-   "orders.sales_order"
+   "orders.sales_order",
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
@@ -128207,7 +128207,7 @@
    "orders.reservation",
    "orders.sales_order",
    "pii.subject",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -135887,7 +135887,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -138965,7 +138965,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.execution",
    "reporting.report_column",
@@ -140139,24 +140139,24 @@
    "control.cell",
    "control.invoice",
    "control.licence_add_on",
-   "control.subscription",
-   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
    "control.cell",
    "control.invoice",
    "control.licence_add_on",
-   "control.subscription",
    "control.tenant",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.outbox"
+   "platform.outbox",
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -140440,7 +140440,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [
@@ -146790,7 +146790,7 @@
    "cache:idempotency",
    "cache:resolution",
    "control.api_licence",
-   "control.api_quota",
+   "control.api_limit",
    "control.api_version",
    "control.integration_listing",
    "marketing.message_dispatch"
@@ -146835,9 +146835,9 @@
    "postgres"
   ],
   "reads": [
-   "fnb.fnb_order",
    "fnb.kitchen_station",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -147104,8 +147104,8 @@
    "postgres"
   ],
   "reads": [
-   "fnb.fnb_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -147226,15 +147226,15 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_station",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
    "fnb.kitchen_exception",
    "fnb.kitchen_ticket",
+   "fnb.service_order",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -147297,12 +147297,12 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -147362,10 +147362,10 @@
    "cache:idempotency",
    "fnb.cold_chain_event",
    "fnb.corrective_action",
-   "fnb.eighty_six_event",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.menu_item",
+   "fnb.sold_out_item",
    "fnb.temperature_log"
   ],
   "writes": [
@@ -147501,7 +147501,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -147575,7 +147575,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "cache:idempotency",
    "reporting.execution"
@@ -148213,7 +148213,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -148297,7 +148297,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency",
    "reporting.alert",
@@ -148373,7 +148373,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "ai.suggestion_outcome",
    "cache:idempotency"
@@ -148883,7 +148883,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -150988,7 +150988,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_definition",
@@ -151221,7 +151221,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -152089,8 +152089,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan",
-   "control.venue_type_template"
+   "control.venue_type_template",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -152719,7 +152719,7 @@
    "redis"
   ],
   "reads": [
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -153090,11 +153090,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -153212,12 +153212,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.payment_provider"
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.payment_provider",
-   "orders.payment_routing"
+   "orders.payment_routing",
+   "payments.provider"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -153274,9 +153274,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription",
-   "control.subscription_plan",
-   "platform.tenant"
+   "platform.tenant",
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency"
@@ -153391,11 +153391,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "storedProcedures": [],
   "wave": 3,

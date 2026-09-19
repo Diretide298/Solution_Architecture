@@ -1682,7 +1682,7 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
-- table: marketing.journey_entrant
+- table: marketing.journey_enrollment
   columns: 10
   store: postgres
   parent: marketing.journey

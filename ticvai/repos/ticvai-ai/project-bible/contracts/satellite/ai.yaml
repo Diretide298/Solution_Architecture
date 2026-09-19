@@ -2420,7 +2420,7 @@ components:
           nullable: true
     AiInteraction:
       type: object
-      x-ticvai-persistence: ai.interaction
+      x-ticvai-persistence: ai.activity
       required:
       - id
       - principalId
@@ -2926,7 +2926,7 @@ components:
             **Operations write it at `venue` scope.**'
     AiUsageReport:
       type: object
-      x-ticvai-persistence: none — aggregated from ai.interaction
+      x-ticvai-persistence: none — aggregated from ai.activity
       properties:
         from:
           type: string

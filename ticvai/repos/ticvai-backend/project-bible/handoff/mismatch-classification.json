@@ -1,0 +1,1340 @@
+{
+ "access.access_change": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Audits ticket/access replacement during an upgrade. The old access should normally be marked UPGRADED/REPLACED and the new access becomes ACTIVE; old records should not be deleted.",
+  "why": "no candidate and not flagged"
+ },
+ "access.accreditation": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the main accreditation record for one person, with event/venue context, approval state and validity period.",
+  "why": "no candidate and not flagged"
+ },
+ "access.accreditation_access": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines where an approved accreditation is allowed to enter by mapping it to Access rules, access points and optional logical venue zones.",
+  "why": "no candidate and not flagged"
+ },
+ "access.accreditation_credential": {
+  "category": "domain-move",
+  "match": "accreditation.credential",
+  "purpose": "Stores the physical or digital credential issued for an accreditation, such as a badge, QR, barcode, RFID or NFC credential.",
+  "why": "same table, we put the domain in its own schema"
+ },
+ "access.accreditation_document": {
+  "category": "domain-move",
+  "match": "accreditation.document",
+  "purpose": "Stores supporting document metadata/evidence submitted for an accreditation and tracks document verification.",
+  "why": "same table, we put the domain in its own schema"
+ },
+ "access.accreditation_status_history": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Keeps an immutable audit trail whenever accreditation status changes, including approval, issue, suspension, revocation, expiry or cancellation.",
+  "why": "no candidate and not flagged"
+ },
+ "access.accreditation_type": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines reusable accreditation categories such as MEDIA, CONTRACTOR, VENDOR, EVENT_STAFF, SECURITY, VIP, ARTIST or SPONSOR.",
+  "why": "no candidate and not flagged"
+ },
+ "access.entry_rule": {
+  "category": "rename-strong",
+  "match": "access.admission_rules",
+  "purpose": "Defines when, where, and how an entitlement may be used for entry or re-entry.",
+  "why": "one candidate, containment 0.80"
+ },
+ "access.entry_rule_point": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Maps the access points that are allowed for an admission profile.",
+  "why": "no candidate and not flagged"
+ },
+ "access.parking_pass": {
+  "category": "rename-ambiguous",
+  "match": "access.parking_entitlement,access.entitlement",
+  "purpose": "Stores a customer's purchased or granted right to access a parking facility.",
+  "why": "2 candidates"
+ },
+ "access.scan": {
+  "category": "rename-strong",
+  "match": "access.scan_event",
+  "purpose": "MODIFIED. Keeps the existing common scan history while allowing the same scanner/validation engine to record ticket, accreditation, membership and parking credentials.",
+  "why": "one candidate, containment 0.60"
+ },
+ "access.ticket_access": {
+  "category": "rename-ambiguous",
+  "match": "access.entitlement,access.parking_entitlement",
+  "purpose": "Stores the ticket, pass, membership access right, or other entitlement owned by a customer or subject.",
+  "why": "2 candidates"
+ },
+ "ai.action_request": {
+  "category": "rename-strong",
+  "match": "ai.proposed_action",
+  "purpose": "Stores a business action proposed by AI and tracks whether it was approved, rejected, or executed.",
+  "why": "one candidate, containment 0.69"
+ },
+ "ai.activity": {
+  "category": "rename-strong",
+  "match": "ai.interaction",
+  "purpose": "Stores usage, cost, outcome, and trace information for any AI request, including non-chat calls.",
+  "why": "one candidate, containment 0.72"
+ },
+ "ai.indexing_job": {
+  "category": "rename-strong",
+  "match": "ai.index_job",
+  "purpose": "Tracks asynchronous indexing or re-indexing jobs for AI knowledge content.",
+  "why": "one candidate, containment 0.64"
+ },
+ "ai.knowledge_group": {
+  "category": "rename-review",
+  "match": "ai.knowledge_collection",
+  "purpose": "Defines a searchable knowledge base used by AI retrieval/RAG.",
+  "why": "one candidate, containment 0.50"
+ },
+ "ai.knowledge_item": {
+  "category": "rename-strong",
+  "match": "ai.knowledge_document",
+  "purpose": "Stores document metadata for content indexed into an AI knowledge collection.",
+  "why": "one candidate, containment 0.78"
+ },
+ "ai.suggestion_result": {
+  "category": "rename-strong",
+  "match": "ai.suggestion_outcome",
+  "purpose": "Stores whether a suggestion was accepted or rejected and the actual result used to evaluate AI quality.",
+  "why": "one candidate, containment 0.88"
+ },
+ "ai.usage_policy": {
+  "category": "rename-certain",
+  "match": "ai.policy",
+  "purpose": "Defines which AI capabilities are allowed for a tenant/scope and the main safety, masking, approval, and usage limits.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_decision": {
+  "category": "rename-certain",
+  "match": "approvals.decision",
+  "purpose": "Stores every approve or reject decision made for an approval request as audit evidence.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_delegation": {
+  "category": "rename-certain",
+  "match": "approvals.delegation",
+  "purpose": "Stores temporary approval authority given by one approver to another for a fixed period.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_escalation": {
+  "category": "rename-certain",
+  "match": "approvals.escalation",
+  "purpose": "Stores when an approval moves to another approver or higher level and records why it moved.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_matrix": {
+  "category": "rename-certain",
+  "match": "approvals.matrix",
+  "purpose": "Defines a versioned approval policy for a business action within a tenant scope.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_request": {
+  "category": "rename-certain",
+  "match": "approvals.request",
+  "purpose": "MODIFIED. Stores one approval request for each business action that requires authorization, and now also carries priority, risk level and SLA due time for the Approval Command Cent",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "approvals.approval_rule": {
+  "category": "rename-certain",
+  "match": "approvals.rule",
+  "purpose": "Defines the conditions, approval level, and approver role required by an approval policy.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "catalogue.membership_benefit": {
+  "category": "rename-ambiguous",
+  "match": "catalogue.variant_dimension,catalogue.variant",
+  "purpose": "Defines a benefit that can be included in one or more membership plans.",
+  "why": "2 candidates"
+ },
+ "catalogue.membership_plan": {
+  "category": "rename-ambiguous",
+  "match": "catalogue.variant_dimension,catalogue.variant,catalogue.alternative_code",
+  "purpose": "Defines a sellable membership plan, its duration, renewal rules, and catalogue product.",
+  "why": "3 candidates"
+ },
+ "catalogue.membership_program": {
+  "category": "rename-ambiguous",
+  "match": "catalogue.variant_dimension,catalogue.donation_campaign,catalogue.variant",
+  "purpose": "Defines the overall membership programme available to customers.",
+  "why": "3 candidates"
+ },
+ "catalogue.plan_benefit": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Maps membership benefits to plans and defines usage limits for each benefit.",
+  "why": "no candidate and not flagged"
+ },
+ "catalogue.product_media": {
+  "category": "rename-ambiguous",
+  "match": "catalogue.variant,catalogue.variant_dimension",
+  "purpose": "Stores images, videos, documents, and other media associated with a product or variant.",
+  "why": "2 candidates"
+ },
+ "catalogue.product_recommendation": {
+  "category": "rename-review",
+  "match": "catalogue.variant",
+  "purpose": "Defines product recommendations for ticketing products. One table handles UPSELL, CROSS_SELL and sellable ADD_ON relationships, including targets owned by FnB or Retail.",
+  "why": "one candidate, containment 0.40"
+ },
+ "catalogue.product_variant": {
+  "category": "rename-certain",
+  "match": "catalogue.variant",
+  "purpose": "Stores SKU or option variants of a product.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "catalogue.rental_product_config": {
+  "category": "rename-ambiguous",
+  "match": "catalogue.variant,catalogue.variant_dimension",
+  "purpose": "NEW TABLE. Stores rental-specific configuration for a Catalogue product, including tracking mode and operational controls.",
+  "why": "2 candidates"
+ },
+ "catalogue.rental_rate": {
+  "category": "rename-review",
+  "match": "catalogue.variant",
+  "purpose": "NEW TABLE. Stores time-based rental prices such as per minute, hour, day, or fixed duration block.",
+  "why": "one candidate, containment 0.40"
+ },
+ "catalogue.rental_requirement": {
+  "category": "rename-review",
+  "match": "catalogue.variant",
+  "purpose": "NEW TABLE. Defines customer requirements that must be satisfied before a rental can be confirmed or checked out.",
+  "why": "one candidate, containment 0.40"
+ },
+ "catalogue.rental_rule": {
+  "category": "rename-review",
+  "match": "catalogue.variant",
+  "purpose": "NEW TABLE. Defines reusable product-level rental rules such as duration, grace, overdue charge, cancellation, pickup/return, and deposit policy.",
+  "why": "one candidate, containment 0.40"
+ },
+ "catalogue.upgrade_rule": {
+  "category": "rename-review",
+  "match": "catalogue.variant",
+  "purpose": "Defines valid post-purchase upgrade paths, for example Standard Ticket to VIP Ticket, and how the upgrade amount should be calculated.",
+  "why": "one candidate, containment 0.40"
+ },
+ "control.api_application": {
+  "category": "rename-ambiguous",
+  "match": "control.api_client,control.cell_instance",
+  "purpose": "Registers an external or internal application that is allowed to call TICVAI APIs.",
+  "why": "2 candidates"
+ },
+ "control.api_limit": {
+  "category": "rename-strong",
+  "match": "control.api_quota",
+  "purpose": "Defines rate limits and usage limits for an API client.",
+  "why": "one candidate, containment 0.71"
+ },
+ "control.channel": {
+  "category": "rename-review",
+  "match": "control.cell_instance",
+  "purpose": "Defines sales and interaction channels such as POS, Kiosk, Web, Mobile App, and partner channels.",
+  "why": "one candidate, containment 0.43"
+ },
+ "control.channel_item": {
+  "category": "rename-review",
+  "match": "control.cell_instance",
+  "purpose": "Controls which Ticketing, FnB or Retail items can be sold through a particular sales channel and scope.",
+  "why": "one candidate, containment 0.43"
+ },
+ "control.webhook": {
+  "category": "rename-ambiguous",
+  "match": "control.webhook_subscription,control.cell_instance",
+  "purpose": "Stores webhook endpoints that should receive selected TICVAI business events.",
+  "why": "2 candidates"
+ },
+ "control.webhook_log": {
+  "category": "rename-ambiguous",
+  "match": "control.webhook_delivery,control.cell_instance",
+  "purpose": "Tracks each webhook delivery attempt and its result.",
+  "why": "2 candidates"
+ },
+ "fnb.dining_table": {
+  "category": "rename-certain",
+  "match": "fnb.table",
+  "purpose": "Stores restaurant dining tables, seating capacity, zone, and operational status.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "fnb.food_safety_action": {
+  "category": "rename-strong",
+  "match": "fnb.corrective_action",
+  "purpose": "Stores actions taken to correct food-safety, temperature, or operational failures.",
+  "why": "one candidate, containment 0.64"
+ },
+ "fnb.ingredient_substitute": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines approved ingredient substitutions for F&B preparation.",
+  "why": "no candidate and not flagged"
+ },
+ "fnb.kitchen_order": {
+  "category": "rename-ambiguous",
+  "match": "fnb.delivery_location_outlet,fnb.kitchen_ticket,fnb.production_plan",
+  "purpose": "Stores a kitchen production ticket generated from an F&B order.",
+  "why": "3 candidates"
+ },
+ "fnb.kitchen_order_item": {
+  "category": "rename-ambiguous",
+  "match": "fnb.kitchen_ticket_line,fnb.fnb_order_line",
+  "purpose": "Stores the individual preparation lines sent to kitchen stations.",
+  "why": "2 candidates"
+ },
+ "fnb.menu_item_modifier": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Maps modifier groups that are available for a menu item.",
+  "why": "no candidate and not flagged"
+ },
+ "fnb.order": {
+  "category": "rename-ambiguous",
+  "match": "fnb.fnb_order,fnb.delivery_location_outlet,fnb.kitchen_ticket",
+  "purpose": "Stores the operational food-service order used by kitchen and serving workflows.",
+  "why": "3 candidates"
+ },
+ "fnb.order_item": {
+  "category": "rename-ambiguous",
+  "match": "fnb.fnb_order_line,fnb.kitchen_ticket_line",
+  "purpose": "Stores each food or beverage item ordered, including course and kitchen notes.",
+  "why": "2 candidates"
+ },
+ "fnb.price": {
+  "category": "placement",
+  "match": "catalogue.price",
+  "purpose": "Stores the selling price of an F&B product or variant within an F&B price list.",
+  "why": "same table name, different owning schema"
+ },
+ "fnb.price_list": {
+  "category": "placement",
+  "match": "catalogue.price_list",
+  "purpose": "Defines F&B prices for a currency, scope, channel and validity period.",
+  "why": "same table name, different owning schema"
+ },
+ "fnb.product": {
+  "category": "placement",
+  "match": "catalogue.product,rental.product",
+  "purpose": "Stores the independent master record for each sellable F&B item. This table does not depend on Ticketing Catalogue.",
+  "why": "same table name, different owning schema"
+ },
+ "fnb.product_category": {
+  "category": "placement",
+  "match": "catalogue.product_category",
+  "purpose": "Groups F&B products into categories such as Food, Beverage, Combo, Dessert or Add-on.",
+  "why": "same table name, different owning schema"
+ },
+ "fnb.product_recommendation": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines product-level F&B upsell, cross-sell and sellable add-on recommendations. Example: Regular Coke to Large Coke (UPSELL), Burger to Fries (CROSS_SELL), or a sellable extra pr",
+  "why": "no candidate and not flagged"
+ },
+ "fnb.recipe_item": {
+  "category": "rename-strong",
+  "match": "fnb.recipe_ingredient",
+  "purpose": "Stores inventory ingredients and quantities required by an F&B recipe.",
+  "why": "one candidate, containment 0.83"
+ },
+ "fnb.reservation_table": {
+  "category": "rename-certain",
+  "match": "fnb.table",
+  "purpose": "Maps one or more dining tables assigned to a reservation.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "fnb.sold_out_item": {
+  "category": "rename-ambiguous",
+  "match": "fnb.eighty_six_event,fnb.delivery_location_outlet",
+  "purpose": "Records when a menu item is temporarily unavailable and when it becomes available again.",
+  "why": "2 candidates"
+ },
+ "fnb.temperature_check": {
+  "category": "rename-ambiguous",
+  "match": "fnb.temperature_log,fnb.cold_chain_event",
+  "purpose": "Stores HACCP-style temperature checks for food, storage, cooking, or equipment checkpoints.",
+  "why": "2 candidates"
+ },
+ "fnb.variant": {
+  "category": "placement",
+  "match": "catalogue.variant",
+  "purpose": "Stores F&B product variants such as Small/Medium/Large size or flavour/SKU variations.",
+  "why": "same table name, different owning schema"
+ },
+ "identity.benefit_usage": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Tracks each use of a customer's membership benefit and the remaining allowance.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.customer": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores customer profile information and optionally links a registered customer to a login principal.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.customer_address": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores postal, billing, and other addresses belonging to a customer.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.customer_contact": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores customer email addresses and phone numbers with verification information.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.customer_extra_field": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.",
+  "why": "they flag it NEW"
+ },
+ "identity.customer_extra_option": {
+  "category": "rename-review",
+  "match": "identity.principal",
+  "purpose": "NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.",
+  "why": "one candidate, containment 0.40"
+ },
+ "identity.customer_extra_value": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Stores the value entered by a customer for each Admin-created extra field.",
+  "why": "they flag it NEW"
+ },
+ "identity.customer_membership": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the membership subscription currently owned by a customer.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.enabled_module": {
+  "category": "rename-review",
+  "match": "identity.delegated_access",
+  "purpose": "Defines which platform modules are enabled for a tenant and optionally for a specific scope node such as region, venue, department, or zone.",
+  "why": "one candidate, containment 0.45"
+ },
+ "identity.family": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores one family or household group so independently registered customers can be linked together.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.family_member": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Links each registered customer to a family and records the relationship such as spouse, child or parent.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.membership_history": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores every status change made to a customer's membership.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.module": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines the system authorization modules and sub-modules available across the platform. Module definitions are global/system master data and are not duplicated per tenant.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.otp": {
+  "category": "rename-declared",
+  "match": "identity.otp_challenge",
+  "purpose": "Stores temporary email or SMS OTP challenges used for verification and recovery flows.",
+  "why": "their Change Log declares it"
+ },
+ "identity.permission": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines individual authorization actions under a module or sub-module, such as PRODUCT.VIEW, ORDER.CREATE, or REFUND.APPROVE.",
+  "why": "no candidate and not flagged"
+ },
+ "identity.refresh_token": {
+  "category": "rename-review",
+  "match": "identity.access_override",
+  "purpose": "Stores hashed refresh tokens and tracks token expiry, rotation, and revocation.",
+  "why": "one candidate, containment 0.40"
+ },
+ "identity.user_access": {
+  "category": "rename-review",
+  "match": "identity.delegated_access",
+  "purpose": "Assigns a role or direct permission to a principal within a specific scope and validity period.",
+  "why": "one candidate, containment 0.54"
+ },
+ "identity.user_account": {
+  "category": "rename-review",
+  "match": "identity.principal",
+  "purpose": "Stores the security identity of any person, backend service, or device that can authenticate or receive permissions.",
+  "why": "one candidate, containment 0.44"
+ },
+ "identity.user_login": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores secure authentication credential information for a principal.",
+  "why": "no candidate and not flagged"
+ },
+ "inventory.stock_count": {
+  "category": "rename-certain",
+  "match": "inventory.count",
+  "purpose": "Stores an inventory count/stocktake performed at a warehouse or stock location.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "inventory.stock_count_line": {
+  "category": "rename-certain",
+  "match": "inventory.count_line",
+  "purpose": "Stores the counted and theoretical quantity for each item in a stock count.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "inventory.stock_movement": {
+  "category": "rename-certain",
+  "match": "inventory.movement",
+  "purpose": "Stores every increase, decrease, reservation, release, transfer, adjustment, or wastage movement of stock.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "inventory.stock_reservation": {
+  "category": "rename-ambiguous",
+  "match": "inventory.movement,inventory.quotation_line,inventory.serialised_item",
+  "purpose": "Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
+  "why": "3 candidates"
+ },
+ "inventory.stock_transfer": {
+  "category": "rename-certain",
+  "match": "inventory.transfer",
+  "purpose": "Stores movement of stock between inventory locations.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "inventory.stock_transfer_line": {
+  "category": "rename-certain",
+  "match": "inventory.transfer_line",
+  "purpose": "Stores each inventory item and quantity included in a stock transfer.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "inventory.supplier_contract": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores purchasing agreements, validity dates, and commercial terms agreed with a supplier.",
+  "why": "no candidate and not flagged"
+ },
+ "inventory.wastage": {
+  "category": "rename-ambiguous",
+  "match": "inventory.quotation_line,inventory.movement",
+  "purpose": "Stores stock loss such as expiry, spoilage, damage, preparation waste, or disposal.",
+  "why": "2 candidates"
+ },
+ "ledger.company": {
+  "category": "rename-ambiguous",
+  "match": "ledger.cost_center,ledger.legal_entity,ledger.tax_code",
+  "purpose": "Stores the legal company/entity for which financial books and accounting records are maintained.",
+  "why": "3 candidates"
+ },
+ "ledger.journal": {
+  "category": "rename-review",
+  "match": "ledger.journal_entry",
+  "purpose": "Stores one financial event header, for example an order payment, refund, wallet top-up, or settlement posting.",
+  "why": "one candidate, containment 0.56"
+ },
+ "ledger.journal_item": {
+  "category": "rename-ambiguous",
+  "match": "ledger.journal_line,ledger.posting",
+  "purpose": "Stores the Debit and Credit lines that make a journal entry balanced and identifies the ledger account affected.",
+  "why": "2 candidates"
+ },
+ "ledger.settlement_issue": {
+  "category": "rename-strong",
+  "match": "ledger.settlement_exception",
+  "purpose": "Stores individual reconciliation problems such as missing payment, amount mismatch, duplicate provider line, or fee mismatch.",
+  "why": "one candidate, containment 0.70"
+ },
+ "maintenance.preventive_plan": {
+  "category": "rename-strong",
+  "match": "maintenance.maintenance_plan",
+  "purpose": "Defines scheduled preventive maintenance for an asset.",
+  "why": "one candidate, containment 0.82"
+ },
+ "maintenance.rental_damage_assessment": {
+  "category": "domain-move",
+  "match": "rental.damage_assessment",
+  "purpose": "NEW TABLE. Records rental-related damage, responsibility, charge recommendation, and maintenance follow-up for returned equipment.",
+  "why": "same table, we put the domain in its own schema"
+ },
+ "marketing.badge": {
+  "category": "rename-ambiguous",
+  "match": "marketing.loyalty_programme,marketing.segment",
+  "purpose": "Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.",
+  "why": "2 candidates"
+ },
+ "marketing.campaign_response": {
+  "category": "rename-ambiguous",
+  "match": "marketing.attribution_touch,marketing.touch_point",
+  "purpose": "OPTIONAL MODIFICATION. Add journey_enrollment_id only if reports need to attribute opens/clicks/conversions to a specific customer journey execution.",
+  "why": "2 candidates"
+ },
+ "marketing.campaign_target": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Links a marketing campaign to the commercial item or offer it promotes.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.case_comment": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores internal or guest-visible comments, updates and notes added to a support case.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.customer_badge": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores badges actually awarded to customers and the source that generated each award.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.customer_challenge_progress": {
+  "category": "rename-certain",
+  "match": "marketing.challenge_progress",
+  "purpose": "Tracks the current measurable progress of each customer toward a challenge.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "marketing.customer_consent": {
+  "category": "rename-strong",
+  "match": "marketing.consent_record",
+  "purpose": "MODIFIED. Adds provenance fields so consent decisions can be traced to registration, waiver, campaign, survey or another business source.",
+  "why": "one candidate, containment 0.67"
+ },
+ "marketing.customer_segment": {
+  "category": "rename-declared",
+  "match": "marketing.segment",
+  "purpose": "Defines a reusable customer audience segment for campaigns, loyalty, and targeted communication.",
+  "why": "their Change Log declares it"
+ },
+ "marketing.customer_segment_rule": {
+  "category": "rename-review",
+  "match": "marketing.segment_criterion",
+  "purpose": "Stores individual rules used to determine whether a customer belongs to a segment.",
+  "why": "one candidate, containment 0.50"
+ },
+ "marketing.data_subject_request": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Tracks formal privacy/data-subject requests such as access, deletion, correction, export or restriction.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.do_not_contact": {
+  "category": "rename-strong",
+  "match": "marketing.suppression",
+  "purpose": "Stores contact addresses that must not receive messages through a specific marketing channel.",
+  "why": "one candidate, containment 0.86"
+ },
+ "marketing.journey_enrollment": {
+  "category": "rename-review",
+  "match": "marketing.journey_entrant",
+  "purpose": "Tracks each customer's live execution state inside an automated journey.",
+  "why": "one candidate, containment 0.50"
+ },
+ "marketing.journey_step": {
+  "category": "rename-review",
+  "match": "marketing.loyalty_programme",
+  "purpose": "Defines each ordered automation step in a customer journey, including waits, messages, conditions and actions.",
+  "why": "one candidate, containment 0.43"
+ },
+ "marketing.loyalty_campaign": {
+  "category": "rename-certain",
+  "match": "marketing.campaign",
+  "purpose": "Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "marketing.loyalty_points": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.loyalty_program": {
+  "category": "rename-ambiguous",
+  "match": "marketing.loyalty_programme,marketing.segment",
+  "purpose": "Defines a loyalty programme through which customers earn points, tiers, and rewards.",
+  "why": "2 candidates"
+ },
+ "marketing.loyalty_rule": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines temporary bonus points, multipliers, earning rules, or rewards applied by a loyalty campaign.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.points_earning_rule": {
+  "category": "rename-review",
+  "match": "marketing.loyalty_programme",
+  "purpose": "Defines how customers earn loyalty points from purchases or other qualifying actions.",
+  "why": "one candidate, containment 0.43"
+ },
+ "marketing.points_redemption_rule": {
+  "category": "rename-review",
+  "match": "marketing.loyalty_programme",
+  "purpose": "Defines how loyalty points can be exchanged for discounts, products, or other benefits.",
+  "why": "one candidate, containment 0.43"
+ },
+ "marketing.review_response": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores staff or business replies to guest reviews and preserves moderation/reply history.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.reward": {
+  "category": "rename-review",
+  "match": "marketing.loyalty_programme",
+  "purpose": "Defines a loyalty reward that can be issued to eligible customers.",
+  "why": "one candidate, containment 0.57"
+ },
+ "marketing.reward_assignment": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "MODIFIED. Reuses the existing reward engine for gamification and referral by recording which business feature generated the reward.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.sla_policy": {
+  "category": "placement",
+  "match": "approvals.sla_policy",
+  "purpose": "Defines service-level response and resolution targets used by support cases.",
+  "why": "same table name, different owning schema"
+ },
+ "marketing.support_case": {
+  "category": "rename-certain",
+  "match": "marketing.case",
+  "purpose": "Stores a guest complaint, enquiry, service request or support issue from creation through assignment, escalation and resolution.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "marketing.survey": {
+  "category": "rename-ambiguous",
+  "match": "marketing.segment,marketing.loyalty_programme",
+  "purpose": "Defines an NPS, CSAT, CES or general guest-feedback questionnaire.",
+  "why": "2 candidates"
+ },
+ "marketing.survey_question": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines each question, response type and display order within a survey.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.survey_response": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores one guest submission for a survey; individual answers may be retained in answers_json in the first version.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.waiver_signature": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.",
+  "why": "no candidate and not flagged"
+ },
+ "marketing.waiver_template": {
+  "category": "rename-ambiguous",
+  "match": "marketing.guest_attribute_model,marketing.loyalty_programme",
+  "purpose": "Defines a versioned legal waiver/consent document that a guest must sign before a qualifying activity or service.",
+  "why": "2 candidates"
+ },
+ "orders.cash_count": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores a complete cash-count session for opening or closing reconciliation.",
+  "why": "no candidate and not flagged"
+ },
+ "orders.currency_rule": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.",
+  "why": "they flag it NEW"
+ },
+ "orders.deposit": {
+  "category": "placement",
+  "match": "ledger.deposit",
+  "purpose": "NEW TABLE. Stores the financial/security deposit associated with a rental order, including hold, release, forfeiture, and settlement totals.",
+  "why": "same table name, different owning schema"
+ },
+ "orders.deposit_activity": {
+  "category": "rename-ambiguous",
+  "match": "orders.payment_tip,orders.chargeback,orders.credit_override",
+  "purpose": "NEW TABLE. Provides an auditable history of every deposit authorization, hold, capture, release, forfeiture, refund, or adjustment.",
+  "why": "3 candidates"
+ },
+ "orders.discount": {
+  "category": "rename-ambiguous",
+  "match": "orders.order_media_link,orders.order_discount,orders.donation_line",
+  "purpose": "Stores each discount or promotion actually applied to an order.",
+  "why": "3 candidates"
+ },
+ "orders.membership_renewal": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores membership renewal transactions and the result of each renewal attempt.",
+  "why": "no candidate and not flagged"
+ },
+ "orders.order": {
+  "category": "rename-ambiguous",
+  "match": "orders.order_media_link,orders.order_discount,orders.donation_line",
+  "purpose": "MODIFIED. Stores the permanent order created when a cart or direct sale is completed, and now also supports payment fees/surcharges and held orders completed through payment links.",
+  "why": "3 candidates"
+ },
+ "orders.order_fee": {
+  "category": "rename-ambiguous",
+  "match": "orders.order_media_link,orders.order_discount,orders.donation_line",
+  "purpose": "NEW TABLE. Stores the actual fee/surcharge snapshot applied to a specific order.",
+  "why": "3 candidates"
+ },
+ "orders.payment_eligibility_rule": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines when a payment method is allowed or denied for a transaction.",
+  "why": "they flag it NEW"
+ },
+ "orders.payment_fee_rule": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.",
+  "why": "they flag it NEW"
+ },
+ "orders.payment_gateway": {
+  "category": "rename-review",
+  "match": "orders.fraud_rule",
+  "purpose": "MODIFIED. Stores payment-provider configuration for Stripe, NI and future providers, including adapter, merchant connection, capabilities and connection health.",
+  "why": "one candidate, containment 0.43"
+ },
+ "orders.payment_method": {
+  "category": "rename-review",
+  "match": "orders.fraud_rule",
+  "purpose": "NEW TABLE. Stores the master catalogue of payment methods supported by TICVAI.",
+  "why": "one candidate, containment 0.43"
+ },
+ "orders.payment_method_config": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Configures where a payment method is enabled, including scope, channel and currency.",
+  "why": "they flag it NEW"
+ },
+ "orders.payment_policy": {
+  "category": "rename-review",
+  "match": "orders.reservation",
+  "purpose": "NEW TABLE. Stores a versioned payment policy that groups payment rules and can be submitted through the existing approval workflow before activation.",
+  "why": "one candidate, containment 0.50"
+ },
+ "orders.payment_route": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "MODIFIED. Defines payment routing by payment-method master, channel, currency, priority and provider/fallback provider.",
+  "why": "no candidate and not flagged"
+ },
+ "orders.payment_terminal": {
+  "category": "rename-review",
+  "match": "orders.reservation",
+  "purpose": "NEW TABLE. Stores payment-specific configuration for a physical terminal while reusing the existing Platform device/workstation as the hardware master.",
+  "why": "one candidate, containment 0.50"
+ },
+ "orders.pos_shift": {
+  "category": "rename-certain",
+  "match": "orders.shift",
+  "purpose": "Stores a cashier's POS work/till session for sales, refunds, and cash reconciliation.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "orders.recommendation_activity": {
+  "category": "rename-ambiguous",
+  "match": "orders.order_media_link,orders.order_discount,orders.donation_line",
+  "purpose": "Tracks whether recommendations were shown, accepted, rejected, removed or purchased. This becomes the main source for upsell/cross-sell/add-on conversion reporting.",
+  "why": "3 candidates"
+ },
+ "orders.upgrade": {
+  "category": "rename-ambiguous",
+  "match": "orders.order_media_link,orders.order_discount,orders.donation_line",
+  "purpose": "Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amo",
+  "why": "3 candidates"
+ },
+ "platform.cash_denomination": {
+  "category": "rename-certain",
+  "match": "platform.denomination",
+  "purpose": "Stores valid cash note and coin denominations for each supported currency.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "platform.cell": {
+  "category": "placement",
+  "match": "control.cell",
+  "purpose": "Defines each regional TICVAI Cell/deployment and links it to the existing Tenancy scope.",
+  "why": "same table name, different owning schema"
+ },
+ "platform.cell_endpoint": {
+  "category": "rename-review",
+  "match": "platform.dsar_request",
+  "purpose": "Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.",
+  "why": "one candidate, containment 0.43"
+ },
+ "platform.device_profile": {
+  "category": "rename-ambiguous",
+  "match": "platform.configuration_profile,platform.sale_board_page,platform.dsar_request",
+  "purpose": "Stores versioned configuration settings that can be assigned to a scope or workstation.",
+  "why": "3 candidates"
+ },
+ "platform.region_setting": {
+  "category": "rename-strong",
+  "match": "platform.region_settings",
+  "purpose": "Stores currency, timezone, date, number, and fiscal settings for a regional scope.",
+  "why": "one candidate, containment 0.73"
+ },
+ "platform.scope": {
+  "category": "rename-ambiguous",
+  "match": "platform.org_unit,platform.sale_board,platform.sale_board_page",
+  "purpose": "Stores the tenant hierarchy and links hierarchy nodes to business records owned by other services.",
+  "why": "3 candidates"
+ },
+ "platform.subscription_tier": {
+  "category": "rename-ambiguous",
+  "match": "platform.sale_board,platform.org_unit,platform.sale_board_page",
+  "purpose": "NEW TABLE. Defines TICVAI commercial subscription tiers/packages such as BASIC, PRO, or ENTERPRISE.",
+  "why": "3 candidates"
+ },
+ "platform.tenant_subscription": {
+  "category": "rename-review",
+  "match": "platform.dsar_request",
+  "purpose": "NEW TABLE. Stores the commercial subscription/licensing package currently assigned to a tenant.",
+  "why": "one candidate, containment 0.43"
+ },
+ "platform.tier_allowance": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines usage/quantity allowances included in a subscription tier.",
+  "why": "they flag it NEW"
+ },
+ "platform.tier_module": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.",
+  "why": "they flag it NEW"
+ },
+ "platform.venue_setting": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores configuration settings that apply to a venue-level scope.",
+  "why": "no candidate and not flagged"
+ },
+ "pricing.dynamic_price_action": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Configurable dynamic pricing component for dynamic price action.",
+  "why": "no candidate and not flagged"
+ },
+ "pricing.dynamic_price_condition": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Configurable dynamic pricing component for dynamic price rule condition.",
+  "why": "no candidate and not flagged"
+ },
+ "pricing.dynamic_price_rule": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Configurable dynamic pricing component for dynamic price rule.",
+  "why": "no candidate and not flagged"
+ },
+ "queue.entry": {
+  "category": "rename-strong",
+  "match": "queue.waiting_guest",
+  "purpose": "Stores a customer or party currently waiting in an operational or virtual queue.",
+  "why": "one candidate, containment 0.69"
+ },
+ "reporting.report": {
+  "category": "rename-ambiguous",
+  "match": "reporting.report_definition,reporting.semantic_model",
+  "purpose": "Defines a reusable report, its data source, security requirement, date limits, and version.",
+  "why": "2 candidates"
+ },
+ "reporting.report_execution": {
+  "category": "rename-certain",
+  "match": "reporting.execution",
+  "purpose": "Stores each report execution request, its parameters, result summary, performance, and status.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "reporting.report_file": {
+  "category": "rename-ambiguous",
+  "match": "reporting.export,reporting.execution",
+  "purpose": "Tracks generated report files such as Excel, CSV, or PDF and their retention period.",
+  "why": "2 candidates"
+ },
+ "reporting.report_input": {
+  "category": "rename-review",
+  "match": "reporting.report_parameter",
+  "purpose": "Defines runtime inputs such as date range, venue, channel, customer, or status for a report.",
+  "why": "one candidate, containment 0.43"
+ },
+ "reporting.report_schedule": {
+  "category": "rename-certain",
+  "match": "reporting.schedule",
+  "purpose": "Defines automatic recurring execution and delivery of a report.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "resources.rental_agreement": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Stores the operational rental lifecycle for a customer after booking/order confirmation, including planned and actual handover/return times.",
+  "why": "they flag it NEW"
+ },
+ "resources.rental_agreement_item": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Stores each serialized or quantity-based item in a rental, enabling partial returns, missing equipment tracking, and per-item status.",
+  "why": "they flag it NEW"
+ },
+ "resources.rental_inspection": {
+  "category": "domain-move",
+  "match": "rental.inspection",
+  "purpose": "NEW TABLE. Stores a before-rental or after-rental inspection performed against a rental agreement.",
+  "why": "same table, we put the domain in its own schema"
+ },
+ "resources.rental_inspection_item": {
+  "category": "additive-declared",
+  "match": "",
+  "purpose": "NEW TABLE. Stores structured condition results for each rented item or component during checkout/return inspection.",
+  "why": "they flag it NEW"
+ },
+ "resources.rental_product_mapping": {
+  "category": "rename-review",
+  "match": "resources.resource_relation",
+  "purpose": "NEW TABLE. Maps a Catalogue rental product to the physical resource pool or quantity-based Inventory item used to fulfil it.",
+  "why": "one candidate, containment 0.50"
+ },
+ "resources.resource_booking": {
+  "category": "rename-certain",
+  "match": "resources.booking",
+  "purpose": "Stores reservations of operational resources for a customer, staff member, or order.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "retail.price": {
+  "category": "placement",
+  "match": "catalogue.price",
+  "purpose": "Stores the selling price of a Retail product or variant within a Retail price list.",
+  "why": "same table name, different owning schema"
+ },
+ "retail.price_list": {
+  "category": "placement",
+  "match": "catalogue.price_list",
+  "purpose": "Defines Retail prices for a currency, scope, channel and validity period.",
+  "why": "same table name, different owning schema"
+ },
+ "retail.product": {
+  "category": "placement",
+  "match": "catalogue.product,rental.product",
+  "purpose": "Stores the independent master record for each sellable Retail merchandise item. It does not depend on Ticketing Catalogue.",
+  "why": "same table name, different owning schema"
+ },
+ "retail.product_category": {
+  "category": "placement",
+  "match": "catalogue.product_category",
+  "purpose": "Groups Retail products into business categories such as Apparel, Souvenir, Toy or Accessory.",
+  "why": "same table name, different owning schema"
+ },
+ "retail.product_recommendation": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines Retail upsell, cross-sell and add-on recommendations, including optional cross-service targets.",
+  "why": "no candidate and not flagged"
+ },
+ "retail.reservation_item": {
+  "category": "rename-ambiguous",
+  "match": "retail.reservation_line,retail.shop_and_drop_line",
+  "purpose": "Stores each merchandise item and Inventory stock reservation included in a retail reservation.",
+  "why": "2 candidates"
+ },
+ "retail.return_item": {
+  "category": "rename-ambiguous",
+  "match": "retail.return_line,retail.reservation_line",
+  "purpose": "Stores each returned merchandise item, its condition, disposition, and approved value.",
+  "why": "2 candidates"
+ },
+ "retail.variant": {
+  "category": "placement",
+  "match": "catalogue.variant",
+  "purpose": "Stores sellable Retail SKUs such as Size/Colour combinations.",
+  "why": "same table name, different owning schema"
+ },
+ "seating.seat_block_item": {
+  "category": "rename-ambiguous",
+  "match": "seating.seat_map_template,seating.import_job",
+  "purpose": "Stores each individual seat included in a seat block.",
+  "why": "2 candidates"
+ },
+ "seating.seat_hold_item": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores each individual seat included in a temporary seat hold.",
+  "why": "no candidate and not flagged"
+ },
+ "seating.seat_rule": {
+  "category": "rename-ambiguous",
+  "match": "seating.seating_rules,seating.accessible",
+  "purpose": "Stores seat-selection rules applied to a seat map.",
+  "why": "2 candidates"
+ },
+ "seating.seat_section_row": {
+  "category": "rename-certain",
+  "match": "seating.section_row",
+  "purpose": "Defines each seating row inside a section.",
+  "why": "their table-name prefix; our exact table exists"
+ },
+ "sync.cell_connection": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines which source Cell is permitted to communicate with which target Cell.",
+  "why": "no candidate and not flagged"
+ },
+ "sync.cross_cell_rejection": {
+  "category": "rename-declared",
+  "match": "sync.rejection",
+  "purpose": "Stores cross-Cell requests that failed or were rejected, including the reason, retry information, and resolution.",
+  "why": "their Change Log declares it"
+ },
+ "sync.cross_cell_request": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores each cross-Cell request such as validating membership, entitlement, benefit, or wallet eligibility.",
+  "why": "no candidate and not flagged"
+ },
+ "sync.guest_link": {
+  "category": "placement",
+  "match": "platform.guest_link",
+  "purpose": "Stores the pseudonymous link used to recognize the same guest across Cells without transferring the guest's full identity.",
+  "why": "same table name, different owning schema"
+ },
+ "venue.department": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores operational departments within a venue such as F&B, Box Office, Parking, Security, or Retail.",
+  "why": "no candidate and not flagged"
+ },
+ "venue.outlet": {
+  "category": "placement",
+  "match": "platform.outlet",
+  "purpose": "Stores physical selling or service outlets such as F&B counters, retail shops, box offices, or parking booths.",
+  "why": "same table name, different owning schema"
+ },
+ "venue.space": {
+  "category": "placement",
+  "match": "catalogue.space",
+  "purpose": "Stores physical spaces inside a venue such as screens, halls, arenas, rooms, or parking areas.",
+  "why": "same table name, different owning schema"
+ },
+ "venue.venue": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the master record for each physical venue operated by a tenant.",
+  "why": "no candidate and not flagged"
+ },
+ "venue.zone": {
+  "category": "placement",
+  "match": "seating.zone",
+  "purpose": "Stores named operational or navigational zones inside a venue or venue space.",
+  "why": "same table name, different owning schema"
+ },
+ "venuemap.layout": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores an indoor or outdoor map definition for navigation within a venue.",
+  "why": "no candidate and not flagged"
+ },
+ "venuemap.route": {
+  "category": "rename-strong",
+  "match": "venuemap.path",
+  "purpose": "Stores a navigable connection between two points on a venue map.",
+  "why": "one candidate, containment 0.80"
+ },
+ "wallet.access": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Controls which customer can view or spend from a wallet and what limits apply.",
+  "why": "no candidate and not flagged"
+ },
+ "wallet.account": {
+  "category": "placement",
+  "match": "ledger.account",
+  "purpose": "Stores the customer stored-value wallet master. It identifies whose wallet it is, wallet type, currency, and status.",
+  "why": "same table name, different owning schema"
+ },
+ "wallet.balance": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the current wallet balance for fast checkout: available amount, held amount, and total amount.",
+  "why": "no candidate and not flagged"
+ },
+ "wallet.hold": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Temporarily reserves wallet money while an order/payment is in progress so the same balance cannot be spent twice.",
+  "why": "no candidate and not flagged"
+ },
+ "wallet.transaction": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores permanent history of every wallet balance movement such as top-up, debit, refund, adjustment, expiry, or reversal.",
+  "why": "no candidate and not flagged"
+ },
+ "whitelabel.brand_setting": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the current white-label branding and UI configuration for a tenant, venue, brand, or other scope.",
+  "why": "no candidate and not flagged"
+ },
+ "whitelabel.brand_version": {
+  "category": "rename-review",
+  "match": "whitelabel.config_version",
+  "purpose": "Stores a publishable version history of a white-label configuration so changes can be reviewed and rolled back.",
+  "why": "one candidate, containment 0.40"
+ },
+ "whitelabel.faq": {
+  "category": "rename-strong",
+  "match": "whitelabel.faq_entry",
+  "purpose": "Stores individual frequently asked questions and answers.",
+  "why": "one candidate, containment 1.00"
+ },
+ "whitelabel.feature_setting": {
+  "category": "rename-ambiguous",
+  "match": "whitelabel.feature_toggle,whitelabel.module_enablement",
+  "purpose": "Controls customer-facing branded features for a tenant or venue without changing the underlying business data.",
+  "why": "2 candidates"
+ },
+ "whitelabel.home_section": {
+  "category": "rename-strong",
+  "match": "whitelabel.homepage_section",
+  "purpose": "Defines configurable sections shown on the branded homepage.",
+  "why": "one candidate, containment 0.67"
+ },
+ "whitelabel.menu_item": {
+  "category": "placement",
+  "match": "fnb.menu_item",
+  "purpose": "Defines branded menu and navigation links shown in web/mobile experiences.",
+  "why": "same table name, different owning schema"
+ },
+ "whitelabel.module_setting": {
+  "category": "rename-ambiguous",
+  "match": "whitelabel.module_enablement,whitelabel.feature_toggle",
+  "purpose": "Controls which licensed TICVAI modules are visible in the branded customer experience.",
+  "why": "2 candidates"
+ },
+ "whitelabel.page": {
+  "category": "rename-ambiguous",
+  "match": "whitelabel.content_page,whitelabel.module_enablement,whitelabel.feature_toggle",
+  "purpose": "Stores branded CMS-style pages such as About, Help, Terms landing pages, and venue information pages.",
+  "why": "3 candidates"
+ },
+ "whitelabel.promotion_block": {
+  "category": "rename-ambiguous",
+  "match": "whitelabel.promo_block,whitelabel.homepage_section,whitelabel.content_page",
+  "purpose": "Stores branded promotional tiles that link UI content to an existing Catalogue promotion or destination.",
+  "why": "3 candidates"
+ },
+ "whitelabel.redirect": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores branded website redirects so old or changed URLs continue to work.",
+  "why": "no candidate and not flagged"
+ },
+ "whitelabel.seo_setting": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores search-engine and social-sharing metadata for branded pages, products, events, and other public entities.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.employee": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the main employee/staff master record.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.employment": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores employment terms and contract validity.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.job_title": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores job/designation definitions such as Cashier, Manager, Chef or Technician.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.leave_balance": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores leave entitlement, used amount and remaining balance per employee/period.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.leave_type": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines leave categories and basic leave behavior.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.pay_component": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Defines reusable earning and deduction components.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.payroll_employee": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores calculated payroll totals for one employee in a payroll run.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.payroll_line": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores detailed earnings and deductions for an employee payroll calculation.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.payroll_run": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores a payroll processing batch for a pay period.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.payslip": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the finalized payslip metadata for an employee/payroll result.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.roster": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores the employee roster/scheduled shift for a specific work date.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.salary": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores effective-dated salary configuration for an employee.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.salary_component": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores employee-specific salary earning/deduction component values.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.shift": {
+  "category": "placement",
+  "match": "orders.shift",
+  "purpose": "Defines reusable shifts such as Morning, Evening or Night.",
+  "why": "same table name, different owning schema"
+ },
+ "workforce.work_assignment": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Assigns an employee to a job and operational location/scope for an effective period.",
+  "why": "no candidate and not flagged"
+ },
+ "workforce.work_time": {
+  "category": "additive-undeclared",
+  "match": "",
+  "purpose": "Stores individual clock-in/clock-out or attendance punch events.",
+  "why": "no candidate and not flagged"
+ }
+}

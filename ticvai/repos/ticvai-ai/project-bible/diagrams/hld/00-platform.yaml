@@ -639,12 +639,12 @@ external:
   via:
   - AiService
   - ReportingService
-  reachedThrough: ai.interaction
+  reachedThrough: ai.activity
   note: 'BYOK, budgeted and metered. **Read-only against the transactional core** (ADR-0020).
 
 
     **Reporting reaches it too** — the governed pair. A natural-language query *is* an AI interaction,
-    which is why `reporting` may write `ai.interaction` and nothing else outside AiService may.'
+    which is why `reporting` may write `ai.activity` and nothing else outside AiService may.'
 - system: Webhooks out
   via:
   - PlatformService

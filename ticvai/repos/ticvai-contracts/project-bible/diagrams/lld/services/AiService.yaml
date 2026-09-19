@@ -314,6 +314,15 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: ai.activity
+  columns: 21
+  store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  - reporting
+  foreignWriters:
+  - reporting
 - table: ai.chunk_ref
   columns: 2
   store: postgres
@@ -354,15 +363,6 @@ tables:
   writtenBy:
   - ai
   foreignWriters: null
-- table: ai.interaction
-  columns: 21
-  store: postgres-analytical
-  parent: null
-  writtenBy:
-  - ai
-  - reporting
-  foreignWriters:
-  - reporting
 - table: ai.knowledge_collection
   columns: 12
   store: postgres

@@ -7328,7 +7328,7 @@ components:
           type: integer
           nullable: true
     Plan:
-      x-ticvai-persistence: control.subscription_plan
+      x-ticvai-persistence: subscription.plan
       allOf:
       - $ref: '#/components/schemas/CreatePlanRequest'
       - type: object
@@ -7376,7 +7376,7 @@ components:
           type: string
           maxLength: 500
     Subscription:
-      x-ticvai-persistence: control.subscription
+      x-ticvai-persistence: subscription.contract
       type: object
       required:
       - tenantId

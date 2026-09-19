@@ -1973,7 +1973,7 @@ components:
             verifiedByPrincipalId: { type: string, format: uuid, nullable: true }
 
     MaintenancePlan:
-      x-ticvai-persistence: "maintenance.maintenance_plan"
+      x-ticvai-persistence: "maintenance.preventive_plan"
       type: object
       required: [id, name, assetId, taskTemplate]
       properties:

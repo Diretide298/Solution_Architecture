@@ -508,13 +508,13 @@
  ],
  "tables": {
   "reads": [
+   "ai.activity",
    "ai.chunk_ref",
    "ai.conversation",
    "ai.index_entry",
    "ai.index_failure",
    "ai.index_job",
    "ai.index_source",
-   "ai.interaction",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "ai.message",
@@ -539,8 +539,8 @@
    "maintenance.inspection_template",
    "marketing.case",
    "marketing.loyalty_programme",
-   "platform.org_unit",
    "platform.region_settings",
+   "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
    "reporting.report_definition",
@@ -558,11 +558,11 @@
    "whitelabel.policy"
   ],
   "writes": [
+   "ai.activity",
    "ai.conversation",
    "ai.index_entry",
    "ai.index_job",
    "ai.index_source",
-   "ai.interaction",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "ai.layout_draft",
@@ -579,6 +579,13 @@
    "qdrant:knowledge"
   ],
   "byStore": {
+   "postgres-analytical": [
+    "ai.activity",
+    "ai.conversation",
+    "ai.message",
+    "ai.suggestion",
+    "ai.suggestion_outcome"
+   ],
    "postgres": [
     "ai.chunk_ref",
     "ai.index_entry",
@@ -605,8 +612,8 @@
     "maintenance.inspection_template",
     "marketing.case",
     "marketing.loyalty_programme",
-    "platform.org_unit",
     "platform.region_settings",
+    "platform.scope",
     "promotions.promotion",
     "reporting.report_definition",
     "retail.merchandise",
@@ -621,13 +628,6 @@
     "whitelabel.content_page",
     "whitelabel.faq_entry",
     "whitelabel.policy"
-   ],
-   "postgres-analytical": [
-    "ai.conversation",
-    "ai.interaction",
-    "ai.message",
-    "ai.suggestion",
-    "ai.suggestion_outcome"
    ],
    "redis": [
     "cache:answer",
@@ -1185,7 +1185,7 @@
    "file": "docs\\active\\change-log-validation-18-september.md",
    "title": "Validating the developer team's Change Log",
    "status": "",
-   "mentions": 1
+   "mentions": 2
   },
   {
    "file": "docs\\active\\contract-audit-19-september.md",
@@ -1209,7 +1209,7 @@
    "file": "docs\\active\\deep-audit-24-august.md",
    "title": "Deep audit \u2014 ten invariants, run adversarially",
    "status": "",
-   "mentions": 4
+   "mentions": 3
   },
   {
    "file": "docs\\active\\deployment-configs-costed.md",
@@ -1227,7 +1227,7 @@
    "file": "docs\\active\\full-layer-audit-20aug.md",
    "title": "Full-layer audit \u2014 20 August",
    "status": "",
-   "mentions": 4
+   "mentions": 3
   },
   {
    "file": "docs\\active\\hierarchy-segregation-services.md",
@@ -1250,6 +1250,18 @@
   {
    "file": "docs\\active\\phase0-identity-pass-all-clusters.md",
    "title": "Phase 0 \u2014 identity pass, all clusters",
+   "status": "",
+   "mentions": 2
+  },
+  {
+   "file": "docs\\active\\rename-worklist-20-september.md",
+   "title": "Their workbook, every change in it, and what it means for us \u2014 20 September",
+   "status": "",
+   "mentions": 2
+  },
+  {
+   "file": "docs\\active\\schema-merge-decision-log.md",
+   "title": "Schema merge \u2014 the decision log",
    "status": "",
    "mentions": 2
   },
@@ -1299,7 +1311,7 @@
    "file": "docs\\adr\\0020-ai-isolation-boundary.md",
    "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
    "status": "Proposed \u00b7 17 August 2026",
-   "mentions": 14
+   "mentions": 13
   },
   {
    "file": "docs\\adr\\0021-qdrant-partitioning.md",
@@ -1311,7 +1323,7 @@
    "file": "docs\\adr\\0023-pii-separation.md",
    "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
    "status": "Accepted \u00b7 17 August 2026, recording a decision already impl",
-   "mentions": 3
+   "mentions": 2
   },
   {
    "file": "docs\\adr\\0028-service-decomposition.md",
@@ -1329,7 +1341,7 @@
    "file": "docs\\adr\\0034-ai-retrieval-and-cost.md",
    "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
    "status": "Accepted",
-   "mentions": 7
+   "mentions": 6
   },
   {
    "file": "docs\\adr\\0046-on-premise-has-two-configurations.md",
@@ -1341,7 +1353,7 @@
    "file": "docs\\architecture\\ai-credentials.md",
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": "",
-   "mentions": 4
+   "mentions": 3
   },
   {
    "file": "docs\\architecture\\README.md",
@@ -1530,7 +1542,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 29,
+  "documents": 31,
   "openConflicts": 1
  }
 }

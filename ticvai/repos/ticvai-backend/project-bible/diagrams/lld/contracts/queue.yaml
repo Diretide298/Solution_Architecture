@@ -90,7 +90,7 @@ operations:
   - device
   offline: true
   reads:
-  - queue.waiting_guest
+  - queue.entry
   writes: []
 - operation: getWaitTimes
   verb: GET
@@ -102,9 +102,9 @@ operations:
   - public
   offline: true
   reads:
+  - queue.entry
   - queue.queue
   - queue.reading
-  - queue.waiting_guest
   writes: []
 - operation: getWaitingGuest
   verb: GET
@@ -115,7 +115,7 @@ operations:
   - guest
   offline: false
   reads:
-  - queue.waiting_guest
+  - queue.entry
   writes: []
 - operation: joinQueue
   verb: POST
@@ -127,10 +127,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
   writes:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
 - operation: leaveQueue
   verb: DELETE
   path: /waiting-guests/{entryId}
@@ -141,10 +141,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
   writes:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
 - operation: listQueueEntries
   verb: GET
   path: /queues/{queueId}/entries
@@ -154,7 +154,7 @@ operations:
   - staff
   offline: false
   reads:
-  - queue.waiting_guest
+  - queue.entry
   writes: []
 - operation: listQueueFeeds
   verb: GET
@@ -189,10 +189,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
   writes:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
 - operation: redeemWaitingGuest
   verb: POST
   path: /waiting-guests/{entryId}/redeem
@@ -203,10 +203,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
   writes:
   - cache:idempotency
-  - queue.waiting_guest
+  - queue.entry
 - operation: setQueueStatus
   verb: PUT
   path: /queues/{queueId}/status

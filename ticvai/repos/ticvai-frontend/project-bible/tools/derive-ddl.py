@@ -24,7 +24,7 @@ ADR-0038 and ADR-0039 make the output two artefacts rather than one:
     backend/provision-tenant.sh                CREATE DATABASE, apply the template, register the row
 
 **The 21 are the price of the split and they are stated rather than dropped.** Postgres has no
-cross-database foreign key, so `control.subscription.tenant_id -> platform.tenant(id)` and twenty
+cross-database foreign key, so `subscription.contract.tenant_id -> platform.tenant(id)` and twenty
 others stop being constraints the moment `control` becomes a database of its own. They are emitted
 as commented-out `ALTER TABLE` lines with an index each, because an integrity rule that moved into
 application code is a rule somebody has to be told about — silently not emitting them would leave
@@ -183,7 +183,7 @@ RESERVED = {"table", "order", "user", "group", "check", "default", "references",
 def q(name: str) -> str:
     """Quote an identifier only where Postgres needs it.
 
-    **`fnb.table` and `orders.order` are real tables** and both are reserved words. Quoting
+    **`fnb.dining_table` and `orders.order` are real tables** and both are reserved words. Quoting
     everything makes the DDL unreadable; quoting nothing makes it unparseable.
     """
     return f'"{name}"' if name.lower() in RESERVED else name

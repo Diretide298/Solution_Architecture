@@ -100,7 +100,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.org_unit
+  - platform.scope
   - resources.resource
   writes:
   - cache:idempotency

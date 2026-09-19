@@ -1,6 +1,6 @@
 # Guest web and guest app — parity audit
 
-**Derived.** `python3 tools/audit-guest-parity.py`, 2026-09-19. Reads only.
+**Derived.** `python3 tools/audit-guest-parity.py`, 2026-09-20. Reads only.
 
 **The rule, decided 12 September 2026: guest web (P01) and guest app (P02) are identical.** Every difference below either has a reason recorded against it or is a defect waiting for a decision. Which web screen is which app screen is `screens/_guest-pairs.yaml`.
 

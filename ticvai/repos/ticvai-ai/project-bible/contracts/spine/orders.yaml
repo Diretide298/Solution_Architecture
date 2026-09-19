@@ -8996,7 +8996,7 @@ components:
             **Operations write it at `tenant` scope.**'
     PaymentProvider:
       type: object
-      x-ticvai-persistence: orders.payment_provider
+      x-ticvai-persistence: payments.provider
       description: 'BL-116, CF-131. **`Payment` carried `providerName` and `providerReference`, which
         records a provider and does not abstract one.**
 
@@ -9198,7 +9198,7 @@ components:
             **Operations write it at `venue` scope.**'
     PaymentToken:
       type: object
-      x-ticvai-persistence: orders.payment_token
+      x-ticvai-persistence: payments.token
       description: 'BL-116. **A stored credential, held by the provider and referenced here.** The platform
         never sees a card number, which is what keeps PCI scope where it belongs.
 

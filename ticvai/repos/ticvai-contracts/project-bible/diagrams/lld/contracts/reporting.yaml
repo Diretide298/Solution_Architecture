@@ -36,7 +36,7 @@ operations:
   - reporting.report_column
   - reporting.report_filter
   writes:
-  - ai.interaction
+  - ai.activity
   - cache:idempotency
   - reporting.report_column
   - reporting.report_filter
@@ -470,7 +470,7 @@ operations:
   - reporting.report_filter
   - reporting.report_parameter
   writes:
-  - ai.interaction
+  - ai.activity
   - cache:idempotency
   - reporting.report_column
   - reporting.report_definition

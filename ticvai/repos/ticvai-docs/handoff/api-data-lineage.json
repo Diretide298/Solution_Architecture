@@ -1116,7 +1116,7 @@
   "path": "/org-units",
   "reads": [
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:resolution"
@@ -1142,12 +1142,12 @@
   "path": "/org-units",
   "reads": [
    "cache:idempotency",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "routing": "",
   "scope": "brand",
@@ -1170,7 +1170,7 @@
   "path": "/org-units/{orgUnitId}",
   "reads": [
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:resolution"
@@ -1196,12 +1196,12 @@
   "path": "/org-units/{orgUnitId}",
   "reads": [
    "cache:idempotency",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "routing": "",
   "scope": "brand",
@@ -3152,7 +3152,7 @@
   "verb": "GET",
   "path": "/shifts",
   "reads": [
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [],
   "routing": "primary",
@@ -3177,14 +3177,14 @@
    "cache:idempotency",
    "identity.principal",
    "orders.cash_count_line",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
    "orders.cash_count_line",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3206,7 +3206,7 @@
   "verb": "GET",
   "path": "/shifts/current",
   "reads": [
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [],
   "routing": "primary",
@@ -3228,7 +3228,7 @@
   "verb": "GET",
   "path": "/shifts/{shiftId}",
   "reads": [
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [],
   "routing": "primary",
@@ -3251,11 +3251,11 @@
   "path": "/shifts/{shiftId}/approve-open",
   "reads": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "venue",
@@ -3278,11 +3278,11 @@
   "path": "/shifts/{shiftId}/reopen",
   "reads": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "venue",
@@ -3305,11 +3305,11 @@
   "path": "/shifts/{shiftId}/suspend",
   "reads": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3332,11 +3332,11 @@
   "path": "/shifts/{shiftId}/resume",
   "reads": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3363,14 +3363,14 @@
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.payment",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.venue_settings"
   ],
   "writes": [
    "cache:idempotency",
    "ledger.journal_entry",
    "orders.cash_count_line",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3394,11 +3394,11 @@
   "path": "/shifts/{shiftId}/accept-variance",
   "reads": [
    "cache:idempotency",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.shift",
+   "orders.pos_shift",
    "platform.outbox"
   ],
   "routing": "",
@@ -4291,7 +4291,7 @@
    "identity.principal",
    "identity.role",
    "identity.role_permission",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -5574,7 +5574,7 @@
   "reads": [
    "ledger.fx_rate",
    "orders.payment",
-   "orders.shift"
+   "orders.pos_shift"
   ],
   "writes": [],
   "routing": "analytical",
@@ -7387,7 +7387,7 @@
   "path": "/tenants/{tenantId}",
   "reads": [
    "control.cell",
-   "control.subscription",
+   "subscription.contract",
    "control.tenant"
   ],
   "writes": [],
@@ -7493,12 +7493,12 @@
   "path": "/tenants/{tenantId}/terminate",
   "reads": [
    "cache:idempotency",
-   "control.subscription",
+   "subscription.contract",
    "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription",
+   "subscription.contract",
    "control.tenant"
   ],
   "routing": "",
@@ -7521,7 +7521,7 @@
   "verb": "GET",
   "path": "/plans",
   "reads": [
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -7544,11 +7544,11 @@
   "path": "/plans",
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7570,7 +7570,7 @@
   "verb": "GET",
   "path": "/plans/{planId}",
   "reads": [
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -7593,11 +7593,11 @@
   "path": "/plans/{planId}",
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription_plan"
+   "subscription.plan"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7619,7 +7619,7 @@
   "verb": "GET",
   "path": "/tenants/{tenantId}/subscription",
   "reads": [
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [],
   "routing": "replica",
@@ -7642,11 +7642,11 @@
   "path": "/tenants/{tenantId}/subscription",
   "reads": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7669,8 +7669,8 @@
   "path": "/tenants/{tenantId}/subscription/preview",
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan",
-   "control.subscription",
+   "subscription.plan",
+   "subscription.contract",
    "platform.tenant"
   ],
   "writes": [
@@ -7698,8 +7698,8 @@
   "path": "/tenants/{tenantId}/licences",
   "reads": [
    "control.licence_add_on",
-   "control.subscription_plan",
-   "control.subscription"
+   "subscription.plan",
+   "subscription.contract"
   ],
   "writes": [],
   "routing": "primary",
@@ -7754,7 +7754,7 @@
   "writes": [
    "cache:idempotency",
    "control.licence_add_on",
-   "control.subscription"
+   "subscription.contract"
   ],
   "routing": "",
   "scope": "tenant",
@@ -8171,7 +8171,7 @@
   "verb": "GET",
   "path": "/tenants/{tenantId}/usage",
   "reads": [
-   "control.subscription",
+   "subscription.contract",
    "control.usage_record"
   ],
   "writes": [],
@@ -8194,7 +8194,7 @@
   "verb": "POST",
   "path": "/usage-records",
   "reads": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "control.usage_record"
   ],
@@ -8381,7 +8381,7 @@
   "verb": "GET",
   "path": "/venues/{venueId}/dining",
   "reads": [
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.menu",
    "platform.outlet"
   ],
@@ -8478,11 +8478,11 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -8538,7 +8538,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.kitchen_ticket"
   ],
   "routing": "",
@@ -8563,7 +8563,7 @@
   "path": "/guest-orders/{orderId}",
   "reads": [
    "fnb.delivery_location",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.kitchen_ticket"
   ],
   "writes": [],
@@ -8586,7 +8586,7 @@
   "verb": "GET",
   "path": "/table-sessions/{sessionId}/bill",
   "reads": [
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_session",
    "orders.payment"
   ],
@@ -8827,7 +8827,7 @@
   "verb": "GET",
   "path": "/fnb-orders",
   "reads": [
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [],
   "routing": "replica",
@@ -8850,11 +8850,11 @@
   "path": "/fnb-orders",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "workstation",
@@ -8877,11 +8877,11 @@
   "path": "/fnb-orders/{orderId}/accept",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -8904,11 +8904,11 @@
   "path": "/fnb-orders/{orderId}/cancel",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -8930,7 +8930,7 @@
   "verb": "GET",
   "path": "/fnb-orders/{orderId}",
   "reads": [
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [],
   "routing": "replica",
@@ -8953,11 +8953,11 @@
   "path": "/fnb-orders/{orderId}",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order"
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -8979,7 +8979,7 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/tables",
   "reads": [
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [],
   "routing": "replica",
@@ -9002,11 +9002,11 @@
   "path": "/outlets/{outletId}/tables",
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -9029,12 +9029,12 @@
   "path": "/table-visits",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "routing": "",
@@ -9057,7 +9057,7 @@
   "verb": "GET",
   "path": "/table-visits/{visitId}",
   "reads": [
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "writes": [],
@@ -9081,12 +9081,12 @@
   "path": "/table-visits/{visitId}",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "routing": "",
@@ -9110,12 +9110,12 @@
   "path": "/table-visits/{visitId}/merge",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "routing": "",
@@ -9138,7 +9138,7 @@
   "verb": "GET",
   "path": "/table-visits/{visitId}/bill",
   "reads": [
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_session",
    "orders.payment"
   ],
@@ -9190,12 +9190,12 @@
   "path": "/table-visits/{visitId}/close",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.table_visit"
   ],
   "routing": "",
@@ -9219,11 +9219,11 @@
   "path": "/tables/{tableId}/clear",
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -11931,7 +11931,7 @@
   "path": "/assets/{assetId}",
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [],
@@ -11982,7 +11982,7 @@
   "path": "/assets/lookup",
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan",
+   "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
   "writes": [],
@@ -12289,7 +12289,7 @@
   "verb": "GET",
   "path": "/maintenance-plans",
   "reads": [
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -12312,11 +12312,11 @@
   "path": "/maintenance-plans",
   "reads": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "routing": "",
   "scope": "venue",
@@ -12339,11 +12339,11 @@
   "path": "/maintenance-plans/{planId}",
   "reads": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "routing": "",
   "scope": "venue",
@@ -12366,7 +12366,7 @@
   "path": "/maintenance-plans/due",
   "reads": [
    "maintenance.asset",
-   "maintenance.maintenance_plan"
+   "maintenance.preventive_plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -13419,7 +13419,7 @@
    "reporting.report_filter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_filter"
@@ -13455,7 +13455,7 @@
    "reporting.report_parameter"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_definition",
@@ -14959,7 +14959,7 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -14998,7 +14998,7 @@
    "qdrant:knowledge"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "cache:answer",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -15128,7 +15128,7 @@
    "catalogue.product",
    "marketing.loyalty_programme",
    "platform.region_settings",
-   "platform.org_unit",
+   "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -15138,7 +15138,7 @@
    "seating.section"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -15170,7 +15170,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.layout_draft",
    "cache:idempotency"
   ],
@@ -15195,7 +15195,7 @@
   "verb": "GET",
   "path": "/interactions",
   "reads": [
-   "ai.interaction"
+   "ai.activity"
   ],
   "writes": [],
   "routing": "analytical",
@@ -15243,7 +15243,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency"
   ],
@@ -15268,7 +15268,7 @@
   "verb": "GET",
   "path": "/usage",
   "reads": [
-   "ai.interaction"
+   "ai.activity"
   ],
   "writes": [],
   "routing": "analytical",
@@ -15515,11 +15515,11 @@
   "path": "/waiting-guests",
   "reads": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "routing": "",
   "scope": "venue",
@@ -15541,7 +15541,7 @@
   "verb": "GET",
   "path": "/waiting-guests/{entryId}",
   "reads": [
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [],
   "routing": "primary",
@@ -15564,11 +15564,11 @@
   "path": "/waiting-guests/{entryId}",
   "reads": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "routing": "",
   "scope": "venue",
@@ -15591,11 +15591,11 @@
   "path": "/waiting-guests/{entryId}/redeem",
   "reads": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "routing": "",
   "scope": "workstation",
@@ -15618,11 +15618,11 @@
   "path": "/waiting-guests/{entryId}/override",
   "reads": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "routing": "",
   "scope": "venue",
@@ -15671,7 +15671,7 @@
   "verb": "GET",
   "path": "/queues/{queueId}/entries",
   "reads": [
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [],
   "routing": "primary",
@@ -15693,7 +15693,7 @@
   "verb": "GET",
   "path": "/queues/wait-times",
   "reads": [
-   "queue.waiting_guest",
+   "queue.entry",
    "queue.queue",
    "queue.reading"
   ],
@@ -15893,7 +15893,7 @@
   "verb": "GET",
   "path": "/signage/queue-calls",
   "reads": [
-   "queue.waiting_guest"
+   "queue.entry"
   ],
   "writes": [],
   "routing": "replica",
@@ -17579,7 +17579,7 @@
    "approvals.rule",
    "cache:idempotency",
    "identity.delegated_access",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency"
@@ -18277,7 +18277,7 @@
   "reads": [
    "cache:idempotency",
    "identity.role",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -18357,7 +18357,7 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -18827,7 +18827,7 @@
   "verb": "GET",
   "path": "/table-reservations",
   "reads": [
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18851,7 +18851,7 @@
   "path": "/table-reservations",
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation"
   ],
   "writes": [
@@ -18906,7 +18906,7 @@
   "path": "/table-reservations/{reservationId}/seat",
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation"
   ],
   "writes": [
@@ -19334,12 +19334,12 @@
   "path": "/subscriptions/{subscriptionId}/cancel",
   "reads": [
    "cache:idempotency",
-   "control.subscription",
+   "subscription.contract",
    "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
-   "control.subscription"
+   "subscription.contract"
   ],
   "routing": "",
   "scope": "tenant",
@@ -19526,7 +19526,7 @@
   "path": "/merchandise-reservations/{reservationId}/collect",
   "reads": [
    "cache:idempotency",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -19553,7 +19553,7 @@
   "path": "/merchandise-reservations/{reservationId}/cancel",
   "reads": [
    "cache:idempotency",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -19798,11 +19798,11 @@
   "verb": "POST",
   "path": "/ai-usage/settle",
   "reads": [
-   "ai.interaction",
+   "ai.activity",
    "ai.policy",
    "cache:idempotency",
-   "control.subscription_plan",
-   "control.subscription"
+   "subscription.plan",
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
@@ -19860,7 +19860,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.provider",
    "cache:idempotency"
   ],
@@ -20920,7 +20920,7 @@
   "reads": [
    "marketing.attribution_touch",
    "marketing.journey",
-   "marketing.journey_entrant",
+   "marketing.journey_enrollment",
    "marketing.message_dispatch"
   ],
   "writes": [],
@@ -20967,7 +20967,7 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "platform.org_unit",
+   "platform.scope",
    "venuemap.map"
   ],
   "writes": [
@@ -21058,7 +21058,7 @@
    "venuemap.point"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency"
   ],
@@ -21147,7 +21147,7 @@
   "path": "/venue-maps/{mapId}/live",
   "reads": [
    "access.scan_event",
-   "queue.waiting_guest",
+   "queue.entry",
    "venuemap.map",
    "venuemap.point"
   ],
@@ -21291,7 +21291,7 @@
    "venuemap.map"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency"
   ],
@@ -21422,7 +21422,7 @@
   "path": "/resources",
   "reads": [
    "cache:idempotency",
-   "platform.org_unit",
+   "platform.scope",
    "resources.resource"
   ],
   "writes": [
@@ -21730,7 +21730,7 @@
   "verb": "GET",
   "path": "/payment-providers",
   "reads": [
-   "orders.payment_provider",
+   "payments.provider",
    "orders.payment_routing"
   ],
   "writes": [],
@@ -21754,11 +21754,11 @@
   "path": "/payment-providers",
   "reads": [
    "cache:idempotency",
-   "orders.payment_provider"
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.payment_provider",
+   "payments.provider",
    "orders.payment_routing"
   ],
   "routing": "",
@@ -21781,7 +21781,7 @@
   "verb": "GET",
   "path": "/payment-tokens",
   "reads": [
-   "orders.payment_token"
+   "payments.token"
   ],
   "writes": [],
   "routing": "replica",
@@ -21807,12 +21807,12 @@
   "reads": [
    "cache:idempotency",
    "marketing.consent_record",
-   "orders.payment_provider"
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
    "marketing.consent_record",
-   "orders.payment_token"
+   "payments.token"
   ],
   "routing": "",
   "scope": "venue",
@@ -21837,7 +21837,7 @@
   "path": "/payment-links",
   "reads": [
    "cache:idempotency",
-   "orders.payment_provider",
+   "payments.provider",
    "orders.sales_order"
   ],
   "writes": [
@@ -21946,7 +21946,7 @@
    "cache:idempotency",
    "control.partner_agreement",
    "identity.principal",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -22436,7 +22436,7 @@
   "path": "/waitlist",
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "platform.outlet"
   ],
   "writes": [
@@ -22747,7 +22747,7 @@
   "path": "/onboarding-applications",
   "reads": [
    "cache:idempotency",
-   "control.subscription_plan",
+   "subscription.plan",
    "control.venue_type_template"
   ],
   "writes": [
@@ -23798,7 +23798,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.api_quota"
+   "control.api_limit"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24208,7 +24208,7 @@
    "control.content_block"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.proposed_action",
    "cache:idempotency"
   ],
@@ -24451,7 +24451,7 @@
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [],
   "routing": "replica",
@@ -24477,7 +24477,7 @@
   "reads": [
    "cache:idempotency",
    "orders.payment_link",
-   "orders.payment_provider",
+   "payments.provider",
    "orders.reservation",
    "orders.sales_order"
   ],
@@ -24855,7 +24855,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.temperature_log",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -24965,7 +24965,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.kitchen_ticket",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_visit"
   ],
   "writes": [
@@ -25186,7 +25186,7 @@
   "path": "/waitlist/{entryId}/quote",
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_visit"
   ],
   "writes": [
@@ -25349,12 +25349,12 @@
   "path": "/outlets/{outletId}/sections",
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -25377,12 +25377,12 @@
   "path": "/outlets/{outletId}/table-combinations",
   "reads": [
    "cache:idempotency",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -25596,7 +25596,7 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/86-events",
   "reads": [
-   "fnb.eighty_six_event",
+   "fnb.sold_out_item",
    "fnb.menu_item"
   ],
   "writes": [],
@@ -25620,12 +25620,12 @@
   "path": "/orders/{orderId}/collected",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.kitchen_ticket"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "fnb.kitchen_ticket"
   ],
   "routing": "",
@@ -25654,7 +25654,7 @@
    "cache:idempotency"
   ],
   "writes": [
-   "ai.interaction",
+   "ai.activity",
    "ai.suggestion",
    "cache:idempotency"
   ],
@@ -25936,7 +25936,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -25959,13 +25959,13 @@
   "path": "/tables/{tableId}",
   "reads": [
    "cache:idempotency",
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_visit"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.table"
+   "fnb.dining_table"
   ],
   "routing": "",
   "scope": "venue",
@@ -26069,7 +26069,7 @@
   "path": "/fnb-orders/{orderId}/notify",
   "reads": [
    "cache:idempotency",
-   "fnb.fnb_order",
+   "fnb.service_order",
    "pii.subject"
   ],
   "writes": [
@@ -26212,7 +26212,7 @@
   "verb": "GET",
   "path": "/table-reservations/conflicts",
   "reads": [
-   "fnb.table",
+   "fnb.dining_table",
    "fnb.table_reservation",
    "fnb.table_visit"
   ],
@@ -26398,7 +26398,7 @@
    "cache:idempotency",
    "identity.principal",
    "platform.audit_record",
-   "platform.org_unit"
+   "platform.scope"
   ],
   "writes": [
    "platform.audit_read"
@@ -40699,10 +40699,10 @@
   "verb": "POST",
   "path": "/rental-categories",
   "reads": [
-   "rental.category"
+   "maintenance.asset_category"
   ],
   "writes": [
-   "rental.category"
+   "maintenance.asset_category"
   ],
   "routing": null,
   "scope": "tenant",
@@ -43763,7 +43763,7 @@
   "verb": "GET",
   "path": "/rental-categories",
   "reads": [
-   "rental.category"
+   "maintenance.asset_category"
   ],
   "writes": [],
   "routing": "replica",

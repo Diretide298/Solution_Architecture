@@ -59,8 +59,18 @@ python3 tools/derive-write-decisions.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
 python3 tools/derive-diagrams.py
+# **Before the workbook, because the workbook asks it what changed.** What was "new" used to
+# be a set literal typed on 14 August — still blue five weeks later while the schema went from
+# 378 tables to 556, so 178 arrived and none was marked. This records when each table was first
+# seen and what it was called before, additively: a name that stops appearing is kept, because
+# a tool cannot tell a rename from a deletion and both need a person.
+python3 tools/derive-schema-history.py --apply
 python3 tools/build-schema-workbook.py
 python3 tools/build-services-workbook.py 2>/dev/null || true
+# The merge sheet is generated from handoff/merge-verdicts.json, which is hand-authored.
+# It runs here so the sheet cannot drift from the verdicts the way its first cut did —
+# that one was typed from the review and said 26 where the review had settled 31.
+python3 tools/build-merge-workbook.py 2>/dev/null || true
 # **The screens are authored before anything reads them.** Everything below this comment writes
 # into screens/P*.yaml, and everything after it — the boards, the id register, the screen index,
 # the mirrors — is built from what these leave behind. Running them later would publish an index

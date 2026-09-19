@@ -9122,7 +9122,7 @@ components:
           type: boolean
     PaymentRouting:
       type: object
-      x-ticvai-persistence: orders.payment_routing
+      x-ticvai-persistence: payments.routing_rule
       description: '**Which provider takes a given payment, and why.** With two gateways the question
         is live from day one: a UAE card may cost less through one and an international card less through
         the other.

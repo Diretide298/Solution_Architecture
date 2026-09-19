@@ -1255,7 +1255,7 @@ components:
               variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
 
     Shift:
-      x-ticvai-persistence: "orders.shift"
+      x-ticvai-persistence: "orders.pos_shift"
       type: object
       required: [id, workstationId, venueId, scopePath, principalId, status, currency, currencyScale, openedAt]
       properties:

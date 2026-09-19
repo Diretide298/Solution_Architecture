@@ -281,7 +281,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
-  - control.api_quota
+  - control.api_limit
 - operation: setDeveloperMembers
   verb: PUT
   path: /developers/{developerId}/members
