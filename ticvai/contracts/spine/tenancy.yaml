@@ -1171,9 +1171,796 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '204': { description: Recorded }
+  /devices/{deviceId}/enrolment:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: enrolDevice
+      summary: Take a registered device through enrolment to activation
+      description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
+        device you could trust.** Registration is an assertion — *this serial exists* — and enrolment is
+        the process that issues it an identity, gives it a configuration and lets it talk.
+
+        **Provisioning is inside enrolment rather than beside it**, because a device that is enrolled but
+        unprovisioned is a device that will fail at the gate on its first morning, and the two states are
+        never usefully apart.
+
+        The transitions are the matrix''s own: registered → enrolled → provisioned → active →
+        deactivated → retired. **Retirement revokes the credential** — a retired device whose certificate
+        still validates is a spare key in a drawer.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - state
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - enrolled
+                  - provisioned
+                  - active
+                  - deactivated
+                  - retired
+                configurationProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredDevice'
+        '409':
+          description: The transition is not allowed from the current state
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /devices/{deviceId}/assignment:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setDeviceAssignment
+      summary: Who owns it, who holds it, and where it is
+      description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
+        the package carried none of them.** A device bound to a workstation has a venue, which answers
+        none of the three: the venue owns it, a named supervisor is carrying it, and it is currently at
+        the north gate.
+
+        **Custody is what makes a loss investigable.** A scanner that disappears is a scanner somebody
+        last had, and a model that only knows its workstation cannot say who.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAssignment'
+      responses:
+        '200':
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAssignment'
+  /devices/{deviceId}/telemetry:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getDeviceTelemetry
+      summary: Battery, performance and consumables over time
+      description: '16.4.21 and 16.4.22. **The heartbeat already carries consumables and nothing kept
+        them.** A point-in-time reading answers *is it alive*; the matrix asks *is it degrading*, and
+        those need a series.
+
+        **Battery is the one that matters operationally.** A handheld at 12% at ten in the morning is a
+        handheld that dies during the afternoon rush, and the venue can act on that only if somebody
+        stored the number.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: metric
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The series
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceTelemetryPoint'
+  /device-firmware:
+    get:
+      operationId: listDeviceFirmware
+      summary: Firmware and software versions, and what is running where
+      description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
+        is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
+        bug* is asked constantly.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: deviceKind
+        in: query
+        schema:
+          type: string
+      - name: version
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Firmware releases and their installed counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceFirmware'
+  /device-firmware/rollouts:
+    post:
+      operationId: startDeviceFirmwareRollout
+      summary: Push an update to a fleet, in waves
+      description: '16.6.31 and 16.6.33. **Staged, never all at once.** A firmware update that bricks a
+        scanner has bricked one scanner if it went to a canary and the whole estate if it did not — and
+        gate hardware failing simultaneously across a venue is an evacuation problem rather than an IT
+        one.
+
+        **A device is updated when it is not in use.** The rollout carries a window, because pushing
+        firmware to a turnstile at the top of the hour is how a queue becomes an incident.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceFirmwareRollout'
+      responses:
+        '201':
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceFirmwareRollout'
+  /device-firmware/rollouts/{rolloutId}/rollback:
+    parameters:
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: rollbackDeviceFirmware
+      summary: Put the fleet back on the previous version
+      description: '16.6.34. **The requirement that makes the rest safe.** A staged rollout is only a
+        containment strategy if there is a way back, and the previous image has to still be on the device
+        for that to be true — which is a constraint on the rollout, not on the rollback.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                deviceIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Omit to roll back every device the rollout touched.
+      responses:
+        '200':
+          description: Rolling back
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceFirmwareRollout'
+  /devices/{deviceId}/credentials:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: issueDeviceCredential
+      summary: Give the device an identity it can prove
+      description: '16.7.35, 16.7.36 and 16.7.37. **A device that authenticates with a shared key is a
+        device that cannot be revoked alone.** Per-device credentials with an expiry are what make
+        retirement (16.1.6) mean anything and what let one compromised scanner be cut off without
+        re-keying an estate.
+
+        **Rotation is routine rather than exceptional.** A credential that never expires is one nobody
+        has practised replacing, and it will be replaced for the first time during an incident.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validForDays:
+                  type: integer
+                  default: 90
+                revokePrevious:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCredential'
+    delete:
+      operationId: revokeDeviceCredential
+      summary: Cut a device off now
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: reason
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Revoked
+  /devices/{deviceId}/audit:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listDeviceAuditRecords
+      summary: What was done to this device, and what it did
+      description: '16.7.38 and 16.7.39. **Two logs, one read.** The device audit is what administrators
+        did to it — enrolled, reconfigured, re-keyed, retired. The access log is what it did — who signed
+        in on it and what they scanned. An investigation almost always needs both interleaved, and
+        joining them at read time is the only way to get the order right.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - administration
+          - access
+          - security
+      responses:
+        '200':
+          description: The timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceAuditRecord'
+  /device-tamper-events:
+    get:
+      operationId: listDeviceTamperEvents
+      summary: Devices that report having been interfered with
+      description: '16.7.40. **Tamper detection is only useful if somebody is told.** A turnstile
+        controller whose enclosure was opened at two in the morning has reported a fact that means
+        nothing sitting in a table — so these raise an alert and hold a state, and a device in a tamper
+        state is untrusted until somebody clears it explicitly.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: unresolvedOnly
+        in: query
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: Tamper events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceTamperEvent'
+    post:
+      operationId: recordDeviceTamperEvent
+      summary: A device reports interference
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTamperEvent'
+      responses:
+        '201':
+          description: Recorded, and the device marked untrusted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTamperEvent'
 
 components:
   schemas:
+    DeviceAssignment:
+      type: object
+      x-ticvai-persistence: tenancy.device_assignment
+      description: '16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.**'
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        ownerOrgUnitId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Who the device belongs to — the cost centre that replaces it when it breaks.
+        custodianPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**Who is holding it right now.** The fact a loss investigation needs.'
+        assignedWorkstationId:
+          type: string
+          format: uuid
+          nullable: true
+        locationScopePath:
+          type: string
+          nullable: true
+        lastSeenLocation:
+          type: string
+          nullable: true
+          description: Reported by the heartbeat; distinct from where it is supposed to be.
+        assetTag:
+          type: string
+          nullable: true
+        acquiredAt:
+          type: string
+          format: date
+          nullable: true
+        warrantyExpiresAt:
+          type: string
+          format: date
+          nullable: true
+        assignedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    DeviceTelemetryPoint:
+      type: object
+      x-ticvai-persistence: tenancy.device_telemetry
+      description: '16.4.21 and 16.4.22. **A series, because degradation is not visible in a
+        point-in-time reading.**
+
+        '
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        batteryPercent:
+          type: integer
+          nullable: true
+        batteryHealthPercent:
+          type: integer
+          nullable: true
+        charging:
+          type: boolean
+          nullable: true
+        signalStrength:
+          type: integer
+          nullable: true
+        cpuPercent:
+          type: number
+          nullable: true
+        memoryPercent:
+          type: number
+          nullable: true
+        storageFreeMb:
+          type: integer
+          nullable: true
+        consumables:
+          type: object
+          additionalProperties: true
+          description: Paper, ribbon, wristband stock — whatever the device kind reports.
+        uptimeSeconds:
+          type: integer
+          nullable: true
+        scopePath:
+          type: string
+    DeviceFirmware:
+      type: object
+      x-ticvai-persistence: tenancy.device_firmware
+      description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceKind:
+          type: string
+        version:
+          type: string
+        releaseNotes:
+          type: string
+          nullable: true
+        artefactAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        checksum:
+          type: string
+          nullable: true
+        minimumPreviousVersion:
+          type: string
+          nullable: true
+          description: '**Some updates cannot be applied from any starting point.** Naming the floor is
+            how a two-step upgrade stays possible instead of bricking the devices that skipped one.
+
+            '
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
+        installedCount:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          enum:
+          - draft
+          - released
+          - deprecated
+          - withdrawn
+    DeviceFirmwareRollout:
+      type: object
+      x-ticvai-persistence: tenancy.device_rollout
+      description: '16.6.31, 16.6.33 and 16.6.34. **Staged, windowed and reversible.**'
+      required:
+      - firmwareId
+      properties:
+        id:
+          type: string
+          format: uuid
+        firmwareId:
+          type: string
+          format: uuid
+        targetScopePath:
+          type: string
+          nullable: true
+        targetDeviceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        waves:
+          type: array
+          description: '**A canary first.** Gate hardware failing across a venue at once is an
+            evacuation problem rather than an IT one.
+
+            '
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              percent:
+                type: integer
+              startAt:
+                type: string
+                format: date-time
+                nullable: true
+              haltOnFailurePercent:
+                type: integer
+                default: 5
+        maintenanceWindow:
+          type: object
+          nullable: true
+          properties:
+            from:
+              type: string
+            to:
+              type: string
+        previousVersionRetained:
+          type: boolean
+          default: true
+          description: '**Rollback is only possible if the old image is still there**, so this is a
+            property of the rollout rather than of the rollback.
+
+            '
+        status:
+          type: string
+          enum:
+          - scheduled
+          - running
+          - paused
+          - completed
+          - halted
+          - rolledBack
+        succeededCount:
+          type: integer
+          readOnly: true
+        failedCount:
+          type: integer
+          readOnly: true
+        scopePath:
+          type: string
+    DeviceCredential:
+      type: object
+      x-ticvai-persistence: tenancy.device_credential
+      description: '16.7.35 to 16.7.37. **Per device, with an expiry**, which is what makes retirement
+        and revocation mean anything.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - clientCertificate
+          - deviceToken
+          - mutualTls
+        fingerprint:
+          type: string
+          description: '**The identifier, never the secret.** The credential material is returned once at
+            issue and is not readable afterwards.
+
+            '
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revocationReason:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    DeviceAuditRecord:
+      type: object
+      x-ticvai-persistence: tenancy.device_audit
+      description: '16.7.38 and 16.7.39. **Administration and access interleaved**, because an
+        investigation needs the order.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceId:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        kind:
+          type: string
+          enum:
+          - administration
+          - access
+          - security
+        action:
+          type: string
+        actorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        previousValue:
+          nullable: true
+        newValue:
+          nullable: true
+        sourceIp:
+          type: string
+          nullable: true
+        correlationId:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    DeviceTamperEvent:
+      type: object
+      x-ticvai-persistence: tenancy.device_tamper_event
+      description: '16.7.40. **A state, not a log line.** A device that reported tampering is untrusted
+        until somebody clears it by hand.
+
+        '
+      required:
+      - deviceId
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - enclosureOpened
+          - locationAnomaly
+          - credentialMismatch
+          - firmwareUnsigned
+          - clockSkew
+          - physicalRemoval
+        detectedAt:
+          type: string
+          format: date-time
+        detail:
+          type: string
+          nullable: true
+        deviceTrusted:
+          type: boolean
+          default: false
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        resolution:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
     OutletKind:
       type: string
       enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]

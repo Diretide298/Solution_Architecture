@@ -52,6 +52,11 @@ components:
         - ROLE_MANAGE                 # create roles and attach grants
         - PERMISSION_GRANT            # assign grants to a principal
         - PERMISSION_VIEW             # view the grant set of others
+        - PERMISSION_MANAGE           # author, approve and retire access policies
+        # **Separate from `PERMISSION_GRANT` on purpose.** Granting a role to a person is a
+        # daily act a duty manager performs; writing the policy that decides what any role
+        # can do at three in the morning is not. 3.3.26 asks for approval on the second and
+        # says nothing about the first.
 
         # --- Control Plane ---
         # Held by platform staff, never by tenant users. These operate outside any cell.
@@ -225,6 +230,10 @@ components:
         - KIOSK_ATTEND                # attendant access on an unattended device
         - DEVICE_VIEW
         - DEVICE_CONFIGURE
+        - DEVICE_MANAGE               # enrol, assign, re-key, roll out firmware, retire
+        # **`CONFIGURE` sets a device's settings; `MANAGE` decides whether it exists and
+        # whether it is trusted.** 16.7.35 gives devices credentials, and the ability to
+        # issue one has to be rarer than the ability to change a printer's paper size.
         - APPROVAL_ACT                # approve, reject, return, request info
         - APPROVAL_DELEGATE
         - AI_USE

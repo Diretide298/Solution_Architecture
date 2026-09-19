@@ -189,17 +189,28 @@ def tasks(screen):
     """
     found = []
     for name, lines in (screen.get('sections') or {}).items():
-        if PROSE_SECTION.match(name):
-            continue
-        implied = implied_verb(name)
+        prose = bool(PROSE_SECTION.match(name))
+        # **Skipping a prose heading outright loses whole packs.**
+        # `Marketing_CRM_Configuration_Reference` and `Seat_Management_Venue_Mapping`
+        # are prose PDFs with no directories at all — 120 and 129 screens whose only
+        # heading is `Purpose`, holding text like *"Maintain standard and custom
+        # attributes… Define primary and external identifiers, source-system priority,
+        # survivorship rules… Version and audit schema changes."* Those are tasks. The
+        # tool reported 107 of 107 and 97 of 97 screens with no candidate operation in
+        # any contract, against a `marketing-crm` that has 167 of them.
+        #
+        # What prose actually justifies is refusing to *infer* a verb, not refusing to
+        # read the line. A verbless sentence under `Purpose` is background; one that
+        # leads with `Maintain` or `Configure` is a task wherever it is written.
+        implied = None if prose else implied_verb(name)
         # **The heading is part of the entity, not just the verb.** `Created Date`
         # under `Work Order Information` reaches nothing on its own; the same line
         # under that heading carries `work` and `order` and reaches
         # `maintenance.createWorkOrder`. This is the signal the whitelist threw away
         # even for the sections it did read.
-        head_ent = nouns(name)
+        head_ent = set() if prose else nouns(name)
         for line in lines:
-            for phrase in re.split(r'[;|•]|\s{2,}', line):
+            for phrase in re.split(r'[;|•]|\s{2,}|(?<=[a-z])\.\s+', line):
                 words = re.findall(r'[A-Za-z]{2,}', phrase.lower())
                 if not words:
                     continue

@@ -2250,8 +2250,854 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /access-policies:
+    get:
+      operationId: listAccessPolicies
+      summary: Attribute-based access policies
+      description: '3.3.1. **`Grant` is principal → role → scope, and forty-two matrix rows ask for
+        something it cannot express.** *"Allows permissions to be granted dynamically based on attributes
+        and context rather than fixed roles only."*
+
+        A role grant answers *who you are*. These answer *who you are, where, when, on what device,
+        under what occupancy, at what risk* — and none of that is a property of the person, so none of it
+        can be baked into a role without inventing a role per combination.
+
+        **The role model is not replaced.** Roles remain the coarse grant and a policy narrows or extends
+        it; `resolvePermissions` already simulates the role half and now runs both.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: scopePath
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessPolicy'
+    post:
+      operationId: createAccessPolicy
+      summary: Write a policy without writing code
+      description: '3.3.5. *"Administrators shall configure access policies without software
+        development."* **That sentence is the whole requirement and it decides the shape.** A policy is
+        data — a set of attribute conditions and an effect — evaluated by one engine, because the
+        alternative is a deployment every time a venue changes its opening hours.
+
+        **Created as a draft.** 3.3.25 wants simulation before deployment and 3.3.26 wants approval, so a
+        policy that took effect on creation would satisfy neither.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicy'
+      responses:
+        '201':
+          description: Created as a draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+  /access-policies/{policyId}:
+    parameters:
+    - name: policyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAccessPolicy
+      summary: One policy, at a version
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: version
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+    put:
+      operationId: updateAccessPolicy
+      summary: Change a policy, as a new version
+      description: '3.3.24 and 3.3.39. **Every change is a version and the old one is kept.** An access
+        policy is the thing an investigation asks about months later — *what was in force on the night*
+        — and a policy edited in place cannot answer it.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessPolicy'
+      responses:
+        '200':
+          description: A new version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+  /access-policies/{policyId}/state:
+    parameters:
+    - name: policyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setAccessPolicyState
+      summary: Submit, approve, activate or retire a policy
+      description: '3.3.26. **A policy change is an authorisation change**, so it goes through the same
+        approval machinery as anything else that moves money or opens a door — routed to `approvals`
+        rather than given a second workflow here.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - state
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - draft
+                  - pendingApproval
+                  - active
+                  - suspended
+                  - retired
+                reason:
+                  type: string
+                  nullable: true
+                effectiveFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+  /access-policies/simulate:
+    post:
+      operationId: simulateAccessPolicy
+      summary: What this policy would decide, before it decides anything
+      description: '3.3.25. *"System shall support simulation and testing of policies prior to
+        deployment."*
+
+        **An access policy is uniquely unforgiving of being tested in production.** A pricing rule that
+        is wrong overcharges somebody and is refunded; an access policy that is wrong either lets the
+        wrong person through a gate or strands a shift supervisor outside one at six in the morning.
+
+        Takes a policy — including an unsaved draft — and a set of contexts, and returns the decision and
+        the matched conditions for each.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - contexts
+              properties:
+                policyId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                policy:
+                  $ref: '#/components/schemas/AccessPolicy'
+                contexts:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessContext'
+      responses:
+        '200':
+          description: One decision per context
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessDecision'
+  /access-decisions:
+    post:
+      operationId: evaluateAccess
+      summary: Decide, now, and say why
+      description: '3.3.27 and 3.3.29. **One decision point, called by everything.** Gates, turnstiles,
+        back-office screens and APIs all ask the same question, and a second evaluator anywhere means two
+        answers that diverge silently.
+
+        **The reason is part of the answer, not a log line.** 3.3.38 wants access investigations to be
+        reportable, and an investigation into a denial needs to know *which condition failed* — a bare
+        DENY sends somebody to read forty policies by hand.
+
+        **Offline is a different operation on purpose.** 3.3.30 wants local evaluation when offline, and
+        that is `getAccessPolicyBundle` plus a device-side evaluator — not this call with a longer
+        timeout. A gate that waits for the network is a gate that stops working when the network does.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessContext'
+      responses:
+        '200':
+          description: The decision, with its reasons
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDecision'
+  /access-policies/bundle:
+    get:
+      operationId: getAccessPolicyBundle
+      summary: The policies a device needs to decide for itself
+      description: '3.3.28 and 3.3.30. **Caching and offline evaluation are the same mechanism at two
+        durations.** A signed, versioned bundle of the policies relevant to this device and scope, with a
+        validity window — so a turnstile that loses the network keeps deciding, and stops deciding when
+        the bundle expires rather than drifting indefinitely.
+
+        **Expiry is the safety property.** A cached policy with no end date is a policy that outlives its
+        own revocation.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      parameters:
+      - name: deviceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: scopePath
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The bundle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicyBundle'
+  /access-policy-templates:
+    get:
+      operationId: listAccessPolicyTemplates
+      summary: Reusable policy shapes
+      description: '3.3.23. **A template is where the platform''s own experience lives.** *Shift-hours
+        only*, *venue-local staff*, *capacity-gated entry* are policies every venue writes, and writing
+        them forty times is forty chances to get the condition backwards.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessPolicy'
+  /access-policies/{policyId}/history:
+    parameters:
+    - name: policyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listAccessPolicyHistory
+      summary: Every version, who changed it and why
+      description: '3.3.36 and 3.3.39. **Policy changes and access decisions are two different audits**
+        and this is the first. Conflating them makes the common question — *who widened this and when* —
+        a search through millions of decision records.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessPolicyVersion'
+  /access-decisions/audit:
+    get:
+      operationId: listAccessDecisions
+      summary: What was decided, for whom, where and why
+      description: '3.3.37 and 3.3.38. **The second audit: decisions, not policy edits.** An access
+        investigation starts from a person, a door and a time, and needs the decision, the policy version
+        that produced it and the attribute values it saw — because *the policy says permit* and *the
+        policy saw a stale attribute* look identical without the third.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: principalId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: effect
+        in: query
+        schema:
+          type: string
+          enum:
+          - permit
+          - deny
+      responses:
+        '200':
+          description: Decisions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessDecision'
+  /access-overrides:
+    post:
+      operationId: createEmergencyAccessOverride
+      summary: Bypass the policy, loudly
+      description: '3.3.6. *"Authorized users may temporarily bypass restrictions with full audit
+        logging."*
+
+        **The override is time-boxed at creation and cannot be open-ended.** An emergency bypass with no
+        expiry is how a fire-drill exception becomes a permanent hole nobody remembers opening.
+
+        Raises an alert as well as an audit record. **An override nobody is told about is
+        indistinguishable from a breach**, which is the situation an emergency override is supposed to
+        prevent.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              - expiresAt
+              - scopePath
+              properties:
+                principalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                scopePath:
+                  type: string
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                reason:
+                  type: string
+                expiresAt:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Granted, logged and alerted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyAccessOverride'
+
 components:
   schemas:
+    AccessPolicy:
+      type: object
+      x-ticvai-persistence: identity.access_policy
+      description: '3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are;
+        a policy says under what circumstances that is enough.
+
+        '
+      required:
+      - code
+      - name
+      - effect
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isTemplate:
+          type: boolean
+          default: false
+        permissions:
+          type: array
+          items:
+            type: string
+          description: '**Which permissions this policy speaks to.** A policy with an empty list speaks
+            to all of them, which is powerful enough that it is worth being explicit about.
+
+            '
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessCondition'
+        combining:
+          type: string
+          enum:
+          - allMustMatch
+          - anyMayMatch
+          default: allMustMatch
+        effect:
+          type: string
+          enum:
+          - permit
+          - deny
+          description: '**Deny wins over permit when two policies disagree.** 3.3.32 asks for
+            least-privilege, and a permit that can override a deny is not least-privilege by any
+            reading — it is the union of every mistake anybody has made.
+
+            '
+        priority:
+          type: integer
+          default: 0
+        scopePath:
+          type: string
+          description: '3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**,
+            because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and
+            inheritance is the prefix walk rather than a second table.
+
+            '
+        appliesToRoleIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum:
+          - draft
+          - pendingApproval
+          - active
+          - suspended
+          - retired
+        version:
+          type: integer
+          default: 1
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        delegatedAdminRoleIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: '3.3.35. **Who may edit this policy without being a platform administrator.** A
+            venue manager tuning their own opening-hours rule should not need someone who can edit every
+            tenant''s.
+
+            '
+    AccessCondition:
+      type: object
+      description: '**One attribute, one operator, one value** — and the attribute names are an enum
+        rather than free text, because a policy that reads `venu.type` silently never matches.
+
+        The enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9),
+        accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue
+        (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event
+        (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time
+        (3.3.3).
+
+        '
+      required:
+      - attribute
+      - operator
+      properties:
+        attribute:
+          type: string
+          enum:
+          - user.attribute
+          - employee.attribute
+          - employee.onShift
+          - membership.tier
+          - membership.status
+          - accreditation.type
+          - accreditation.status
+          - customer.segment
+          - resource.classification
+          - venue.attribute
+          - venue.id
+          - attraction.attribute
+          - device.kind
+          - device.id
+          - device.trusted
+          - time.ofDay
+          - time.dayOfWeek
+          - time.season
+          - time.withinOperatingHours
+          - event.id
+          - event.status
+          - capacity.utilisationPercent
+          - occupancy.level
+          - risk.score
+          - ticket.status
+          - location.scopePath
+        key:
+          type: string
+          nullable: true
+          description: For the `*.attribute` forms — which attribute, by code.
+        operator:
+          type: string
+          enum:
+          - equals
+          - notEquals
+          - in
+          - notIn
+          - greaterThan
+          - lessThan
+          - between
+          - contains
+          - startsWith
+          - exists
+        value:
+          nullable: true
+        values:
+          type: array
+          items:
+            type: string
+    AccessContext:
+      type: object
+      description: '**Everything the decision is allowed to depend on.** Stated as one object so a
+        simulation and a live decision see the same shape — a simulator that takes different inputs from
+        the evaluator is testing something else.
+
+        '
+      properties:
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+        scopePath:
+          type: string
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        attractionId:
+          type: string
+          format: uuid
+          nullable: true
+        deviceId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        at:
+          type: string
+          format: date-time
+          nullable: true
+        attributes:
+          type: object
+          additionalProperties: true
+          description: '**Supplied attributes are a fallback, not the source.** The evaluator resolves
+            what it can itself; a caller that could assert its own membership tier could assert any
+            membership tier.
+
+            '
+    AccessDecision:
+      type: object
+      x-ticvai-persistence: identity.access_decision
+      description: '3.3.37. **The decision, the policy version behind it, and the attribute values it
+        actually saw.** The third is what separates *the policy is wrong* from *the data was stale*.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        effect:
+          type: string
+          enum:
+          - permit
+          - deny
+        decidedAt:
+          type: string
+          format: date-time
+        decidedBy:
+          type: string
+          enum:
+          - central
+          - deviceBundle
+          description: 3.3.29 against 3.3.30 — which evaluator answered.
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+        scopePath:
+          type: string
+        matchedPolicies:
+          type: array
+          items:
+            type: object
+            properties:
+              policyId:
+                type: string
+                format: uuid
+              version:
+                type: integer
+              effect:
+                type: string
+              matched:
+                type: boolean
+              failedCondition:
+                type: string
+                nullable: true
+        observedAttributes:
+          type: object
+          additionalProperties: true
+        overrideId:
+          type: string
+          format: uuid
+          nullable: true
+        latencyMs:
+          type: integer
+          nullable: true
+        scopePathIndex:
+          type: string
+    AccessPolicyBundle:
+      type: object
+      description: '3.3.28 and 3.3.30. **Signed, versioned and time-boxed**, so an offline gate decides
+        correctly and then stops rather than drifting.
+
+        '
+      properties:
+        bundleId:
+          type: string
+          format: uuid
+        deviceId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessPolicy'
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        signature:
+          type: string
+    AccessPolicyVersion:
+      type: object
+      x-ticvai-persistence: identity.access_policy_version
+      description: '3.3.36 and 3.3.39. **Who changed what, from what, and why.**'
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        changedBy:
+          type: string
+          format: uuid
+        changedAt:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          nullable: true
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        previous:
+          $ref: '#/components/schemas/AccessPolicy'
+        current:
+          $ref: '#/components/schemas/AccessPolicy'
+        scopePath:
+          type: string
+    EmergencyAccessOverride:
+      type: object
+      x-ticvai-persistence: identity.access_override
+      description: '3.3.6. **Time-boxed at creation, alerted as well as logged.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        alertedTo:
+          type: array
+          items:
+            type: string
+            format: uuid
     GuestSession:
       x-ticvai-persistence: none — Redis session registry
       type: object
