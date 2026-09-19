@@ -36,13 +36,20 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "handoff", "api-list.md")
 VERBS = ("get", "post", "put", "patch", "delete")
 
-# From each screens/P*.yaml platform block. Held here rather than read from the screens
-# because this tool has no other reason to open them, and the codes do not move.
+# **The app a platform builds into, not a pretty name for the platform.** These are the
+# `platform.app` values the screens declare, which are the `frontend/*.yaml` filenames —
+# the package's own roster. The first cut wrote display names ("Venue POS", "Venue Mgmt")
+# and broke the viewer's consumer layer, which matches this column against an app list.
+#
+# Several platforms share an app and that is correct: P08, P13 and P16 are three surfaces
+# of `venue-management-web`, and P02 and P05 are the guest app on a phone and on a kiosk.
 APPS = {
-    "P01": "Guest Web", "P02": "Guest App", "P04": "Venue POS", "P05": "Guest Kiosk",
-    "P06": "Staff App", "P07": "Scanner", "P08": "Venue Mgmt", "P09": "TICVAI Web",
-    "P10": "Partner Web", "P11": "Accreditation", "P12": "Support", "P13": "Venue CMS",
-    "P14": "Developer", "P15": "Kitchen", "P16": "Analytics", "P17": "Sign-up",
+    "P01": "guest-web", "P02": "guest-app", "P04": "venue-pos", "P05": "guest-app",
+    "P06": "venue-staff-app", "P07": "venue-scanner", "P08": "venue-management-web",
+    "P09": "ticvai-web", "P10": "partner-web", "P11": "accreditation-web",
+    "P12": "venue-support-web", "P13": "venue-management-web",
+    "P14": "developer-portal-web", "P15": "kitchen-display",
+    "P16": "venue-management-web", "P17": "signup-web",
 }
 
 
