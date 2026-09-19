@@ -28,7 +28,7 @@ cost again.
 | 1 | Rental domain | **keep `rental.*` and take their agreement** | 20 Sep |
 | 2 | Payments domain | **keep `payments` for config**, fix our own split first | 20 Sep |
 | 3 | Subscription domain | **consolidate into `subscription`**, decline `platform` | 20 Sep |
-| 4 | `venue` schema | **their name, our table** — `platform.scope`; take `department` | 20 Sep |
+| 4 | `venue` schema | **their name, our table** — `platform.scope`; decline all five | 20 Sep |
 | 5 | `pricing` schema | **take all three**, and give the schema an owner | 20 Sep |
 | 6 | Payroll and HR scope | **client question** — and payroll wants its own owner | 20 Sep |
 | 7 | Where a customer lives | **keep the three-way split** | 20 Sep |
@@ -282,8 +282,13 @@ and effort does not count.
 been calling it all along. Decline `venue.venue`, `outlet`, `space` and `zone`, because each is a
 level of the hierarchy we already hold as a row.
 
-**And `venue.department` is not optional.** `platform.workstation.department_id` **references a
-table that does not exist.** We have a dangling column today, and their table is it.
+**Decline all five, including `department`.** *(Corrected — we had `department` down as a gap and
+as a dangling reference. It is neither.)* `ScopeLevel` in `contracts/shared/common.yaml`
+enumerates **tenant, brand, region, venue, department, subDepartment, workstation, outlet,
+subject**, and **ADR-0011 makes the hierarchy binding**. `platform.org_unit` holds a department as
+a row with `level: department`, and `platform.workstation.department_id` points at it. **Their
+five tables are five of our nine levels flattened into tables** — which is the argument of this
+whole decision, applied to the one table we had conceded.
 
 ## 5 · The `pricing` schema — **take it, and give it an owner**
 

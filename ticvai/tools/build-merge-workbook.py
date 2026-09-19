@@ -86,12 +86,13 @@ DECISIONS = [
      "TenancyService and licensing in PlatformService, so a plan lookup becomes a cross-service "
      "call. Ours is split three ways. Moving control.subscription and subscription_plan into the "
      "subscription schema is the only option that puts one domain in one schema in one service."),
-    (4, "venue schema", "Their name, our table: platform.scope. Take department", 5,
+    (4, "venue schema", "Their name, our table: platform.scope. Decline all five", 5,
      "ours", "theirs", "tie", "tie",
      "platform.org_unit is one self-referencing hierarchy - level, parent_id, path, child_count. "
      "Their five typed tables flatten it, so adding a level becomes a new table. But scope is the "
-     "word 58 of our configuration profiles already address by. And venue.department is not "
-     "optional: platform.workstation.department_id references a table that does not exist."),
+     "word 58 of our configuration profiles already address by. All five of their tables are "
+     "levels of that hierarchy: ScopeLevel enumerates tenant, brand, region, venue, department, "
+     "subDepartment, workstation, outlet and subject, and ADR-0011 makes it binding."),
     (5, "pricing schema", "Take all three; give the schema an owner", 3,
      "theirs", "theirs", "theirs", "theirs",
      "We hold three guardrail columns on rental.pricing_profile - dynamic_enabled and a max "
@@ -144,8 +145,6 @@ ACTIONS = [
     ("Loyalty", "Take marketing.loyalty_points, the ledger",
      "loyalty_position is a balance with no transaction history behind it, so it cannot be "
      "audited or corrected.", "Defect"),
-    ("Venue", "Take venue.department",
-     "platform.workstation.department_id references a table that does not exist.", "Defect"),
     ("Rental", "Take rental_agreement; merge rental_agreement_item with rental.equipment_assignment",
      "We hold agreement_rules and agreement_signature and no agreement. The signature references "
      "a participant and a version string, and rental.participant has no booking reference.",

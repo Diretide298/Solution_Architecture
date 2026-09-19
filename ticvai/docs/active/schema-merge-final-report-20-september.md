@@ -31,8 +31,8 @@ moved **38 rows**, almost all of them in your favour.
 
 | | tables | |
 |---|---:|---|
-| **we take yours** | **106** | your table, your name, or your columns |
-| we keep ours | 104 | with the reason stated per row |
+| **we take yours** | **105** | your table, your name, or your columns |
+| we keep ours | 105 | with the reason stated per row |
 | **open** | **7** | payroll — a scope question, not a schema one |
 | corrections | 6 | matches we had wrong |
 
@@ -43,7 +43,7 @@ moved **38 rows**, almost all of them in your favour.
 
 ## 1 · What we are changing on our side
 
-**Twelve of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
+**Thirteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
 is how we found most of them.
 
 ### Things that are wrong today
@@ -52,7 +52,6 @@ is how we found most of them.
 |---|---|
 | **`marketing.loyalty_programme` holds no rules.** It is a header — code, name, expiry months. The only rules table is **`marketing.loyalty_tier`, which is misnamed** (it holds earning triggers and multipliers, not tiers) and **referenced by nothing at all: 0 operations, 0 screens, 0 foreign keys.** The tier a guest is in is two denormalised strings on their balance row | **your split is right.** We take `points_earning_rule`, `points_redemption_rule` and `loyalty_rule`, retire `loyalty_tier`, and add a real tier table |
 | **`marketing.loyalty_position` is a balance with no ledger behind it.** It cannot be audited or corrected | we take `marketing.loyalty_points` |
-| **`platform.workstation.department_id` references a table that does not exist** | we take `venue.department`. Not a nicety — a dangling column |
 | **We hold `rental.agreement_rules` and `rental.agreement_signature` and no agreement.** The signature references a participant and a version *string*, so it signs a version number rather than a document, and `rental.participant` carries no booking reference at all | **we take `rental_agreement`**, and merge `rental_agreement_item` with our `equipment_assignment` |
 | **`orders.payment_routing` and `payments.routing_rule` are the same table.** Both are "priority plus conditions decide which provider" | your single `payment_route` maps onto both. We collapse them |
 | **`rental.category` is the asset-category master for the whole venue** — `maintenance.asset`, `maintenance_plan`, `inspection_template`, `resources.resource_category` and `resource_requirement` all point at it. A forklift that is never rented has its category defined in `rental` | it moves out of `rental` |
@@ -120,7 +119,7 @@ reporting layer flattens joins into one namespace, and we would rather hear it.
 | `identity.customer`, `_address`, `family`, `family_member` | `marketing.guest_profile` + `pii.subject` + `guest_relationship` | **`identity.principal` carries 134 inbound foreign keys — the most connected table in the package.** Your proposal adds every guest row to the table every authentication already reads. The split is also what lets a DSAR walk one subtree |
 | `marketing.data_subject_request` | `platform.dsar_request` | a DSAR spans every service. Ours is TenancyService and walks `guest_link`; yours would be MarketingService, which owns one of the dozen schemas a DSAR must reach |
 | `sync.guest_link` | `platform.guest_link` | **we reversed ourselves on this one.** `dsar_request.guest_link_id` points at it and both are TenancyService. Moving the link alone puts a DSAR fan-out across a service boundary on its hottest path |
-| `venue.venue`, `outlet`, `space`, `zone` | `platform.scope` | each is a *level* of a self-referencing hierarchy we hold as a row. Five typed tables make adding a level a new table |
+| `venue.venue`, `department`, `outlet`, `space`, `zone` | `platform.scope` | **each of the five is a *level* of a hierarchy we hold as rows.** `ScopeLevel` enumerates tenant, brand, region, venue, department, subDepartment, workstation, outlet and subject, and ADR-0011 makes it binding. Five typed tables make adding a level a new table |
 | `orders.order` | `orders.sales_order` | `sales_order` distinguishes it from an F&B order, a purchase order and a kitchen order |
 | `inventory.wastage` | `inventory.movement` | ours carries `unit_cost`, `cost_center_id` and `journal_entry_id`, so wastage posts to the ledger by the same path as every other movement. A separate table splits the stock ledger in two |
 | `marketing.survey`, `waiver_template` | `marketing.form_definition` | it holds `kind`, `score_scale`, `requires_signature`, `signature_kind`, `legal_reviewed_by` and `version` — NPS and a waiver are shapes of one form |
@@ -158,6 +157,8 @@ wants its own schema and its own owner** — not thirteen more tables in `workfo
 `rental.pricing_profile`: `dynamic_enabled`, and a maximum increase and decrease percent. **A
 ceiling and a floor with no engine under them**, and nothing at all on tickets, F&B or retail.
 Your three `pricing` tables are still a genuine gap; the claim was overstated.
+
+**We said `venue.department` was a gap and that `platform.workstation.department_id` pointed at nothing. Both were wrong** — `department` is one of nine `ScopeLevel` values, the column points at `platform.org_unit` with `level: department`, and ADR-0011 makes that hierarchy binding. We are declining all five `venue` tables, not four.
 
 **Two matches we had wrong**, corrected so they do not propagate:
 

@@ -736,8 +736,8 @@
   "Decision 10, reversed. platform.dsar_request.guest_link_id points at platform.guest_link and both are TenancyService; sync is CrossRegionService. Moving the link alone puts a DSAR fan-out across a service boundary on its hottest path. Either both go or neither does, and a DSAR is a tenancy obligation rather than a synchronisation mechanism"
  ],
  "venue.department": [
-  "ADDITIVE",
-  "Decision 4. Not optional: platform.workstation.department_id references a table that does not exist"
+  "DECLINE",
+  "corrected. department is one of nine ScopeLevel values in contracts/shared/common.yaml - tenant, brand, region, venue, department, subDepartment, workstation, outlet, subject - and ADR-0011 makes the hierarchy binding. platform.org_unit holds a department as a row with level=department, and platform.workstation.department_id points at it. We had this as a dangling reference and a gap; it is neither. Their five venue tables are five of our nine levels flattened into tables, which is the decision-4 argument applied to the one table we had conceded"
  ],
  "venue.outlet": [
   "DECLINE",
