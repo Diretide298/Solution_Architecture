@@ -52,6 +52,10 @@ python3 tools/derive-burst-scope.py --apply
 python3 tools/derive-sizing.py --apply
 python3 tools/derive-table-notes.py --apply
 python3 tools/derive-schema-roots.py
+# **The table question, asked once per drafted write, against the columns that now exist.**
+# It compares an operation's request fields to `backend/*/0*.sql`, so it runs after derive-ddl
+# and not before. Last built by hand on 4 September; 346 operations have been written since.
+python3 tools/derive-write-decisions.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
 python3 tools/derive-diagrams.py
@@ -76,6 +80,11 @@ python3 tools/build-services-workbook.py 2>/dev/null || true
 # found. **They are one-off corrections, already applied; run them deliberately, not on a
 # rebuild.** Their effects live in screens/P*.yaml and are preserved by the generators' carry
 # rules, so nothing here needs to re-assert them.
+# **Before the transitions, so a board flow written this run is adopted this run.** It reads
+# `navigation.exitTo`, which is authored, so nothing below it is an input — and putting it after
+# derive-transitions would mean every new board flow waited a full rebuild to become an edge.
+# It skips any board an authored flow already reaches; derived flows stay counted apart.
+python3 tools/derive-board-flows.py --apply
 python3 tools/derive-transitions-from-flows.py --apply --adopt   # 94 flows -> triggers, +107 edges
 python3 tools/label-launcher-edges.py --apply            # home screens are launchers
 python3 tools/derive-carries-from-entrystate.py --apply  # carries, from what the destination needs
@@ -119,6 +128,15 @@ python3 tools/derive-app-roles.py
 # it, and also means a stale register fails the package for a screen that is perfectly fine.
 python3 tools/derive-id-register.py --apply
 python3 tools/link-screens-contracts.py
+# **Four artefacts derived from the finished screens, none of which was ever in this script.**
+# Their dates are the argument for putting them here: the ledger was last built 4 September, the
+# estate audit and the undrawn list on 8 September, the thin-screens workbook on 9 September --
+# and 798 screens have been placed since the oldest of them. A number that is expensive to
+# derive gets derived carelessly, which is the same lesson index-boards taught.
+python3 tools/screen-ledger.py
+python3 tools/audit-screen-estate.py
+python3 tools/list-undrawn.py
+python3 tools/build-thin-screens-workbook.py 2>/dev/null || true
 
 python3 - <<'PY'
 import yaml, glob, json
@@ -167,6 +185,15 @@ done
 
 python3 tools/build-backlog-index.py
 python3 tools/build-cluster-index.py
+# **`conflict-status.md` was last built on 25 August and `conflicts.md` on 19 September.** The
+# index and the register it indexes were twenty-five days apart, which is exactly the failure
+# this tool's own docstring names: "a count kept by hand next to the thing it counts will
+# disagree with it."
+python3 tools/build-cf-index.py
+# **What the client sent, and whether anything has read it.** It writes one derived index into
+# `sources/` -- the only thing in this script that does, and it writes nothing else there. The
+# client's own files are read-only and the `--apply` that moves them is deliberately not passed.
+python3 tools/index-packs.py
 python3 tools/sync-project-bible.py
 python3 tools/derive-platform.py
 python3 tools/derive-platform-deployment.py
@@ -194,7 +221,13 @@ echo
 # never completed on Windows at all — it died on the `→` in its own first heading. A check
 # nobody runs is a check nobody has, so every checking tool in tools/ is now in this list.
 # One-shot repairs stay out: they assert content rather than report on it.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations audit-links audit-workbooks audit-pack-citations; do
+#
+# **That claim was false for a year of this file's life and six more were found on 19 September.**
+# `check-contract-split`, `check-spec-coverage`, `check-rfp-coverage`, `audit-contracts`,
+# `audit-screen-estate` and `index-sources` were all sitting in tools/ with nothing running them.
+# The last three write a dated report only when passed `--write`; bare, they report and read, so
+# they belong here and produce no file.
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-contract-split check-spec-coverage check-rfp-coverage audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.
@@ -205,3 +238,39 @@ done
 # still pass every check above — nothing fails for an edge nobody labelled — so it is printed here
 # next to the checks rather than left to be noticed later.
 printf "  %-22s" "transition coverage"; python3 tools/audit-transitions.py 2>&1 | grep '^ALL'
+
+# **This script was missing eleven tools on 19 September and nothing said so.** Four derived
+# artefacts were between 10 and 25 days stale, and the checker loop above carried a comment
+# claiming "every checking tool in tools/ is now in this list" while six sat outside it. A tool
+# that exists and never runs is worse than one that does not exist, because its output is on
+# disk with a date nobody reads.
+#
+# So the coverage is checked rather than asserted. Everything in tools/*.py must either appear
+# above or be named here with the reason it does not belong. A new tool fails this until
+# somebody decides which it is -- that decision is the whole point.
+_EXCLUDED="
+contract_io contract_shapes packshape workshop_boards              # imported, no main
+parse-workshop-pack mine-moms extract-mom-decisions                # intake, once per client drop
+extract-board-reads extract-design-document import-design-frames
+annotate-hardware-sheet fix-docx-media inject-cover
+generate-screens-from-pack generate-screens-from-contracts         # author screens; assert content
+derive-pack-screens derive-pack-linkage derive-task-linkage
+draft-pack-operations specify-pack-operations scope-pack-to-contracts
+splice-contract apply-p04-transitions
+retire-answered-questions                                          # never run: the answers are the reasoning
+bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
+build-mom-digest build-review-responses scan-domain-drift find-capability
+"
+_missing=""
+for _t in tools/*.py; do
+  _n="$(basename "$_t" .py)"
+  case "$_EXCLUDED" in *" $_n "*|*"
+$_n "*) continue ;; esac
+  grep -q -- "$_n" tools/refresh.sh || _missing="$_missing $_n"
+done
+if [ -n "$_missing" ]; then
+  echo
+  echo "  tools/ has files this script neither runs nor excuses:$_missing" >&2
+  echo "  add it above, or name it in _EXCLUDED with the reason." >&2
+  exit 1
+fi
