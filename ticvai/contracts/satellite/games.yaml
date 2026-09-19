@@ -720,8 +720,1623 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameCard'
+  /attraction-types:
+    get:
+      operationId: listAttractionTypes
+      summary: The classes of game and ride
+      description: 'Board 1.4. **A type decides which operational settings apply.** A ride has a height
+        restriction and a cycle time; a redemption game has a ticket payout; a crane has both a payout
+        and a direct-pay price. Shipping one settings page for all three gives every operator the wrong
+        form.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Attraction types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttractionType'
+    put:
+      operationId: setAttractionType
+      summary: Define a class of attraction
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttractionType'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttractionType'
+  /games/{gameId}/operations:
+    parameters:
+    - name: gameId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setGameOperationalConfiguration
+      summary: Capacity, cycle time, restrictions and staffing
+      description: 'Board 1.5. **Cycle time is the number everything else derives from.** Throughput,
+        queue estimates, staffing and the capacity a ticket is sold against all come from *how long one
+        go takes and how many people go at once*, and a venue that leaves it blank gets a wait-time
+        estimate of nothing.
+
+        Height, age and health restrictions sit here because they are enforced at the reader, not at
+        the till — a guest is stopped at the ride, and the rule has to be where the stopping happens.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameOperationalConfig'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameOperationalConfig'
+  /readers:
+    get:
+      operationId: listReaders
+      summary: Readers, their attractions and their health
+      description: 'Boards 2.2 and 8.3. **A reader is a `tenancy` device with a game configuration.**
+        Enrolment, firmware, credentials and tamper state live there as of 19 September; what lives here
+        is which attraction it opens, what it charges, and what it shows.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Readers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reader'
+  /readers/{readerId}:
+    parameters:
+    - name: readerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setReaderConfiguration
+      summary: What this reader charges, opens, shows and refuses
+      description: 'Boards 2.3 to 2.8. **The retap delay is the setting that stops a guest paying twice
+        for one go.** A wristband held against a reader for a second and a half is two taps to the
+        hardware and one intention to the guest, and every arcade that has skipped this has refunded its
+        way to discovering it.
+
+        Display rules are here for the same reason: a *free game* glow is what tells a guest their
+        entitlement was used rather than their money, and without it the complaint arrives at the desk
+        instead.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reader'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+  /readers/{readerId}/deploy:
+    parameters:
+    - name: readerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: deployReaderConfiguration
+      summary: Push configuration and the offline rule package to a reader
+      description: 'Boards 9.5 and 9.8. **A reader decides on its own.** It has to authorise a tap in
+        under a second, which means the rules — prices, entitlements, retap delay, restrictions — are
+        cached on the device, and a change nobody deployed is a change that did not happen.
+
+        **The edge package carries an expiry.** A reader running a rule set from three months ago is a
+        reader charging last season''s prices, and the only safe end to that is one it enforces itself.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '202':
+          description: Deploying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReaderDeployment'
+  /readers/{readerId}/test:
+    parameters:
+    - name: readerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: testReader
+      summary: Prove a reader works before a guest finds out it does not
+      description: 'Boards 2.10 and 9.9. Tap, balance check, display, I/O trigger and the return path —
+        each reported separately, because *the reader is fine and the game did not start* and *the
+        reader never saw the card* send an engineer to different places.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      responses:
+        '200':
+          description: Per-check results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReaderTestResult'
+  /game-entitlements:
+    get:
+      operationId: listGameEntitlements
+      summary: Passes, packages and per-game entitlements
+      description: 'Board 4. **Four shapes that look alike and behave differently:** an all-games pass,
+        unlimited play on one game, a limited number of plays on one game, and a package of several.
+
+        Modelling them as one *credit balance* is the mistake that makes *"why did my unlimited pass
+        charge me"* unanswerable — an entitlement is a right to play, not money, and it is consumed
+        before money is.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Entitlements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameEntitlement'
+    post:
+      operationId: createGameEntitlement
+      summary: Define a pass, package or per-game entitlement
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameEntitlement'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameEntitlement'
+  /gameplay-validation-rules:
+    get:
+      operationId: getGameplayValidationRules
+      summary: What a tap is checked against, and in what order
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameplayValidationRules'
+    put:
+      operationId: setGameplayValidationRules
+      summary: Deduction priority and the order of checks
+      description: 'Boards 4.2 and 4.3. **The deduction order decides who pays, and the guest never
+        sees it happen.** Entitlement before bonus before promotional before cash is the usual answer
+        and it is not the only defensible one — but it must be *an* answer, stated once, rather than
+        whatever the reader firmware happens to do.
+
+        **This is the same problem `wallet` solves for credit types**, one level up: `wallet` orders
+        the money, this decides whether money is touched at all.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameplayValidationRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameplayValidationRules'
+  /gameplay-authorisations:
+    post:
+      operationId: authoriseGameplay
+      summary: Decide a tap, now
+      description: 'Board 4.9. **Under a second, or the queue notices.** Card valid, not expired, not
+        blocked; restrictions met; entitlement available or funds sufficient; retap window clear.
+
+        **The refusal reason is the product.** *Declined* on a reader in front of a child is a member
+        of staff walking over; *no plays left on your pass* is a guest who understands. Board 8.5 is a
+        whole screen for analysing rejection reasons, which only works if the reason was recorded.
+
+        Offline-capable: the reader decides from its edge package and reports afterwards.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameplayAuthorisationRequest'
+      responses:
+        '200':
+          description: The decision, with its reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameplayAuthorisation'
+  /gameplay-authorisations/simulate:
+    post:
+      operationId: simulateGameplayAuthorisation
+      summary: What would happen if this card tapped this reader
+      description: 'Board 4.10. **The configuration is five layers deep and fails silently.** An
+        entitlement that does not cover the game, a price rule nobody published, a restriction on the
+        wrong type — all of them look correct on their own screen and only disagree at the reader.
+
+        Returns the decision and the full trace, including the rules that did not fire.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameplayAuthorisationRequest'
+      responses:
+        '200':
+          description: The trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameplayAuthorisation'
+  /game-pricing:
+    get:
+      operationId: getGamePricing
+      summary: The effective price at a reader, and why
+      description: 'Boards 5.9 and 5.8. **Standard, group, peak, VIP, retry and calendar exceptions all
+        apply to the same tap**, and the operator''s question is always *what will this actually
+        charge*. Returns the resolved price and the rules behind it.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: gameId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: readerId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: at
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: guestTier
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Effective price and trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamePriceResolution'
+    put:
+      operationId: setGamePricing
+      summary: Standard, group, peak, VIP, retry and calendar prices
+      description: 'Board 5. **Retry pricing is the one that is easy to miss and hard to explain
+        afterwards.** A second go at a crane priced below the first is a deliberate commercial
+        mechanic; the same thing happening because a rule overlapped is a revenue leak nobody notices.
+
+        **Priority is explicit** (board 5.8), because six price sources overlapping with no stated order
+        means the answer depends on evaluation order, and evaluation order is not a decision anybody
+        made.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GamePricing'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamePricing'
+  /redemption-rules:
+    put:
+      operationId: setRedemptionRules
+      summary: How tickets are earned, held and spent
+      description: 'Boards 6.2, 6.3 and 6.4. **Ticket-based and ticketless redemption are the same
+        currency arriving two ways.** A ticket-eater counts paper; a ticketless game credits the card
+        directly; and a guest holding both expects one balance at the prize counter.
+
+        **The earn rate is configuration and the machines will disagree with it.** A crane set to pay
+        out more than the platform thinks is a machine that empties a prize shelf, so the reconciliation
+        on board 6.10 compares what machines reported against what was credited.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedemptionRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedemptionRules'
+  /prizes/{prizeId}/cost:
+    parameters:
+    - name: prizeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setPrizeCost
+      summary: What a prize costs in tickets, and what it costs the venue
+      description: 'Boards 6.7 and 6.8. **Two numbers, and only one of them is on the shelf.** The
+        ticket price is what the guest pays; the unit cost is what the venue paid, and the ratio between
+        them is the only control on a redemption arcade''s margin.
+
+        Stock comes from `inventory`. **A prize catalogue with its own stock count is a prize catalogue
+        that disagrees with the stockroom**, and the guest finds out at the counter.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrizeCost'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrizeCost'
+  /game-cards/{cardId}/lifecycle:
+    parameters:
+    - name: cardId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setGameCardLifecycle
+      summary: Block, suspend, reactivate, replace or expire a card
+      description: 'Boards 7.7 and 7.8. **Replacement moves the balance and the card does not carry
+        it.** A guest who has lost a wristband has not lost their credit, and the relink is the whole
+        of that promise — `wallet.linkWalletCredential` does the binding and this records why.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - block
+                  - suspend
+                  - reactivate
+                  - replace
+                  - expire
+                replacementCardId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                reason:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameCard'
+  /game-card-expiry-rules:
+    put:
+      operationId: setGameCardExpiryRules
+      summary: When a card lapses, and what warns the guest first
+      description: 'Boards 7.3 to 7.6. **Expiry measured from last activity rather than from issue is
+        the difference between a loyalty mechanic and a complaint.** A guest who visits every month
+        never loses their balance; one who has not been for two years probably has.
+
+        **The warning is part of the rule.** Expiring a balance with no notice is the behaviour that
+        ends up on social media, and the notice has to be scheduled from the same date the expiry is.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameCardExpiryRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameCardExpiryRules'
+  /gameplay-transactions:
+    get:
+      operationId: listGameplayTransactions
+      summary: Taps, decisions and what they cost
+      description: 'Boards 8.2, 8.4 and 8.5. **Every tap, accepted or refused, with the reason and the
+        rule that produced it.** The refused ones are the valuable half: a reader refusing 40% of taps
+        is misconfigured, and nobody will report it because each individual guest just walks away.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: readerId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: outcome
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameplayTransaction'
+  /gameplay-sync-status:
+    get:
+      operationId: getGameplaySyncStatus
+      summary: What readers took offline and have not sent
+      description: 'Board 8.8. **The gaming equivalent of store-and-forward, and the same risk.** Plays
+        authorised offline are revenue the platform has not seen, entitlement consumption it has not
+        counted, and a balance the guest may have spent twice.
+
+        `syncGamePlays` sends them; this says how many are outstanding and how old.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Per-reader sync state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReaderSyncStatus'
+  /game-eligibility:
+    get:
+      operationId: getGameEligibility
+      summary: What this guest can play right now, and what it would cost
+      description: 'Board 10.7 — *"What Can I Play?"*, and it is the most useful screen in the pack.
+
+        **A guest holding a card has no way to know what it is good for.** Balance, entitlements,
+        restrictions and per-game prices resolve into one answer — *these eight games are free to you,
+        these twelve cost credit, and you are too short for those four* — and every one of those facts
+        lives somewhere different.
+
+        Guest-callable, because the kiosk and the app both ask it.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: cardId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: subjectId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: What they can play
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameEligibility'
+  /game-kiosk-config:
+    put:
+      operationId: setGameKioskConfiguration
+      summary: The self-service journey, its theme and its languages
+      description: 'Boards 10.2 and 10.10. **A kiosk in an arcade is used by a child holding a
+        wristband**, and the configuration that matters is which steps appear, in what language, and
+        what happens when nobody touches it for thirty seconds.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameKioskConfig'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameKioskConfig'
+
 components:
   schemas:
+    AttractionType:
+      type: object
+      x-ticvai-persistence: games.attraction_type
+      description: 'Board 1.4. **The type decides which settings apply.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        family:
+          type: string
+          enum:
+          - ride
+          - arcadeGame
+          - redemptionGame
+          - crane
+          - vrExperience
+          - softPlay
+          - attraction
+          - show
+        hasTicketPayout:
+          type: boolean
+          default: false
+        hasDirectPay:
+          type: boolean
+          default: false
+        hasCycleTime:
+          type: boolean
+          default: true
+        hasHeightRestriction:
+          type: boolean
+          default: false
+        supportsEntitlements:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+    GameOperationalConfig:
+      type: object
+      x-ticvai-persistence: games.operational_config
+      description: 'Board 1.5. **Cycle time is the number everything else derives from.**'
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        cycleSeconds:
+          type: integer
+          nullable: true
+        riderCapacity:
+          type: integer
+          nullable: true
+        throughputPerHour:
+          type: integer
+          readOnly: true
+        minimumHeightCm:
+          type: integer
+          nullable: true
+        maximumHeightCm:
+          type: integer
+          nullable: true
+        minimumAge:
+          type: integer
+          nullable: true
+        supervisionRequiredBelowAge:
+          type: integer
+          nullable: true
+        healthRestrictions:
+          type: array
+          items:
+            type: string
+        staffPositions:
+          type: integer
+          nullable: true
+        operatingHours:
+          type: object
+          nullable: true
+          additionalProperties: true
+        scopePath:
+          type: string
+    Reader:
+      type: object
+      x-ticvai-persistence: games.reader
+      description: 'Board 2. **A `tenancy` device with a game configuration on it.**'
+      required:
+      - deviceId
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          description: '`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live
+            there.**
+
+            '
+        gameId:
+          type: string
+          format: uuid
+          nullable: true
+        readerProfileId:
+          type: string
+          format: uuid
+          nullable: true
+        acceptedCreditTypeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        acceptsDirectPay:
+          type: boolean
+          default: false
+        retapDelaySeconds:
+          type: integer
+          default: 3
+          description: '**The setting that stops a guest paying twice for one go.** A wristband held
+            against a reader for a second and a half is two taps to the hardware and one intention to
+            the guest.
+
+            '
+        displayRules:
+          type: object
+          properties:
+            freeGameGlow:
+              type: boolean
+              default: true
+              description: '**What tells a guest their entitlement was used rather than their money.**
+                Without it the complaint arrives at the desk.
+
+                '
+            showBalance:
+              type: boolean
+              default: true
+            showPrice:
+              type: boolean
+              default: true
+            themeCode:
+              type: string
+              nullable: true
+            languages:
+              type: array
+              items:
+                type: string
+        ioMapping:
+          type: object
+          additionalProperties: true
+          description: 'Board 9.6. Which output starts the game, which input reports it finished.'
+        status:
+          type: string
+          enum:
+          - unconfigured
+          - active
+          - offline
+          - maintenance
+          - disabled
+        scopePath:
+          type: string
+    ReaderDeployment:
+      type: object
+      x-ticvai-persistence: games.reader_deployment
+      description: 'Boards 9.5 and 9.8. **A change nobody deployed is a change that did not happen.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        readerId:
+          type: string
+          format: uuid
+        configurationVersion:
+          type: integer
+        edgePackageExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**A reader running a three-month-old rule set is charging last season''s
+            prices.** The only safe end to that is one it enforces itself.
+
+            '
+        deployedAt:
+          type: string
+          format: date-time
+          nullable: true
+        acknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - queued
+          - sent
+          - acknowledged
+          - failed
+          - stale
+        failureReason:
+          type: string
+          nullable: true
+    ReaderTestResult:
+      type: object
+      description: 'Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to
+        different places.
+
+        '
+      properties:
+        readerId:
+          type: string
+          format: uuid
+        testedAt:
+          type: string
+          format: date-time
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              check:
+                type: string
+                enum:
+                - connectivity
+                - cardRead
+                - balanceCheck
+                - display
+                - sound
+                - gameTrigger
+                - gameCompleteSignal
+              passed:
+                type: boolean
+              detail:
+                type: string
+                nullable: true
+        overall:
+          type: string
+          enum:
+          - pass
+          - partial
+          - fail
+    GameEntitlement:
+      type: object
+      x-ticvai-persistence: games.entitlement
+      description: 'Board 4. **A right to play, not money** — consumed before money is.'
+      required:
+      - code
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - allGamesPass
+          - unlimitedSingleGame
+          - limitedSingleGame
+          - package
+          - freePlay
+        gameIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        attractionTypeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        playCount:
+          type: integer
+          nullable: true
+          description: 'For `limitedSingleGame` and `package`. Null means unlimited.'
+        validityKind:
+          type: string
+          enum:
+          - sameDay
+          - days
+          - untilDate
+          - untilUsed
+        validityDays:
+          type: integer
+          nullable: true
+        activationKind:
+          type: string
+          enum:
+          - onPurchase
+          - onFirstUse
+          - onDate
+          default: onFirstUse
+          description: '**On first use is what a guest expects from a day pass bought the night
+            before.** On purchase is what a venue defaults to by accident, and it costs them a day.
+
+            '
+        dailyPlayCap:
+          type: integer
+          nullable: true
+        cooldownMinutes:
+          type: integer
+          nullable: true
+          description: '**Unlimited does not mean continuous.** A cooldown is how one child does not
+            hold a popular ride all afternoon.
+
+            '
+        linkedProductId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    GameplayValidationRules:
+      type: object
+      x-ticvai-persistence: games.validation_rules
+      description: 'Boards 4.2 and 4.3. **Must be an answer, stated once**, rather than whatever the
+        firmware happens to do.
+
+        '
+      properties:
+        deductionOrder:
+          type: array
+          items:
+            type: string
+            enum:
+            - entitlement
+            - freePlay
+            - bonusCredit
+            - promotionalCredit
+            - gameCredit
+            - cashCredit
+            - directPay
+        checkOrder:
+          type: array
+          items:
+            type: string
+            enum:
+            - cardValid
+            - cardNotExpired
+            - cardNotBlocked
+            - restrictionsMet
+            - retapWindow
+            - entitlementAvailable
+            - fundsSufficient
+        allowPartialEntitlement:
+          type: boolean
+          default: false
+          description: '**Whether an entitlement covering part of the price may be topped up with
+            credit.** Usually no, because a guest who thinks they have a pass does not expect a charge.
+
+            '
+        refuseBelowBalance:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        offlineDecisionAllowed:
+          type: boolean
+          default: true
+        offlineMaximumValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+    GameplayAuthorisationRequest:
+      type: object
+      required:
+      - readerId
+      properties:
+        readerId:
+          type: string
+          format: uuid
+        cardId:
+          type: string
+          format: uuid
+          nullable: true
+        credentialIdentifier:
+          type: string
+          nullable: true
+        gameId:
+          type: string
+          format: uuid
+          nullable: true
+        at:
+          type: string
+          format: date-time
+          nullable: true
+        guestHeightCm:
+          type: integer
+          nullable: true
+        offline:
+          type: boolean
+          default: false
+    GameplayAuthorisation:
+      type: object
+      x-ticvai-persistence: games.authorisation
+      description: 'Board 4.9. **The refusal reason is the product.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        decision:
+          type: string
+          enum:
+          - allow
+          - refuse
+        reason:
+          type: string
+          nullable: true
+          enum:
+          - ok
+          - cardNotFound
+          - cardExpired
+          - cardBlocked
+          - retapTooSoon
+          - heightRestriction
+          - ageRestriction
+          - insufficientFunds
+          - entitlementExhausted
+          - entitlementNotValidHere
+          - cooldownActive
+          - dailyCapReached
+          - readerNotConfigured
+          - gameUnavailable
+        guestMessage:
+          type: string
+          nullable: true
+          description: '***"No plays left on your pass"* rather than *"Declined"*.** One is a guest who
+            understands; the other is a member of staff walking over.
+
+            '
+        chargedFrom:
+          type: string
+          nullable: true
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        entitlementId:
+          type: string
+          format: uuid
+          nullable: true
+        remainingBalance:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        remainingPlays:
+          type: integer
+          nullable: true
+        trace:
+          type: array
+          items:
+            type: object
+            properties:
+              check:
+                type: string
+              passed:
+                type: boolean
+              detail:
+                type: string
+                nullable: true
+        decidedOffline:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    GamePricing:
+      type: object
+      x-ticvai-persistence: games.pricing
+      description: 'Board 5. **Priority is explicit**, because evaluation order is not a decision
+        anybody made.
+
+        '
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        standardPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        vipPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        groupPricing:
+          type: array
+          items:
+            type: object
+            properties:
+              minimumPlayers:
+                type: integer
+              pricePerPlayer:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        peakPricing:
+          type: array
+          items:
+            type: object
+            properties:
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+              from:
+                type: string
+              to:
+                type: string
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        calendarExceptions:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              closed:
+                type: boolean
+                default: false
+        retryPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        retryWindowSeconds:
+          type: integer
+          nullable: true
+        priority:
+          type: array
+          items:
+            type: string
+            enum:
+            - calendarException
+            - peak
+            - group
+            - vip
+            - retry
+            - standard
+        scopePath:
+          type: string
+    GamePriceResolution:
+      type: object
+      description: 'Board 5.9. **What will this actually charge.**'
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        effectivePrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        appliedRule:
+          type: string
+        trace:
+          type: array
+          items:
+            type: object
+            properties:
+              rule:
+                type: string
+              applied:
+                type: boolean
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              skippedBecause:
+                type: string
+                nullable: true
+    RedemptionRules:
+      type: object
+      x-ticvai-persistence: games.redemption_rules
+      description: 'Board 6. **Ticket-based and ticketless are one currency arriving two ways.**'
+      properties:
+        ticketCreditTypeId:
+          type: string
+          format: uuid
+          nullable: true
+        earnRules:
+          type: array
+          items:
+            type: object
+            properties:
+              gameId:
+                type: string
+                format: uuid
+              ticketsPerPlay:
+                type: integer
+                nullable: true
+              ticketsPerScorePoint:
+                type: number
+                nullable: true
+              maximumPerPlay:
+                type: integer
+                nullable: true
+        ticketEaterEnabled:
+          type: boolean
+          default: false
+        ticketlessEnabled:
+          type: boolean
+          default: true
+        ticketsExpire:
+          type: boolean
+          default: false
+        ticketValidityDays:
+          type: integer
+          nullable: true
+        counterApprovalAboveTickets:
+          type: integer
+          nullable: true
+          description: '**A prize above a threshold needs a second person.** The alternative is a
+            counter that can hand out the top shelf.
+
+            '
+        scopePath:
+          type: string
+    PrizeCost:
+      type: object
+      x-ticvai-persistence: games.prize_cost
+      description: 'Boards 6.7 and 6.8. **Two numbers, one of them on the shelf.**'
+      properties:
+        prizeId:
+          type: string
+          format: uuid
+        ticketPrice:
+          type: integer
+        unitCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        marginPercent:
+          type: number
+          readOnly: true
+        inventoryItemId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**Stock comes from `inventory`.** A prize catalogue with its own count is one
+            that disagrees with the stockroom.
+
+            '
+        directPayPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        displayTier:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    GameCardExpiryRules:
+      type: object
+      x-ticvai-persistence: games.card_expiry_rules
+      description: 'Boards 7.3 to 7.6. **Measured from last activity, and the warning is part of the
+        rule.**
+
+        '
+      properties:
+        basis:
+          type: string
+          enum:
+          - fromIssue
+          - fromLastActivity
+          - fromLastRecharge
+          default: fromLastActivity
+        validityMonths:
+          type: integer
+        warnBeforeDays:
+          type: array
+          items:
+            type: integer
+          description: '**Expiring a balance with no notice is what ends up on social media.**'
+        warningChannels:
+          type: array
+          items:
+            type: string
+        extendOnRecharge:
+          type: boolean
+          default: true
+        onExpiry:
+          type: string
+          enum:
+          - forfeit
+          - holdForClaim
+          - transferToBreakage
+          default: holdForClaim
+        holdForClaimDays:
+          type: integer
+          nullable: true
+        scopePath:
+          type: string
+    GameplayTransaction:
+      type: object
+      x-ticvai-persistence: games.gameplay_transaction
+      description: 'Boards 8.2 and 8.5. **The refused ones are the valuable half.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        readerId:
+          type: string
+          format: uuid
+        gameId:
+          type: string
+          format: uuid
+          nullable: true
+        cardId:
+          type: string
+          format: uuid
+          nullable: true
+        at:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+          enum:
+          - allowed
+          - refused
+          - reversed
+        reason:
+          type: string
+          nullable: true
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        chargedFrom:
+          type: string
+          nullable: true
+        entitlementId:
+          type: string
+          format: uuid
+          nullable: true
+        ticketsEarned:
+          type: integer
+          nullable: true
+        decidedOffline:
+          type: boolean
+          default: false
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    ReaderSyncStatus:
+      type: object
+      description: 'Board 8.8. **Revenue the platform has not seen.**'
+      properties:
+        readerId:
+          type: string
+          format: uuid
+        readerName:
+          type: string
+        pendingTransactions:
+          type: integer
+        pendingValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        oldestPendingAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+        edgePackageVersion:
+          type: integer
+          nullable: true
+        edgePackageStale:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - online
+          - offline
+          - degraded
+          - unreachable
+    GameEligibility:
+      type: object
+      description: 'Board 10.7 — *"What Can I Play?"*, and every fact in it lives somewhere different.'
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        playable:
+          type: boolean
+        costKind:
+          type: string
+          enum:
+          - freeWithEntitlement
+          - credit
+          - directPay
+          - notPlayable
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        entitlementId:
+          type: string
+          format: uuid
+          nullable: true
+        remainingPlays:
+          type: integer
+          nullable: true
+        blockedReason:
+          type: string
+          nullable: true
+        ticketsTypicallyEarned:
+          type: integer
+          nullable: true
+    GameKioskConfig:
+      type: object
+      x-ticvai-persistence: games.kiosk_config
+      description: 'Boards 10.2 and 10.10. **Used by a child holding a wristband.**'
+      properties:
+        kioskDeviceId:
+          type: string
+          format: uuid
+        steps:
+          type: array
+          items:
+            type: string
+            enum:
+            - identify
+            - balance
+            - topUp
+            - entitlements
+            - whatCanIPlay
+            - redemption
+            - history
+        languages:
+          type: array
+          items:
+            type: string
+        themeCode:
+          type: string
+          nullable: true
+        idleTimeoutSeconds:
+          type: integer
+          default: 30
+        requiresPinForTopUp:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
     GameStatus:
       type: string
       enum:
