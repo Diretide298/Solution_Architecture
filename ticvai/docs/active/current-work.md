@@ -97,6 +97,42 @@ Anything above 9 on `check-package` is ours, and it gets fixed before the next c
 
 ## Todo
 
+### Schema merge — 20 September, every mismatch classified
+
+**All 223 of their tables that do not match ours by name are now categorised**, in
+`handoff/mismatch-classification.json`, with their own `Purpose` line against each.
+Worklist and method: [rename-worklist-20-september.md](rename-worklist-20-september.md).
+
+| category | n | what it means |
+|---|---:|---|
+| `rename-declared` | 3 | their Change Log says so — `identity.otp`, `marketing.customer_segment`, `sync.cross_cell_rejection` |
+| `rename-certain` | 24 | their redundant table prefix; our exact table exists |
+| `domain-move` | 4 | same table, we gave the domain its own schema |
+| `placement` | 20 | same table name, different owning schema |
+| `rename-strong` | 19 | one candidate, containment ≥ 0.60 |
+| `rename-review` | 29 | one candidate, 0.40–0.60 |
+| `rename-ambiguous` | 44 | several candidates; a matcher cannot choose |
+| `additive-declared` | 11 | they flag it NEW TABLE |
+| `additive-undeclared` | 69 | no candidate and no flag — **the real worklist** |
+
+- [ ] **Settle the rental / payments / subscription collision first.** Their 28 new tables are
+      11 payment, 10 rental and 4 subscription-tier — **and we built all three the same week**,
+      in `payments` (16 tables), `rental` (21) and `control.subscription*`. Theirs went into
+      `orders`, `catalogue`, `resources`, `maintenance` and `platform`. **Two schemas for one
+      domain, days apart. More expensive than every rename in the file put together**
+- [ ] **Take the 3 declared and the 24 certain.** No judgement needed on either
+- [ ] **Answer the column-prefix question once** — we do not prefix. **645 of their 743 changes
+      resolve in that one answer**
+- [ ] **Work the 69 undeclared additives one at a time.** Several are plainly ours under another
+      name — `identity.customer*` against our `pii.subject*`, `access.accreditation*` against our
+      13-table `accreditation` schema — and the `Purpose` line settles them where columns cannot
+- [ ] **The 44 ambiguous need a person.** `fnb.table` matches both `dining_table` and
+      `reservation_table`: either they split one or collapsed two, and guessing produces a table
+      nobody owns
+- [ ] **Three renames are expensive** — `approvals.request` (16 inbound FKs), `catalogue.variant`
+      (11, and the table F&B and Retail both point at), `orders.shift` (11 reads, 16 screens)
+
+
 ### Now — renames first, then Phase 1
 
 **Sequencing changed 18 September.** Phase 1 was authored and then **reverted on purpose**: adding
