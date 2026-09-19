@@ -1948,7 +1948,7 @@ components:
           default: true
     RentalCategory:
       type: object
-      x-ticvai-persistence: rental.category
+      x-ticvai-persistence: maintenance.asset_category
       description: 'Board 1.4. **Defaults cascade and products override within a permitted set.**'
       required:
       - code

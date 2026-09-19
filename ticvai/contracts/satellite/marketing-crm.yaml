@@ -12393,7 +12393,7 @@ components:
               '
     JourneyEntrant:
       type: object
-      x-ticvai-persistence: marketing.journey_entrant
+      x-ticvai-persistence: marketing.journey_enrollment
       description: '**A guest inside a journey, at a step.**
 
 

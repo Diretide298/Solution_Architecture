@@ -1187,7 +1187,7 @@ components:
             heightRequirementCm: { type: integer, nullable: true }
 
     WaitingGuest:
-      x-ticvai-persistence: "queue.waiting_guest"
+      x-ticvai-persistence: "queue.entry"
       type: object
       required: [id, queueId, partyNumber, partySize, status, joinedAt]
       properties:

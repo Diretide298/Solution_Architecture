@@ -67,7 +67,7 @@ for f in sorted(glob.glob(str(_BE / '**' / '0*.sql'), recursive=True)):
     s=open(f, encoding='utf-8').read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
     # **A quoted identifier is still a table.** `[\w.]+` stops at the first double quote, so
     # `CREATE TABLE fnb."table"` matched `fnb.` and four tables were never marked written:
-    # fnb.table, identity.session, marketing.case and retail.return — the four whose names are
+    # fnb.dining_table, identity.session, marketing.case and retail.return — the four whose names are
     # Postgres reserved words, which is exactly why derive-ddl quotes them.
     #
     # **They were the only four the viewer reported as built-but-not-claimed**, and the report was
@@ -254,7 +254,7 @@ for t_ in ['Out is how many foreign keys leave the module; In is how many point 
            'venue_id and every audited one carries a principal — 97 and 74 references in respectively.',
            '',
            'Ops counts operations on the contracts a module derives from. shift is counted under orders:',
-           'its 13 operations write orders.shift, because cash handling is a sales concern.',
+           'its 13 operations write orders.pos_shift, because cash handling is a sales concern.',
            '',
            'pii and sync show no contract. They are storage the platform writes rather than surfaces',
            'anyone calls — which is the point of pii, and why it is the module hardest to reach.']:

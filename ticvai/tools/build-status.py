@@ -419,7 +419,7 @@ def domain_status(domain: str) -> dict:
                     if f"{k}.{pk}" not in modelled:
                         unmodelled.append(f"{k}.{pk}")
 
-    governed = [k for k in own if k in lineage and "ai.interaction" in (lineage[k].get("writes") or [])]
+    governed = [k for k in own if k in lineage and "ai.activity" in (lineage[k].get("writes") or [])]
     guest = [k for k, v in own.items() if "guest" in (v.get("audience") or [])]
     screens_with_wave = {}
     for s in d["screens"]:
@@ -524,7 +524,7 @@ def domain_status(domain: str) -> dict:
         ],
         "governedOperations": {
             "count": len(governed),
-            "note": "Operations that call a model and write an ai.interaction (8.3.55).",
+            "note": "Operations that call a model and write an ai.activity (8.3.55).",
         },
         "guestCallable": {"count": len(guest), "operations": sorted(guest)},
         "storage": {k: len(v) for k, v in d["tables"]["byStore"].items()},

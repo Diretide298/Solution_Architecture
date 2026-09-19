@@ -1,11 +1,11 @@
 {
  "generated": "2026-08-18",
- "note": "Derived by tools/derive-relationships.py from schema-reference.json and api-data-lineage.json. **Not hand-maintained** \u2014 the previous graph described 540 relationships across 192 tables while the package held 352, because it had not been touched since the schema grew past it.",
+ "note": "Derived by tools/derive-relationships.py from schema-reference.json and api-data-lineage.json. **Not hand-maintained** — the previous graph described 540 relationships across 192 tables while the package held 352, because it had not been touched since the schema grew past it.",
  "rels": [
   {
    "frm": "assets.media_asset",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -41,7 +41,7 @@
   {
    "frm": "assets.media_collection",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -59,7 +59,7 @@
   {
    "frm": "fnb.delivery_location",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -68,7 +68,7 @@
   {
    "frm": "fnb.delivery_location",
    "col": "table_id",
-   "to": "fnb.table",
+   "to": "fnb.dining_table",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -122,7 +122,7 @@
   {
    "frm": "fnb.location_session",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -140,7 +140,7 @@
   {
    "frm": "fnb.table_session",
    "col": "table_id",
-   "to": "fnb.table",
+   "to": "fnb.dining_table",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -210,7 +210,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "outlet_id",
    "to": "platform.outlet",
    "how": "declared",
@@ -219,7 +219,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "table_visit_id",
    "to": "fnb.table_visit",
    "how": "declared",
@@ -228,7 +228,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "kitchen_ticket_id",
    "to": "fnb.kitchen_ticket",
    "how": "declared",
@@ -237,7 +237,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.table",
+   "frm": "fnb.dining_table",
    "col": "outlet_id",
    "to": "platform.outlet",
    "how": "declared",
@@ -248,7 +248,7 @@
   {
    "frm": "fnb.table_visit",
    "col": "table_id",
-   "to": "fnb.table",
+   "to": "fnb.dining_table",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -383,7 +383,7 @@
   {
    "frm": "games.card",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -401,7 +401,7 @@
   {
    "frm": "games.game",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -446,7 +446,7 @@
   {
    "frm": "games.prize",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -464,7 +464,7 @@
   {
    "frm": "games.redemption",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -500,7 +500,7 @@
   {
    "frm": "inventory.item",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -509,7 +509,7 @@
   {
    "frm": "inventory.item",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -527,7 +527,7 @@
   {
    "frm": "inventory.location",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -689,7 +689,7 @@
   {
    "frm": "inventory.requisition",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -698,7 +698,7 @@
   {
    "frm": "inventory.requisition",
    "col": "department_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -824,7 +824,7 @@
   {
    "frm": "inventory.purchase_order",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -905,7 +905,7 @@
   {
    "frm": "maintenance.asset",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -914,7 +914,7 @@
   {
    "frm": "maintenance.asset",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -950,7 +950,7 @@
   {
    "frm": "maintenance.work_order",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -986,7 +986,7 @@
   {
    "frm": "maintenance.work_order",
    "col": "source_plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1020,7 +1020,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "maintenance.maintenance_plan",
+   "frm": "maintenance.preventive_plan",
    "col": "asset_id",
    "to": "maintenance.asset",
    "how": "declared",
@@ -1029,9 +1029,9 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "maintenance.maintenance_plan",
+   "frm": "maintenance.preventive_plan",
    "col": "asset_category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -1040,7 +1040,7 @@
   {
    "frm": "maintenance.inspection_template",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1049,7 +1049,7 @@
   {
    "frm": "maintenance.inspection_template",
    "col": "applies_to_asset_category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -1067,7 +1067,7 @@
   {
    "frm": "maintenance.inspection",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1094,7 +1094,7 @@
   {
    "frm": "maintenance.incident",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1229,7 +1229,7 @@
   {
    "frm": "marketing.segment",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1238,7 +1238,7 @@
   {
    "frm": "marketing.campaign",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1301,7 +1301,7 @@
   {
    "frm": "marketing.case",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -1319,7 +1319,7 @@
   {
    "frm": "marketing.case",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1355,7 +1355,7 @@
   {
    "frm": "marketing.loyalty_programme",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1409,7 +1409,7 @@
   {
    "frm": "marketing.review",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1508,7 +1508,7 @@
   {
    "frm": "control.migration_run",
    "col": "plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -1571,7 +1571,7 @@
   {
    "frm": "promotions.promotion",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1580,7 +1580,7 @@
   {
    "frm": "promotions.coupon_campaign",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1616,7 +1616,7 @@
   {
    "frm": "promotions.voucher_batch",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1652,7 +1652,7 @@
   {
    "frm": "promotions.bundle_component",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1697,7 +1697,7 @@
   {
    "frm": "promotions.allocation_component",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1715,7 +1715,7 @@
   {
    "frm": "promotions.bundle",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1733,7 +1733,7 @@
   {
    "frm": "queue.queue",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1776,7 +1776,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "queue.waiting_guest",
+   "frm": "queue.entry",
    "col": "queue_id",
    "to": "queue.queue",
    "how": "declared",
@@ -1785,7 +1785,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "queue.waiting_guest",
+   "frm": "queue.entry",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -1794,7 +1794,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "queue.waiting_guest",
+   "frm": "queue.entry",
    "col": "entitlement_id",
    "to": "access.entitlement",
    "how": "declared",
@@ -1967,7 +1967,7 @@
   {
    "frm": "reporting.dashboard",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -1994,7 +1994,7 @@
   {
    "frm": "retail.merchandise",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -2039,7 +2039,7 @@
   {
    "frm": "retail.sale",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2219,7 +2219,7 @@
   {
    "frm": "retail.shop_and_drop",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2291,7 +2291,7 @@
   {
    "frm": "seating.seat_map",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2309,7 +2309,7 @@
   {
    "frm": "seating.seat",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -2327,7 +2327,7 @@
   {
    "frm": "seating.seat_category",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2336,7 +2336,7 @@
   {
    "frm": "seating.seat_map_template",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2417,7 +2417,7 @@
   {
    "frm": "control.tenant",
    "col": "plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -2435,14 +2435,14 @@
   {
    "frm": "control.tenant",
    "col": "subscription",
-   "to": "control.subscription",
+   "to": "subscription.contract",
    "how": "declared",
    "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.subscription",
+   "frm": "subscription.contract",
    "col": "tenant_id",
    "to": "platform.tenant",
    "how": "declared",
@@ -2451,9 +2451,9 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.subscription",
+   "frm": "subscription.contract",
    "col": "plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -2462,7 +2462,7 @@
   {
    "frm": "control.licence_add_on",
    "col": "plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -2480,7 +2480,7 @@
   {
    "frm": "control.cell",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2498,7 +2498,7 @@
   {
    "frm": "control.usage_record",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2651,7 +2651,7 @@
   {
    "frm": "access.scan_event",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2696,7 +2696,7 @@
   {
    "frm": "access.access_point",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2759,7 +2759,7 @@
   {
    "frm": "catalogue.product",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2813,7 +2813,7 @@
   {
    "frm": "catalogue.price_list",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2849,7 +2849,7 @@
   {
    "frm": "catalogue.event",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -2939,7 +2939,7 @@
   {
    "frm": "catalogue.published_bundle",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3038,7 +3038,7 @@
   {
    "frm": "platform.cross_region_entitlement",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3137,7 +3137,7 @@
   {
    "frm": "ledger.account_mapping",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3146,7 +3146,7 @@
   {
    "frm": "ledger.cost_center",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3290,7 +3290,7 @@
   {
    "frm": "ledger.posting",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3335,7 +3335,7 @@
   {
    "frm": "ledger.price_variance",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3443,7 +3443,7 @@
   {
    "frm": "identity.sso_group_mapping",
    "col": "scope_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3470,7 +3470,7 @@
   {
    "frm": "identity.principal",
    "col": "home_scope_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3551,7 +3551,7 @@
   {
    "frm": "identity.delegated_access",
    "col": "scope_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3641,7 +3641,7 @@
   {
    "frm": "orders.sales_order",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3668,7 +3668,7 @@
   {
    "frm": "orders.sales_order",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3686,7 +3686,7 @@
   {
    "frm": "orders.refund_policy",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3704,7 +3704,7 @@
   {
    "frm": "orders.refund",
    "col": "tax_reversal_entry_id",
-   "to": "queue.waiting_guest",
+   "to": "queue.entry",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -3758,7 +3758,7 @@
   {
    "frm": "orders.reservation",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -3792,7 +3792,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.shift",
+   "frm": "orders.pos_shift",
    "col": "workstation_id",
    "to": "platform.workstation",
    "how": "declared",
@@ -3801,16 +3801,16 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.shift",
+   "frm": "orders.pos_shift",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.shift",
+   "frm": "orders.pos_shift",
    "col": "principal_id",
    "to": "identity.principal",
    "how": "declared",
@@ -3821,7 +3821,7 @@
   {
    "frm": "orders.cash_movement",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3839,7 +3839,7 @@
   {
    "frm": "platform.outlet",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3866,7 +3866,7 @@
   {
    "frm": "platform.sale_board",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3893,7 +3893,7 @@
   {
    "frm": "platform.region_settings",
    "col": "org_unit_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3902,7 +3902,7 @@
   {
    "frm": "platform.workstation",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3911,7 +3911,7 @@
   {
    "frm": "platform.workstation",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3920,7 +3920,7 @@
   {
    "frm": "platform.workstation",
    "col": "department_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -3938,7 +3938,7 @@
   {
    "frm": "platform.workstation",
    "col": "edge_node_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "convention",
    "cross": "",
    "required": "yes",
@@ -3956,7 +3956,7 @@
   {
    "frm": "platform.workstation",
    "col": "org_unit_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -4080,7 +4080,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "conversation_id",
    "to": "ai.conversation",
    "how": "declared",
@@ -4089,7 +4089,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "principal_id",
    "to": "identity.principal",
    "how": "declared",
@@ -4098,7 +4098,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -4107,7 +4107,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "billable_to_tenant_id",
    "to": "control.tenant",
    "how": "convention",
@@ -4172,7 +4172,7 @@
   {
    "frm": "ai.provider",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4190,7 +4190,7 @@
   {
    "frm": "workforce.announcement",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4280,7 +4280,7 @@
   {
    "frm": "workforce.attendance",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4316,7 +4316,7 @@
   {
    "frm": "orders.cart",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4379,7 +4379,7 @@
   {
    "frm": "control.cell_cluster",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4415,7 +4415,7 @@
   {
    "frm": "marketing.conversation",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4460,7 +4460,7 @@
   {
    "frm": "marketing.conversation_message",
    "col": "ai_interaction_id",
-   "to": "ai.interaction",
+   "to": "ai.activity",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4487,7 +4487,7 @@
   {
    "frm": "orders.deposit_box",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4505,7 +4505,7 @@
   {
    "frm": "orders.deposit_box",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -4532,7 +4532,7 @@
   {
    "frm": "catalogue.donation_campaign",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4550,7 +4550,7 @@
   {
    "frm": "ledger.fx_rate",
    "col": "region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4622,7 +4622,7 @@
   {
    "frm": "marketing.kiosk_assist_session",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4685,7 +4685,7 @@
   {
    "frm": "orders.no_sale_event",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -4739,7 +4739,7 @@
   {
    "frm": "access.parking_facility",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4784,7 +4784,7 @@
   {
    "frm": "ai.proposed_action",
    "col": "interaction_id",
-   "to": "ai.interaction",
+   "to": "ai.activity",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -4811,7 +4811,7 @@
   {
    "frm": "workforce.rota_assignment",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -4820,7 +4820,7 @@
   {
    "frm": "workforce.rota_assignment",
    "col": "department_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -5072,7 +5072,7 @@
   {
    "frm": "control.release",
    "col": "plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5234,7 +5234,7 @@
   {
    "frm": "orders.cash_count_line",
    "col": "shift_id",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5360,7 +5360,7 @@
   {
    "frm": "platform.audit_record",
    "col": "org_unit_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5387,7 +5387,7 @@
   {
    "frm": "platform.tenant",
    "col": "home_region_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5396,7 +5396,7 @@
   {
    "frm": "platform.venue_settings",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5405,7 +5405,7 @@
   {
    "frm": "platform.venue_settings",
    "col": "org_unit_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -5522,7 +5522,7 @@
   {
    "frm": "venuemap.map",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -5630,7 +5630,7 @@
   {
    "frm": "resources.resource",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -5772,7 +5772,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.payment_token",
+   "frm": "payments.token",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -5781,7 +5781,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.payment_token",
+   "frm": "payments.token",
    "col": "provider_id",
    "to": "ai.provider",
    "how": "declared",
@@ -5790,7 +5790,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "orders.payment_token",
+   "frm": "payments.token",
    "col": "consent_purpose_id",
    "to": "marketing.consent_purpose",
    "how": "declared",
@@ -5864,7 +5864,7 @@
   {
    "frm": "marketing.lost_item",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -6098,7 +6098,7 @@
   {
    "frm": "control.onboarding_application",
    "col": "requested_plan_id",
-   "to": "control.subscription_plan",
+   "to": "subscription.plan",
    "how": "convention",
    "cross": "",
    "required": "yes",
@@ -6294,7 +6294,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.api_quota",
+   "frm": "control.api_limit",
    "col": "client_id",
    "to": "control.api_client",
    "how": "convention",
@@ -6323,7 +6323,7 @@
   {
    "frm": "control.webhook_delivery",
    "col": "subscription_id",
-   "to": "control.subscription",
+   "to": "subscription.contract",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -6467,7 +6467,7 @@
   {
    "frm": "access.entitlement",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -6548,7 +6548,7 @@
   {
    "frm": "ledger.journal_line",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -6564,16 +6564,16 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.fnb_order_line",
+   "frm": "fnb.service_order_line",
    "col": "fnb_order_id",
-   "to": "fnb.fnb_order",
+   "to": "fnb.service_order",
    "how": "declared",
    "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.fnb_order_line",
+   "frm": "fnb.service_order_line",
    "col": "menu_item_id",
    "to": "fnb.menu_item",
    "how": "convention",
@@ -6762,7 +6762,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.eighty_six_event",
+   "frm": "fnb.sold_out_item",
    "col": "outlet_id",
    "to": "platform.outlet",
    "how": "convention",
@@ -6771,7 +6771,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.eighty_six_event",
+   "frm": "fnb.sold_out_item",
    "col": "menu_item_id",
    "to": "fnb.menu_item",
    "how": "convention",
@@ -6780,7 +6780,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.eighty_six_event",
+   "frm": "fnb.sold_out_item",
    "col": "called_by_principal_id",
    "to": "identity.principal",
    "how": "convention",
@@ -6951,7 +6951,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "marketing.journey_entrant",
+   "frm": "marketing.journey_enrollment",
    "col": "journey_id",
    "to": "marketing.journey",
    "how": "convention",
@@ -6960,7 +6960,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "marketing.journey_entrant",
+   "frm": "marketing.journey_enrollment",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "convention",
@@ -6969,7 +6969,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "marketing.journey_entrant",
+   "frm": "marketing.journey_enrollment",
    "col": "step_id",
    "to": "approvals.step_up_policy",
    "how": "convention",
@@ -7079,7 +7079,7 @@
   {
    "frm": "marketing.subscription",
    "col": "guest_id",
-   "to": "queue.waiting_guest",
+   "to": "queue.entry",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -7106,7 +7106,7 @@
   {
    "frm": "retail.store_rule",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -7556,7 +7556,7 @@
   {
    "frm": "tenancy.device_assignment",
    "col": "owner_org_unit_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -7844,7 +7844,7 @@
   {
    "frm": "marketing.guest_relationship",
    "col": "related_guest_id",
-   "to": "queue.waiting_guest",
+   "to": "queue.entry",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -7952,7 +7952,7 @@
   {
    "frm": "workforce.open_shift",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8211,16 +8211,16 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "rental.category",
+   "frm": "maintenance.asset_category",
    "col": "parent_category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "rental.category",
+   "frm": "maintenance.asset_category",
    "col": "icon_asset_id",
    "to": "maintenance.asset",
    "how": "convention",
@@ -8229,7 +8229,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "rental.category",
+   "frm": "maintenance.asset_category",
    "col": "default_deposit_policy_id",
    "to": "rental.deposit_policy",
    "how": "convention",
@@ -8276,7 +8276,7 @@
   {
    "frm": "rental.deposit_policy",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "",
    "required": "yes",
@@ -8375,7 +8375,7 @@
   {
    "frm": "rental.pricing_profile",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8393,7 +8393,7 @@
   {
    "frm": "rental.product",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "",
    "required": "yes",
@@ -8420,7 +8420,7 @@
   {
    "frm": "rental.product",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8519,7 +8519,7 @@
   {
    "frm": "resources.resource_category",
    "col": "parent_category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -8546,7 +8546,7 @@
   {
    "frm": "resources.resource_dependency",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8573,7 +8573,7 @@
   {
    "frm": "resources.resource_requirement",
    "col": "category_id",
-   "to": "rental.category",
+   "to": "maintenance.asset_category",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -8690,7 +8690,7 @@
   {
    "frm": "catalogue.space",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8834,7 +8834,7 @@
   {
    "frm": "wallet.wallet_transaction",
    "col": "venue_id",
-   "to": "platform.org_unit",
+   "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -9158,7 +9158,7 @@
   {
    "frm": "orders.cash_count_line",
    "col": "via openShift",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -9176,14 +9176,14 @@
   {
    "frm": "ledger.journal_entry",
    "col": "via closeShift",
-   "to": "orders.shift",
+   "to": "orders.pos_shift",
    "how": "lineage",
    "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
   {
-   "frm": "orders.shift",
+   "frm": "orders.pos_shift",
    "col": "via acceptShiftVariance",
    "to": "platform.outbox",
    "how": "lineage",
@@ -9399,7 +9399,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "control.subscription",
+   "frm": "subscription.contract",
    "col": "via terminateTenant",
    "to": "control.tenant",
    "how": "lineage",
@@ -9410,14 +9410,14 @@
   {
    "frm": "control.licence_add_on",
    "col": "via removeLicenceAddOn",
-   "to": "control.subscription",
+   "to": "subscription.contract",
    "how": "lineage",
    "cross": "",
    "required": "",
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via createGuestFnbOrder",
    "to": "fnb.kitchen_ticket",
    "how": "lineage",
@@ -9480,7 +9480,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via openTableVisit",
    "to": "fnb.table_visit",
    "how": "lineage",
@@ -9489,7 +9489,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via updateTableVisit",
    "to": "fnb.table_visit",
    "how": "lineage",
@@ -9498,7 +9498,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via mergeTableVisits",
    "to": "fnb.table_visit",
    "how": "lineage",
@@ -9507,7 +9507,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via closeTableVisit",
    "to": "fnb.table_visit",
    "how": "lineage",
@@ -9687,7 +9687,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via askReportingQuestion",
    "to": "reporting.report_column",
    "how": "lineage",
@@ -9696,7 +9696,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via askReportingQuestion",
    "to": "reporting.report_filter",
    "how": "lineage",
@@ -9777,7 +9777,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via sendAiMessage",
    "to": "ai.message",
    "how": "lineage",
@@ -9786,7 +9786,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via sendAiMessage",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -9795,7 +9795,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via generateConfiguration",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -9804,7 +9804,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via generateVenueLayout",
    "to": "ai.layout_draft",
    "how": "lineage",
@@ -9813,7 +9813,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via decideProposedAction",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -10101,7 +10101,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via testAiProvider",
    "to": "ai.provider",
    "how": "lineage",
@@ -10254,7 +10254,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via proposeVenueLabels",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -10272,7 +10272,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via proposeWalkways",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -10344,7 +10344,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "orders.payment_provider",
+   "frm": "payments.provider",
    "col": "via setPaymentProvider",
    "to": "orders.payment_routing",
    "how": "lineage",
@@ -10355,7 +10355,7 @@
   {
    "frm": "marketing.consent_record",
    "col": "via storePaymentToken",
-   "to": "orders.payment_token",
+   "to": "payments.token",
    "how": "lineage",
    "cross": "yes",
    "required": "",
@@ -10470,7 +10470,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via proposeTranslations",
    "to": "ai.proposed_action",
    "how": "lineage",
@@ -10587,7 +10587,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "fnb.fnb_order",
+   "frm": "fnb.service_order",
    "col": "via markOrderCollected",
    "to": "fnb.kitchen_ticket",
    "how": "lineage",
@@ -10596,7 +10596,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.interaction",
+   "frm": "ai.activity",
    "col": "via requestSuggestion",
    "to": "ai.suggestion",
    "how": "lineage",
@@ -10933,25 +10933,6 @@
    "getEntitlementHistory",
    "payByLink",
    "listEntitlements"
-  ],
-  "platform.org_unit": [
-   "listOrgUnits",
-   "createOrgUnit",
-   "getOrgUnit",
-   "updateOrgUnit",
-   "resolvePermissions",
-   "generateConfiguration",
-   "evaluateApprovalRequirement",
-   "publishAnnouncement",
-   "createCart",
-   "collectMerchandiseReservation",
-   "cancelMerchandiseReservation",
-   "createVenueMap",
-   "createResource",
-   "createPartnerUser",
-   "getPaymentLink",
-   "logTemperature",
-   "listAuditRecords"
   ],
   "platform.region_settings": [
    "getRegionSettings",
@@ -11345,19 +11326,6 @@
    "validateVenueMapGraph",
    "setPathClosure",
    "acceptWalkwayProposals"
-  ],
-  "orders.shift": [
-   "listShifts",
-   "openShift",
-   "getCurrentShift",
-   "getShift",
-   "approveShiftOpen",
-   "reopenShift",
-   "suspendShift",
-   "resumeShift",
-   "closeShift",
-   "acceptShiftVariance",
-   "getForeignTenderReport"
   ],
   "orders.cash_count_line": [
    "openShift",
@@ -11759,28 +11727,6 @@
    "getCellHealth",
    "requestBurstEnvironment"
   ],
-  "control.subscription": [
-   "getTenant",
-   "terminateTenant",
-   "getSubscription",
-   "setSubscription",
-   "previewSubscriptionChange",
-   "getTenantLicences",
-   "removeLicenceAddOn",
-   "getUsageMetering",
-   "cancelSubscription",
-   "settleAiUsage"
-  ],
-  "control.subscription_plan": [
-   "listPlans",
-   "createPlan",
-   "getPlan",
-   "createPlanVersion",
-   "previewSubscriptionChange",
-   "getTenantLicences",
-   "settleAiUsage",
-   "submitOnboardingApplication"
-  ],
   "platform.tenant": [
    "previewSubscriptionChange",
    "createPartnerAgreement"
@@ -11814,24 +11760,6 @@
   "control.tenant_migration_plan": [
    "planTenantMigration"
   ],
-  "ai.interaction": [
-   "recordUsage",
-   "askReportingQuestion",
-   "saveNaturalLanguageQuery",
-   "sendAiMessage",
-   "semanticSearch",
-   "generateConfiguration",
-   "generateVenueLayout",
-   "listAiInteractions",
-   "decideProposedAction",
-   "getAiUsage",
-   "settleAiUsage",
-   "testAiProvider",
-   "proposeVenueLabels",
-   "proposeWalkways",
-   "proposeTranslations",
-   "requestSuggestion"
-  ],
   "control.invoice": [
    "recordInvoicePayment",
    "disputeInvoice",
@@ -11851,27 +11779,6 @@
    "rollbackMenu",
    "scheduleMenuPublish",
    "applyMenuActions"
-  ],
-  "fnb.fnb_order": [
-   "listDiningOutlets",
-   "recordOrderHandover",
-   "createGuestFnbOrder",
-   "getGuestOrderStatus",
-   "getGuestBill",
-   "listFnbOrders",
-   "createFnbOrder",
-   "acceptFnbOrder",
-   "cancelFnbOrder",
-   "getFnbOrder",
-   "amendFnbOrder",
-   "openTableVisit",
-   "getTableVisit",
-   "updateTableVisit",
-   "mergeTableVisits",
-   "getBill",
-   "closeTableVisit",
-   "markOrderCollected",
-   "sendOrderNotification"
   ],
   "fnb.modifier_group": [
    "getGuestMenu",
@@ -11940,22 +11847,6 @@
    "updateMenu",
    "setMenuSections",
    "publishMenu"
-  ],
-  "fnb.table": [
-   "getTableMap",
-   "setTableLayout",
-   "clearTable",
-   "listTableReservations",
-   "createTableReservation",
-   "seatTableReservation",
-   "joinRestaurantWaitlist",
-   "moveTableVisit",
-   "quoteWaitTime",
-   "setSectionLayout",
-   "setTableCombinations",
-   "createTable",
-   "updateTable",
-   "resolveBookingConflict"
   ],
   "fnb.table_visit": [
    "openTableVisit",
@@ -12222,14 +12113,6 @@
    "getAssetHistory",
    "getDueMaintenance",
    "closeWorkOrder"
-  ],
-  "maintenance.maintenance_plan": [
-   "getAsset",
-   "lookupAsset",
-   "listMaintenancePlans",
-   "createMaintenancePlan",
-   "updateMaintenancePlan",
-   "getDueMaintenance"
   ],
   "maintenance.work_order": [
    "getAsset",
@@ -12560,17 +12443,6 @@
    "getWaitTimes",
    "setWaitTime",
    "getSignageQueueBoard"
-  ],
-  "queue.waiting_guest": [
-   "joinQueue",
-   "getWaitingGuest",
-   "leaveQueue",
-   "redeemWaitingGuest",
-   "overrideWaitingGuest",
-   "listQueueEntries",
-   "getWaitTimes",
-   "getSignageQueueCalls",
-   "getVenueMapLive"
   ],
   "queue.reading": [
    "getWaitTimes",
@@ -12912,9 +12784,6 @@
    "getJourneyPerformance",
    "recordTouchPoint"
   ],
-  "marketing.journey_entrant": [
-   "getJourneyPerformance"
-  ],
   "venuemap.import_job": [
    "importVenueGeometry",
    "proposeVenueLabels",
@@ -12956,20 +12825,9 @@
    "recordDeposit",
    "settleDeposit"
   ],
-  "orders.payment_provider": [
-   "listPaymentProviders",
-   "setPaymentProvider",
-   "storePaymentToken",
-   "createPaymentLink",
-   "payByLink"
-  ],
   "orders.payment_routing": [
    "listPaymentProviders",
    "setPaymentProvider"
-  ],
-  "orders.payment_token": [
-   "listPaymentTokens",
-   "storePaymentToken"
   ],
   "orders.chargeback": [
    "listChargebacks",
@@ -13118,9 +12976,6 @@
    "listWebhookDeliveries",
    "replayEvents"
   ],
-  "control.api_quota": [
-   "setApiQuota"
-  ],
   "control.api_version": [
    "listApiVersions",
    "deprecateApiVersion",
@@ -13209,9 +13064,6 @@
   "fnb.kitchen_exception": [
    "chaseStation",
    "logKitchenException"
-  ],
-  "fnb.eighty_six_event": [
-   "list86Events"
   ],
   "ai.suggestion": [
    "requestSuggestion",
@@ -13408,10 +13260,6 @@
   ],
   "rental.blackout": [
    "createRentalBlackout"
-  ],
-  "rental.category": [
-   "createRentalCategory",
-   "listRentalCategories"
   ],
   "rental.pricing_profile": [
    "createRentalPricingProfile",
@@ -13901,6 +13749,158 @@
   ],
   "payments.chargeback_evidence": [
    "submitChargebackEvidence"
+  ],
+  "platform.scope": [
+   "listOrgUnits",
+   "createOrgUnit",
+   "getOrgUnit",
+   "updateOrgUnit",
+   "resolvePermissions",
+   "generateConfiguration",
+   "evaluateApprovalRequirement",
+   "publishAnnouncement",
+   "createCart",
+   "collectMerchandiseReservation",
+   "cancelMerchandiseReservation",
+   "createVenueMap",
+   "createResource",
+   "createPartnerUser",
+   "getPaymentLink",
+   "logTemperature",
+   "listAuditRecords"
+  ],
+  "fnb.service_order": [
+   "listDiningOutlets",
+   "recordOrderHandover",
+   "createGuestFnbOrder",
+   "getGuestOrderStatus",
+   "getGuestBill",
+   "listFnbOrders",
+   "createFnbOrder",
+   "acceptFnbOrder",
+   "cancelFnbOrder",
+   "getFnbOrder",
+   "amendFnbOrder",
+   "openTableVisit",
+   "getTableVisit",
+   "updateTableVisit",
+   "mergeTableVisits",
+   "getBill",
+   "closeTableVisit",
+   "markOrderCollected",
+   "sendOrderNotification"
+  ],
+  "fnb.dining_table": [
+   "getTableMap",
+   "setTableLayout",
+   "clearTable",
+   "listTableReservations",
+   "createTableReservation",
+   "seatTableReservation",
+   "joinRestaurantWaitlist",
+   "moveTableVisit",
+   "quoteWaitTime",
+   "setSectionLayout",
+   "setTableCombinations",
+   "createTable",
+   "updateTable",
+   "resolveBookingConflict"
+  ],
+  "fnb.sold_out_item": [
+   "list86Events"
+  ],
+  "ai.activity": [
+   "recordUsage",
+   "askReportingQuestion",
+   "saveNaturalLanguageQuery",
+   "sendAiMessage",
+   "semanticSearch",
+   "generateConfiguration",
+   "generateVenueLayout",
+   "listAiInteractions",
+   "decideProposedAction",
+   "getAiUsage",
+   "settleAiUsage",
+   "testAiProvider",
+   "proposeVenueLabels",
+   "proposeWalkways",
+   "proposeTranslations",
+   "requestSuggestion"
+  ],
+  "control.api_limit": [
+   "setApiQuota"
+  ],
+  "queue.entry": [
+   "joinQueue",
+   "getWaitingGuest",
+   "leaveQueue",
+   "redeemWaitingGuest",
+   "overrideWaitingGuest",
+   "listQueueEntries",
+   "getWaitTimes",
+   "getSignageQueueCalls",
+   "getVenueMapLive"
+  ],
+  "orders.pos_shift": [
+   "listShifts",
+   "openShift",
+   "getCurrentShift",
+   "getShift",
+   "approveShiftOpen",
+   "reopenShift",
+   "suspendShift",
+   "resumeShift",
+   "closeShift",
+   "acceptShiftVariance",
+   "getForeignTenderReport"
+  ],
+  "maintenance.preventive_plan": [
+   "getAsset",
+   "lookupAsset",
+   "listMaintenancePlans",
+   "createMaintenancePlan",
+   "updateMaintenancePlan",
+   "getDueMaintenance"
+  ],
+  "marketing.journey_enrollment": [
+   "getJourneyPerformance"
+  ],
+  "payments.provider": [
+   "listPaymentProviders",
+   "setPaymentProvider",
+   "storePaymentToken",
+   "createPaymentLink",
+   "payByLink"
+  ],
+  "payments.token": [
+   "listPaymentTokens",
+   "storePaymentToken"
+  ],
+  "subscription.contract": [
+   "getTenant",
+   "terminateTenant",
+   "getSubscription",
+   "setSubscription",
+   "previewSubscriptionChange",
+   "getTenantLicences",
+   "removeLicenceAddOn",
+   "getUsageMetering",
+   "cancelSubscription",
+   "settleAiUsage"
+  ],
+  "subscription.plan": [
+   "listPlans",
+   "createPlan",
+   "getPlan",
+   "createPlanVersion",
+   "previewSubscriptionChange",
+   "getTenantLicences",
+   "settleAiUsage",
+   "submitOnboardingApplication"
+  ],
+  "maintenance.asset_category": [
+   "createRentalCategory",
+   "listRentalCategories"
   ]
  },
  "tab_screens": {
@@ -14221,33 +14221,6 @@
    "BO-825",
    "BO-826",
    "BO-829"
-  ],
-  "queue.waiting_guest": [
-   "WEB-002",
-   "WEB-004",
-   "WEB-015",
-   "WEB-039",
-   "WEB-040",
-   "GST-003",
-   "GST-004",
-   "GST-021",
-   "GST-022",
-   "GST-023",
-   "GST-038",
-   "GST-046",
-   "GST-051",
-   "GST-053",
-   "GST-054",
-   "GST-059",
-   "POS-029",
-   "EMP-031",
-   "EMP-032",
-   "EMP-030",
-   "BO-001",
-   "BO-002",
-   "BO-004",
-   "BO-005",
-   "BO-038"
   ],
   "catalogue.inventory_hold": [
    "WEB-004",
@@ -14595,43 +14568,6 @@
    "BO-1048",
    "ADM-680",
    "CMS-018"
-  ],
-  "platform.org_unit": [
-   "WEB-010",
-   "WEB-014",
-   "GST-009",
-   "POS-002",
-   "POS-004",
-   "EMP-007",
-   "EMP-037",
-   "EMP-039",
-   "EMP-047",
-   "EMP-038",
-   "EMP-062",
-   "EMP-067",
-   "SCN-001",
-   "BO-035",
-   "BO-036",
-   "BO-064",
-   "BO-066",
-   "BO-068",
-   "BO-085",
-   "BO-092",
-   "BO-095",
-   "BO-117",
-   "BO-124",
-   "BO-126",
-   "BO-133",
-   "BO-368",
-   "BO-597",
-   "BO-598",
-   "BO-857",
-   "BO-1062",
-   "ADM-006",
-   "ADM-036",
-   "ADM-337",
-   "ADM-420",
-   "ADM-593"
   ],
   "promotions.coupon_code": [
    "WEB-010",
@@ -15306,15 +15242,6 @@
    "PTR-018",
    "SUP-008"
   ],
-  "orders.payment_provider": [
-   "WEB-014",
-   "WEB-021",
-   "GST-009",
-   "GST-071",
-   "ADM-412",
-   "ADM-592",
-   "SGN-021"
-  ],
   "orders.payment_link": [
    "WEB-014",
    "GST-009",
@@ -15790,10 +15717,6 @@
    "ADM-627",
    "ADM-628"
   ],
-  "orders.payment_token": [
-   "WEB-021",
-   "GST-071"
-  ],
   "wallet.wallet": [
    "WEB-021",
    "GST-011",
@@ -16047,32 +15970,6 @@
    "KIT-008",
    "KIT-009"
   ],
-  "fnb.fnb_order": [
-   "WEB-036",
-   "WEB-038",
-   "GST-024",
-   "GST-025",
-   "GST-029",
-   "GST-032",
-   "POS-012",
-   "POS-022",
-   "POS-028",
-   "POS-029",
-   "KSK-016",
-   "EMP-030",
-   "EMP-051",
-   "EMP-058",
-   "EMP-059",
-   "BO-020",
-   "BO-021",
-   "BO-044",
-   "BO-062",
-   "BO-065",
-   "KIT-001",
-   "KIT-004",
-   "KIT-006",
-   "KIT-007"
-  ],
   "fnb.delivery_location": [
    "WEB-036",
    "WEB-038",
@@ -16172,21 +16069,6 @@
    "BO-140",
    "CMS-009",
    "KIT-008"
-  ],
-  "fnb.table": [
-   "WEB-036",
-   "GST-070",
-   "POS-024",
-   "POS-028",
-   "EMP-051",
-   "EMP-052",
-   "EMP-053",
-   "EMP-054",
-   "EMP-055",
-   "EMP-056",
-   "EMP-058",
-   "EMP-060",
-   "BO-044"
   ],
   "fnb.waitlist_entry": [
    "WEB-036",
@@ -16491,45 +16373,6 @@
    "ANL-052",
    "ANL-056"
   ],
-  "ai.interaction": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-052",
-   "GST-054",
-   "GST-059",
-   "POS-008",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020",
-   "EMP-040",
-   "EMP-041",
-   "BO-029",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-091",
-   "BO-093",
-   "BO-115",
-   "BO-117",
-   "BO-593",
-   "BO-597",
-   "BO-598",
-   "ADM-004",
-   "ADM-037",
-   "PTR-018",
-   "SUP-008",
-   "KIT-010",
-   "ANL-001",
-   "ANL-008",
-   "ANL-009",
-   "ANL-010",
-   "ANL-019",
-   "ANL-052",
-   "ANL-056"
-  ],
   "ai.conversation": [
    "WEB-044",
    "GST-031",
@@ -16614,24 +16457,6 @@
    "BO-040",
    "BO-041",
    "BO-042"
-  ],
-  "orders.shift": [
-   "POS-001",
-   "POS-007",
-   "POS-009",
-   "POS-012",
-   "POS-019",
-   "POS-025",
-   "EMP-003",
-   "EMP-009",
-   "EMP-008",
-   "EMP-022",
-   "SCN-001",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-100"
   ],
   "platform.denomination": [
    "POS-001",
@@ -17630,22 +17455,6 @@
    "BO-552",
    "BO-907"
   ],
-  "maintenance.maintenance_plan": [
-   "EMP-075",
-   "BO-031",
-   "BO-069",
-   "BO-071",
-   "BO-506",
-   "BO-508",
-   "BO-509",
-   "BO-548",
-   "BO-574",
-   "BO-575",
-   "BO-576",
-   "BO-583",
-   "BO-910",
-   "CMS-004"
-  ],
   "rental.inspection": [
    "EMP-076",
    "EMP-094",
@@ -18352,9 +18161,6 @@
    "BO-503",
    "BO-904"
   ],
-  "rental.category": [
-   "BO-497"
-  ],
   "rental.inventory_model": [
    "BO-498",
    "BO-904"
@@ -18617,9 +18423,6 @@
    "BO-776",
    "BO-789",
    "BO-816"
-  ],
-  "marketing.journey_entrant": [
-   "BO-781"
   ],
   "marketing.suppression": [
    "BO-791"
@@ -18954,31 +18757,6 @@
    "ADM-015",
    "CMS-001"
   ],
-  "control.subscription_plan": [
-   "ADM-002",
-   "ADM-005",
-   "ADM-006",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-010",
-   "ADM-011",
-   "ADM-012",
-   "ADM-015",
-   "ADM-019",
-   "ADM-380",
-   "ADM-392",
-   "ADM-398",
-   "ADM-400",
-   "ADM-414",
-   "ADM-422",
-   "ADM-450",
-   "ADM-463",
-   "CMS-001",
-   "SGN-002",
-   "SGN-012",
-   "SGN-022"
-  ],
   "control.licence_add_on": [
    "ADM-002",
    "ADM-005",
@@ -18996,33 +18774,6 @@
    "ADM-450",
    "ADM-457",
    "CMS-001"
-  ],
-  "control.subscription": [
-   "ADM-002",
-   "ADM-005",
-   "ADM-006",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-010",
-   "ADM-011",
-   "ADM-012",
-   "ADM-015",
-   "ADM-369",
-   "ADM-371",
-   "ADM-410",
-   "ADM-414",
-   "ADM-417",
-   "ADM-418",
-   "ADM-422",
-   "ADM-450",
-   "ADM-451",
-   "ADM-458",
-   "ADM-463",
-   "CMS-001",
-   "SGN-019",
-   "SGN-022",
-   "SGN-024"
   ],
   "control.cell_job": [
    "ADM-003",
@@ -19060,10 +18811,6 @@
   "control.scaling_policy": [
    "ADM-014",
    "ADM-030"
-  ],
-  "control.api_quota": [
-   "ADM-015",
-   "DEV-008"
   ],
   "control.release": [
    "ADM-022",
@@ -19395,9 +19142,6 @@
    "KIT-006",
    "KIT-008"
   ],
-  "fnb.eighty_six_event": [
-   "KIT-008"
-  ],
   "ai.suggestion_outcome": [
    "ANL-010"
   ],
@@ -19437,6 +19181,262 @@
    "ANL-043",
    "ANL-044",
    "ANL-046"
+  ],
+  "platform.scope": [
+   "WEB-010",
+   "WEB-014",
+   "GST-009",
+   "POS-002",
+   "POS-004",
+   "EMP-007",
+   "EMP-037",
+   "EMP-039",
+   "EMP-047",
+   "EMP-038",
+   "EMP-062",
+   "EMP-067",
+   "SCN-001",
+   "BO-035",
+   "BO-036",
+   "BO-064",
+   "BO-066",
+   "BO-068",
+   "BO-085",
+   "BO-092",
+   "BO-095",
+   "BO-117",
+   "BO-124",
+   "BO-126",
+   "BO-133",
+   "BO-368",
+   "BO-597",
+   "BO-598",
+   "BO-857",
+   "BO-1062",
+   "ADM-006",
+   "ADM-036",
+   "ADM-337",
+   "ADM-420",
+   "ADM-593"
+  ],
+  "fnb.service_order": [
+   "WEB-036",
+   "WEB-038",
+   "GST-024",
+   "GST-025",
+   "GST-029",
+   "GST-032",
+   "POS-012",
+   "POS-022",
+   "POS-028",
+   "POS-029",
+   "KSK-016",
+   "EMP-030",
+   "EMP-051",
+   "EMP-058",
+   "EMP-059",
+   "BO-020",
+   "BO-021",
+   "BO-044",
+   "BO-062",
+   "BO-065",
+   "KIT-001",
+   "KIT-004",
+   "KIT-006",
+   "KIT-007"
+  ],
+  "fnb.dining_table": [
+   "WEB-036",
+   "GST-070",
+   "POS-024",
+   "POS-028",
+   "EMP-051",
+   "EMP-052",
+   "EMP-053",
+   "EMP-054",
+   "EMP-055",
+   "EMP-056",
+   "EMP-058",
+   "EMP-060",
+   "BO-044"
+  ],
+  "fnb.sold_out_item": [
+   "KIT-008"
+  ],
+  "ai.activity": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "GST-033",
+   "GST-052",
+   "GST-054",
+   "GST-059",
+   "POS-008",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020",
+   "EMP-040",
+   "EMP-041",
+   "BO-029",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-091",
+   "BO-093",
+   "BO-115",
+   "BO-117",
+   "BO-593",
+   "BO-597",
+   "BO-598",
+   "ADM-004",
+   "ADM-037",
+   "PTR-018",
+   "SUP-008",
+   "KIT-010",
+   "ANL-001",
+   "ANL-008",
+   "ANL-009",
+   "ANL-010",
+   "ANL-019",
+   "ANL-052",
+   "ANL-056"
+  ],
+  "control.api_limit": [
+   "ADM-015",
+   "DEV-008"
+  ],
+  "queue.entry": [
+   "WEB-002",
+   "WEB-004",
+   "WEB-015",
+   "WEB-039",
+   "WEB-040",
+   "GST-003",
+   "GST-004",
+   "GST-021",
+   "GST-022",
+   "GST-023",
+   "GST-038",
+   "GST-046",
+   "GST-051",
+   "GST-053",
+   "GST-054",
+   "GST-059",
+   "POS-029",
+   "EMP-031",
+   "EMP-032",
+   "EMP-030",
+   "BO-001",
+   "BO-002",
+   "BO-004",
+   "BO-005",
+   "BO-038"
+  ],
+  "orders.pos_shift": [
+   "POS-001",
+   "POS-007",
+   "POS-009",
+   "POS-012",
+   "POS-019",
+   "POS-025",
+   "EMP-003",
+   "EMP-009",
+   "EMP-008",
+   "EMP-022",
+   "SCN-001",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-100"
+  ],
+  "maintenance.preventive_plan": [
+   "EMP-075",
+   "BO-031",
+   "BO-069",
+   "BO-071",
+   "BO-506",
+   "BO-508",
+   "BO-509",
+   "BO-548",
+   "BO-574",
+   "BO-575",
+   "BO-576",
+   "BO-583",
+   "BO-910",
+   "CMS-004"
+  ],
+  "marketing.journey_enrollment": [
+   "BO-781"
+  ],
+  "payments.provider": [
+   "WEB-014",
+   "WEB-021",
+   "GST-009",
+   "GST-071",
+   "ADM-412",
+   "ADM-592",
+   "SGN-021"
+  ],
+  "payments.token": [
+   "WEB-021",
+   "GST-071"
+  ],
+  "subscription.contract": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "ADM-369",
+   "ADM-371",
+   "ADM-410",
+   "ADM-414",
+   "ADM-417",
+   "ADM-418",
+   "ADM-422",
+   "ADM-450",
+   "ADM-451",
+   "ADM-458",
+   "ADM-463",
+   "CMS-001",
+   "SGN-019",
+   "SGN-022",
+   "SGN-024"
+  ],
+  "subscription.plan": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "ADM-019",
+   "ADM-380",
+   "ADM-392",
+   "ADM-398",
+   "ADM-400",
+   "ADM-414",
+   "ADM-422",
+   "ADM-450",
+   "ADM-463",
+   "CMS-001",
+   "SGN-002",
+   "SGN-012",
+   "SGN-022"
+  ],
+  "maintenance.asset_category": [
+   "BO-497"
   ]
  }
 }

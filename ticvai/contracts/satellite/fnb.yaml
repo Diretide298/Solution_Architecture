@@ -5511,7 +5511,7 @@ components:
           nullable: true
     EightySixEvent:
       type: object
-      x-ticvai-persistence: fnb.eighty_six_event
+      x-ticvai-persistence: fnb.sold_out_item
       description: 'Board 5J. **`setItemAvailability` recorded the current state and not the history.**
         An item 86''d at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the
         package kept only the flag.
@@ -6849,7 +6849,7 @@ components:
           type: string
           format: date-time
     FnbOrder:
-      x-ticvai-persistence: fnb.fnb_order + fnb.fnb_order_line
+      x-ticvai-persistence: fnb.service_order + fnb.service_order_line
       type: object
       required:
       - id
@@ -6920,7 +6920,7 @@ components:
       - reserved
       - outOfService
     TableDefinition:
-      x-ticvai-persistence: fnb.table
+      x-ticvai-persistence: fnb.dining_table
       type: object
       required:
       - id
