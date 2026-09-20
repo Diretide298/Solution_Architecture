@@ -1,4 +1,4 @@
--- seating — 18 tables
+-- seating — 20 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS seating.group_request (
     status                            text,
     quote_expires_at                  timestamptz,
     deposit_amount                    numeric(18,4),
-    order_id                          uuid,
+    order_id                          text,
     scope_path                        text
 );
 
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS seating.import_job (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.reassignment (
     id                                uuid PRIMARY KEY,
-    order_id                          uuid,
+    order_id                          text,
     from_seat_ids                     text[],
     to_seat_ids                       text[],
     reason                            text,
@@ -136,6 +136,13 @@ CREATE TABLE IF NOT EXISTS seating.seat_block (
     scope_path                        text
 );
 
+CREATE TABLE IF NOT EXISTS seating.seat_block_item (
+    id                                uuid PRIMARY KEY,
+    block_id                          uuid NOT NULL,
+    seat_id                           uuid NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
 -- A price band or a physical class — restricted view, accessible, premium
 CREATE TABLE IF NOT EXISTS seating.seat_category (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -161,6 +168,14 @@ CREATE TABLE IF NOT EXISTS seating.seat_hold (
     created_at                        timestamptz NOT NULL,
     expires_at                        timestamptz NOT NULL,
     block_id                          uuid
+);
+
+CREATE TABLE IF NOT EXISTS seating.seat_hold_item (
+    id                                uuid PRIMARY KEY,
+    hold_id                           uuid NOT NULL,
+    seat_id                           uuid NOT NULL,
+    held_price                        numeric(18,4),
+    created_at                        timestamptz NOT NULL
 );
 
 -- The plan of a room — sections, rows, seats, and what may combine with what. Versioned, so

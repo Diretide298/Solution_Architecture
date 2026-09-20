@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 218 operations, 86 tables
+title: VenueOpsService — 218 operations, 89 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -22,7 +22,7 @@ schemas:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 8
+  tables: 9
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -45,9 +45,9 @@ schemas:
   tables: 21
   stores:
   - postgres
-  largestTable: games.entitlement
+  largestTable: games.game
 - schema: rental
-  tables: 21
+  tables: 23
   stores:
   - postgres
   largestTable: rental.pricing_profile
@@ -2065,6 +2065,13 @@ tables:
   writtenBy:
   - maintenance
   foreignWriters: null
+- table: maintenance.asset_category
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
 - table: maintenance.incident
   columns: 26
   store: postgres
@@ -2092,7 +2099,7 @@ tables:
   parent: maintenance.inspection_template
   writtenBy: []
   foreignWriters: null
-- table: maintenance.maintenance_plan
+- table: maintenance.preventive_plan
   columns: 11
   store: postgres
   parent: null
@@ -2112,6 +2119,13 @@ tables:
   parent: maintenance.work_order
   writtenBy:
   - maintenance
+  foreignWriters: null
+- table: queue.entry
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
   foreignWriters: null
 - table: queue.feed
   columns: 7
@@ -2134,12 +2148,17 @@ tables:
   writtenBy:
   - queue
   foreignWriters: null
-- table: queue.waiting_guest
-  columns: 18
+- table: rental.agreement
+  columns: 13
   store: postgres
   parent: null
-  writtenBy:
-  - queue
+  writtenBy: []
+  foreignWriters: null
+- table: rental.agreement_item
+  columns: 19
+  store: postgres
+  parent: rental.agreement
+  writtenBy: []
   foreignWriters: null
 - table: rental.agreement_rules
   columns: 10
@@ -2174,13 +2193,6 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
-  foreignWriters: null
-- table: rental.category
-  columns: 14
-  store: postgres
-  parent: null
-  writtenBy:
-  - rental
   foreignWriters: null
 - table: rental.damage_assessment
   columns: 10
@@ -2230,6 +2242,12 @@ tables:
   parent: null
   writtenBy:
   - rental
+  foreignWriters: null
+- table: rental.inspection_item
+  columns: 9
+  store: postgres
+  parent: rental.inspection
+  writtenBy: []
   foreignWriters: null
 - table: rental.inventory_model
   columns: 10

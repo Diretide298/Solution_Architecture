@@ -842,6 +842,102 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
 components:
   schemas:
+    SyncCellConnection:
+      type: object
+      x-ticvai-persistence: sync.cell_connection
+      description: '**Taken from the backend workbook, 20 September.** Defines which source Cell is permitted to communicate with which target Cell.'
+      required:
+      - sourceCellId
+      - targetCellId
+      - type
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceCellId:
+          type: string
+          format: uuid
+        targetCellId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          maxLength: 30
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    SyncCrossCellRequest:
+      type: object
+      x-ticvai-persistence: sync.cross_cell_request
+      description: '**Taken from the backend workbook, 20 September.** Stores each cross-Cell request such as validating membership, entitlement, benefit, or wallet eligibility.'
+      required:
+      - guestLinkId
+      - type
+      - sourceCellId
+      - targetCellId
+      - subjectType
+      - status
+      - requestedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        guestLinkId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          maxLength: 50
+        sourceCellId:
+          type: string
+          format: uuid
+        targetCellId:
+          type: string
+          format: uuid
+        subjectType:
+          type: string
+          maxLength: 50
+        subjectReferenceId:
+          type: string
+          format: uuid
+          nullable: true
+        payload:
+          type: string
+          nullable: true
+        responsePayload:
+          type: string
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        correlationId:
+          type: string
+          maxLength: 100
+          nullable: true
+        requestedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     GuestLink:
       x-ticvai-persistence: platform.guest_link
       type: object

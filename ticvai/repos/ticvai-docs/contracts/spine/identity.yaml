@@ -2748,6 +2748,316 @@ paths:
 
 components:
   schemas:
+    IdentityBenefitUsage:
+      type: object
+      x-ticvai-persistence: identity.benefit_usage
+      description: '**Taken from the backend workbook, 20 September.** Tracks each use of a customer''s membership benefit and the remaining allowance.'
+      required:
+      - customerMembershipId
+      - membershipBenefitId
+      - quantity
+      - usedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerMembershipId:
+          type: string
+          format: uuid
+        membershipBenefitId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+        sourceType:
+          type: string
+          maxLength: 30
+          nullable: true
+        sourceOrderId:
+          type: string
+          format: uuid
+          nullable: true
+        usedAt:
+          type: string
+          format: date-time
+        remainingQuantity:
+          type: number
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+          nullable: true
+    IdentityCustomerMembership:
+      type: object
+      x-ticvai-persistence: identity.customer_membership
+      description: '**Taken from the backend workbook, 20 September.** Stores the membership subscription currently owned by a customer.'
+      required:
+      - customerId
+      - planId
+      - number
+      - startAt
+      - status
+      - autoRenew
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        planId:
+          type: string
+          format: uuid
+        number:
+          type: string
+          maxLength: 50
+        sourceOrderId:
+          type: string
+          format: uuid
+          nullable: true
+        startAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        autoRenew:
+          type: boolean
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    IdentityMembershipHistory:
+      type: object
+      x-ticvai-persistence: identity.membership_history
+      description: '**Taken from the backend workbook, 20 September.** Stores every status change made to a customer''s membership.'
+      required:
+      - customerMembershipId
+      - toStatus
+      - changedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerMembershipId:
+          type: string
+          format: uuid
+        fromStatus:
+          type: string
+          maxLength: 30
+          nullable: true
+        toStatus:
+          type: string
+          maxLength: 30
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        changedByUserAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        changedAt:
+          type: string
+          format: date-time
+    IdentityModule:
+      type: object
+      x-ticvai-persistence: identity.module
+      description: '**Taken from the backend workbook, 20 September.** Defines the system authorization modules and sub-modules available across the platform. Module definitions are global/system master data and are not duplicated per tenant.'
+      required:
+      - code
+      - name
+      - type
+      - sortOrder
+      - isSystemModule
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        parentModuleId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        sortOrder:
+          type: integer
+        isSystemModule:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    IdentityPermission:
+      type: object
+      x-ticvai-persistence: identity.permission
+      description: '**Taken from the backend workbook, 20 September.** Defines individual authorization actions under a module or sub-module, such as PRODUCT.VIEW, ORDER.CREATE, or REFUND.APPROVE.'
+      required:
+      - moduleId
+      - code
+      - name
+      - action
+      - isSystem
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        moduleId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 150
+        name:
+          type: string
+          maxLength: 150
+        action:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        isSystem:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    IdentityRefreshToken:
+      type: object
+      x-ticvai-persistence: identity.refresh_token
+      description: '**Taken from the backend workbook, 20 September.** Stores hashed refresh tokens and tracks token expiry, rotation, and revocation.'
+      required:
+      - userId
+      - hash
+      - expiresAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        hash:
+          type: string
+          maxLength: 500
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        createdByIp:
+          type: string
+          maxLength: 50
+          nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revokedByIp:
+          type: string
+          maxLength: 50
+          nullable: true
+        revocationReason:
+          type: string
+          maxLength: 250
+          nullable: true
+        replacedByTokenId:
+          type: string
+          format: uuid
+          nullable: true
+    IdentityUserAccess:
+      type: object
+      x-ticvai-persistence: identity.user_access
+      description: '**Taken from the backend workbook, 20 September.** Assigns a role or direct permission to a principal within a specific scope and validity period.'
+      required:
+      - userId
+      - effect
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        roleId:
+          type: string
+          format: uuid
+          nullable: true
+        permissionId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          nullable: true
+        effect:
+          type: string
+          maxLength: 10
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        grantedByUserAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revokedByUserAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
     AccessPolicy:
       type: object
       x-ticvai-persistence: identity.access_policy

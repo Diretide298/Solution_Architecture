@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 182 operations, 60 tables
+title: PlatformService — 182 operations, 62 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -25,10 +25,10 @@ schemas:
   - postgres
   largestTable: control.partner_agreement
 - schema: subscription
-  tables: 11
+  tables: 13
   stores:
   - postgres
-  largestTable: subscription.module_listing
+  largestTable: subscription.plan
 operationsByContract:
 - contract: subscription
   count: 127
@@ -1898,6 +1898,18 @@ tables:
   parent: null
   writtenBy:
   - subscription
+  foreignWriters: null
+- table: subscription.tier_allowance
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: subscription.tier_module
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: subscription.trial_config
   columns: 10

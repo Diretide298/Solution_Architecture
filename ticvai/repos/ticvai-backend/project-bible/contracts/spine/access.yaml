@@ -7858,6 +7858,71 @@ paths:
                   $ref: '#/components/schemas/AiAccessIntelligenceForecastingExecutiveInsightsView'
 components:
   schemas:
+    AccessAccessChange:
+      type: object
+      x-ticvai-persistence: access.access_change
+      description: '**Taken from the backend workbook, 20 September.** Audits ticket/access replacement during an upgrade. The old access should normally be marked UPGRADED/REPLACED and the new access becomes ACTIVE; old records should not be deleted.'
+      required:
+      - oldAccessId
+      - type
+      - changedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        oldAccessId:
+          type: string
+          format: uuid
+        newAccessId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        upgradeId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        changedByUserId:
+          type: string
+          format: uuid
+          nullable: true
+        changedAt:
+          type: string
+          format: date-time
+    AccessEntryRulePoint:
+      type: object
+      x-ticvai-persistence: access.entry_rule_point
+      description: '**Taken from the backend workbook, 20 September.** Maps the access points that are allowed for an admission profile.'
+      required:
+      - admissionProfileId
+      - accessPointId
+      - isActive
+      - createdAt
+      properties:
+        admissionProfileId:
+          type: string
+          format: uuid
+        accessPointId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
     DraftedRecord:
       type: object
       x-ticvai-provisional: true

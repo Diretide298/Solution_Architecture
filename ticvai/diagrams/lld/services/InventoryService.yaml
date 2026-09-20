@@ -1,5 +1,5 @@
 id: LLD-InventoryService
-title: InventoryService — 50 operations, 19 tables
+title: InventoryService — 50 operations, 21 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: inventory
-  tables: 19
+  tables: 21
   stores:
   - derived
   - postgres
@@ -550,12 +550,24 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: inventory.stock_reservation
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: inventory.supplier
   columns: 13
   store: postgres
   parent: null
   writtenBy:
   - inventory
+  foreignWriters: null
+- table: inventory.supplier_contract
+  columns: 12
+  store: postgres
+  parent: inventory.supplier
+  writtenBy: []
   foreignWriters: null
 - table: inventory.transfer
   columns: 10

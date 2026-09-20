@@ -1,4 +1,4 @@
--- marketing — 45 tables
+-- marketing — 61 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS marketing.agent_availability (
 -- Every marketing touch, not just the converting one (BL-177). A platform storing only its chosen
 -- attribution model cannot answer a question asked in a different one. Hangs off: reaches
 -- marketing.guest_profile through its keys; references marketing.campaign, marketing.journey,
--- pii.subject. Reached by: 2 operations read it and 0 write it.
+-- orders.sales_order. Reached by: 2 operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     touched_at                        timestamptz NOT NULL,
     channel                           text NOT NULL,
     interaction                       text,
-    order_id                          uuid
+    order_id                          text
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
@@ -67,6 +67,18 @@ CREATE TABLE IF NOT EXISTS marketing.audience_list (
     scope_path                        text
 );
 
+CREATE TABLE IF NOT EXISTS marketing.badge (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    icon_url                          text,
+    type                              text NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A send with an audience and a schedule. Every dispatch it produces is a message_dispatch row,
 -- which is where consent was checked
 CREATE TABLE IF NOT EXISTS marketing.campaign (
@@ -90,6 +102,16 @@ CREATE TABLE IF NOT EXISTS marketing.campaign (
     launched_at                       timestamptz,
     completed_at                      timestamptz,
     performance                       jsonb
+);
+
+CREATE TABLE IF NOT EXISTS marketing.campaign_target (
+    id                                uuid PRIMARY KEY,
+    campaign_id                       uuid NOT NULL,
+    domain                            text NOT NULL,
+    type                              text NOT NULL,
+    target_id                         uuid NOT NULL,
+    is_primary                        boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- A guest problem with a lifecycle — raised, assigned, answered, closed. The messages are
@@ -219,8 +241,8 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
 -- One message. The sender is resolved, never declared, and the assistant is labelled as one — a
 -- guest talking to a bot that presents as a person is a complaint waiting to happen Hangs off: a
 -- child of marketing.conversation; reaches marketing.guest_profile through its keys; references
--- ai.interaction, identity.principal, marketing.conversation. Reached by: 1 operations read it and
--- 1 write it.
+-- ai.activity, identity.principal, marketing.conversation. Reached by: 1 operations read it and 1
+-- write it.
 CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     id                                uuid PRIMARY KEY NOT NULL,
     sender                            text NOT NULL,
@@ -230,6 +252,18 @@ CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     sent_at                           timestamptz NOT NULL,
     read_at                           timestamptz,
     conversation_id                   uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.customer_badge (
+    id                                uuid PRIMARY KEY,
+    customer_id                       uuid NOT NULL,
+    badge_id                          uuid NOT NULL,
+    challenge_id                      uuid,
+    source_type                       text,
+    source_reference_id               uuid,
+    awarded_at                        timestamptz NOT NULL,
+    expires_at                        timestamptz,
+    status                            text NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -322,6 +356,35 @@ CREATE TABLE IF NOT EXISTS marketing.guest_document (
     retain_until                      date,
     uploaded_at                       timestamptz,
     uploaded_by_principal_id          uuid
+);
+
+CREATE TABLE IF NOT EXISTS marketing.guest_extra_field (
+    id                                uuid PRIMARY KEY,
+    tenant_id                         uuid NOT NULL,
+    name                              text NOT NULL,
+    type                              text NOT NULL,
+    is_required                       boolean NOT NULL,
+    display_order                     integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS marketing.guest_extra_option (
+    id                                uuid PRIMARY KEY,
+    field_id                          uuid NOT NULL,
+    name                              text NOT NULL,
+    display_order                     integer NOT NULL,
+    is_active                         boolean NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.guest_extra_value (
+    id                                uuid PRIMARY KEY,
+    customer_id                       uuid NOT NULL,
+    field_id                          uuid NOT NULL,
+    field_value                       text,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- What a venue knows about a guest that is not their identity — preferences, lifetime value,
@@ -431,7 +494,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey (
 
 -- A guest inside a journey, at a step. Pausing does not evict them, because a half-finished
 -- recovery sequence that restarts sends the first message twice
-CREATE TABLE IF NOT EXISTS marketing.journey_entrant (
+CREATE TABLE IF NOT EXISTS marketing.journey_enrollment (
     id                                uuid PRIMARY KEY NOT NULL,
     journey_id                        uuid NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -442,6 +505,23 @@ CREATE TABLE IF NOT EXISTS marketing.journey_entrant (
     next_action_at                    timestamptz,
     exited_at                         timestamptz,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS marketing.journey_step (
+    id                                uuid PRIMARY KEY,
+    journey_id                        uuid NOT NULL,
+    number                            integer NOT NULL,
+    type                              text NOT NULL,
+    name                              text,
+    message_template_id               uuid,
+    campaign_id                       uuid,
+    wait_minutes                      integer,
+    condition_json                    text,
+    action_config_json                text,
+    next_journey_step_id              uuid,
+    failure_journey_step_id           uuid,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- A staff member acting on a kiosk session remotely (2.1.25). The guest can always see it and
@@ -480,6 +560,33 @@ CREATE TABLE IF NOT EXISTS marketing.lost_item (
     dispose_after                     date
 );
 
+CREATE TABLE IF NOT EXISTS marketing.loyalty_campaign (
+    id                                uuid PRIMARY KEY,
+    program_id                        uuid NOT NULL,
+    campaign_id                       uuid,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    start_at                          timestamptz NOT NULL,
+    end_at                            timestamptz NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.loyalty_points (
+    id                                uuid PRIMARY KEY,
+    program_id                        uuid NOT NULL,
+    customer_id                       uuid NOT NULL,
+    transaction_type                  text NOT NULL,
+    points                            numeric(18,4) NOT NULL,
+    balance_after                     numeric(18,4) NOT NULL,
+    source_type                       text,
+    source_reference_id               uuid,
+    expires_at                        timestamptz,
+    reversed_loyalty_points_id        uuid,
+    notes                             text,
+    created_at                        timestamptz NOT NULL
+);
+
 -- Where a guest stands — points, tier, progress. A balance, not a history
 CREATE TABLE IF NOT EXISTS marketing.loyalty_position (
     subject_id                        uuid NOT NULL,
@@ -505,14 +612,16 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_programme (
     is_active                         boolean
 );
 
--- One level, with its threshold and benefits
-CREATE TABLE IF NOT EXISTS marketing.loyalty_tier (
-    loyalty_programme_id              uuid NOT NULL,
-    trigger                           text NOT NULL,
-    points                            numeric(18,4) NOT NULL,
-    product_kinds                     text[],
+CREATE TABLE IF NOT EXISTS marketing.loyalty_rule (
+    id                                uuid PRIMARY KEY,
+    campaign_id                       uuid NOT NULL,
+    type                              text NOT NULL,
+    points_earning_rule_id            uuid,
+    reward_id                         uuid,
+    bonus_points                      numeric(18,4),
     multiplier                        numeric(18,4),
-    id                                uuid PRIMARY KEY NOT NULL
+    conditions_json                   text,
+    is_active                         boolean NOT NULL
 );
 
 -- one row per recipient per send. Delivery, bounce and engagement Hangs off: reaches
@@ -562,6 +671,32 @@ CREATE TABLE IF NOT EXISTS marketing.message_trigger (
     priority                          text,
     is_active                         boolean NOT NULL,
     scope_path                        text
+);
+
+-- One level, with its threshold and benefits
+CREATE TABLE IF NOT EXISTS marketing.points_earning_rule (
+    loyalty_programme_id              uuid NOT NULL,
+    trigger                           text NOT NULL,
+    points                            numeric(18,4) NOT NULL,
+    product_kinds                     text[],
+    multiplier                        numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.points_redemption_rule (
+    id                                uuid PRIMARY KEY,
+    loyalty_program_id                uuid NOT NULL,
+    point_redemption_rule_code        text NOT NULL,
+    name                              text NOT NULL,
+    redemption_type                   text NOT NULL,
+    required                          numeric(18,4),
+    monetary_value                    numeric(18,4),
+    minimum_points                    numeric(18,4),
+    maximum_points                    numeric(18,4),
+    product_id                        uuid,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL
 );
 
 -- A personal-data breach (BL-176). UAE PDPL gives 72 hours from discovery — discoveredAt starts
@@ -631,6 +766,43 @@ CREATE TABLE IF NOT EXISTS marketing.review (
     opened_case_id                    text
 );
 
+CREATE TABLE IF NOT EXISTS marketing.review_response (
+    id                                uuid PRIMARY KEY,
+    review_id                         uuid NOT NULL,
+    text                              text NOT NULL,
+    status                            text NOT NULL,
+    responded_by_user_id              uuid,
+    responded_at                      timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS marketing.reward (
+    id                                uuid PRIMARY KEY,
+    loyalty_program_id                uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    type                              text NOT NULL,
+    product_id                        uuid,
+    points_cost                       numeric(18,4),
+    discount_value                    numeric(18,4),
+    validity_days                     integer,
+    is_active                         boolean NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.reward_assignment (
+    id                                uuid PRIMARY KEY,
+    customer_id                       uuid NOT NULL,
+    reward_id                         uuid NOT NULL,
+    code                              text NOT NULL,
+    source_type                       text,
+    source_reference_id               uuid,
+    status                            text NOT NULL,
+    issued_at                         timestamptz NOT NULL,
+    expires_at                        timestamptz,
+    redeemed_at                       timestamptz,
+    redeemed_order_id                 uuid
+);
+
 -- A rule that selects an audience, evaluated rather than stored as a list
 CREATE TABLE IF NOT EXISTS marketing.segment (
     name                              text,
@@ -654,6 +826,21 @@ CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     value                             text,
     values                            text[],
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.sla_policy (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    priority                          text,
+    first_response_minutes            integer,
+    resolution_minutes                integer,
+    escalation_minutes                integer,
+    business_hours_only               boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -690,7 +877,25 @@ CREATE TABLE IF NOT EXISTS marketing.touch_point (
     channel                           text NOT NULL,
     kind                              text,
     occurred_at                       timestamptz NOT NULL,
-    order_id                          uuid
+    order_id                          text
+);
+
+CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
+    id                                uuid PRIMARY KEY,
+    template_id                       uuid NOT NULL,
+    customer_id                       uuid,
+    subject_name                      text NOT NULL,
+    signed_name                       text NOT NULL,
+    signer_type                       text NOT NULL,
+    guardian_name                     text,
+    source_type                       text,
+    source_reference_id               uuid,
+    data_reference                    text,
+    document_hash                     text NOT NULL,
+    ip_address                        text,
+    device_info                       text,
+    status                            text NOT NULL,
+    signed_at                         timestamptz NOT NULL
 );
 
 -- Something a guest saved. Per guest, synced across their devices

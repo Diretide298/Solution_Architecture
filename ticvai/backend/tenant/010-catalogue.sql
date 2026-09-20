@@ -1,4 +1,4 @@
--- catalogue — 27 tables
+-- catalogue — 30 tables
 -- **Derived. Do not hand-edit.**
 
 -- Another way to name the same product — a barcode, a supplier code, a legacy id
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS catalogue.channel_capacity (
 
 -- Fixed, free or round-up. Posts to a liability account, not revenue — money collected for a
 -- charity is not the venue’s to recognise Hangs off: reaches catalogue.event through its keys;
--- references ledger.account, platform.org_unit. Reached by: 2 operations read it and 2 write it; 1
+-- references ledger.account, platform.scope. Reached by: 2 operations read it and 2 write it; 1
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
     id                                uuid PRIMARY KEY,
@@ -234,6 +234,30 @@ CREATE TABLE IF NOT EXISTS catalogue.inventory_hold (
     envelope_id                       uuid NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    type                              text NOT NULL,
+    description                       text,
+    value                             numeric(18,4),
+    unit                              text,
+    entitlement_template_id           uuid,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS catalogue.membership_programme (
+    id                                uuid PRIMARY KEY NOT NULL,
+    program_id                        uuid NOT NULL,
+    program_code                      text NOT NULL,
+    program_name                      text NOT NULL,
+    description                       text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- When a product happens — a session, a showing, a timed entry slot. Capacity lives here and in
 -- catalogue.channel_capacity, never on the product
 CREATE TABLE IF NOT EXISTS catalogue.performance (
@@ -247,6 +271,17 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
     admission_rules_id                uuid,
     seat_map_id                       uuid,
     admission_profile_id              uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS catalogue.plan_benefit (
+    id                                uuid PRIMARY KEY NOT NULL,
+    membership_plan_id                uuid NOT NULL,
+    membership_benefit_id             uuid NOT NULL,
+    usage_limit                       numeric(18,4),
+    usage_period                      text,
+    priority                          integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing

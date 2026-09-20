@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS resources.booking (
     id                                uuid PRIMARY KEY NOT NULL,
     resource_id                       uuid NOT NULL,
     subject_id                        uuid,
-    order_id                          uuid,
+    order_id                          text,
     "from"                            timestamptz NOT NULL,
     "to"                              timestamptz NOT NULL,
     status                            text NOT NULL,

@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 136 operations, 70 tables
+title: TenancyService — 136 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -27,12 +27,12 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: platform
-  tables: 25
+  tables: 26
   stores:
   - postgres
   largestTable: platform.wallet_authorisation
 - schema: workforce
-  tables: 10
+  tables: 17
   stores:
   - postgres
   largestTable: workforce.rota_assignment
@@ -1378,6 +1378,12 @@ tables:
   - tenancy
   foreignWriters:
   - inventory
+- table: platform.cell_endpoint
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: platform.configuration_profile
   columns: 9
   store: postgres
@@ -1632,12 +1638,42 @@ tables:
   writtenBy:
   - workforce
   foreignWriters: null
+- table: workforce.employee
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.employment
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.job_title
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.leave_balance
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: workforce.leave_request
   columns: 10
   store: postgres
   parent: null
   writtenBy:
   - workforce
+  foreignWriters: null
+- table: workforce.leave_type
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: workforce.open_shift
   columns: 16
@@ -1651,6 +1687,12 @@ tables:
   parent: null
   writtenBy:
   - workforce
+  foreignWriters: null
+- table: workforce.shift
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: workforce.shift_swap
   columns: 8
@@ -1675,6 +1717,12 @@ tables:
   foreignWriters: null
 - table: workforce.training_record
   columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.work_assignment
+  columns: 12
   store: postgres
   parent: null
   writtenBy: []

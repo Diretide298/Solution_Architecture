@@ -5,12 +5,12 @@
  "counts": {
   "operations": 1974,
   "contracts": 32,
-  "tables": 556,
+  "tables": 635,
   "stores": 5,
   "foreignKeys": 598,
-  "indexes": 618,
-  "tablesWritten": 552,
-  "relationships": 1190,
+  "indexes": 631,
+  "tablesWritten": 631,
+  "relationships": 1357,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -75,9 +75,9 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 493,
-    "total": 565,
-    "percent": 87,
+    "done": 565,
+    "total": 644,
+    "percent": 88,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
@@ -126,8 +126,8 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 552,
-    "total": 556,
+    "done": 631,
+    "total": 635,
     "percent": 99,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },

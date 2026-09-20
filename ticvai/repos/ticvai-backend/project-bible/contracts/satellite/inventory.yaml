@@ -2439,6 +2439,102 @@ paths:
                 $ref: '#/components/schemas/GoodsReceipt'
 components:
   schemas:
+    InventoryStockReservation:
+      type: object
+      x-ticvai-persistence: inventory.stock_reservation
+      description: '**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.'
+      required:
+      - itemId
+      - locationId
+      - quantity
+      - sourceType
+      - sourceId
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+        sourceType:
+          type: string
+          maxLength: 50
+        sourceId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          maxLength: 30
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
+    InventorySupplierContract:
+      type: object
+      x-ticvai-persistence: inventory.supplier_contract
+      description: '**Taken from the backend workbook, 20 September.** Stores purchasing agreements, validity dates, and commercial terms agreed with a supplier.'
+      required:
+      - supplierId
+      - number
+      - name
+      - validFrom
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        supplierId:
+          type: string
+          format: uuid
+        number:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        currencyCode:
+          type: string
+          maxLength: 10
+          nullable: true
+        paymentTermsDays:
+          type: integer
+          nullable: true
+        documentReference:
+          type: string
+          maxLength: 500
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        createdByUserId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
     CostingMethod:
       type: string
       description: Fixed at item creation. Immutable once movements exist.

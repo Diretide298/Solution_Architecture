@@ -1162,6 +1162,13 @@ components:
         currencyCode:
           type: string
           maxLength: 10
+          x-ticvai-persisted: false
+          description: '**Resolved from the region, not stored** (ADR-0018). The same rule
+            catalogue.price_list already follows: a price list in a UAE region is AED and
+            cannot be anything else, so the column would hold millions of copies of one
+            region-owned answer and would let a price list disagree with its own region.
+            **Kept on the wire, removed from the table.** Taken from the backend workbook,
+            which stored it.'
         validFrom:
           type: string
           format: date-time

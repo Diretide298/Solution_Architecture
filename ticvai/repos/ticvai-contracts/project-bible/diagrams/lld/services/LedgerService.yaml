@@ -20,7 +20,7 @@ schemas:
   tables: 18
   stores:
   - postgres
-  largestTable: ledger.journal_entry
+  largestTable: ledger.settlement
 operationsByContract:
 - contract: finance
   count: 56

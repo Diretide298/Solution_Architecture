@@ -21731,7 +21731,7 @@
   "path": "/payment-providers",
   "reads": [
    "payments.provider",
-   "orders.payment_routing"
+   "payments.routing_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -21759,7 +21759,7 @@
   "writes": [
    "cache:idempotency",
    "payments.provider",
-   "orders.payment_routing"
+   "payments.routing_rule"
   ],
   "routing": "",
   "scope": "venue",
@@ -25027,7 +25027,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.order_discount",
    "orders.order_line"
   ],
   "routing": "",

@@ -1135,6 +1135,260 @@ paths:
                 $ref: '#/components/schemas/PaymentConfigurationSimulation'
 components:
   schemas:
+    PaymentsCurrencyRule:
+      type: object
+      x-ticvai-persistence: payments.currency_rule
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.'
+      required:
+      - paymentPolicyId
+      - code
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentPolicyId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          maxLength: 10
+        settlementCurrencyCode:
+          type: string
+          maxLength: 10
+          nullable: true
+        minPaymentAmount:
+          type: number
+          nullable: true
+        maxPaymentAmount:
+          type: number
+          nullable: true
+        roundingIncrement:
+          type: number
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PaymentsDepositActivity:
+      type: object
+      x-ticvai-persistence: payments.deposit_activity
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Provides an auditable history of every deposit authorization, hold, capture, release, forfeiture, refund, or adjustment.'
+      required:
+      - depositId
+      - type
+      - amount
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        depositId:
+          type: string
+          format: uuid
+        paymentId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        amount:
+          type: number
+        reason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        createdByUserId:
+          type: string
+          format: uuid
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    PaymentsEligibilityRule:
+      type: object
+      x-ticvai-persistence: payments.eligibility_rule
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines when a payment method is allowed or denied for a transaction.'
+      required:
+      - paymentPolicyId
+      - paymentMethodId
+      - effect
+      - priority
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentPolicyId:
+          type: string
+          format: uuid
+        paymentMethodId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        businessArea:
+          type: string
+          maxLength: 30
+          nullable: true
+        currencyCode:
+          type: string
+          maxLength: 10
+          nullable: true
+        minOrderAmount:
+          type: number
+          nullable: true
+        maxOrderAmount:
+          type: number
+          nullable: true
+        effect:
+          type: string
+          maxLength: 10
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PaymentsFeeRule:
+      type: object
+      x-ticvai-persistence: payments.fee_rule
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.'
+      required:
+      - paymentPolicyId
+      - name
+      - category
+      - calculationType
+      - value
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentPolicyId:
+          type: string
+          format: uuid
+        paymentMethodId:
+          type: string
+          format: uuid
+          nullable: true
+        providerId:
+          type: string
+          format: uuid
+          nullable: true
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        businessArea:
+          type: string
+          maxLength: 30
+          nullable: true
+        currencyCode:
+          type: string
+          maxLength: 10
+          nullable: true
+        name:
+          type: string
+          maxLength: 150
+        category:
+          type: string
+          maxLength: 20
+        calculationType:
+          type: string
+          maxLength: 20
+        value:
+          type: number
+        minFee:
+          type: number
+          nullable: true
+        maxFee:
+          type: number
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PaymentsMethodConfig:
+      type: object
+      x-ticvai-persistence: payments.method_config
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Configures where a payment method is enabled, including scope, channel and currency.'
+      required:
+      - paymentPolicyId
+      - paymentMethodId
+      - isEnabled
+      - displayOrder
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentPolicyId:
+          type: string
+          format: uuid
+        paymentMethodId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        currencyCode:
+          type: string
+          maxLength: 10
+          nullable: true
+        isEnabled:
+          type: boolean
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
     PaymentMethod:
       type: object
       x-ticvai-persistence: payments.method

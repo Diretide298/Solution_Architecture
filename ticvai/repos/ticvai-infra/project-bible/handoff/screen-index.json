@@ -19002,7 +19002,6 @@
    "fnb.table_visit",
    "ledger.journal_entry",
    "ledger.posting",
-   "orders.order_discount",
    "orders.order_line",
    "orders.payment",
    "platform.outbox"
@@ -120027,8 +120026,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.payment_routing",
-   "payments.provider"
+   "payments.provider",
+   "payments.routing_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -153216,8 +153215,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.payment_routing",
-   "payments.provider"
+   "payments.provider",
+   "payments.routing_rule"
   ],
   "storedProcedures": [],
   "wave": 3,

@@ -51,19 +51,15 @@
    "operations": 2
   },
   {
+   "contract": "promotions",
+   "operations": 1
+  },
+  {
    "contract": "access",
    "operations": 1
   },
   {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
    "contract": "approvals",
-   "operations": 1
-  },
-  {
-   "contract": "promotions",
    "operations": 1
   },
   {
@@ -72,6 +68,10 @@
   },
   {
    "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],

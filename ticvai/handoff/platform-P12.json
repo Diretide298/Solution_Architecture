@@ -72,7 +72,7 @@
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "white-label",
    "operations": 1
   },
   {
@@ -80,7 +80,7 @@
    "operations": 1
   },
   {
-   "contract": "white-label",
+   "contract": "finance",
    "operations": 1
   },
   {

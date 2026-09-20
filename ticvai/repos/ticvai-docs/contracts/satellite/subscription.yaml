@@ -5739,6 +5739,83 @@ paths:
 
 components:
   schemas:
+    SubscriptionTierAllowance:
+      type: object
+      x-ticvai-persistence: subscription.tier_allowance
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
+      required:
+      - tierId
+      - code
+      - name
+      - isUnlimited
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tierId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        limitValue:
+          type: number
+          nullable: true
+        period:
+          type: string
+          maxLength: 20
+          nullable: true
+        isUnlimited:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    SubscriptionTierModule:
+      type: object
+      x-ticvai-persistence: subscription.tier_module
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
+      required:
+      - tierId
+      - code
+      - isIncluded
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tierId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        isIncluded:
+          type: boolean
+        notes:
+          type: string
+          maxLength: 500
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
     VsiModel:
       type: object
       x-ticvai-persistence: subscription.vsi_model

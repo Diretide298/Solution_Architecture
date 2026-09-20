@@ -1,5 +1,17 @@
--- access — 7 tables
+-- access — 9 tables
 -- **Derived. Do not hand-edit.**
+
+CREATE TABLE IF NOT EXISTS access.access_change (
+    id                                uuid PRIMARY KEY,
+    old_access_id                     uuid NOT NULL,
+    new_access_id                     uuid,
+    type                              text NOT NULL,
+    order_id                          uuid,
+    upgrade_id                        uuid,
+    reason                            text,
+    changed_by_user_id                uuid,
+    changed_at                        timestamptz NOT NULL
+);
 
 -- A place a credential is presented — a gate, a turnstile, a door, a scanner position. Carries the
 -- rules it applies through access.admission_rules
@@ -53,7 +65,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     id                                text PRIMARY KEY NOT NULL,
     template_id                       uuid NOT NULL,
     product_id                        uuid NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     order_line_id                     uuid,
     subject_id                        uuid NOT NULL,
     venue_id                          uuid,
@@ -76,6 +88,14 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     wallet_value_id                   uuid
 );
 
+CREATE TABLE IF NOT EXISTS access.entry_rule_point (
+    admission_profile_id              uuid NOT NULL,
+    access_point_id                   uuid NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    id                                uuid PRIMARY KEY
+);
+
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
 -- since a plate identifies a person Hangs off: reaches access.entitlement through its keys;
 -- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 1 operations
@@ -96,7 +116,7 @@ CREATE TABLE IF NOT EXISTS access.parking_entitlement (
 );
 
 -- A car park and its integration mode. Three modes, and the mode decides what happens at sale
--- (CF-52) Hangs off: reaches access.entitlement through its keys; references platform.org_unit.
+-- (CF-52) Hangs off: reaches access.entitlement through its keys; references platform.scope.
 -- Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS access.parking_facility (
     id                                uuid PRIMARY KEY,

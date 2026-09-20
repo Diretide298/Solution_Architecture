@@ -11,7 +11,7 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
 scale:
   operations: 1974
   contracts: 32
-  tables: 560
+  tables: 639
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -23,7 +23,7 @@ scale:
   - cache:idempotency
   - cache:resolution
   - qdrant:knowledge
-  schemas: 32
+  schemas: 33
   services: 17
   platforms: 16
   apps: 13
@@ -639,12 +639,12 @@ external:
   via:
   - AiService
   - ReportingService
-  reachedThrough: ai.interaction
+  reachedThrough: ai.activity
   note: 'BYOK, budgeted and metered. **Read-only against the transactional core** (ADR-0020).
 
 
     **Reporting reaches it too** — the governed pair. A natural-language query *is* an AI interaction,
-    which is why `reporting` may write `ai.interaction` and nothing else outside AiService may.'
+    which is why `reporting` may write `ai.activity` and nothing else outside AiService may.'
 - system: Webhooks out
   via:
   - PlatformService
@@ -667,7 +667,7 @@ layers:
 - layer: contracts
   holds: 1974 operations across 28 contracts — the join
 - layer: backend
-  holds: 560 tables in 26 schemas, 910 relationships
+  holds: 639 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

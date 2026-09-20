@@ -8,7 +8,7 @@
   "operations": 34,
   "ofTotalOperations": 1974,
   "tables": 42,
-  "ofTotalTables": 556
+  "ofTotalTables": 635
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -18,7 +18,7 @@
     "target": "shared cell",
     "services": 17,
     "operations": 1940,
-    "tables": 556,
+    "tables": 635,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -456,7 +456,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something **Hangs off**: reaches `orders.sales_order` through its keys; references `pii.subject`, `platform.org_unit`. **Reache"
+   "note": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something **Hangs off**: reaches `orders.sales_order` through its keys; references `pii.subject`, `platform.scope`. **Reached b"
   },
   {
    "table": "orders.cart_line",
@@ -577,7 +577,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.org_unit`. **Reached by**:"
+   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 14"
   },
   {
    "table": "marketing.guest_profile",

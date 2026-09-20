@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 50 operations, 13 tables
+title: WhiteLabelService — 50 operations, 15 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 13
+  tables: 15
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
@@ -521,6 +521,18 @@ tables:
   parent: null
   writtenBy:
   - white-label
+  foreignWriters: null
+- table: whitelabel.redirect
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: whitelabel.seo_setting
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: whitelabel.tenant_config
   columns: 17

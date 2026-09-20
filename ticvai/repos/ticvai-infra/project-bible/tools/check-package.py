@@ -603,6 +603,18 @@ def main() -> int:
         # Renamed from `retail.wallet` on 19 September when the wallet runtime left `retail.yaml`
         # for `wallet.yaml`; the allowlist entry moved with the table, and the reason is unchanged.
         "wallet.wallet",
+        # **Seven more from the backend workbook, 20 September.** Their schema stores a
+        # currency on anything holding money, which is what a money table usually looks
+        # like; it cannot know a region owns the answer here. These seven genuinely
+        # differ. The two that did not - fnb.price_list and retail.price_list - carry
+        # `x-ticvai-persisted: false` instead, the same as catalogue.price_list.
+        "payments.fee_rule",                 # the currency the fee applies TO, not the currency it is in - a selector on the rule
+        "payments.eligibility_rule",         # same: a condition saying which currency this method is allowed for
+        "payments.method_config",            # which currency a method is enabled for, per scope and channel
+        "inventory.supplier_contract",       # an overseas supplier contracts in its own currency; inventory.supplier is already exempt for this reason
+        "orders.deposit",                    # money actually taken, like orders.payment.tender_currency beside it
+        "wallet.balance",                    # a stored-value balance is denominated, the same reason wallet.wallet is exempt
+        "wallet.hold",                       # a hold on a denominated balance carries the balance's denomination
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

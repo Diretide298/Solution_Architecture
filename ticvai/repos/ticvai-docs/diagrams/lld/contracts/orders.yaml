@@ -1155,8 +1155,8 @@ operations:
   - staff
   offline: false
   reads:
-  - orders.payment_routing
   - payments.provider
+  - payments.routing_rule
   writes: []
 - operation: listPaymentReconciliationException
   verb: GET
@@ -1908,8 +1908,8 @@ operations:
   - payments.provider
   writes:
   - cache:idempotency
-  - orders.payment_routing
   - payments.provider
+  - payments.routing_rule
 - operation: setProRataResidual
   verb: PUT
   path: /pro-rata-residual

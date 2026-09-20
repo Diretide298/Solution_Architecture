@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 177 operations, 8 tables
+title: AccessService — 177 operations, 10 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: access
-  tables: 8
+  tables: 10
   stores:
   - postgres
   largestTable: access.entitlement
@@ -1455,6 +1455,12 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: access.access_change
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: access.access_point
   columns: 12
   store: postgres
@@ -1487,6 +1493,12 @@ tables:
   foreignWriters:
   - catalogue
   - orders
+- table: access.entry_rule_point
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: access.parking_entitlement
   columns: 12
   store: postgres

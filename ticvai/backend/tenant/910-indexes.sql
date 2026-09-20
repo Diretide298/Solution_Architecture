@@ -3,8 +3,6 @@
 -- naming habits the contracts never asserted, and enforcing one fails on the first
 -- row that legitimately points nowhere.
 
--- convention, not declared: access.entitlement.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_entitlement_order_id ON access.entitlement (order_id);
 -- convention, not declared: access.entitlement.order_line_id -> orders.order_line
 CREATE INDEX IF NOT EXISTS ix_entitlement_order_line_id ON access.entitlement (order_line_id);
 -- convention, not declared: access.entitlement.product_id -> catalogue.product
@@ -13,8 +11,6 @@ CREATE INDEX IF NOT EXISTS ix_entitlement_product_id ON access.entitlement (prod
 CREATE INDEX IF NOT EXISTS ix_entitlement_subject_id ON access.entitlement (subject_id);
 -- convention, not declared: access.entitlement.supersedes_entitlement_id -> access.entitlement
 CREATE INDEX IF NOT EXISTS ix_entitlement_supersedes_entitlement_id ON access.entitlement (supersedes_entitlement_id);
--- convention, not declared: access.entitlement.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_entitlement_venue_id ON access.entitlement (venue_id);
 -- convention, not declared: accreditation.application.approval_request_id -> approvals.request
 CREATE INDEX IF NOT EXISTS ix_application_approval_request_id ON accreditation.application (approval_request_id);
 -- convention, not declared: accreditation.application.holder_id -> accreditation.holder
@@ -29,7 +25,7 @@ CREATE INDEX IF NOT EXISTS ix_audit_actor_principal_id ON accreditation.audit (a
 CREATE INDEX IF NOT EXISTS ix_audit_approval_request_id ON accreditation.audit (approval_request_id);
 -- convention, not declared: accreditation.audit.holder_id -> accreditation.holder
 CREATE INDEX IF NOT EXISTS ix_audit_holder_id ON accreditation.audit (holder_id);
--- convention, not declared: accreditation.badge_template.background_asset_id -> maintenance.asset
+-- convention, not declared: accreditation.badge_template.background_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_badge_template_background_asset_id ON accreditation.badge_template (background_asset_id);
 -- convention, not declared: accreditation.credential.badge_template_id -> accreditation.badge_template
 CREATE INDEX IF NOT EXISTS ix_credential_badge_template_id ON accreditation.credential (badge_template_id);
@@ -43,7 +39,7 @@ CREATE INDEX IF NOT EXISTS ix_document_application_id ON accreditation.document 
 CREATE INDEX IF NOT EXISTS ix_document_asset_id ON accreditation.document (asset_id);
 -- convention, not declared: accreditation.document.holder_id -> accreditation.holder
 CREATE INDEX IF NOT EXISTS ix_document_holder_id ON accreditation.document (holder_id);
--- convention, not declared: accreditation.holder.photo_asset_id -> maintenance.asset
+-- convention, not declared: accreditation.holder.photo_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_holder_photo_asset_id ON accreditation.holder (photo_asset_id);
 -- convention, not declared: accreditation.holder.programme_id -> accreditation.programme
 CREATE INDEX IF NOT EXISTS ix_holder_programme_id ON accreditation.holder (programme_id);
@@ -59,10 +55,10 @@ CREATE INDEX IF NOT EXISTS ix_print_job_printer_device_id ON accreditation.print
 CREATE INDEX IF NOT EXISTS ix_requirements_programme_id ON accreditation.requirements (programme_id);
 -- convention, not declared: accreditation.validity.programme_id -> accreditation.programme
 CREATE INDEX IF NOT EXISTS ix_validity_programme_id ON accreditation.validity (programme_id);
+-- convention, not declared: ai.activity.billable_to_tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS ix_activity_billable_to_tenant_id ON ai.activity (billable_to_tenant_id);
 -- convention, not declared: ai.index_failure.source_id -> ai.index_source
 CREATE INDEX IF NOT EXISTS ix_index_failure_source_id ON ai.index_failure (source_id);
--- convention, not declared: ai.interaction.billable_to_tenant_id -> control.tenant
-CREATE INDEX IF NOT EXISTS ix_interaction_billable_to_tenant_id ON ai.interaction (billable_to_tenant_id);
 -- convention, not declared: ai.knowledge_document.source_asset_id -> maintenance.asset
 CREATE INDEX IF NOT EXISTS ix_knowledge_document_source_asset_id ON ai.knowledge_document (source_asset_id);
 -- convention, not declared: ai.policy.fallback_provider_id -> ai.provider
@@ -137,7 +133,7 @@ CREATE INDEX IF NOT EXISTS ix_prepaid_minutes_credit_type_id ON catalogue.prepai
 CREATE INDEX IF NOT EXISTS ix_product_approved_by_principal_id ON catalogue.product (approved_by_principal_id);
 -- convention, not declared: catalogue.product.created_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_product_created_by_principal_id ON catalogue.product (created_by_principal_id);
--- convention, not declared: catalogue.product_category.image_asset_id -> maintenance.asset
+-- convention, not declared: catalogue.product_category.image_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_product_category_image_asset_id ON catalogue.product_category (image_asset_id);
 -- convention, not declared: catalogue.product_version.published_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_product_version_published_by_principal_id ON catalogue.product_version (published_by_principal_id);
@@ -147,8 +143,6 @@ CREATE INDEX IF NOT EXISTS ix_session_template_space_id ON catalogue.session_tem
 CREATE INDEX IF NOT EXISTS ix_space_parent_space_id ON catalogue.space (parent_space_id);
 -- convention, not declared: catalogue.space.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_space_resource_id ON catalogue.space (resource_id);
--- convention, not declared: catalogue.space.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_space_venue_id ON catalogue.space (venue_id);
 -- convention, not declared: catalogue.space.venue_map_zone_id -> seating.zone
 CREATE INDEX IF NOT EXISTS ix_space_venue_map_zone_id ON catalogue.space (venue_map_zone_id);
 -- convention, not declared: fnb.cold_chain_event.corrective_action_id -> fnb.corrective_action
@@ -165,14 +159,6 @@ CREATE INDEX IF NOT EXISTS ix_combo_slot_combo_id ON fnb.combo_slot (combo_id);
 CREATE INDEX IF NOT EXISTS ix_corrective_action_escalated_to_principal_id ON fnb.corrective_action (escalated_to_principal_id);
 -- convention, not declared: fnb.corrective_action.signed_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_corrective_action_signed_by_principal_id ON fnb.corrective_action (signed_by_principal_id);
--- convention, not declared: fnb.eighty_six_event.called_by_principal_id -> identity.principal
-CREATE INDEX IF NOT EXISTS ix_eighty_six_event_called_by_principal_id ON fnb.eighty_six_event (called_by_principal_id);
--- convention, not declared: fnb.eighty_six_event.menu_item_id -> fnb.menu_item
-CREATE INDEX IF NOT EXISTS ix_eighty_six_event_menu_item_id ON fnb.eighty_six_event (menu_item_id);
--- convention, not declared: fnb.eighty_six_event.outlet_id -> platform.outlet
-CREATE INDEX IF NOT EXISTS ix_eighty_six_event_outlet_id ON fnb.eighty_six_event (outlet_id);
--- convention, not declared: fnb.fnb_order_line.menu_item_id -> fnb.menu_item
-CREATE INDEX IF NOT EXISTS ix_fnb_order_line_menu_item_id ON fnb.fnb_order_line (menu_item_id);
 -- convention, not declared: fnb.kitchen_exception.outlet_id -> platform.outlet
 CREATE INDEX IF NOT EXISTS ix_kitchen_exception_outlet_id ON fnb.kitchen_exception (outlet_id);
 -- convention, not declared: fnb.kitchen_exception.raised_by_principal_id -> identity.principal
@@ -187,6 +173,14 @@ CREATE INDEX IF NOT EXISTS ix_production_plan_based_on_suggestion_id ON fnb.prod
 CREATE INDEX IF NOT EXISTS ix_production_plan_outlet_id ON fnb.production_plan (outlet_id);
 -- convention, not declared: fnb.production_run.producing_outlet_id -> platform.outlet
 CREATE INDEX IF NOT EXISTS ix_production_run_producing_outlet_id ON fnb.production_run (producing_outlet_id);
+-- convention, not declared: fnb.service_order_line.menu_item_id -> fnb.menu_item
+CREATE INDEX IF NOT EXISTS ix_service_order_line_menu_item_id ON fnb.service_order_line (menu_item_id);
+-- convention, not declared: fnb.sold_out_item.called_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS ix_sold_out_item_called_by_principal_id ON fnb.sold_out_item (called_by_principal_id);
+-- convention, not declared: fnb.sold_out_item.menu_item_id -> fnb.menu_item
+CREATE INDEX IF NOT EXISTS ix_sold_out_item_menu_item_id ON fnb.sold_out_item (menu_item_id);
+-- convention, not declared: fnb.sold_out_item.outlet_id -> platform.outlet
+CREATE INDEX IF NOT EXISTS ix_sold_out_item_outlet_id ON fnb.sold_out_item (outlet_id);
 -- convention, not declared: fnb.sub_bill.sub_bill_id -> fnb.sub_bill
 CREATE INDEX IF NOT EXISTS ix_sub_bill_sub_bill_id ON fnb.sub_bill (sub_bill_id);
 -- convention, not declared: fnb.sub_bill.visit_id -> fnb.table_visit
@@ -263,14 +257,12 @@ CREATE INDEX IF NOT EXISTS ix_count_line_counted_by_principal_id ON inventory.co
 CREATE INDEX IF NOT EXISTS ix_count_line_item_id ON inventory.count_line (item_id);
 -- convention, not declared: inventory.count_line.location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS ix_count_line_location_id ON inventory.count_line (location_id);
--- convention, not declared: inventory.item.category_id -> rental.category
+-- convention, not declared: inventory.item.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_item_category_id ON inventory.item (category_id);
 -- convention, not declared: inventory.location.parent_location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS ix_location_parent_location_id ON inventory.location (parent_location_id);
 -- convention, not declared: inventory.movement.source_id -> ai.index_source
 CREATE INDEX IF NOT EXISTS ix_movement_source_id ON inventory.movement (source_id);
--- convention, not declared: inventory.purchase_order.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_purchase_order_venue_id ON inventory.purchase_order (venue_id);
 -- convention, not declared: inventory.serialised_item.item_id -> inventory.item
 CREATE INDEX IF NOT EXISTS ix_serialised_item_item_id ON inventory.serialised_item (item_id);
 -- convention, not declared: inventory.serialised_item.location_id -> inventory.location
@@ -279,14 +271,10 @@ CREATE INDEX IF NOT EXISTS ix_serialised_item_location_id ON inventory.serialise
 CREATE INDEX IF NOT EXISTS ix_serialised_item_sold_on_order_line_id ON inventory.serialised_item (sold_on_order_line_id);
 -- convention, not declared: ledger.deposit.liability_account_id -> ledger.account
 CREATE INDEX IF NOT EXISTS ix_deposit_liability_account_id ON ledger.deposit (liability_account_id);
--- convention, not declared: ledger.deposit.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_deposit_order_id ON ledger.deposit (order_id);
 -- convention, not declared: ledger.fx_rate.set_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_fx_rate_set_by_principal_id ON ledger.fx_rate (set_by_principal_id);
 -- convention, not declared: ledger.inter_entity_obligation.from_legal_entity_id -> ledger.legal_entity
 CREATE INDEX IF NOT EXISTS ix_inter_entity_obligation_from_legal_entity_id ON ledger.inter_entity_obligation (from_legal_entity_id);
--- convention, not declared: ledger.inter_entity_obligation.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_inter_entity_obligation_order_id ON ledger.inter_entity_obligation (order_id);
 -- convention, not declared: ledger.inter_entity_obligation.to_legal_entity_id -> ledger.legal_entity
 CREATE INDEX IF NOT EXISTS ix_inter_entity_obligation_to_legal_entity_id ON ledger.inter_entity_obligation (to_legal_entity_id);
 -- convention, not declared: ledger.journal_entry.source_id -> ai.index_source
@@ -295,37 +283,39 @@ CREATE INDEX IF NOT EXISTS ix_journal_entry_source_id ON ledger.journal_entry (s
 CREATE INDEX IF NOT EXISTS ix_journal_line_account_id ON ledger.journal_line (account_id);
 -- convention, not declared: ledger.journal_line.cost_center_id -> ledger.cost_center
 CREATE INDEX IF NOT EXISTS ix_journal_line_cost_center_id ON ledger.journal_line (cost_center_id);
--- convention, not declared: ledger.journal_line.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_journal_line_venue_id ON ledger.journal_line (venue_id);
 -- convention, not declared: ledger.posting.source_id -> ai.index_source
 CREATE INDEX IF NOT EXISTS ix_posting_source_id ON ledger.posting (source_id);
 -- convention, not declared: ledger.recognition_schedule.no_show_account_id -> ledger.account
 CREATE INDEX IF NOT EXISTS ix_recognition_schedule_no_show_account_id ON ledger.recognition_schedule (no_show_account_id);
 -- convention, not declared: ledger.tax_code.compound_on_tax_code_id -> ledger.tax_code
 CREATE INDEX IF NOT EXISTS ix_tax_code_compound_on_tax_code_id ON ledger.tax_code (compound_on_tax_code_id);
--- convention, not declared: maintenance.asset.category_id -> rental.category
+-- convention, not declared: maintenance.asset.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_asset_category_id ON maintenance.asset (category_id);
 -- convention, not declared: maintenance.asset.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_asset_resource_id ON maintenance.asset (resource_id);
--- convention, not declared: maintenance.inspection_template.applies_to_asset_category_id -> rental.category
+-- convention, not declared: maintenance.asset_category.default_deposit_policy_id -> rental.deposit_policy
+CREATE INDEX IF NOT EXISTS ix_asset_category_default_deposit_policy_id ON maintenance.asset_category (default_deposit_policy_id);
+-- convention, not declared: maintenance.asset_category.icon_asset_id -> assets.media_asset
+CREATE INDEX IF NOT EXISTS ix_asset_category_icon_asset_id ON maintenance.asset_category (icon_asset_id);
+-- convention, not declared: maintenance.asset_category.parent_category_id -> maintenance.asset_category
+CREATE INDEX IF NOT EXISTS ix_asset_category_parent_category_id ON maintenance.asset_category (parent_category_id);
+-- convention, not declared: maintenance.inspection_template.applies_to_asset_category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_inspection_template_applies_to_asset_category_id ON maintenance.inspection_template (applies_to_asset_category_id);
--- convention, not declared: maintenance.maintenance_plan.asset_category_id -> rental.category
-CREATE INDEX IF NOT EXISTS ix_maintenance_plan_asset_category_id ON maintenance.maintenance_plan (asset_category_id);
+-- convention, not declared: maintenance.preventive_plan.asset_category_id -> maintenance.asset_category
+CREATE INDEX IF NOT EXISTS ix_preventive_plan_asset_category_id ON maintenance.preventive_plan (asset_category_id);
 -- convention, not declared: maintenance.work_order.verified_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_work_order_verified_by_principal_id ON maintenance.work_order (verified_by_principal_id);
 -- convention, not declared: maintenance.work_order_attachment.captured_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_work_order_attachment_captured_by_principal_id ON maintenance.work_order_attachment (captured_by_principal_id);
--- convention, not declared: marketing.attribution_touch.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_attribution_touch_order_id ON marketing.attribution_touch (order_id);
 -- convention, not declared: marketing.audience_activation.approval_request_id -> approvals.request
 CREATE INDEX IF NOT EXISTS ix_audience_activation_approval_request_id ON marketing.audience_activation (approval_request_id);
 -- convention, not declared: marketing.audience_activation.segment_id -> marketing.segment
 CREATE INDEX IF NOT EXISTS ix_audience_activation_segment_id ON marketing.audience_activation (segment_id);
 -- convention, not declared: marketing.audience_list.asset_id -> maintenance.asset
 CREATE INDEX IF NOT EXISTS ix_audience_list_asset_id ON marketing.audience_list (asset_id);
--- convention, not declared: marketing.case.category_id -> rental.category
+-- convention, not declared: marketing.case.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_case_category_id ON marketing."case" (category_id);
--- convention, not declared: marketing.challenge.badge_asset_id -> maintenance.asset
+-- convention, not declared: marketing.challenge.badge_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_challenge_badge_asset_id ON marketing.challenge (badge_asset_id);
 -- convention, not declared: marketing.conversation.assist_session_id -> marketing.kiosk_assist_session
 CREATE INDEX IF NOT EXISTS ix_conversation_assist_session_id ON marketing.conversation (assist_session_id);
@@ -333,38 +323,32 @@ CREATE INDEX IF NOT EXISTS ix_conversation_assist_session_id ON marketing.conver
 CREATE INDEX IF NOT EXISTS ix_conversation_message_sender_principal_id ON marketing.conversation_message (sender_principal_id);
 -- convention, not declared: marketing.form_submission.on_behalf_of_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_form_submission_on_behalf_of_subject_id ON marketing.form_submission (on_behalf_of_subject_id);
--- convention, not declared: marketing.form_submission.signature_asset_id -> maintenance.asset
+-- convention, not declared: marketing.form_submission.signature_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_form_submission_signature_asset_id ON marketing.form_submission (signature_asset_id);
 -- convention, not declared: marketing.guest_document.uploaded_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_guest_document_uploaded_by_principal_id ON marketing.guest_document (uploaded_by_principal_id);
--- convention, not declared: marketing.guest_relationship.related_guest_id -> queue.waiting_guest
+-- convention, not declared: marketing.guest_relationship.related_guest_id -> queue.entry
 CREATE INDEX IF NOT EXISTS ix_guest_relationship_related_guest_id ON marketing.guest_relationship (related_guest_id);
 -- convention, not declared: marketing.invitation.issued_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_invitation_issued_by_principal_id ON marketing.invitation (issued_by_principal_id);
 -- convention, not declared: marketing.invitation.offered_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_invitation_offered_by_principal_id ON marketing.invitation (offered_by_principal_id);
--- convention, not declared: marketing.journey_entrant.journey_id -> marketing.journey
-CREATE INDEX IF NOT EXISTS ix_journey_entrant_journey_id ON marketing.journey_entrant (journey_id);
--- convention, not declared: marketing.journey_entrant.step_id -> approvals.step_up_policy
-CREATE INDEX IF NOT EXISTS ix_journey_entrant_step_id ON marketing.journey_entrant (step_id);
--- convention, not declared: marketing.journey_entrant.subject_id -> pii.subject
-CREATE INDEX IF NOT EXISTS ix_journey_entrant_subject_id ON marketing.journey_entrant (subject_id);
--- convention, not declared: marketing.kiosk_assist_session.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_kiosk_assist_session_venue_id ON marketing.kiosk_assist_session (venue_id);
+-- convention, not declared: marketing.journey_enrollment.journey_id -> marketing.journey
+CREATE INDEX IF NOT EXISTS ix_journey_enrollment_journey_id ON marketing.journey_enrollment (journey_id);
+-- convention, not declared: marketing.journey_enrollment.step_id -> approvals.step_up_policy
+CREATE INDEX IF NOT EXISTS ix_journey_enrollment_step_id ON marketing.journey_enrollment (step_id);
+-- convention, not declared: marketing.journey_enrollment.subject_id -> pii.subject
+CREATE INDEX IF NOT EXISTS ix_journey_enrollment_subject_id ON marketing.journey_enrollment (subject_id);
 -- convention, not declared: marketing.lost_item.last_seen_point_id -> venuemap.point
 CREATE INDEX IF NOT EXISTS ix_lost_item_last_seen_point_id ON marketing.lost_item (last_seen_point_id);
 -- convention, not declared: marketing.lost_item.reported_by_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_lost_item_reported_by_subject_id ON marketing.lost_item (reported_by_subject_id);
--- convention, not declared: marketing.lost_item.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_lost_item_venue_id ON marketing.lost_item (venue_id);
 -- convention, not declared: marketing.referral.referee_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_referral_referee_subject_id ON marketing.referral (referee_subject_id);
 -- convention, not declared: marketing.referral.referrer_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_referral_referrer_subject_id ON marketing.referral (referrer_subject_id);
--- convention, not declared: marketing.subscription.guest_id -> queue.waiting_guest
+-- convention, not declared: marketing.subscription.guest_id -> queue.entry
 CREATE INDEX IF NOT EXISTS ix_subscription_guest_id ON marketing.subscription (guest_id);
--- convention, not declared: marketing.touch_point.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_touch_point_order_id ON marketing.touch_point (order_id);
 -- convention, not declared: orders.cart_line.inventory_hold_id -> catalogue.inventory_hold
 CREATE INDEX IF NOT EXISTS ix_cart_line_inventory_hold_id ON orders.cart_line (inventory_hold_id);
 -- convention, not declared: orders.cash_count_line.denomination_id -> platform.denomination
@@ -373,14 +357,10 @@ CREATE INDEX IF NOT EXISTS ix_cash_count_line_denomination_id ON orders.cash_cou
 CREATE INDEX IF NOT EXISTS ix_cash_count_line_deposit_box_id ON orders.cash_count_line (deposit_box_id);
 -- convention, not declared: orders.credit_override.authorised_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_credit_override_authorised_by_principal_id ON orders.credit_override (authorised_by_principal_id);
--- convention, not declared: orders.credit_override.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_credit_override_order_id ON orders.credit_override (order_id);
 -- convention, not declared: orders.deposit_box.closed_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_deposit_box_closed_by_principal_id ON orders.deposit_box (closed_by_principal_id);
 -- convention, not declared: orders.group_booking.leader_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_group_booking_leader_subject_id ON orders.group_booking (leader_subject_id);
--- convention, not declared: orders.group_booking.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_group_booking_order_id ON orders.group_booking (order_id);
 -- convention, not declared: orders.invitation.issued_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_invitation_issued_by_principal_id ON orders.invitation (issued_by_principal_id);
 -- convention, not declared: orders.invitation.offered_by_principal_id -> identity.principal
@@ -389,13 +369,9 @@ CREATE INDEX IF NOT EXISTS ix_invitation_offered_by_principal_id ON orders.invit
 CREATE INDEX IF NOT EXISTS ix_order_line_inventory_hold_id ON orders.order_line (inventory_hold_id);
 -- convention, not declared: orders.payment_link.issued_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_payment_link_issued_by_principal_id ON orders.payment_link (issued_by_principal_id);
--- convention, not declared: orders.payment_link.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_payment_link_order_id ON orders.payment_link (order_id);
 -- convention, not declared: orders.payment_link.reservation_id -> retail.reservation
 CREATE INDEX IF NOT EXISTS ix_payment_link_reservation_id ON orders.payment_link (reservation_id);
--- convention, not declared: orders.payment_routing.fallback_provider_id -> ai.provider
-CREATE INDEX IF NOT EXISTS ix_payment_routing_fallback_provider_id ON orders.payment_routing (fallback_provider_id);
--- convention, not declared: orders.refund.tax_reversal_entry_id -> queue.waiting_guest
+-- convention, not declared: orders.refund.tax_reversal_entry_id -> queue.entry
 CREATE INDEX IF NOT EXISTS ix_refund_tax_reversal_entry_id ON orders.refund (tax_reversal_entry_id);
 -- convention, not declared: orders.resale_listing.entitlement_id -> catalogue.entitlement_template
 CREATE INDEX IF NOT EXISTS ix_resale_listing_entitlement_id ON orders.resale_listing (entitlement_id);
@@ -405,11 +381,11 @@ CREATE INDEX IF NOT EXISTS ix_resale_listing_seller_subject_id ON orders.resale_
 CREATE INDEX IF NOT EXISTS ix_resale_listing_sold_to_subject_id ON orders.resale_listing (sold_to_subject_id);
 -- convention, not declared: orders.wallet_pass.entitlement_id -> catalogue.entitlement_template
 CREATE INDEX IF NOT EXISTS ix_wallet_pass_entitlement_id ON orders.wallet_pass (entitlement_id);
--- convention, not declared: payments.authentication_policy.mandate_text_asset_id -> maintenance.asset
+-- convention, not declared: payments.authentication_policy.mandate_text_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_authentication_policy_mandate_text_asset_id ON payments.authentication_policy (mandate_text_asset_id);
 -- convention, not declared: payments.chargeback_evidence.chargeback_id -> orders.chargeback
 CREATE INDEX IF NOT EXISTS ix_chargeback_evidence_chargeback_id ON payments.chargeback_evidence (chargeback_id);
--- convention, not declared: payments.hosted_checkout.branding_asset_id -> maintenance.asset
+-- convention, not declared: payments.hosted_checkout.branding_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_hosted_checkout_branding_asset_id ON payments.hosted_checkout (branding_asset_id);
 -- convention, not declared: payments.merchant_account.legal_entity_id -> ledger.legal_entity
 CREATE INDEX IF NOT EXISTS ix_merchant_account_legal_entity_id ON payments.merchant_account (legal_entity_id);
@@ -419,6 +395,8 @@ CREATE INDEX IF NOT EXISTS ix_payment_terms_account_id ON payments.payment_terms
 CREATE INDEX IF NOT EXISTS ix_provider_connection_merchant_account_id ON payments.provider_connection (merchant_account_id);
 -- convention, not declared: payments.reconciliation_source.connection_id -> payments.provider_connection
 CREATE INDEX IF NOT EXISTS ix_reconciliation_source_connection_id ON payments.reconciliation_source (connection_id);
+-- convention, not declared: payments.routing_rule.fallback_provider_id -> ai.provider
+CREATE INDEX IF NOT EXISTS ix_routing_rule_fallback_provider_id ON payments.routing_rule (fallback_provider_id);
 -- convention, not declared: payments.stored_forward.device_id -> platform.device
 CREATE INDEX IF NOT EXISTS ix_stored_forward_device_id ON payments.stored_forward (device_id);
 -- convention, not declared: payments.terminal.acquirer_connection_id -> payments.provider_connection
@@ -441,31 +419,27 @@ CREATE INDEX IF NOT EXISTS ix_cross_region_entitlement_right_id ON platform.cros
 CREATE INDEX IF NOT EXISTS ix_dead_letter_outbox_id ON platform.dead_letter (outbox_id);
 -- convention, not declared: platform.profile_deployment.profile_id -> platform.profile_deployment
 CREATE INDEX IF NOT EXISTS ix_profile_deployment_profile_id ON platform.profile_deployment (profile_id);
--- convention, not declared: platform.venue_settings.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_venue_settings_venue_id ON platform.venue_settings (venue_id);
 -- convention, not declared: platform.wallet_authorisation.authorisation_id -> platform.wallet_authorisation
 CREATE INDEX IF NOT EXISTS ix_wallet_authorisation_authorisation_id ON platform.wallet_authorisation (authorisation_id);
 -- convention, not declared: platform.wallet_authorisation.fx_rate_id -> ledger.fx_rate
 CREATE INDEX IF NOT EXISTS ix_wallet_authorisation_fx_rate_id ON platform.wallet_authorisation (fx_rate_id);
 -- convention, not declared: platform.workstation.configuration_profile_id -> platform.configuration_profile
 CREATE INDEX IF NOT EXISTS ix_workstation_configuration_profile_id ON platform.workstation (configuration_profile_id);
--- convention, not declared: platform.workstation.edge_node_id -> platform.org_unit
+-- convention, not declared: platform.workstation.edge_node_id -> platform.scope
 CREATE INDEX IF NOT EXISTS ix_workstation_edge_node_id ON platform.workstation (edge_node_id);
 -- convention, not declared: promotions.product_relationship.from_product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_product_relationship_from_product_id ON promotions.product_relationship (from_product_id);
 -- convention, not declared: promotions.product_relationship.to_product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_product_relationship_to_product_id ON promotions.product_relationship (to_product_id);
--- convention, not declared: promotions.recommendation_outcome.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_recommendation_outcome_order_id ON promotions.recommendation_outcome (order_id);
 -- convention, not declared: queue.queue.parent_queue_id -> queue.queue
 CREATE INDEX IF NOT EXISTS ix_queue_parent_queue_id ON queue.queue (parent_queue_id);
--- convention, not declared: rental.agreement_rules.terms_document_asset_id -> maintenance.asset
+-- convention, not declared: rental.agreement_rules.terms_document_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_agreement_rules_terms_document_asset_id ON rental.agreement_rules (terms_document_asset_id);
--- convention, not declared: rental.agreement_signature.document_asset_id -> maintenance.asset
+-- convention, not declared: rental.agreement_signature.document_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_agreement_signature_document_asset_id ON rental.agreement_signature (document_asset_id);
 -- convention, not declared: rental.agreement_signature.participant_id -> rental.participant
 CREATE INDEX IF NOT EXISTS ix_agreement_signature_participant_id ON rental.agreement_signature (participant_id);
--- convention, not declared: rental.agreement_signature.signature_asset_id -> maintenance.asset
+-- convention, not declared: rental.agreement_signature.signature_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_agreement_signature_signature_asset_id ON rental.agreement_signature (signature_asset_id);
 -- convention, not declared: rental.blackout.location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS ix_blackout_location_id ON rental.blackout (location_id);
@@ -475,25 +449,17 @@ CREATE INDEX IF NOT EXISTS ix_blackout_product_id ON rental.blackout (product_id
 CREATE INDEX IF NOT EXISTS ix_booking_deposit_authorisation_id ON rental.booking (deposit_authorisation_id);
 -- convention, not declared: rental.booking.location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS ix_booking_location_id ON rental.booking (location_id);
--- convention, not declared: rental.booking.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_booking_order_id ON rental.booking (order_id);
 -- convention, not declared: rental.booking.product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_booking_product_id ON rental.booking (product_id);
 -- convention, not declared: rental.booking.return_location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS ix_booking_return_location_id ON rental.booking (return_location_id);
--- convention, not declared: rental.category.default_deposit_policy_id -> rental.deposit_policy
-CREATE INDEX IF NOT EXISTS ix_category_default_deposit_policy_id ON rental.category (default_deposit_policy_id);
--- convention, not declared: rental.category.icon_asset_id -> maintenance.asset
-CREATE INDEX IF NOT EXISTS ix_category_icon_asset_id ON rental.category (icon_asset_id);
--- convention, not declared: rental.category.parent_category_id -> rental.category
-CREATE INDEX IF NOT EXISTS ix_category_parent_category_id ON rental.category (parent_category_id);
 -- convention, not declared: rental.damage_assessment.asset_id -> maintenance.asset
 CREATE INDEX IF NOT EXISTS ix_damage_assessment_asset_id ON rental.damage_assessment (asset_id);
 -- convention, not declared: rental.damage_assessment.inspection_id -> maintenance.inspection
 CREATE INDEX IF NOT EXISTS ix_damage_assessment_inspection_id ON rental.damage_assessment (inspection_id);
 -- convention, not declared: rental.damage_assessment.work_order_id -> maintenance.work_order
 CREATE INDEX IF NOT EXISTS ix_damage_assessment_work_order_id ON rental.damage_assessment (work_order_id);
--- convention, not declared: rental.deposit_policy.category_id -> rental.category
+-- convention, not declared: rental.deposit_policy.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_deposit_policy_category_id ON rental.deposit_policy (category_id);
 -- convention, not declared: rental.deposit_policy.product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_deposit_policy_product_id ON rental.deposit_policy (product_id);
@@ -519,61 +485,47 @@ CREATE INDEX IF NOT EXISTS ix_override_booking_id ON rental.override (booking_id
 CREATE INDEX IF NOT EXISTS ix_pricing_profile_customer_segment_id ON rental.pricing_profile (customer_segment_id);
 -- convention, not declared: rental.pricing_profile.product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_pricing_profile_product_id ON rental.pricing_profile (product_id);
--- convention, not declared: rental.pricing_profile.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_pricing_profile_venue_id ON rental.pricing_profile (venue_id);
 -- convention, not declared: rental.product.catalogue_product_id -> rental.product
 CREATE INDEX IF NOT EXISTS ix_product_catalogue_product_id ON rental.product (catalogue_product_id);
--- convention, not declared: rental.product.category_id -> rental.category
+-- convention, not declared: rental.product.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_product_category_id ON rental.product (category_id);
--- convention, not declared: rental.product.image_asset_id -> maintenance.asset
+-- convention, not declared: rental.product.image_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_product_image_asset_id ON rental.product (image_asset_id);
 -- convention, not declared: rental.product.resource_type_id -> resources.resource_type
 CREATE INDEX IF NOT EXISTS ix_product_resource_type_id ON rental.product (resource_type_id);
 -- convention, not declared: rental.product.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_product_tenant_id ON rental.product (tenant_id);
--- convention, not declared: rental.product.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_product_venue_id ON rental.product (venue_id);
 -- convention, not declared: rental.settlement.booking_id -> rental.booking
 CREATE INDEX IF NOT EXISTS ix_settlement_booking_id ON rental.settlement (booking_id);
 -- convention, not declared: reporting.alert.acknowledged_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_alert_acknowledged_by_principal_id ON reporting.alert (acknowledged_by_principal_id);
--- convention, not declared: reporting.delivery.report_id -> reporting.report_definition
-CREATE INDEX IF NOT EXISTS ix_delivery_report_id ON reporting.delivery (report_id);
 -- convention, not declared: reporting.delivery.subscription_id -> marketing.subscription
 CREATE INDEX IF NOT EXISTS ix_delivery_subscription_id ON reporting.delivery (subscription_id);
--- convention, not declared: reporting.subscription.report_id -> reporting.report_definition
-CREATE INDEX IF NOT EXISTS ix_subscription_report_id ON reporting.subscription (report_id);
 -- convention, not declared: reporting.subscription.runs_as_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_subscription_runs_as_principal_id ON reporting.subscription (runs_as_principal_id);
 -- convention, not declared: reporting.subscription.schedule_id -> reporting.schedule
 CREATE INDEX IF NOT EXISTS ix_subscription_schedule_id ON reporting.subscription (schedule_id);
 -- convention, not declared: resources.booking.deposit_authorisation_id -> platform.wallet_authorisation
 CREATE INDEX IF NOT EXISTS ix_booking_deposit_authorisation_id ON resources.booking (deposit_authorisation_id);
--- convention, not declared: resources.booking.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_booking_order_id ON resources.booking (order_id);
 -- convention, not declared: resources.booking.recurrence_group_id -> orders.group_booking
 CREATE INDEX IF NOT EXISTS ix_booking_recurrence_group_id ON resources.booking (recurrence_group_id);
--- convention, not declared: resources.qualification.document_asset_id -> maintenance.asset
+-- convention, not declared: resources.qualification.document_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_qualification_document_asset_id ON resources.qualification (document_asset_id);
 -- convention, not declared: resources.resource.parent_resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_parent_resource_id ON resources.resource (parent_resource_id);
--- convention, not declared: resources.resource.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_resource_venue_id ON resources.resource (venue_id);
 -- convention, not declared: resources.resource_audit.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_audit_resource_id ON resources.resource_audit (resource_id);
 -- convention, not declared: resources.resource_block.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_block_resource_id ON resources.resource_block (resource_id);
--- convention, not declared: resources.resource_category.parent_category_id -> rental.category
+-- convention, not declared: resources.resource_category.parent_category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_resource_category_parent_category_id ON resources.resource_category (parent_category_id);
 -- convention, not declared: resources.resource_dependency.target_resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_dependency_target_resource_id ON resources.resource_dependency (target_resource_id);
 -- convention, not declared: resources.resource_dependency.target_resource_type_id -> resources.resource_type
 CREATE INDEX IF NOT EXISTS ix_resource_dependency_target_resource_type_id ON resources.resource_dependency (target_resource_type_id);
--- convention, not declared: resources.resource_dependency.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_resource_dependency_venue_id ON resources.resource_dependency (venue_id);
 -- convention, not declared: resources.resource_relation.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_relation_resource_id ON resources.resource_relation (resource_id);
--- convention, not declared: resources.resource_requirement.category_id -> rental.category
+-- convention, not declared: resources.resource_requirement.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_resource_requirement_category_id ON resources.resource_requirement (category_id);
 -- convention, not declared: resources.resource_requirement.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_requirement_resource_id ON resources.resource_requirement (resource_id);
@@ -581,29 +533,23 @@ CREATE INDEX IF NOT EXISTS ix_resource_requirement_resource_id ON resources.reso
 CREATE INDEX IF NOT EXISTS ix_resource_requirement_resource_type_id ON resources.resource_requirement (resource_type_id);
 -- convention, not declared: resources.resource_schedule.resource_id -> resources.resource
 CREATE INDEX IF NOT EXISTS ix_resource_schedule_resource_id ON resources.resource_schedule (resource_id);
--- convention, not declared: retail.merchandise.category_id -> rental.category
+-- convention, not declared: retail.merchandise.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_merchandise_category_id ON retail.merchandise (category_id);
 -- convention, not declared: retail.store_rule.outlet_id -> platform.outlet
 CREATE INDEX IF NOT EXISTS ix_store_rule_outlet_id ON retail.store_rule (outlet_id);
--- convention, not declared: retail.store_rule.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_store_rule_venue_id ON retail.store_rule (venue_id);
 -- convention, not declared: seating.accessible.seat_map_id -> seating.seat_map
 CREATE INDEX IF NOT EXISTS ix_accessible_seat_map_id ON seating.accessible (seat_map_id);
--- convention, not declared: seating.group_request.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_group_request_order_id ON seating.group_request (order_id);
 -- convention, not declared: seating.group_request.performance_id -> catalogue.performance
 CREATE INDEX IF NOT EXISTS ix_group_request_performance_id ON seating.group_request (performance_id);
 -- convention, not declared: seating.hold_pool.hold_type_id -> seating.hold_type
 CREATE INDEX IF NOT EXISTS ix_hold_pool_hold_type_id ON seating.hold_pool (hold_type_id);
 -- convention, not declared: seating.hold_pool.performance_id -> catalogue.performance
 CREATE INDEX IF NOT EXISTS ix_hold_pool_performance_id ON seating.hold_pool (performance_id);
--- convention, not declared: seating.reassignment.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_reassignment_order_id ON seating.reassignment (order_id);
 -- convention, not declared: seating.recommendation_rules.performance_id -> catalogue.performance
 CREATE INDEX IF NOT EXISTS ix_recommendation_rules_performance_id ON seating.recommendation_rules (performance_id);
 -- convention, not declared: seating.recommendation_rules.seat_map_id -> seating.seat_map
 CREATE INDEX IF NOT EXISTS ix_recommendation_rules_seat_map_id ON seating.recommendation_rules (seat_map_id);
--- convention, not declared: seating.seat.category_id -> rental.category
+-- convention, not declared: seating.seat.category_id -> maintenance.asset_category
 CREATE INDEX IF NOT EXISTS ix_seat_category_id ON seating.seat (category_id);
 -- convention, not declared: seating.seat_rules.seat_map_id -> seating.seat_map
 CREATE INDEX IF NOT EXISTS ix_seat_rules_seat_map_id ON seating.seat_rules (seat_map_id);
@@ -621,7 +567,7 @@ CREATE INDEX IF NOT EXISTS ix_device_assignment_assigned_workstation_id ON tenan
 CREATE INDEX IF NOT EXISTS ix_device_assignment_custodian_principal_id ON tenancy.device_assignment (custodian_principal_id);
 -- convention, not declared: tenancy.device_assignment.device_id -> platform.device
 CREATE INDEX IF NOT EXISTS ix_device_assignment_device_id ON tenancy.device_assignment (device_id);
--- convention, not declared: tenancy.device_assignment.owner_org_unit_id -> platform.org_unit
+-- convention, not declared: tenancy.device_assignment.owner_org_unit_id -> platform.scope
 CREATE INDEX IF NOT EXISTS ix_device_assignment_owner_org_unit_id ON tenancy.device_assignment (owner_org_unit_id);
 -- convention, not declared: tenancy.device_audit.actor_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_device_audit_actor_principal_id ON tenancy.device_audit (actor_principal_id);
@@ -629,7 +575,7 @@ CREATE INDEX IF NOT EXISTS ix_device_audit_actor_principal_id ON tenancy.device_
 CREATE INDEX IF NOT EXISTS ix_device_audit_device_id ON tenancy.device_audit (device_id);
 -- convention, not declared: tenancy.device_credential.device_id -> platform.device
 CREATE INDEX IF NOT EXISTS ix_device_credential_device_id ON tenancy.device_credential (device_id);
--- convention, not declared: tenancy.device_firmware.artefact_asset_id -> maintenance.asset
+-- convention, not declared: tenancy.device_firmware.artefact_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_device_firmware_artefact_asset_id ON tenancy.device_firmware (artefact_asset_id);
 -- convention, not declared: tenancy.device_rollout.firmware_id -> tenancy.device_firmware
 CREATE INDEX IF NOT EXISTS ix_device_rollout_firmware_id ON tenancy.device_rollout (firmware_id);
@@ -639,8 +585,6 @@ CREATE INDEX IF NOT EXISTS ix_device_tamper_event_device_id ON tenancy.device_ta
 CREATE INDEX IF NOT EXISTS ix_device_telemetry_device_id ON tenancy.device_telemetry (device_id);
 -- convention, not declared: venuemap.map.base_asset_id -> maintenance.asset
 CREATE INDEX IF NOT EXISTS ix_map_base_asset_id ON venuemap.map (base_asset_id);
--- convention, not declared: venuemap.map.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_map_venue_id ON venuemap.map (venue_id);
 -- convention, not declared: venuemap.path.from_point_id -> venuemap.point
 CREATE INDEX IF NOT EXISTS ix_path_from_point_id ON venuemap.path (from_point_id);
 -- convention, not declared: venuemap.path.restricted_by_point_id -> venuemap.point
@@ -683,8 +627,6 @@ CREATE INDEX IF NOT EXISTS ix_custom_domain_tenant_id ON whitelabel.custom_domai
 CREATE INDEX IF NOT EXISTS ix_announcement_published_by_principal_id ON workforce.announcement (published_by_principal_id);
 -- convention, not declared: workforce.attendance.amended_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_attendance_amended_by_principal_id ON workforce.attendance (amended_by_principal_id);
--- convention, not declared: workforce.attendance.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_attendance_venue_id ON workforce.attendance (venue_id);
 -- convention, not declared: workforce.leave_request.approval_request_id -> approvals.request
 CREATE INDEX IF NOT EXISTS ix_leave_request_approval_request_id ON workforce.leave_request (approval_request_id);
 -- convention, not declared: workforce.leave_request.principal_id -> identity.principal
@@ -693,10 +635,6 @@ CREATE INDEX IF NOT EXISTS ix_leave_request_principal_id ON workforce.leave_requ
 CREATE INDEX IF NOT EXISTS ix_open_shift_rota_assignment_id ON workforce.open_shift (rota_assignment_id);
 -- convention, not declared: workforce.open_shift.shift_template_id -> workforce.shift_template
 CREATE INDEX IF NOT EXISTS ix_open_shift_shift_template_id ON workforce.open_shift (shift_template_id);
--- convention, not declared: workforce.open_shift.venue_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_open_shift_venue_id ON workforce.open_shift (venue_id);
--- convention, not declared: workforce.rota_assignment.department_id -> platform.org_unit
-CREATE INDEX IF NOT EXISTS ix_rota_assignment_department_id ON workforce.rota_assignment (department_id);
 -- convention, not declared: workforce.rota_assignment.required_role_id -> identity.role
 CREATE INDEX IF NOT EXISTS ix_rota_assignment_required_role_id ON workforce.rota_assignment (required_role_id);
 -- convention, not declared: workforce.shift_swap.from_principal_id -> identity.principal
@@ -707,8 +645,6 @@ CREATE INDEX IF NOT EXISTS ix_shift_swap_to_principal_id ON workforce.shift_swap
 CREATE INDEX IF NOT EXISTS ix_training_record_principal_id ON workforce.training_record (principal_id);
 -- crosses the database boundary: ai.provider.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_provider_tenant_id ON ai.provider (tenant_id);
--- crosses the database boundary: maintenance.work_order.source_plan_id -> control.subscription_plan
-CREATE INDEX IF NOT EXISTS ix_work_order_source_plan_id ON maintenance.work_order (source_plan_id);
 -- crosses the database boundary: whitelabel.tenant_config.footer -> control.footer_config
 CREATE INDEX IF NOT EXISTS ix_tenant_config_footer ON whitelabel.tenant_config (footer);
 CREATE INDEX IF NOT EXISTS ix_access_decision_scope ON identity.access_decision (scope_path text_pattern_ops);
@@ -719,6 +655,7 @@ CREATE INDEX IF NOT EXISTS ix_access_policy_version_scope ON identity.access_pol
 CREATE INDEX IF NOT EXISTS ix_access_profile_scope ON accreditation.access_profile (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_accessible_scope ON seating.accessible (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_accounting_mapping_scope ON wallet.accounting_mapping (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_activity_scope ON ai.activity (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_adjustment_scope ON wallet.adjustment (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_admission_rules_scope ON access.admission_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_agreement_rules_scope ON rental.agreement_rules (scope_path text_pattern_ops);
@@ -730,6 +667,7 @@ CREATE INDEX IF NOT EXISTS ix_anomaly_scope ON reporting.anomaly (scope_path tex
 CREATE INDEX IF NOT EXISTS ix_application_scope ON accreditation.application (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_approval_scope ON assets.approval (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_approver_availability_scope ON approvals.approver_availability (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_asset_category_scope ON maintenance.asset_category (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_asset_version_scope ON assets.asset_version (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_attraction_type_scope ON games.attraction_type (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_attribute_definition_scope ON resources.attribute_definition (scope_path text_pattern_ops);
@@ -746,7 +684,6 @@ CREATE INDEX IF NOT EXISTS ix_blacklist_scope ON access.blacklist (scope_path te
 CREATE INDEX IF NOT EXISTS ix_blackout_scope ON rental.blackout (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_booking_scope ON rental.booking (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_card_expiry_rules_scope ON games.card_expiry_rules (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_category_scope ON rental.category (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_challenge_scope ON marketing.challenge (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_channel_rules_scope ON wallet.channel_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_chargeback_evidence_scope ON payments.chargeback_evidence (scope_path text_pattern_ops);
@@ -766,6 +703,7 @@ CREATE INDEX IF NOT EXISTS ix_credit_account_scope ON payments.credit_account (s
 CREATE INDEX IF NOT EXISTS ix_credit_eligibility_scope ON wallet.credit_eligibility (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_credit_lot_scope ON wallet.credit_lot (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_credit_type_scope ON wallet.credit_type (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_currency_rule_scope ON payments.currency_rule (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_damage_assessment_scope ON rental.damage_assessment (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_dead_letter_scope ON platform.dead_letter (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_decision_record_scope ON approvals.decision_record (scope_path text_pattern_ops);
@@ -784,6 +722,8 @@ CREATE INDEX IF NOT EXISTS ix_distribution_channel_scope ON assets.distribution_
 CREATE INDEX IF NOT EXISTS ix_document_scope ON accreditation.document (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_duplicate_candidate_scope ON marketing.duplicate_candidate (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_duration_rules_scope ON rental.duration_rules (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_dynamic_price_rule_scope ON pricing.dynamic_price_rule (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_eligibility_rule_scope ON payments.eligibility_rule (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_entitlement_scope ON access.entitlement (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_entitlement_scope ON games.entitlement (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_entitlement_template_scope ON catalogue.entitlement_template (scope_path text_pattern_ops);
@@ -816,11 +756,10 @@ CREATE INDEX IF NOT EXISTS ix_identity_rules_scope ON marketing.identity_rules (
 CREATE INDEX IF NOT EXISTS ix_import_job_scope ON catalogue.import_job (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_incident_scope ON rental.incident (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_inspection_scope ON rental.inspection (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_interaction_scope ON ai.interaction (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_inventory_model_scope ON rental.inventory_model (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_invitation_campaign_scope ON marketing.invitation_campaign (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_invitation_scope ON marketing.invitation (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_journey_entrant_scope ON marketing.journey_entrant (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_journey_enrollment_scope ON marketing.journey_enrollment (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_journey_scope ON marketing.journey (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_kiosk_config_scope ON games.kiosk_config (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_knowledge_collection_scope ON ai.knowledge_collection (scope_path text_pattern_ops);
@@ -835,6 +774,7 @@ CREATE INDEX IF NOT EXISTS ix_matching_rules_scope ON payments.matching_rules (s
 CREATE INDEX IF NOT EXISTS ix_matrix_scope ON approvals.matrix (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_merchant_account_scope ON payments.merchant_account (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_message_trigger_scope ON marketing.message_trigger (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_method_config_scope ON payments.method_config (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_method_scope ON payments.method (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_mixed_tender_rules_scope ON payments.mixed_tender_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_modifier_group_scope ON fnb.modifier_group (scope_path text_pattern_ops);
@@ -847,25 +787,33 @@ CREATE INDEX IF NOT EXISTS ix_outbox_scope ON platform.outbox (scope_path text_p
 CREATE INDEX IF NOT EXISTS ix_override_scope ON rental.override (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_password_policy_scope ON identity.password_policy (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_payment_link_scope ON orders.payment_link (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_payment_provider_scope ON orders.payment_provider (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_payment_routing_scope ON orders.payment_routing (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_payment_terms_scope ON payments.payment_terms (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_pipeline_scope ON reporting.pipeline (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_policy_scope ON whitelabel.policy (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_pos_shift_scope ON orders.pos_shift (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_prepaid_minutes_scope ON catalogue.prepaid_minutes (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_price_list_scope ON fnb.price_list (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_price_list_scope ON retail.price_list (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_pricing_profile_scope ON rental.pricing_profile (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_pricing_scope ON games.pricing (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_print_job_scope ON accreditation.print_job (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_privacy_incident_scope ON marketing.privacy_incident (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_prize_cost_scope ON games.prize_cost (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_product_category_scope ON catalogue.product_category (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_category_scope ON fnb.product_category (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_category_scope ON retail.product_category (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_recommendation_scope ON fnb.product_recommendation (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_recommendation_scope ON retail.product_recommendation (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_product_relationship_scope ON promotions.product_relationship (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_product_scope ON catalogue.product (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_scope ON fnb.product (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_product_scope ON rental.product (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_product_scope ON retail.product (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_programme_scope ON accreditation.programme (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_promo_block_scope ON whitelabel.promo_block (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_provider_connection_scope ON payments.provider_connection (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_provider_scope ON ai.provider (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_provider_scope ON payments.provider (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_purchase_order_scope ON inventory.purchase_order (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_qualification_scope ON resources.qualification (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_quotation_scope ON inventory.quotation (scope_path text_pattern_ops);
@@ -914,10 +862,10 @@ CREATE INDEX IF NOT EXISTS ix_settlement_scope ON ledger.settlement (scope_path 
 CREATE INDEX IF NOT EXISTS ix_settlement_scope ON rental.settlement (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_share_scope ON assets.share (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_shared_wallet_scope ON wallet.shared_wallet (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_shift_scope ON orders.shift (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_shift_template_scope ON workforce.shift_template (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_signature_scope ON approvals.signature (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_sla_policy_scope ON approvals.sla_policy (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_sla_policy_scope ON marketing.sla_policy (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_space_scope ON catalogue.space (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_sso_group_mapping_scope ON identity.sso_group_mapping (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_sso_provider_scope ON identity.sso_provider (scope_path text_pattern_ops);
@@ -933,10 +881,12 @@ CREATE INDEX IF NOT EXISTS ix_taxonomy_scope ON assets.taxonomy (scope_path text
 CREATE INDEX IF NOT EXISTS ix_terminal_scope ON payments.terminal (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_transfer_rules_scope ON wallet.transfer_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_transfer_scope ON inventory.transfer (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_user_access_scope ON identity.user_access (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_validation_rules_scope ON games.validation_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_validity_scope ON accreditation.validity (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_venue_assignment_scope ON resources.venue_assignment (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_voucher_type_scope ON wallet.voucher_type (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_wallet_pass_scope ON orders.wallet_pass (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_wallet_type_scope ON wallet.wallet_type (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_work_assignment_scope ON workforce.work_assignment (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_workstation_scope ON platform.workstation (scope_path text_pattern_ops);

@@ -1002,6 +1002,305 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    WorkforceEmployee:
+      type: object
+      x-ticvai-persistence: workforce.employee
+      description: '**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.'
+      required:
+      - tenantId
+      - code
+      - firstName
+      - lastName
+      - dateOfJoining
+      - employmentType
+      - employmentStatus
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          maxLength: 50
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          maxLength: 254
+          nullable: true
+        mobile:
+          type: string
+          maxLength: 30
+          nullable: true
+        dateOfJoining:
+          type: string
+          format: date
+        employmentType:
+          type: string
+          maxLength: 30
+        employmentStatus:
+          type: string
+          maxLength: 30
+        managerEmployeeId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceEmployment:
+      type: object
+      x-ticvai-persistence: workforce.employment
+      description: '**Taken from the backend workbook, 20 September.** Stores employment terms and contract validity.'
+      required:
+      - employeeId
+      - contractType
+      - startDate
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+        contractType:
+          type: string
+          maxLength: 30
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        standardHoursPerWeek:
+          type: number
+          nullable: true
+        probationEndDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        createdAt:
+          type: string
+          format: date-time
+    WorkforceJobTitle:
+      type: object
+      x-ticvai-persistence: workforce.job_title
+      description: '**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.'
+      required:
+      - tenantId
+      - code
+      - name
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceLeaveBalance:
+      type: object
+      x-ticvai-persistence: workforce.leave_balance
+      description: '**Taken from the backend workbook, 20 September.** Stores leave entitlement, used amount and remaining balance per employee/period.'
+      required:
+      - employeeId
+      - typeId
+      - periodYear
+      - entitledDays
+      - usedDays
+      - pendingDays
+      - availableDays
+      - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+        typeId:
+          type: string
+          format: uuid
+        periodYear:
+          type: integer
+        entitledDays:
+          type: number
+        usedDays:
+          type: number
+        pendingDays:
+          type: number
+        availableDays:
+          type: number
+        updatedAt:
+          type: string
+          format: date-time
+    WorkforceLeaveType:
+      type: object
+      x-ticvai-persistence: workforce.leave_type
+      description: '**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.'
+      required:
+      - tenantId
+      - code
+      - name
+      - isPaid
+      - requiresApproval
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 100
+        isPaid:
+          type: boolean
+        requiresApproval:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    WorkforceShift:
+      type: object
+      x-ticvai-persistence: workforce.shift
+      description: '**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.'
+      required:
+      - tenantId
+      - code
+      - name
+      - startTime
+      - endTime
+      - breakMinutes
+      - crossesMidnight
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 100
+        startTime:
+          type: string
+          maxLength: 0
+        endTime:
+          type: string
+          maxLength: 0
+        breakMinutes:
+          type: integer
+        crossesMidnight:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    WorkforceWorkAssignment:
+      type: object
+      x-ticvai-persistence: workforce.work_assignment
+      description: '**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.'
+      required:
+      - employeeId
+      - jobTitleId
+      - effectiveFrom
+      - isPrimary
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+        jobTitleId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        departmentId:
+          type: string
+          format: uuid
+          nullable: true
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+        effectiveFrom:
+          type: string
+          format: date
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        isPrimary:
+          type: boolean
+        status:
+          type: string
+          maxLength: 30
+        createdAt:
+          type: string
+          format: date-time
     ShiftTemplate:
       type: object
       x-ticvai-persistence: workforce.shift_template

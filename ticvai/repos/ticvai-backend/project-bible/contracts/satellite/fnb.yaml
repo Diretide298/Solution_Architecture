@@ -5217,6 +5217,478 @@ paths:
                 $ref: '#/components/schemas/CorrectiveAction'
 components:
   schemas:
+    FnbIngredientSubstitute:
+      type: object
+      x-ticvai-persistence: fnb.ingredient_substitute
+      description: '**Taken from the backend workbook, 20 September.** Defines approved ingredient substitutions for F&B preparation.'
+      required:
+      - fromInventoryItemId
+      - toInventoryItemId
+      - substitutionRatio
+      - requiresApproval
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromInventoryItemId:
+          type: string
+          format: uuid
+        toInventoryItemId:
+          type: string
+          format: uuid
+        substitutionRatio:
+          type: number
+        conditionsJson:
+          type: string
+          nullable: true
+        allergensAddedJson:
+          type: string
+          nullable: true
+        allergensRemovedJson:
+          type: string
+          nullable: true
+        requiresApproval:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    FnbMenuItemModifier:
+      type: object
+      x-ticvai-persistence: fnb.menu_item_modifier
+      description: '**Taken from the backend workbook, 20 September.** Maps modifier groups that are available for a menu item.'
+      required:
+      - itemId
+      - groupId
+      - sortOrder
+      - isActive
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        sortOrder:
+          type: integer
+        isActive:
+          type: boolean
+    FnbOrderTable:
+      type: object
+      x-ticvai-persistence: fnb.order
+      description: '**Taken from the backend workbook, 20 September.** Stores the operational food-service order used by kitchen and serving workflows.'
+      required:
+      - number
+      - outletId
+      - serviceMode
+      - status
+      - grossAmount
+      - taxAmount
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          maxLength: 50
+        salesOrderId:
+          type: string
+          format: uuid
+          nullable: true
+        outletId:
+          type: string
+          format: uuid
+        tableVisitId:
+          type: string
+          format: uuid
+          nullable: true
+        serviceMode:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          maxLength: 30
+        grossAmount:
+          type: number
+        taxAmount:
+          type: number
+        estimatedReadyAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbOrderItem:
+      type: object
+      x-ticvai-persistence: fnb.order_item
+      description: '**Taken from the backend workbook, 20 September.** Stores each food or beverage item ordered, including course and kitchen notes.'
+      required:
+      - fnbOrderId
+      - menuItemId
+      - quantity
+      - unitPrice
+      - lineTotal
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        fnbOrderId:
+          type: string
+          format: uuid
+        menuItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+        seatNumber:
+          type: string
+          maxLength: 30
+          nullable: true
+        course:
+          type: string
+          maxLength: 30
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+        selectedModifiersJson:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+        lineTotal:
+          type: number
+        status:
+          type: string
+          maxLength: 30
+        createdAt:
+          type: string
+          format: date-time
+    FnbPrice:
+      type: object
+      x-ticvai-persistence: fnb.price
+      description: '**Taken from the backend workbook, 20 September.** Stores the selling price of an F&B product or variant within an F&B price list.'
+      required:
+      - listId
+      - productId
+      - amount
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        listId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+        amount:
+          type: number
+        taxCode:
+          type: string
+          maxLength: 50
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbPriceList:
+      type: object
+      x-ticvai-persistence: fnb.price_list
+      description: '**Taken from the backend workbook, 20 September.** Defines F&B prices for a currency, scope, channel and validity period.'
+      required:
+      - code
+      - name
+      - currencyCode
+      - priority
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        currencyCode:
+          type: string
+          maxLength: 10
+          x-ticvai-persisted: false
+          description: '**Resolved from the region, not stored** (ADR-0018). The same rule
+            catalogue.price_list already follows: a price list in a UAE region is AED and
+            cannot be anything else, so the column would hold millions of copies of one
+            region-owned answer and would let a price list disagree with its own region.
+            **Kept on the wire, removed from the table.** Taken from the backend workbook,
+            which stored it.'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        channelsJson:
+          type: string
+          nullable: true
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbProduct:
+      type: object
+      x-ticvai-persistence: fnb.product
+      description: '**Taken from the backend workbook, 20 September.** Stores the independent master record for each sellable F&B item. This table does not depend on Ticketing Catalogue.'
+      required:
+      - categoryId
+      - code
+      - name
+      - type
+      - isStockTracked
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        taxCode:
+          type: string
+          maxLength: 50
+          nullable: true
+        isStockTracked:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbProductCategory:
+      type: object
+      x-ticvai-persistence: fnb.product_category
+      description: '**Taken from the backend workbook, 20 September.** Groups F&B products into categories such as Food, Beverage, Combo, Dessert or Add-on.'
+      required:
+      - code
+      - name
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbProductRecommendation:
+      type: object
+      x-ticvai-persistence: fnb.product_recommendation
+      description: '**Taken from the backend workbook, 20 September.** Defines product-level F&B upsell, cross-sell and sellable add-on recommendations. Example: Regular Coke to Large Coke (UPSELL), Burger to Fries (CROSS_SELL), or a sellable extra product (ADD_ON).'
+      required:
+      - sourceProductId
+      - type
+      - targetService
+      - targetProductId
+      - defaultQuantity
+      - priority
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        sourceProductId:
+          type: string
+          format: uuid
+        sourceVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        targetService:
+          type: string
+          maxLength: 30
+        targetProductId:
+          type: string
+          format: uuid
+        targetVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        displayMessage:
+          type: string
+          maxLength: 300
+          nullable: true
+        defaultQuantity:
+          type: number
+        maxQuantity:
+          type: number
+          nullable: true
+        priority:
+          type: integer
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    FnbReservationTable:
+      type: object
+      x-ticvai-persistence: fnb.reservation_table
+      description: '**Taken from the backend workbook, 20 September.** Maps one or more dining tables assigned to a reservation.'
+      required:
+      - reservationId
+      - tableId
+      - createdAt
+      properties:
+        reservationId:
+          type: string
+          format: uuid
+        tableId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    FnbVariant:
+      type: object
+      x-ticvai-persistence: fnb.variant
+      description: '**Taken from the backend workbook, 20 September.** Stores F&B product variants such as Small/Medium/Large size or flavour/SKU variations.'
+      required:
+      - productId
+      - sku
+      - name
+      - isDefault
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        barcode:
+          type: string
+          maxLength: 100
+          nullable: true
+        isDefault:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
     TableReservationStatus:
       type: string
       enum:

@@ -1,6 +1,33 @@
 -- ai — 16 tables
 -- **Derived. Do not hand-edit.**
 
+-- The audit record. Retention is unresolved (CF-64) — a prompt may carry personal data. Analytical
+-- store, not the transactional primary (ADR-0020) — append-only with an analytical read pattern,
+-- and it must not compete with a gate scan for a connection
+CREATE TABLE IF NOT EXISTS ai.activity (
+    id                                uuid PRIMARY KEY NOT NULL,
+    conversation_id                   uuid,
+    principal_id                      uuid NOT NULL,
+    audience                          text,
+    subject_id                        uuid,
+    billable_to_tenant_id             uuid,
+    scope_path                        text,
+    capability                        text NOT NULL,
+    prompt                            text,
+    response                          text,
+    outcome                           text NOT NULL,
+    refusal_reason                    text,
+    provider                          text,
+    model                             text,
+    prompt_tokens                     integer,
+    completion_tokens                 integer,
+    cost_minor                        integer,
+    latency_ms                        integer,
+    masked_field_count                integer,
+    trace_id                          text,
+    created_at                        timestamptz NOT NULL
+);
+
 -- Maps a Qdrant point id back to its document and scope. The join between the two stores Hangs
 -- off: reaches ai.index_source through its keys; references ai.knowledge_document. Reached by: 6
 -- operations read it and 0 write it.
@@ -85,33 +112,6 @@ CREATE TABLE IF NOT EXISTS ai.index_source (
     last_indexed_at                   timestamptz,
     stale_count                       integer,
     collection_id                     uuid NOT NULL
-);
-
--- The audit record. Retention is unresolved (CF-64) — a prompt may carry personal data. Analytical
--- store, not the transactional primary (ADR-0020) — append-only with an analytical read pattern,
--- and it must not compete with a gate scan for a connection
-CREATE TABLE IF NOT EXISTS ai.interaction (
-    id                                uuid PRIMARY KEY NOT NULL,
-    conversation_id                   uuid,
-    principal_id                      uuid NOT NULL,
-    audience                          text,
-    subject_id                        uuid,
-    billable_to_tenant_id             uuid,
-    scope_path                        text,
-    capability                        text NOT NULL,
-    prompt                            text,
-    response                          text,
-    outcome                           text NOT NULL,
-    refusal_reason                    text,
-    provider                          text,
-    model                             text,
-    prompt_tokens                     integer,
-    completion_tokens                 integer,
-    cost_minor                        integer,
-    latency_ms                        integer,
-    masked_field_count                integer,
-    trace_id                          text,
-    created_at                        timestamptz NOT NULL
 );
 
 -- A collection in the vector store. One per embedding model — a collection carries its own vector
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS ai.policy (
 );
 
 -- A draft the assistant produced and a person must approve. Nothing executes from here Hangs off:
--- reaches ai.index_source through its keys; references ai.interaction, identity.principal. Reached
+-- reaches ai.index_source through its keys; references ai.activity, identity.principal. Reached
 -- by: 5 operations read it and 6 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.proposed_action (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
 
 -- Configured providers, models and failover order. Credentials are a vault reference, never a key
 -- Hangs off: reaches ai.index_source through its keys; references ai.provider, control.tenant,
--- platform.org_unit. Reached by: 14 operations read it and 3 write it; 6 tables reference it.
+-- platform.scope. Reached by: 14 operations read it and 3 write it; 6 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.provider (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL,

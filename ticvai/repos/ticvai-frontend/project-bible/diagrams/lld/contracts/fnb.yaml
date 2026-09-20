@@ -199,7 +199,6 @@ operations:
   - orders.order_line
   writes:
   - cache:idempotency
-  - orders.order_discount
   - orders.order_line
 - operation: completeProductionRun
   verb: POST

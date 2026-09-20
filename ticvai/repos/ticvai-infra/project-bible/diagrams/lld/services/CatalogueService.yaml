@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 389 operations, 61 tables
+title: CatalogueService — 389 operations, 66 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 27
+  tables: 30
   stores:
   - postgres
   largestTable: catalogue.entitlement_template
@@ -26,7 +26,7 @@ schemas:
   - postgres
   largestTable: promotions.promotion
 - schema: seating
-  tables: 18
+  tables: 20
   stores:
   - postgres
   largestTable: seating.group_request
@@ -3267,12 +3267,30 @@ tables:
   - orders
   foreignWriters:
   - orders
+- table: catalogue.membership_benefit
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: catalogue.membership_programme
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: catalogue.performance
   columns: 10
   store: postgres
   parent: null
   writtenBy:
   - catalogue
+  foreignWriters: null
+- table: catalogue.plan_benefit
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: catalogue.prepaid_minutes
   columns: 13
@@ -3537,6 +3555,12 @@ tables:
   writtenBy:
   - seating
   foreignWriters: null
+- table: seating.seat_block_item
+  columns: 4
+  store: postgres
+  parent: seating.seat
+  writtenBy: []
+  foreignWriters: null
 - table: seating.seat_category
   columns: 7
   store: postgres
@@ -3550,6 +3574,12 @@ tables:
   parent: null
   writtenBy:
   - seating
+  foreignWriters: null
+- table: seating.seat_hold_item
+  columns: 5
+  store: postgres
+  parent: seating.seat
+  writtenBy: []
   foreignWriters: null
 - table: seating.seat_map
   columns: 12

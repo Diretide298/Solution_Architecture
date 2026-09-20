@@ -1,4 +1,4 @@
--- identity — 18 tables
+-- identity — 25 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -76,6 +76,33 @@ CREATE TABLE IF NOT EXISTS identity.authz_audit (
     subject_principal_id              uuid
 );
 
+CREATE TABLE IF NOT EXISTS identity.benefit_usage (
+    id                                uuid PRIMARY KEY,
+    customer_membership_id            uuid NOT NULL,
+    membership_benefit_id             uuid NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    source_type                       text,
+    source_order_id                   uuid,
+    used_at                           timestamptz NOT NULL,
+    remaining_quantity                numeric(18,4),
+    notes                             text
+);
+
+CREATE TABLE IF NOT EXISTS identity.customer_membership (
+    id                                uuid PRIMARY KEY,
+    customer_id                       uuid NOT NULL,
+    plan_id                           uuid NOT NULL,
+    number                            text NOT NULL,
+    source_order_id                   uuid,
+    start_at                          timestamptz NOT NULL,
+    expires_at                        timestamptz,
+    status                            text NOT NULL,
+    auto_renew                        boolean NOT NULL,
+    cancelled_at                      timestamptz,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- One person acting for another, or for a scope they do not own. A parent managing a child's
 -- membership, a manager covering another venue for a week. Renamed from grant, which is a verb, a
 -- subsidy and a permission depending on who reads it
@@ -99,6 +126,16 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     granted_by                        uuid NOT NULL,
     revoked_by                        uuid NOT NULL,
     scope_id                          uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS identity.membership_history (
+    id                                uuid PRIMARY KEY,
+    customer_membership_id            uuid NOT NULL,
+    from_status                       text,
+    to_status                         text NOT NULL,
+    reason                            text,
+    changed_by_user_account_id        uuid,
+    changed_at                        timestamptz NOT NULL
 );
 
 -- an issued MFA challenge and its outcome Hangs off: reaches identity.principal through its keys;
@@ -128,6 +165,20 @@ CREATE TABLE IF NOT EXISTS identity.mfa_recovery_code (
     principal_id                      uuid
 );
 
+CREATE TABLE IF NOT EXISTS identity.module (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    parent_module_id                  uuid,
+    type                              text NOT NULL,
+    sort_order                        integer NOT NULL,
+    is_system_module                  boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- a one-time code sent to a guest contact point Hangs off: reaches identity.principal through its
 -- keys; references pii.subject. Reached by: 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS identity.otp_challenge (
@@ -153,6 +204,19 @@ CREATE TABLE IF NOT EXISTS identity.password_policy (
     mfa_required_for_permissions      text[]
 );
 
+CREATE TABLE IF NOT EXISTS identity.permission (
+    id                                uuid PRIMARY KEY,
+    module_id                         uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    action                            text NOT NULL,
+    description                       text,
+    is_system                         boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A person who can be authorised — staff, partner, platform operator. The most referenced table in
 -- the package at 122 incoming columns, because almost everything records who did it. Not a guest:
 -- a guest is a pii.subject, and ADR-0023 keeps them apart so a data-subject request has one place
@@ -175,6 +239,19 @@ CREATE TABLE IF NOT EXISTS identity.principal (
 CREATE TABLE IF NOT EXISTS identity.principal_credential (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid
+);
+
+CREATE TABLE IF NOT EXISTS identity.refresh_token (
+    id                                uuid PRIMARY KEY,
+    user_id                           uuid NOT NULL,
+    hash                              text NOT NULL,
+    expires_at                        timestamptz NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    created_by_ip                     text,
+    revoked_at                        timestamptz,
+    revoked_by_ip                     text,
+    revocation_reason                 text,
+    replaced_by_token_id              uuid
 );
 
 -- A named set of permissions, inheritable. A principal holds roles at scopes; the resolution walks
@@ -240,5 +317,20 @@ CREATE TABLE IF NOT EXISTS identity.sso_provider (
     auto_provision_principals         boolean,
     is_enforced                       boolean,
     is_active                         boolean
+);
+
+CREATE TABLE IF NOT EXISTS identity.user_access (
+    id                                uuid PRIMARY KEY,
+    user_id                           uuid NOT NULL,
+    role_id                           uuid,
+    permission_id                     uuid,
+    scope_path                        text,
+    effect                            text NOT NULL,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    granted_by_user_account_id        uuid,
+    revoked_at                        timestamptz,
+    revoked_by_user_account_id        uuid,
+    created_at                        timestamptz NOT NULL
 );
 

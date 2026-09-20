@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Repaint the Aster designs onto pure grounds and the logo's own cyan.
+"""Repaint the Adam designs onto pure grounds and the logo's own cyan.
 
 **The accent was never the logo's colour.** Every design used `#48CFCB` - hue 178, 58% saturation.
 The lockup beside it is hue 187 at 83%, sampled from 6,472 neon pixels of
-`brand/aster-lockup-night.png`. Eleven degrees greener and two-thirds the saturation is far enough
+`brand/adam-lockup-night.png`. Eleven degrees greener and two-thirds the saturation is far enough
 to read as wrong and close enough to look like a mistake rather than a choice.
 
 **The greys were tinted toward that same teal.** `#1D2C30`, `#0E1314`, `#7E8C8D` - all of them
@@ -58,9 +58,9 @@ SAT_CAP = 0.95
 # A file is a night file unless its own ground says otherwise; the day ones are named for it,
 # except the viewer topbar, whose day variant is the unsuffixed name.
 # **Matched on the name before the first dot, not `Path.stem`** - these carry two extensions, so
-# `stem` yields `Aster Invite Day.dc` and every day file was being repainted as a night one.
-DAY_FILES = {"Aster Invite Day", "Aster Sign In Day", "Viewer Redesign - Topbar",
-             "Aster Landing Day"}
+# `stem` yields `Adam Invite Day.dc` and every day file was being repainted as a night one.
+DAY_FILES = {"Adam Invite Day", "Adam Sign In Day", "Viewer Redesign - Topbar",
+             "Adam Landing Day"}
 
 
 def is_day(path):

@@ -5630,11 +5630,9 @@
     "orders.invitation",
     "orders.invitation_allowance",
     "orders.no_sale_event",
-    "orders.order_discount",
     "orders.order_line",
     "orders.payment",
     "orders.payment_link",
-    "orders.payment_routing",
     "orders.pos_shift",
     "orders.refund",
     "orders.refund_policy",
@@ -5858,7 +5856,7 @@
     "screens": 2087,
     "flows": 135,
     "contracts": 32,
-    "tables": 504
+    "tables": 502
    }
   }
  }

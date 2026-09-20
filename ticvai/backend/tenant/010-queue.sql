@@ -1,6 +1,29 @@
 -- queue — 4 tables
 -- **Derived. Do not hand-edit.**
 
+-- A person in a virtual queue, with their position and their window. Renamed from entry: it is
+-- somebody waiting, not a row in a log
+CREATE TABLE IF NOT EXISTS queue.entry (
+    id                                text PRIMARY KEY NOT NULL,
+    queue_id                          uuid NOT NULL,
+    queue_name                        jsonb,
+    subject_id                        uuid,
+    party_number                      integer NOT NULL,
+    party_size                        integer NOT NULL,
+    status                            text NOT NULL,
+    position_in_queue                 integer,
+    parties_ahead                     integer,
+    estimated_call_at                 timestamptz,
+    is_fast_pass                      boolean,
+    entitlement_id                    text,
+    called_at                         timestamptz,
+    return_window_ends_at             timestamptz,
+    redeemed_at                       timestamptz,
+    admitted_count                    integer,
+    joined_at                         timestamptz NOT NULL,
+    synced_at                         timestamptz
+);
+
 -- Where readings come from — an adaptor to a venue’s own system (ADR-0012)
 CREATE TABLE IF NOT EXISTS queue.feed (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -56,28 +79,5 @@ CREATE TABLE IF NOT EXISTS queue.reading (
     confidence                        numeric(18,4),
     observed_at                       timestamptz NOT NULL,
     queue_id                          uuid NOT NULL
-);
-
--- A person in a virtual queue, with their position and their window. Renamed from entry: it is
--- somebody waiting, not a row in a log
-CREATE TABLE IF NOT EXISTS queue.waiting_guest (
-    id                                text PRIMARY KEY NOT NULL,
-    queue_id                          uuid NOT NULL,
-    queue_name                        jsonb,
-    subject_id                        uuid,
-    party_number                      integer NOT NULL,
-    party_size                        integer NOT NULL,
-    status                            text NOT NULL,
-    position_in_queue                 integer,
-    parties_ahead                     integer,
-    estimated_call_at                 timestamptz,
-    is_fast_pass                      boolean,
-    entitlement_id                    text,
-    called_at                         timestamptz,
-    return_window_ends_at             timestamptz,
-    redeemed_at                       timestamptz,
-    admitted_count                    integer,
-    joined_at                         timestamptz NOT NULL,
-    synced_at                         timestamptz
 );
 

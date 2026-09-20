@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 218 operations, 86 tables
+title: VenueOpsService — 218 operations, 89 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -47,7 +47,7 @@ schemas:
   - postgres
   largestTable: games.game
 - schema: rental
-  tables: 20
+  tables: 23
   stores:
   - postgres
   largestTable: rental.pricing_profile
@@ -2068,7 +2068,7 @@ tables:
 - table: maintenance.asset_category
   columns: 14
   store: postgres
-  parent: maintenance.asset
+  parent: null
   writtenBy:
   - rental
   foreignWriters: null
@@ -2147,6 +2147,18 @@ tables:
   parent: null
   writtenBy:
   - queue
+  foreignWriters: null
+- table: rental.agreement
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: rental.agreement_item
+  columns: 19
+  store: postgres
+  parent: rental.agreement
+  writtenBy: []
   foreignWriters: null
 - table: rental.agreement_rules
   columns: 10
@@ -2230,6 +2242,12 @@ tables:
   parent: null
   writtenBy:
   - rental
+  foreignWriters: null
+- table: rental.inspection_item
+  columns: 9
+  store: postgres
+  parent: rental.inspection
+  writtenBy: []
   foreignWriters: null
 - table: rental.inventory_model
   columns: 10

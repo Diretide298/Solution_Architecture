@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_outcome (
     recommendation_id                 uuid NOT NULL,
     outcome                           text NOT NULL,
     at                                timestamptz,
-    order_id                          uuid,
+    order_id                          text,
     value                             numeric(18,4),
     holdout                           boolean,
     scope_path                        text,

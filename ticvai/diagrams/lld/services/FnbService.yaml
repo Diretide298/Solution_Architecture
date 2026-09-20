@@ -1,5 +1,5 @@
 id: LLD-FnbService
-title: FnbService — 99 operations, 34 tables
+title: FnbService — 99 operations, 45 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -16,10 +16,10 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 34
+  tables: 45
   stores:
   - postgres
-  largestTable: fnb.kitchen_ticket
+  largestTable: fnb.product_recommendation
 operationsByContract:
 - contract: fnb
   count: 99
@@ -127,7 +127,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 3
-    writes: 3
+    writes: 2
   - operation: completeProductionRun
     verb: POST
     path: /production-runs/{runId}/complete
@@ -878,27 +878,21 @@ tables:
   parent: fnb.delivery_location
   writtenBy: []
   foreignWriters: null
-- table: fnb.eighty_six_event
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.fnb_order
-  columns: 14
+- table: fnb.dining_table
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
   - fnb
   foreignWriters: null
-- table: fnb.fnb_order_line
-  columns: 11
-  store: postgres
-  parent: fnb.fnb_order
-  writtenBy: []
-  foreignWriters: null
 - table: fnb.guest_note
   columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.ingredient_substitute
+  columns: 10
   store: postgres
   parent: null
   writtenBy: []
@@ -958,6 +952,12 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.menu_item_modifier
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.menu_section
   columns: 5
   store: postgres
@@ -976,6 +976,48 @@ tables:
   columns: 6
   store: postgres
   parent: fnb.modifier_group
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.order
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.order_item
+  columns: 12
+  store: postgres
+  parent: fnb.order
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.price
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.price_list
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.product
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.product_category
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.product_recommendation
+  columns: 17
+  store: postgres
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: fnb.production_plan
@@ -1005,6 +1047,31 @@ tables:
   parent: fnb.recipe
   writtenBy: []
   foreignWriters: null
+- table: fnb.reservation_table
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.service_order
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.service_order_line
+  columns: 12
+  store: postgres
+  parent: fnb.service_order
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.sold_out_item
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.sub_bill
   columns: 11
   store: postgres
@@ -1013,13 +1080,6 @@ tables:
   foreignWriters: null
 - table: fnb.substitution_rule
   columns: 9
-  store: postgres
-  parent: null
-  writtenBy:
-  - fnb
-  foreignWriters: null
-- table: fnb.table
-  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1035,14 +1095,14 @@ tables:
 - table: fnb.table_session
   columns: 9
   store: postgres
-  parent: fnb.table
+  parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.table_visit
   columns: 13
   store: postgres
-  parent: fnb.table
+  parent: null
   writtenBy:
   - fnb
   foreignWriters: null
@@ -1052,6 +1112,12 @@ tables:
   parent: null
   writtenBy:
   - fnb
+  foreignWriters: null
+- table: fnb.variant
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: fnb.waitlist_entry
   columns: 9

@@ -1,4 +1,4 @@
--- orders — 33 tables
+-- orders — 34 tables
 -- **Derived. Do not hand-edit.**
 
 -- A partner’s credit line, drawn against and settled periodically
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.org_unit. Reached by: 9 operations read it and 6 write it; 2 tables reference it.
+-- platform.scope. Reached by: 9 operations read it and 6 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
     token                             text,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
 );
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
--- its keys; references orders.deposit_box, orders.shift, platform.denomination. Reached by: 5
+-- its keys; references orders.deposit_box, orders.pos_shift, platform.denomination. Reached by: 5
 -- operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS orders.cash_count_line (
     id                                uuid PRIMARY KEY,
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS orders.chargeback (
 
 -- a manual override of a partner credit limit, recorded with who and why. Second table on a marker
 -- the deriver only read the first half of Hangs off: a child of orders.b2b_credit; reaches
--- orders.sales_order through its keys; references identity.principal, orders.b2b_credit. Reached
--- by: 1 operations read it and 1 write it.
+-- orders.sales_order through its keys; references identity.principal, orders.b2b_credit,
+-- orders.sales_order. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.credit_override (
     b2b_credit_id                     uuid NOT NULL,
     order_id                          text,
@@ -124,11 +124,28 @@ CREATE TABLE IF NOT EXISTS orders.credit_override (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS orders.deposit (
+    id                                uuid PRIMARY KEY,
+    order_id                          uuid NOT NULL,
+    customer_id                       uuid,
+    rental_agreement_id               uuid,
+    currency_code                     text NOT NULL,
+    required_amount                   numeric(18,4) NOT NULL,
+    authorized_amount                 numeric(18,4) NOT NULL,
+    captured_amount                   numeric(18,4) NOT NULL,
+    released_amount                   numeric(18,4) NOT NULL,
+    forfeited_amount                  numeric(18,4) NOT NULL,
+    status                            text NOT NULL,
+    settled_at                        timestamptz,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
 -- A cashier’s cash box. Allocated to a person, not a workstation — a cashier moving between tills
 -- takes their float, which is what makes a variance attributable. withdrawnTotal reduces the
 -- expected close: cash skimmed for banking is not a shortfall Hangs off: reaches
--- orders.sales_order through its keys; references identity.principal, orders.shift,
--- platform.org_unit. Reached by: 4 operations read it
+-- orders.sales_order through its keys; references identity.principal, orders.pos_shift,
+-- platform.scope. Reached by: 4 operations read it
 CREATE TABLE IF NOT EXISTS orders.deposit_box (
     id                                uuid PRIMARY KEY,
     cashier_principal_id              uuid NOT NULL,
@@ -145,6 +162,18 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
     closed_by_principal_id            uuid,
     allocated_at                      timestamptz,
     closed_at                         timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS orders.discount (
+    id                                uuid PRIMARY KEY,
+    order_id                          uuid NOT NULL,
+    promotion_id                      uuid,
+    coupon_code                       text,
+    type                              text NOT NULL,
+    value                             numeric(18,4),
+    applied_amount                    numeric(18,4) NOT NULL,
+    reason                            text,
+    created_at                        timestamptz NOT NULL
 );
 
 -- A donation within a transaction. A line, not a flag, because one transaction may give to several
@@ -172,7 +201,7 @@ CREATE TABLE IF NOT EXISTS orders.fraud_rule (
 -- person who pays and forty who need names collecting, and a generic order has one guest
 CREATE TABLE IF NOT EXISTS orders.group_booking (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     leader_subject_id                 uuid NOT NULL,
     organisation_name                 text,
     expected_size                     integer NOT NULL,
@@ -216,8 +245,22 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
     requires_approval_above           integer
 );
 
+CREATE TABLE IF NOT EXISTS orders.membership_renewal (
+    id                                uuid PRIMARY KEY,
+    customer_membership_id            uuid NOT NULL,
+    plan_id                           uuid NOT NULL,
+    order_id                          uuid,
+    type                              text NOT NULL,
+    status                            text NOT NULL,
+    previous_expiry_at                timestamptz,
+    new_expiry_at                     timestamptz,
+    attempted_at                      timestamptz NOT NULL,
+    completed_at                      timestamptz,
+    failure_reason                    text
+);
+
 -- drawer opened without a sale. Recorded because it is the classic cover for theft Hangs off:
--- reaches orders.sales_order through its keys; references identity.principal, orders.shift,
+-- reaches orders.sales_order through its keys; references identity.principal, orders.pos_shift,
 -- platform.workstation. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.no_sale_event (
     id                                text PRIMARY KEY NOT NULL,
@@ -230,12 +273,18 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
     count_this_shift                  integer
 );
 
--- manual discount with reason and approver. Posts to a discount account, never as a price change
--- Hangs off: reaches orders.sales_order through its keys; references orders.sales_order. Reached
--- by: 0 operations read it and 1 write it.
-CREATE TABLE IF NOT EXISTS orders.order_discount (
-    id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL
+CREATE TABLE IF NOT EXISTS orders.order_fee (
+    id                                uuid PRIMARY KEY,
+    order_id                          uuid NOT NULL,
+    rule_id                           uuid,
+    payment_method_id                 uuid,
+    name                              text NOT NULL,
+    category                          text NOT NULL,
+    calculation_type                  text,
+    rate_value                        numeric(18,4),
+    amount                            numeric(18,4) NOT NULL,
+    tax_amount                        numeric(18,4) NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- One thing bought on one order, priced at the moment of sale. A price list changing afterwards
@@ -293,11 +342,11 @@ CREATE TABLE IF NOT EXISTS orders.payment (
 -- A link a guest opens to pay for a booking taken at a till (BL-072). The link is the credential —
 -- a guest holding one is anonymous, and a phone booking is exactly the case where they have not
 -- registered. The expiry releases the hold, not just the link. Hangs off: reaches
--- orders.sales_order through its keys; references identity.principal, retail.reservation. Reached
--- by: 3 operations read it and 2 wr
+-- orders.sales_order through its keys; references identity.principal, orders.sales_order,
+-- retail.reservation. Reached by: 3 operati
 CREATE TABLE IF NOT EXISTS orders.payment_link (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     reservation_id                    uuid,
     token                             text NOT NULL,
     status                            text NOT NULL,
@@ -312,36 +361,6 @@ CREATE TABLE IF NOT EXISTS orders.payment_link (
     scope_path                        text
 );
 
--- A configured gateway (BL-116, CF-131). Two are confirmed for Phase 1, which is the number that
--- forces an abstraction — one can be hard-coded and two cannot. Credentials live in the vault
-CREATE TABLE IF NOT EXISTS orders.payment_provider (
-    id                                uuid PRIMARY KEY NOT NULL,
-    name                              text NOT NULL,
-    kind                              text NOT NULL,
-    supported_methods                 text[],
-    supported_currencies              text[],
-    supports_tokenisation             boolean,
-    supports_partial_capture          boolean,
-    presentment_currencies            text[],
-    supports3ds                       boolean,
-    terminal                          jsonb,
-    credential_ref                    text,
-    scope_level                       text,
-    scope_path                        text,
-    is_active                         boolean NOT NULL
-);
-
--- Which provider takes a given payment (BL-116). Ordered rules, first match wins, and a fallback
--- that is not optional — a gateway outage with no fallback is a venue that cannot sell
-CREATE TABLE IF NOT EXISTS orders.payment_routing (
-    id                                uuid PRIMARY KEY NOT NULL,
-    priority                          integer NOT NULL,
-    provider_id                       uuid NOT NULL,
-    conditions                        jsonb,
-    fallback_provider_id              uuid,
-    scope_path                        text
-);
-
 -- tips post to a liability, not to sales Hangs off: a child of orders.payment; reaches
 -- orders.sales_order through its keys; references orders.payment.
 CREATE TABLE IF NOT EXISTS orders.payment_tip (
@@ -349,19 +368,28 @@ CREATE TABLE IF NOT EXISTS orders.payment_tip (
     payment_id                        text NOT NULL
 );
 
--- A stored credential held by the provider (BL-116). The platform never sees a card number.
--- Provider-scoped, so a routing change means asking the guest again rather than silently losing
--- their card
-CREATE TABLE IF NOT EXISTS orders.payment_token (
-    id                                uuid PRIMARY KEY NOT NULL,
-    subject_id                        uuid NOT NULL,
-    provider_id                       uuid NOT NULL,
-    token                             text NOT NULL,
-    method                            text,
-    masked_identifier                 text,
-    expires_at                        date,
-    is_default                        boolean NOT NULL,
-    consent_purpose_id                uuid
+-- A cash session at a workstation — opened with a float, closed with a count and a variance. Moved
+-- to OrderService on 24 August because all its data is in orders
+CREATE TABLE IF NOT EXISTS orders.pos_shift (
+    id                                text PRIMARY KEY NOT NULL,
+    workstation_id                    uuid NOT NULL,
+    venue_id                          uuid NOT NULL,
+    scope_path                        text NOT NULL,
+    principal_id                      uuid NOT NULL,
+    principal_display_name            text,
+    status                            text NOT NULL,
+    deposit_box_code                  text,
+    bag_number                        text,
+    opening_float                     numeric(18,4),
+    sales_total                       numeric(18,4),
+    refunds_total                     numeric(18,4),
+    lifts_total                       numeric(18,4),
+    held_lease_count                  integer,
+    opened_at                         timestamptz NOT NULL,
+    recorded_at                       timestamptz,
+    suspended_at                      timestamptz,
+    closed_at                         timestamptz,
+    synced_at                         timestamptz
 );
 
 -- Money going back, always against a payment and never editing it. The ledger posts both
@@ -448,34 +476,10 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
     synced_at                         timestamptz
 );
 
--- A cash session at a workstation — opened with a float, closed with a count and a variance. Moved
--- to OrderService on 24 August because all its data is in orders
-CREATE TABLE IF NOT EXISTS orders.shift (
-    id                                text PRIMARY KEY NOT NULL,
-    workstation_id                    uuid NOT NULL,
-    venue_id                          uuid NOT NULL,
-    scope_path                        text NOT NULL,
-    principal_id                      uuid NOT NULL,
-    principal_display_name            text,
-    status                            text NOT NULL,
-    deposit_box_code                  text,
-    bag_number                        text,
-    opening_float                     numeric(18,4),
-    sales_total                       numeric(18,4),
-    refunds_total                     numeric(18,4),
-    lifts_total                       numeric(18,4),
-    held_lease_count                  integer,
-    opened_at                         timestamptz NOT NULL,
-    recorded_at                       timestamptz,
-    suspended_at                      timestamptz,
-    closed_at                         timestamptz,
-    synced_at                         timestamptz
-);
-
 -- A hold against any stored-value instrument (CF-126). Two-phase spend for all six, where only the
 -- retail wallet had it — a guest with 200 game credits starting a play the machine then failed had
--- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 3 operations
--- read it and 6 write it; written by 3 contracts — marketing-crm, orders, resources.
+-- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 2 operations
+-- read it and 5 write it; written by 3 contracts — marketing-crm, orders, resources.
 CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
@@ -517,6 +521,24 @@ CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
     offered_at                        timestamptz NOT NULL,
     claimed_at                        timestamptz,
     expires_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS orders.upgrade (
+    id                                uuid PRIMARY KEY,
+    number                            text NOT NULL,
+    order_id                          uuid NOT NULL,
+    original_order_line_id            uuid NOT NULL,
+    new_order_line_id                 uuid,
+    rule_id                           uuid,
+    original_amount                   numeric(18,4) NOT NULL,
+    new_amount                        numeric(18,4) NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    status                            text NOT NULL,
+    requested_by_user_id              uuid,
+    reason                            text,
+    created_at                        timestamptz NOT NULL,
+    completed_at                      timestamptz,
+    cancelled_at                      timestamptz
 );
 
 -- An Apple or Google wallet pass (BL-029). A live object, not a download — a pass that cannot be

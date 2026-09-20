@@ -1,4 +1,4 @@
--- control — 51 tables
+-- control — 49 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 -- Rate limits per client (13.1.36). A quota protects the venue, not the developer. Hangs off:
 -- reaches control.cell through its keys; references control.api_client. Reached by: 0 operations
 -- read it and 1 write it.
-CREATE TABLE IF NOT EXISTS control.api_quota (
+CREATE TABLE IF NOT EXISTS control.api_limit (
     id                                uuid PRIMARY KEY,
     client_id                         uuid NOT NULL,
     sustained_per_minute              integer NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS control.cell (
 
 -- identical cells serving a region. Scaling out is launching another, not growing one Hangs off: a
 -- child of control.cell; reaches control.cell through its keys; references control.cell,
--- platform.org_unit. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+-- platform.scope. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS control.cell_cluster (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
 );
 
 -- Something bought beyond the plan. Hangs off: reaches control.cell through its keys; references
--- control.subscription_plan. Reached by: 4 operations read it and 2 write it.
+-- subscription.plan. Reached by: 4 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS control.licence_add_on (
     module_key                        text NOT NULL,
     price                             numeric(18,4),
@@ -494,8 +494,8 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
 );
 
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
--- off: reaches control.cell through its keys; references control.subscription_plan,
--- identity.principal. Reached by: 5 operations read it and 3 write it; 3 tables reference it.
+-- off: reaches control.cell through its keys; references identity.principal, subscription.plan.
+-- Reached by: 5 operations read it and 3 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS control.release (
     version                           text,
     required_migrations               text[],
@@ -621,39 +621,6 @@ CREATE TABLE IF NOT EXISTS control.seo_metadata (
     is_auto_generated                 boolean,
     no_index                          boolean,
     scope_path                        text
-);
-
--- What a tenant is paying for, and which modules that licenses
-CREATE TABLE IF NOT EXISTS control.subscription (
-    tenant_id                         uuid NOT NULL,
-    plan_id                           uuid NOT NULL,
-    plan_name                         text,
-    plan_version                      text NOT NULL,
-    status                            text NOT NULL,
-    starts_at                         date NOT NULL,
-    renews_at                         date,
-    cancelled_at                      date,
-    current_price                     numeric(18,4),
-    billing_period                    text,
-    id                                uuid PRIMARY KEY NOT NULL
-);
-
--- What a tenant pays for — the modules, the limits, the price. Renamed from plan, which sat beside
--- migration_plan and production_plan
-CREATE TABLE IF NOT EXISTS control.subscription_plan (
-    code                              text,
-    name                              text,
-    description                       text,
-    cell_tier                         text,
-    base_price                        numeric(18,4),
-    billing_period                    text,
-    includes_branded_app              boolean,
-    included_ai_tokens                integer,
-    id                                uuid PRIMARY KEY,
-    version                           text,
-    is_active                         boolean,
-    subscriber_count                  integer,
-    published_at                      timestamptz
 );
 
 -- Something the platform is telling tenants, scheduled or in progress

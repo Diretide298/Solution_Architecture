@@ -133,6 +133,36 @@ def main() -> int:
             if target:
                 add(table, name, target, "convention", "foreignKey")
 
+
+    # 2a. **A media asset is not a maintenance asset.** Every `*_asset_id` resolved to the stem
+    #     `asset`, which is `maintenance.asset` — the only table whose short name is `asset`.
+    #     That made an icon, a product image, a terms PDF and two signature scans into pieces of
+    #     venue equipment, and inflated the rental-to-maintenance coupling by 70% at the moment
+    #     that coupling was the argument in a schema merge.
+    #
+    #     Only prefixes we are sure of. `outgoing`, `incoming`, `returned`, `missing` and
+    #     `available` are rental equipment movements and stay where they are, as does a bare
+    #     `asset_id`; `plan`, `source`, `fallback` and `base` are genuinely ambiguous and are
+    #     left unlinked rather than guessed at, which is what this deriver already does with
+    #     `template_id`.
+    MEDIA_PREFIXES = ['icon', 'image', 'photo', 'logo', 'cover', 'background', 'branding', 'badge', 'signature', 'document', 'terms_document', 'mandate_text', 'schema', 'evidence', 'artefact']
+    _media = 0
+    if "assets.media_asset" in tables:
+        for table, columns in cols.items():
+            for c in columns:
+                name = c["column"]
+                if not name.endswith("_id") or c.get("references"):
+                    continue
+                stem = name[:-3]
+                if not stem.endswith("_asset"):
+                    continue
+                if stem[:-len("_asset")] in MEDIA_PREFIXES:
+                    add(table, name, "assets.media_asset", "convention", "foreignKey")
+                    _media += 1
+        if _media:
+            print("  %d media asset edge(s) sent to assets.media_asset, not maintenance.asset"
+                  % _media)
+
     # 2b. Precedent. A column name the contracts declare a target for everywhere they
     #     mention it, applied to the columns that name it and declare nothing.
     #

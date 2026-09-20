@@ -12,46 +12,46 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: #FFFFFF; }
+  html, body { margin: 0; padding: 0; background: #000000; }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-  a { color: #07707F; text-decoration: none; }
-  a:hover { color: #04525E; }
+  a { color: #1AD3EA; text-decoration: none; }
+  a:hover { color: #7BE7F7; }
   *, *::before, *::after { box-sizing: border-box; }
-  @keyframes asterHint { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
-  @keyframes asterRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes adamHint { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
+  @keyframes adamRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 </style>
 </helmet>
 
-<div style="position:relative;width:100%;height:100vh;min-height:640px;overflow:hidden;background:#FFFFFF">
+<div style="position:relative;width:100%;height:100vh;min-height:640px;overflow:hidden;background:#000000">
   <canvas ref="{{ bindScene }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
 
   <div style="position:absolute;left:0;right:0;top:0;height:210px;pointer-events:none;background:transparent"></div>
 
   <div style="position:absolute;left:46px;top:38px;display:flex;flex-direction:column;gap:22px;max-width:430px">
     <div style="display:flex;align-items:center;gap:13px">
-      <img src="brand/aster-lockup-day.png" alt="Aster — the context layer for AI-assisted development" style="height:42px;width:auto;display:block">
+      <img src="brand/adam-lockup-night.png" alt="Adam — the context layer for AI-assisted development" style="height:42px;width:auto;display:block">
     </div>
     <div style="display:flex;flex-direction:column;gap:13px">
-      <h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.028em;line-height:1.14;color:#0B1013;text-wrap:pretty">Five layers, one reference graph.</h1>
-      <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5A6469;text-wrap:pretty">The contracts are the join. Everything else — screens, flows, state models, migrations, decisions — is drawn by resolving against them. Pick a layer to go in.</p>
+      <h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.028em;line-height:1.14;color:#F2F5F6;text-wrap:pretty">Five layers, one reference graph.</h1>
+      <p style="margin:0;font-size:14.5px;line-height:1.62;color:#9AA3A7;text-wrap:pretty">The contracts are the join. Everything else — screens, flows, state models, migrations, decisions — is drawn by resolving against them. Pick a layer to go in.</p>
     </div>
     <div style="display:flex;align-items:center;gap:18px">
-      <span style="display:flex;align-items:baseline;gap:7px"><span style="font-size:19px;font-weight:800;color:#0B1013;letter-spacing:-0.02em">668</span><span style="font-size:11px;font-weight:600;color:#828C91;letter-spacing:.02em">artefacts indexed</span></span>
-      <span style="width:1px;height:18px;background:#E3E7E9;display:block"></span>
-      <span style="display:flex;align-items:baseline;gap:7px"><span style="font-size:19px;font-weight:800;color:#0B1013;letter-spacing:-0.02em">1043</span><span style="font-size:11px;font-weight:600;color:#828C91;letter-spacing:.02em">operations</span></span>
+      <span style="display:flex;align-items:baseline;gap:7px"><span style="font-size:19px;font-weight:800;color:#F2F5F6;letter-spacing:-0.02em">668</span><span style="font-size:11px;font-weight:600;color:#6B7479;letter-spacing:.02em">artefacts indexed</span></span>
+      <span style="width:1px;height:18px;background:#1C2023;display:block"></span>
+      <span style="display:flex;align-items:baseline;gap:7px"><span style="font-size:19px;font-weight:800;color:#F2F5F6;letter-spacing:-0.02em">1043</span><span style="font-size:11px;font-weight:600;color:#6B7479;letter-spacing:.02em">operations</span></span>
     </div>
   </div>
 
-  <div style="position:absolute;right:40px;top:38px;display:flex;background:rgba(255,255,255,.8);border:1px solid #E3E7E9;border-radius:11px;padding:3px;gap:2px;backdrop-filter:blur(8px)">
+  <div style="position:absolute;right:40px;top:38px;display:flex;background:rgba(11,13,15,.72);border:1px solid #1C2023;border-radius:11px;padding:3px;gap:2px;backdrop-filter:blur(8px)">
     <sc-for list="{{ dimTabs }}" as="d" hint-placeholder-count="2">
-      <button onClick="{{ d.pick }}" style="border:0;padding:7px 13px;border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;cursor:pointer;background:{{ d.bg }};color:{{ d.fg }}" style-hover="color:#0B1013">{{ d.name }}</button>
+      <button onClick="{{ d.pick }}" style="border:0;padding:7px 13px;border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;cursor:pointer;background:{{ d.bg }};color:{{ d.fg }}" style-hover="color:#F2F5F6">{{ d.name }}</button>
     </sc-for>
   </div>
 
   <div style="position:absolute;right:40px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:11px">
-    <button onClick="{{ toOverview }}" style="border:0;background:transparent;font:inherit;font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:{{ overviewFg }};cursor:pointer;padding:4px 0" style-hover="color:#0B1013">Overview</button>
+    <button onClick="{{ toOverview }}" style="border:0;background:transparent;font:inherit;font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:{{ overviewFg }};cursor:pointer;padding:4px 0" style-hover="color:#F2F5F6">Overview</button>
     <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
-      <button onClick="{{ r.pick }}" style="display:flex;align-items:center;gap:11px;border:0;background:transparent;font:inherit;cursor:pointer;padding:3px 0;color:{{ r.fg }}" style-hover="color:#0B1013">
+      <button onClick="{{ r.pick }}" style="display:flex;align-items:center;gap:11px;border:0;background:transparent;font:inherit;cursor:pointer;padding:3px 0;color:{{ r.fg }}" style-hover="color:#F2F5F6">
         <span style="font-size:12.5px;font-weight:600;letter-spacing:-0.01em">{{ r.name }}</span>
         <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:{{ r.countFg }}">{{ r.count }}</span>
         <span style="width:{{ r.barW }};height:2px;border-radius:2px;background:{{ r.bar }};display:block"></span>
@@ -60,29 +60,29 @@
   </div>
 
   <sc-if value="{{ hasFocus }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;left:46px;bottom:46px;width:428px;padding:24px 26px;border-radius:17px;background:rgba(255,255,255,.88);border:1px solid #E3E7E9;backdrop-filter:blur(9px);display:flex;flex-direction:column;gap:17px;animation:asterRise .34s ease-out">
+    <div style="position:absolute;left:46px;bottom:46px;width:428px;padding:24px 26px;border-radius:17px;background:rgba(11,13,15,.82);border:1px solid #1C2023;backdrop-filter:blur(9px);display:flex;flex-direction:column;gap:17px;animation:adamRise .34s ease-out">
       <div style="display:flex;align-items:flex-start;gap:14px">
         <span style="width:11px;height:11px;border-radius:50%;background:{{ focusDot }};box-shadow:0 0 14px {{ focusGlow }};display:block;margin-top:7px;flex:none"></span>
         <div style="display:flex;flex-direction:column;gap:4px;flex:1">
-          <span style="font-size:22px;font-weight:800;letter-spacing:-0.022em;color:#0B1013">{{ focusName }}</span>
-          <span style="font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#828C91"><span style="font-family:'JetBrains Mono',monospace;color:#3F484D">{{ focusCount }}</span> {{ focusUnit }} · {{ focusSource }}</span>
+          <span style="font-size:22px;font-weight:800;letter-spacing:-0.022em;color:#F2F5F6">{{ focusName }}</span>
+          <span style="font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#6B7479"><span style="font-family:'JetBrains Mono',monospace;color:#C6CDD1">{{ focusCount }}</span> {{ focusUnit }} · {{ focusSource }}</span>
         </div>
       </div>
-      <p style="margin:0;font-size:13.5px;line-height:1.62;color:#5A6469;text-wrap:pretty">{{ focusBlurb }}</p>
+      <p style="margin:0;font-size:13.5px;line-height:1.62;color:#9AA3A7;text-wrap:pretty">{{ focusBlurb }}</p>
       <div style="display:flex;flex-wrap:wrap;gap:7px">
         <sc-for list="{{ focusViews }}" as="v" hint-placeholder-count="5">
-          <span style="padding:6px 11px;border-radius:9px;background:#F5F7F8;border:1px solid #E3E7E9;font-size:11.5px;font-weight:600;color:#5A6469">{{ v }}</span>
+          <span style="padding:6px 11px;border-radius:9px;background:#000000;border:1px solid #2A3034;font-size:11.5px;font-weight:600;color:#9AA3A7">{{ v }}</span>
         </sc-for>
       </div>
       <div style="display:flex;align-items:center;gap:11px;padding-top:3px">
-        <a href="{{ focusHref }}" style="padding:11px 18px;border-radius:11px;background:#07707F;color:#FFFFFF;font-size:13px;font-weight:700;letter-spacing:-0.01em">Open {{ focusName }} →</a>
-        <button onClick="{{ toOverview }}" style="padding:11px 16px;border-radius:11px;border:1px solid #E3E7E9;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#5A6469;cursor:pointer" style-hover="border-color:#C7CFD3;color:#0B1013">Back out</button>
+        <a href="{{ focusHref }}" style="padding:11px 18px;border-radius:11px;background:#1AD3EA;color:#00232A;font-size:13px;font-weight:700;letter-spacing:-0.01em">Open {{ focusName }} →</a>
+        <button onClick="{{ toOverview }}" style="padding:11px 16px;border-radius:11px;border:1px solid #2A3034;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#9AA3A7;cursor:pointer" style-hover="border-color:#3A4247;color:#F2F5F6">Back out</button>
       </div>
     </div>
   </sc-if>
 
   <div style="position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:center;pointer-events:none">
-    <span style="font-size:11.5px;font-weight:600;letter-spacing:.03em;color:#828C91;animation:asterHint 3.4s ease-in-out infinite">{{ hint }}</span>
+    <span style="font-size:11.5px;font-weight:600;letter-spacing:.03em;color:#6B7479;animation:adamHint 3.4s ease-in-out infinite">{{ hint }}</span>
   </div>
 </div>
 
@@ -93,23 +93,23 @@ class Component extends DCLogic {
     { name: 'Frontend', flat: [-1.35, -0.5], count: 364, unit: 'screens', source: 'screens/ · flows/ · frontend/',
       blurb: 'The product as a person meets it: every screen as the schematic a wireframe implements, every flow traced across screens, and the app manifests behind them.',
       views: ['Screen', 'Journey', 'Apps', 'Waves', 'Audit'],
-      pos: [-1.45, 0.78, -0.5], up: 1, tint: ['7,112,127', '26,211,234'] },
+      pos: [-1.45, 0.78, -0.5], up: 1, tint: ['190,240,250', '26,211,234'] },
     { name: 'Contracts', flat: [0, 0.04], count: 24, unit: 'contracts', source: 'contracts/',
       blurb: 'The join. Nothing here $refs another contract — they are joined by events, which is what the graph draws. Every other layer resolves against this one.',
       views: ['Graph', 'Structure', 'ER', 'Lineage', 'Reader', 'Audit'],
-      pos: [0, -0.05, 0.55], up: 0, tint: ['138,90,5', '224,174,82'] },
+      pos: [0, -0.05, 0.55], up: 0, tint: ['252,230,184', '224,174,82'] },
     { name: 'Domain', flat: [1.35, -0.5], count: 38, unit: 'status enums', source: 'states/ · events/',
       blurb: 'The two artefacts that check each other: which moves between statuses are legal, and what crosses the outbox when one happens. Nineteen enums still have no model.',
       views: ['States', 'Events', 'Audit'],
-      pos: [1.5, 0.72, -0.25], up: 1, tint: ['7,112,127', '26,211,234'] },
+      pos: [1.5, 0.72, -0.25], up: 1, tint: ['190,240,250', '26,211,234'] },
     { name: 'Backend', flat: [1.02, 0.78], count: 224, unit: 'tables', source: 'backend/ SQL · schema reference',
       blurb: 'Two sources with different standing, kept apart: the database as it stands in six versioned migrations, and the 224 tables it is meant to become.',
       views: ['Services', 'Data', 'Migrations', 'Routing', 'Audit'],
-      pos: [1.15, -0.88, 0.2], up: 0, tint: ['4,82,94', '15,168,190'] },
+      pos: [1.15, -0.88, 0.2], up: 0, tint: ['150,225,240', '15,168,190'] },
     { name: 'Decisions', flat: [-1.02, 0.78], count: 18, unit: 'ADRs', source: 'docs/',
       blurb: 'The deliberation: what was rejected, what it would have cost, and what has since been superseded. The one layer a client account never sees.',
       views: ['Register', 'Audit'],
-      pos: [-1.35, -0.92, -0.55], up: 0, tint: ['7,112,127', '26,211,234'] },
+      pos: [-1.35, -0.92, -0.55], up: 0, tint: ['190,240,250', '26,211,234'] },
   ];
   LINKS = [[0, 1], [1, 2], [1, 3], [2, 3], [3, 4], [1, 4]];
 
@@ -361,22 +361,22 @@ class Component extends DCLogic {
     const rail = this.LAYERS.map((l, i) => ({
       name: l.name, count: l.count,
       pick: (e) => { if (e) e.preventDefault(); this.setState({ focus: i }); },
-      fg: f === i ? '#0B1013' : '#828C91',
-      countFg: f === i ? '#07707F' : '#C7CFD3',
-      bar: f === i ? '#07707F' : '#E3E7E9',
+      fg: f === i ? '#F2F5F6' : '#6B7479',
+      countFg: f === i ? '#1AD3EA' : '#3A4247',
+      bar: f === i ? '#1AD3EA' : '#2A3034',
       barW: f === i ? '26px' : '12px',
     }));
     const dimTabs = ['3D', '2D'].map(name => ({
       name,
       pick: (e) => { if (e) e.preventDefault(); this.setState({ mode: name }); },
-      bg: this.state.mode === name ? '#EFF2F3' : 'transparent',
-      fg: this.state.mode === name ? '#07707F' : '#A6AFB4',
+      bg: this.state.mode === name ? '#14181B' : 'transparent',
+      fg: this.state.mode === name ? '#1AD3EA' : '#4A5257',
     }));
     return {
       bindScene: this.bindScene, rail, dimTabs,
       focusHref: L ? 'Viewer Redesign - Topbar Night.dc.html#layer=' + L.name : '#',
       toOverview: (e) => { if (e) e.preventDefault(); this.setState({ focus: -1 }); },
-      overviewFg: f < 0 ? '#07707F' : '#828C91',
+      overviewFg: f < 0 ? '#1AD3EA' : '#6B7479',
       hasFocus: !!L,
       focusName: L ? L.name : '', focusCount: L ? L.count : '', focusUnit: L ? L.unit : '',
       focusSource: L ? L.source : '', focusBlurb: L ? L.blurb : '',

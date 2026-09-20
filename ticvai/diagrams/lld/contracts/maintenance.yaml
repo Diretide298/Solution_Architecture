@@ -116,10 +116,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   writes:
   - cache:idempotency
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
 - operation: createWorkOrder
   verb: POST
   path: /work-orders
@@ -144,7 +144,7 @@ operations:
   offline: true
   reads:
   - maintenance.asset
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   - maintenance.work_order
   writes: []
 - operation: getAssetHistory
@@ -168,7 +168,7 @@ operations:
   offline: false
   reads:
   - maintenance.asset
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   writes: []
 - operation: getIncident
   verb: GET
@@ -245,7 +245,7 @@ operations:
   - staff
   offline: false
   reads:
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   writes: []
 - operation: listWorkOrders
   verb: GET
@@ -268,7 +268,7 @@ operations:
   offline: true
   reads:
   - maintenance.asset
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   - maintenance.work_order
   writes: []
 - operation: pauseWorkOrder
@@ -450,10 +450,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
   writes:
   - cache:idempotency
-  - maintenance.maintenance_plan
+  - maintenance.preventive_plan
 - operation: updateWorkOrder
   verb: PATCH
   path: /work-orders/{workOrderId}

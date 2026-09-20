@@ -1,4 +1,4 @@
--- retail — 12 tables
+-- retail — 18 tables
 -- **Derived. Do not hand-edit.**
 
 -- Goods swapped rather than returned, which settles differently
@@ -31,6 +31,80 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
     requires_serial_number            boolean,
     image_asset_ref                   text,
     is_active                         boolean NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS retail.price (
+    id                                uuid PRIMARY KEY,
+    list_id                           uuid NOT NULL,
+    product_id                        uuid NOT NULL,
+    variant_id                        uuid,
+    amount                            numeric(18,4) NOT NULL,
+    tax_code                          text,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS retail.price_list (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    currency_code                     text NOT NULL,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    channels_json                     text,
+    priority                          integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS retail.product (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    category_id                       uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    brand                             text,
+    tax_code                          text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS retail.product_category (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS retail.product_recommendation (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    source_product_id                 uuid NOT NULL,
+    source_variant_id                 uuid,
+    type                              text NOT NULL,
+    target_service                    text NOT NULL,
+    target_product_id                 uuid NOT NULL,
+    target_variant_id                 uuid,
+    display_message                   text,
+    default_quantity                  numeric(18,4) NOT NULL,
+    max_quantity                      numeric(18,4),
+    priority                          integer NOT NULL,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Merchandise held for collection. Hangs off: reaches retail.sale through its keys; references
@@ -175,6 +249,19 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     threshold_minor                   integer,
     requires_permission               text,
     enabled                           boolean,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS retail.variant (
+    id                                uuid PRIMARY KEY,
+    product_id                        uuid NOT NULL,
+    sku                               text NOT NULL,
+    name                              text NOT NULL,
+    barcode                           text,
+    attributes_json                   text,
+    is_default                        boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz
 );
 

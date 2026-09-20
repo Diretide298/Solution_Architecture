@@ -1652,6 +1652,55 @@ paths:
 
 components:
   schemas:
+    PlatformCellEndpoint:
+      type: object
+      x-ticvai-persistence: platform.cell_endpoint
+      description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.'
+      required:
+      - cellId
+      - serviceName
+      - url
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        serviceName:
+          type: string
+          maxLength: 100
+        url:
+          type: string
+          maxLength: 1000
+        contractVersion:
+          type: string
+          maxLength: 50
+          nullable: true
+        authenticationType:
+          type: string
+          maxLength: 50
+          nullable: true
+        credentialReference:
+          type: string
+          maxLength: 500
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        lastHealthCheckAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
     DeviceAssignment:
       type: object
       x-ticvai-persistence: tenancy.device_assignment

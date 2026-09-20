@@ -1,4 +1,4 @@
--- fnb — 33 tables
+-- fnb — 44 tables
 -- **Derived. Do not hand-edit.**
 
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
@@ -86,51 +86,29 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location_outlet (
     outlet_id                         uuid
 );
 
--- An item off the menu and back on (board 5J). setItemAvailability kept the flag and not the
--- history — time off, time back, who called it, and what it cost in refused orders
-CREATE TABLE IF NOT EXISTS fnb.eighty_six_event (
+-- A physical table with a capacity and a position. What may combine with what is declared rather
+-- than inferred — a pillar or a service run means two adjacent tables sometimes cannot
+CREATE TABLE IF NOT EXISTS fnb.dining_table (
     id                                uuid PRIMARY KEY NOT NULL,
-    outlet_id                         uuid,
-    menu_item_id                      uuid NOT NULL,
-    off_at                            timestamptz NOT NULL,
-    back_at                           timestamptz,
-    reason                            text,
-    called_by_principal_id            uuid,
-    refused_order_count               integer
+    label                             text NOT NULL,
+    capacity                          integer NOT NULL,
+    zone                              text,
+    position                          jsonb,
+    shape                             text,
+    outlet_id                         uuid
 );
 
--- Food and drink ordered, wherever from — a counter, a table, a lounger, the app. The kitchen
--- ticket is what the pass sees; this is what the guest bought
-CREATE TABLE IF NOT EXISTS fnb.fnb_order (
-    id                                text PRIMARY KEY NOT NULL,
-    order_number                      text NOT NULL,
-    outlet_id                         uuid NOT NULL,
-    service_mode                      text NOT NULL,
-    table_visit_id                    text,
-    status                            text NOT NULL,
-    lines                             text[] NOT NULL,
-    gross_amount                      numeric(18,4) NOT NULL,
-    tax_amount                        numeric(18,4),
-    kitchen_ticket_id                 text,
-    estimated_ready_at                timestamptz,
-    created_at                        timestamptz NOT NULL,
-    recorded_at                       timestamptz,
-    synced_at                         timestamptz
-);
-
--- One item on a food order, with its modifiers resolved at the moment of sale
-CREATE TABLE IF NOT EXISTS fnb.fnb_order_line (
-    fnb_order_id                      text NOT NULL,
-    id                                text PRIMARY KEY NOT NULL,
-    menu_item_id                      uuid NOT NULL,
-    quantity                          integer NOT NULL,
-    modifier_option_ids               text[],
-    note                              text,
-    seat_number                       integer,
-    course                            integer,
-    status                            text,
-    unit_price                        numeric(18,4),
-    line_total                        numeric(18,4)
+CREATE TABLE IF NOT EXISTS fnb.ingredient_substitute (
+    id                                uuid PRIMARY KEY,
+    from_inventory_item_id            uuid NOT NULL,
+    to_inventory_item_id              uuid NOT NULL,
+    substitution_ratio                numeric(18,4) NOT NULL,
+    conditions_json                   text,
+    allergens_added_json              text,
+    allergens_removed_json            text,
+    requires_approval                 boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- Something that cost the kitchen a service and left no other trace — equipment down, an item run
@@ -244,6 +222,14 @@ CREATE TABLE IF NOT EXISTS fnb.menu_item (
     allergens                         text[]
 );
 
+CREATE TABLE IF NOT EXISTS fnb.menu_item_modifier (
+    id                                uuid PRIMARY KEY NOT NULL,
+    item_id                           uuid NOT NULL,
+    group_id                          uuid NOT NULL,
+    sort_order                        integer NOT NULL,
+    is_active                         boolean NOT NULL
+);
+
 -- A run of items on a menu, in the order the outlet set. Not alphabetical, or Desserts sits above
 -- Mains forever
 CREATE TABLE IF NOT EXISTS fnb.menu_section (
@@ -273,6 +259,111 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_option (
     price_delta                       numeric(18,4) NOT NULL,
     is_default                        boolean,
     is_available                      boolean
+);
+
+CREATE TABLE IF NOT EXISTS fnb."order" (
+    id                                uuid PRIMARY KEY,
+    number                            text NOT NULL,
+    sales_order_id                    uuid,
+    outlet_id                         uuid NOT NULL,
+    table_visit_id                    uuid,
+    service_mode                      text NOT NULL,
+    status                            text NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    tax_amount                        numeric(18,4) NOT NULL,
+    estimated_ready_at                timestamptz,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS fnb.order_item (
+    id                                uuid PRIMARY KEY,
+    fnb_order_id                      uuid NOT NULL,
+    menu_item_id                      uuid NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    seat_number                       text,
+    course                            text,
+    note                              text,
+    selected_modifiers_json           text,
+    unit_price                        numeric(18,4) NOT NULL,
+    line_total                        numeric(18,4) NOT NULL,
+    status                            text NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fnb.price (
+    id                                uuid PRIMARY KEY,
+    list_id                           uuid NOT NULL,
+    product_id                        uuid NOT NULL,
+    variant_id                        uuid,
+    amount                            numeric(18,4) NOT NULL,
+    tax_code                          text,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS fnb.price_list (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    currency_code                     text NOT NULL,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    channels_json                     text,
+    priority                          integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS fnb.product (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    category_id                       uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    type                              text NOT NULL,
+    tax_code                          text,
+    is_stock_tracked                  boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS fnb.product_category (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS fnb.product_recommendation (
+    id                                uuid PRIMARY KEY,
+    scope_path                        text,
+    source_product_id                 uuid NOT NULL,
+    source_variant_id                 uuid,
+    type                              text NOT NULL,
+    target_service                    text NOT NULL,
+    target_product_id                 uuid NOT NULL,
+    target_variant_id                 uuid,
+    display_message                   text,
+    default_quantity                  numeric(18,4) NOT NULL,
+    max_quantity                      numeric(18,4),
+    priority                          integer NOT NULL,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A forecast turned into a prep list (board 2M). A plan is not a production run — a plan that
@@ -319,6 +410,61 @@ CREATE TABLE IF NOT EXISTS fnb.recipe_ingredient (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS fnb.reservation_table (
+    id                                uuid PRIMARY KEY NOT NULL,
+    reservation_id                    uuid NOT NULL,
+    table_id                          uuid NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+-- Food and drink ordered, wherever from — a counter, a table, a lounger, the app. The kitchen
+-- ticket is what the pass sees; this is what the guest bought
+CREATE TABLE IF NOT EXISTS fnb.service_order (
+    id                                text PRIMARY KEY NOT NULL,
+    order_number                      text NOT NULL,
+    outlet_id                         uuid NOT NULL,
+    service_mode                      text NOT NULL,
+    table_visit_id                    text,
+    status                            text NOT NULL,
+    lines                             text[] NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    tax_amount                        numeric(18,4),
+    kitchen_ticket_id                 text,
+    estimated_ready_at                timestamptz,
+    created_at                        timestamptz NOT NULL,
+    recorded_at                       timestamptz,
+    synced_at                         timestamptz
+);
+
+-- One item on a food order, with its modifiers resolved at the moment of sale
+CREATE TABLE IF NOT EXISTS fnb.service_order_line (
+    service_order_id                  text NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
+    menu_item_id                      uuid NOT NULL,
+    quantity                          integer NOT NULL,
+    modifier_option_ids               text[],
+    note                              text,
+    seat_number                       integer,
+    course                            integer,
+    status                            text,
+    unit_price                        numeric(18,4),
+    line_total                        numeric(18,4),
+    fnb_order_id                      text NOT NULL
+);
+
+-- An item off the menu and back on (board 5J). setItemAvailability kept the flag and not the
+-- history — time off, time back, who called it, and what it cost in refused orders
+CREATE TABLE IF NOT EXISTS fnb.sold_out_item (
+    id                                uuid PRIMARY KEY NOT NULL,
+    outlet_id                         uuid,
+    menu_item_id                      uuid NOT NULL,
+    off_at                            timestamptz NOT NULL,
+    back_at                           timestamptz,
+    reason                            text,
+    called_by_principal_id            uuid,
+    refused_order_count               integer
+);
+
 -- One bill from a split (client board 4, 24 August). Tax and service charge recompute per bill
 -- rather than apportioning pro rata — a split that divides VAT by percentage produces bills that
 -- do not sum to the original
@@ -349,18 +495,6 @@ CREATE TABLE IF NOT EXISTS fnb.substitution_rule (
     conditions                        text[],
     requires_approval                 boolean,
     is_active                         boolean
-);
-
--- A physical table with a capacity and a position. What may combine with what is declared rather
--- than inferred — a pillar or a service run means two adjacent tables sometimes cannot
-CREATE TABLE IF NOT EXISTS fnb."table" (
-    id                                uuid PRIMARY KEY NOT NULL,
-    label                             text NOT NULL,
-    capacity                          integer NOT NULL,
-    zone                              text,
-    position                          jsonb,
-    shape                             text,
-    outlet_id                         uuid
 );
 
 -- A booking with a time and a party size. Distinct from a table session, which is a guest already
@@ -434,6 +568,18 @@ CREATE TABLE IF NOT EXISTS fnb.temperature_log (
     outcome                           text NOT NULL,
     device_reported                   boolean,
     corrective_action_id              uuid
+);
+
+CREATE TABLE IF NOT EXISTS fnb.variant (
+    id                                uuid PRIMARY KEY,
+    product_id                        uuid NOT NULL,
+    sku                               text NOT NULL,
+    name                              text NOT NULL,
+    barcode                           text,
+    is_default                        boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A restaurant waitlist party (BL-130). Distinct from queue, which is for rides — this has a party

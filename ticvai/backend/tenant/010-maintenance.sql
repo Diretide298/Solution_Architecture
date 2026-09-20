@@ -1,4 +1,4 @@
--- maintenance — 8 tables
+-- maintenance — 9 tables
 -- **Derived. Do not hand-edit.**
 
 -- A physical thing with a service history — a lift, a chiller, a ride. Distinct from a resource,
@@ -34,6 +34,25 @@ CREATE TABLE IF NOT EXISTS maintenance.asset (
     is_maintenance_overdue            boolean,
     last_inspection_at                timestamptz,
     usage_counter                     numeric(18,4)
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS maintenance.asset_category (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    parent_category_id                uuid,
+    icon_asset_id                     uuid,
+    default_tracking_model            text,
+    default_duration_minutes          integer,
+    default_turnaround_minutes        integer,
+    default_waiver_required           boolean,
+    default_deposit_policy_id         uuid,
+    overridable_fields                text[],
+    scope_path                        text,
+    is_active                         boolean
 );
 
 -- Something that happened and needs recording — distinct from a work order, which is something to
@@ -114,7 +133,7 @@ CREATE TABLE IF NOT EXISTS maintenance.inspection_template_item (
 );
 
 -- What should be inspected, how often. Generates work orders rather than being one
-CREATE TABLE IF NOT EXISTS maintenance.maintenance_plan (
+CREATE TABLE IF NOT EXISTS maintenance.preventive_plan (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     asset_id                          uuid NOT NULL,

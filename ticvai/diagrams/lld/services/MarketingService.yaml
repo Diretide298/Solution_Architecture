@@ -1,5 +1,5 @@
 id: LLD-MarketingService
-title: MarketingService — 183 operations, 45 tables
+title: MarketingService — 183 operations, 61 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -19,7 +19,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 45
+  tables: 61
   stores:
   - postgres
   largestTable: marketing.guest_profile
@@ -1533,12 +1533,24 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.badge
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.campaign
   columns: 20
   store: postgres
   parent: null
   writtenBy:
   - marketing-crm
+  foreignWriters: null
+- table: marketing.campaign_target
+  columns: 7
+  store: postgres
+  parent: marketing.campaign
+  writtenBy: []
   foreignWriters: null
 - table: marketing.case
   columns: 19
@@ -1599,6 +1611,12 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.customer_badge
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.duplicate_candidate
   columns: 10
   store: postgres
@@ -1639,6 +1657,24 @@ tables:
   parent: null
   writtenBy:
   - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_extra_field
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.guest_extra_option
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.guest_extra_value
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: marketing.guest_profile
   columns: 22
@@ -1682,8 +1718,14 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
-- table: marketing.journey_entrant
+- table: marketing.journey_enrollment
   columns: 10
+  store: postgres
+  parent: marketing.journey
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.journey_step
+  columns: 14
   store: postgres
   parent: marketing.journey
   writtenBy: []
@@ -1702,6 +1744,18 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.loyalty_campaign
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.loyalty_points
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.loyalty_position
   columns: 10
   store: postgres
@@ -1716,10 +1770,10 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
-- table: marketing.loyalty_tier
-  columns: 6
+- table: marketing.loyalty_rule
+  columns: 9
   store: postgres
-  parent: marketing.loyalty_programme
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: marketing.message_delivery
@@ -1759,6 +1813,18 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.points_earning_rule
+  columns: 6
+  store: postgres
+  parent: marketing.loyalty_programme
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.points_redemption_rule
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.privacy_incident
   columns: 12
   store: postgres
@@ -1787,6 +1853,24 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.review_response
+  columns: 7
+  store: postgres
+  parent: marketing.review
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.reward
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.reward_assignment
+  columns: 11
+  store: postgres
+  parent: marketing.reward
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.segment
   columns: 9
   store: postgres
@@ -1800,6 +1884,12 @@ tables:
   parent: marketing.segment
   writtenBy:
   - marketing-crm
+  foreignWriters: null
+- table: marketing.sla_policy
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: marketing.subscription
   columns: 8
@@ -1821,6 +1911,12 @@ tables:
   parent: null
   writtenBy:
   - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_signature
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: marketing.wishlist_item
   columns: 12

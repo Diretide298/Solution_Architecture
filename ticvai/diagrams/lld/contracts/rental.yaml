@@ -73,9 +73,9 @@ operations:
   - staff
   offline: false
   reads:
-  - rental.category
+  - maintenance.asset_category
   writes:
-  - rental.category
+  - maintenance.asset_category
 - operation: createRentalPricingProfile
   verb: POST
   path: /rental-pricing-profiles
@@ -195,7 +195,7 @@ operations:
   - staff
   offline: false
   reads:
-  - rental.category
+  - maintenance.asset_category
   writes: []
 - operation: listRentalPricingProfiles
   verb: GET

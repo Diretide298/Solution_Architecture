@@ -2467,6 +2467,51 @@ paths:
 
 components:
   schemas:
+    SeatingSeatBlockItem:
+      type: object
+      x-ticvai-persistence: seating.seat_block_item
+      description: '**Taken from the backend workbook, 20 September.** Stores each individual seat included in a seat block.'
+      required:
+      - blockId
+      - seatId
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        blockId:
+          type: string
+          format: uuid
+        seatId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    SeatingSeatHoldItem:
+      type: object
+      x-ticvai-persistence: seating.seat_hold_item
+      description: '**Taken from the backend workbook, 20 September.** Stores each individual seat included in a temporary seat hold.'
+      required:
+      - holdId
+      - seatId
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        holdId:
+          type: string
+          format: uuid
+        seatId:
+          type: string
+          format: uuid
+        heldPrice:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
     SeatHoldType:
       type: object
       x-ticvai-persistence: seating.hold_type

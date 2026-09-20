@@ -1,4 +1,4 @@
--- platform — 24 tables
+-- platform — 25 tables
 -- **Derived. Do not hand-edit.**
 
 -- PII reads only, written by the platform. Who looked at a passport number is the question a
@@ -12,12 +12,26 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
 -- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.org_unit through its
--- keys; references identity.principal, platform.org_unit. Reached by: 1 operations read it and 2
+-- keys; references identity.principal, platform.scope. Reached by: 1 operations read it and 2
 -- write it; written by 2 contracts — inventory, tenancy.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     org_unit_id                       uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
+    id                                uuid PRIMARY KEY,
+    cell_id                           uuid NOT NULL,
+    service_name                      text NOT NULL,
+    url                               text NOT NULL,
+    contract_version                  text,
+    authentication_type               text,
+    credential_reference              text,
+    status                            text NOT NULL,
+    last_health_check_at              timestamptz,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- What a class of workstation is configured to be (client Board 1, 20 August). A profile is what a
@@ -168,22 +182,6 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
     requires_manager_to_extend        boolean
 );
 
--- One unit of the venue structure — a tenant, a brand, a region, a venue, a department, a
--- sub-department, a workstation or an outlet. Every row has a level, a parent and a materialised
--- path, and configuration resolves by walking that path upward until something answers. Renamed
--- from org_unit on 26 August: *node* said it was a tree and hid what the tree is of. A row is an
--- org unit; a scope_path is a
-CREATE TABLE IF NOT EXISTS platform.org_unit (
-    id                                uuid PRIMARY KEY NOT NULL,
-    level                             text NOT NULL,
-    parent_id                         uuid,
-    path                              text NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    is_active                         boolean NOT NULL,
-    child_count                       integer
-);
-
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.org_unit through its keys. Reached by:
 -- 2 operations read it and 22 write it; 1 tables reference it; written by 13 contracts — access,
@@ -274,16 +272,32 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
     page_id                           uuid
 );
 
+-- One unit of the venue structure — a tenant, a brand, a region, a venue, a department, a
+-- sub-department, a workstation or an outlet. Every row has a level, a parent and a materialised
+-- path, and configuration resolves by walking that path upward until something answers. Renamed
+-- from org_unit on 26 August: *node* said it was a tree and hid what the tree is of. A row is an
+-- org unit; a scope_path is a
+CREATE TABLE IF NOT EXISTS platform.scope (
+    id                                uuid PRIMARY KEY NOT NULL,
+    level                             text NOT NULL,
+    parent_id                         uuid,
+    path                              text NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    is_active                         boolean NOT NULL,
+    child_count                       integer
+);
+
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.org_unit
--- through its keys; references platform.org_unit. Reached by: 2 operations read it and 0 write it;
--- 13 tables reference it.
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 13
+-- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,
     home_region_id                    uuid
 );
 
 -- read through composed tenancy operations Hangs off: reaches platform.org_unit through its keys;
--- references platform.org_unit. Reached by: 4 operations read it and 1 write it.
+-- references platform.scope. Reached by: 4 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.venue_settings (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,

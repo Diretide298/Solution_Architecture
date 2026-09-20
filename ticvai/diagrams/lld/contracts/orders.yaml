@@ -309,7 +309,7 @@ operations:
   reads:
   - cache:idempotency
   - pii.subject
-  - platform.org_unit
+  - platform.scope
   writes:
   - cache:idempotency
   - orders.cart
@@ -384,8 +384,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.payment_provider
   - orders.sales_order
+  - payments.provider
   writes:
   - cache:idempotency
   - marketing.message_dispatch
@@ -612,7 +612,7 @@ operations:
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
-  - platform.org_unit
+  - platform.scope
   writes: []
 - operation: getRefundPolicy
   verb: GET
@@ -1155,8 +1155,8 @@ operations:
   - staff
   offline: false
   reads:
-  - orders.payment_provider
-  - orders.payment_routing
+  - payments.provider
+  - payments.routing_rule
   writes: []
 - operation: listPaymentReconciliationException
   verb: GET
@@ -1178,7 +1178,7 @@ operations:
   - guest
   offline: false
   reads:
-  - orders.payment_token
+  - payments.token
   writes: []
 - operation: listPersonTypeProduct
   verb: GET
@@ -1564,9 +1564,9 @@ operations:
   reads:
   - cache:idempotency
   - orders.payment_link
-  - orders.payment_provider
   - orders.reservation
   - orders.sales_order
+  - payments.provider
   writes:
   - access.entitlement
   - cache:idempotency
@@ -1905,11 +1905,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.payment_provider
+  - payments.provider
   writes:
   - cache:idempotency
-  - orders.payment_provider
-  - orders.payment_routing
+  - payments.provider
+  - payments.routing_rule
 - operation: setProRataResidual
   verb: PUT
   path: /pro-rata-residual
@@ -2022,11 +2022,11 @@ operations:
   reads:
   - cache:idempotency
   - marketing.consent_record
-  - orders.payment_provider
+  - payments.provider
   writes:
   - cache:idempotency
   - marketing.consent_record
-  - orders.payment_token
+  - payments.token
 - operation: syncOrders
   verb: POST
   path: /sync/orders

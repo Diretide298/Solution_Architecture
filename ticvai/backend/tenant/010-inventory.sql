@@ -1,4 +1,4 @@
--- inventory — 18 tables
+-- inventory — 20 tables
 -- **Derived. Do not hand-edit.**
 
 -- A stock take. Its lines carry both the counted number and the recount, because two counts that
@@ -265,6 +265,19 @@ CREATE TABLE IF NOT EXISTS inventory.stock_batch (
     status                            text
 );
 
+CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
+    id                                uuid PRIMARY KEY,
+    item_id                           uuid NOT NULL,
+    location_id                       uuid NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    source_type                       text NOT NULL,
+    source_id                         uuid NOT NULL,
+    status                            text NOT NULL,
+    expires_at                        timestamptz,
+    created_at                        timestamptz NOT NULL,
+    released_at                       timestamptz
+);
+
 -- Who a venue buys from, invoicing in their own currency
 CREATE TABLE IF NOT EXISTS inventory.supplier (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -280,6 +293,21 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
     account_id                        uuid,
     is_active                         boolean,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
+    id                                uuid PRIMARY KEY,
+    supplier_id                       uuid NOT NULL,
+    number                            text NOT NULL,
+    name                              text NOT NULL,
+    valid_from                        date NOT NULL,
+    valid_to                          date,
+    currency_code                     text,
+    payment_terms_days                integer,
+    document_reference                text,
+    status                            text NOT NULL,
+    created_by_user_id                uuid,
+    created_at                        timestamptz NOT NULL
 );
 
 -- Stock moving between locations. In transit is a state, not a gap

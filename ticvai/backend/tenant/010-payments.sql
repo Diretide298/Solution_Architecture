@@ -1,4 +1,4 @@
--- payments — 16 tables
+-- payments — 23 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -42,6 +42,50 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
     scope_path                        text
 );
 
+CREATE TABLE IF NOT EXISTS payments.currency_rule (
+    id                                uuid PRIMARY KEY,
+    payment_policy_id                 uuid NOT NULL,
+    scope_path                        text,
+    channel_id                        uuid,
+    code                              text NOT NULL,
+    settlement_currency_code          text,
+    min_payment_amount                numeric(18,4),
+    max_payment_amount                numeric(18,4),
+    rounding_increment                numeric(18,4),
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS payments.deposit_activity (
+    id                                uuid PRIMARY KEY,
+    deposit_id                        uuid NOT NULL,
+    payment_id                        uuid,
+    type                              text NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    reason                            text,
+    created_by_user_id                uuid,
+    occurred_at                       timestamptz NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payments.eligibility_rule (
+    id                                uuid PRIMARY KEY,
+    payment_policy_id                 uuid NOT NULL,
+    payment_method_id                 uuid NOT NULL,
+    scope_path                        text,
+    channel_id                        uuid,
+    business_area                     text,
+    currency_code                     text,
+    min_order_amount                  numeric(18,4),
+    max_order_amount                  numeric(18,4),
+    effect                            text NOT NULL,
+    priority                          integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.failover_policy (
@@ -52,6 +96,25 @@ CREATE TABLE IF NOT EXISTS payments.failover_policy (
     circuit_breaker                   jsonb,
     scope_path                        text,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payments.fee_rule (
+    id                                uuid PRIMARY KEY,
+    payment_policy_id                 uuid NOT NULL,
+    payment_method_id                 uuid,
+    provider_id                       uuid,
+    channel_id                        uuid,
+    business_area                     text,
+    currency_code                     text,
+    name                              text NOT NULL,
+    category                          text NOT NULL,
+    calculation_type                  text NOT NULL,
+    value                             numeric(18,4) NOT NULL,
+    min_fee                           numeric(18,4),
+    max_fee                           numeric(18,4),
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -115,6 +178,20 @@ CREATE TABLE IF NOT EXISTS payments.method (
     is_active                         boolean
 );
 
+CREATE TABLE IF NOT EXISTS payments.method_config (
+    id                                uuid PRIMARY KEY,
+    payment_policy_id                 uuid NOT NULL,
+    payment_method_id                 uuid NOT NULL,
+    scope_path                        text,
+    channel_id                        uuid,
+    currency_code                     text,
+    is_enabled                        boolean NOT NULL,
+    display_order                     integer NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.mixed_tender_rules (
@@ -141,6 +218,25 @@ CREATE TABLE IF NOT EXISTS payments.payment_terms (
     override_approval_role            text,
     scope_path                        text,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- A configured gateway (BL-116, CF-131). Two are confirmed for Phase 1, which is the number that
+-- forces an abstraction — one can be hard-coded and two cannot. Credentials live in the vault
+CREATE TABLE IF NOT EXISTS payments.provider (
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text NOT NULL,
+    kind                              text NOT NULL,
+    supported_methods                 text[],
+    supported_currencies              text[],
+    supports_tokenisation             boolean,
+    supports_partial_capture          boolean,
+    presentment_currencies            text[],
+    supports3ds                       boolean,
+    terminal                          jsonb,
+    credential_ref                    text,
+    scope_level                       text,
+    scope_path                        text,
+    is_active                         boolean NOT NULL
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -184,6 +280,8 @@ CREATE TABLE IF NOT EXISTS payments.risk_rules (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.routing_rule (
+    provider_id                       uuid NOT NULL,
+    fallback_provider_id              uuid,
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
     priority                          integer,
@@ -221,5 +319,20 @@ CREATE TABLE IF NOT EXISTS payments.terminal (
     status                            text,
     scope_path                        text,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- A stored credential held by the provider (BL-116). The platform never sees a card number.
+-- Provider-scoped, so a routing change means asking the guest again rather than silently losing
+-- their card
+CREATE TABLE IF NOT EXISTS payments.token (
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid NOT NULL,
+    provider_id                       uuid NOT NULL,
+    token                             text NOT NULL,
+    method                            text,
+    masked_identifier                 text,
+    expires_at                        date,
+    is_default                        boolean NOT NULL,
+    consent_purpose_id                uuid
 );
 

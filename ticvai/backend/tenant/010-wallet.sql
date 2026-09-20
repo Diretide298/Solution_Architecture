@@ -1,4 +1,4 @@
--- wallet — 23 tables
+-- wallet — 25 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -22,6 +22,18 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
     approved_by                       uuid,
     at                                timestamptz,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS wallet.balance (
+    id                                uuid PRIMARY KEY NOT NULL,
+    wallet_balance_id                 uuid NOT NULL,
+    wallet_id                         uuid NOT NULL,
+    available_balance                 numeric(18,4) NOT NULL,
+    hold_balance                      numeric(18,4) NOT NULL,
+    total_balance                     numeric(18,4) NOT NULL,
+    currency_code                     text NOT NULL,
+    version                           integer NOT NULL,
+    updated_at                        timestamptz NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -192,6 +204,21 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
     credit_type_id                    uuid,
     physical                          boolean,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS wallet.hold (
+    id                                uuid PRIMARY KEY NOT NULL,
+    wallet_hold_id                    uuid NOT NULL,
+    wallet_id                         uuid NOT NULL,
+    order_id                          uuid,
+    payment_id                        uuid,
+    wallet_hold_amount                numeric(18,4) NOT NULL,
+    currency_code                     text NOT NULL,
+    wallet_hold_status                text NOT NULL,
+    expires_at                        timestamptz NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    captured_at                       timestamptz,
+    released_at                       timestamptz
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing

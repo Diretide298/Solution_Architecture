@@ -7,13 +7,13 @@ about: '**Where configuration lives.** A venue operator does not have one set of
   top breaks a venue that needed to differ.
 
 
-  `platform.org_unit` is the answer. A node has a `level`, a `parent_id` and a materialised `path`;
-  **configuration resolves by walking that path upward until something answers.**'
+  `platform.scope` is the answer. A node has a `level`, a `parent_id` and a materialised `path`; **configuration
+  resolves by walking that path upward until something answers.**'
 decisions:
 - docs/adr/0011-hierarchy-is-binding.md
 - docs/adr/0018-configuration-scope.md
 spine:
-  table: platform.org_unit
+  table: platform.scope
   columns:
   - id
   - level

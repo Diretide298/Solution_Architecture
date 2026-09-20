@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 56 operations, 24 tables
+title: IdentityService — 56 operations, 31 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 20
+  tables: 27
   stores:
   - postgres
   - redis
@@ -524,6 +524,18 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: identity.benefit_usage
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: identity.customer_membership
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.delegated_access
   columns: 19
   store: postgres
@@ -541,6 +553,12 @@ tables:
   parent: null
   writtenBy:
   - identity
+  foreignWriters: null
+- table: identity.membership_history
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: identity.mfa_challenge
   columns: 2
@@ -563,6 +581,12 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.module
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.otp_challenge
   columns: 2
   store: postgres
@@ -577,6 +601,12 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.permission
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.principal
   columns: 9
   store: postgres
@@ -588,6 +618,12 @@ tables:
   columns: 2
   store: postgres
   parent: identity.principal
+  writtenBy: []
+  foreignWriters: null
+- table: identity.refresh_token
+  columns: 10
+  store: postgres
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: identity.role
@@ -632,6 +668,12 @@ tables:
   parent: null
   writtenBy:
   - identity
+  foreignWriters: null
+- table: identity.user_access
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: pii.subject
   columns: 13

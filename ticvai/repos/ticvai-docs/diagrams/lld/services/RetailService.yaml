@@ -1,5 +1,5 @@
 id: LLD-RetailService
-title: RetailService — 24 operations, 12 tables
+title: RetailService — 24 operations, 18 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -15,10 +15,10 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: retail
-  tables: 12
+  tables: 18
   stores:
   - postgres
-  largestTable: retail.merchandise
+  largestTable: retail.product_recommendation
 operationsByContract:
 - contract: retail
   count: 24
@@ -244,6 +244,36 @@ tables:
   writtenBy:
   - retail
   foreignWriters: null
+- table: retail.price
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: retail.price_list
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: retail.product
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: retail.product_category
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: retail.product_recommendation
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: retail.reservation
   columns: 8
   store: postgres
@@ -309,6 +339,12 @@ tables:
   parent: null
   writtenBy:
   - retail
+  foreignWriters: null
+- table: retail.variant
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 readsFrom:
 - service: TenancyService

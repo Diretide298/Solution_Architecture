@@ -17,7 +17,7 @@ tiers:
   services:
   - service: TenancyService
     operations: 136
-    tables: 70
+    tables: 78
     schemas:
     - platform
     - workforce
@@ -35,7 +35,7 @@ tiers:
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
     operations: 56
-    tables: 24
+    tables: 31
     schemas:
     - identity
     - pii
@@ -50,7 +50,7 @@ tiers:
   services:
   - service: CatalogueService
     operations: 389
-    tables: 61
+    tables: 66
     schemas:
     - catalogue
     - promotions
@@ -66,7 +66,7 @@ tiers:
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
     operations: 217
-    tables: 50
+    tables: 58
     schemas:
     - orders
     - payments
@@ -80,7 +80,7 @@ tiers:
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
     operations: 177
-    tables: 8
+    tables: 10
     schemas:
     - access
     contracts:
@@ -104,7 +104,7 @@ tiers:
     ref: diagrams/lld/services/LedgerService.yaml
   - service: WalletService
     operations: 48
-    tables: 23
+    tables: 25
     schemas:
     - wallet
     contracts:
@@ -123,7 +123,7 @@ tiers:
   services:
   - service: VenueOpsService
     operations: 218
-    tables: 86
+    tables: 89
     schemas:
     - queue
     - maintenance
@@ -146,7 +146,7 @@ tiers:
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
     operations: 99
-    tables: 34
+    tables: 45
     schemas:
     - fnb
     contracts:
@@ -157,7 +157,7 @@ tiers:
     ref: diagrams/lld/services/FnbService.yaml
   - service: InventoryService
     operations: 50
-    tables: 19
+    tables: 21
     schemas:
     - inventory
     contracts:
@@ -168,7 +168,7 @@ tiers:
     ref: diagrams/lld/services/InventoryService.yaml
   - service: RetailService
     operations: 24
-    tables: 12
+    tables: 18
     schemas:
     - retail
     contracts:
@@ -183,7 +183,7 @@ tiers:
   services:
   - service: MarketingService
     operations: 183
-    tables: 45
+    tables: 61
     schemas:
     - marketing
     contracts:
@@ -209,7 +209,7 @@ tiers:
   services:
   - service: PlatformService
     operations: 182
-    tables: 60
+    tables: 62
     schemas:
     - control
     - subscription
@@ -223,7 +223,7 @@ tiers:
     ref: diagrams/lld/services/PlatformService.yaml
   - service: WhiteLabelService
     operations: 50
-    tables: 13
+    tables: 15
     schemas:
     - whitelabel
     contracts:
@@ -245,7 +245,7 @@ tiers:
     ref: diagrams/lld/services/ReportingService.yaml
   - service: CrossRegionService
     operations: 16
-    tables: 1
+    tables: 3
     schemas:
     - sync
     contracts:
@@ -300,11 +300,6 @@ crossServiceWrites:
   writes: 3
   reads: 7
   kind: ordinary
-- from: FnbService
-  to: OrderService
-  writes: 3
-  reads: 4
-  kind: ordinary
 - from: InventoryService
   to: TenancyService
   writes: 3
@@ -339,6 +334,11 @@ crossServiceWrites:
   to: TenancyService
   writes: 2
   reads: 1
+  kind: ordinary
+- from: FnbService
+  to: OrderService
+  writes: 2
+  reads: 4
   kind: ordinary
 - from: FnbService
   to: CatalogueService

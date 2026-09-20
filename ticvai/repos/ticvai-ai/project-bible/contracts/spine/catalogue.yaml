@@ -8670,6 +8670,213 @@ paths:
 
 components:
   schemas:
+    CatalogueMembershipBenefit:
+      type: object
+      x-ticvai-persistence: catalogue.membership_benefit
+      description: '**Taken from the backend workbook, 20 September.** Defines a benefit that can be included in one or more membership plans.'
+      required:
+      - code
+      - name
+      - type
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        type:
+          type: string
+          maxLength: 30
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        value:
+          type: number
+          nullable: true
+        unit:
+          type: string
+          maxLength: 30
+          nullable: true
+        entitlementTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    CatalogueMembershipProgramme:
+      type: object
+      x-ticvai-persistence: catalogue.membership_programme
+      description: '**Taken from the backend workbook, 20 September.** Defines the overall membership programme available to customers.'
+      required:
+      - programId
+      - programCode
+      - programName
+      - isActive
+      - createdAt
+      properties:
+        programId:
+          type: string
+          format: uuid
+        programCode:
+          type: string
+          maxLength: 100
+        programName:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    CataloguePlanBenefit:
+      type: object
+      x-ticvai-persistence: catalogue.plan_benefit
+      description: '**Taken from the backend workbook, 20 September.** Maps membership benefits to plans and defines usage limits for each benefit.'
+      required:
+      - membershipPlanId
+      - membershipBenefitId
+      - priority
+      - isActive
+      - createdAt
+      properties:
+        membershipPlanId:
+          type: string
+          format: uuid
+        membershipBenefitId:
+          type: string
+          format: uuid
+        usageLimit:
+          type: number
+          nullable: true
+        usagePeriod:
+          type: string
+          maxLength: 30
+          nullable: true
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    PricingDynamicPriceAction:
+      type: object
+      x-ticvai-persistence: pricing.dynamic_price_action
+      description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.'
+      required:
+      - ruleId
+      - type
+      - value
+      properties:
+        id:
+          type: string
+          format: uuid
+        ruleId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          maxLength: 30
+        value:
+          type: number
+        minPrice:
+          type: number
+          nullable: true
+        maxPrice:
+          type: number
+          nullable: true
+    PricingDynamicPriceCondition:
+      type: object
+      x-ticvai-persistence: pricing.dynamic_price_condition
+      description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.'
+      required:
+      - actionId
+      - ruleId
+      - type
+      - ruleOperator
+      - valueJson
+      - sequenceNo
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        ruleId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          maxLength: 50
+        ruleOperator:
+          type: string
+          maxLength: 20
+        valueJson:
+          type: string
+        sequenceNo:
+          type: integer
+    PricingDynamicPriceRule:
+      type: object
+      x-ticvai-persistence: pricing.dynamic_price_rule
+      description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.'
+      required:
+      - pricingRuleCode
+      - name
+      - priority
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        pricingRuleCode:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          nullable: true
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: integer
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
     EventType:
       type: object
       x-ticvai-persistence: catalogue.event_type

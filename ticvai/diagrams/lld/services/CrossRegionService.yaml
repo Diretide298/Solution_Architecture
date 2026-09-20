@@ -1,5 +1,5 @@
 id: LLD-CrossRegionService
-title: CrossRegionService — 16 operations, 1 tables
+title: CrossRegionService — 16 operations, 3 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -19,10 +19,10 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: sync
-  tables: 1
+  tables: 3
   stores:
   - postgres
-  largestTable: sync.rejection
+  largestTable: sync.cross_cell_request
 operationsByContract:
 - contract: cross-region
   count: 16
@@ -163,6 +163,18 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: sync.cell_connection
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: sync.cross_cell_request
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: sync.rejection
   columns: 9
   store: postgres

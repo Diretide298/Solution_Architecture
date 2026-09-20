@@ -1,5 +1,43 @@
--- rental — 21 tables
+-- rental — 23 tables
 -- **Derived. Do not hand-edit.**
+
+CREATE TABLE IF NOT EXISTS rental.agreement (
+    id                                uuid PRIMARY KEY,
+    rental_number                     text NOT NULL,
+    order_id                          uuid NOT NULL,
+    customer_id                       uuid NOT NULL,
+    venue_id                          uuid NOT NULL,
+    scheduled_start_at                timestamptz NOT NULL,
+    scheduled_return_at               timestamptz NOT NULL,
+    actual_start_at                   timestamptz,
+    actual_return_at                  timestamptz,
+    status                            text NOT NULL,
+    overdue_minutes                   integer NOT NULL,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS rental.agreement_item (
+    id                                uuid PRIMARY KEY,
+    rental_agreement_id               uuid NOT NULL,
+    order_line_id                     uuid NOT NULL,
+    catalogue_product_id              uuid NOT NULL,
+    tracking_mode                     text NOT NULL,
+    resource_booking_id               uuid,
+    resource_id                       uuid,
+    asset_id                          uuid,
+    inventory_item_id                 uuid,
+    stock_reservation_id              uuid,
+    quantity_booked                   numeric(18,4) NOT NULL,
+    quantity_checked_out              numeric(18,4) NOT NULL,
+    quantity_returned                 numeric(18,4) NOT NULL,
+    quantity_missing                  numeric(18,4) NOT NULL,
+    status                            text,
+    checked_out_at                    timestamptz,
+    returned_at                       timestamptz,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
@@ -64,7 +102,7 @@ CREATE TABLE IF NOT EXISTS rental.booking (
     location_id                       uuid,
     return_location_id                uuid,
     customer_id                       uuid,
-    order_id                          uuid,
+    order_id                          text,
     "from"                            timestamptz NOT NULL,
     "to"                              timestamptz NOT NULL,
     quantity                          integer,
@@ -75,25 +113,6 @@ CREATE TABLE IF NOT EXISTS rental.booking (
     deposit_authorisation_id          uuid,
     accrued_late_fee                  numeric(18,4),
     scope_path                        text
-);
-
--- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS rental.category (
-    id                                uuid PRIMARY KEY,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    description                       text,
-    parent_category_id                uuid,
-    icon_asset_id                     uuid,
-    default_tracking_model            text,
-    default_duration_minutes          integer,
-    default_turnaround_minutes        integer,
-    default_waiver_required           boolean,
-    default_deposit_policy_id         uuid,
-    overridable_fields                text[],
-    scope_path                        text,
-    is_active                         boolean
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -206,6 +225,18 @@ CREATE TABLE IF NOT EXISTS rental.inspection (
     inspected_by                      uuid,
     inspected_at                      timestamptz,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS rental.inspection_item (
+    id                                uuid PRIMARY KEY,
+    rental_inspection_id              uuid NOT NULL,
+    rental_agreement_item_id          uuid NOT NULL,
+    component_code                    text,
+    component_name                    text,
+    condition_status                  text NOT NULL,
+    severity                          text,
+    note                              text,
+    created_at                        timestamptz NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

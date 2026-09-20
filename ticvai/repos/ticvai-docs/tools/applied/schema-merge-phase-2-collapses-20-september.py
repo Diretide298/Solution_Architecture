@@ -68,7 +68,7 @@ RULE = '''
     # 2a. **A media asset is not a maintenance asset.** Every `*_asset_id` resolved to the stem
     #     `asset`, which is `maintenance.asset` — the only table whose short name is `asset`.
     #     That made an icon, a product image, a terms PDF and two signature scans into pieces of
-    #     venue equipment, and inflated the rental-to-maintenance coupling by 70% at the moment
+    #     venue equipment, and inflated the rental-to-maintenance coupling by 70%% at the moment
     #     that coupling was the argument in a schema merge.
     #
     #     Only prefixes we are sure of. `outgoing`, `incoming`, `returned`, `missing` and

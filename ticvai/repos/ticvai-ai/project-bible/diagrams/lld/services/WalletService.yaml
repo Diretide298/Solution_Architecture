@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 48 operations, 23 tables
+title: WalletService — 48 operations, 25 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -24,7 +24,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: wallet
-  tables: 23
+  tables: 25
   stores:
   - postgres
   largestTable: wallet.wallet_type
@@ -437,6 +437,12 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: wallet.balance
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: wallet.channel_rules
   columns: 10
   store: postgres
@@ -511,6 +517,12 @@ tables:
   parent: null
   writtenBy:
   - wallet
+  foreignWriters: null
+- table: wallet.hold
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: wallet.refund_policy
   columns: 7

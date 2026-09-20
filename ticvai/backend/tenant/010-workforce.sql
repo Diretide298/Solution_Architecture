@@ -1,8 +1,8 @@
--- workforce — 10 tables
+-- workforce — 17 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
--- workforce.rota_assignment through its keys; references identity.principal, platform.org_unit.
+-- workforce.rota_assignment through its keys; references identity.principal, platform.scope.
 -- Reached by: 2 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.announcement (
     id                                uuid PRIMARY KEY,
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
 
 -- Who actually turned up. occurredAt and recordedAt are both kept — a steward clocking in offline
 -- is not late because the sync was Hangs off: reaches workforce.rota_assignment through its keys;
--- references access.access_point, identity.principal, workforce.rota_assignment. Reached by: 2
--- operations read it and 2 write it.
+-- references access.access_point, identity.principal, platform.scope. Reached by: 2 operations
+-- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.attendance (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -51,6 +51,58 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
     exception                         text
 );
 
+CREATE TABLE IF NOT EXISTS workforce.employee (
+    id                                uuid PRIMARY KEY,
+    tenant_id                         uuid NOT NULL,
+    user_id                           uuid,
+    code                              text NOT NULL,
+    first_name                        text NOT NULL,
+    last_name                         text NOT NULL,
+    email                             text,
+    mobile                            text,
+    date_of_joining                   date NOT NULL,
+    employment_type                   text NOT NULL,
+    employment_status                 text NOT NULL,
+    manager_employee_id               uuid,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS workforce.employment (
+    id                                uuid PRIMARY KEY,
+    employee_id                       uuid NOT NULL,
+    contract_type                     text NOT NULL,
+    start_date                        date NOT NULL,
+    end_date                          date,
+    standard_hours_per_week           numeric(18,4),
+    probation_end_date                date,
+    status                            text NOT NULL,
+    created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS workforce.job_title (
+    id                                uuid PRIMARY KEY,
+    tenant_id                         uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS workforce.leave_balance (
+    id                                uuid PRIMARY KEY,
+    employee_id                       uuid NOT NULL,
+    type_id                           uuid NOT NULL,
+    period_year                       integer NOT NULL,
+    entitled_days                     numeric(18,4) NOT NULL,
+    used_days                         numeric(18,4) NOT NULL,
+    pending_days                      numeric(18,4) NOT NULL,
+    available_days                    numeric(18,4) NOT NULL,
+    updated_at                        timestamptz NOT NULL
+);
+
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_request (
@@ -64,6 +116,17 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
     status                            text,
     approval_request_id               uuid,
     scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS workforce.leave_type (
+    id                                uuid PRIMARY KEY,
+    tenant_id                         uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    is_paid                           boolean NOT NULL,
+    requires_approval                 boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
@@ -89,8 +152,8 @@ CREATE TABLE IF NOT EXISTS workforce.open_shift (
 
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
 -- on a rota never touch a till Hangs off: a root — nothing above it in its schema; references
--- identity.principal, identity.role, platform.org_unit. Reached by: 6 operations read it and 2
--- write it; 3 tables reference it.
+-- identity.principal, identity.role, platform.scope. Reached by: 6 operations read it and 2 write
+-- it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     overtime_minutes                  integer,
     rest_period_before                integer,
@@ -109,6 +172,19 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     status                            text,
     break_minutes                     integer,
     note                              text
+);
+
+CREATE TABLE IF NOT EXISTS workforce.shift (
+    id                                uuid PRIMARY KEY,
+    tenant_id                         uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    start_time                        text NOT NULL,
+    end_time                          text NOT NULL,
+    break_minutes                     integer NOT NULL,
+    crosses_midnight                  boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz
 );
 
 -- Both parties agree before the supervisor sees it. Routed through approvals rather than a second
@@ -166,5 +242,20 @@ CREATE TABLE IF NOT EXISTS workforce.training_record (
     expires_at                        timestamptz,
     state                             text,
     evidence_ref                      text
+);
+
+CREATE TABLE IF NOT EXISTS workforce.work_assignment (
+    id                                uuid PRIMARY KEY,
+    employee_id                       uuid NOT NULL,
+    job_title_id                      uuid NOT NULL,
+    scope_path                        text,
+    venue_id                          uuid,
+    department_id                     uuid,
+    outlet_id                         uuid,
+    effective_from                    date NOT NULL,
+    effective_to                      date,
+    is_primary                        boolean NOT NULL,
+    status                            text NOT NULL,
+    created_at                        timestamptz NOT NULL
 );
 

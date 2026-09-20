@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 217 operations, 50 tables
+title: OrderService — 217 operations, 58 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -27,12 +27,12 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 34
+  tables: 35
   stores:
   - postgres
-  largestTable: orders.shift
+  largestTable: orders.pos_shift
 - schema: payments
-  tables: 16
+  tables: 23
   stores:
   - postgres
   largestTable: payments.method
@@ -1846,12 +1846,24 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
+- table: orders.deposit
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: orders.deposit_box
   columns: 15
   store: postgres
   parent: null
   writtenBy:
   - shift
+  foreignWriters: null
+- table: orders.discount
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: orders.donation_line
   columns: 3
@@ -1886,6 +1898,12 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
+- table: orders.membership_renewal
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: orders.no_sale_event
   columns: 8
   store: postgres
@@ -1893,14 +1911,12 @@ tables:
   writtenBy:
   - shift
   foreignWriters: null
-- table: orders.order_discount
-  columns: 2
+- table: orders.order_fee
+  columns: 11
   store: postgres
   parent: null
-  writtenBy:
-  - fnb
-  foreignWriters:
-  - fnb
+  writtenBy: []
+  foreignWriters: null
 - table: orders.order_line
   columns: 18
   store: postgres
@@ -1934,32 +1950,18 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
-- table: orders.payment_provider
-  columns: 14
-  store: postgres
-  parent: null
-  writtenBy:
-  - orders
-  foreignWriters: null
-- table: orders.payment_routing
-  columns: 6
-  store: postgres
-  parent: null
-  writtenBy:
-  - orders
-  foreignWriters: null
 - table: orders.payment_tip
   columns: 2
   store: postgres
   parent: orders.payment
   writtenBy: []
   foreignWriters: null
-- table: orders.payment_token
-  columns: 9
+- table: orders.pos_shift
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
-  - orders
+  - shift
   foreignWriters: null
 - table: orders.refund
   columns: 17
@@ -2006,13 +2008,6 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: orders.shift
-  columns: 19
-  store: postgres
-  parent: null
-  writtenBy:
-  - shift
-  foreignWriters: null
 - table: orders.stored_value_authorisation
   columns: 9
   store: postgres
@@ -2036,6 +2031,12 @@ tables:
   parent: null
   writtenBy:
   - orders
+  foreignWriters: null
+- table: orders.upgrade
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: orders.wallet_pass
   columns: 9
@@ -2065,12 +2066,36 @@ tables:
   writtenBy:
   - payments
   foreignWriters: null
+- table: payments.currency_rule
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: payments.deposit_activity
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: payments.eligibility_rule
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: payments.failover_policy
   columns: 7
   store: postgres
   parent: null
   writtenBy:
   - payments
+  foreignWriters: null
+- table: payments.fee_rule
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: payments.hosted_checkout
   columns: 9
@@ -2100,6 +2125,12 @@ tables:
   writtenBy:
   - payments
   foreignWriters: null
+- table: payments.method_config
+  columns: 11
+  store: postgres
+  parent: payments.method
+  writtenBy: []
+  foreignWriters: null
 - table: payments.mixed_tender_rules
   columns: 7
   store: postgres
@@ -2113,6 +2144,13 @@ tables:
   parent: ledger.account
   writtenBy:
   - payments
+  foreignWriters: null
+- table: payments.provider
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
   foreignWriters: null
 - table: payments.provider_connection
   columns: 11
@@ -2136,10 +2174,11 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.routing_rule
-  columns: 7
+  columns: 9
   store: postgres
-  parent: null
+  parent: ai.provider
   writtenBy:
+  - orders
   - payments
   foreignWriters: null
 - table: payments.stored_forward
@@ -2154,6 +2193,13 @@ tables:
   parent: platform.device
   writtenBy:
   - payments
+  foreignWriters: null
+- table: payments.token
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
   foreignWriters: null
 readsFrom:
 - service: CatalogueService

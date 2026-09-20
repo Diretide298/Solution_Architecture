@@ -1861,6 +1861,177 @@ paths:
                 $ref: '#/components/schemas/RentalIncident'
 components:
   schemas:
+    RentalAgreement:
+      type: object
+      x-ticvai-persistence: rental.agreement
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the operational rental lifecycle for a customer after booking/order confirmation, including planned and actual handover/return times.'
+      required:
+      - rentalNumber
+      - orderId
+      - customerId
+      - venueId
+      - scheduledStartAt
+      - scheduledReturnAt
+      - status
+      - overdueMinutes
+      properties:
+        id:
+          type: string
+          format: uuid
+        rentalNumber:
+          type: string
+          maxLength: 50
+        orderId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        scheduledStartAt:
+          type: string
+          format: date-time
+        scheduledReturnAt:
+          type: string
+          format: date-time
+        actualStartAt:
+          type: string
+          format: date-time
+          nullable: true
+        actualReturnAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        overdueMinutes:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    RentalAgreementItem:
+      type: object
+      x-ticvai-persistence: rental.agreement_item
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores each serialized or quantity-based item in a rental, enabling partial returns, missing equipment tracking, and per-item status.'
+      required:
+      - rentalAgreementId
+      - orderLineId
+      - catalogueProductId
+      - trackingMode
+      - quantityBooked
+      - quantityCheckedOut
+      - quantityReturned
+      - quantityMissing
+      properties:
+        id:
+          type: string
+          format: uuid
+        rentalAgreementId:
+          type: string
+          format: uuid
+        orderLineId:
+          type: string
+          format: uuid
+        catalogueProductId:
+          type: string
+          format: uuid
+        trackingMode:
+          type: string
+          maxLength: 30
+        resourceBookingId:
+          type: string
+          format: uuid
+          nullable: true
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+        inventoryItemId:
+          type: string
+          format: uuid
+          nullable: true
+        stockReservationId:
+          type: string
+          format: uuid
+          nullable: true
+        quantityBooked:
+          type: number
+        quantityCheckedOut:
+          type: number
+        quantityReturned:
+          type: number
+        quantityMissing:
+          type: number
+        status:
+          type: string
+          maxLength: 30
+        checkedOutAt:
+          type: string
+          format: date-time
+          nullable: true
+        returnedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    RentalInspectionItem:
+      type: object
+      x-ticvai-persistence: rental.inspection_item
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores structured condition results for each rented item or component during checkout/return inspection.'
+      required:
+      - rentalInspectionId
+      - rentalAgreementItemId
+      - conditionStatus
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        rentalInspectionId:
+          type: string
+          format: uuid
+        rentalAgreementItemId:
+          type: string
+          format: uuid
+        componentCode:
+          type: string
+          maxLength: 100
+          nullable: true
+        componentName:
+          type: string
+          maxLength: 200
+          nullable: true
+        conditionStatus:
+          type: string
+          maxLength: 30
+        severity:
+          type: string
+          maxLength: 20
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
     RentalProduct:
       type: object
       x-ticvai-persistence: rental.product

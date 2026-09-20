@@ -170,19 +170,19 @@
    "operations": 12
   },
   {
-   "contract": "finance",
-   "operations": 7
-  },
-  {
    "contract": "tenancy",
    "operations": 7
   },
   {
-   "contract": "public-api",
-   "operations": 5
+   "contract": "finance",
+   "operations": 7
   },
   {
    "contract": "ai",
+   "operations": 5
+  },
+  {
+   "contract": "public-api",
    "operations": 5
   },
   {

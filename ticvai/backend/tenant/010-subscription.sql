@@ -1,4 +1,4 @@
--- subscription — 9 tables
+-- subscription — 13 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -14,6 +14,21 @@ CREATE TABLE IF NOT EXISTS subscription.capacity_pack (
     temporary                         boolean,
     approved_by                       uuid,
     invoice_id                        uuid
+);
+
+-- What a tenant is paying for, and which modules that licenses
+CREATE TABLE IF NOT EXISTS subscription.contract (
+    tenant_id                         uuid NOT NULL,
+    plan_id                           uuid NOT NULL,
+    plan_name                         text,
+    plan_version                      text NOT NULL,
+    status                            text NOT NULL,
+    starts_at                         date NOT NULL,
+    renews_at                         date,
+    cancelled_at                      date,
+    current_price                     numeric(18,4),
+    billing_period                    text,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -82,6 +97,48 @@ CREATE TABLE IF NOT EXISTS subscription.partner_quote (
     state                             text,
     valid_until                       timestamptz,
     created_at                        timestamptz
+);
+
+-- What a tenant pays for — the modules, the limits, the price. Renamed from plan, which sat beside
+-- migration_plan and production_plan
+CREATE TABLE IF NOT EXISTS subscription.plan (
+    code                              text,
+    name                              text,
+    description                       text,
+    cell_tier                         text,
+    base_price                        numeric(18,4),
+    billing_period                    text,
+    includes_branded_app              boolean,
+    included_ai_tokens                integer,
+    id                                uuid PRIMARY KEY,
+    version                           text,
+    is_active                         boolean,
+    subscriber_count                  integer,
+    published_at                      timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS subscription.tier_allowance (
+    id                                uuid PRIMARY KEY,
+    tier_id                           uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    limit_value                       numeric(18,4),
+    period                            text,
+    is_unlimited                      boolean NOT NULL,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS subscription.tier_module (
+    id                                uuid PRIMARY KEY,
+    tier_id                           uuid NOT NULL,
+    code                              text NOT NULL,
+    is_included                       boolean NOT NULL,
+    notes                             text,
+    is_active                         boolean NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
