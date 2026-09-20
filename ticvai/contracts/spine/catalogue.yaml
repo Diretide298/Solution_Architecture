@@ -8679,7 +8679,7 @@ paths:
         '
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_VIEW
+      x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff
       - guest
@@ -8699,7 +8699,7 @@ paths:
       summary: Define a membership programme
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_MANAGE
+      x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -8730,7 +8730,7 @@ paths:
         '
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_VIEW
+      x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff
       - guest
@@ -8750,7 +8750,7 @@ paths:
       summary: Define a benefit
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_MANAGE
+      x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -8781,7 +8781,7 @@ paths:
         '
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_VIEW
+      x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff
       - guest
@@ -8812,7 +8812,7 @@ paths:
         '
       tags:
       - catalogue
-      x-ticvai-permission: CATALOGUE_MANAGE
+      x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue

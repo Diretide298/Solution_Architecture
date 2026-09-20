@@ -7910,6 +7910,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Which access points an admission rule covers

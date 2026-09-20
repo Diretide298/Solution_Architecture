@@ -155,14 +155,50 @@ def main() -> int:
                 # refused `payments.reconciliation_source.connection_id`, which is unambiguously
                 # `payments.provider_connection`, because `sync.cell_connection` shares the
                 # suffix. Every `parent_category_id` self-reference failed the same way.
-                cands = (exact.get(stem) or prefixes.get(stem) or suffixes.get(stem) or [])
-                same = [t for t in cands if t.split(".", 1)[0] == schema]
-                if len(same) == 1:
-                    target = same[0]
+                # **Four tests in strict order, and the order is the whole of it.**
+                #
+                #   1. an EXACT name in the referring schema
+                #   2. an exact name anywhere, if only one table has it
+                #   3. a prefix or suffix in the referring schema
+                #   4. a prefix or suffix anywhere, if unambiguous
+                #
+                # Collapsing 1 and 3 into one same-schema test breaks
+                # `payments.fee_rule.provider_id`: `payments.provider` is the exact match and
+                # `payments.provider_connection` shares the prefix, so both are same-schema, the
+                # test sees two and gives up — landing on `identity.sso_provider` through the
+                # global suffix. **An exact name in your own schema is the strongest evidence
+                # there is** and has to be asked for on its own.
+                #
+                # Running 3 only after 2 fails is what finds
+                # `fnb.reservation_table.reservation_id`: `retail.reservation` and
+                # `orders.reservation` are two exact matches and neither is in `fnb`, so the
+                # global test refuses, and `fnb.table_reservation` — six operations, one schema
+                # away — is waiting in the suffix set.
+                #
+                # **The table itself is never a candidate.** `fnb.reservation_table` is its own
+                # prefix match, and a self-reference needs the declared form: guessing one from a
+                # name is how a join table becomes its own parent.
+                ex = list(exact.get(stem) or [])
+                px = list(set(prefixes.get(stem) or []) | set(suffixes.get(stem) or []))
+                ex_same = [t for t in ex if t.split(".", 1)[0] == schema]
+                px_same = [t for t in px if t.split(".", 1)[0] == schema]
+                for pick in (ex_same, ex, px_same, px):
+                    # **Another table beats the table itself, and the table itself beats
+                    # nothing.** `maintenance.asset_category.parent_category_id` is a real
+                    # self-reference and dropping self outright unlinked every `parent_*_id` in
+                    # the package; keeping self in the running let `fnb.reservation_table` match
+                    # its own prefix and tie with `fnb.table_reservation`, which is the case that
+                    # started this.
+                    ns = [t for t in pick if t != table]
+                    if len(ns) == 1:
+                        target = ns[0]
+                        break
+                    if not ns and len(pick) == 1:
+                        target = pick[0]
+                        break
+                if target:
                     break
-                if stem in stems:
-                    target = stems[stem]
-                    break
+
             if target:
                 add(table, name, target, "convention", "foreignKey")
 

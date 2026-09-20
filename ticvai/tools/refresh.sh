@@ -45,6 +45,13 @@ cd "$(dirname "$0")/.."
 # the 1,445 entries that differ, and reads only; the rebuild it argues for is a separate job that
 # somebody has to decide on rather than have happen to them.
 python3 tools/derive-lineage.py --apply
+
+# **`service-decomposition.json` is an authored input and half of it is arithmetic.**
+# Which schemas a service owns is a boundary decision and nothing rewrites it; the
+# operation and table counts, and the cross-service read and write edges, are counted
+# from the contracts every run. Its note said 520 tables while the package held 623,
+# and five tools read this file -- including the service allocation.
+python3 tools/derive-service-counts.py --apply
 python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
 python3 tools/derive-ddl.py --apply
@@ -267,7 +274,7 @@ echo
 # whether a twin is a duplicate or a deliberate copy, whether an array should be a table. A
 # checker that fails the package on a judgement gets silenced rather than answered -- so they run
 # every time and print, and the judgement stays with whoever reads the run.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-screenless-operations audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.

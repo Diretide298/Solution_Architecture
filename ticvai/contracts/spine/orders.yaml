@@ -8396,6 +8396,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Renewals
@@ -8418,7 +8420,7 @@ paths:
         '
       tags:
       - orders
-      x-ticvai-permission: ORDER_MANAGE
+      x-ticvai-permission: ORDER_MODIFY
       x-ticvai-audience:
       - staff
       - service
@@ -8537,6 +8539,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Fees charged on an order

@@ -142,8 +142,13 @@ def main() -> int:
     print(f"linked {consumed} operations to screens")
     print(f"{uncovered} operations have no screen consuming them")
     print()
-    print("An operation nobody calls is either a screen not yet specified, or an endpoint")
-    print("that should not exist. Worth reading the gap report before assuming the former.")
+    # **This number has been read as a design backlog at least three times and it is not one.**
+    # On 20 September it was 257 and 105 of them needed no screen: a write reached from the
+    # screen its sibling read feeds, an operation running inside a turnstile, a webhook, a job.
+    # Printing the raw count with no route to the answer is what made it keep coming back.
+    print("Most of these need no screen. `handoff/operations-without-screens.md` records which")
+    print("kinds and why; `tools/audit-screenless-operations.py` applies it and prints only the")
+    print("ones that are genuinely unspecified.")
     return 0
 
 

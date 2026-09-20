@@ -8611,6 +8611,8 @@ paths:
         schema:
           type: string
           format: date-time
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Campaigns
@@ -8714,6 +8716,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Rewards
@@ -8835,6 +8839,9 @@ paths:
       - guest
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Badges
@@ -8893,6 +8900,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Badges held
@@ -8961,6 +8970,9 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Venue-defined guest fields and their options
@@ -9087,6 +9099,9 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Response and resolution targets for cases

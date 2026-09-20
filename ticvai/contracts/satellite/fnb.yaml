@@ -5237,6 +5237,8 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Approved substitutions for a recipe's ingredients
@@ -5299,6 +5301,9 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Upsell and pairing suggestions for F&B
