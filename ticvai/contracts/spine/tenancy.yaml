@@ -1650,6 +1650,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceTamperEvent'
 
+  /cells/{cellId}/endpoints:
+    get:
+      operationId: listCellEndpoints
+      summary: Where each service answers inside a cell
+      description: >
+        **A cross-cell call needs an address and the addresses were not readable.**
+        `contract_version` is on the row because two cells can run different versions of the same
+        contract during a rollout, and a caller that assumes otherwise fails in the least debuggable
+        way.
+      tags:
+      - tenancy
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Where each service answers inside a cell
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlatformCellEndpoint'
 components:
   schemas:
     PlatformCellEndpoint:

@@ -8944,8 +8944,236 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /guest-extra-fields:
+    get:
+      operationId: listGuestExtraFields
+      summary: Venue-defined guest fields and their options
+      description: >
+        **A venue that needs one more field about a guest should not need a schema change.** Dietary
+        requirement, accessibility need, school year group — three venues want three different ones,
+        and the alternative is a `notes` column nobody can report on.
+
+        The options come back with the field because a select with no options is not a field.
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Venue-defined guest fields and their options
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GuestExtraFieldDefinition'
+    put:
+      operationId: setGuestExtraFields
+      summary: Define the extra guest fields
+      description: >
+        **Set whole, because removing an option is only safe when the values are in view.** An
+        option deleted while guests still hold it leaves rows pointing at nothing.
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GuestExtraFieldDefinition'
+      responses:
+        '200':
+          description: Define the extra guest fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GuestExtraFieldDefinition'
+  /guests/{guestId}/extra-values:
+    get:
+      operationId: getGuestExtraValues
+      summary: What a guest answered
+      description: >
+        Separate from the field definitions because **the definitions are venue configuration and
+        the values are personal data.** `GUEST_VIEW_PII` guards the values on the write side; the
+        definitions are readable by anyone who can see a guest at all.
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: guestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: What a guest answered
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MarketingGuestExtraValue'
+    put:
+      operationId: setGuestExtraValues
+      summary: Record a guest's answers
+      description: >
+        **Whole, so a cleared answer is expressible.** Sending only what changed cannot say that a
+        guest withdrew a dietary requirement, and a stale allergy is the worst kind of stale.
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: guestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarketingGuestExtraValue'
+      responses:
+        '200':
+          description: Record a guest's answers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MarketingGuestExtraValue'
+  /sla-policies:
+    get:
+      operationId: listSlaPolicies
+      summary: Response and resolution targets for cases
+      description: >
+        **Not `approvals.sla_policy`, which times an approval request.** This times a guest case:
+        first response, resolution, escalation, and whether the clock runs outside business hours.
+        Two tables with one name, and the `audit-duplicate-tables` pairing was a false positive for
+        exactly that reason.
+      tags:
+      - marketing
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Response and resolution targets for cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MarketingSlaPolicy'
+    put:
+      operationId: setSlaPolicy
+      summary: Define an SLA policy
+      description: >
+        **`businessHoursOnly` is the field that makes the rest meaningful.** Four hours to first
+        response means something different on a Sunday night, and a policy that cannot say which
+        breaches every weekend.
+      tags:
+      - marketing
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketingSlaPolicy'
+      responses:
+        '200':
+          description: Define an SLA policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketingSlaPolicy'
+  /waiver-signatures:
+    get:
+      operationId: listWaiverSignatures
+      summary: Signed waivers
+      description: >
+        **`getWaiverStatus` answered whether a guest had signed and nothing could produce the
+        signature.** A waiver whose evidence cannot be retrieved is not a waiver, which is the
+        entire reason venues collect them.
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Signed waivers
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/MarketingWaiverSignature'
 components:
   schemas:
+    GuestExtraFieldDefinition:
+      type: object
+      x-ticvai-persistence: none — composed from a field and its options
+      description: >
+        **A select with no options is not a field**, so the options come back with the
+        definition rather than from a second call.
+      required:
+      - field
+      properties:
+        field:
+          $ref: '#/components/schemas/MarketingGuestExtraField'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketingGuestExtraOption'
     LoyaltyAdjustmentResult:
       type: object
       x-ticvai-persistence: none — composed from the entry posted and the resulting position

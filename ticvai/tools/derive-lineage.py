@@ -319,8 +319,19 @@ def main() -> int:
         # incomplete, not a decision that was wrong.
         for o in sorted(set(stored) & set(fresh)):
             for key, direct_key in (("reads", "_direct_reads"), ("writes", "_direct_writes")):
-                gained = set(fresh[o].get(key) or []) - set(fresh[o].get(direct_key) or [])
-                add = sorted(gained - set(stored[o].get(key) or []))
+                # **Widened on 20 September from "transitive gains" to "anything the contract
+                # demonstrably refs".** The narrow version missed 82 tables, because a
+                # hand-mapped entry can be short for reasons that have nothing to do with
+                # composed schemas: `listBurstEnvironments` returns `BurstEnvironment` and its
+                # 31 August entry lists `catalogue.performance` and not
+                # `control.burst_environment`.
+                #
+                # **A short lineage entry is indistinguishable from a missing API**, and the
+                # unwired audit reported four operations' worth of burst-environment API as a
+                # gap on exactly that basis. Reads and writes derived from a `$ref` are a
+                # derivation, not a judgement — so a missing one is filled. Nothing is ever
+                # removed; a narrowing IS a judgement and `--audit` reports it instead.
+                add = sorted(set(fresh[o].get(key) or []) - set(stored[o].get(key) or []))
                 if add:
                     stored[o][key] = sorted(set(stored[o].get(key) or []) | set(add))
                     followed += len(add)

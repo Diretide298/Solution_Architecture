@@ -5737,8 +5737,88 @@ paths:
               schema:
                 $ref: '#/components/schemas/BillingReconciliation'
 
+  /plans/{planId}/tiers:
+    get:
+      operationId: getPlanTiers
+      summary: What a plan tier allows and includes
+      description: >
+        **Two tables that only make sense together**: `tier_allowance` is the numbers — how many
+        venues, how many users, unlimited or not — and `tier_module` is which modules are switched
+        on. A plan page shows both and a decision about one is made against the other.
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: planId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: What a plan tier allows and includes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanTierDetail'
+    put:
+      operationId: setPlanTiers
+      summary: Set a plan tier's allowances and modules
+      description: >
+        **Whole.** A tier that gained a module and not the allowance to use it sells something the
+        enforcement policy will refuse.
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - name: planId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanTierDetail'
+      responses:
+        '200':
+          description: Set a plan tier's allowances and modules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanTierDetail'
 components:
   schemas:
+    PlanTierDetail:
+      type: object
+      x-ticvai-persistence: none — composed from a tier's allowances and modules
+      description: >
+        **Two tables that only make sense together.** `tierAllowance` is the numbers — how many
+        venues, how many users, unlimited or not — and `tierModule` is which modules are switched
+        on. A tier that gained a module and not the allowance to use it sells something the
+        enforcement policy will refuse.
+      properties:
+        allowances:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionTierAllowance'
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionTierModule'
     SubscriptionTierAllowance:
       type: object
       x-ticvai-persistence: subscription.tier_allowance

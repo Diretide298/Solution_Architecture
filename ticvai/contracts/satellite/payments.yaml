@@ -1133,8 +1133,152 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentConfigurationSimulation'
+  /payments/rules:
+    get:
+      operationId: getPaymentRules
+      summary: Currency, eligibility and fee rules as one set
+      description: >
+        **Three tables, one decision.** Whether a guest may pay with this method, in this currency,
+        and what it costs the venue are evaluated together at checkout, and an administrator
+        changing one without seeing the others is how a method becomes eligible in a currency it
+        cannot settle.
+
+        **`payment_policy_id` was dropped from all three**: no such table exists and it resolved to
+        `whitelabel.policy` — a payment rule pointing at a website's terms page. They are scoped by
+        `scopePath`, `channelId` and `businessArea`, which they already carry.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Currency, eligibility and fee rules as one set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRuleSet'
+    put:
+      operationId: setPaymentRules
+      summary: Replace the payment rule set
+      description: >
+        **Whole, for the reason the read is composed.** An eligibility rule admitting a currency the
+        currency rule does not settle is only visible when both are in front of you.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRuleSet'
+      responses:
+        '200':
+          description: Replace the payment rule set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRuleSet'
+  /deposits/{depositId}/activity:
+    get:
+      operationId: listDepositActivity
+      summary: Movements on a deposit
+      description: >
+        **Authorise, capture, release, forfeit — the history a disputed deposit is settled from.**
+        `orders.deposit` carries the five running totals and could not say how they got there.
+
+        The deposit referenced is `orders.deposit`, the authorisation lifecycle, **not**
+        `ledger.deposit`, which is the liability posting. Both exist, both are called deposit, and
+        the convention matcher correctly refused to guess — so the reference is declared.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: depositId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Movements on a deposit
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentsDepositActivity'
+    post:
+      operationId: recordDepositActivity
+      summary: Record a movement on a deposit
+      description: >
+        **A forfeit needs a reason and an author, which is why this is a row rather than a column
+        update.** A deposit that went from authorised to forfeited with no record of who decided is
+        the dispute the venue loses.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: depositId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentsDepositActivity'
+      responses:
+        '201':
+          description: Record a movement on a deposit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentsDepositActivity'
 components:
   schemas:
+    PaymentRuleSet:
+      type: object
+      x-ticvai-persistence: none — composed from the three payment rule tables
+      description: >
+        **Three tables, one decision.** Whether a guest may pay with this method, in this
+        currency, and what it costs the venue are evaluated together at checkout. An
+        administrator changing one without seeing the others is how a method becomes eligible in
+        a currency it cannot settle.
+      properties:
+        currencyRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsCurrencyRule'
+        eligibilityRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsEligibilityRule'
+        feeRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsFeeRule'
     PaymentsCurrencyRule:
       type: object
       x-ticvai-persistence: payments.currency_rule

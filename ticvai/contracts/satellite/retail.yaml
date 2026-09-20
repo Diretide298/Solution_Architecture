@@ -1086,6 +1086,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StoreRule'
+  /product-recommendations:
+    get:
+      operationId: listRetailRecommendations
+      summary: Upsell and pairing suggestions for retail
+      description: >
+        The retail half of the same table F&B keeps. **Separate because the merchandising is
+        separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
+        serving both would be filtered on every read.
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Upsell and pairing suggestions for retail
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetailProductRecommendation'
 components:
   schemas:
     RetailProductRecommendation:

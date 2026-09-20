@@ -8842,8 +8842,121 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CataloguePlanBenefit'
+  /pricing/dynamic-rules:
+    get:
+      operationId: listDynamicPriceRules
+      summary: Dynamic pricing rules
+      description: >
+        Decision 5 of the schema merge took all three `pricing` tables and said the schema needed an
+        owner. **It had none because it had no operations** — a service is inferred from the
+        contract that declares them, and nothing declared any. They live here because a price
+        belongs to the catalogue.
+
+        **Read from a replica inside the cell.** A dynamic price is evaluated at a till; a rule
+        fetched across a cell boundary at the moment of sale is a queue.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Dynamic pricing rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PricingDynamicPriceRule'
+  /pricing/dynamic-rules/{ruleId}:
+    get:
+      operationId: getDynamicPriceRule
+      summary: One rule with its conditions and actions
+      description: >
+        **A rule is unreadable without both halves.** The conditions say when it fires and the
+        actions say what it does to the price, and a screen showing one without the other cannot
+        tell a reviewer whether the rule is safe. `minPrice` and `maxPrice` on the action are the
+        guard rails, and they are the first thing anyone looks for.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: One rule with its conditions and actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamicPriceRuleDetail'
+    put:
+      operationId: setDynamicPriceRule
+      summary: Replace a rule, its conditions and its actions
+      description: >
+        **Applied whole.** A rule whose conditions have been updated and whose actions have not is a
+        rule that fires on the new trigger with the old discount, and for a live price that is a
+        loss taken silently.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DynamicPriceRuleDetail'
+      responses:
+        '200':
+          description: Replace a rule, its conditions and its actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamicPriceRuleDetail'
 components:
   schemas:
+    DynamicPriceRuleDetail:
+      type: object
+      x-ticvai-persistence: none — composed from a rule, its conditions and its actions
+      description: >
+        **A rule is unreadable without both halves.** The conditions say when it fires, the
+        actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the
+        guard rails a reviewer looks for first.
+      required:
+      - rule
+      properties:
+        rule:
+          $ref: '#/components/schemas/PricingDynamicPriceRule'
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDynamicPriceCondition'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDynamicPriceAction'
     CatalogueMembershipBenefit:
       type: object
       x-ticvai-persistence: catalogue.membership_benefit
@@ -8956,14 +9069,14 @@ components:
       x-ticvai-persistence: pricing.dynamic_price_action
       description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.'
       required:
-      - ruleId
+      - dynamicPriceRuleId
       - type
       - value
       properties:
         id:
           type: string
           format: uuid
-        ruleId:
+        dynamicPriceRuleId:
           type: string
           format: uuid
         type:
@@ -8983,7 +9096,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.'
       required:
       - actionId
-      - ruleId
+      - dynamicPriceRuleId
       - type
       - ruleOperator
       - valueJson
@@ -8992,7 +9105,7 @@ components:
         actionId:
           type: string
           format: uuid
-        ruleId:
+        dynamicPriceRuleId:
           type: string
           format: uuid
         type:

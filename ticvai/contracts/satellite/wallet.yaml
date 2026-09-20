@@ -2003,6 +2003,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Wallet'
+  /wallets/{walletId}/balance:
+    get:
+      operationId: getWalletBalance
+      summary: A wallet's balance
+      description: >
+        **Keyed by wallet, not by guest, and that is the cross-cell decision.** A shared wallet
+        spans venues and a guest spans cells; listing balances by guest would make a till in another
+        cell fetch across the boundary on a payment path. The wallet's own cell owns the balance and
+        answers for it.
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: walletId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: A wallet's balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletBalance'
+  /wallets/{walletId}/holds:
+    get:
+      operationId: listWalletHolds
+      summary: Funds held against a wallet
+      description: >
+        **A hold is the difference between a balance and a spendable balance**, and a guest refused
+        at a till with money showing is this table being invisible. `seating.seat_hold_item` and
+        `control.rollout` both point at it.
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: walletId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Funds held against a wallet
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletHold'
 components:
   schemas:
     WalletBalance:

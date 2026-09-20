@@ -8450,6 +8450,134 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /deposits:
+    get:
+      operationId: listDeposits
+      summary: Deposits and their authorisation state
+      description: >
+        **The authorisation lifecycle, not the accounting one.** `required`, `authorized`,
+        `captured`, `released` and `forfeited` are what the card company knows; `ledger.deposit`
+        holds the liability posting and its `refundableUntil`. Two tables called deposit, two
+        different questions.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Deposits and their authorisation state
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersDeposit'
+  /order-discounts:
+    get:
+      operationId: listOrderDiscounts
+      summary: Discounts applied to orders
+      description: >
+        **Distinct from `promotions`, which decides whether a discount applies.** This records that
+        one did, to this order, for this amount — the row a refund has to reverse and a report has
+        to total.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Discounts applied to orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersDiscount'
+  /orders/{orderId}/fees:
+    get:
+      operationId: listOrderFees
+      summary: Fees charged on an order
+      description: >
+        **A booking fee is not a line and not a tax**, and putting it in either makes one of the two
+        wrong. A guest disputing a total is usually disputing a fee, and until now there was nowhere
+        to read them.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Fees charged on an order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdersOrderFee'
+  /upgrades:
+    get:
+      operationId: listUpgrades
+      summary: Upgrade requests and their outcome
+      description: >
+        **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
+        the cheap half; the record is what a guest arriving with an upgraded entitlement is checked
+        against.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Upgrade requests and their outcome
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersUpgrade'
 components:
   schemas:
     OrdersDeposit:

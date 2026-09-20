@@ -5215,6 +5215,99 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+  /recipes/{recipeId}/substitutes:
+    get:
+      operationId: listIngredientSubstitutes
+      summary: Approved substitutions for a recipe's ingredients
+      description: >
+        **A kitchen out of an ingredient substitutes it whether or not the system says so.**
+        Recording which swaps are approved is how an allergen declaration survives a delivery that
+        did not arrive.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: recipeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Approved substitutions for a recipe's ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbIngredientSubstitute'
+    put:
+      operationId: setIngredientSubstitutes
+      summary: Define approved substitutions
+      description: >
+        Set whole per recipe: a substitution list is reviewed as a list, usually against an allergen
+        matrix.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: recipeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FnbIngredientSubstitute'
+      responses:
+        '200':
+          description: Define approved substitutions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbIngredientSubstitute'
+  /product-recommendations:
+    get:
+      operationId: listFnbRecommendations
+      summary: Upsell and pairing suggestions for F&B
+      description: >
+        **Seventeen columns and no way to read them.** Kept whole from the backend workbook when the
+        ten duplicate catalogue tables were collapsed, because we have nothing like it —
+        `promotions.getUpsellSuggestions` computes, and this is what a venue configured.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Upsell and pairing suggestions for F&B
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbProductRecommendation'
 components:
   schemas:
     FnbIngredientSubstitute:
