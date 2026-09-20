@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 60
+  "operationsWithNoScreen": 85
  },
  "waves": {
   "wave2": 2,
@@ -72,7 +72,7 @@
    "operations": 7
   },
   {
-   "contract": "queue",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -80,11 +80,11 @@
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "queue",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "ai",
    "operations": 1
   }
  ],
@@ -477,6 +477,12 @@
     "summary": "The policies a device needs to decide for itself"
    },
    {
+    "operation": "getMembership",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "A membership with its history, usage and renewals"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -493,6 +499,30 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "Reusable policy shapes"
+   },
+   {
+    "operation": "listCustomerMemberships",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listModules",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The module tree permissions are grouped under"
+   },
+   {
+    "operation": "listPermissions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every permission key the contracts enforce"
+   },
+   {
+    "operation": "recordBenefitUsage",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Consume a benefit"
    },
    {
     "operation": "setAccessPolicyState",
@@ -519,10 +549,22 @@
     "summary": "Suppress an address"
    },
    {
+    "operation": "awardBadge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Award a badge"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "getGuestExtraValues",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What a guest answered"
    },
    {
     "operation": "getLostItemMatches",
@@ -531,10 +573,64 @@
     "summary": "Candidate matches, scored"
    },
    {
+    "operation": "getLoyaltyRules",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Every rule a loyalty programme runs on"
+   },
+   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "issueReward",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a reward to a guest"
+   },
+   {
+    "operation": "listBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest can be awarded"
+   },
+   {
+    "operation": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest holds"
+   },
+   {
+    "operation": "listGuestExtraFields",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Venue-defined guest fields and their options"
+   },
+   {
+    "operation": "listLoyaltyCampaigns",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Time-boxed campaigns inside a programme"
+   },
+   {
+    "operation": "listLoyaltyPointEntries",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The ledger behind a points balance"
+   },
+   {
+    "operation": "listRewardAssignments",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Rewards issued to guests, and whether they were used"
+   },
+   {
+    "operation": "listRewards",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What points can be turned into"
    },
    {
     "operation": "listSegmentMembers",
@@ -543,16 +639,70 @@
     "summary": "List guests currently matching a segment"
    },
    {
+    "operation": "listSlaPolicies",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Response and resolution targets for cases"
+   },
+   {
+    "operation": "listWaiverSignatures",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Signed waivers"
+   },
+   {
     "operation": "recordLostItem",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Report something lost, or hand something in"
    },
    {
+    "operation": "setBadge",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a badge"
+   },
+   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setGuestExtraFields",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define the extra guest fields"
+   },
+   {
+    "operation": "setGuestExtraValues",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Record a guest's answers"
+   },
+   {
+    "operation": "setLoyaltyCampaign",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a loyalty campaign and its window"
+   },
+   {
+    "operation": "setLoyaltyRules",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Replace a programme's rules as one set"
+   },
+   {
+    "operation": "setReward",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a reward and its points cost"
+   },
+   {
+    "operation": "setSlaPolicy",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define an SLA policy"
    },
    {
     "operation": "startKioskAssist",

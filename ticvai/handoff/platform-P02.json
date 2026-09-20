@@ -15,7 +15,7 @@
   "contracts": 17,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 1
+  "operationsWithNoScreen": 8
  },
  "waves": {
   "wave1": 20,
@@ -178,19 +178,19 @@
    "operations": 5
   },
   {
-   "contract": "wallet",
-   "operations": 4
-  },
-  {
    "contract": "white-label",
    "operations": 4
   },
   {
-   "contract": "ai",
+   "contract": "wallet",
    "operations": 4
   },
   {
    "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -202,7 +202,7 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 1
   },
   {
@@ -210,7 +210,7 @@
    "operations": 1
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -857,6 +857,48 @@
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "getPlanBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Which benefits a plan grants, and how much of each"
+   },
+   {
+    "operation": "listMembershipBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Benefits a plan can grant"
+   },
+   {
+    "operation": "listMembershipProgrammes",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "listCustomerMemberships",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest can be awarded"
+   },
+   {
+    "operation": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest holds"
+   },
+   {
+    "operation": "listRewards",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What points can be turned into"
+   },
    {
     "operation": "recordRecommendationOutcome",
     "contract": "promotions",

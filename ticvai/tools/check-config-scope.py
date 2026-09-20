@@ -69,6 +69,16 @@ IS_CONFIG = re.compile(
     r"Config|Setting|Policy|Rule|Template|Toggle|Enablement|Mapping|Threshold|"
     r"AdmissionRules|WorkstationProfile|"
     r"Layout|Board|Denomination|Programme|Definition|Dashboard|"
+    # **Widened 20 September** for thirteen operations written that day whose scope the
+    # rules could not see. Every one defines a thing other rows resolve against rather
+    # than recording an event: a job title a posting names, a shift pattern a rota is
+    # built from, a tier a membership sits in, a badge or reward a guest is awarded, an
+    # integration source that masters a field, an approved substitution for an
+    # ingredient. **`Benefit` is the sharpest case** — a plan benefit is the definition
+    # and `identity.benefit_usage` is the record written against it, and only the first
+    # is configuration.
+    r"JobTitle|ShiftPattern|Tier|Badge|Reward|PlanBenefit|MembershipBenefit|Substitute|"
+    r"IntegrationSource|FieldOwnership|ExtraField|ExtraValue|LoyaltyCampaign|"
     # **Widened 19 September** for ten operations that carried a scope the rules could not
     # see. A *Type* is the clearest case: a credit type, a wallet type, an attraction type
     # and an event type are each a thing a venue defines once and everything else resolves
@@ -117,7 +127,15 @@ NOT_CONFIG = re.compile(
     # nothing.** A supplier quotation is a commercial record with its own lifecycle — quoted,
     # compared, awarded, or it lapses. The widened vocabulary that caught five real guest settings
     # also caught this, which is the cost of a keyword list and worth paying.
-    r"GuestProfile|createResource|createVenueMap|createDonationCampaign|recordQuotation", re.I)
+    # **`createBadgePrintJob` reaches these rules because 20 September added `Badge`, and a
+    # print job configures nothing** — it is a job with a queue and an outcome. Same cost,
+    # same list, same reason it is worth paying.
+    r"GuestProfile|createResource|createVenueMap|createDonationCampaign|recordQuotation|"
+    # **`updateCellTier` says it itself**: *"Promotion from shared to dedicated is a
+    # migration, not a setting. Returns a job to track."* Tagging a config scope onto
+    # something its author explicitly called not-a-setting would be answering the checker
+    # rather than the question.
+    r"BadgePrintJob|updateCellTier", re.I)
 WRITES = ("put", "post", "patch")
 
 

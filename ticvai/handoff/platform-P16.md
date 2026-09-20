@@ -9,17 +9,20 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 79 |
+| Operations with no screen | 124 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 79 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `listAccessChanges` | access | GET | Changes made to an entitlement's access |
+| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
+| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
@@ -36,31 +39,28 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
+| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
+| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
+| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
+| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
+| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
-| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
-| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
-| `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
-| `submitCountLines` | inventory | POST | Submit counted quantities |
-| `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
-| `addSuppression` | marketing-crm | POST | Suppress an address |
-| `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
-| `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
-| `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| … | | | 39 more |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| … | | | 84 more |
 
 ## Modules
 

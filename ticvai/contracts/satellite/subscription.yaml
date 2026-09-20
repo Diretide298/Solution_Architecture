@@ -2994,6 +2994,12 @@ paths:
       - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      # Added 20 September when `IS_CONFIG` was widened to see `Tier`. A membership
+      # product and its tiers are defined once and everything else resolves against
+      # them, which is the distinction that list draws. **Still provisional** — the
+      # shape was read out of a workshop PDF and the scope is this operation's declared
+      # level, not an independent judgement about where a venue should set it.
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary

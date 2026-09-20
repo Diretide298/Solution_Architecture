@@ -9,17 +9,20 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 93 |
+| Operations with no screen | 164 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 93 operations with no screen here
+### 164 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `listAccessChanges` | access | GET | Changes made to an entitlement's access |
+| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
+| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
@@ -36,11 +39,20 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
+| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
+| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
+| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
+| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
+| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
@@ -48,19 +60,7 @@
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
-| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
-| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
-| `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
-| `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
-| `updateTable` | fnb | PUT | Change what a table is |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
-| `evaluateAccess` | identity | POST | Decide, now, and say why |
-| … | | | 53 more |
+| … | | | 124 more |
 
 ### 1 modules split across waves
 

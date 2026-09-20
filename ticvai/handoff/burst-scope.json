@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 1974,
-  "tables": 42,
-  "ofTotalTables": 637
+  "ofTotalOperations": 2055,
+  "tables": 44,
+  "ofTotalTables": 623
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 1940,
-    "tables": 637,
+    "operations": 2021,
+    "tables": 623,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 42,
+    "tables": 44,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -299,7 +299,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 21,
+   "columns": 23,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -395,7 +395,7 @@
   {
    "table": "catalogue.entitlement_template",
    "schema": "catalogue",
-   "columns": 35,
+   "columns": 39,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -406,7 +406,7 @@
   {
    "table": "catalogue.variant",
    "schema": "catalogue",
-   "columns": 5,
+   "columns": 8,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -417,7 +417,7 @@
   {
    "table": "identity.delegated_access",
    "schema": "identity",
-   "columns": 19,
+   "columns": 21,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -525,6 +525,17 @@
    "note": "**Every presentation of a credential, admitted or not.** The highest-volume table in the platform"
   },
   {
+   "table": "approvals.decision",
+   "schema": "approvals",
+   "columns": 13,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Every decision at every level. **Immutable once the request completes** — an approval is evidence **Hangs off**: reaches `approvals.request` through its keys; references `approvals.request`, `identity.principal`. **Reach"
+  },
+  {
    "table": "approvals.request",
    "schema": "approvals",
    "columns": 26,
@@ -593,7 +604,7 @@
   {
    "table": "marketing.loyalty_position",
    "schema": "marketing",
-   "columns": 10,
+   "columns": 11,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -666,6 +677,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A retail transaction**, distinct from an admission sale because it moves stock"
+  },
+  {
+   "table": "retail.sale_line",
+   "schema": "retail",
+   "columns": 13,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One item sold**, which produces a stock movement"
   },
   {
    "table": "seating.seat_category",
@@ -787,7 +809,9 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.performance",
-    "catalogue.variant"
+    "catalogue.variant",
+    "orders.cart",
+    "orders.cart_line"
    ],
    "writes": [
     "catalogue.inventory_hold",
@@ -926,8 +950,10 @@
    "contract": "approvals",
    "callsPerBuyer": 1,
    "reads": [
+    "approvals.decision",
     "approvals.delegation",
     "approvals.matrix",
+    "approvals.request",
     "approvals.rule",
     "identity.principal"
    ],
@@ -1178,7 +1204,8 @@
    "contract": "retail",
    "callsPerBuyer": 1,
    "reads": [
-    "retail.sale"
+    "retail.sale",
+    "retail.sale_line"
    ],
    "writes": [],
    "lock": null
