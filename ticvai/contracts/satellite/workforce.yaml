@@ -995,6 +995,654 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
 
+  /employees:
+    get:
+      operationId: listEmployees
+      summary: People, as the HR system of record has them
+      description: 'Resource board 3 page 45, decision 6 of the schema merge. **The employee record
+        is a projection of an external system and this endpoint reads it, never writes it.** The write
+        path is a synchronisation run; `field_ownership` says which fields we may hold an opinion about
+        at all.
+
+        **`workforce.employee` had no operation of any kind until 20 September** — the rota, attendance
+        and leave were all wired and the people they are about were not.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      parameters:
+      - name: employmentStatus
+        in: query
+        schema:
+          type: string
+      - name: jobTitleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Employees
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceEmployee'
+  /employees/{employeeId}:
+    get:
+      operationId: getEmployee
+      summary: One person, with their employment, postings and leave balances
+      description: 'Four tables and one question. **A profile screen that fans out across four list
+        endpoints is four round trips and four chances to show a half-loaded person**, so the
+        employment record, the postings and the leave balances come back composed.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      parameters:
+      - name: employeeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceEmployeeProfile'
+        '404':
+          description: No such employee
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /job-titles:
+    get:
+      operationId: listJobTitles
+      summary: The job titles a posting can name
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Job titles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceJobTitle'
+    put:
+      operationId: setJobTitle
+      summary: Define a job title
+      description: '**Ours to configure even where the HRMS masters the people.** A venue names the
+        role a posting fills; the external system names the person who fills it.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceJobTitle'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceJobTitle'
+  /leave-types:
+    get:
+      operationId: listLeaveTypes
+      summary: Leave types and how each accrues
+      description: '**`requestLeave` existed and nothing described what could be requested.** A leave
+        request carries a type; the types were a vocabulary nobody could read.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Leave types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceLeaveType'
+    put:
+      operationId: setLeaveType
+      summary: Define a leave type
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceLeaveType'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceLeaveType'
+  /leave-balances:
+    get:
+      operationId: listLeaveBalances
+      summary: What each person has left, by leave type
+      description: '**A leave request that cannot be checked against a balance is a form, not a
+        workflow.** `requestLeave` has existed since the contract was written and the balance it
+        should refuse against had no operation.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: employeeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: leaveTypeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceLeaveBalance'
+  /shifts:
+    get:
+      operationId: listShifts
+      summary: Named shift patterns
+      description: '**Distinct from `/shift-templates`, and the distinguishing column is
+        `crossesMidnight`.** A pattern says that 22:00 to 06:00 is one shift; a template carries two
+        timestamps and already knows. This is the definition, that is the instance.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceShift'
+    put:
+      operationId: setShift
+      summary: Define a shift pattern and its break
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceShift'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceShift'
+  /work-assignments:
+    get:
+      operationId: listWorkAssignments
+      summary: Where each person is posted, and from when
+      description: '**A posting is not a rota slot.** `rota_assignment` says a principal works
+        Saturday 14:00 to 22:00; this says they are a Ride Operator at Venue 3, Attractions
+        department, from 1 March and primary. **A roster could not be checked against a posting
+        because only one of the two was wired.**
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: employeeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: activeOn
+        in: query
+        description: Postings in force on this date. Omit for current.
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Postings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceWorkAssignment'
+    put:
+      operationId: setWorkAssignment
+      summary: Post a person to a job title at a venue
+      description: '**A posting ends by `effectiveTo`, never by deletion.** An attendance record from
+        March has to resolve against the posting that was in force in March.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceWorkAssignment'
+      responses:
+        '200':
+          description: Posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceWorkAssignment'
+        '409':
+          description: Overlaps an existing primary posting, or the employee is terminated externally
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /integration-sources:
+    get:
+      operationId: listIntegrationSources
+      summary: External systems that master workforce data, and their health
+      description: 'Resource board 10. **The six-state display the board asks for lives on this row** —
+        what is connected, when it last synchronised, and whether its credentials still work.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceIntegrationSource'
+    put:
+      operationId: setIntegrationSource
+      summary: Connect or reconfigure an external workforce system
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceIntegrationSource'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceIntegrationSource'
+  /integration-sources/{sourceId}/field-ownership:
+    get:
+      operationId: getFieldOwnership
+      summary: Which fields this source masters
+      description: 'Resource board 3, Ownership Rules: *"For every field, administrators shall determine
+        ... External System Master. This prevents conflicting updates."*
+
+        **Absent means ours**, so nothing has to be enumerated before it is decided and the set returned
+        here is only what somebody has actually said.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Ownership rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceFieldOwnership'
+    put:
+      operationId: setFieldOwnership
+      summary: Declare who masters each field
+      description: '**Set as a whole, not row by row.** Ownership is only meaningful read together —
+        a screen showing nine fields owned externally and one owned here is the artefact an
+        administrator is reasoning about, and applying it one row at a time leaves it inconsistent in
+        the middle.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkforceFieldOwnership'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceFieldOwnership'
+  /sync-runs:
+    get:
+      operationId: listSyncRuns
+      summary: Synchronisation history, with counts
+      description: 'Resource board 10 asks the page to show successful records, failed records,
+        warnings and mapping errors rather than *"integration failed"*.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: analytical
+      parameters:
+      - name: sourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Runs
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceSyncRun'
+    post:
+      operationId: startSync
+      summary: Run a synchronisation now
+      description: '**This is the write path for `workforce.employee`.** The projection is not edited
+        through an API; it is replaced by what the system of record says, field by field, subject to
+        `field_ownership`.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One run per source at a time. Two concurrent runs against one HRMS
+        produce conflicts that are artefacts of the runs rather than of the data.
+
+        '
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sourceId
+              properties:
+                sourceId:
+                  type: string
+                  format: uuid
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Report what would change without applying it.
+      responses:
+        '202':
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceSyncRun'
+        '409':
+          description: A run is already in progress for this source
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /sync-conflicts:
+    get:
+      operationId: listSyncConflicts
+      summary: Disagreements a person has to settle
+      description: 'Resource board 3 names the cases: an employee in HR and not here, a venue changed
+        externally, a certification expired, and *"employee terminated externally but has future TICVAI
+        assignments"*.
+
+        **`affectedAssignmentIds` is a snapshot, not a live join** — what was at risk when the conflict
+        was raised, which must not change when a roster does.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - name: sourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Conflicts
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceSyncConflict'
+    post:
+      operationId: resolveSyncConflict
+      summary: Settle a disagreement
+      description: '**Board 3 requires the downstream consequence to be visible, not just the
+        conflict.** Resolving a terminated-externally conflict has to say what happens to the future
+        assignments it flagged, which is why the resolution names them rather than leaving a rota to
+        discover it.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveSyncConflictRequest'
+      responses:
+        '200':
+          description: Resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceSyncConflict'
+        '409':
+          description: Already resolved, or the resolution is not available for this kind
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 components:
   securitySchemes:
     bearerAuth:
@@ -1002,6 +1650,78 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    WorkforceEmployeeProfile:
+      type: object
+      x-ticvai-persistence: none — composed from employee and four related tables
+      description: >
+        **One person and everything a profile screen asks about them.** The employment record, the
+        postings and the leave balances are separate tables and one question, so fanning out across
+        four endpoints is four round trips and four chances to render a half-loaded person.
+      required:
+      - employee
+      properties:
+        employee:
+          $ref: '#/components/schemas/WorkforceEmployee'
+        employments:
+          type: array
+          description: >
+            Most recent first. **More than one is normal** — a seasonal worker rehired each summer
+            has several, and collapsing them to the current one loses the service history that
+            leave accrual is calculated from.
+          items:
+            $ref: '#/components/schemas/WorkforceEmployment'
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkforceWorkAssignment'
+        leaveBalances:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkforceLeaveBalance'
+        jobTitles:
+          type: array
+          description: >
+            The titles the postings name, so a client does not have to resolve them one by one.
+          items:
+            $ref: '#/components/schemas/WorkforceJobTitle'
+        externallyMasteredFields:
+          type: array
+          description: >
+            **Which fields on this record the venue may not edit**, resolved from
+            `field_ownership` for whichever source masters this employee. A screen that shows an
+            editable input over a field the HRMS owns has promised something it cannot keep.
+          items:
+            type: string
+    ResolveSyncConflictRequest:
+      type: object
+      x-ticvai-persistence: none — writes sync_conflict
+      required:
+      - conflictId
+      - resolution
+      properties:
+        conflictId:
+          type: string
+          format: uuid
+        resolution:
+          type: string
+          enum:
+          - acceptExternal
+          - keepTicvai
+          - retry
+          - ignore
+          - escalate
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+        releaseAffectedAssignments:
+          type: boolean
+          default: false
+          description: >
+            **For a termination conflict, what happens to the shifts already rostered.** Board 3
+            requires the downstream consequence to be acted on rather than reported: releasing them
+            puts the shifts back on the marketplace, and leaving them means a manager has decided
+            to cover them another way.
     WorkforceIntegrationSource:
       type: object
       x-ticvai-persistence: workforce.integration_source
