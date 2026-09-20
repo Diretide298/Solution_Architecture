@@ -47,11 +47,15 @@ and usually enough to predict what an ADR says.
 | [0044](0044-which-tables-partition-by-venue.md) | Which tables partition by venue | **Proposed** — needs sign-off before any DDL | — completes 0005 |
 | [0045](0045-every-order-carries-a-proven-contact.md) | **Every order carries a proven contact, and the gate is the checkout page** | Accepted | **CF-172** |
 | [0046](0046-on-premise-has-two-configurations.md) | **On-premise has two configurations, and the difference is a control channel** | Accepted | **CF-61** — amends 0017, closes the AI question in 0020 |
+| [0047](0047-how-long-data-is-kept-and-where-it-goes-next.md) | **How long data is kept, and where it goes next** | Accepted — one number pending | **CF-64** (closed), **CF-165** — amends 0042 |
+| [0048](0048-guest-recurring-billing-is-commerce.md) | **Guest recurring billing is commerce, not the Control Plane** | Accepted | **BL-100** — relates to 0039, 0043, 0028 |
 
 > **This table is twelve entries short.** 0026 to 0037 are on disk and were never added to it —
 > the index has not kept up since 24 August. 0038 is here because it supersedes two of the rows
 > above it, and a supersession that is not visible in the index is a superseded ADR somebody
-> still reads as current. **0040 to 0045 were added 18 September**, **0046 on 19 September** — the gap is now 0026–0037 only.
+> still reads as current. **0040 to 0045 were added 18 September**, **0046 on 19 September**,
+> **0047 and 0048 on 21 September** — 0047 was written the day before and added a day late, which
+> is the same lapse this note has been describing since August. The gap is now 0026–0037 only.
 
 ## Still needed
 
