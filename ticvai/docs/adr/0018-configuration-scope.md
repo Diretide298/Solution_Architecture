@@ -117,7 +117,10 @@ last year silently follows it. The frozen value has to be written down, which is
 |---|---|
 | `venue_settings` gains `currency_code` and `currency_scale` | written at creation from the region, frozen at first trade |
 | the freeze needs a guard | an operation that changes a traded venue's currency must fail, the way `check-package` already fails an operation declaring a scope it is not entitled to |
-| `ledger.fx_rate` is keyed `region_id` | a venue trading outside its entity's currency needs FX from **its** currency to the books. There is no venue granularity today, and this is the one piece of real work in the change |
+| `ledger.posting` and `journal_line` carry one amount and no currency | **this is the real work.** Currency is inherited from `account.currency`, so a venue trading in USD posts into an AED entity with the USD figure gone. Multi-currency accounting keeps both, and `platform.wallet_authorisation` already does exactly that — `allocation_currency`, `home_currency`, `consuming_currency`, `amount_in_consuming_currency` |
+| `ledger.settlement` has no currency | `provider_gross`, `ledger_gross` and `difference` are bare numbers, so a provider file in one currency against a ledger in another computes a meaningless difference |
+| `runFxRevaluation` is narrower than its name | it reads `ledger.inter_entity_obligation` only. It cannot revalue a venue's foreign balance because nothing records one |
+| `ledger.fx_rate` is keyed `region_id` | **not a blocker.** It scopes which rate *set* applies, not which pairs exist — a USD venue looks up USD→AED in its region's set. Load the pairs |
 | `region_settings` is a bundle | currency sits beside date format, number format and fiscal year. A venue overrides currency and scale only; the rest still resolves from the region |
 
 **What did not move.** Tax rates, cash denominations, chart of accounts, settlement and acquirer

@@ -546,9 +546,26 @@ free-zone unit or a duty-free shop genuinely trades in a currency its region doe
 override is free once the frozen column exists, and it does not let a venue choose its VAT,
 which was the conflation. See the 20 September amendment to ADR-0018.
 
-**The one real piece of work it leaves:** `ledger.fx_rate` is keyed `region_id`. A venue trading
-outside its legal entity's currency needs FX from **its** currency to the books, and there is no
-venue granularity today.
+**What it leaves, corrected 20 September.** `ledger.fx_rate` being keyed `region_id` is *not*
+the blocker — it scopes which rate set applies, not which pairs exist, so a USD venue looks up
+USD→AED in its own region's set. That was overstated. The real gaps are in the ledger:
+
+    ledger.journal_line    journal_entry_id, account_id, debit, credit, venue_id, cost_center_id
+    ledger.posting         ..., account_code, debit, credit, venue_id, cost_center_id, ...
+    ledger.settlement      provider_gross, provider_fees, provider_net, ledger_gross, difference
+
+**A posting carries one amount and no currency**, inherited from `account.currency`, so a venue
+trading in USD posts into an AED entity with the USD figure gone. Settlement carries no currency
+at all, so `difference` between a provider file and a ledger in another currency means nothing.
+And `runFxRevaluation` reads `ledger.inter_entity_obligation` only — it cannot revalue a venue's
+foreign balance because nothing records one.
+
+**The package already solved this shape once.** `platform.wallet_authorisation` carries
+`allocation_currency`, `home_currency`, `consuming_currency` and `amount_in_consuming_currency`
+for cross-cell wallet spend. The ledger never got the same treatment.
+
+**Foreign tender already works and is not affected** — `orders.payment` has `tender_currency`,
+`fx_rate` and `fx_rate_source`, and 14 operations across 27 screens are already on that path.
 
 ### Why it is worth telling them
 
