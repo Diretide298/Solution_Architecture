@@ -48835,6 +48835,14 @@ screens:
     contract: orders
     purpose: Deposit, Partial Payment & Outstanding Balance Management
     trigger: onLoad
+  - operationId: listDepositActivity
+    contract: payments
+    purpose: What has happened against this deposit
+    trigger: onLoad
+  - operationId: recordDepositActivity
+    contract: payments
+    purpose: Record a capture, release or adjustment
+    trigger: onAction
   entryState:
     preloaded:
     - DepositPartialPaymentOutstandingBalanceManagementView.total

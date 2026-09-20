@@ -40,7 +40,13 @@ someone to search for a table that was never meant to exist.
 
 One migration per module, applied in order. Module boundaries match the contract tiers.
 
-    V0001__baseline.sql              platform, RLS, partitioning, outbox, pii   [DONE]
+    001-extensions.sql               ltree, btree_gist, pgcrypto                [DERIVED]
+    002-migration-register.sql       platform.schema_version                    [DERIVED]
+    010-<schema>.sql                 621 tables across 32 schemas               [DERIVED]
+    900-foreign-keys.sql             632 declared references                    [DERIVED]
+    910-indexes.sql                  conventions and scope paths                [DERIVED]
+    920-row-level-security.sql       242 by scope_path, 58 by venue_id          [DERIVED]
+    930-partitioning.sql             the venue partition helper (ADR-0044)      [DERIVED]
     V0002__identity.sql              principals, roles, grants, sso, mfa
     V0003__tenancy.sql               workstations, sale boards, devices
     V0003a__scope-typing.sql         level-typed scope FKs, outlet, tenant projection

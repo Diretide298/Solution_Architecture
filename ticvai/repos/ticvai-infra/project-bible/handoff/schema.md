@@ -45,7 +45,7 @@ prices, guests and entitlement definitions are shared; transactions are not.
 
 ---
 
-## Applied — `V0001__baseline.sql`
+## Applied — the generated template under `backend/`
 
 | Object | Purpose |
 |---|---|
@@ -135,4 +135,4 @@ A static product table cannot express it; pure runtime expansion kills pricing q
 
 ## Files
 
-`ticvai-backend/src/Ticvai.Migrations/Scripts/` — `V0001__baseline.sql` applied.
+`backend/tenant/` and `backend/control/`, applied in numeric order by `backend/provision-tenant.sh`. **Both `V*` series were deleted on 21 September** — the root baseline because its content is generated now, and the August `V0001`-`V0003b` set in the backend repo because it was the superseded generation.

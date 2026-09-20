@@ -60778,6 +60778,14 @@ screens:
     purpose: What is being changed
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getPaymentRules
+    contract: payments
+    purpose: The rules currently in force
+    trigger: onLoad
+  - operationId: setPaymentRules
+    contract: payments
+    purpose: Amend them
+    trigger: onSave
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-567
@@ -65053,6 +65061,22 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id013
+  - operationId: getDunningPolicy
+    contract: payments
+    purpose: Read the retry schedule this venue runs
+    trigger: onLoad
+  - operationId: setDunningPolicy
+    contract: payments
+    purpose: Set attempts, spacing and what happens when they run out
+    trigger: onSave
+  - operationId: listDunningCases
+    contract: payments
+    purpose: The queue, ordered by attempts remaining
+    trigger: onLoad
+  - operationId: resolveDunningCase
+    contract: payments
+    purpose: Stop chasing, with a reason
+    trigger: onAction
   entryState:
     preloaded:
     - AED 200 ✓

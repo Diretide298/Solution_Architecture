@@ -175,6 +175,242 @@ TYPE_MAP = {
 
 POSTGRES_STORES = {"postgres", "postgres-analytical"}
 
+# --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
+
+EXTENSIONS = """-- Extensions, applied before any table.
+-- **Derived by tools/derive-ddl.py. Do not hand-edit.**
+--
+-- **Numbered 001 so it sorts before 010-*.** `ltree` is used by the scope index and the
+-- row-level-security predicate, so it cannot arrive after the tables that depend on it.
+-- This is why the machinery could not be a `V*.sql` file living beside the numeric series:
+-- digits sort before letters, and the security layer would have applied last.
+
+-- ltree carries the scope tree. GiST indexes its containment operators, which is what makes
+-- `<@` cheap enough to sit inside every policy on every table.
+CREATE EXTENSION IF NOT EXISTS ltree;
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+"""
+
+RLS_HEAD = """-- Row-level security.
+-- **Derived by tools/derive-ddl.py. Do not hand-edit.**
+--
+-- **Default deny is the point.** With `ticvai.scope_paths` unset, every policy below returns no
+-- rows. A connection that forgets to set it sees an empty database, not the whole of it — which
+-- is the Sprint 1 Gate 0 criterion, written as a predicate rather than a promise.
+--
+-- **Applied to every table that carries `scope_path`, which is what changed on 21 September.**
+-- The hand-written baseline enabled RLS on three tables. The partition key is a column this
+-- generator already knows about on every table that has one, so the policy set is derived rather
+-- than remembered — and a new table with a `scope_path` is protected by existing, not by somebody
+-- noticing.
+
+-- The paths the current connection may see, read from a session GUC the API layer sets per
+-- request. `true` in current_setting makes an unset GUC return NULL rather than raising, so an
+-- unconfigured connection degrades to zero rows instead of an error nobody catches.
+CREATE OR REPLACE FUNCTION platform.current_scope_paths()
+    RETURNS ltree[]
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT COALESCE(
+        (SELECT array_agg(p::ltree)
+           FROM unnest(string_to_array(
+                    NULLIF(current_setting('ticvai.scope_paths', true), ''), ',')) AS p
+          WHERE btrim(p) <> ''),
+        ARRAY[]::ltree[]);
+$$;
+
+-- True when the row sits at or beneath one of the granted paths. An empty grant list matches
+-- nothing — deny is the default, and it is the default because it is the absence of a grant
+-- rather than the presence of a denial.
+CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path text)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT row_scope_path IS NOT NULL
+       AND cardinality(platform.current_scope_paths()) > 0
+       AND row_scope_path::ltree <@ ANY (platform.current_scope_paths());
+$$;
+
+-- Applies the standard policy to a table.
+-- **FORCE is the whole point.** Without it the table owner — which is what a migration and most
+-- pooled application connections run as — bypasses every policy silently.
+CREATE OR REPLACE FUNCTION platform.apply_scope_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := 'scope_isolation';
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format(
+        'CREATE POLICY %I ON %s USING (platform.in_scope(scope_path)) '
+        'WITH CHECK (platform.in_scope(scope_path))', policy_name, target);
+END
+$$;
+
+-- **59 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path` alone
+-- leaves every one of them open.** `check-migrations` has said so since it was written — *"checking
+-- only scope_path missed 41 tables that carry venue_id instead; they would have passed with no
+-- policy at all"* — and the hand-written baseline never closed it because it protected three
+-- tables in total.
+--
+-- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
+-- the price of not carrying a redundant `scope_path` column on sixty tables**, and `platform.scope`
+-- is small, cached and indexed on `id`.
+CREATE OR REPLACE FUNCTION platform.venue_in_scope(row_venue_id uuid)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT row_venue_id IS NOT NULL
+       AND cardinality(platform.current_scope_paths()) > 0
+       AND EXISTS (
+            SELECT 1 FROM platform.scope s
+             WHERE s.id = row_venue_id
+               AND s.path::ltree <@ ANY (platform.current_scope_paths()));
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_venue_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := 'venue_isolation';
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format(
+        'CREATE POLICY %I ON %s USING (platform.venue_in_scope(venue_id)) '
+        'WITH CHECK (platform.venue_in_scope(venue_id))', policy_name, target);
+END
+$$;
+"""
+
+# **The scope tree protects itself on `path`, which is the column it calls its own scope_path.**
+# `platform.scope` is what every other policy resolves against, so leaving it open would make the
+# rest decorative: a connection that can read the whole tree can read every path in it.
+SCOPE_SELF_RLS = """
+ALTER TABLE platform.scope ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform.scope FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS scope_isolation ON platform.scope;
+CREATE POLICY scope_isolation ON platform.scope
+    USING (platform.in_scope(path))
+    WITH CHECK (platform.in_scope(path));
+"""
+
+PARTITION_HEAD = """-- The venue partitioning mechanism (ADR-0005, ADR-0044).
+-- **Derived by tools/derive-ddl.py. Do not hand-edit.**
+--
+-- ADR-0044, signed off 18 September 2026: a table whose `venue_id` is NOT NULL partitions by list
+-- on it, carries `venue_id` as the leading column of its primary key, and every foreign key into
+-- it is composite. **What lives here is the mechanism; the tables declare their own partitioning
+-- where they are created.**
+--
+-- **Every partitioned table needs a DEFAULT partition.** Misconfiguration should be loud rather
+-- than silently lossy — an insert for an unprovisioned venue lands somewhere it can be found.
+--
+-- **One thing from the old baseline is deliberately not carried: the `platform.scope_level` enum.**
+-- It existed so a `venue_id` column could not resolve to a workstation, paired with a composite
+-- foreign key in a `V0003a__scope-typing.sql` that is not part of this generation. Every
+-- `scope_level` column here is `text`, derived from contracts that declare it as a string.
+-- **Emitting an unused type would imply a constraint nothing enforces**, so the gap is named here
+-- instead: scope levels are validated by the application, not by the database.
+CREATE OR REPLACE FUNCTION platform.ensure_venue_partition(target regclass, venue_id uuid)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    part_name text;
+    parent_name text := target::text;
+BEGIN
+    part_name := replace(split_part(parent_name, '.', 2) || '_' ||
+                         replace(venue_id::text, '-', ''), '.', '_');
+    IF to_regclass(format('%I.%I', split_part(parent_name, '.', 1), part_name)) IS NOT NULL THEN
+        RETURN;
+    END IF;
+    EXECUTE format('CREATE TABLE %I.%I PARTITION OF %s FOR VALUES IN (%L)',
+                   split_part(parent_name, '.', 1), part_name, target, venue_id);
+END
+$$;
+"""
+
+
+MIGRATION_REGISTER = """-- The migration register.
+-- **Derived by tools/derive-ddl.py. Do not hand-edit.**
+--
+-- **The one table this generator cannot derive**, because `handoff/schema-reference.json` carries
+-- it with no columns — it is storage the contracts never describe, which is correct: no operation
+-- reads or writes it. It came from `V0001__baseline.sql` and would have been lost when that file
+-- was deleted on 21 September.
+--
+-- Migrations fan out per region, not per tenant (ADR-0014). A tenant in three regions is three
+-- cells and three applications, and they may legitimately sit at different versions mid-rollout.
+-- **Emitted into both databases** because ADR-0039 made `control` a database of its own, and a
+-- database that is migrated independently needs its own record of where it got to.
+CREATE TABLE IF NOT EXISTS platform.schema_version (
+    version                           text PRIMARY KEY NOT NULL,
+    description                       text NOT NULL,
+    checksum                          text NOT NULL,
+    applied_at                        timestamptz NOT NULL DEFAULT now(),
+    applied_by                        text NOT NULL DEFAULT current_user,
+    execution_ms                      integer,
+    rollback_tested_at                timestamptz
+);
+
+-- **Deliberately not under RLS**, and it carries no `scope_path` to put one on: the register
+-- describes the database rather than anybody's data, and a connection that cannot read it cannot
+-- safely migrate.
+"""
+
+
+def rls_file(db: str, scoped: list, by_venue: list, total: int, has_scope_table: bool) -> str:
+    """The functions, then one call per table — by `scope_path` where it has one, by `venue_id`
+    where it does not."""
+    body = [RLS_HEAD if db == "tenant" else RLS_HEAD.replace(
+        "-- Row-level security.", "-- Row-level security, control database.")]
+    body.append(
+        f"-- **{len(scoped)} tables carry `scope_path` and {len(by_venue)} carry `venue_id` "
+        f"instead, out of {total}.**\n"
+        "-- Both are protected. A table with neither is not scoped -- it is reference data, a\n"
+        "-- registry, or the migration log itself, and a policy on it would deny every row to\n"
+        "-- everybody.\n")
+    if has_scope_table:
+        body.append(SCOPE_SELF_RLS)
+    # **Quoted through `q()` like every other identifier this file emits.** `marketing.case` is a
+    # reserved word and `'marketing.case'::regclass` does not parse; the first cut of this emitter
+    # wrote it unquoted, and `check-migrations` could not see the mistake because its own regex
+    # stopped at the quote in `CREATE TABLE marketing."case"`. Two blind spots lining up is how a
+    # table ends up with no policy and nothing saying so.
+    def qual(t: str) -> str:
+        s, n = t.split(".", 1)
+        return f"{q(s)}.{q(n)}"
+
+    if scoped:
+        body.append("\n-- Scoped by path.")
+        body += [f"SELECT platform.apply_scope_rls('{qual(t)}'::regclass);" for t in scoped]
+    if by_venue:
+        body.append("\n-- Scoped by venue, resolved through the scope tree.")
+        body += [f"SELECT platform.apply_venue_rls('{qual(t)}'::regclass);" for t in by_venue]
+    return "\n".join(body) + "\n"
+
+
+def partition_file(tables: list) -> str:
+    lines = [PARTITION_HEAD, "",
+             f"-- **{len(tables)} tables qualify today** — a NOT NULL `venue_id` in the schema "
+             "reference.\n-- Listed rather than counted, because ADR-0044's rule is checkable and "
+             "the list is how.\n"]
+    lines += [f"--   {t}" for t in tables]
+    return "\n".join(lines) + "\n"
+
 RESERVED = {"table", "order", "user", "group", "check", "default", "references", "primary",
             "column", "constraint", "index", "unique", "all", "any", "case", "end", "from",
             "to", "grant", "limit", "offset", "return", "session", "authorization"}
@@ -446,6 +682,44 @@ def main() -> int:
     # the unit of provisioning, migration, backup and destruction, which needs one artefact
     # that creates it, applies the template and registers the row. Without it, “apply the
     # template” is a sentence in an ADR rather than a thing that runs.
+    # 5. **The machinery layer, which lived outside this generator until 21 September and was the
+    # only place row-level security existed.** `src/Ticvai.Migrations/Scripts/V0001__baseline.sql`
+    # held the extensions, the scope vocabulary, the RLS functions, the partition helper and the
+    # outbox — and it lived outside `backend/` for one reason, stated in `current-work.md`: a
+    # `V*.sql` file in `backend/` sorts after the numeric series and would apply last.
+    #
+    # **That reasoning was right and the consequence was that `backend/` shipped with no security
+    # at all.** Every table here was created, constrained and indexed, and nothing enabled RLS on
+    # any of them. It also meant `platform.outbox` and `platform.dead_letter` existed in both
+    # files — the exact duplicate-definition failure `backend/README.md` records from 31 August.
+    #
+    # **Emitting it here makes the series one series**, numbered so the order is the apply order,
+    # and regenerated in full like everything else.
+    for db in (CONTROL, "tenant"):
+        files[f"{db}/001-extensions.sql"] = EXTENSIONS
+        files[f"{db}/002-migration-register.sql"] = (
+            MIGRATION_REGISTER if db == "tenant" else
+            MIGRATION_REGISTER.replace("CREATE TABLE IF NOT EXISTS platform.schema_version",
+                                       "CREATE SCHEMA IF NOT EXISTS platform;\n\n"
+                                       "CREATE TABLE IF NOT EXISTS platform.schema_version"))
+
+    scoped = sorted(t for t in real if any(c["column"] == "scope_path" for c in cols[t]))
+    venue_only = sorted(t for t in real if t not in set(scoped)
+                        and any(c["column"] == "venue_id" for c in cols[t]))
+    for db in ("tenant", CONTROL):
+        mine = [t for t in scoped if area(t.split(".")[0]) == db]
+        vmine = [t for t in venue_only if area(t.split(".")[0]) == db]
+        total = len(by_schema.get(CONTROL) or []) if db == CONTROL else n_tenant_tables
+        files[f"{db}/920-row-level-security.sql"] = rls_file(
+            db, mine, vmine, total, has_scope_table=("platform.scope" in real and db == "tenant"))
+
+    # **The venue partition mechanism** (ADR-0005, ADR-0044). The helper only; the tables that use
+    # it declare their own partitioning where they are created.
+    partitioned = sorted(t for t in real if area(t.split(".")[0]) == "tenant"
+                         and any(c["column"] == "venue_id" and c.get("required") == "yes"
+                                 for c in cols[t]))
+    files["tenant/930-partitioning.sql"] = partition_file(partitioned)
+
     files["provision-tenant.sh"] = PROVISION
 
     # **The compose entry point.** provision-tenant.sh takes one tenant; a cell has several, and

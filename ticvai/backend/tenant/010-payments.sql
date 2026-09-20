@@ -73,6 +73,8 @@ CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     created_at                        timestamptz NOT NULL
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS payments.dunning_case (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
@@ -85,9 +87,13 @@ CREATE TABLE IF NOT EXISTS payments.dunning_case (
     first_failed_at                   timestamptz NOT NULL,
     resolved_at                       timestamptz,
     resolution                        text,
+    resolution_note                   text,
+    resolved_by_principal_id          uuid,
     scope_path                        text
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS payments.dunning_policy (
     id                                uuid PRIMARY KEY,
     max_attempts                      integer NOT NULL,

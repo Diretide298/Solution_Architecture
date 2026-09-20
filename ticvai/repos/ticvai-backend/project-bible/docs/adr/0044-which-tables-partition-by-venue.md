@@ -2,7 +2,7 @@
 
 **Status:** Accepted — signed off by Chinmay, 18 September 2026. **The full rule, not the six-table
 subset**: `venue_id NOT NULL` implies `PARTITION BY LIST (venue_id)`, a leading `venue_id` in the
-primary key, and composite foreign keys into it. The 74 columns are in scope. `V0001__baseline.sql`
+primary key, and composite foreign keys into it. The 74 columns are in scope. `backend/tenant/930-partitioning.sql`
 is written against this.
 **Date:** 8 September 2026
 **Amends:** [ADR-0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) — it decided *that* venues are isolated by list partitioning and never said which tables

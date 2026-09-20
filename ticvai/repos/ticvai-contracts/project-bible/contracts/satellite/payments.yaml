@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
-  x-ticvai-screen-count: 31
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -55,6 +55,8 @@ paths:
   /dunning-policy:
     get:
       operationId: getDunningPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
       summary: How a failed recurring charge is chased
       description: '2.14.19-2.14.23, BL-100. **Recurring guest billing had auto-renewal and no
         answer for the renewal that fails**, which is the case that actually happens.
@@ -76,6 +78,8 @@ paths:
                 $ref: '#/components/schemas/DunningPolicy'
     put:
       operationId: setDunningPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
       summary: Set the retry schedule and what happens when it runs out
       description: '2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes
         and must never share a counter.** `setPaymentFailoverPolicy` governs retry *inside* one
@@ -129,6 +133,8 @@ paths:
   /dunning-cases:
     get:
       operationId: listDunningCases
+      x-ticvai-consumed-by:
+        - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
       summary: Recurring charges currently being chased
       description: '2.14.19-2.14.23, BL-100. **The work queue, and the number a venue actually
         manages by.** A dunning policy with no view of what it is doing is a schedule running in
@@ -164,6 +170,8 @@ paths:
   /dunning-cases/{caseId}/resolve:
     post:
       operationId: resolveDunningCase
+      x-ticvai-consumed-by:
+        - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
       summary: Stop chasing, with a reason
       description: 'BL-100. **The manual exit, and it is an operation rather than a status edit
         because somebody has to own it.** A guest who paid at a counter, a card replaced over the
@@ -1298,6 +1306,8 @@ paths:
   /payments/rules:
     get:
       operationId: getPaymentRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
       summary: Currency, eligibility and fee rules as one set
       description: >
         **Three tables, one decision.** Whether a guest may pay with this method, in this currency,
@@ -1324,6 +1334,8 @@ paths:
                 $ref: '#/components/schemas/PaymentRuleSet'
     put:
       operationId: setPaymentRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
       summary: Replace the payment rule set
       description: >
         **Whole, for the reason the read is composed.** An eligibility rule admitting a currency the
@@ -1353,6 +1365,8 @@ paths:
   /deposits/{depositId}/activity:
     get:
       operationId: listDepositActivity
+      x-ticvai-consumed-by:
+        - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
       summary: Movements on a deposit
       description: >
         **Authorise, capture, release, forfeit — the history a disputed deposit is settled from.**
@@ -1386,6 +1400,8 @@ paths:
                   $ref: '#/components/schemas/PaymentsDepositActivity'
     post:
       operationId: recordDepositActivity
+      x-ticvai-consumed-by:
+        - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
       summary: Record a movement on a deposit
       description: >
         **A forfeit needs a reason and an author, which is why this is a row rather than a column

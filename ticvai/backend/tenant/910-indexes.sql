@@ -513,6 +513,10 @@ CREATE INDEX IF NOT EXISTS ix_chargeback_evidence_chargeback_id ON payments.char
 CREATE INDEX IF NOT EXISTS ix_deposit_activity_created_by_principal_id ON payments.deposit_activity (created_by_principal_id);
 -- convention, not declared: payments.deposit_activity.deposit_id -> payments.deposit_activity
 CREATE INDEX IF NOT EXISTS ix_deposit_activity_deposit_id ON payments.deposit_activity (deposit_id);
+-- convention, not declared: payments.dunning_case.order_id -> orders.sales_order
+CREATE INDEX IF NOT EXISTS ix_dunning_case_order_id ON payments.dunning_case (order_id);
+-- convention, not declared: payments.dunning_case.subject_id -> pii.subject
+CREATE INDEX IF NOT EXISTS ix_dunning_case_subject_id ON payments.dunning_case (subject_id);
 -- convention, not declared: payments.eligibility_rule.payment_method_id -> payments.method
 CREATE INDEX IF NOT EXISTS ix_eligibility_rule_payment_method_id ON payments.eligibility_rule (payment_method_id);
 -- convention, not declared: payments.fee_rule.payment_method_id -> payments.method

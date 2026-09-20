@@ -500,7 +500,7 @@ Change Log reading narrowed it wrongly.
 ### Build, on the critical path
 
 - [x] **ADR-0044 signed off** — full partitioning rule, 32 tables qualify
-- [x] **V0001__baseline.sql written** — RLS with `FORCE`, scope tree, partition helper, outbox,
+- [x] **The machinery layer is generated** (21 September) — RLS with `FORCE`, scope tree, partition helper, outbox,
       `platform.schema_version`. `check-migrations` PASS
 - [ ] **B5 migration orchestrator** — 10 days, critical path, fans out per region, every migration
       needs a tested `-- ROLLBACK`
@@ -529,7 +529,7 @@ rewrite prose elsewhere in the package. Phrase counts so it cannot match them.
 run, forever, until someone rebuilds by hand.
 
 **`backend/` is derived** — but only `0*.sql` and `9*.sql` are deleted on regeneration, which is why
-`V0001__baseline.sql` survives. It lives in `src/Ticvai.Migrations/Scripts/` regardless, because a
+**Superseded 21 September.** The machinery moved into `derive-ddl.py` and is emitted as `001-extensions.sql` and `920-row-level-security.sql`, so the whole series regenerates together. It used to live in `src/Ticvai.Migrations/Scripts/` because a
 `V*.sql` file in `backend/` sorts after the numeric series and would apply last.
 
 **Never trust a name match, and never trust column overlap alone.** Read both column lists.
