@@ -7951,6 +7951,36 @@ components:
             and liveness are different questions** — an instance being emptied is not an instance being
             down, and collapsing them would either strand its tenants or send new ones to a host that
             is being retired.'
+        role:
+          type: string
+          enum:
+          - primary
+          - archive
+          - burst
+          default: primary
+          description: '**What the instance is for, which decides whether a tenant may be placed
+            on it.** ADR-0042 provisions a new tenant onto the instance in its region with the
+            most headroom, and until this column existed every instance was a candidate.
+
+
+            **`archive` holds data past its active stage** (ADR-0047) and takes almost no
+            connections, so an emptiest-first rule reads it as the best place in the region and
+            would put the next tenant provisioned straight onto it.
+
+
+            **`burst` is CF-162''s flash-sale environment and has no trailing history at all**,
+            so its headroom reads as total — emptiest-first would send the most violent workload
+            in the estate to whichever host has the least room for it.
+
+
+            **Only `primary` is placed onto, and `archive` and `burst` enter no other instance''s
+            headroom figure.** A sale that joined the trailing seven-day average would push
+            tenants away from that host for a week after it had gone quiet.
+
+
+            **Distinct from `status: draining`.** Draining is a state an instance passes through
+            and is temporary; a role is permanent. Marking an archive as draining to keep tenants
+            off it would make a healthy instance indistinguishable from one being retired.'
         maxConnections:
           type: integer
           nullable: true
