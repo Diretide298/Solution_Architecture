@@ -50,15 +50,15 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
-   "operations": 2
-  },
-  {
    "contract": "fnb",
    "operations": 2
   },
   {
    "contract": "white-label",
+   "operations": 2
+  },
+  {
+   "contract": "marketing-crm",
    "operations": 2
   },
   {

@@ -1268,6 +1268,12 @@
    "mentions": 2
   },
   {
+   "file": "docs\\active\\schema-merge-final-report-20-september.md",
+   "title": "Schema merge \u2014 final report",
+   "status": "",
+   "mentions": 2
+  },
+  {
    "file": "docs\\active\\screen-duplicate-triage.md",
    "title": "Identical operation sets \u2014 what each cluster actually is",
    "status": "",
@@ -1544,7 +1550,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 31,
+  "documents": 32,
   "openConflicts": 1
  }
 }

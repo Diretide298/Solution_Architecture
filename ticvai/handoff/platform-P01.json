@@ -156,11 +156,11 @@
    "operations": 5
   },
   {
-   "contract": "white-label",
+   "contract": "wallet",
    "operations": 4
   },
   {
-   "contract": "wallet",
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -168,7 +168,7 @@
    "operations": 4
   },
   {
-   "contract": "ai",
+   "contract": "white-label",
    "operations": 4
   },
   {
@@ -180,7 +180,7 @@
    "operations": 2
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -188,7 +188,7 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 1
   }
  ],

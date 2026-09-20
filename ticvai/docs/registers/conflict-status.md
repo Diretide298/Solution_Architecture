@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **16** |
-| OPEN — Softlabs | **1** |
-| CLOSED | **152** |
+| OPEN — client | **12** |
+| OPEN — Softlabs | **0** |
+| CLOSED | **157** |
 | WITHDRAWN | **6** |
 | **Total** | **175** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**17 open, 152 closed.**
+**12 open, 157 closed.**
 
 
-## Open — needs a client decision — 16
+## Open — needs a client decision — 12
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -28,24 +28,14 @@ register.
 | **CF-133** | The platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices, simplif | Qossai + finance |
 | **CF-140** | The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found. `sources/planning/TAIS_Product_Planning_ | Chinmay + Qossai |
 | **CF-162** | Three deployment scenarios were requested and the package models one. The 24 August session asks Softlabs to document (a) independent tenant deploymen | Dinesh |
-| **CF-163** | `openDated` was missing from `ProductKind` and it is one of six main ticket types the client draws. The *Create Ticket Flow* board names Open Dated, G | Chinmay |
-| **CF-164** | The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered n | Chinmay + Allam |
 | **CF-165** | Consent, retention and archival were walked in the 20 August CRM session and the package has consent only. `recordConsent` exists, CF-160 settled that | Allam |
 | **CF-166** | Seat map reuse and comparison — three of four gaps closed, and the fourth was never a gap. The 21 August decision reads: *"full and partial (section-l |  |
-| **CF-167** | The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region. Two sources want it in two places | Chinmay + Dinesh |
 | **CF-168** | A region may now hold more than one Postgres instance, and nothing decides which one a new tenant lands on. ADR-0040 removed the ceiling by letting a  | Chinmay + Dinesh |
 | **CF-169** | Three places where the data model was built and no screen was ever written, and one where the reverse is true. ADR-0041 turns 57 command centres into  | Chinmay + Dinesh |
 | **CF-170** | Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.  | Chinmay + Dinesh |
 | **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 | Chinmay + Qossai |
-| **CF-172** | The identity contract said both that an unverified guest buys and that it cannot. `verifyGuestEmail`: *"Unverified accounts still buy. Blocking purcha | Chinmay |
 
-## Open — Softlabs to resolve — 1
-
-| ID | Issue | Owner |
-|---|---|---|
-| **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
-
-## Closed — 152
+## Closed — 157
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -68,6 +58,7 @@ register.
 | **CF-18** | Dynamic bundle auto-discounting design. Closed 17 August — ADR-0019, and the gap was two things wearing one name. The contract could not express a dyn |  |
 | **CF-19** | KDS scope |  |
 | **CF-20** | AI data residency |  |
+| **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 | **CF-22** | Accreditation vs entitlement |  |
 | **CF-23** | 10 Aug §5.1 has a lost subject — "agreed this makes more sense and will be adopted" names nobody. Closed 17 August: the missing name no longer matters |  |
 | **CF-24** | 9.2% actor coverage — 292 of 3,184 requirements name a human actor. Closed 17 August, and the measure was wrong. Actor coverage in requirement *text*  |  |
@@ -200,6 +191,10 @@ register.
 | **CF-159** | Food safety was absent from 947 operations, and it is a regulatory obligation rather than a feature. Found 20 August auditing the client F&B hi-fi boa | Chinmay |
 | **CF-160** | Two joins that did not exist, declared 24 August. (1) No screen said which module it belonged to. `LicencePosition.moduleKey` was a free string and `s | Chinmay |
 | **CF-161** | Database segregation per service was decided in a workshop and the package had already decided the opposite |  |
+| **CF-163** | `openDated` was missing from `ProductKind` and it is one of six main ticket types the client draws. The *Create Ticket Flow* board names Open Dated, G | Chinmay |
+| **CF-164** | The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered n | Chinmay + Allam |
+| **CF-167** | The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region. Two sources want it in two places | Chinmay + Dinesh |
+| **CF-172** | The identity contract said both that an unverified guest buys and that it cannot. `verifyGuestEmail`: *"Unverified accounts still buy. Blocking purcha | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6

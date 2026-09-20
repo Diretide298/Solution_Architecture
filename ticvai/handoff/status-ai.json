@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 31,
+  "documents": 32,
   "openConflicts": 1
  },
  "metrics": {
@@ -249,6 +249,11 @@
   {
    "file": "docs\\active\\schema-merge-decision-log.md",
    "title": "Schema merge \u2014 the decision log",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\schema-merge-final-report-20-september.md",
+   "title": "Schema merge \u2014 final report",
    "status": ""
   },
   {

@@ -111,11 +111,11 @@
    "operations": 3
   },
   {
-   "contract": "games",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "games",
    "operations": 2
   },
   {
@@ -123,11 +123,11 @@
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "wallet",
    "operations": 1
   },
   {
-   "contract": "wallet",
+   "contract": "assets",
    "operations": 1
   },
   {

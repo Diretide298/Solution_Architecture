@@ -39,11 +39,11 @@
    "operations": 6
   },
   {
-   "contract": "orders",
+   "contract": "cross-region",
    "operations": 2
   },
   {
-   "contract": "cross-region",
+   "contract": "orders",
    "operations": 2
   },
   {

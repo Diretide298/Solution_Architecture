@@ -50137,5 +50137,28 @@
    "postgres",
    "redis"
   ]
+ },
+ "deleteDashboard": {
+  "contract": "reporting",
+  "verb": "DELETE",
+  "path": "/dashboards/{dashboardId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "REPORT_MANAGE",
+  "offline": false,
+  "summary": "Archive a dashboard",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
  }
 }

@@ -72,7 +72,7 @@
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "ai",
    "operations": 1
   },
   {
@@ -84,7 +84,7 @@
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "finance",
    "operations": 1
   }
  ],

@@ -82,9 +82,26 @@ def main() -> int:
     # A row whose text says it is closed while it sits in an open section. This drifted twice:
     # new items were inserted at the top of the open table and completed ones were never moved,
     # so on 17 August eleven closed conflicts were still filed as open.
-    RESOLVED = re.compile(r"\*\*Closed \d|Closed \d+ \w+\.|\*\*Closed\b|Recovered —|Added —", re.I)
+    # **Widened 20 September.** It matched `Added —` and CF-163 said `Added 24 August`, so a
+    # conflict whose work landed on 24 August read as open for four weeks. A resolution is
+    # written as a verb and a date far more often than as a verb and a dash.
+    #
+    # **The date has to be a real month.** The first widening took any two words, so CF-164's
+    # *"built 96 operations"* read as a closure — and CF-164 is open precisely because the
+    # building happened and the workshop did not. A guard that reports the opposite of the
+    # conflict it is reading is worse than no guard.
+    RESOLVED = re.compile(
+        r"\*\*Closed \d|Closed \d+ \w+\.|\*\*Closed\b|Recovered —|"
+        r"(?:Added|Built|Fixed|Resolved|Corrected|Implemented|Decided) "
+        r"(?:—|\d{1,2} (?:January|February|March|April|May|June|July|August|September|"
+        r"October|November|December))", re.I)
+    # **A row that says it stays open, stays open.** CF-168 reads "Decided 8 September by
+    # ADR-0042, and it stays open on one number" — the decision was taken and one threshold is
+    # still a client's to set. Warning on that trains people to ignore the warning.
+    STILL = re.compile(r"stays open|remains open|still open|open on one|one number", re.I)
     for r in rows:
-        if r["section"].startswith("Open") and RESOLVED.search(" | ".join(r["cells"])):
+        cells = " | ".join(r["cells"])
+        if r["section"].startswith("Open") and RESOLVED.search(cells) and not STILL.search(cells):
             print(f"  WARN  {r['id']} reads as resolved but sits under '{r['section']}'",
                   file=sys.stderr)
 

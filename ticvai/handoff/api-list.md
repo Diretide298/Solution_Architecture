@@ -314,8 +314,8 @@ Defines what can be sold and what it grants.
 | GET | `/effective-date-season` | `listEffectiveDateSeason` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/entitlement-templates` | `listEntitlementTemplates` | `PRODUCT_VIEW` | ✓ | venue-management-web |
 | POST | `/entitlement-templates` | `createEntitlementTemplate` | `PRODUCT_CONFIGURE` | — | venue-management-web |
-| GET | `/entitlement-templates/{templateId}/benefits` | `getPlanBenefits` | `CATALOGUE_VIEW` | — | — |
-| PUT | `/entitlement-templates/{templateId}/benefits` | `setPlanBenefits` | `CATALOGUE_MANAGE` | — | — |
+| GET | `/entitlement-templates/{templateId}/benefits` | `getPlanBenefits` | `PRODUCT_VIEW` | — | — |
+| PUT | `/entitlement-templates/{templateId}/benefits` | `setPlanBenefits` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/entitlements/{entitlementId}/freeze` | `freezeEntitlement` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/entitlements/{entitlementId}/reinstate` | `reinstateEntitlement` | `PRODUCT_CONFIGURE` | — | — |
 | POST | `/entitlements/{entitlementId}/suspend` | `suspendEntitlement` | `ORDER_MODIFY` | — | — |
@@ -354,11 +354,11 @@ Defines what can be sold and what it grants.
 | GET | `/location-venue-event` | `listLocationVenueEvent` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/market-tourism-holiday` | `listMarketTourismHoliday` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/market-venue-currency` | `listMarketVenueCurrency` | `PRODUCT_VIEW` | — | ticvai-web |
-| GET | `/membership-benefits` | `listMembershipBenefits` | `CATALOGUE_VIEW` | — | — |
-| PUT | `/membership-benefits` | `setMembershipBenefit` | `CATALOGUE_MANAGE` | — | — |
+| GET | `/membership-benefits` | `listMembershipBenefits` | `PRODUCT_VIEW` | — | — |
+| PUT | `/membership-benefits` | `setMembershipBenefit` | `PRODUCT_CONFIGURE` | — | — |
 | GET | `/membership-loyalty-pricing` | `listMembershipLoyaltyPricing` | `PRODUCT_VIEW` | — | ticvai-web |
-| GET | `/membership-programmes` | `listMembershipProgrammes` | `CATALOGUE_VIEW` | — | — |
-| PUT | `/membership-programmes` | `setMembershipProgramme` | `CATALOGUE_MANAGE` | — | — |
+| GET | `/membership-programmes` | `listMembershipProgrammes` | `PRODUCT_VIEW` | — | — |
+| PUT | `/membership-programmes` | `setMembershipProgramme` | `PRODUCT_CONFIGURE` | — | — |
 | GET | `/nearby-event-exhibition` | `listNearbyEventExhibition` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/package-bundle-add` | `listPackageBundleAdd` | `PRODUCT_VIEW` | — | ticvai-web |
 | GET | `/performances/{performanceId}` | `getPerformance` | `PRODUCT_VIEW` | ✓ | guest-app, guest-web, venue-management-web, venue-pos |
@@ -684,7 +684,7 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | GET | `/media/{mediaCode}/entitlements` | `getMediaEntitlements` | `ORDER_VIEW` | ✓ | venue-management-web, venue-pos, venue-staff-app |
 | POST | `/media/{mediaCode}/entitlements` | `appendEntitlementToMedia` | `ORDER_CREATE` | — | venue-management-web, venue-pos, venue-staff-app |
 | GET | `/memberships/{membershipId}/renewals` | `listMembershipRenewals` | `ORDER_VIEW` | — | — |
-| POST | `/memberships/{membershipId}/renewals` | `renewMembership` | `ORDER_MANAGE` | — | — |
+| POST | `/memberships/{membershipId}/renewals` | `renewMembership` | `ORDER_MODIFY` | — | — |
 | PUT | `/multi-payment-split` | `setMultiPaymentSplit` | `ORDER_CREATE` | — | ticvai-web, venue-management-web |
 | GET | `/my/orders` | `listMyOrders` | `—` | — | guest-app, guest-web |
 | GET | `/official-resale-marketplace` | `listOfficialResaleMarketplace` | `ORDER_VIEW` | — | ticvai-web |

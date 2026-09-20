@@ -7,10 +7,10 @@
   "contracts": 32,
   "tables": 623,
   "stores": 5,
-  "foreignKeys": 610,
-  "indexes": 740,
+  "foreignKeys": 632,
+  "indexes": 730,
   "tablesWritten": 619,
-  "relationships": 1342,
+  "relationships": 1345,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -75,7 +75,7 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 555,
+    "done": 557,
     "total": 632,
     "percent": 88,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
