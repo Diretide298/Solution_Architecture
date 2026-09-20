@@ -2528,7 +2528,7 @@ components:
         status:
           type: string
           maxLength: 30
-        createdByUserId:
+        createdByPrincipalId:
           type: string
           format: uuid
           nullable: true

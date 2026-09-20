@@ -1225,7 +1225,7 @@ components:
         tenantId:
           type: string
           format: uuid
-        userId:
+        principalId:
           type: string
           format: uuid
           nullable: true

@@ -7892,7 +7892,7 @@ components:
           type: string
           maxLength: 500
           nullable: true
-        changedByUserId:
+        changedByPrincipalId:
           type: string
           format: uuid
           nullable: true

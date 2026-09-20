@@ -2865,7 +2865,7 @@ components:
           type: string
           maxLength: 500
           nullable: true
-        changedByUserAccountId:
+        changedByPrincipalId:
           type: string
           format: uuid
           nullable: true
@@ -2966,7 +2966,7 @@ components:
       x-ticvai-persistence: identity.refresh_token
       description: '**Taken from the backend workbook, 20 September.** Stores hashed refresh tokens and tracks token expiry, rotation, and revocation.'
       required:
-      - userId
+      - principalId
       - hash
       - expiresAt
       - createdAt
@@ -2974,7 +2974,7 @@ components:
         id:
           type: string
           format: uuid
-        userId:
+        principalId:
           type: string
           format: uuid
         hash:
@@ -3011,14 +3011,14 @@ components:
       x-ticvai-persistence: identity.user_access
       description: '**Taken from the backend workbook, 20 September.** Assigns a role or direct permission to a principal within a specific scope and validity period.'
       required:
-      - userId
+      - principalId
       - effect
       - createdAt
       properties:
         id:
           type: string
           format: uuid
-        userId:
+        principalId:
           type: string
           format: uuid
         roleId:
@@ -3043,7 +3043,7 @@ components:
           type: string
           format: date-time
           nullable: true
-        grantedByUserAccountId:
+        grantedByPrincipalId:
           type: string
           format: uuid
           nullable: true
@@ -3051,7 +3051,7 @@ components:
           type: string
           format: date-time
           nullable: true
-        revokedByUserAccountId:
+        revokedByPrincipalId:
           type: string
           format: uuid
           nullable: true

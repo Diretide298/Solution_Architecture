@@ -1213,7 +1213,7 @@ components:
           type: string
           maxLength: 1000
           nullable: true
-        createdByUserId:
+        createdByPrincipalId:
           type: string
           format: uuid
           nullable: true

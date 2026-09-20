@@ -8969,7 +8969,7 @@ components:
         status:
           type: string
           maxLength: 30
-        respondedByUserId:
+        respondedByPrincipalId:
           type: string
           format: uuid
           nullable: true

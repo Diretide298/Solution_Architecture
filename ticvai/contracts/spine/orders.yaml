@@ -8607,7 +8607,7 @@ components:
         status:
           type: string
           maxLength: 30
-        requestedByUserId:
+        requestedByPrincipalId:
           type: string
           format: uuid
           nullable: true
