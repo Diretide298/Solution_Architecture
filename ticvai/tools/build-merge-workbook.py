@@ -157,6 +157,25 @@ DECISIONS = [
      "x-ticvai-read-routing: analytical already exists for real contention. Six of their "
      "columns stay, including product.categoryId - catalogue.product_category had two "
      "operations since 20 August and nothing could be filed under it."),
+    (14, "The tier table decision 8 promised", "marketing.programme_tier - and keep the cache", 1,
+     "theirs", "theirs", "ours", "ours",
+     "Decision 8 said retire loyalty_tier and add a real tier table; the retire happened and the "
+     "add did not, so loyalty_position carried tierCode and tierName as denormalised strings and "
+     "pointsToNextTier was computed from a threshold that lived nowhere. The name was the part "
+     "that needed deciding: marketing.loyalty_tier is spent - schema-history declares it renamed "
+     "to points_earning_rule - and marketing.tier would repeat the subscription.plan collision. "
+     "The answer is BOTH the table and the cache: maintainability and readability want the "
+     "table, optimised access and cross-cell want the strings, because reading a definition to "
+     "render a badge would be a cross-cell call to print a word."),
+    (15, "Inspection answers", "maintenance.inspection_item", 1,
+     "theirs", "theirs", "ours", "ours",
+     "SubmitInspectionRequest.responses[] has always taken a key, a value, a pass flag, a note "
+     "and attachments, tagged 'none - request only', and the only persistence ever claimed was "
+     "maintenance.inspection_response, which does not exist. The template held the questions, "
+     "the inspection held failedItemCount, and which check failed was accepted over the wire and "
+     "dropped - on a record that takes an asset out of service. Items go on InspectionResult, "
+     "the detail response, not on Inspection, the list row, and the counts stay because "
+     "listInspections returns it in a list."),
 ]
 
 # area, what we change, why, kind

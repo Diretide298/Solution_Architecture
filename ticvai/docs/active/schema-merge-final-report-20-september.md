@@ -5,7 +5,7 @@
 > before the criteria below were agreed.
 >
 > Every row: `handoff/TICVAI_Schema_Merge_Tasks.xlsx`. Every reason:
-> `handoff/merge-verdicts.json`. The eleven structural decisions, scored:
+> `handoff/merge-verdicts.json`. The fifteen structural decisions, scored:
 > [schema-merge-decision-log.md](schema-merge-decision-log.md).
 
 ---
@@ -264,7 +264,61 @@ tables usually look like. **It cannot know that a region owns the answer here** 
 a criticism, it is an argument for reading both workbooks against the decisions rather than
 against each other.
 
-## 6 · Corrections to things we told you earlier
+## 6 · Twenty-one of your columns point at the wrong table in our package, and the pattern is the useful part
+
+**None of these is a mistake on your side.** Every one is a column whose name is correct in your
+schema and resolves to something else in ours, because our relationship deriver matches a column
+stem against table names and **our names are not your names**. We found them by wiring your
+tables and watching where the edges landed.
+
+| Your column | Resolved to | Should be |
+|---|---|---|
+| `*_user_id` on eight tables | **`identity.user_access`** | `identity.principal` |
+| `*_user_account_id` on three | **`ledger.account`** | `identity.principal` |
+| `customer_membership.plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `plan_benefit.membership_plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `membership_renewal.plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `*_rule.payment_policy_id` on three | **`whitelabel.policy`** | nothing — dropped |
+| `fee_rule.provider_id` | **`ai.provider`** | `payments.provider` |
+| `dynamic_price_condition.rule_id` | **`approvals.rule`** | renamed to `dynamic_price_rule_id` |
+
+**Three of these are worth reading twice.** `identity.user_access.user_id` resolved to
+`identity.user_access` — a permission grant whose subject is another grant.
+`granted_by_user_account_id` resolved to a general-ledger account: the person who granted a
+permission, pointing at a chart-of-accounts row. And `customer_membership.plan_id` resolved to
+`subscription.plan`, **which is what a venue pays us for the platform** — so a guest's annual
+pass pointed at whether that venue's SaaS tier includes a branded app.
+
+### What causes it, because it will happen again
+
+Our deriver matches a stem as a whole name, then as a prefix, then as a suffix. **A prefix rule
+cannot tell a missing table from a differently-named one** — it finds the nearest thing. There is
+no `identity.user` in our package because the user is `identity.principal`, so `user` found
+`user_access`. There is no `catalogue.membership_plan` because the plan is
+`catalogue.entitlement_template`, so `plan` found `subscription.plan`.
+
+**We have changed the deriver rather than only the columns.** It now prefers a table in the
+referring schema and refuses an ambiguous match outright, which is why
+`payments.fee_rule.provider_id` now reaches `payments.provider` instead of `ai.provider`.
+Twenty-three short names are held by two or more of our schemas, and every column whose stem hit
+one of them had been resolved to whichever table happened to be loaded first.
+
+### The one that would have been more than untidy
+
+`identity.user_access` is our `identity.delegated_access` with six columns missing — and
+**`resolvePermissions`, `login` and `getCurrentSession` all read ours and none reads yours.**
+`effect` carries DENY, so a grant written to the second table would have been invisible to
+permission resolution: a permission somebody believes is revoked and is not. We collapsed it and
+kept your `permission_id`, which is better than our free-text `permission` because it names a row
+in the catalogue rather than a string.
+
+**What we would ask of you:** where a column names a concept rather than a table — `plan`,
+`user`, `policy`, `provider` — tell us which of your tables it points at, even informally. Our
+matcher will guess, and it guesses from our vocabulary.
+
+---
+
+## 7 · Corrections to things we told you earlier
 
 **We said we had no dynamic pricing at all.** We do — three guardrail columns on
 `rental.pricing_profile`: `dynamic_enabled`, and a maximum increase and decrease percent. **A
