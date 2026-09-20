@@ -554,15 +554,17 @@ USD→AED in its own region's set. That was overstated. The real gaps are in the
     ledger.posting         ..., account_code, debit, credit, venue_id, cost_center_id, ...
     ledger.settlement      provider_gross, provider_fees, provider_net, ledger_gross, difference
 
-**A posting carries one amount and no currency**, inherited from `account.currency`, so a venue
-trading in USD posts into an AED entity with the USD figure gone. Settlement carries no currency
-at all, so `difference` between a provider file and a ledger in another currency means nothing.
-And `runFxRevaluation` reads `ledger.inter_entity_obligation` only — it cannot revalue a venue's
-foreign balance because nothing records one.
+**Read once more before changing anything, and the posting half was wrong.** `Money` declares
+`x-ticvai-persistence-column`, so an amount stores as `numeric(18,4)` deliberately, and
+`ledger.posting.accountId` is required — **a posting's currency is its account's**, and
+`ledger.account.currency` exists. Accounts are already denominated. Nothing to fix.
 
-**The package already solved this shape once.** `platform.wallet_authorisation` carries
-`allocation_currency`, `home_currency`, `consuming_currency` and `amount_in_consuming_currency`
-for cross-cell wallet spend. The ledger never got the same treatment.
+**One amount had nothing to resolve from.** `ledger.settlement` is a provider file for a period
+and belongs to no account, so `provider_gross`, `ledger_gross` and `difference` were bare
+numbers and a cross-currency file made the difference meaningless. It gained `currencyCode`.
+
+**`runFxRevaluation` is still narrower than its name** — it reads `ledger.inter_entity_obligation`
+only. Revaluing a foreign-denominated account balance is an operation change and is not done here.
 
 **Foreign tender already works and is not affected** — `orders.payment` has `tender_currency`,
 `fx_rate` and `fx_rate_source`, and 14 operations across 27 screens are already on that path.
