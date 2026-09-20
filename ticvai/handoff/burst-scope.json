@@ -368,7 +368,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 4 operatio"
+   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 5 operatio"
   },
   {
    "table": "approvals.matrix",
@@ -390,7 +390,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 5 operations read it "
+   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 6 operations read it "
   },
   {
    "table": "catalogue.entitlement_template",
@@ -544,7 +544,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`, `pii.subject`. **Reached by**: 6 operati"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`, `pii.subject`. **Reached by**: 7 operati"
   },
   {
    "table": "catalogue.price_list",
