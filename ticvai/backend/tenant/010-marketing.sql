@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS marketing.audience_list (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.badge (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS marketing.campaign (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.campaign_target (
     id                                uuid PRIMARY KEY,
     campaign_id                       uuid NOT NULL,
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation_message (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.customer_badge (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
@@ -365,7 +365,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_document (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.guest_extra_field (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_extra_field (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.guest_extra_option (
     id                                uuid PRIMARY KEY,
     field_id                          uuid NOT NULL,
@@ -389,7 +389,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_extra_option (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.guest_extra_value (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
@@ -520,7 +520,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey_enrollment (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.journey_step (
     id                                uuid PRIMARY KEY,
     journey_id                        uuid NOT NULL,
@@ -575,7 +575,7 @@ CREATE TABLE IF NOT EXISTS marketing.lost_item (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.loyalty_campaign (
     id                                uuid PRIMARY KEY,
     program_id                        uuid NOT NULL,
@@ -589,7 +589,7 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_campaign (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.loyalty_points (
     id                                uuid PRIMARY KEY,
     program_id                        uuid NOT NULL,
@@ -631,7 +631,7 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_programme (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.loyalty_rule (
     id                                uuid PRIMARY KEY,
     campaign_id                       uuid NOT NULL,
@@ -704,7 +704,7 @@ CREATE TABLE IF NOT EXISTS marketing.points_earning_rule (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.points_redemption_rule (
     id                                uuid PRIMARY KEY,
     loyalty_program_id                uuid NOT NULL,
@@ -789,7 +789,7 @@ CREATE TABLE IF NOT EXISTS marketing.review (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.review_response (
     id                                uuid PRIMARY KEY,
     review_id                         uuid NOT NULL,
@@ -801,7 +801,7 @@ CREATE TABLE IF NOT EXISTS marketing.review_response (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.reward (
     id                                uuid PRIMARY KEY,
     loyalty_program_id                uuid NOT NULL,
@@ -816,7 +816,7 @@ CREATE TABLE IF NOT EXISTS marketing.reward (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.reward_assignment (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
@@ -857,7 +857,7 @@ CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.sla_policy (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -911,7 +911,7 @@ CREATE TABLE IF NOT EXISTS marketing.touch_point (
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
     id                                uuid PRIMARY KEY,
     template_id                       uuid NOT NULL,

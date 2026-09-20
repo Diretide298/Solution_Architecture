@@ -5276,106 +5276,6 @@ components:
           type: integer
         isActive:
           type: boolean
-    FnbOrderTable:
-      type: object
-      x-ticvai-persistence: fnb.order
-      description: '**Taken from the backend workbook, 20 September.** Stores the operational food-service order used by kitchen and serving workflows.'
-      required:
-      - number
-      - outletId
-      - serviceMode
-      - status
-      - grossAmount
-      - taxAmount
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        number:
-          type: string
-          maxLength: 50
-        salesOrderId:
-          type: string
-          format: uuid
-          nullable: true
-        outletId:
-          type: string
-          format: uuid
-        tableVisitId:
-          type: string
-          format: uuid
-          nullable: true
-        serviceMode:
-          type: string
-          maxLength: 30
-        status:
-          type: string
-          maxLength: 30
-        grossAmount:
-          type: number
-        taxAmount:
-          type: number
-        estimatedReadyAt:
-          type: string
-          format: date-time
-          nullable: true
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    FnbOrderItem:
-      type: object
-      x-ticvai-persistence: fnb.order_item
-      description: '**Taken from the backend workbook, 20 September.** Stores each food or beverage item ordered, including course and kitchen notes.'
-      required:
-      - fnbOrderId
-      - menuItemId
-      - quantity
-      - unitPrice
-      - lineTotal
-      - status
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        fnbOrderId:
-          type: string
-          format: uuid
-        menuItemId:
-          type: string
-          format: uuid
-        quantity:
-          type: number
-        seatNumber:
-          type: string
-          maxLength: 30
-          nullable: true
-        course:
-          type: string
-          maxLength: 30
-          nullable: true
-        note:
-          type: string
-          maxLength: 1000
-          nullable: true
-        selectedModifiersJson:
-          type: string
-          nullable: true
-        unitPrice:
-          type: number
-        lineTotal:
-          type: number
-        status:
-          type: string
-          maxLength: 30
-        createdAt:
-          type: string
-          format: date-time
     FnbPrice:
       type: object
       x-ticvai-persistence: fnb.price
@@ -7360,6 +7260,21 @@ components:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 lineTotal:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+        salesOrderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and
+            kitchen ticket on an F&B order and nothing joining it to what was actually sold, so
+            an F&B line could not be reconciled to the order that paid for it.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both
+            offline-sync fields, and no plain updated timestamp.
         grossAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:

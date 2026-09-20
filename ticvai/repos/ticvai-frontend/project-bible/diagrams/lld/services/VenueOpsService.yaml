@@ -45,7 +45,7 @@ schemas:
   tables: 21
   stores:
   - postgres
-  largestTable: games.game
+  largestTable: games.entitlement
 - schema: rental
   tables: 23
   stores:

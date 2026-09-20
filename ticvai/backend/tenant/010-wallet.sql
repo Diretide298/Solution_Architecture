@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.balance (
     wallet_balance_id                 uuid NOT NULL,
     wallet_id                         uuid NOT NULL,
@@ -209,11 +209,11 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.hold (
     wallet_hold_id                    uuid NOT NULL,
     wallet_id                         uuid NOT NULL,
-    order_id                          uuid,
+    order_id                          text,
     payment_id                        uuid,
     wallet_hold_amount                numeric(18,4) NOT NULL,
     currency_code                     text NOT NULL,

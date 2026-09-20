@@ -337,11 +337,6 @@ fnb.menu_item_modifier,group_id,fnb.modifier_group,reference,convention,,yes
 fnb.menu_item_modifier,item_id,inventory.item,reference,convention,yes,yes
 fnb.menu_section,menu_id,fnb.menu,child,declared,,yes
 fnb.modifier_option,modifier_group_id,fnb.modifier_group,reference,declared,,yes
-fnb.order,outlet_id,platform.outlet,reference,convention,yes,yes
-fnb.order,sales_order_id,orders.sales_order,reference,convention,yes,yes
-fnb.order,table_visit_id,fnb.table_visit,reference,convention,,yes
-fnb.order_item,fnb_order_id,fnb.order,child,convention,,yes
-fnb.order_item,menu_item_id,fnb.menu_item,reference,convention,,yes
 fnb.price,product_id,rental.product,reference,convention,yes,yes
 fnb.price,variant_id,catalogue.variant,reference,convention,yes,yes
 fnb.product,category_id,maintenance.asset_category,reference,declared,yes,yes
@@ -362,6 +357,7 @@ fnb.reservation_table,reservation_id,retail.reservation,reference,convention,yes
 fnb.reservation_table,table_id,fnb.dining_table,reference,declared,,yes
 fnb.service_order,kitchen_ticket_id,fnb.kitchen_ticket,reference,declared,,yes
 fnb.service_order,outlet_id,platform.outlet,reference,declared,yes,yes
+fnb.service_order,sales_order_id,orders.sales_order,reference,convention,yes,
 fnb.service_order,table_visit_id,fnb.table_visit,reference,declared,,yes
 fnb.service_order,via closeTableVisit,fnb.table_visit,ambient,lineage,,
 fnb.service_order,via createGuestFnbOrder,fnb.kitchen_ticket,ambient,lineage,,
@@ -369,7 +365,6 @@ fnb.service_order,via markOrderCollected,fnb.kitchen_ticket,ambient,lineage,,
 fnb.service_order,via mergeTableVisits,fnb.table_visit,ambient,lineage,,
 fnb.service_order,via openTableVisit,fnb.table_visit,ambient,lineage,,
 fnb.service_order,via updateTableVisit,fnb.table_visit,ambient,lineage,,
-fnb.service_order_line,fnb_order_id,fnb.service_order,child,declared,,yes
 fnb.service_order_line,menu_item_id,fnb.menu_item,reference,convention,,yes
 fnb.service_order_line,service_order_id,fnb.service_order,child,declared,,yes
 fnb.sold_out_item,called_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -445,9 +440,7 @@ identity.authz_audit,actor_principal_id,identity.principal,reference,declared,,y
 identity.authz_audit,subject_principal_id,identity.principal,reference,declared,,yes
 identity.benefit_usage,customer_membership_id,identity.customer_membership,reference,convention,,yes
 identity.benefit_usage,membership_benefit_id,catalogue.membership_benefit,reference,convention,yes,yes
-identity.benefit_usage,source_order_id,fnb.order,reference,convention,yes,yes
 identity.customer_membership,plan_id,subscription.plan,reference,convention,yes,yes
-identity.customer_membership,source_order_id,fnb.order,reference,convention,yes,yes
 identity.delegated_access,created_by_principal_id,identity.principal,reference,declared,,yes
 identity.delegated_access,granted_by,identity.principal,reference,declared,,yes
 identity.delegated_access,over_subject_id,pii.subject,reference,convention,yes,yes
@@ -781,7 +774,6 @@ marketing.review,venue_id,platform.scope,reference,declared,yes,yes
 marketing.review_response,responded_by_user_id,identity.user_access,reference,convention,yes,yes
 marketing.review_response,review_id,marketing.review,child,convention,,yes
 marketing.reward,product_id,rental.product,reference,convention,yes,yes
-marketing.reward_assignment,redeemed_order_id,fnb.order,reference,convention,yes,yes
 marketing.reward_assignment,reward_id,marketing.reward,child,convention,,yes
 marketing.segment,venue_id,platform.scope,reference,declared,yes,yes
 marketing.segment,via createSegment,marketing.segment_criterion,ambient,lineage,,
@@ -1323,6 +1315,7 @@ workforce.employee,manager_employee_id,workforce.employee,reference,convention,,
 workforce.employee,tenant_id,platform.tenant,reference,convention,yes,yes
 workforce.employee,user_id,identity.user_access,reference,convention,yes,yes
 workforce.employment,employee_id,workforce.employee,reference,convention,,yes
+workforce.field_ownership,source_id,ai.index_source,reference,precedent,yes,
 workforce.job_title,tenant_id,platform.tenant,reference,convention,yes,yes
 workforce.leave_balance,employee_id,workforce.employee,reference,convention,,yes
 workforce.leave_request,approval_request_id,approvals.request,reference,convention,yes,yes
@@ -1341,6 +1334,11 @@ workforce.shift_swap,approval_request_id,approvals.request,reference,declared,ye
 workforce.shift_swap,assignment_id,workforce.rota_assignment,reference,declared,,yes
 workforce.shift_swap,from_principal_id,identity.principal,reference,convention,yes,yes
 workforce.shift_swap,to_principal_id,identity.principal,reference,convention,yes,yes
+workforce.sync_conflict,employee_id,workforce.employee,reference,convention,,
+workforce.sync_conflict,resolved_by_principal_id,identity.principal,reference,convention,yes,
+workforce.sync_conflict,source_id,ai.index_source,reference,precedent,yes,
+workforce.sync_conflict,sync_run_id,workforce.sync_run,reference,convention,,
+workforce.sync_run,source_id,ai.index_source,reference,precedent,yes,
 workforce.training_record,principal_id,identity.principal,reference,convention,yes,yes
 workforce.work_assignment,department_id,platform.scope,reference,declared,yes,yes
 workforce.work_assignment,employee_id,workforce.employee,reference,convention,,yes

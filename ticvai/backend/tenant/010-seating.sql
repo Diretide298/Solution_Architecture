@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_block (
 );
 
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS seating.seat_block_item (
     id                                uuid PRIMARY KEY,
     block_id                          uuid NOT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_hold (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS seating.seat_hold_item (
     id                                uuid PRIMARY KEY,
     hold_id                           uuid NOT NULL,

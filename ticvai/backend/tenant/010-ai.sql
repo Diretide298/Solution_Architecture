@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS ai.index_job (
 
 -- One declaration per indexed table. The owning service does not know it exists — the AI service
 -- consumes the event that service already publishes Hangs off: a root — nothing above it in its
--- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 6
+-- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 7
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS ai.index_source (
     id                                uuid PRIMARY KEY,

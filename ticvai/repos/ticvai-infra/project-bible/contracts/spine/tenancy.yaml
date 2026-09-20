@@ -2409,7 +2409,14 @@ components:
           type: string
           pattern: ^[A-Z]{3}$
           nullable: true
+          readOnly: true
           description: >
+            **`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its
+            request body, so without it any settings save could rewrite the currency of a venue
+            that had already traded — which is the one thing ADR-0018's amendment forbids. It is
+            set when the venue is provisioned, defaulted from the region, and changed only by an
+            operation whose precondition is that the venue has not yet traded.
+
             **The venue's trading currency, defaulted from its region and frozen once the venue
             has traded** (ADR-0018, amended 20 September). Currency was a region-only fact,
             grouped with tax rates on the reasoning that *"a venue cannot choose its VAT"* --
@@ -2427,8 +2434,9 @@ components:
           minimum: 0
           maximum: 4
           nullable: true
+          readOnly: true
           description: >
-            **Scale travels with currency** (ADR-0008). OMR is three decimal places because Oman
+            **Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman
             says so; overriding the currency without the scale gets rounding wrong. Set together
             or not at all.
         supportHours:

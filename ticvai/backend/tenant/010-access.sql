@@ -2,13 +2,13 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS access.access_change (
     id                                uuid PRIMARY KEY,
     old_access_id                     uuid NOT NULL,
     new_access_id                     uuid,
     type                              text NOT NULL,
-    order_id                          uuid,
+    order_id                          text,
     upgrade_id                        uuid,
     reason                            text,
     changed_by_user_id                uuid,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS access.entry_rule_point (
     admission_profile_id              uuid NOT NULL,
     access_point_id                   uuid NOT NULL,

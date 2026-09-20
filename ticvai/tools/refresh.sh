@@ -261,7 +261,13 @@ echo
 # files in handoff/ and wireframes/ are inputs wearing the clothes of outputs — read by
 # the pipeline and the viewer, written by nothing. It hashes the contracts' operationIds
 # and schema names and says which of the nine were written against a different set.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
+# **Three of these report rather than fail, and that is deliberate.** `audit-unwired-tables`,
+# `audit-duplicate-tables` and `audit-array-relationships` each ask a question only a person can
+# close: whether a table nothing reaches is a missing operation or a table that should not exist,
+# whether a twin is a duplicate or a deliberate copy, whether an array should be a table. A
+# checker that fails the package on a judgement gets silenced rather than answered -- so they run
+# every time and print, and the judgement stays with whoever reads the run.
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.

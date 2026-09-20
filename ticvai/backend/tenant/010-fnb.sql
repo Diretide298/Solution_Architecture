@@ -1,4 +1,4 @@
--- fnb — 44 tables
+-- fnb — 42 tables
 -- **Derived. Do not hand-edit.**
 
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS fnb.dining_table (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.ingredient_substitute (
     id                                uuid PRIMARY KEY,
     from_inventory_item_id            uuid NOT NULL,
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS fnb.menu_item (
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.menu_item_modifier (
     item_id                           uuid NOT NULL,
     group_id                          uuid NOT NULL,
@@ -266,42 +266,8 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_option (
     is_available                      boolean
 );
 
--- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 12 tables reference it.
-CREATE TABLE IF NOT EXISTS fnb."order" (
-    id                                uuid PRIMARY KEY,
-    number                            text NOT NULL,
-    sales_order_id                    uuid,
-    outlet_id                         uuid NOT NULL,
-    table_visit_id                    uuid,
-    service_mode                      text NOT NULL,
-    status                            text NOT NULL,
-    gross_amount                      numeric(18,4) NOT NULL,
-    tax_amount                        numeric(18,4) NOT NULL,
-    estimated_ready_at                timestamptz,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
--- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
-CREATE TABLE IF NOT EXISTS fnb.order_item (
-    id                                uuid PRIMARY KEY,
-    fnb_order_id                      uuid NOT NULL,
-    menu_item_id                      uuid NOT NULL,
-    quantity                          numeric(18,4) NOT NULL,
-    seat_number                       text,
-    course                            text,
-    note                              text,
-    selected_modifiers_json           text,
-    unit_price                        numeric(18,4) NOT NULL,
-    line_total                        numeric(18,4) NOT NULL,
-    status                            text NOT NULL,
-    created_at                        timestamptz NOT NULL
-);
-
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.price (
     id                                uuid PRIMARY KEY,
     list_id                           uuid NOT NULL,
@@ -317,7 +283,7 @@ CREATE TABLE IF NOT EXISTS fnb.price (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.price_list (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -333,7 +299,7 @@ CREATE TABLE IF NOT EXISTS fnb.price_list (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.product (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -350,7 +316,7 @@ CREATE TABLE IF NOT EXISTS fnb.product (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.product_category (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -363,7 +329,7 @@ CREATE TABLE IF NOT EXISTS fnb.product_category (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.product_recommendation (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -429,7 +395,7 @@ CREATE TABLE IF NOT EXISTS fnb.recipe_ingredient (
 );
 
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.reservation_table (
     reservation_id                    uuid NOT NULL,
     table_id                          uuid NOT NULL,
@@ -447,6 +413,8 @@ CREATE TABLE IF NOT EXISTS fnb.service_order (
     table_visit_id                    text,
     status                            text NOT NULL,
     lines                             text[] NOT NULL,
+    sales_order_id                    uuid,
+    updated_at                        timestamptz,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount                        numeric(18,4),
     kitchen_ticket_id                 text,
@@ -468,8 +436,7 @@ CREATE TABLE IF NOT EXISTS fnb.service_order_line (
     course                            integer,
     status                            text,
     unit_price                        numeric(18,4),
-    line_total                        numeric(18,4),
-    fnb_order_id                      text NOT NULL
+    line_total                        numeric(18,4)
 );
 
 -- An item off the menu and back on (board 5J). setItemAvailability kept the flag and not the
@@ -591,7 +558,7 @@ CREATE TABLE IF NOT EXISTS fnb.temperature_log (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.variant (
     id                                uuid PRIMARY KEY,
     product_id                        uuid NOT NULL,

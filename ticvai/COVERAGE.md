@@ -14,9 +14,9 @@ Every number below is counted from the files in this package, not from memory.
 | **API operations** | **1,974** | Every unblocked module. 267 spine, 470 satellite |
 | API schemas | 607 | Across 30 files |
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
-| **Tables designed** | **635** | 3,911 columns |
-| **Tables written as DDL** | **635** | `backend/*.sql`, 598 foreign keys. Never executed |
-| Relationships | 1,348 | 362 of 635 tables carry one; the twelve that do not are correct |
+| **Tables designed** | **637** | 3,911 columns |
+| **Tables written as DDL** | **637** | `backend/*.sql`, 613 foreign keys. Never executed |
+| Relationships | 1,346 | 362 of 637 tables carry one; the twelve that do not are correct |
 | Screens defined | **2,427** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |

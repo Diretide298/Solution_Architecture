@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.currency_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS payments.currency_rule (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     id                                uuid PRIMARY KEY,
     deposit_id                        uuid NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS payments.deposit_activity (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.eligibility_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS payments.failover_policy (
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.fee_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS payments.method (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.method_config (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,

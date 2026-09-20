@@ -5619,9 +5619,11 @@
   "path": "/fx/revaluation",
   "reads": [
    "cache:idempotency",
+   "ledger.account",
    "ledger.fiscal_period",
    "ledger.fx_rate",
-   "ledger.inter_entity_obligation"
+   "ledger.inter_entity_obligation",
+   "ledger.legal_entity"
   ],
   "writes": [
    "cache:idempotency",

@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.price (
     id                                uuid PRIMARY KEY,
     list_id                           uuid NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS retail.price (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.price_list (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS retail.price_list (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS retail.product (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_category (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS retail.product_category (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS retail.variant (
     id                                uuid PRIMARY KEY,
     product_id                        uuid NOT NULL,

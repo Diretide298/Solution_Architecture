@@ -5,12 +5,12 @@
  "counts": {
   "operations": 1974,
   "contracts": 32,
-  "tables": 635,
+  "tables": 637,
   "stores": 5,
-  "foreignKeys": 598,
-  "indexes": 789,
-  "tablesWritten": 631,
-  "relationships": 1348,
+  "foreignKeys": 613,
+  "indexes": 769,
+  "tablesWritten": 633,
+  "relationships": 1346,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -69,14 +69,14 @@
    {
     "name": "State models",
     "done": 125,
-    "total": 173,
-    "percent": 72,
+    "total": 176,
+    "percent": 71,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 565,
-    "total": 644,
+    "done": 566,
+    "total": 646,
     "percent": 88,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -126,8 +126,8 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 631,
-    "total": 635,
+    "done": 633,
+    "total": 637,
     "percent": 99,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },

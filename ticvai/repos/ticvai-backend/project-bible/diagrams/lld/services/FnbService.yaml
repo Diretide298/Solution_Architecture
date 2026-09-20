@@ -1,5 +1,5 @@
 id: LLD-FnbService
-title: FnbService — 99 operations, 45 tables
+title: FnbService — 99 operations, 43 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 45
+  tables: 43
   stores:
   - postgres
   largestTable: fnb.product_recommendation
@@ -978,18 +978,6 @@ tables:
   parent: fnb.modifier_group
   writtenBy: []
   foreignWriters: null
-- table: fnb.order
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.order_item
-  columns: 12
-  store: postgres
-  parent: fnb.order
-  writtenBy: []
-  foreignWriters: null
 - table: fnb.price
   columns: 11
   store: postgres
@@ -1054,14 +1042,14 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: fnb.service_order
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.service_order_line
-  columns: 12
+  columns: 11
   store: postgres
   parent: fnb.service_order
   writtenBy: []

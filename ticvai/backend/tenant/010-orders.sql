@@ -125,10 +125,10 @@ CREATE TABLE IF NOT EXISTS orders.credit_override (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.deposit (
     id                                uuid PRIMARY KEY,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     customer_id                       uuid,
     rental_agreement_id               uuid,
     currency_code                     text NOT NULL,
@@ -167,10 +167,10 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.discount (
     id                                uuid PRIMARY KEY,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     promotion_id                      uuid,
     coupon_code                       text,
     type                              text NOT NULL,
@@ -250,12 +250,12 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.membership_renewal (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
     plan_id                           uuid NOT NULL,
-    order_id                          uuid,
+    order_id                          text,
     type                              text NOT NULL,
     status                            text NOT NULL,
     previous_expiry_at                timestamptz,
@@ -280,10 +280,10 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_fee (
     id                                uuid PRIMARY KEY,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     rule_id                           uuid,
     payment_method_id                 uuid,
     name                              text NOT NULL,
@@ -532,11 +532,11 @@ CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.upgrade (
     id                                uuid PRIMARY KEY,
     number                            text NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     original_order_line_id            uuid NOT NULL,
     new_order_line_id                 uuid,
     rule_id                           uuid,

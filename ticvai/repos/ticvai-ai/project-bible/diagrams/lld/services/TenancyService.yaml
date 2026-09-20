@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 136 operations, 78 tables
+title: TenancyService — 136 operations, 82 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -32,7 +32,7 @@ schemas:
   - postgres
   largestTable: platform.wallet_authorisation
 - schema: workforce
-  tables: 17
+  tables: 21
   stores:
   - postgres
   largestTable: workforce.rota_assignment
@@ -1650,6 +1650,18 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: workforce.field_ownership
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.integration_source
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: workforce.job_title
   columns: 8
   store: postgres
@@ -1714,6 +1726,18 @@ tables:
   parent: null
   writtenBy:
   - workforce
+  foreignWriters: null
+- table: workforce.sync_conflict
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: workforce.sync_run
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: workforce.training_record
   columns: 8

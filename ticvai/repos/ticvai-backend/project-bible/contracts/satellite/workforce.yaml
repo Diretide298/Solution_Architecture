@@ -1002,6 +1002,209 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    WorkforceIntegrationSource:
+      type: object
+      x-ticvai-persistence: workforce.integration_source
+      description: >
+        **An external system that masters some of our workforce data.** Board 3 names HRMS,
+        Workforce Management, Payroll, Time & Attendance, Identity Management and external
+        staffing agencies. The six-state display Board 10 asks for lives on this row: what is
+        connected, when it last synchronised, and whether its credentials still work.
+      required:
+      - code
+      - name
+      - kind
+      - transport
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 60
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          type: string
+          enum: [hrms, workforceManagement, payroll, timeAndAttendance, identity, staffingAgency]
+        transport:
+          type: string
+          enum: [api, webhook, scheduled, manual, fileImport]
+          description: >
+            Board 3, Support. **`manual` and `fileImport` are in the list on purpose** — a
+            staffing agency that sends a spreadsheet is still a system of record, and modelling
+            only the API cases would leave the messiest source unmanaged.
+        authenticationStatus:
+          type: string
+          enum: [healthy, expiring, expired, failed, notConfigured]
+        lastSynchronisedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [active, degraded, suspended]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceFieldOwnership:
+      type: object
+      x-ticvai-persistence: workforce.field_ownership
+      description: >
+        **Which system owns a field, which is what prevents conflicting updates.** Board 3:
+        *"For every field, administrators shall determine ... External System Master."* Without
+        this, an employee record mastered in HRMS and edited here disagrees with its source and
+        nothing can say which answer is right.
+
+        One row per table and column. Absent means ours, so nothing has to be enumerated before
+        it is decided.
+      required:
+      - tableName
+      - columnName
+      - master
+      properties:
+        id:
+          type: string
+          format: uuid
+        tableName:
+          type: string
+          maxLength: 120
+        columnName:
+          type: string
+          maxLength: 120
+        master:
+          type: string
+          enum: [ticvai, external]
+        sourceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The integration source that masters it, when `master` is `external`.
+        onConflict:
+          type: string
+          enum: [externalWins, ticvaiWins, flagForReview]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceSyncRun:
+      type: object
+      x-ticvai-persistence: workforce.sync_run
+      description: >
+        **One synchronisation, and what it did.** Board 10 asks the page to show successful
+        records, failed records, warnings and mapping errors rather than *"integration failed"* —
+        and to say the operational consequence: *"12 employee availability updates could not be
+        synchronised. Four employees have assignments within the next 24 hours."* That sentence
+        needs counts on a row, not a log line.
+      required:
+      - sourceId
+      - startedAt
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceId:
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [running, succeeded, partial, failed]
+        recordsRead:
+          type: integer
+        recordsApplied:
+          type: integer
+        recordsFailed:
+          type: integer
+        warningCount:
+          type: integer
+        mappingErrorCount:
+          type: integer
+        trigger:
+          type: string
+          enum: [scheduled, manual, webhook, fileImport]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceSyncConflict:
+      type: object
+      x-ticvai-persistence: workforce.sync_conflict
+      description: >
+        **A disagreement a person has to settle, and the assignments it puts at risk.** Board 3
+        lists the cases by name: an employee in HR and not here, a venue changed externally, a
+        certification expired, and *"employee terminated externally but has future TICVAI
+        assignments"* — where *"the system shall flag affected downstream assignments"*.
+
+        `affectedAssignmentIds` is deliberately an array and deliberately an exception: it is a
+        snapshot of what was at risk when the conflict was raised, not a live relationship, and
+        it must not change when a roster does.
+      required:
+      - sourceId
+      - kind
+      - status
+      - raisedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceId:
+          type: string
+          format: uuid
+        syncRunId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - missingInTicvai
+          - missingExternally
+          - venueChangedExternally
+          - certificationExpired
+          - terminatedExternally
+          - fieldDisagreement
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        externalReference:
+          type: string
+          maxLength: 200
+          nullable: true
+        detail:
+          type: string
+          maxLength: 1000
+          nullable: true
+        affectedAssignmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum: [open, retried, reprocessed, escalated, resolved, ignored]
+        raisedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          nullable: true
     WorkforceEmployee:
       type: object
       x-ticvai-persistence: workforce.employee

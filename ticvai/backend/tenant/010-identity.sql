@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS identity.authz_audit (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.benefit_usage (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.customer_membership (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.membership_history (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS identity.mfa_recovery_code (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.module (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS identity.password_policy (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.permission (
     id                                uuid PRIMARY KEY,
     module_id                         uuid NOT NULL,
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS identity.principal_credential (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.refresh_token (
     id                                uuid PRIMARY KEY,
     user_id                           uuid NOT NULL,
@@ -332,7 +332,7 @@ CREATE TABLE IF NOT EXISTS identity.sso_provider (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 8 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.user_access (
     id                                uuid PRIMARY KEY,
     user_id                           uuid NOT NULL,

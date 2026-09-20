@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS catalogue.inventory_hold (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.membership_programme (
     program_id                        uuid NOT NULL,
     program_code                      text NOT NULL,
@@ -278,7 +278,7 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.plan_benefit (
     membership_plan_id                uuid NOT NULL,
     membership_benefit_id             uuid NOT NULL,

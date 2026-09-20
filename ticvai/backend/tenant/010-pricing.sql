@@ -2,7 +2,7 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS pricing.dynamic_price_action (
     id                                uuid PRIMARY KEY,
     rule_id                           uuid NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS pricing.dynamic_price_action (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS pricing.dynamic_price_condition (
     action_id                         uuid NOT NULL,
     rule_id                           uuid NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS pricing.dynamic_price_condition (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS pricing.dynamic_price_rule (
     id                                uuid PRIMARY KEY,
     pricing_rule_code                 text NOT NULL,

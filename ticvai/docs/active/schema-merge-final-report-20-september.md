@@ -46,23 +46,53 @@ moved **38 rows**, almost all of them in your favour.
 **Fourteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
 is how we found most of them.
 
-### The biggest thing you found, and we had it the wrong way round — 15 tables
+### The biggest thing you found — and we got it wrong twice before getting it right
 
-**We said we had reached this conclusion independently. We had not.** F&B and Retail have their
-own schemas and their own services in our package, but **not their own catalogue data**:
+**We first said we had reached this conclusion independently. We had not.** F&B and Retail have
+their own schemas and their own services in our package, but not their own catalogue data:
 
     fnb.menu_item.product_variant_id   ->  catalogue.variant
     retail.merchandise.variant_id      ->  catalogue.variant
     retail.merchandise.price           ->  a column, not a price table
 
-There is no `fnb.product`, `fnb.price`, `fnb.price_list`, `fnb.variant` or `fnb.product_category`
-in our package, and no `retail.` equivalent either. **Both read `catalogue.variant` on every
-sale.**
+**Then we took all ten of your tables, and that was wrong too.** Here is the measurement that
+settled it:
 
-That is exactly the contention we argue `catalogue` must be protected from. We make that argument
-against your `rental_rate` in §2 — while our own F&B and Retail sit on the hot table while we make
-it. **Your fifteen tables are the single most valuable thing in this workbook**, and we are taking
-every one of them.
+| | columns | operations |
+|---|---|---|
+| `catalogue.product` | 21 | **40**, across twelve contracts |
+| `fnb.product` | 12 | 0 |
+| `retail.product` | 11 | 0 |
+
+The same holds for `product_category`, `variant`, `price` and `price_list`. **No retail operation
+reads `catalogue.product` at all**, and `fnb` reads it exactly once.
+
+**A split that relieves contention requires moving the reads, not adding the tables.** We added
+ten tables and moved nothing — all of the maintenance cost, none of the isolation, and three
+models to keep in step where a tax rule or an allergen flag now has three homes. The contention we
+were protecting `catalogue` from is not in the contracts on either side.
+
+So the ten come out, and `catalogue.*` stays the one product model. Where contention turns out to
+be real we have `x-ticvai-read-routing: analytical`, which does not cost a second copy.
+
+**Six of your columns stay, and one of them is the best single find in the workbook:**
+
+| Column | Why |
+|---|---|
+| `catalogue.product.categoryId` | **`catalogue.product_category` has had two operations since 20 August and nothing could be filed under it.** A merchandise hierarchy with a tree and no leaves. Both your product tables carried this link and ours did not |
+| `catalogue.product.isStockTracked` | whether a sale decrements stock — not what `isSellable` asks. A ticket does not, a bottle of water does |
+| `catalogue.variant.name` | `axisValues` gives `{size: L}` and no string a guest can read |
+| `catalogue.variant.barcode` | our `alternative_code` is a *partner's* code and requires `partnerId`, so a manufacturer's EAN had nowhere to live |
+| `catalogue.variant.isDefault` | which variant a product page opens on |
+| `catalogue.product_category.code` | a stable import key. Ours had a uuid and a localised name |
+
+**`fnb.product_recommendation` and `retail.product_recommendation` are kept whole** — 17 columns
+each, and we have nothing like them.
+
+**How we caught it is worth more than the correction.** Our phase 3 tested *"already a table of
+ours"* by name, so anything you sent under a name we did not use looked like a gap. That is also
+what produced a duplicate `fnb.order` beside our `fnb.service_order`. There is now a check for it
+that runs on every build, and it found all ten of these plus two in `whitelabel` on its first run.
 
 ### Things that are wrong today
 
@@ -109,7 +139,7 @@ screen changes** — your table names already carry the domain.
 
 | | move | to | why |
 |---|---|---|---|
-| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** That is the flash-sale contention argument — the same one that says F&B and Retail need their own price tables, which §1 now concedes they do not yet have. Your layout also splits rental across CatalogueService and VenueOpsService |
+| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** `catalogue.product` alone is read by twelve contracts across 40 operations, so a rental rate change takes write locks in the middle of that. (§1 explains why we are *not* splitting F&B and Retail off it — the fix for a hot table is routing, not a second copy of the model.) Your layout also splits rental across CatalogueService and VenueOpsService |
 | **payments** | 5 tables from `orders` | `payments` | all five are **configuration**. `orders` is the highest-churn schema in the system, and config read on every checkout should not share a schema with rows written on every sale |
 | **subscription** | 2 tables from `platform` | `subscription` | your placement puts billing in TenancyService and licensing in PlatformService. **A plan lookup becomes a cross-service call** |
 | **accreditation** | 4 tables from `access` | `accreditation` | same principle |

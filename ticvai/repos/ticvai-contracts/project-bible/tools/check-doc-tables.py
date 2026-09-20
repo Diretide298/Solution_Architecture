@@ -136,9 +136,15 @@ def main():
     if fix:
         print("\n  --fix applied. Quotations were not touched.")
         return 0
-    if stale:
+    # **A quoted stale name is not a failure.** It records what somebody wrote, and rewriting a
+    # quotation to keep a checker quiet is the one outcome this must never produce — so the
+    # exit code counts only the names `--fix` would actually touch.
+    live = n_stale - n_quoted
+    if live:
         print("\n  run with --fix, or exempt the file in EXEMPT_NAMES if it is about the rename")
-    return 1 if stale else 0
+    elif stale:
+        print("\n  PASS — the %d remaining are quoted and stay that way" % n_quoted)
+    return 1 if live else 0
 
 
 if __name__ == "__main__":

@@ -2,11 +2,11 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS rental.agreement (
     id                                uuid PRIMARY KEY,
     rental_number                     text NOT NULL,
-    order_id                          uuid NOT NULL,
+    order_id                          text NOT NULL,
     customer_id                       uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     scheduled_start_at                timestamptz NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS rental.agreement (
 );
 
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS rental.agreement_item (
     id                                uuid PRIMARY KEY,
     rental_agreement_id               uuid NOT NULL,
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS rental.inspection (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS rental.inspection_item (
     id                                uuid PRIMARY KEY,
     rental_inspection_id              uuid NOT NULL,

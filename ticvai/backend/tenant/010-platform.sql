@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS platform.audit_record (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
     id                                uuid PRIMARY KEY,
     cell_id                           uuid NOT NULL,

@@ -160,15 +160,15 @@
    "operations": 4
   },
   {
-   "contract": "retail",
-   "operations": 4
-  },
-  {
    "contract": "white-label",
    "operations": 4
   },
   {
    "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -180,11 +180,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   },
   {

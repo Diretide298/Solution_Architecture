@@ -18,10 +18,15 @@ things and nothing else:
 | **Optimised access** | does the query a screen actually runs stay inside one schema, on narrow rows |
 | **DB strain** | contention, row width, update churn, and what shares a hot table with what |
 
-**The fourth one carries more weight than it looks.** It is the same argument that gave F&B and
-Retail their own product and price tables: a flash sale on retail stock must not contend with
-ticket inventory. Anything that puts a second workload on `catalogue` or `orders` is paying that
-cost again.
+**The fourth one carries more weight than it looks.** A flash sale on retail stock must not
+contend with ticket inventory, and anything that puts a second workload on `catalogue` or
+`orders` is paying that cost again.
+
+**This criterion was first written citing a precedent that does not exist.** It said *"the same
+argument that gave F&B and Retail their own product and price tables"* — and nothing ever gave
+them those. Decision 13 covers what happened and reverses it. The criterion itself stands on
+something better than a precedent: **`catalogue.product` carries 40 operations across twelve
+contracts**, which is not an analogy for a hot table, it is the measurement.
 
 | # | Decision | Call | Date |
 |---|---|---|---|
@@ -37,6 +42,7 @@ cost again.
 | 10 | Cross-cell guest link | **reversed — keep it in `platform`** | 20 Sep |
 | 11 | The DSAR duplicate | **drop theirs** | 20 Sep |
 | 12 | Currency on nine accepted tables | **seven genuinely differ, two are copies** — confirmed, and it amended ADR-0018 | 20 Sep |
+| 13 | The F&B and Retail catalogue | **collapse into `catalogue.*`** — keep six of their columns | 20 Sep |
 
 ---
 
@@ -55,7 +61,7 @@ record we do not have and should.
 | **Maintainability** | **ours** | a rental change touches one schema. Theirs touches `catalogue`, `resources` and `maintenance` — and `rental_rate` in `catalogue` means a pricing change lands in the ticket team's schema |
 | **Readability** | **ours** | `rental.inspection` against `resources.rental_inspection`. Their prefix exists *because* of the placement — the name is carrying the schema's job |
 | **Optimised access** | **ours** | a checkout reads booking, agreement, items, inspection, participant and pricing together. In ours that is one schema. In theirs it joins across three |
-| **DB strain** | **ours, decisively** | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** That is the flash-sale contention argument that gave F&B and Retail their own price tables, reintroduced |
+| **DB strain** | **ours, decisively** | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system** — `catalogue.product` alone is read by twelve contracts across 40 operations. A rental rate change would take write locks in the middle of that |
 
 **The fourth line is their own principle used against their own layout**, and it is the one to
 lead with — not "the cost falls on you". The cost asymmetry is real (187 change points against a
@@ -576,3 +582,74 @@ money table usually looks like.** It cannot know that a region owns the answer h
 the same shape as the payroll tables in §6** — the conventional thing supplied, the specific
 thing missed — and it is the second time reading their workbook against an ADR of ours found
 something neither team would have caught by comparing table names.
+
+---
+
+## 13 · The F&B and Retail catalogue — **collapse into `catalogue.*`, keep six of their columns**
+
+**Their proposal:** F&B and Retail each get their own `product`, `product_category`, `variant`,
+`price` and `price_list` — ten tables.
+**What we did on 20 September:** took all ten.
+**What we are doing now:** removing all ten and keeping six of their columns.
+
+### What the measurement showed
+
+    catalogue.product        21 columns   **40 operations**, read by twelve contracts
+    fnb.product              12 columns    0 operations
+    retail.product           11 columns    0 operations
+
+and the same for the other four pairs. **Zero operations on any of the ten.** No retail
+operation reads `catalogue.product` either, and `fnb` reads it exactly once, through
+`createCombo`.
+
+**A split that relieves contention requires moving the reads.** Phase 3 added the tables and
+moved nothing, which is the worse of the two positions: all of the maintenance cost, none of the
+isolation. The contention being defended against is not in the contracts.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **catalogue** | one product model. A tax rule, an allergen flag or a lifecycle state is one change, not three. Three models means three places to forget |
+| **Readability** | **catalogue** | three tables named `product` in one package is the exact failure the naming rules exist to prevent. `fnb.product` against `retail.product` against `catalogue.product` tells a developer nothing about which one their query wants |
+| **Optimised access** | **catalogue** | a guest order spanning an F&B item and a retail item is one join today and a union across three product tables afterwards. The order does not know which domain sold the line |
+| **DB strain** | **the split, in principle** | and this is the one criterion it wins, hypothetically. `x-ticvai-read-routing: analytical` already exists for contention that turns out to be real, and it does not cost a second copy of the model |
+
+**Three to one, and the one is unexercised.**
+
+### How this happened, which matters more than the decision
+
+**This is the `fnb.order` bug at ten times the size and from the same root.** Phase 3 took every
+TAKE THEIRS whose target was not already a table of ours, and tested *"a table of ours"* by
+**name**. `fnb.product` was not a name we had. `catalogue.product` is the thing it is.
+
+`fnb.order` was found by accident — an array audit resolved a column to a table that should not
+have existed. **`audit-duplicate-tables.py` now finds this class on purpose**, and found all ten
+of these plus two in `whitelabel` on its first run.
+
+### What their tables found, which we keep
+
+| Column | Why it is real |
+|---|---|
+| `catalogue.product.categoryId` | **`catalogue.product_category` has had two operations since 20 August and nothing could be filed under it.** A merchandise hierarchy with a tree and no leaves. Both their product tables carried this and ours did not |
+| `catalogue.product.isStockTracked` | distinct from `isSellable` — whether a sale decrements stock. A ticket does not, a bottle of water does |
+| `catalogue.variant.name` | `axisValues` gives `{size: L}` and no string a guest can read |
+| `catalogue.variant.barcode` | `catalogue.alternative_code` is a *partner's* code and **requires `partnerId`**, so a manufacturer's EAN had nowhere to live. One-per-variant against many-per-variant is a different cardinality, and a POS scan should be an indexed column, not a join |
+| `catalogue.variant.isDefault` | which variant a product page opens on. A three-size drink opened on whichever row sorted first |
+| `catalogue.product_category.code` | a stable key for import. Ours had a uuid and a localised name, so an importer matched on a display string a venue is free to translate |
+
+### What is declined, with the reason it is not an oversight
+
+| Declined | Because |
+|---|---|
+| `brand` | **`ProductCategory.kind` already has `brand`** and `parentId` builds the tree — *"one tree, not four"*. A flat `brand` string is that argument reintroduced as a column |
+| `channels_json` | `PriceList.channels` is already an array of the `Channel` enum. A json blob is the worse of the two, by the same argument that took their six normalised tables |
+| `scope_path` on `price_list` | `venueId` is **required** on `PriceList`. Adding a second scoping mechanism beside a required one is the maintainability fault this merge has been scoring against |
+| `tax_code` on product | tax lives on `catalogue.price.tax_code_id`, where a rate that differs by price list can be expressed |
+| `valid_from` / `valid_to` on price | `price_list` carries validity and `promotions` carries overrides. Per-price validity is a third mechanism for one idea |
+| `type` | `catalogue.product.kind` is this column |
+| `attributes_json` | `catalogue.variant.axis_values` is this, declared rather than free-form |
+
+**Six columns kept out of a proposal of ten tables is not a rejection.** Their workbook found a
+category link our catalogue had been missing for a month, and a barcode our one place for codes
+could not hold.

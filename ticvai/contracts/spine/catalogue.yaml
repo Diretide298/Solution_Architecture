@@ -9471,6 +9471,14 @@ components:
           format: uuid
         name:
           type: string
+        code:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            **Taken from their category tables, 20 September.** Ours had a uuid and a localised
+            name, so an importer matching *Beverages* had to match on a display string that a
+            venue is free to translate.
         nameLocalised:
           type: object
           additionalProperties:
@@ -10320,6 +10328,15 @@ components:
             stops selling and every order that referenced it still resolves.
 
             '
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Taken from their `fnb.product` and `retail.product`, 20 September.**
+            `catalogue.product_category` has existed since 20 August with two operations and
+            nothing could be filed under it — a merchandise hierarchy with a tree and no leaves.
+            Their per-domain product tables both carried this column and ours did not.
         lifecycleState:
           $ref: '#/components/schemas/ProductLifecycleState'
         isSellable:
@@ -10328,6 +10345,14 @@ components:
             are different acts.
 
             '
+        isStockTracked:
+          type: boolean
+          default: false
+          description: >
+            **Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock,
+            which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a
+            bottle of water is both. Without it, an F&B sale cannot tell inventory whether to
+            move.
         hasVariants:
           type: boolean
         variantCount:
@@ -10479,6 +10504,30 @@ components:
           type: object
           additionalProperties:
             type: string
+        name:
+          type: string
+          maxLength: 150
+          nullable: true
+          description: >
+            **Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}`
+            and no string a guest can read. A menu showing *Large* needs somewhere for the word
+            to live.
+        barcode:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            **Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a
+            partner's own code for a variant and **requires `partnerId`**, so a manufacturer's
+            EAN had nowhere to go. One per variant against many per variant is a different
+            cardinality and belongs in a different place — and a POS scan should be an indexed
+            column lookup, not a join.
+        isDefault:
+          type: boolean
+          default: false
+          description: >
+            Taken from their variant tables. Which variant a product page opens on. Ours had no
+            way to say, so a three-size drink opened on whichever row sorted first.
         isActive:
           type: boolean
           description: False when retired. Retired variants are never deleted — orders reference them.

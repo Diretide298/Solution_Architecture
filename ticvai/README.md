@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**1974 operations · 635 tables · 2427 screens · 125 state models · 29 events · 96 flows · 46 ADRs**
+**1974 operations · 637 tables · 2427 screens · 125 state models · 29 events · 96 flows · 46 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -20,7 +20,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 218 boards, 2427 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 635 tables, 3,911 columns, nine sheets |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 637 tables, 3,911 columns, nine sheets |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **1974 operations, 635 tables and 2427 screens are specified and none of it
+A design package. **1974 operations, 637 tables and 2427 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

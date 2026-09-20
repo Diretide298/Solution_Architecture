@@ -1712,6 +1712,10 @@ paths:
       description: 'Restates open inter-entity obligations and any foreign-denominated balance at the
         closing rate, posting the movement to FX gain and loss.
 
+        A ledger account is foreign-denominated when its currency differs from the functional currency
+        of its legal entity, which is the only test the schema supports and the one used here.
+
+
         Part of period close and refused outside one — revaluing mid-period produces a figure that disagrees
         with itself the next day.
 
@@ -3971,6 +3975,15 @@ components:
         journalEntryId:
           type: string
           nullable: true
+        accountsRevalued:
+          type: integer
+          description: >
+            **Foreign-denominated ledger accounts restated, which is the other half of what this
+            operation has always claimed to do.** An account is foreign when its `currency`
+            differs from the `currency` of the legal entity it belongs to; there is no third
+            source for that judgement. Until 20 September this operation read only
+            `ledger.inter_entity_obligation` and reported only `obligationsRevalued`, so a EUR
+            bank account under an AED entity was never restated and nothing said so.
         byEntity:
           type: array
           items:
@@ -3981,6 +3994,36 @@ components:
                 format: uuid
               openBalance:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+              movement:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        byAccount:
+          type: array
+          description: >
+            One row per account restated. **A net movement by entity cannot be explained to an
+            auditor** — the question at close is which account moved and at what rate, and an
+            entity total is the sum of answers rather than an answer.
+          items:
+            type: object
+            properties:
+              accountId:
+                type: string
+                format: uuid
+              accountCode:
+                type: string
+              currency:
+                type: string
+                pattern: ^[A-Z]{3}$
+              functionalCurrency:
+                type: string
+                pattern: ^[A-Z]{3}$
+              openBalance:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              closingRate:
+                type: number
+                description: >
+                  The `revaluation`-purpose rate applied. **Recorded on the result and not
+                  looked up again** — a rate row can be superseded, and a close that cannot be
+                  re-explained at the rate it actually used is not a close.
               movement:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     SettlementStatus:

@@ -2,7 +2,7 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS sync.cell_connection (
     id                                uuid PRIMARY KEY,
     source_cell_id                    uuid NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS sync.cell_connection (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS sync.cross_cell_request (
     id                                uuid PRIMARY KEY,
     guest_link_id                     uuid NOT NULL,

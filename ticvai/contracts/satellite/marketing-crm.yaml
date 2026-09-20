@@ -10776,6 +10776,15 @@ components:
           - campaignExpired
           - restructure
           - slugChanged
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: >
+            **Taken from their `whitelabel.redirect`, 20 September.** This table counts hits and
+            could not say when a redirect was added — a record of a site's history with no date
+            on its own rows. Ours had `hitCount` and no timestamp of any kind.
         hitCount:
           type: integer
           readOnly: true

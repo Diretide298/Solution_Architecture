@@ -1,9 +1,9 @@
--- workforce — 17 tables
+-- workforce — 21 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
--- workforce.rota_assignment through its keys; references identity.principal, platform.scope.
--- Reached by: 2 operations read it and 2 write it; 1 tables reference it.
+-- workforce.employee through its keys; references identity.principal, platform.scope. Reached by:
+-- 2 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.announcement (
     id                                uuid PRIMARY KEY,
     title                             text NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement (
 );
 
 -- Delivered and acknowledged, per principal. The outstanding list is the roll call Hangs off: a
--- child of workforce.announcement; reaches workforce.rota_assignment through its keys; references
+-- child of workforce.announcement; reaches workforce.employee through its keys; references
 -- identity.principal, workforce.announcement. Reached by: 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
 );
 
 -- Who actually turned up. occurredAt and recordedAt are both kept — a steward clocking in offline
--- is not late because the sync was Hangs off: reaches workforce.rota_assignment through its keys;
+-- is not late because the sync was Hangs off: reaches workforce.employee through its keys;
 -- references access.access_point, identity.principal, platform.scope. Reached by: 2 operations
 -- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.attendance (
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.employee (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS workforce.employee (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.employment (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,
@@ -84,8 +84,30 @@ CREATE TABLE IF NOT EXISTS workforce.employment (
     created_at                        timestamptz NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS workforce.field_ownership (
+    id                                uuid PRIMARY KEY,
+    table_name                        text NOT NULL,
+    column_name                       text NOT NULL,
+    master                            text NOT NULL,
+    source_id                         uuid,
+    on_conflict                       text,
+    scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS workforce.integration_source (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    kind                              text NOT NULL,
+    transport                         text NOT NULL,
+    authentication_status             text,
+    last_synchronised_at              timestamptz,
+    status                            text NOT NULL,
+    scope_path                        text
+);
+
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.job_title (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -98,7 +120,7 @@ CREATE TABLE IF NOT EXISTS workforce.job_title (
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_balance (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,
@@ -127,7 +149,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.leave_type (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -161,7 +183,7 @@ CREATE TABLE IF NOT EXISTS workforce.open_shift (
 );
 
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
--- on a rota never touch a till Hangs off: a root — nothing above it in its schema; references
+-- on a rota never touch a till Hangs off: reaches workforce.employee through its keys; references
 -- identity.principal, identity.role, platform.scope. Reached by: 6 operations read it and 2 write
 -- it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
@@ -185,7 +207,7 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.shift (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -200,9 +222,8 @@ CREATE TABLE IF NOT EXISTS workforce.shift (
 );
 
 -- Both parties agree before the supervisor sees it. Routed through approvals rather than a second
--- mechanism Hangs off: reaches workforce.rota_assignment through its keys; references
--- approvals.request, identity.principal, workforce.rota_assignment. Reached by: 1 operations read
--- it and 1 write it.
+-- mechanism Hangs off: reaches workforce.employee through its keys; references approvals.request,
+-- identity.principal, workforce.rota_assignment. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS workforce.shift_swap (
     id                                uuid PRIMARY KEY NOT NULL,
     assignment_id                     uuid NOT NULL,
@@ -243,6 +264,37 @@ CREATE TABLE IF NOT EXISTS workforce.staffing_rules (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
+    id                                uuid PRIMARY KEY,
+    source_id                         uuid NOT NULL,
+    sync_run_id                       uuid,
+    kind                              text NOT NULL,
+    employee_id                       uuid,
+    external_reference                text,
+    detail                            text,
+    affected_assignment_ids           text[],
+    status                            text NOT NULL,
+    raised_at                         timestamptz NOT NULL,
+    resolved_at                       timestamptz,
+    resolved_by_principal_id          uuid,
+    scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS workforce.sync_run (
+    id                                uuid PRIMARY KEY,
+    source_id                         uuid NOT NULL,
+    started_at                        timestamptz NOT NULL,
+    finished_at                       timestamptz,
+    status                            text NOT NULL,
+    records_read                      integer,
+    records_applied                   integer,
+    records_failed                    integer,
+    warning_count                     integer,
+    mapping_error_count               integer,
+    trigger                           text,
+    scope_path                        text
+);
+
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.training_record (
@@ -257,7 +309,7 @@ CREATE TABLE IF NOT EXISTS workforce.training_record (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.work_assignment (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,

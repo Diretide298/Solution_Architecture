@@ -654,7 +654,11 @@
   "workforce.leave_balance": "2026-09-20",
   "workforce.leave_type": "2026-09-20",
   "workforce.shift": "2026-09-20",
-  "workforce.work_assignment": "2026-09-20"
+  "workforce.work_assignment": "2026-09-20",
+  "workforce.field_ownership": "2026-09-20",
+  "workforce.integration_source": "2026-09-20",
+  "workforce.sync_conflict": "2026-09-20",
+  "workforce.sync_run": "2026-09-20"
  },
  "renames": [
   {
@@ -775,7 +779,9 @@
  "withdrawn": {
   "marketing.loyalty_tier": "2026-09-20",
   "orders.order_discount": "2026-09-20",
-  "orders.payment_routing": "2026-09-20"
+  "orders.payment_routing": "2026-09-20",
+  "fnb.order": "2026-09-20",
+  "fnb.order_item": "2026-09-20"
  },
  "baseline": "2026-09-19",
  "generated": "2026-09-20"
