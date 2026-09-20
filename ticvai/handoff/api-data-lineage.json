@@ -50168,5 +50168,49 @@
    "postgres-analytical",
    "redis"
   ]
+ },
+ "listLeaderboard": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/leaderboard",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Standings, by nickname",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setLeaderboardNickname": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/loyalty/leaderboard-nickname",
+  "reads": [
+   "marketing.loyalty_position"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Choose the name shown on the board",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

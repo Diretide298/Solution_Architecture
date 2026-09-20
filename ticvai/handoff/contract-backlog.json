@@ -5370,8 +5370,8 @@
     "22.6.17",
     "22.6.20"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "marketing-crm"
    ],
@@ -5386,7 +5386,9 @@
    "blockedOnDomains": [],
    "cf": "CF-137",
    "narrowed": "2026-09-20",
-   "whatBefore": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards."
+   "whatBefore": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards.",
+   "closed": "2026-09-20",
+   "closedBy": "**Closed 20 September.** Challenges, streaks, milestones, badges and achievements were already built — `createChallenge`, `getMyChallenges`, `listBadges`, `setBadge`, `awardBadge`, `listCustomerBadges`, and `Challenge.kind` carrying `streak` and `milestone`. **The leaderboard was the last piece, and it was a privacy decision before it was an operation**: a leaderboard shows one guest something about another.\n\n**Decided by Chinmay: a guest always gets to add a nickname when they reach the board, and the nickname is what is shown. Always.** `setLeaderboardNickname` writes `marketing.loyalty_position.leaderboard_nickname`, and **setting it is the consent** — nothing reads `pii.subject.display_name`, because a name given for one purpose and reused on a public board is a use nobody agreed to.\n\n**`LeaderboardEntry` carries `rank`, `nickname`, `points` and no subject identifier, and that is the whole design.** A nickname beside an id the client can resolve elsewhere is decoration over a disclosure. The caller finds their own row by `isMe` rather than by matching identifiers — which is also why the apply script asserts that `subjectId` is absent rather than trusting it to stay so.\n\n**A guest with no nickname yet appears as a rank with no name.** Not hidden — standings that skip people are wrong about who is second — and **never filled in from their real name**, which would disclose silently on the day they first placed.\n\n**The window is bounded** (`week`, `month`, `season`): an all-time board is won once and then stops being a reason to come back. **Moderation is named rather than invented** — length and pattern stop markup and impersonating whitespace and nothing else, and a nickname impersonating staff needs a review queue, which is a product decision.\n\n`x-ticvai-config-scope: subject` is declared on the setter rather than the checker being widened to excuse it: a nickname is a setting the guest holds, and `subject` is a level five other operations already use."
   },
   {
    "id": "BL-174",
