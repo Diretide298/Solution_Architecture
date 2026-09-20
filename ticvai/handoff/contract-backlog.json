@@ -3035,13 +3035,15 @@
     "orders",
     "finance"
    ],
-   "what": "No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements.",
-   "why": "**`subscription` looks like the answer and is not.** It is the Control Plane, running outside any cell because it provisions cells, and it bills tenants for the platform. A guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode. **The `subscription` state model already mentions a dunning period and no contract declares one** — the capability search flagged it as present only in states, which is CF-49's shape. Recurring guest billing also brings stored card credentials, mandates and PCI scope that the current payment model does not carry.",
+   "what": "No dunning, no retry schedule and no billing statement. **Auto-renewal, grace periods, billing cycles, downgrade and mandates now exist** — `setRenewalAutoMembership`, `listRenewalAuto`, `autoRenewEligible`, `graceDays`, and mandates in `payments`. The three that remain appear nowhere in `contracts/`.",
+   "why": "**`subscription` looks like the answer and is not.** It is the Control Plane, running outside any cell because it provisions cells, and it bills tenants for the platform. A guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode. **The `subscription` state model already mentions a dunning period and no contract declares one** — the capability search flagged it as present only in states, which is CF-49's shape. Recurring guest billing also brings stored card credentials, mandates and PCI scope that the current payment model does not carry.\n\n**Narrowed 20 September, and the entry's own argument has been overtaken.** It said *\"`subscription` looks like the answer and is not — it is the Control Plane, and a guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode.\"* `setRenewalAutoMembership` and `listMembershipRenewalRetention` are guest membership billing and **they are in `subscription.yaml`**. Either the boundary moved deliberately or guest billing landed in the control-plane contract; **that is a boundary decision and it is recorded rather than made.** Five of the eight capabilities this entry named are served; the stored-card and PCI scope it warned about arrived with them and has not been re-examined.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "cf": "CF-129"
+   "cf": "CF-129",
+   "narrowed": "2026-09-20",
+   "whatBefore": "No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements."
   },
   {
    "id": "BL-101",
@@ -4213,10 +4215,12 @@
     "finance"
    ],
    "what": "No invoice, no credit memo, and no statement of what a compliant receipt must show.",
-   "why": "`subscription.generateInvoice` bills tenants for the platform. **A tax invoice in the UAE has a mandated format** — supplier TRN, sequential number, prescribed fields, Arabic where required — and issuing one that does not comply is a VAT matter rather than a document-formatting one. `LegalEntity.taxRegistrationNumber` exists, so the data is there and the document is not. Credit memos are the paired obligation: a refund against a tax invoice needs one. **5.10.3 is the same gap at the till** — nothing states which fields a VAT receipt must carry.",
+   "why": "`subscription.generateInvoice` bills tenants for the platform. **A tax invoice in the UAE has a mandated format** — supplier TRN, sequential number, prescribed fields, Arabic where required — and issuing one that does not comply is a VAT matter rather than a document-formatting one. `LegalEntity.taxRegistrationNumber` exists, so the data is there and the document is not. Credit memos are the paired obligation: a refund against a tax invoice needs one. **5.10.3 is the same gap at the till** — nothing states which fields a VAT receipt must carry.\n\n**Blocked on CF-133 from 20 September, which it always was.** This entry recorded no blocker while CF-133 — open with the client — opens *\"the platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices...\"* **5.7.93 is this entry's own first reference.** The inverse of BL-155, where a blocker outlived its conflict: here a conflict never reached its entry, and both leave the register wrong about what is ready to work.",
    "fix": null,
    "blockedOnSections": [],
-   "blockedOnConflicts": [],
+   "blockedOnConflicts": [
+    "CF-133"
+   ],
    "blockedOnDomains": [],
    "cf": "CF-133"
   },
@@ -4962,8 +4966,8 @@
     "16.7.39",
     "16.7.40"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "tenancy",
     "identity"
@@ -4977,10 +4981,10 @@
    "fix": null,
    "cf": "CF-136",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-64"
-   ],
-   "blockedOnDomains": []
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-20",
+   "closedBy": "**All six requirements are contracted in `contracts/spine/tenancy.yaml`, each naming its ref.** 16.7.35–37: `issueDeviceCredential` — *\"give the device an identity it can prove\"*, with `revokeDeviceCredential` and the `DeviceCredential` schema on `tenancy.device_credential`, per device and with an expiry, because **a device that authenticates with a shared key is a device that cannot be revoked alone** and one compromised scanner should not mean re-keying an estate. 16.7.38–39: `listDeviceAuditRecords` on `tenancy.device_audit`, administration and access interleaved *\"because an investigation needs the order\"*. 16.7.40: `listDeviceTamperEvents` and `recordDeviceTamperEvent` on `tenancy.device_tamper_event` — **a state, not a log line**, so a device that reported tampering is untrusted until somebody clears it.\n\n**Blocked on CF-64, which is retention and RPO and has nothing to do with device authentication.** Second instance today of a blocker naming an unrelated conflict, after BL-155 on CF-21 — the register was holding two entries shut against subjects they do not share. `offlineScope` on `RegisteredDevice` answers the entry's remaining question of what an unattended device may do without a connection; **`fullVenue` on a personal handset is a decision, not a default.**"
   },
   {
    "id": "BL-162",
@@ -5372,13 +5376,15 @@
    "candidateHomes": [
     "marketing-crm"
    ],
-   "what": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards.",
-   "why": "**Nothing anywhere**, and this is the third appearance: 19.2.73–75 in the guest app, `white-label.ModuleKey.gamification` as a toggle pointing at nothing, and twenty requirements here. **The currencies it would award into all exist** — loyalty points with `earnRules` and tiers, wallet, membership — so the missing piece is the game rather than the reward. Family and team challenges also depend on CF-132.",
+   "what": "No leaderboard. **Challenges, streaks, milestones, badges and achievements are built** — `createChallenge`, `getMyChallenges`, `listBadges`, `setBadge`, `awardBadge`, `listCustomerBadges`, and `Challenge.kind` carries `streak` and `milestone`. **Ranking guests against each other is not.** `BO-831 Progress, Leaderboards & Hub` is served by `getLoyaltyPosition`, which returns a guest their own points and tier, and `Challenge` has no ranking field.",
+   "why": "**Nothing anywhere**, and this is the third appearance: 19.2.73–75 in the guest app, `white-label.ModuleKey.gamification` as a toggle pointing at nothing, and twenty requirements here. **The currencies it would award into all exist** — loyalty points with `earnRules` and tiers, wallet, membership — so the missing piece is the game rather than the reward. Family and team challenges also depend on CF-132.\n\n**Narrowed 20 September.** The traceability rows read `CONTRACTED` against `Challenge` and the entry stayed open — correctly, because it names leaderboards and `Challenge` does not address them. **Closing it on the strength of that schema resolving would repeat the BL-160 mistake**: a schema that exists is not evidence for a gap it does not answer. A leaderboard also asks a question the rest of gamification does not — **what one guest may see of another**, which is a privacy decision before it is an operation.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "cf": "CF-137"
+   "cf": "CF-137",
+   "narrowed": "2026-09-20",
+   "whatBefore": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards."
   },
   {
    "id": "BL-174",

@@ -1,33 +1,31 @@
 # Contract backlog — index
 
-**179 edits raised by the requirement walk — 12 open, 165 done, 2 withdrawn.**
+**179 edits raised by the requirement walk — 9 open, 168 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
 
 | Lane | Open |
 |---|---|
-| Needs a decision | **7** |
-| Deferred | **5** |
+| Needs a decision | **5** |
+| Deferred | **4** |
 | Settled | **0** |
-| **Total open** | **12** |
+| **Total open** | **9** |
 
 
-## Needs a decision — tracked as a conflict — 7
+## Needs a decision — tracked as a conflict — 5
 
 Each of these has a CF. The register holds the reasoning; this is the index.
 
 | ID | Section | Refs | What | Contracts | Blocked on | CF |
 |---|---|---|---|---|---|---|
 | **BL-073** | 2.6 | 2.6.51, 2.6.52, 2.6.53, 2.6.54, 2.6.55, 2.6… | No cookie consent management — banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. | `white-label` | — | CF-127 |
-| **BL-100** | 2.14 | 2.14.19, 2.14.20, 2.14.21, 2.14.22, 2.14.23… | No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements. | `orders, finance` | — | CF-129 |
+| **BL-100** | 2.14 | 2.14.19, 2.14.20, 2.14.21, 2.14.22, 2.14.23… | No dunning, no retry schedule and no billing statement. **Auto-renewal, grace periods, billing cycles, downgrade and mandates now exist** — `setRenewalAutoMembership`, `listRenewalAuto`, `autoRenewEligible`, `graceDays`, and mandates in `payments`. The three that remain appear nowhere in `contracts/`. | `orders, finance` | — | CF-129 |
 | **BL-110** | 3.3 | 3.3.1, 3.3.2, 3.3.3, 3.3.4, 3.3.5, 3.3.6, 3… | Attribute-based access control does not exist — forty-eight requirements against a role-based model chosen deliberately. | `identity` | — | CF-130 |
 | **BL-140** | 5.7 | 5.7.93, 5.7.94, 5.10.3, 6.1.1, 6.1.23, 20.7.7 | No invoice, no credit memo, and no statement of what a compliant receipt must show. | `finance` | — | CF-133 |
-| **BL-160** | 16.1 | 16.1.2, 16.1.3, 16.1.6, 16.2.9, 16.2.10, 16… | No firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. | `tenancy, maintenance` | — | CF-136 |
-| **BL-161** | 16.7 | 16.7.35, 16.7.36, 16.7.37, 16.7.38, 16.7.39… | A device does not authenticate to the platform, and there is no tamper detection. | `tenancy, identity` | — | CF-136 |
-| **BL-173** | 22.6 | 22.6.1, 22.6.2, 22.6.3, 22.6.4, 22.6.5, 22.… | No gamification — challenges, achievements, badges, streaks, milestones or leaderboards. | `marketing-crm` | — | CF-137 |
+| **BL-173** | 22.6 | 22.6.1, 22.6.2, 22.6.3, 22.6.4, 22.6.5, 22.… | No leaderboard. **Challenges, streaks, milestones, badges and achievements are built** — `createChallenge`, `getMyChallenges`, `listBadges`, `setBadge`, `awardBadge`, `listCustomerBadges`, and `Challenge.kind` carries `streak` and `milestone`. **Ranking guests against each other is not.** `BO-831 Progress, Leaderboards & Hub` is served by `getLoyaltyPosition`, which returns a guest their own points and tier, and `Challenge` has no ranking field. | `marketing-crm` | — | CF-137 |
 
-## Deferred — waiting on a section — 5
+## Deferred — waiting on a section — 4
 
 Crosses contracts, or has no precedent to copy. Deciding now would design it in the wrong contract. Each names what unblocks it.
 
@@ -36,7 +34,6 @@ Crosses contracts, or has no precedent to copy. Deciding now would design it in 
 | **BL-096** | 2.13 | 2.13.41, 2.14.7, 5.3.21 | No identity verification. A presented document is never checked against the entitlement holder. | `access` | — | — |
 | **BL-105** | 3.2 | 3.2.9 | Biometric checking cannot be switched on or off per ticket type. | `access, catalogue` | — | — |
 | **BL-106** | 3.2 | 3.2.44 | Face Tag — temporary facial storage discarded when the ticket expires — is not distinguished from Face Pass. | `access` | — | — |
-| **BL-155** | 11.1 | 11.1.64, 11.1.65, 11.1.66, 12.1.53, 13.1.26… | No outbound webhooks and no third-party workflow integration. | `approvals, platform-ops` | — | — |
 | **BL-179** | 3.2 | 3.2.45 | Device-assisted gender verification is a switch with no driver behind it. | `tenancy, access` | — | — |
 
 ## Closed
@@ -189,9 +186,24 @@ Crosses contracts, or has no precedent to copy. Deciding now would design it in 
 | **BL-152** | 8.7 | Nothing evaluates a threshold or raises an operational alert, anywhere in the package. | **Done.** AlertRule and Alert. **Six contracts detect their own trouble and none told a person** — this is BL-052 seen from the operational side: that one tells a guest something happened, this tells an operator something is wrong. **The window stops it firing on noise** and the cooldown stops it becoming something people close. Acknowledged rather than dismissed, because that records who saw it, and resolution is automatic when the metric returns to range — **an alert only a person can close is a list that only grows.** |
 | **BL-153** | 10.2 | A game reader has no display behaviour, no per-game entitlement, no retry pricing and no re-tap delay. | **Done.** ReaderProfile. **A guest at an arcade machine cannot read a message, they can only see a light** — display behaviour per outcome, because the interaction is a second long across a noisy room. **A retry after a machine fault is not a second play**, and without it a guest whose game crashed pays twice and the attendant refunds by hand. |
 | **BL-154** | 11.1 | Out-of-office rerouting, email-link approval, reopening a decided approval, and a shared approval centre. | **Done.** ApprovalRequest rerouteOnNoApprover, outOfOfficeDelegateId, allowEmailApproval and reopenedFrom. **An approver on leave is an approval that waits for them to come back**, and workforce already knows who is on leave. **Email approval is the weakest path in the system**, so it is off by default. **Reopening creates a new approval that points back** — editing a decision in place destroys what was originally approved. |
+| **BL-155** | 11.1 | No outbound webhooks and no third-party workflow integration. | **Done.** **Built 18 August by CF-135 and never connected back to this entry**, which stayed blocked on CF-21 — a conflict about scheduling workshops for three uncontracted domains. CF-135 walked domain 13 and found four separable gaps; *"events stop at the boundary"* was the fourth, and it produced `contracts/satellite/public-api.yaml`.
+
+All three halves of the stated fix are there. **Signing**: `WebhookSubscription.signingSecret` — *"how the receiver knows it was TICVAI"*. **Retry**: `WebhookDelivery.status` carries `pending, delivered, failed, retrying, abandoned`, and `listWebhookDeliveries` is what BO-1078 Monitoring, Retry & Reconciliation reads. **Replay**: `replayEvents`, bounded by the retention policy (13.3.20), with `isReplay` on the delivery so a consumer that cannot tell a replay from a live event is not silently given one.
+
+**Third-party workflow integration** (11.1.65) is `listIntegrationListings`, `submitIntegrationListing` and `certifyIntegration`, under ADR-0026's rule that third-party code does not execute inside TICVAI. |
 | **BL-156** | 13.1 | No developer portal, no developer identity, no rate limiting, no API lifecycle management and no extension marketplace. | **Done.** The public-api contract (CF-135). Developer portal, developer identity, rate limiting and API lifecycle. **A partner resells tickets and a developer writes software** — DeveloperAccount.partnerId links them and keeps them separate. |
 | **BL-157** | 13.2 | No developer sandbox — provisioning, reset, cloning, test data, masking or lifecycle. | **Done.** Sandbox with SyntheticDataProfile and resetSandbox (D2, D3). **Synthetic only, one shared sandbox** — no cloning, no masking, no production data to isolate. |
 | **BL-159** | 15.3 | No request for quotation, no blanket purchase orders and no contract purchasing. | **Done.** PurchaseOrder.kind with blanket and release, plus rfqId. **A blanket order is a price and a commitment, not a delivery**, and modelling each release as its own order loses the contract that makes the price valid. |
+| **BL-160** | 16.1 | No firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. | **Done.** **Reopened 20 September because the 20 August closure recorded CF-136 device health against an entry naming three different gaps, and closed the same day against all three.**
+
+**Firmware deployment** was already done and the entry had never been re-read: `listDeviceFirmware`, `startDeviceFirmwareRollout`, `rollbackDeviceFirmware`.
+
+**The lifecycle was half done in a way that looked whole.** `enrolDevice` has taken the full matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and **wrote nothing**. `derive-lineage` had it reading `platform.device` with an empty `writes` list, because its request body was an anonymous inline object and the table had no column for `state` or `configurationProfileId`. `status` is `online/offline/error/consumableLow`, which is health — **a decommissioned turnstile still on the network is `online` and `retired` at once**, and neither column could say so. Closed by `RegisteredDevice` gaining `enrolmentState`, `retiredAt` and `configurationProfileId`, and by naming the body `DeviceEnrolment` on `platform.device` so the operation declares its write. The transition reason stays on `tenancy.device_audit` rather than becoming a column, because the latest transition stored twice is one copy to go stale.
+
+**The device-to-asset link is `maintenance.asset.deviceId`**, beside `resourceId`, which already says an AV rig is an asset to maintain and a resource to allocate — a turnstile is the same sentence. **It lives on the asset and not the device** because `platform` is TenancyService, tier `foundation`, and `maintenance` is VenueOpsService, tier `operations`, which already reads from Tenancy in four operations: a foreign key the other way would invert the tiers and make every cell running a spine carry a column for a satellite it may not deploy. It is nullable on both sides because most assets are not devices and most devices are not on the asset register. |
+| **BL-161** | 16.7 | A device does not authenticate to the platform, and there is no tamper detection. | **Done.** **All six requirements are contracted in `contracts/spine/tenancy.yaml`, each naming its ref.** 16.7.35–37: `issueDeviceCredential` — *"give the device an identity it can prove"*, with `revokeDeviceCredential` and the `DeviceCredential` schema on `tenancy.device_credential`, per device and with an expiry, because **a device that authenticates with a shared key is a device that cannot be revoked alone** and one compromised scanner should not mean re-keying an estate. 16.7.38–39: `listDeviceAuditRecords` on `tenancy.device_audit`, administration and access interleaved *"because an investigation needs the order"*. 16.7.40: `listDeviceTamperEvents` and `recordDeviceTamperEvent` on `tenancy.device_tamper_event` — **a state, not a log line**, so a device that reported tampering is untrusted until somebody clears it.
+
+**Blocked on CF-64, which is retention and RPO and has nothing to do with device authentication.** Second instance today of a blocker naming an unrelated conflict, after BL-155 on CF-21 — the register was holding two entries shut against subjects they do not share. `offlineScope` on `RegisteredDevice` answers the entry's remaining question of what an unattended device may do without a connection; **`fullVenue` on a personal handset is a decision, not a default.** |
 | **BL-162** | 17.3 | No downtime measurement, no structured root cause, no work-order escalation, no corrective action as a tracked item, and no spare-parts reservation. | **Done.** WorkOrder.downtimeMinutes, rootCause and escalationLevel. **Downtime is measured out-of-service to back-in-service, not work start to work end** — a ride down six hours of which two were worked is down six hours, and the gap is the thing worth managing. **rootCause is structured because free text cannot be counted**, and deferredMaintenance is the value a venue least wants to see and most needs to. **Escalation is a clock, not a decision.** |
 | **BL-163** | 18.1 | Staff devices cannot be registered for push, offline scope is unstated for the staff app, and there is no staff-to-staff messaging. | **Done.** RegisteredDevice.pushToken, pushPlatform, pushFailureCount and offlineScope. **Guest devices registered for push and staff devices did not** — a scanner that cannot be told anything is a scanner somebody has to walk to. **fullVenue on a personal handset is a decision, not a default**: a device that can do everything offline carries the whole venue data in somebody pocket. |
 | **BL-164** | 18.10 | No voice interaction — `AiCapability` is chat, embedding, vision and rerank. | **Done.** AiCapability speechToText and textToSpeech. **Voice added rather than declined, with its own residency position** — speech is the capability where UAE residency is hardest to satisfy, and a guest speaking into a kiosk is producing personal data in the moment. |
