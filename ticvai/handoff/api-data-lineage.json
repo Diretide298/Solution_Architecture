@@ -49073,5 +49073,99 @@
    "postgres",
    "redis"
   ]
+ },
+ "listModules": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/modules",
+  "reads": [
+   "identity.module"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "The module tree permissions are grouped under",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPermissions": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/permissions",
+  "reads": [
+   "identity.permission"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Every permission key the contracts enforce",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPrincipalAccess": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/principals/{principalId}/access",
+  "reads": [
+   "identity.user_access"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "What a principal is granted, and where",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrincipalAccess": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/principals/{principalId}/access",
+  "reads": [
+   "identity.user_access"
+  ],
+  "writes": [
+   "identity.user_access"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PERMISSION_GRANT",
+  "offline": false,
+  "summary": "Replace a principal's grants",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

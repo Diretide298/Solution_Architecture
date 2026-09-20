@@ -1,6 +1,6 @@
 # Tables that exist only in storage
 
-**Twelve tables are in the migrations and not in the schema reference.** Every one is correct.
+**Thirteen tables are in the migrations and not in the schema reference.** Every one is correct.
 They are recorded here so the difference reads as a decision rather than an omission.
 
 The schema reference derives from the API contracts. A table with no API representation
@@ -16,6 +16,7 @@ cannot appear there — and some tables should have no API representation.
 | `identity.principal_credential` | **Deliberately absent from every API.** A credential hash has no response it belongs in |
 | `identity.role_permission` | Child of `role`, returned nested |
 | `identity.mfa_recovery_code` | Hashed and single-use. Returned once at enrolment and never retrievable — a recovery code that can be re-read is a second password |
+| `identity.refresh_token` | **A bearer credential, like `principal_credential`.** Returning a refresh token hash over any endpoint defeats rotation. Revocation is `forceLogout` and `guestLogout`, which end a session; the tokens behind them are an implementation of that, not a resource |
 | `identity.authz_audit` | Written by the platform, read through reporting. No direct API |
 | `orders.sales_order_unassigned`, `access.scan_event_unassigned` | **Default partitions.** Not tables in the modelling sense — they catch rows whose `venue_id` matches no configured partition, so a misconfiguration is loud rather than silently lossy |
 

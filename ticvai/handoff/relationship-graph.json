@@ -4935,15 +4935,6 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "fnb.location_code",
-   "col": "location_id",
-   "to": "fnb.delivery_location",
-   "how": "declared",
-   "cross": "",
-   "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "games.credit_ledger",
    "col": "card_id",
    "to": "games.card",
@@ -5120,33 +5111,6 @@
    "to": "identity.principal",
    "how": "convention",
    "cross": "yes",
-   "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.donation_line",
-   "col": "campaign_id",
-   "to": "catalogue.donation_campaign",
-   "how": "declared",
-   "cross": "yes",
-   "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.donation_line",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "declared",
-   "cross": "",
-   "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.order_media_link",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "declared",
-   "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },

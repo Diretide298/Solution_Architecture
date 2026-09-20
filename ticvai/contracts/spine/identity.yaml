@@ -2869,6 +2869,167 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /modules:
+    get:
+      operationId: listModules
+      summary: The module tree permissions are grouped under
+      description: '**Read-only, and that is the point.** A module exists because the product has
+        one; inventing modules over an API would create groups no permission belongs to.
+
+        `parentModuleId` builds one tree rather than a fixed two levels, for the same reason
+        `ProductCategory` does — a venue that nests its modules differently should not need a schema
+        change.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityModule'
+  /permissions:
+    get:
+      operationId: listPermissions
+      summary: Every permission key the contracts enforce
+      description: '**The catalogue that makes a role reviewable.** Every refresh reports *154
+        permission keys on operations, 35 in roles.yaml, 0 shared* — the keys the contracts enforce
+        and the keys the roles grant have been two vocabularies with no overlap, and nothing could
+        reconcile them because there was no list of what exists.
+
+        **Read-only.** A permission key exists because an operation declares
+        `x-ticvai-permission`; this catalogue is derived from the contracts. An endpoint that let
+        somebody create one would produce a key no operation checks, which is worse than a missing
+        key because it looks granted.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: moduleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityPermission'
+  /principals/{principalId}/access:
+    get:
+      operationId: listPrincipalAccess
+      summary: What a principal is granted, and where
+      description: '**`identity.principal.primaryRoleId` is one role.** Between that and
+        `role_permission` there was no way to say *Duty Manager at Venue 3 until March, and denied
+        refunds anywhere*.
+
+        Grants are returned including expired ones by default filter, because **the question asked
+        of this endpoint is usually why somebody could do something last Tuesday**, and a view that
+        silently drops lapsed grants cannot answer it.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: principalId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: activeOn
+        in: query
+        description: Grants in force at this instant. Omit for all, including lapsed and revoked.
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Grants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityUserAccess'
+    put:
+      operationId: setPrincipalAccess
+      summary: Replace a principal's grants
+      description: '**Set whole, because a deny only means something against the allows it sits
+        beside.** Applying grants one at a time opens a window in which a revoked allow is gone and
+        its replacing deny is not yet there, or the reverse — and for an access table that window is
+        the whole problem.
+
+        Revoking is expressed by omitting a grant, which records `revokedAt` and
+        `revokedByPrincipalId` rather than deleting the row. **A grant that is deleted cannot answer
+        why somebody had it.**
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_GRANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - name: principalId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IdentityUserAccess'
+      responses:
+        '200':
+          description: Granted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityUserAccess'
+        '409':
+          description: A grant breaches a segregation-of-duties rule
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 components:
   schemas:
     MembershipDetail:
