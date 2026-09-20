@@ -43,6 +43,8 @@ contracts**, which is not an analogy for a hot table, it is the measurement.
 | 11 | The DSAR duplicate | **drop theirs** | 20 Sep |
 | 12 | Currency on nine accepted tables | **seven genuinely differ, two are copies** — confirmed, and it amended ADR-0018 | 20 Sep |
 | 13 | The F&B and Retail catalogue | **collapse into `catalogue.*`** — keep six of their columns | 20 Sep |
+| 14 | The tier table decision 8 promised | **`marketing.programme_tier`** — and keep the denormalised copy | 20 Sep |
+| 15 | Inspection answers | **`maintenance.inspection_item`** — already submitted, never stored | 20 Sep |
 
 ---
 
@@ -653,3 +655,78 @@ of these plus two in `whitelabel` on its first run.
 **Six columns kept out of a proposal of ten tables is not a rejection.** Their workbook found a
 category link our catalogue had been missing for a month, and a barcode our one place for codes
 could not hold.
+
+---
+
+## 14 · The tier table decision 8 promised — **`marketing.programme_tier`, and keep the cache**
+
+Decision 8 said *"retire `loyalty_tier`, and add a real tier table"*. **The retire happened and
+the add did not.**
+
+### The name was the part that needed deciding
+
+`marketing.loyalty_tier` is the natural name and **it is spent** — `schema-history.json` declares
+it renamed to `marketing.points_earning_rule` on 20 September. Re-using it would not trip
+`check-doc-tables`, which skips a token that is a current table, but it would leave the rename
+record contradicting the schema. **A history that disagrees with the package is worse than a
+longer name.**
+
+`marketing.tier` was rejected: `subscription.tier_allowance` is a SaaS plan's tier, and one bare
+`tier` in a package with two tier concepts is exactly how `plan_id` came to point at
+`subscription.plan`.
+
+`marketing.programme_tier` sits beside `marketing.loyalty_programme`, says what it is a tier
+*of*, and resolves as a unique suffix.
+
+### Scored — and the answer is both
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **the table** | a tier is a string somebody writes; thresholds live in code, so adding one is a code change |
+| **Readability** | **the table** | `tierCode: 'GOLD'` cannot tell you what tiers exist or what Gold requires |
+| **Optimised access** | **the cache** | a till showing *Gold* beside a balance should not join |
+| **DB strain** | neutral | tiny, read-mostly, cacheable |
+| **Cross-cell** | **the cache, decisively** | definitions are programme config replicated per cell; the guest's tier is on their position in their home cell. Reading the definition to render a badge would be a cross-cell call to print a word |
+
+**Both, and it is not a compromise.** The table is the source of truth; `tierCode` and `tierName`
+on the position are its cache — which is what they already were, except that nothing they cached
+existed. `tierId` now links them.
+
+**`pointsToNextTier` is the proof.** It sits on `loyalty_position` today and is computed from a
+threshold that lived nowhere — the same shape as `renewalTermDays`, where
+`orders.membership_renewal` computed `newExpiryAt` from a number no table held.
+
+---
+
+## 15 · Inspection answers — **`maintenance.inspection_item`**
+
+**The answers were already being submitted.** `SubmitInspectionRequest.responses[]` takes a key,
+a value, a pass flag, a note and attachments, and was tagged `"none — request only"`. The only
+persistence ever claimed for them was `maintenance.inspection_response`, which does not exist.
+
+    maintenance.inspection_template_item   the questions, with is_safety_critical
+    maintenance.inspection                 failed_item_count, failed_safety_critical_count
+    (nothing)                              which item failed
+
+**A failed safety-critical item takes an asset out of service** — `InspectionResult.consequences`
+says so — and the record of which check caused it was accepted over the wire and dropped.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **the table** | a report on recurring failures has no source |
+| **Readability** | **the table** | `failedItemCount: 3` is three of what |
+| **Optimised access** | **keep the counts** | `listInspections` returns `Inspection` in a list; twenty item rows per row is the wrong trade |
+| **DB strain** | **the real cost** | one row per item per inspection is the highest-volume table in `maintenance`, and `retainUntil` is what bounds it |
+| **Cross-cell** | none | an inspection is venue-local |
+
+So the items go on `InspectionResult`, the detail response, and **not** on `Inspection`, the list
+row. `SubmitInspectionRequest` is retagged to name both tables it writes.
+
+`attachmentAssetIds` is a deliberate array and the same exception as
+`workforce.sync_conflict.affectedAssignmentIds`: evidence attached at the moment of recording,
+never queried from the other end, and it must not move when an asset library is reorganised.
+
+**Neither table needed a new operation.** `getLoyaltyRules` and `submitInspection` already
+existed and now reach them.

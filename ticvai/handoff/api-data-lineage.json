@@ -12533,11 +12533,13 @@
   "path": "/inspections",
   "reads": [
    "cache:idempotency",
-   "maintenance.inspection"
+   "maintenance.inspection",
+   "maintenance.inspection_item"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.inspection"
+   "maintenance.inspection",
+   "maintenance.inspection_item"
   ],
   "routing": "",
   "scope": "venue",
@@ -48611,7 +48613,8 @@
   "path": "/loyalty/programmes/{programmeId}/rules",
   "reads": [
    "marketing.loyalty_rule",
-   "marketing.points_redemption_rule"
+   "marketing.points_redemption_rule",
+   "marketing.programme_tier"
   ],
   "writes": [],
   "routing": "replica",
@@ -48851,11 +48854,13 @@
   "path": "/loyalty/programmes/{programmeId}/rules",
   "reads": [
    "marketing.loyalty_rule",
-   "marketing.points_redemption_rule"
+   "marketing.points_redemption_rule",
+   "marketing.programme_tier"
   ],
   "writes": [
    "marketing.loyalty_rule",
-   "marketing.points_redemption_rule"
+   "marketing.points_redemption_rule",
+   "marketing.programme_tier"
   ],
   "routing": null,
   "scope": "venue",

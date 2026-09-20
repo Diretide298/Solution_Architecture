@@ -9159,6 +9159,67 @@ paths:
                         $ref: '#/components/schemas/MarketingWaiverSignature'
 components:
   schemas:
+    MarketingProgrammeTier:
+      type: object
+      x-ticvai-persistence: marketing.programme_tier
+      description: >
+        **The tier definition decision 8 promised and nobody built.**
+        `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as
+        denormalised strings and a number, with no table saying what tiers exist or what each
+        one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.
+
+        **Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json`
+        as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that
+        contradicts the schema is worse than a longer name. Not named `marketing.tier` either,
+        because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a
+        package with two tier concepts is how `plan_id` came to point at `subscription.plan`.
+
+        **The denormalised copy on the position stays.** A till rendering *Gold* beside a
+        balance must not join, and must certainly not cross a cell boundary to print a word.
+        This table is the source of truth and those columns are its cache.
+      required:
+      - loyaltyProgrammeId
+      - code
+      - name
+      - rank
+      properties:
+        id:
+          type: string
+          format: uuid
+        loyaltyProgrammeId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 40
+        name:
+          type: string
+          maxLength: 120
+        rank:
+          type: integer
+          description: >
+            **Order, not threshold.** Two tiers can share a qualifying rule and still have an
+            order, and sorting by points breaks the moment a tier is granted rather than earned.
+        minLifetimePoints:
+          type: integer
+          nullable: true
+          description: >
+            What reaching this tier requires. **`pointsToNextTier` on the position is this minus
+            the guest's lifetime points**, and until now it was this minus nothing.
+        retainLifetimePoints:
+          type: integer
+          nullable: true
+          description: >
+            What keeping it requires, per review period. **Usually lower than reaching it**, and
+            a scheme that cannot express the difference either never demotes or demotes on the
+            day a guest stops earning.
+        validityMonths:
+          type: integer
+          nullable: true
+          description: Null means the tier does not lapse on its own.
+        isActive:
+          type: boolean
+          default: true
     GuestExtraFieldDefinition:
       type: object
       x-ticvai-persistence: none — composed from a field and its options
@@ -9211,6 +9272,15 @@ components:
           description: Bonus, multiplier and condition rules, each scoped to a campaign window.
           items:
             $ref: '#/components/schemas/MarketingLoyaltyRule'
+        tiers:
+          type: array
+          description: >
+            The programme's tiers, in `rank` order. **Read with the rules because a redemption
+            rule that is tier-gated is meaningless without them** — 500 points off for Gold
+            members is two facts, and reviewing one without the other is how a tier nobody can
+            reach acquires a benefit.
+          items:
+            $ref: '#/components/schemas/MarketingProgrammeTier'
         redemptionRules:
           type: array
           items:
@@ -13740,6 +13810,14 @@ components:
           type: integer
         lifetimePoints:
           type: integer
+        tierId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September
+            with `marketing.programme_tier`: the two strings were a cache of something that did
+            not exist, and a cache with no source cannot be rebuilt or audited.
         tierCode:
           type: string
         tierName:

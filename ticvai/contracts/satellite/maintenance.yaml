@@ -1649,6 +1649,68 @@ paths:
 
 components:
   schemas:
+    InspectionItem:
+      x-ticvai-persistence: maintenance.inspection_item
+      type: object
+      description: >
+        **One answer to one question, which the API has always accepted and never stored.**
+        `SubmitInspectionRequest.responses[]` takes a key, a value, a pass flag, a note and
+        attachments; the only persistence ever claimed for them was
+        `maintenance.inspection_response`, a table that does not exist.
+
+        So `maintenance.inspection_template_item` held the questions, `maintenance.inspection`
+        held `failedItemCount` and `failedSafetyCriticalCount`, and **which check failed was
+        accepted over the wire and dropped** — on a record that takes an asset out of service.
+
+        Returned on `InspectionResult`, not on `Inspection`: `listInspections` returns the
+        latter in a list, and twenty item rows per inspection on a list screen is the wrong
+        trade. The counts stay for exactly that reason.
+      required: [id, inspectionId, itemKey]
+      properties:
+        id: { type: string, format: uuid }
+        inspectionId: { type: string }
+        templateItemId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Nullable because a template changes and an inspection does not.** An answer
+            recorded against an item that was later removed still has to be readable, so the key
+            below is the durable record and this is the live link.
+        itemKey:
+          type: string
+          maxLength: 120
+          description: The template item's `key`, copied at submission and never updated.
+        label:
+          type: string
+          nullable: true
+          description: >
+            The question as it was asked, copied at submission. **A template reworded next
+            season must not silently reword last season's inspection.**
+        value:
+          nullable: true
+          description: Whatever the item's `kind` calls for — a boolean, a number, a string.
+        passed:
+          type: boolean
+          nullable: true
+          description: Null where the item is informational rather than pass or fail.
+        isSafetyCritical:
+          type: boolean
+          default: false
+          description: >
+            Copied from the template item at submission, for the same reason as `label`: it is
+            what makes `failedSafetyCriticalCount` reproducible, and the template can change.
+        note: { type: string, maxLength: 1000, nullable: true }
+        attachmentAssetIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: >
+            **A deliberate array, and the same exception as
+            `workforce.sync_conflict.affectedAssignmentIds`**: evidence attached to this answer
+            at the moment it was recorded. It is never queried from the other end — nobody asks
+            which inspection items reference a photograph — and it must not change when an asset
+            library is reorganised.
+        recordedAt: { type: string, format: date-time }
     AssetStatus:
       type: string
       enum: [inService, outOfService, underMaintenance, awaitingParts, retired, disposed]
@@ -2089,7 +2151,11 @@ components:
       enum: [passed, passedWithObservations, failed]
 
     SubmitInspectionRequest:
-      x-ticvai-persistence: "none — request only"
+      x-ticvai-persistence: maintenance.inspection + maintenance.inspection_item
+      # **It was tagged "none — request only" and it writes two tables.**
+      # `responses[]` has always carried the per-item answers; nothing
+      # persisted them, so the write derived from this schema named the
+      # inspection and not the items it is made of.
       type: object
       required: [id, templateId, venueId, responses, recordedAt]
       properties:
@@ -2152,6 +2218,13 @@ components:
       required: [inspection, consequences]
       properties:
         inspection: { $ref: '#/components/schemas/Inspection' }
+        items:
+          type: array
+          description: >
+            **The answers, which had nowhere to live until 20 September.** A failed
+            safety-critical item takes an asset out of service and `consequences` below says it
+            happened; this says which check caused it.
+          items: { $ref: '#/components/schemas/InspectionItem' }
         consequences:
           type: object
           description: >
