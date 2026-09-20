@@ -48802,5 +48802,276 @@
    "postgres",
    "redis"
   ]
+ },
+ "getMembership": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/memberships/{membershipId}",
+  "reads": [
+   "identity.benefit_usage",
+   "identity.customer_membership",
+   "identity.membership_history"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "A membership with its history, usage and renewals",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPlanBenefits": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/entitlement-templates/{templateId}/benefits",
+  "reads": [
+   "catalogue.plan_benefit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CATALOGUE_VIEW",
+  "offline": false,
+  "summary": "Which benefits a plan grants, and how much of each",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCustomerMemberships": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/customers/{customerId}/memberships",
+  "reads": [
+   "identity.customer_membership"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Memberships a customer holds",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMembershipBenefits": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/membership-benefits",
+  "reads": [
+   "catalogue.membership_benefit"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CATALOGUE_VIEW",
+  "offline": false,
+  "summary": "Benefits a plan can grant",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMembershipProgrammes": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/membership-programmes",
+  "reads": [
+   "catalogue.membership_programme"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CATALOGUE_VIEW",
+  "offline": false,
+  "summary": "Membership schemes, the level above a plan",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMembershipRenewals": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/memberships/{membershipId}/renewals",
+  "reads": [
+   "orders.membership_renewal"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "Renewal attempts and why they failed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordBenefitUsage": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/memberships/{membershipId}/benefit-usage",
+  "reads": [
+   "identity.benefit_usage"
+  ],
+  "writes": [
+   "identity.benefit_usage"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": true,
+  "summary": "Consume a benefit",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "renewMembership": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/memberships/{membershipId}/renewals",
+  "reads": [
+   "orders.membership_renewal"
+  ],
+  "writes": [
+   "orders.membership_renewal"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MANAGE",
+  "offline": false,
+  "summary": "Renew a membership",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMembershipBenefit": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/membership-benefits",
+  "reads": [
+   "catalogue.membership_benefit"
+  ],
+  "writes": [
+   "catalogue.membership_benefit"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CATALOGUE_MANAGE",
+  "offline": false,
+  "summary": "Define a benefit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMembershipProgramme": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/membership-programmes",
+  "reads": [
+   "catalogue.membership_programme"
+  ],
+  "writes": [
+   "catalogue.membership_programme"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CATALOGUE_MANAGE",
+  "offline": false,
+  "summary": "Define a membership programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPlanBenefits": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/entitlement-templates/{templateId}/benefits",
+  "reads": [
+   "catalogue.plan_benefit"
+  ],
+  "writes": [
+   "catalogue.plan_benefit"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CATALOGUE_MANAGE",
+  "offline": false,
+  "summary": "Replace the benefits a plan grants",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

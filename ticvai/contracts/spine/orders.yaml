@@ -8373,6 +8373,83 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WhiteLabelMarketplaceDeploymentExperienceArchitecturView'
+  /memberships/{membershipId}/renewals:
+    get:
+      operationId: listMembershipRenewals
+      summary: Renewal attempts and why they failed
+      description: '**A failed renewal is the thing a guest phones about**, and until 20 September
+        there was nowhere to read one. `failureReason` is on the row precisely so the answer does not
+        require reading a payment provider''s logs.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Renewals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdersMembershipRenewal'
+    post:
+      operationId: renewMembership
+      summary: Renew a membership
+      description: '**The term, the grace period and what a renewal sells come from the entitlement
+        template**, which is the plan. Until those four columns were added on 20 September this
+        operation could not have computed `newExpiryAt` — the number to add did not exist anywhere.
+
+        A renewal inside the grace period extends from the old expiry, not from today; outside it,
+        the membership is rejoined rather than renewed, and the two produce different dates.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MANAGE
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersMembershipRenewal'
+      responses:
+        '201':
+          description: Renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersMembershipRenewal'
+        '409':
+          description: Outside the grace period, or already renewed for this term
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 components:
   schemas:
     OrdersDeposit:
@@ -8475,7 +8552,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Stores membership renewal transactions and the result of each renewal attempt.'
       required:
       - customerMembershipId
-      - planId
+      - entitlementTemplateId
       - type
       - status
       - attemptedAt
@@ -8486,7 +8563,7 @@ components:
         customerMembershipId:
           type: string
           format: uuid
-        planId:
+        entitlementTemplateId:
           type: string
           format: uuid
         orderId:

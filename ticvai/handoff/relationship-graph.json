@@ -8941,10 +8941,10 @@
   },
   {
    "frm": "catalogue.plan_benefit",
-   "col": "membership_plan_id",
-   "to": "subscription.plan",
+   "col": "entitlement_template_id",
+   "to": "catalogue.entitlement_template",
    "how": "convention",
-   "cross": "yes",
+   "cross": "",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
@@ -9067,8 +9067,8 @@
   },
   {
    "frm": "identity.customer_membership",
-   "col": "plan_id",
-   "to": "subscription.plan",
+   "col": "entitlement_template_id",
+   "to": "catalogue.entitlement_template",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
@@ -9454,8 +9454,8 @@
   },
   {
    "frm": "orders.membership_renewal",
-   "col": "plan_id",
-   "to": "subscription.plan",
+   "col": "entitlement_template_id",
+   "to": "catalogue.entitlement_template",
    "how": "convention",
    "cross": "yes",
    "required": "yes",
