@@ -8,22 +8,21 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **10** |
+| OPEN — client | **9** |
 | OPEN — Softlabs | **0** |
-| CLOSED | **159** |
+| CLOSED | **160** |
 | WITHDRAWN | **6** |
 | **Total** | **175** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**10 open, 159 closed.**
+**9 open, 160 closed.**
 
 
-## Open — needs a client decision — 10
+## Open — needs a client decision — 9
 
 | ID | Issue | Owner |
 |---|---|---|
 | **CF-35** | Biometric data is sensitive under PDPL — heightened protection, explicit consent, DPIA, stricter transfer rules. Affects Face Pass, facial readers and | Allam + counsel |
-| **CF-64** | 89 retention requirements, two stated periods — and RPO/RTO is a narrower question than it looked. Only 4.3.4 (10 years, payment) and 6.1.78 (7 years) | Dinesh + Qossai |
 | **CF-127** | Cookie consent management is fifteen requirements, a regulatory obligation, and normally bought rather than built. 2.6.51–2.6.65 ask for a consent ban | Qossai |
 | **CF-133** | The platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices, simplif | Qossai + finance |
 | **CF-140** | The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found. `sources/planning/TAIS_Product_Planning_ | Chinmay + Qossai |
@@ -33,7 +32,7 @@ register.
 | **CF-170** | Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.  | Chinmay + Dinesh |
 | **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 |  |
 
-## Closed — 159
+## Closed — 160
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -95,6 +94,7 @@ register.
 | **CF-61** | On-premise deployment was never designed for. Settled 14 Aug as the third client-facing model: the platform on the venue's own hardware, nothing leavi |  |
 | **CF-62** | `createReservation` had been silently absent from the contracts. `/reservations` was declared twice in `orders.yaml`; YAML keeps the last block and dr | Chinmay |
 | **CF-63** | 263 of 273 "configurable" requirements did not say at what level |  |
+| **CF-64** | 89 retention requirements against two stated periods, and an RPO floor nobody had set. Only 4.3.4 (10 years, payment) and 6.1.78 (7 years) named a per |  |
 | **CF-65** | 52 reports named by title and nothing listed them. Closed 17 August, and counting properly found 133 rather than 52 — plus a split that matters more t |  |
 | **CF-66** | Seventeen enum values existed that nothing could reach. Writing state models for twenty entities found that the contracts could start and finish thing | Chinmay |
 | **CF-67** | Virtual and hybrid events appear once and nowhere else. 1.3.30 requires "physical, virtual and hybrid events with configurable attendance rules and ac |  |

@@ -7981,6 +7981,16 @@ components:
             **Distinct from `status: draining`.** Draining is a state an instance passes through
             and is temporary; a role is permanent. Marking an archive as draining to keep tenants
             off it would make a healthy instance indistinguishable from one being retired.'
+        supportsSynchronousReplication:
+          type: boolean
+          default: false
+          description: >
+            CF-64. **Whether this host has the standby and the link to offer a near-zero RPO**, and
+            false is the honest default for an instance nobody has built one for.
+
+            **Read rather than assumed**, the same way `maxConnections` is. A tenant selecting
+            `replicationMode: synchronous` is refused where its instance reports false, so a
+            durability promise cannot be made on behalf of a topology that does not exist.
         maxConnections:
           type: integer
           nullable: true
@@ -7997,6 +8007,28 @@ components:
           nullable: true
           description: 'Set rather than the row deleted, for the reason `CellTenant.droppedAt` is: a migration
             run records the host it touched by name, and that record has to stay readable.'
+    ReplicationMode:
+      type: string
+      description: >
+        CF-64, decided 21 September. **What a tenant's data durability costs the write path**, and
+        therefore what RPO it can be sold.
+
+        `asynchronous` — **the default, and the floor.** A several-minute recovery point, streaming
+        replication, one site with a standby. Every tenant gets this and nothing is required of
+        them to get it.
+
+        `synchronous` — near-zero recovery point, **selectable rather than standard**, and
+        available only on a pinned instance. Every commit waits for a remote acknowledgement, so
+        the cost lands inside `acquireInventoryHold` and `access.scan_event` — the two paths in
+        this package with the least headroom to give.
+
+        **The floor is a default, not a limit.** DR-11 asks the platform to *support configurable*
+        recovery point objectives; a platform that offered exactly one would have answered a
+        different requirement.
+      enum:
+      - asynchronous
+      - synchronous
+
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced
@@ -8034,6 +8066,24 @@ components:
             cell with one instance still names it, because a column that is only populated once there
             are two is a column every reader has to guess about. **`cellId` and `instanceId` together
             are the address**; the database name alone has not been one since ADR-0040.
+        replicationMode:
+          allOf:
+          - $ref: '#/components/schemas/ReplicationMode'
+          description: >
+            CF-64, decided 21 September. **Asynchronous by default; synchronous is a configuration
+            a tenant selects and cannot select alone.**
+
+            **`synchronous` requires `pinnedInstance: true`**, and that is not a restriction
+            invented for this field. Synchronous replication puts a network round-trip inside
+            every write transaction, and on a shared instance that cost is paid by every tenant on
+            the host — including the ones who did not ask for it and are not paying for it.
+            ADR-0042 already says the pin is what a dedicated client is buying, and a dedicated
+            client is exactly who asks for near-zero. **One decision serves CF-64 and CF-168.**
+
+            **Also requires `CellInstance.supportsSynchronousReplication` on the instance that
+            holds this tenant.** A capability absent is a capability unavailable, not one
+            assumed — the refusal happens when somebody selects it rather than silently at the
+            next failover, which is the only other moment anybody would find out.
         pinnedInstance:
           type: boolean
           default: false

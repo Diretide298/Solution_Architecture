@@ -1,6 +1,6 @@
 # ADR-0047: How long data is kept, and where it goes next
 
-**Status:** Accepted — two numbers pending sign-off, marked below
+**Status:** Accepted — the RPO floor decided 21 September; one number pending sign-off, marked below
 **Date:** 20 September 2026
 **Decides:** **CF-64** and **CF-165**, which are the same hole seen from the infrastructure side and the CRM side
 **Amends:** [ADR-0042](0042-when-a-region-grows-and-where-a-tenant-lands.md) — an instance now has a role, and only one role is placed onto
@@ -186,18 +186,40 @@ reproduced by hand when somebody disputes one.
 
 ## Pending sign-off
 
-**Two numbers, both marked in place above, in the same way ADR-0042 left its threshold.**
+**One number left. The RPO floor was decided 21 September and is recorded below rather than removed**, because a register that deletes its questions when they are answered cannot show what was decided.
 
 **The guest-profile ceiling**, proposed at seven years. Five is the default and a tenant may extend;
 the question is how far before the platform refuses.
 
-**The RPO floor**, which is the rest of CF-64 and belongs to Dinesh. The question is *not* what
-Miral's RPO is — it is **the tightest RPO any tenant may ever buy**, because offering one near zero
-requires synchronous replication and a second site, which is a topology decision made once.
-**Recommendation: tie it to ADR-0042's pin** — asynchronous replication with a several-minute RPO as
-standard, near-zero available only on a pinned dedicated instance, which is what a dedicated client
-is already paying for. One decision then serves two conflicts, and the commercial model already
-carries the pin.
+**~~The RPO floor~~ — decided 21 September, Chinmay, and the recommendation was taken.**
+
+    asynchronous    several-minute RPO -- the default, and what every tenant gets
+    synchronous     near-zero RPO -- selectable, and only on a pinned instance
+
+**The second line is the half that matters.** A floor nobody can rise above is not a floor, it is
+a ceiling wearing the wrong name — and DR-11 asks the platform to *support configurable* recovery
+point objectives, so a platform offering exactly one would have answered a different requirement.
+
+**`synchronous` requires `pinnedInstance`, and that precondition was not invented for this
+decision.** Synchronous replication puts a network round-trip inside every write transaction; on a
+shared instance that cost is paid by every tenant on the host, and it lands on the two paths in
+this package with the least headroom — `acquireInventoryHold`, which already serialises on
+contention and is the first thing to load-test, and `access.scan_event`, which runs tens of
+thousands of times a day at a gate. ADR-0042 already holds that *"the pin is what a dedicated
+client is actually buying"*, and a dedicated client is exactly who asks for near-zero. **One
+decision serves CF-64 and CF-168.**
+
+**`CellInstance.supportsSynchronousReplication` is the topology fact underneath**, in the same
+shape as `DeviceCapability`: a capability absent is a capability unavailable rather than one
+assumed, and the refusal happens at selection rather than silently at the next failover.
+
+**RTO is deliberately not modelled.** DR-12 asks for it configurably too, but an RTO is a promise
+about how fast an operator restores rather than a property a row can carry. It belongs in the SOW
+beside the runbook; a column claiming it would be a column nothing enforces.
+
+**What stays with Dinesh is building the standby**, not deciding whether to offer one — backup
+schedules, replication topology and restore drills are the 62 DR requirements CF-60 placed in
+infrastructure.
 
 ---
 
