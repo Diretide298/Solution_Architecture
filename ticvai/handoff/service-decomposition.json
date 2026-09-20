@@ -514,7 +514,7 @@
    "schemas": [
     "reporting"
    ],
-   "operations": 42,
+   "operations": 43,
    "tables": 20,
    "why": "**Reads almost everything and writes only its own definitions.** Separate because it is the one service that should never touch the transactional primary — ADR-0016 read-write separation exists for this.",
    "scale": "Analytical. Runs against the replica and the analytical store.",

@@ -9,12 +9,12 @@
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 236 |
+| Operations with no screen | 237 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 236 operations with no screen here
+### 237 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
-| … | | | 196 more |
+| … | | | 197 more |
 
 ### 8 modules split across waves
 

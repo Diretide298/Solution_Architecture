@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 204
+  "operationsWithNoScreen": 205
  },
  "waves": {
   "wave1": 12,
@@ -178,11 +178,11 @@
    "operations": 7
   },
   {
-   "contract": "public-api",
+   "contract": "ai",
    "operations": 5
   },
   {
-   "contract": "ai",
+   "contract": "public-api",
    "operations": 5
   },
   {
@@ -7055,6 +7055,12 @@
     "contract": "promotions",
     "verb": "POST",
     "summary": "Cancel a voucher"
+   },
+   {
+    "operation": "deleteDashboard",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Archive a dashboard"
    },
    {
     "operation": "deleteReportSchedule",

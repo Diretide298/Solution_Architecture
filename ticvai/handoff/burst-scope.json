@@ -6,7 +6,7 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2055,
+  "ofTotalOperations": 2056,
   "tables": 44,
   "ofTotalTables": 623
  },
@@ -17,7 +17,7 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2021,
+    "operations": 2022,
     "tables": 623,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."

@@ -1774,6 +1774,24 @@ components:
 
                 **`resources` owns the calendar and this owns the condition.** An asset out of service
                 makes its resource unbookable, which is one link rather than two models of availability.
+            deviceId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                BL-160. **Where this asset is also a registered device.** A turnstile is an asset
+                to maintain and a device to operate, and — exactly as with `resourceId` above —
+                they are the same object seen from two sides.
+
+                **Nothing joined them before this.** A turnstile controller reporting
+                `needsAttention` could not raise a work order against itself, and an engineer
+                closing one had no way back to the device whose firmware caused it.
+
+                **Null for most assets and for most devices.** A chiller is not a device and a
+                signature pad is not on the asset register; the link is sparse, and it lives here
+                rather than on `platform.device` because `platform` is the foundation tier and a
+                foreign key pointing from it into `maintenance` would invert the tiers — every
+                cell running a spine would carry a column for a satellite it may not deploy.
             acquisitionCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             acquiredOn: { type: string, format: date, nullable: true }
             depreciation:

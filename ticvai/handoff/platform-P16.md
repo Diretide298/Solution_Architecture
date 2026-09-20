@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 124 |
+| Operations with no screen | 125 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 124 operations with no screen here
+### 125 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
-| … | | | 84 more |
+| … | | | 85 more |
 
 ## Modules
 

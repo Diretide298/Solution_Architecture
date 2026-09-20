@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 85 |
+| Operations with no screen | 86 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 85 operations with no screen here
+### 86 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
 | `getLoyaltyRules` | marketing-crm | GET | Every rule a loyalty programme runs on |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| … | | | 45 more |
+| … | | | 46 more |
 
 ## Modules
 

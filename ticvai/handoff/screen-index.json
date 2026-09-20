@@ -2726,6 +2726,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "maintenance.work_order",
    "orders.group_booking",
@@ -2737,6 +2738,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "orders.reservation"
   ],
@@ -3063,6 +3065,7 @@
    "fnb.menu_item",
    "fnb.modifier_group",
    "fnb.modifier_option",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
@@ -3074,6 +3077,7 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
@@ -8935,6 +8939,7 @@
    "catalogue.performance",
    "catalogue.waitlist_entry",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "fnb.waitlist_entry",
    "maintenance.work_order",
@@ -8945,6 +8950,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.waitlist_entry",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "fnb.waitlist_entry"
   ],
@@ -12883,6 +12889,7 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_reservation",
@@ -18554,6 +18561,7 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_reservation"
@@ -18726,6 +18734,7 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18784,12 +18793,14 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "storedProcedures": [],
@@ -18990,6 +19001,7 @@
    "fnb.dining_table",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_reservation",
@@ -19174,6 +19186,7 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [],

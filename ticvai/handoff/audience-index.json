@@ -108,7 +108,7 @@
   }
  },
  "totals": {
-  "operations": 2055,
+  "operations": 2056,
   "screens": 2427,
   "flows": 288
  },
@@ -660,6 +660,7 @@
     "fnb.menu_item",
     "fnb.modifier_group",
     "fnb.modifier_option",
+    "fnb.reservation_table",
     "fnb.service_order",
     "fnb.table_reservation",
     "fnb.table_session",
@@ -786,7 +787,7 @@
     "screens": 130,
     "flows": 22,
     "contracts": 20,
-    "tables": 164
+    "tables": 165
    }
   },
   "partner": {
@@ -1557,6 +1558,7 @@
     "decommissionCell",
     "deleteBanner",
     "deleteContentPage",
+    "deleteDashboard",
     "deleteDelegatedAccess",
     "deleteMediaAsset",
     "deletePromoBlock",
@@ -5624,6 +5626,7 @@
     "fnb.production_run",
     "fnb.recipe",
     "fnb.recipe_ingredient",
+    "fnb.reservation_table",
     "fnb.service_order",
     "fnb.service_order_line",
     "fnb.sold_out_item",
@@ -6051,11 +6054,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 1928,
+    "operations": 1929,
     "screens": 2087,
     "flows": 135,
     "contracts": 32,
-    "tables": 589
+    "tables": 590
    }
   }
  }

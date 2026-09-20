@@ -356,6 +356,8 @@ fnb.recipe_ingredient,inventory_item_id,inventory.item,reference,declared,yes,ye
 fnb.recipe_ingredient,recipe_id,fnb.recipe,child,declared,,yes
 fnb.reservation_table,reservation_id,fnb.table_reservation,reference,convention,,yes
 fnb.reservation_table,table_id,fnb.dining_table,reference,declared,,yes
+fnb.reservation_table,via createTableReservation,fnb.table_reservation,ambient,lineage,,
+fnb.reservation_table,via updateTableReservation,fnb.table_reservation,ambient,lineage,,
 fnb.service_order,kitchen_ticket_id,fnb.kitchen_ticket,reference,declared,,yes
 fnb.service_order,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.service_order,sales_order_id,orders.sales_order,reference,convention,yes,yes
@@ -616,6 +618,7 @@ ledger.tax_code,account_id,ledger.account,reference,declared,,yes
 ledger.tax_code,compound_on_tax_code_id,ledger.tax_code,reference,convention,,yes
 ledger.tax_exemption,tax_code_id,ledger.tax_code,reference,declared,,yes
 maintenance.asset,category_id,maintenance.asset_category,reference,convention,,yes
+maintenance.asset,device_id,platform.device,reference,convention,yes,
 maintenance.asset,linked_access_point_id,access.access_point,reference,declared,yes,yes
 maintenance.asset,resource_id,resources.resource,reference,convention,yes,yes
 maintenance.asset,supplier_id,inventory.supplier,reference,declared,yes,yes
@@ -961,6 +964,7 @@ platform.cross_region_entitlement,ticket_id,access.entitlement,reference,declare
 platform.cross_region_entitlement,venue_id,platform.scope,reference,declared,,yes
 platform.dead_letter,outbox_id,platform.outbox,reference,convention,,yes
 platform.dead_letter,via replayDeadLetter,platform.outbox,ambient,lineage,,
+platform.device,configuration_profile_id,platform.configuration_profile,reference,convention,,
 platform.device,via configureWorkstation,platform.workstation,ambient,lineage,,
 platform.device,workstation_id,platform.workstation,reference,declared,,yes
 platform.device_heartbeat,device_id,platform.device,child,declared,,yes

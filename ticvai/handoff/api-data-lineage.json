@@ -41312,7 +41312,9 @@
   "reads": [
    "platform.device"
   ],
-  "writes": [],
+  "writes": [
+   "platform.device"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "DEVICE_MANAGE",

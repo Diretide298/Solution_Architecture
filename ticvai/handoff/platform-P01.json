@@ -124,11 +124,11 @@
  ],
  "contracts": [
   {
-   "contract": "orders",
+   "contract": "marketing-crm",
    "operations": 30
   },
   {
-   "contract": "marketing-crm",
+   "contract": "orders",
    "operations": 30
   },
   {
@@ -156,15 +156,15 @@
    "operations": 5
   },
   {
-   "contract": "wallet",
-   "operations": 4
-  },
-  {
    "contract": "ai",
    "operations": 4
   },
   {
    "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "wallet",
    "operations": 4
   },
   {
@@ -180,7 +180,7 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 1
   },
   {
@@ -188,7 +188,7 @@
    "operations": 1
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 1
   }
  ],

@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 85
+  "operationsWithNoScreen": 86
  },
  "waves": {
   "wave2": 2,
@@ -72,11 +72,11 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "white-label",
    "operations": 1
   },
   {
-   "contract": "white-label",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -84,7 +84,7 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "ai",
    "operations": 1
   }
  ],
@@ -727,6 +727,12 @@
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "deleteDashboard",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Archive a dashboard"
    },
    {
     "operation": "deleteReportSchedule",

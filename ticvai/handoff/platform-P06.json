@@ -15,7 +15,7 @@
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 164
+  "operationsWithNoScreen": 165
  },
  "waves": {
   "wave1": 25,
@@ -92,15 +92,15 @@
    "operations": 11
   },
   {
-   "contract": "queue",
-   "operations": 7
-  },
-  {
    "contract": "access",
    "operations": 7
   },
   {
    "contract": "identity",
+   "operations": 7
+  },
+  {
+   "contract": "queue",
    "operations": 7
   },
   {
@@ -116,11 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -1733,6 +1733,12 @@
     "contract": "rental",
     "verb": "GET",
     "summary": "Rental agreements"
+   },
+   {
+    "operation": "deleteDashboard",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Archive a dashboard"
    },
    {
     "operation": "deleteReportSchedule",

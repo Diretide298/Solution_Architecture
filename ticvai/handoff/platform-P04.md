@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 177 |
+| Operations with no screen | 178 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 177 operations with no screen here
+### 178 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
-| … | | | 137 more |
+| … | | | 138 more |
 
 ### 2 modules split across waves
 

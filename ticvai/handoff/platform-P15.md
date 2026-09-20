@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 30 |
+| Operations with no screen | 31 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 30 operations with no screen here
+### 31 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -38,6 +38,7 @@
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
 | `updateTable` | fnb | PUT | Change what a table is |
+| `deleteDashboard` | reporting | DELETE | Archive a dashboard |
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
 | `listAlertRules` | reporting | GET | What raises an alert, and when |
 | `updateReportSchedule` | reporting | PATCH | Amend, pause or resume a schedule |

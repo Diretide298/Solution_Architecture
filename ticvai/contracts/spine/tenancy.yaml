@@ -1228,25 +1228,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-              - state
-              properties:
-                state:
-                  type: string
-                  enum:
-                  - enrolled
-                  - provisioned
-                  - active
-                  - deactivated
-                  - retired
-                configurationProfileId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                reason:
-                  type: string
-                  nullable: true
+              $ref: '#/components/schemas/DeviceEnrolment'
       responses:
         '200':
           description: Moved
@@ -2365,6 +2347,81 @@ components:
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+        enrolmentState:
+          type: string
+          enum: [registered, enrolled, provisioned, active, deactivated, retired]
+          default: registered
+          description: >
+            BL-160. **Where the device is in its life, which is not the same question as whether
+            it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled,
+            provisioned, active, deactivated, retired — since 16.1.2, and until now there was no
+            column for it to land in, so the operation read this table and wrote nothing.
+
+            **Distinct from `status` and from `health`.** `status` is what the device last said
+            and `health` is what we computed from it; a decommissioned turnstile still sitting on
+            the network is `online` and `retired` at once, and neither column contradicts the
+            other. **A device that is `retired` is refused at the gate whatever its status says.**
+
+            The transition itself — who moved it, from what, and why — is a
+            `tenancy.device_audit` record. It is not repeated here, because the latest transition
+            stored in two places is one place to go stale.
+        retiredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from
+            `tenancy.device_audit`, and kept as a column for the same reason
+            `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit
+            log is a date nobody filters a fleet by.
+        configurationProfileId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The profile this device was provisioned with.** `enrolDevice` has accepted one since
+            16.1.3 and there was nowhere to keep it, so the answer to *"what is this reader
+            configured as"* lived only in the request that set it.
+
+    DeviceEnrolment:
+      x-ticvai-persistence: "platform.device"
+      type: object
+      description: >
+        BL-160. **The body `enrolDevice` accepts, named so that it writes.**
+
+        It was an anonymous inline object, and `derive-lineage` reads writes from the schema an
+        operation accepts — so the one operation that moves a device through its whole lifecycle
+        recorded no writes at all, and `platform.device` looked like a table only
+        `registerDevice` touched.
+
+        **Provisioning is inside enrolment rather than beside it**, which is why
+        `configurationProfileId` is here: a device that is enrolled but unprovisioned is a device
+        that will fail at the gate on its first morning.
+      required:
+      - state
+      properties:
+        state:
+          type: string
+          enum:
+          - enrolled
+          - provisioned
+          - active
+          - deactivated
+          - retired
+          description: >
+            **The target state, not the current one.** `registered` is absent because
+            `registerDevice` is what produces it and nothing transitions back to it.
+        configurationProfileId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+          description: >
+            **Recorded on the `tenancy.device_audit` row, not on the device.** Required in
+            practice for `deactivated` and `retired`, where an investigation six months later
+            needs to know why a gate stopped working.
 
     ScopeLevel:
       type: string

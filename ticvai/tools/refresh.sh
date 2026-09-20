@@ -305,6 +305,7 @@ derive-pack-screens derive-pack-linkage derive-task-linkage
 draft-pack-operations specify-pack-operations scope-pack-to-contracts
 splice-contract apply-p04-transitions
 retire-answered-questions                                          # never run: the answers are the reasoning
+retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "

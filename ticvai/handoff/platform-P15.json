@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 30
+  "operationsWithNoScreen": 31
  },
  "waves": {
   "wave2": 10
@@ -244,6 +244,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Change what a table is"
+   },
+   {
+    "operation": "deleteDashboard",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Archive a dashboard"
    },
    {
     "operation": "deleteReportSchedule",

@@ -4722,8 +4722,8 @@
     "21.13.4",
     "23.1.13"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "approvals",
     "platform-ops"
@@ -4735,12 +4735,10 @@
    "why": "Domain events are defined per contract and consumed inside the platform. **Nothing publishes to an external subscriber.** 11.1.66 and 12.1.53 both ask for webhooks and 11.1.65 asks for integration with a third-party workflow system. This is a platform capability rather than an approvals one — every contract that emits an event would use it — and it needs delivery guarantees, retry, signing and a subscription model. Belongs with domain 13 Developer & API Management, which has no contract.",
    "fix": "An outbound webhook subscription with signing, retry and replay.",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-21"
-   ],
-   "blockedOnDomains": [
-    "13"
-   ]
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-20",
+   "closedBy": "**Built 18 August by CF-135 and never connected back to this entry**, which stayed blocked on CF-21 — a conflict about scheduling workshops for three uncontracted domains. CF-135 walked domain 13 and found four separable gaps; *\"events stop at the boundary\"* was the fourth, and it produced `contracts/satellite/public-api.yaml`.\n\nAll three halves of the stated fix are there. **Signing**: `WebhookSubscription.signingSecret` — *\"how the receiver knows it was TICVAI\"*. **Retry**: `WebhookDelivery.status` carries `pending, delivered, failed, retrying, abandoned`, and `listWebhookDeliveries` is what BO-1078 Monitoring, Retry & Reconciliation reads. **Replay**: `replayEvents`, bounded by the retention policy (13.3.20), with `isReplay` on the delivery so a consumer that cannot tell a replay from a live event is not silently given one.\n\n**Third-party workflow integration** (11.1.65) is `listIntegrationListings`, `submitIntegrationListing` and `certifyIntegration`, under ADR-0026's rule that third-party code does not execute inside TICVAI."
   },
   {
    "id": "BL-156",
@@ -4931,8 +4929,8 @@
     "17.1.5",
     "21.4.6"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "tenancy",
     "maintenance"
@@ -4948,10 +4946,10 @@
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "closed": "2026-08-20",
-   "closedBy": "RegisteredDevice gained batteryPercent, lastCheckedAt and health; Workstation gained healthScore and configurationProfileId (CF-136, closed 20 August). **All nine device kinds the client board names already existed in DeviceKind, which carries twenty** — the list was never the gap. **lastCheckedAt is separate from lastHeartbeatAt because a printer with no paper heartbeats perfectly.**",
+   "closed": "2026-09-20",
+   "closedBy": "**Reopened 20 September because the 20 August closure recorded CF-136 device health against an entry naming three different gaps, and closed the same day against all three.**\n\n**Firmware deployment** was already done and the entry had never been re-read: `listDeviceFirmware`, `startDeviceFirmwareRollout`, `rollbackDeviceFirmware`.\n\n**The lifecycle was half done in a way that looked whole.** `enrolDevice` has taken the full matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and **wrote nothing**. `derive-lineage` had it reading `platform.device` with an empty `writes` list, because its request body was an anonymous inline object and the table had no column for `state` or `configurationProfileId`. `status` is `online/offline/error/consumableLow`, which is health — **a decommissioned turnstile still on the network is `online` and `retired` at once**, and neither column could say so. Closed by `RegisteredDevice` gaining `enrolmentState`, `retiredAt` and `configurationProfileId`, and by naming the body `DeviceEnrolment` on `platform.device` so the operation declares its write. The transition reason stays on `tenancy.device_audit` rather than becoming a column, because the latest transition stored twice is one copy to go stale.\n\n**The device-to-asset link is `maintenance.asset.deviceId`**, beside `resourceId`, which already says an AV rig is an asset to maintain and a resource to allocate — a turnstile is the same sentence. **It lives on the asset and not the device** because `platform` is TenancyService, tier `foundation`, and `maintenance` is VenueOpsService, tier `operations`, which already reads from Tenancy in four operations: a foreign key the other way would invert the tiers and make every cell running a spine carry a column for a satellite it may not deploy. It is nullable on both sides because most assets are not devices and most devices are not on the asset register.",
    "reopened": "2026-09-20",
-   "reopenedWhy": "**Closed 20 August against CF-136, which is a different gap.** This entry names three: no firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. `closedBy` records `RegisteredDevice` gaining `batteryPercent`, `lastCheckedAt` and `health`, and `Workstation` gaining `healthScore` — that is device HEALTH, and none of the three. **Firmware is genuinely done**: `listDeviceFirmware`, `startDeviceFirmwareRollout` and `rollbackDeviceFirmware` exist. Enrolment is done: `enrolDevice` and `registerDevice`. **The other two are not.** No operation retires or decommissions a device — `revokeDeviceCredential` revokes a credential, which is not a lifecycle — and **no column anywhere joins a device to a `maintenance.asset`**, so a turnstile that needs a part cannot raise a work order against itself. Found 20 September by re-testing the 21 traceability rows routed here, which had been out of view since the entry closed."
+   "reopenedWhy": "**Closed 20 August against CF-136, which is a different gap.** This entry names three: no firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. `closedBy` records `RegisteredDevice` gaining `batteryPercent`, `lastCheckedAt` and `health`, and `Workstation` gaining `healthScore` — that is device HEALTH, and none of the three. **Firmware is genuinely done**: `listDeviceFirmware`, `startDeviceFirmwareRollout` and `rollbackDeviceFirmware` exist. Enrolment is done: `enrolDevice` and `registerDevice`. **The other two were not what I first wrote.** I said no operation retires a device; `enrolDevice` does, and has since 16.1.2 — I searched for an operationId containing \"retire\", found none, and concluded from its absence. **The real defect was next door and worse**: `enrolDevice` moved a device through six states and wrote nothing, because `platform.device` had no column to hold the state. And **no column anywhere joins a device to a `maintenance.asset`**, so a turnstile that needs a part cannot raise a work order against itself. Found 20 September by re-testing the 21 traceability rows routed here, which had been out of view since the entry closed."
   },
   {
    "id": "BL-161",
