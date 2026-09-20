@@ -18960,6 +18960,7 @@
   "path": "/table-reservations",
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18984,10 +18985,12 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "routing": "",
@@ -19011,10 +19014,12 @@
   "path": "/table-reservations/{reservationId}",
   "reads": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "routing": "",
@@ -19039,6 +19044,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [

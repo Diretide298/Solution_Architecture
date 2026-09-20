@@ -6243,6 +6243,8 @@ components:
     TableReservation:
       type: object
       x-ticvai-persistence: fnb.table_reservation
+      x-ticvai-retired-columns:
+      - table_ids
       required:
       - outletId
       - startsAt
@@ -6275,15 +6277,24 @@ components:
             this to be real, or the second sitting cannot be booked.
 
             '
-        tableIds:
+        tables:
           type: array
-          description: 'Usually empty until seating. **Committing a specific table at booking time refuses
-            later bookings against a constraint that did not need to exist.**
+          description: >
+            The dining tables assigned to this reservation, one row each.
 
-            '
+            **Usually empty until seating.** Committing a specific table at booking time refuses
+            later bookings against a constraint that did not need to exist — that was true of the
+            `tableIds` array this replaces and it is still true, because it is about *when* a
+            table is assigned rather than how the assignment is stored.
+
+            **Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state,
+            which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`,
+            `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the
+            backend workbook. A party seated across three tables that releases one early has
+            nowhere to say so in an array, and *"which reservations are on table 7 tonight"* is a
+            GIN scan over every reservation instead of an index seek.
           items:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/FnbReservationTable'
         status:
           $ref: '#/components/schemas/TableReservationStatus'
         groupId:
