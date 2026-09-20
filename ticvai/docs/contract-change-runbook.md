@@ -97,6 +97,7 @@ they are inputs.
 | `handoff/artefact-audit.md` | 3 Sep | viewer `lib/decisions.mjs` | classifies the handoff tables; new artefacts unclassified |
 | `handoff/schema-viewer-notes.md` | 3 Sep | viewer `lib/relationships.mjs` | the prose explaining the schema the viewer draws |
 | `handoff/rag-index-sources.md` | 3 Sep | `check-package` | what the RAG index was built from |
+| **`docs/**/*.md`** | **continuously** | the reasoning — ADRs, briefs, audits, the registers | **a rename falsifies every sentence naming the old table.** On 20 September sixteen tables were renamed and 48 names across 21 documents went stale, including ADR-0018's own justification for the scope walk, *"`org_unit` is an `ltree`"* — in the ADR the rename was argued from. **Guarded since: `check-doc-tables.py`**, which reads the renames `derive-schema-history.py` declares and fails on a document still using the old name. A quotation is left alone |
 | `wireframes/LINKAGE.md` | **25 Aug** | viewer `lib/wireframes.mjs`, `lib/lineage.mjs` | the chain from board to screen to operation, drawn in one line |
 
 **`service-decomposition.json` is the one that matters most and the one that can least be

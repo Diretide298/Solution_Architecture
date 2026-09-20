@@ -60,7 +60,7 @@ thing the rule said could not configure, which is how the gap announced itself.
       └── outlet                                            commercial
 
 **Department could not do this job.** `inventory.requisition.department_id` and
-`platform.workstation.department_id` both resolve to `platform.org_unit`: a department has
+`platform.workstation.department_id` both resolve to `platform.scope`: a department has
 requisitions, rotas and workstations. **Modelling a restaurant as a department would put it in
 the staffing tree and give every rota a restaurant to schedule against.**
 
