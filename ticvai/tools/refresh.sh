@@ -274,12 +274,22 @@ echo
 # whether a twin is a duplicate or a deliberate copy, whether an array should be a table. A
 # checker that fails the package on a judgement gets silenced rather than answered -- so they run
 # every time and print, and the judgement stays with whoever reads the run.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs check-output-paths audit-screenless-operations audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
-  # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
-  # one checker returning non-zero killed the whole run: for most of 9 September this script died
-  # at check-flows and nobody saw the eight checks below it, including the ones that were passing.
-  printf "  %-22s" "$t"; python3 "tools/$t.py" 2>&1 | tail -1 || true
-done
+# **A report that stops at the first failure is not a report, and a report that cannot fail is not
+# a gate.** `set -e` plus `pipefail` meant one checker returning non-zero killed the whole run: for
+# most of 9 September this script died at check-flows and nobody saw the eight checks below it,
+# including the ones that were passing.
+#
+# **The fix for that was to discard every failure, and it was too wide.** Until 21 September this
+# loop ran `python3 "tools/$t.py" 2>&1 | tail -1 || true` -- which throws the exit code away twice,
+# once because a pipeline reports `tail`'s status and again with `|| true` -- and kept only the
+# final line of output. A checker emitting four hundred errors contributed one line and did not
+# fail the run. Several tools whose last line is prose printed no verdict at all, so the run said
+# nothing about whether they passed.
+#
+# **The answer to "one failure stops the report" is to collect failures, not to drop them.**
+# `tools/run-checks.py` runs every checker, keeps each exit code, prints the same table, and exits
+# non-zero at the end if a gating checker failed. The report survives; the gate comes back.
+python3 tools/run-checks.py
 
 # **Coverage is a number that can quietly go down.** A regeneration that dropped transitions would
 # still pass every check above — nothing fails for an edge nobody labelled — so it is printed here
@@ -295,6 +305,11 @@ printf "  %-22s" "transition coverage"; python3 tools/audit-transitions.py 2>&1 
 # So the coverage is checked rather than asserted. Everything in tools/*.py must either appear
 # above or be named here with the reason it does not belong. A new tool fails this until
 # somebody decides which it is -- that decision is the whole point.
+#
+# **The search covers `run-checks.py` too, because the checker list moved there on 21 September.**
+# Grepping this file alone would have reported all thirty-two checkers as unrun on the same day
+# the gate was restored -- which is the failure this block exists to catch, arriving through the
+# block itself.
 _EXCLUDED="
 contract_io contract_shapes packshape workshop_boards              # imported, no main
 parse-workshop-pack mine-moms extract-mom-decisions                # intake, once per client drop
@@ -315,7 +330,7 @@ for _t in tools/*.py; do
   _n="$(basename "$_t" .py)"
   case "$_EXCLUDED" in *" $_n "*|*"
 $_n "*) continue ;; esac
-  grep -q -- "$_n" tools/refresh.sh || _missing="$_missing $_n"
+  grep -q -- "$_n" tools/refresh.sh tools/run-checks.py || _missing="$_missing $_n"
 done
 if [ -n "$_missing" ]; then
   echo
