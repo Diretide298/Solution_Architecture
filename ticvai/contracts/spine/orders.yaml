@@ -8375,6 +8375,257 @@ paths:
                   $ref: '#/components/schemas/WhiteLabelMarketplaceDeploymentExperienceArchitecturView'
 components:
   schemas:
+    OrdersDeposit:
+      type: object
+      x-ticvai-persistence: orders.deposit
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the financial/security deposit associated with a rental order, including hold, release, forfeiture, and settlement totals.'
+      required:
+      - orderId
+      - currencyCode
+      - requiredAmount
+      - authorizedAmount
+      - capturedAmount
+      - releasedAmount
+      - forfeitedAmount
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        rentalAgreementId:
+          type: string
+          format: uuid
+          nullable: true
+        currencyCode:
+          type: string
+          maxLength: 10
+        requiredAmount:
+          type: number
+        authorizedAmount:
+          type: number
+        capturedAmount:
+          type: number
+        releasedAmount:
+          type: number
+        forfeitedAmount:
+          type: number
+        status:
+          type: string
+          maxLength: 30
+        settledAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    OrdersDiscount:
+      type: object
+      x-ticvai-persistence: orders.discount
+      description: '**Taken from the backend workbook, 20 September.** Stores each discount or promotion actually applied to an order.'
+      required:
+      - orderId
+      - type
+      - appliedAmount
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+        couponCode:
+          type: string
+          maxLength: 100
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        value:
+          type: number
+          nullable: true
+        appliedAmount:
+          type: number
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    OrdersMembershipRenewal:
+      type: object
+      x-ticvai-persistence: orders.membership_renewal
+      description: '**Taken from the backend workbook, 20 September.** Stores membership renewal transactions and the result of each renewal attempt.'
+      required:
+      - customerMembershipId
+      - planId
+      - type
+      - status
+      - attemptedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerMembershipId:
+          type: string
+          format: uuid
+        planId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          maxLength: 30
+        previousExpiryAt:
+          type: string
+          format: date-time
+          nullable: true
+        newExpiryAt:
+          type: string
+          format: date-time
+          nullable: true
+        attemptedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+    OrdersOrderFee:
+      type: object
+      x-ticvai-persistence: orders.order_fee
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the actual fee/surcharge snapshot applied to a specific order.'
+      required:
+      - orderId
+      - name
+      - category
+      - amount
+      - taxAmount
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        ruleId:
+          type: string
+          format: uuid
+          nullable: true
+        paymentMethodId:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+          maxLength: 150
+        category:
+          type: string
+          maxLength: 20
+        calculationType:
+          type: string
+          maxLength: 20
+          nullable: true
+        rateValue:
+          type: number
+          nullable: true
+        amount:
+          type: number
+        taxAmount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+    OrdersUpgrade:
+      type: object
+      x-ticvai-persistence: orders.upgrade
+      description: '**Taken from the backend workbook, 20 September.** Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amount.'
+      required:
+      - number
+      - orderId
+      - originalOrderLineId
+      - originalAmount
+      - newAmount
+      - amount
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          maxLength: 50
+        orderId:
+          type: string
+          format: uuid
+        originalOrderLineId:
+          type: string
+          format: uuid
+        newOrderLineId:
+          type: string
+          format: uuid
+          nullable: true
+        ruleId:
+          type: string
+          format: uuid
+          nullable: true
+        originalAmount:
+          type: number
+        newAmount:
+          type: number
+        amount:
+          type: number
+        status:
+          type: string
+          maxLength: 30
+        requestedByUserId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
     DraftedRecord:
       type: object
       x-ticvai-provisional: true

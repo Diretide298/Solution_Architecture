@@ -8508,6 +8508,680 @@ paths:
 
 components:
   schemas:
+    MarketingGuestExtraField:
+      type: object
+      x-ticvai-persistence: marketing.guest_extra_field
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.'
+      required:
+      - tenantId
+      - name
+      - type
+      - isRequired
+      - displayOrder
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 150
+        type:
+          type: string
+          maxLength: 30
+        isRequired:
+          type: boolean
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MarketingGuestExtraOption:
+      type: object
+      x-ticvai-persistence: marketing.guest_extra_option
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.'
+      required:
+      - fieldId
+      - name
+      - displayOrder
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        fieldId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 150
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+    MarketingGuestExtraValue:
+      type: object
+      x-ticvai-persistence: marketing.guest_extra_value
+      description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the value entered by a customer for each Admin-created extra field.'
+      required:
+      - customerId
+      - fieldId
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        fieldId:
+          type: string
+          format: uuid
+        fieldValue:
+          type: string
+          maxLength: 2000
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MarketingBadge:
+      type: object
+      x-ticvai-persistence: marketing.badge
+      description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'
+      required:
+      - code
+      - name
+      - type
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        iconUrl:
+          type: string
+          maxLength: 1000
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MarketingCampaignTarget:
+      type: object
+      x-ticvai-persistence: marketing.campaign_target
+      description: '**Taken from the backend workbook, 20 September.** Links a marketing campaign to the commercial item or offer it promotes.'
+      required:
+      - campaignId
+      - domain
+      - type
+      - targetId
+      - isPrimary
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        domain:
+          type: string
+          maxLength: 30
+        type:
+          type: string
+          maxLength: 50
+        targetId:
+          type: string
+          format: uuid
+        isPrimary:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    MarketingCustomerBadge:
+      type: object
+      x-ticvai-persistence: marketing.customer_badge
+      description: '**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.'
+      required:
+      - customerId
+      - badgeId
+      - awardedAt
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        badgeId:
+          type: string
+          format: uuid
+        challengeId:
+          type: string
+          format: uuid
+          nullable: true
+        sourceType:
+          type: string
+          maxLength: 30
+          nullable: true
+        sourceReferenceId:
+          type: string
+          format: uuid
+          nullable: true
+        awardedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          maxLength: 20
+    MarketingJourneyStep:
+      type: object
+      x-ticvai-persistence: marketing.journey_step
+      description: '**Taken from the backend workbook, 20 September.** Defines each ordered automation step in a customer journey, including waits, messages, conditions and actions.'
+      required:
+      - journeyId
+      - number
+      - type
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        journeyId:
+          type: string
+          format: uuid
+        number:
+          type: integer
+        type:
+          type: string
+          maxLength: 40
+        name:
+          type: string
+          maxLength: 150
+          nullable: true
+        messageTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+        waitMinutes:
+          type: integer
+          nullable: true
+        conditionJson:
+          type: string
+          nullable: true
+        actionConfigJson:
+          type: string
+          nullable: true
+        nextJourneyStepId:
+          type: string
+          format: uuid
+          nullable: true
+        failureJourneyStepId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    MarketingLoyaltyCampaign:
+      type: object
+      x-ticvai-persistence: marketing.loyalty_campaign
+      description: '**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.'
+      required:
+      - programId
+      - code
+      - name
+      - startAt
+      - endAt
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        programId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    MarketingLoyaltyPoints:
+      type: object
+      x-ticvai-persistence: marketing.loyalty_points
+      description: '**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.'
+      required:
+      - programId
+      - customerId
+      - transactionType
+      - points
+      - balanceAfter
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        programId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        transactionType:
+          type: string
+          maxLength: 30
+        points:
+          type: number
+        balanceAfter:
+          type: number
+        sourceType:
+          type: string
+          maxLength: 50
+          nullable: true
+        sourceReferenceId:
+          type: string
+          format: uuid
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        reversedLoyaltyPointsId:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    MarketingLoyaltyRule:
+      type: object
+      x-ticvai-persistence: marketing.loyalty_rule
+      description: '**Taken from the backend workbook, 20 September.** Defines temporary bonus points, multipliers, earning rules, or rewards applied by a loyalty campaign.'
+      required:
+      - campaignId
+      - type
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          maxLength: 30
+        pointsEarningRuleId:
+          type: string
+          format: uuid
+          nullable: true
+        rewardId:
+          type: string
+          format: uuid
+          nullable: true
+        bonusPoints:
+          type: number
+          nullable: true
+        multiplier:
+          type: number
+          nullable: true
+        conditionsJson:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+    MarketingPointsRedemptionRule:
+      type: object
+      x-ticvai-persistence: marketing.points_redemption_rule
+      description: '**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.'
+      required:
+      - loyaltyProgramId
+      - pointRedemptionRuleCode
+      - name
+      - redemptionType
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        loyaltyProgramId:
+          type: string
+          format: uuid
+        pointRedemptionRuleCode:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        redemptionType:
+          type: string
+          maxLength: 30
+        required:
+          type: number
+          nullable: true
+        monetaryValue:
+          type: number
+          nullable: true
+        minimumPoints:
+          type: number
+          nullable: true
+        maximumPoints:
+          type: number
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+    MarketingReviewResponse:
+      type: object
+      x-ticvai-persistence: marketing.review_response
+      description: '**Taken from the backend workbook, 20 September.** Stores staff or business replies to guest reviews and preserves moderation/reply history.'
+      required:
+      - reviewId
+      - text
+      - status
+      - respondedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        reviewId:
+          type: string
+          format: uuid
+        text:
+          type: string
+          maxLength: 2000
+        status:
+          type: string
+          maxLength: 30
+        respondedByUserId:
+          type: string
+          format: uuid
+          nullable: true
+        respondedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MarketingReward:
+      type: object
+      x-ticvai-persistence: marketing.reward
+      description: '**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.'
+      required:
+      - loyaltyProgramId
+      - code
+      - name
+      - type
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        loyaltyProgramId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 200
+        type:
+          type: string
+          maxLength: 30
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        pointsCost:
+          type: number
+          nullable: true
+        discountValue:
+          type: number
+          nullable: true
+        validityDays:
+          type: integer
+          nullable: true
+        isActive:
+          type: boolean
+    MarketingRewardAssignment:
+      type: object
+      x-ticvai-persistence: marketing.reward_assignment
+      description: '**Taken from the backend workbook, 20 September.** MODIFIED. Reuses the existing reward engine for gamification and referral by recording which business feature generated the reward.'
+      required:
+      - customerId
+      - rewardId
+      - code
+      - status
+      - issuedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        rewardId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 100
+        sourceType:
+          type: string
+          maxLength: 30
+          nullable: true
+        sourceReferenceId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        redeemedAt:
+          type: string
+          format: date-time
+          nullable: true
+        redeemedOrderId:
+          type: string
+          format: uuid
+          nullable: true
+    MarketingSlaPolicy:
+      type: object
+      x-ticvai-persistence: marketing.sla_policy
+      description: '**Taken from the backend workbook, 20 September.** Defines service-level response and resolution targets used by support cases.'
+      required:
+      - code
+      - name
+      - businessHoursOnly
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        code:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 150
+        priority:
+          type: string
+          maxLength: 20
+          nullable: true
+        firstResponseMinutes:
+          type: integer
+          nullable: true
+        resolutionMinutes:
+          type: integer
+          nullable: true
+        escalationMinutes:
+          type: integer
+          nullable: true
+        businessHoursOnly:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MarketingWaiverSignature:
+      type: object
+      x-ticvai-persistence: marketing.waiver_signature
+      description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
+      required:
+      - templateId
+      - subjectName
+      - signedName
+      - signerType
+      - documentHash
+      - status
+      - signedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        templateId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        subjectName:
+          type: string
+          maxLength: 200
+        signedName:
+          type: string
+          maxLength: 200
+        signerType:
+          type: string
+          maxLength: 20
+        guardianName:
+          type: string
+          maxLength: 200
+          nullable: true
+        sourceType:
+          type: string
+          maxLength: 30
+          nullable: true
+        sourceReferenceId:
+          type: string
+          format: uuid
+          nullable: true
+        dataReference:
+          type: string
+          maxLength: 1000
+          nullable: true
+        documentHash:
+          type: string
+          maxLength: 128
+        ipAddress:
+          type: string
+          maxLength: 64
+          nullable: true
+        deviceInfo:
+          type: string
+          maxLength: 500
+          nullable: true
+        status:
+          type: string
+          maxLength: 20
+        signedAt:
+          type: string
+          format: date-time
     GuestAttributeModel:
       type: object
       x-ticvai-persistence: marketing.guest_attribute_model

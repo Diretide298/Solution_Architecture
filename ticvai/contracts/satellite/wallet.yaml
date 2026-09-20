@@ -2005,6 +2005,89 @@ paths:
                 $ref: '#/components/schemas/Wallet'
 components:
   schemas:
+    WalletBalance:
+      type: object
+      x-ticvai-persistence: wallet.balance
+      description: '**Taken from the backend workbook, 20 September.** Stores the current wallet balance for fast checkout: available amount, held amount, and total amount.'
+      required:
+      - walletBalanceId
+      - walletId
+      - availableBalance
+      - holdBalance
+      - totalBalance
+      - currencyCode
+      - version
+      - updatedAt
+      properties:
+        walletBalanceId:
+          type: string
+          format: uuid
+        walletId:
+          type: string
+          format: uuid
+        availableBalance:
+          type: number
+        holdBalance:
+          type: number
+        totalBalance:
+          type: number
+        currencyCode:
+          type: string
+          maxLength: 10
+        version:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+    WalletHold:
+      type: object
+      x-ticvai-persistence: wallet.hold
+      description: '**Taken from the backend workbook, 20 September.** Temporarily reserves wallet money while an order/payment is in progress so the same balance cannot be spent twice.'
+      required:
+      - walletHoldId
+      - walletId
+      - walletHoldAmount
+      - currencyCode
+      - walletHoldStatus
+      - expiresAt
+      - createdAt
+      properties:
+        walletHoldId:
+          type: string
+          format: uuid
+        walletId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        paymentId:
+          type: string
+          format: uuid
+          nullable: true
+        walletHoldAmount:
+          type: number
+        currencyCode:
+          type: string
+          maxLength: 10
+        walletHoldStatus:
+          type: string
+          maxLength: 20
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        capturedAt:
+          type: string
+          format: date-time
+          nullable: true
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
     WalletType:
       type: object
       x-ticvai-persistence: wallet.wallet_type
