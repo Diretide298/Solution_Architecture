@@ -296,7 +296,13 @@ def main():
     meaning = {
         "We take theirs": "their table, their name, or their columns",
         "We keep ours": "same table, we keep ours, with the reason stated per row",
-        "Needs a choice": "payroll — a scope question, not a schema one",
+        # **This read "payroll — a scope question, not a schema one" against a row of zero.**
+        # Payroll was closed on 20 September by Decision 6, on the client's own Resource
+        # Management pack, and the caption outlived the bucket it described. A label that names
+        # an open question on an empty row tells a reader something is outstanding when nothing
+        # is, which is the one thing a summary sheet must never do.
+        "Needs a choice": "nothing is outstanding; payroll closed on their own sources (see "
+                          "Decision 6)",
         "Correction": "matches we had wrong; no choice involved",
     }
     for g in ORDER:
