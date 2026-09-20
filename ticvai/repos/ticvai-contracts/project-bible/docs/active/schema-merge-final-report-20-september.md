@@ -207,7 +207,34 @@ than beside you.
 - **`platform.scope`** — we are taking your name. Confirm you are happy for the hierarchy to stay
   one table rather than five.
 
-## 5 · Corrections to things we told you earlier
+## 5 · One thing your workbook and ours disagree on, which neither of us would have found by comparing names
+
+**Nine of the tables we accepted store `currency_code`.** Our checker failed all nine the moment
+they landed, and it is right to: **ADR-0018 puts currency at region level** — *"currency and
+decimal scale: OMR has three decimal places because Oman says so"* — so a currency resolves by
+walking the scope tree rather than being stored on the row.
+
+**Seven of the nine genuinely differ and we kept your column:**
+
+| | why it stays |
+|---|---|
+| `payments.fee_rule`, `eligibility_rule`, `method_config` | the currency names **which** currency the rule applies to. That is a condition on the row, not a copy of the region's answer, and removing it would make the rule unconditional |
+| `inventory.supplier_contract`, `orders.deposit` | an overseas supplier contracts in its own currency, and a deposit is money actually taken. Our `inventory.supplier` and `orders.payment` were already exempt for exactly this |
+| `wallet.balance`, `wallet.hold` | a stored-value balance is denominated and a hold on it carries the same denomination |
+
+**Two we changed.** `fnb.price_list` and `retail.price_list` now carry
+`x-ticvai-persisted: false` on `currencyCode` — kept on the wire, removed from the table — which
+is what our `catalogue.price_list` already does. A price list in a UAE region **is** AED and
+cannot be anything else, so the column would hold millions of copies of one region-owned value
+and would let a price list disagree with its own region.
+
+**We mention it because it is the same shape as the payroll tables in §4.** A schema generated to
+look like a schema puts a currency column on anything holding money, because that is what money
+tables usually look like. **It cannot know that a region owns the answer here** — and that is not
+a criticism, it is an argument for reading both workbooks against the decisions rather than
+against each other.
+
+## 6 · Corrections to things we told you earlier
 
 **We said we had no dynamic pricing at all.** We do — three guardrail columns on
 `rental.pricing_profile`: `dynamic_enabled`, and a maximum increase and decrease percent. **A

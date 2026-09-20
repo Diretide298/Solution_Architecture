@@ -36,6 +36,7 @@ cost again.
 | 9 | Membership hierarchy | **take it** | 20 Sep |
 | 10 | Cross-cell guest link | **reversed — keep it in `platform`** | 20 Sep |
 | 11 | The DSAR duplicate | **drop theirs** | 20 Sep |
+| 12 | Currency on nine accepted tables | **seven genuinely differ, two are copies** — confirmed, and it amended ADR-0018 | 20 Sep |
 
 ---
 
@@ -483,3 +484,93 @@ layer above being missing from both sides, since nothing conventional would have
 **It is also the reason to cite their sources rather than our judgement.** A decline backed by
 their own Board 3 and by an empty search of the matrix is checkable. A decline backed by "we did
 not think it was in scope" is not.
+
+---
+
+## 12 · Currency on nine of the tables we accepted — **found by the checker, not by the review**
+
+**This one was not on the list of eleven.** It surfaced when `check-package` failed nine of the
+81 tables phase 3 generated, and it is recorded here because it is a finding worth sending them
+rather than a fix worth burying in a commit.
+
+**ADR-0018 puts currency at region level** — its `Region — law and money` table opens with
+*"Currency and decimal scale · OMR has three decimal places because Oman says so (ADR-0008)"*.
+A venue cannot choose its currency any more than it can choose its VAT, so a currency resolves
+by walking the scope tree. The ADR notes that walk already exists and *"costs nothing new"*.
+
+**So a stored `currency_code` is a cached copy of an answer the region owns**, and the checker
+says so: mark the property `x-ticvai-persisted: false`, or say why the table genuinely differs.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **split** | seven of the nine are not copies at all; two are, and a copy is a second place the answer can be wrong |
+| **Readability** | ours | `currency_code` on a price list reads as though a price list may choose its currency. It may not |
+| **Optimised access** | theirs, marginally | a stored currency saves a scope walk on read — which is the argument the ADR already considered and rejected |
+| **DB strain** | **ours** | the column would hold millions of copies of one region-owned value |
+
+### The call, table by table
+
+| kind | tables | |
+|---|---|---|
+| **a selector, not a copy** | `payments.fee_rule`, `payments.eligibility_rule`, `payments.method_config` | **keep the column.** It names *which* currency the rule applies to — a condition on the row. Remove it and the rule becomes unconditional |
+| **money that really is other** | `inventory.supplier_contract`, `orders.deposit` | **keep.** An overseas supplier contracts in its own currency, and a deposit is money actually taken. `inventory.supplier` and `orders.payment` were already exempt for exactly this |
+| **a denominated balance** | `wallet.balance`, `wallet.hold` | **keep.** `wallet.wallet` is exempt because *"a stored-value balance is denominated and the denomination is part of the balance"*; a hold on that balance carries the same denomination |
+| **the denormalisation** | `fnb.price_list`, `retail.price_list` | **`x-ticvai-persisted: false`**, matching `catalogue.price_list`, which carries the ADR quoted on the property. A price list in a UAE region **is** AED and cannot be anything else |
+
+Seven exemptions are in `CURRENCY_OK` in `tools/check-package.py`, each with its reason on the
+line. `check-package` is PASS.
+
+### Confirmed, and it was closer than it looked
+
+**The question that settles it: can a venue's currency change after it has traded?** If it can,
+every dated artefact that resolves its currency renders retrospectively wrong — a price list is
+a dated range, `valid_from` to `valid_to`, so one valid in January and read in July resolves the
+currency *now*. On that reading their stored column would have been right and ours wrong,
+including `catalogue.price_list`, which is ours and has carried `x-ticvai-persisted: false`
+since 24 August.
+
+**Answered 20 September: once a venue has traded, its currency cannot change.** So resolution
+always returns what it was, and the call above stands on all three price lists.
+
+**With one consequence that is not obvious, and that amends ADR-0018.** A venue resolving purely
+from its region has nowhere to hold the frozen answer — change the region's currency and a venue
+that traded last year silently follows it. **The frozen value has to be written down**, which
+means `platform.venue_settings` gains `currency_code` and `currency_scale`, set at creation from
+the region, overridable until first trade, immutable after.
+
+That column also settles a second thing the ADR had wrong: it put currency in the same row as
+tax rates, *"a venue cannot choose its VAT"*. **True of tax, over-applied to currency** — a
+free-zone unit or a duty-free shop genuinely trades in a currency its region does not. The
+override is free once the frozen column exists, and it does not let a venue choose its VAT,
+which was the conflation. See the 20 September amendment to ADR-0018.
+
+**What it leaves, corrected 20 September.** `ledger.fx_rate` being keyed `region_id` is *not*
+the blocker — it scopes which rate set applies, not which pairs exist, so a USD venue looks up
+USD→AED in its own region's set. That was overstated. The real gaps are in the ledger:
+
+    ledger.journal_line    journal_entry_id, account_id, debit, credit, venue_id, cost_center_id
+    ledger.posting         ..., account_code, debit, credit, venue_id, cost_center_id, ...
+    ledger.settlement      provider_gross, provider_fees, provider_net, ledger_gross, difference
+
+**A posting carries one amount and no currency**, inherited from `account.currency`, so a venue
+trading in USD posts into an AED entity with the USD figure gone. Settlement carries no currency
+at all, so `difference` between a provider file and a ledger in another currency means nothing.
+And `runFxRevaluation` reads `ledger.inter_entity_obligation` only — it cannot revalue a venue's
+foreign balance because nothing records one.
+
+**The package already solved this shape once.** `platform.wallet_authorisation` carries
+`allocation_currency`, `home_currency`, `consuming_currency` and `amount_in_consuming_currency`
+for cross-cell wallet spend. The ledger never got the same treatment.
+
+**Foreign tender already works and is not affected** — `orders.payment` has `tender_currency`,
+`fx_rate` and `fx_rate_source`, and 14 operations across 27 screens are already on that path.
+
+### Why it is worth telling them
+
+**A generated schema puts a currency column on anything holding money, because that is what a
+money table usually looks like.** It cannot know that a region owns the answer here. **This is
+the same shape as the payroll tables in §6** — the conventional thing supplied, the specific
+thing missed — and it is the second time reading their workbook against an ADR of ours found
+something neither team would have caught by comparing table names.
