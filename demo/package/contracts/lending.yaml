@@ -140,6 +140,91 @@ paths:
                   items:
                     type: array
                     items: { $ref: '#/components/schemas/OverdueLoan' }
+  /books/{bookId}/reserve:
+    post:
+      operationId: reserveBook
+      tags: [Loans]
+      summary: Join the queue for a book that is all out
+      description: |
+        A member queues for a book whose copies are all on loan. Checked in this
+        order: an unknown member is 404 `member_not_found`; an unknown book is 404
+        `book_not_found`; a book with a copy on the shelf is 409 `copies_available`,
+        because it should be borrowed rather than reserved; a member already in that
+        book's queue is 409 `already_reserved`.
+
+        A new reservation is `queued`, and `position` is its place in the queue,
+        counting from 1 over that book's queued reservations, oldest first.
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReserveRequest' }
+      responses:
+        '201':
+          description: The reservation that was placed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The reservation is not allowed right now.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /reservations/{reservationId}:
+    delete:
+      operationId: cancelReservation
+      tags: [Loans]
+      summary: Leave the queue
+      description: |
+        Cancels a queued reservation and closes the gap behind it: every later
+        reservation for that book moves up one place. An unknown reservation is 404
+        `reservation_not_found`; one already cancelled is 409 `already_cancelled`.
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema: { type: string, example: rs_0001 }
+      responses:
+        '200':
+          description: The cancelled reservation.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Already cancelled.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /members/{memberId}:
+    get:
+      operationId: getMember
+      tags: [Members]
+      summary: One member, with what they have out
+      description: |
+        The member with a count of their active loans, how many of those are
+        overdue, and how many books they are queued for. An unknown member is 404
+        `member_not_found`.
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: string, example: mb_0001 }
+      responses:
+        '200':
+          description: The member.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MemberSummary' }
+        '404':
+          $ref: '#/components/responses/NotFound'
   /books/{bookId}:
     get:
       operationId: getBook
@@ -359,6 +444,21 @@ components:
         id: { type: string, example: mb_0003 }
         name: { type: string }
         email: { type: string, format: email }
+    MemberSummary:
+      allOf:
+        - $ref: '#/components/schemas/Member'
+        - type: object
+          required: [activeLoans, overdueLoans, reservations]
+          properties:
+            activeLoans: { type: integer, minimum: 0 }
+            overdueLoans:
+              type: integer
+              minimum: 0
+              description: Active loans past dueAt. Never above activeLoans.
+            reservations:
+              type: integer
+              minimum: 0
+              description: Books this member is queued for.
     NewMember:
       type: object
       required: [name, email]
@@ -375,6 +475,30 @@ components:
             daysOverdue: { type: integer, minimum: 1 }
             memberName: { type: string }
             bookTitle: { type: string }
+    Reservation:
+      type: object
+      required: [id, memberId, bookId, status, placedAt]
+      properties:
+        id: { type: string, example: rs_0001 }
+        memberId: { type: string }
+        bookId: { type: string }
+        status:
+          type: string
+          enum: [queued, cancelled]
+        placedAt: { type: string, format: date-time }
+        cancelledAt:
+          type: [string, 'null']
+          format: date-time
+        position:
+          type: integer
+          minimum: 1
+          description: Place in that book's queue, oldest first. Absent once cancelled.
+    ReserveRequest:
+      type: object
+      required: [memberId]
+      additionalProperties: false
+      properties:
+        memberId: { type: string, example: mb_0001 }
     Problem:
       type: object
       required: [status, code, title]
@@ -394,5 +518,9 @@ components:
             - renewal_limit_reached
             - duplicate_book
             - duplicate_member
+            - reservation_not_found
+            - already_reserved
+            - already_cancelled
+            - copies_available
         title: { type: string }
         detail: { type: string }

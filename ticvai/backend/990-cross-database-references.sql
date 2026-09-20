@@ -1,7 +1,7 @@
 -- References that cross the control/tenant database boundary.
 -- **Derived by tools/derive-ddl.py. Do not hand-edit.**
 --
--- 24 declared references stopped being constraints when ADR-0039 made `control` a
+-- 25 declared references stopped being constraints when ADR-0039 made `control` a
 -- database of its own. **Postgres has no cross-database foreign key**, so each one is now
 -- a rule the caller has to keep, and the index below is all the database can offer.
 --
@@ -85,6 +85,9 @@
 -- control.webhook_delivery.subscription_id -> subscription.contract
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE control.webhook_delivery ADD CONSTRAINT fk_webhook_delivery_subscription_id FOREIGN KEY (subscription_id) REFERENCES subscription.contract(id);
+-- platform.cell_endpoint.cell_id -> control.cell
+-- tenant database -> control database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE platform.cell_endpoint ADD CONSTRAINT fk_cell_endpoint_cell_id FOREIGN KEY (cell_id) REFERENCES control.cell(id);
 -- whitelabel.tenant_config.footer -> control.footer_config
 -- tenant database -> control database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT fk_tenant_config_footer FOREIGN KEY (footer) REFERENCES control.footer_config(id);

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS access.access_change (
     order_id                          text,
     upgrade_id                        uuid,
     reason                            text,
-    changed_by_user_id                uuid,
+    changed_by_principal_id           uuid,
     changed_at                        timestamptz NOT NULL
 );
 
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS access.entry_rule_point (
 
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
 -- since a plate identifies a person Hangs off: reaches access.entitlement through its keys;
--- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 1 operations
+-- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 2 operations
 -- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
     id                                uuid PRIMARY KEY,

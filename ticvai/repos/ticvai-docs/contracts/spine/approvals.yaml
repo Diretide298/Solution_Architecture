@@ -1826,9 +1826,14 @@ paths:
         - "P09 ADM-339 Governance & Compliance Command Center"
         - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
       summary: Segregation of duties, four-eyes and dual control
-      description: 'Approvals boards 4.8, 6.2 and 6.3. **`identity.setSegregationRules` says which roles
-        one person may not hold at once. This says which *decisions* one person may not take alone**, and
-        they are different controls that get conflated.
+      description: 'Approvals boards 4.8, 6.2 and 6.3. **`identity.setSegregationRules` says which
+        permissions one person may not hold at once. This says which *decisions* one person may not take
+        alone**, and they are different controls that get conflated.
+
+        **Corrected 21 September, from "roles" to "permissions".** The operation exists and has always
+        been over permission pairs; the description here described a model that was never built. A rule
+        over roles would be defeated by editing a role — add `ORDER_REFUND_APPROVE` to a third role and
+        the conflict reappears while the rule still reports compliant.
 
         A cashier who may also approve refunds is a segregation problem. A refund of fifty thousand
         approved by one person who is allowed to approve refunds is a dual-control problem, and no role

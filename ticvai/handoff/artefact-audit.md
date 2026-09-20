@@ -11,7 +11,8 @@ version counted 3,297 across four sheets; the walk resolved the difference as du
 superseded rows.
 
 > **The verdicts below were assigned during the walk and have not been re-tested since
-> 18 August.** The package has gained roughly 83 operations since — including the device
+> 18 August, except five re-tested on 21 September** — 2.13.41, 2.14.22, 2.14.23, 3.2.9 and
+> 3.2.44, against the biometric cluster and the dunning model built that day.** The package has gained roughly 83 operations since — including the device
 > lifecycle work that closed BL-160 on 20 September — so **some rows counted as gaps here are
 > likely served now.** `tools/retest-gap-rows.py` reports which are worth re-reading and
 > deliberately proposes no verdicts: re-deciding one is a judgement, and a tool that overwrote
@@ -22,13 +23,13 @@ superseded rows.
 
 | Verdict | Rows | | What it means |
 |---|---:|---:|---|
-| `CONTRACTED` | 2,647 | 83.1% | An operation or schema field demonstrably serves it |
+| `CONTRACTED` | 2,650 | 83.2% | An operation or schema field demonstrably serves it |
 | `PARKED` | 396 | 12.4% | AI-parked or workshop-blocked, with the reason named |
-| `GAP_CONTRACT` | 93 | 2.9% | Needs an operation or schema that does not exist |
-| `CONTRACTED_PARTIAL` | 43 | 1.4% | Served, but a field, operation or state is missing |
+| `GAP_CONTRACT` | 89 | 2.8% | Needs an operation or schema that does not exist |
+| `CONTRACTED_PARTIAL` | 44 | 1.4% | Served, but a field, operation or state is missing |
 | `GAP_DECISION` | 5 | 0.2% | Undesignable without a client answer |
 
-**98 rows are a genuine gap** — 93 needing contract work and 5 needing the client. That is
+**94 rows are a genuine gap** — 89 needing contract work and 5 needing the client. That is
 **3.1% of the matrix**, against an August position where whole artefact classes had no register
 at all.
 

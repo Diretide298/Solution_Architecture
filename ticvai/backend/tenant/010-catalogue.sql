@@ -43,8 +43,7 @@ CREATE TABLE IF NOT EXISTS catalogue.channel_capacity (
 
 -- Fixed, free or round-up. Posts to a liability account, not revenue — money collected for a
 -- charity is not the venue’s to recognise Hangs off: reaches catalogue.event through its keys;
--- references ledger.account, platform.scope. Reached by: 2 operations read it and 2 write it; 1
--- tables reference it.
+-- references ledger.account, platform.scope. Reached by: 3 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL,
@@ -65,7 +64,7 @@ CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
 -- The rules a ticket carries before anybody buys one — validity, entries allowed, transferability,
 -- what a gate does with it. access.entitlement is the issued instance
 CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
-    entitlement_id                    uuid NOT NULL,
+    entitlement_id                    text NOT NULL,
     product_name                      text,
     status                            text NOT NULL,
     entries_used                      integer,
@@ -96,6 +95,10 @@ CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
     can_share_media                   boolean,
     can_claim_shop_and_drop           boolean,
     is_name_bound                     boolean,
+    auto_renew_default                boolean,
+    renewal_term_days                 integer,
+    renewal_grace_days                integer,
+    renewal_variant_id                uuid,
     crosses_cells                     boolean,
     is_active                         boolean,
     scope_path                        text,
@@ -201,7 +204,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_type (
 );
 
 -- Two-phase catalogue import (BL-057), following seating.ImportJob. A job that parses zero
--- products is not a parsed job. Hangs off: reaches catalogue.event through its keys. Reached by: 1
+-- products is not a parsed job. Hangs off: reaches catalogue.event through its keys. Reached by: 2
 -- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -280,7 +283,7 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.plan_benefit (
-    membership_plan_id                uuid NOT NULL,
+    entitlement_template_id           uuid NOT NULL,
     membership_benefit_id             uuid NOT NULL,
     usage_limit                       numeric(18,4),
     usage_period                      text,
@@ -343,8 +346,10 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
     responsible_department_id         uuid,
     on_sale_from                      timestamptz,
     on_sale_to                        timestamptz,
+    category_id                       uuid,
     lifecycle_state                   text,
     is_sellable                       boolean NOT NULL,
+    is_stock_tracked                  boolean,
     has_variants                      boolean NOT NULL,
     variant_count                     integer,
     segment_tags                      text[],
@@ -360,6 +365,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
 CREATE TABLE IF NOT EXISTS catalogue.product_category (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
+    code                              text,
     name_localised                    jsonb,
     kind                              text NOT NULL,
     parent_id                         uuid,
@@ -438,6 +444,9 @@ CREATE TABLE IF NOT EXISTS catalogue.variant (
     product_id                        uuid NOT NULL,
     sku                               text NOT NULL,
     axis_values                       jsonb NOT NULL,
+    name                              text,
+    barcode                           text,
+    is_default                        boolean,
     is_active                         boolean NOT NULL
 );
 
@@ -452,7 +461,7 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
 
 -- Who asked to be told when a sold-out session frees up. Not a queue — a queue is people standing
 -- at a ride Hangs off: reaches catalogue.event through its keys; references catalogue.performance,
--- catalogue.variant, pii.subject. Reached by: 3 operations read it and 3 write it.
+-- catalogue.variant, pii.subject. Reached by: 4 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS catalogue.waitlist_entry (
     id                                uuid PRIMARY KEY,
     performance_id                    uuid NOT NULL,

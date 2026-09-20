@@ -419,6 +419,12 @@ export const setPmsProject = (projectId, pmsProjectId) =>
 export const clearPmsProject = (projectId) =>
   call(`/api/pms/projects/${encodeURIComponent(projectId)}`, { method: 'DELETE' });
 
+// Every ticket in the project's OpenProject project, in every state. Admin only,
+// and cached by the service for five minutes — `refresh` is the Refresh button.
+export const boardOverview = (projectId, { refresh = false } = {}) =>
+  call(`/api/board/overview?${new URLSearchParams({
+    project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}) })}`);
+
 export const logoutAccount = (id) =>
   call(`/api/accounts/${id}/logout-all`, { method: 'POST' });
 

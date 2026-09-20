@@ -1184,6 +1184,18 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\bl-073-cookie-consent-20-september.md",
+   "title": "BL-073 \u2014 cookie consent: what to buy, what to build, what is ours either way",
+   "status": "",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\active\\build-plan-20-september.md",
+   "title": "Build plan \u2014 20 September 2026",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\change-log-validation-18-september.md",
    "title": "Validating the developer team's Change Log",
    "status": "",
@@ -1298,6 +1310,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\undrafted-packs-scope-20-september.md",
+   "title": "The 26 undrafted packs \u2014 what is in them and what they would cost",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\viewer-update-brief-20aug.md",
    "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": "",
@@ -1358,6 +1376,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\adr\\0047-how-long-data-is-kept-and-where-it-goes-next.md",
+   "title": "ADR-0047: How long data is kept, and where it goes next",
+   "status": "Accepted \u2014 the RPO floor decided 21 September; one number pe",
+   "mentions": 2
+  },
+  {
    "file": "docs\\architecture\\ai-credentials.md",
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": "",
@@ -1372,7 +1396,7 @@
  ],
  "conflicts": [
   {
-   "id": "CF-166",
+   "id": "CF-165",
    "open": true,
    "section": "Open \u2014 needs a client decision"
   },
@@ -1532,6 +1556,11 @@
    "section": "Resolved in the 17 August working session"
   },
   {
+   "id": "CF-166",
+   "open": false,
+   "section": "By research or architecture"
+  },
+  {
    "id": "CF-20",
    "open": false,
    "section": "By research or architecture"
@@ -1550,7 +1579,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 32,
+  "documents": 36,
   "openConflicts": 1
  }
 }

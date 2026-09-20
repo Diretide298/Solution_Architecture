@@ -1,6 +1,9 @@
 {
- "handoff/service-decomposition.json": "5b6f32c65c89fea80b9001acec578de339587f13dd3b8fcc8d817148518efbd0",
- "handoff/rag-index-sources.md": "5b6f32c65c89fea80b9001acec578de339587f13dd3b8fcc8d817148518efbd0",
- "handoff/artefact-audit.md": "5b6f32c65c89fea80b9001acec578de339587f13dd3b8fcc8d817148518efbd0",
- "handoff/schema-viewer-notes.md": "5b6f32c65c89fea80b9001acec578de339587f13dd3b8fcc8d817148518efbd0"
+ "handoff/service-decomposition.json": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/rag-index-sources.md": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/artefact-audit.md": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/schema-viewer-notes.md": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/traceability.json": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/contract-backlog.json": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4",
+ "handoff/backlog-clusters.json": "f236f872cf310abda8551139cc363cacd2f465ccb45bde942a86afb9003013d4"
 }

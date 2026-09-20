@@ -41,8 +41,11 @@
  "conflict:CF-160": [
   "ai:closed"
  ],
- "conflict:CF-166": [
+ "conflict:CF-165": [
   "ai:open"
+ ],
+ "conflict:CF-166": [
+  "ai:closed"
  ],
  "conflict:CF-17": [
   "ai:closed"
@@ -104,6 +107,12 @@
  "document:docs\\active\\ai-scope-for-confirmation.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\bl-073-cookie-consent-20-september.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\build-plan-20-september.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\change-log-validation-18-september.md": [
   "ai:names it"
  ],
@@ -161,6 +170,9 @@
  "document:docs\\active\\spec-coverage-19-september.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\undrafted-packs-scope-20-september.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\viewer-update-brief-20aug.md": [
   "ai:names it"
  ],
@@ -189,6 +201,9 @@
   "ai:names it"
  ],
  "document:docs\\adr\\0046-on-premise-has-two-configurations.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0047-how-long-data-is-kept-and-where-it-goes-next.md": [
   "ai:names it"
  ],
  "document:docs\\architecture\\README.md": [

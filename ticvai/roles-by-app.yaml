@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-09-20'
+generated: '2026-09-21'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 154
   inRolesYaml: 35
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 154 permission keys across 1884 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 154 permission keys across 1974 operations; `roles.yaml`
     grants 35, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file

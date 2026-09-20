@@ -52,6 +52,168 @@ info:
 servers:
 - url: https://api.ticvai.com/v1
 paths:
+  /dunning-policy:
+    get:
+      operationId: getDunningPolicy
+      summary: How a failed recurring charge is chased
+      description: '2.14.19-2.14.23, BL-100. **Recurring guest billing had auto-renewal and no
+        answer for the renewal that fails**, which is the case that actually happens.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DunningPolicy'
+    put:
+      operationId: setDunningPolicy
+      summary: Set the retry schedule and what happens when it runs out
+      description: '2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes
+        and must never share a counter.** `setPaymentFailoverPolicy` governs retry *inside* one
+        attempt — a timeout or a 5xx moves to the next provider within seconds, and a decline is
+        final there. This governs retry *across days*: a fresh authorisation, the same guest, a
+        card that may since have been replaced. **Both are called retry, and treating a dunning
+        attempt as a failover attempt is how a guest is charged twice.**
+
+        **A hard decline exits immediately and is never scheduled.** A closed account, a stolen
+        card or a do-not-honour retried on a timetable is how a merchant ID gets flagged by the
+        scheme — so the classification is explicit rather than "anything that was not a success".
+
+        **Dunning cannot revoke admission.** `terminalAction` tops out at `suspendBilling`, and
+        the reason is a person rather than a principle: a guest at a gate on a family day out,
+        refused because a card expired and a retry ran at 3am. Ending someone''s access stays a
+        staff decision with a name attached to it.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DunningPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DunningPolicy'
+        '422':
+          description: '**An attempt schedule that would breach the policy''s own guard** — more
+            attempts than `maxAttempts`, two attempts inside `minimumHoursBetweenAttempts`, or a
+            `terminalAction` the caller is not permitted to set.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /dunning-cases:
+    get:
+      operationId: listDunningCases
+      summary: Recurring charges currently being chased
+      description: '2.14.19-2.14.23, BL-100. **The work queue, and the number a venue actually
+        manages by.** A dunning policy with no view of what it is doing is a schedule running in
+        the dark.
+
+        **Ordered by attempts remaining rather than by age**, because the ones about to exhaust
+        are the ones somebody can still save by calling the guest.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: state
+        in: query
+        schema:
+          $ref: '#/components/schemas/DunningState'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DunningCase'
+  /dunning-cases/{caseId}/resolve:
+    post:
+      operationId: resolveDunningCase
+      summary: Stop chasing, with a reason
+      description: 'BL-100. **The manual exit, and it is an operation rather than a status edit
+        because somebody has to own it.** A guest who paid at a counter, a card replaced over the
+        phone, or a venue writing the balance off — three different reasons that must be told
+        apart afterwards.
+
+        **`writeOff` does not erase the case**, which is why this is not a delete: a dunning case
+        that vanishes leaves the finance side unable to say what happened to the money.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - resolution
+              properties:
+                resolution:
+                  type: string
+                  enum:
+                  - paidByOtherMeans
+                  - cardReplaced
+                  - writeOff
+                  - cancelledByGuest
+                note:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DunningCase'
   /payment-methods:
     get:
       operationId: listPaymentMethods
@@ -1258,6 +1420,199 @@ paths:
                 $ref: '#/components/schemas/PaymentsDepositActivity'
 components:
   schemas:
+    DeclineClass:
+      type: string
+      description: >
+        BL-100. **Whether a failed charge may be tried again at all**, and the distinction is a
+        merchant-account risk rather than a courtesy.
+
+        `soft` — insufficient funds, a temporary hold, an issuer timeout. **Worth another attempt
+        on another day**, and the whole reason a dunning schedule exists.
+
+        `hard` — closed account, stolen card, do-not-honour, invalid number. **Never retried.** A
+        hard decline put on a timetable is how a merchant ID gets flagged by the scheme, and the
+        venue finds out when its acquirer calls.
+
+        `unknown` — the provider gave no usable code. **Treated as `hard`**, because guessing
+        `soft` optimises for one more attempt and risks the thing that cannot be undone.
+      enum:
+      - soft
+      - hard
+      - unknown
+
+    DunningState:
+      type: string
+      enum:
+      - scheduled
+      - inProgress
+      - exhausted
+      - recovered
+      - resolvedManually
+      description: >
+        BL-100. **`exhausted` and `recovered` are both endings and only one of them is a
+        failure.** A schedule with a single terminal state cannot tell a venue whether dunning is
+        working, which is the only question a venue asks of it.
+
+    DunningPolicy:
+      x-ticvai-persistence: payments.dunning_policy
+      type: object
+      description: >
+        2.14.19-2.14.23, BL-100. **How a failed recurring charge is chased, as a tenant policy
+        rather than a platform constant.** A season pass at AED 300 a month and a locker
+        subscription at AED 15 do not deserve the same number of attempts.
+      required:
+      - maxAttempts
+      - terminalAction
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        maxAttempts:
+          type: integer
+          minimum: 1
+          maximum: 8
+          default: 4
+          description: >
+            **Capped at eight and defaulted to four.** The ceiling is not arbitrary: past a
+            handful of attempts the recovery rate is close to nothing and the cost is a guest
+            watching their bank app light up repeatedly for a charge they already know failed.
+        attemptOffsetDays:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+          default: [0, 3, 7, 14]
+          description: >
+            **Days after the first failure, and the spacing is the part that matters.** Retrying
+            at the same hour each day hits the same daily limit on the same card and tells the
+            venue nothing it did not already know — **attempts spaced across the month straddle a
+            payday**, which is the single thing that changes the answer for a soft decline.
+
+            **Must be non-decreasing and no longer than `maxAttempts`**, enforced with 422 rather
+            than by silently truncating a list somebody meant.
+        minimumHoursBetweenAttempts:
+          type: integer
+          default: 24
+          description: >
+            **A floor under the offsets, because a schedule is edited by hand.** Two offsets on
+            the same day are a typo that reads as a policy.
+        retryableDeclineClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeclineClass'
+          default: [soft]
+          description: >
+            **`soft` alone, and widening it is a deliberate act.** The field exists rather than
+            being implied so that a venue that adds `unknown` has chosen to, and so an auditor can
+            see that it did.
+        notifyGuestOnEachAttempt:
+          type: boolean
+          default: false
+          description: >
+            **False by default.** A guest told four times about one failed renewal reads it as
+            four failures. The first and the last are the ones that mean something — the first
+            because they can fix it, the last because their pass is about to change.
+        terminalAction:
+          type: string
+          enum:
+          - suspendBilling
+          - cancelRenewal
+          default: suspendBilling
+          description: >
+            **What happens when the attempts run out, and it deliberately stops short of
+            admission.** `suspendBilling` stops charging and leaves the entitlement as it is;
+            `cancelRenewal` also stops the next term. **Neither revokes entry.**
+
+            `graceDays` on the renewal model already governs how long a pass keeps working, and
+            the failure this separation prevents is concrete: **a guest at a gate on a family day
+            out, refused because a card expired and a retry ran at 3am.** Ending somebody's access
+            stays a staff decision with a name on it.
+        scopePath:
+          type: string
+          description: >
+            **The partition key** (ADR-0005). Written at `tenant` scope.
+
+    DunningCase:
+      x-ticvai-persistence: payments.dunning_case
+      type: object
+      description: >
+        BL-100. **One recurring charge being chased**, and the row a venue works from.
+      required:
+      - id
+      - state
+      - attemptsMade
+      - firstFailedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          description: The order whose renewal failed.
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        state:
+          $ref: '#/components/schemas/DunningState'
+        declineClass:
+          allOf:
+          - $ref: '#/components/schemas/DeclineClass'
+          description: >
+            **From the most recent attempt.** A case that begins `soft` and turns `hard` stops
+            immediately rather than finishing its schedule — the card changed underneath it.
+        attemptsMade:
+          type: integer
+        nextAttemptAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Null where the case has ended or the decline is hard.** A scheduled time on a case
+            nothing will act on is the field that makes a queue untrustworthy.
+        firstFailedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolution:
+          type: string
+          nullable: true
+          enum:
+          - paidByOtherMeans
+          - cardReplaced
+          - writeOff
+          - cancelledByGuest
+          - null
+        resolutionNote:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: >
+            **What `resolveDunningCase` was told, which had nowhere to land until now.** The enum
+            above tells `writeOff` from `cardReplaced`; **which invoice, whose phone call and on
+            what authority is the sentence beside it**, and the operation's own reasoning — that
+            these reasons must be told apart afterwards — only works if the sentence survives.
+
+            **Same shape as `marketing.case.resolution_note`**, which is a RAG source for exactly
+            this reason: a resolution note is the most useful free text a support record holds.
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: >
+            **Who closed it.** A write-off with no name against it is the one resolution nobody
+            can follow up, and it is also the one that moves money.
+        scopePath:
+          type: string
+          description: >
+            **The partition key** (ADR-0005). Written at `venue` scope.
+
     PaymentRuleSet:
       type: object
       x-ticvai-persistence: none — composed from the three payment rule tables

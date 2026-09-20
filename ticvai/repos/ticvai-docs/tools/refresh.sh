@@ -274,7 +274,7 @@ echo
 # whether a twin is a duplicate or a deliberate copy, whether an array should be a table. A
 # checker that fails the package on a judgement gets silenced rather than answered -- so they run
 # every time and print, and the judgement stays with whoever reads the run.
-for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs audit-screenless-operations audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
+for t in check-screens check-frontend check-flows check-board-flows check-session-entry check-step-up check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy check-bindings check-migrations check-lineage check-doc-tables check-contract-split check-spec-coverage check-rfp-coverage check-authored-inputs check-output-paths audit-screenless-operations audit-unwired-tables audit-duplicate-tables audit-array-relationships audit-links audit-workbooks audit-pack-citations audit-contracts audit-screen-estate index-sources; do
   # **A report that stops at the first failure is not a report.** `set -e` plus `pipefail` meant
   # one checker returning non-zero killed the whole run: for most of 9 September this script died
   # at check-flows and nobody saw the eight checks below it, including the ones that were passing.
@@ -306,6 +306,7 @@ draft-pack-operations specify-pack-operations scope-pack-to-contracts
 splice-contract apply-p04-transitions
 retire-answered-questions                                          # never run: the answers are the reasoning
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
+build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "

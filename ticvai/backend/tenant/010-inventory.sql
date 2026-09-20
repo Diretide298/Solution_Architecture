@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS inventory.movement (
     total_cost                        numeric(18,4),
     principal_id                      uuid,
     source_type                       text,
-    source_id                         text,
+    source_id                         uuid,
     journal_entry_id                  text,
     created_at                        timestamptz
 );
@@ -193,7 +193,8 @@ CREATE TABLE IF NOT EXISTS inventory.quotation (
 );
 
 -- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.item through its
--- keys; references inventory.item, inventory.quotation.
+-- keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 0
+-- write it.
 CREATE TABLE IF NOT EXISTS inventory.quotation_line (
     quotation_id                      uuid NOT NULL,
     item_id                           uuid NOT NULL,
@@ -221,7 +222,8 @@ CREATE TABLE IF NOT EXISTS inventory.requisition (
 );
 
 -- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.item through
--- its keys; references inventory.item, inventory.requisition.
+-- its keys; references inventory.item, inventory.requisition. Reached by: 3 operations read it and
+-- 0 write it.
 CREATE TABLE IF NOT EXISTS inventory.requisition_line (
     requisition_id                    text NOT NULL,
     line_id                           text,
@@ -310,7 +312,7 @@ CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
     payment_terms_days                integer,
     document_reference                text,
     status                            text NOT NULL,
-    created_by_user_id                uuid,
+    created_by_principal_id           uuid,
     created_at                        timestamptz NOT NULL
 );
 

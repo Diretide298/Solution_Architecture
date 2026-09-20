@@ -1,5 +1,5 @@
 id: LLD-MarketingService
-title: MarketingService — 203 operations, 62 tables
+title: MarketingService — 205 operations, 62 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -12,7 +12,7 @@ why: '**93 operations and 37 tables — the biggest thing in the package, and pr
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 203
+  operations: 205
   inAFlow: 39
   percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -25,7 +25,7 @@ schemas:
   largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
-  count: 203
+  count: 205
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -787,6 +787,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listLeaderboard
+    verb: GET
+    path: /loyalty/leaderboard
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listLostItems
     verb: GET
     path: /lost-items
@@ -1427,6 +1435,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setLeaderboardNickname
+    verb: PUT
+    path: /loyalty/leaderboard-nickname
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setLocalizationBrandingCustomer
     verb: PUT
     path: /localization-branding-customer
@@ -1924,9 +1940,9 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.loyalty_position
-  columns: 11
+  columns: 12
   store: postgres
-  parent: pii.subject
+  parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null

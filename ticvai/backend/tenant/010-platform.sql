@@ -67,8 +67,7 @@ CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
 -- Something bought in one jurisdiction and honoured in another. ADR-0010: the guest does not move,
 -- a pseudonymous link does. Renamed from cross_region_entitlement — a right to redeem what, and
 -- where? Hangs off: reaches platform.scope through its keys; references access.admission_rules,
--- access.entitlement, platform.cross_region_entitlement. Reached by: 5 operations read it and 4
--- write it; 1 tables re
+-- access.entitlement, platform.guest_link. Reached by: 5 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS platform.cross_region_entitlement (
     id                                uuid PRIMARY KEY,
     right_id                          text NOT NULL,
@@ -123,6 +122,8 @@ CREATE TABLE IF NOT EXISTS platform.denomination (
 -- A physical thing that authenticates and does not authorise — a scanner, a printer, a kitchen
 -- display. It proves which device; the person proves what they may do
 CREATE TABLE IF NOT EXISTS platform.device (
+    state                             text NOT NULL,
+    reason                            text,
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
     driver                            text NOT NULL,
@@ -139,7 +140,10 @@ CREATE TABLE IF NOT EXISTS platform.device (
     battery_percent                   integer,
     last_checked_at                   timestamptz,
     health                            text,
-    last_heartbeat_at                 timestamptz
+    last_heartbeat_at                 timestamptz,
+    enrolment_state                   text,
+    retired_at                        timestamptz,
+    configuration_profile_id          uuid
 );
 
 -- high-volume, short-lived. Trimmed by retention Hangs off: a child of platform.device; reaches
@@ -291,7 +295,7 @@ CREATE TABLE IF NOT EXISTS platform.scope (
 );
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.scope
--- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 18
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 8
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -307,6 +311,7 @@ CREATE TABLE IF NOT EXISTS platform.venue_settings (
     currency_scale                    integer,
     support_hours                     jsonb,
     quiet_hours                       jsonb,
+    biometrics                        jsonb,
     segregated_access                 jsonb,
     alerting                          jsonb,
     org_unit_id                       uuid NOT NULL

@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 86
+  "operationsWithNoScreen": 88
  },
  "waves": {
   "wave2": 2,
@@ -76,15 +76,15 @@
    "operations": 1
   },
   {
+   "contract": "ai",
+   "operations": 1
+  },
+  {
    "contract": "finance",
    "operations": 1
   },
   {
    "contract": "queue",
-   "operations": 1
-  },
-  {
-   "contract": "ai",
    "operations": 1
   }
  ],
@@ -517,6 +517,18 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "Every permission key the contracts enforce"
+   },
+   {
+    "operation": "listSegregationRules",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the conflicting-permission rules back"
+   },
+   {
+    "operation": "listSegregationViolations",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who already holds a conflicting pair"
    },
    {
     "operation": "recordBenefitUsage",

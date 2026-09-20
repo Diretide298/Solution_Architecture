@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 227 operations, 56 tables
+title: OrderService — 233 operations, 58 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -16,11 +16,18 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
   **What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles
   against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till''s takings
   and a till''s drawer are the same money counted twice** — separating them makes every settlement a
-  distributed join.'
+  distributed join.
+
+
+  **Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)**
+  rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case`
+  are the two newest tables in the service. **A charge on a schedule fails differently from a charge
+  at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a
+  queue and a timetable rather than a second card.'
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 227
+  operations: 233
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,13 +39,13 @@ schemas:
   - postgres
   largestTable: orders.pos_shift
 - schema: payments
-  tables: 23
+  tables: 25
   stores:
   - postgres
   largestTable: payments.fee_rule
 operationsByContract:
 - contract: orders
-  count: 173
+  count: 175
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -312,6 +319,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getBillingStatement
+    verb: GET
+    path: /billing-statements/{statementId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getCart
     verb: GET
     path: /carts/{cartId}
@@ -429,6 +444,14 @@ operationsByContract:
     path: /amendment-after-sale
     scope: venue
     permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBillingStatements
+    verb: GET
+    path: /billing-statements
+    scope: tenant
+    permission: null
     offline: false
     reads: 0
     writes: 0
@@ -1425,7 +1448,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: payments
-  count: 35
+  count: 39
   operations:
   - operation: createB2bCreditAccount
     verb: POST
@@ -1451,6 +1474,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: getDunningPolicy
+    verb: GET
+    path: /dunning-policy
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getMixedTenderRules
     verb: GET
     path: /mixed-tender-rules
@@ -1504,6 +1535,14 @@ operationsByContract:
     path: /deposits/{depositId}/activity
     scope: venue
     permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDunningCases
+    verb: GET
+    path: /dunning-cases
+    scope: venue
+    permission: PAYMENT_CONFIGURE
     offline: false
     reads: 1
     writes: 0
@@ -1571,11 +1610,27 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: resolveDunningCase
+    verb: POST
+    path: /dunning-cases/{caseId}/resolve
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setB2bPaymentTerms
     verb: PUT
     path: /b2b-credit-accounts/{accountId}/terms
     scope: tenant
     permission: CREDIT_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setDunningPolicy
+    verb: PUT
+    path: /dunning-policy
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
     offline: false
     reads: 1
     writes: 1
@@ -2144,6 +2199,19 @@ tables:
   foreignWriters: null
 - table: payments.deposit_activity
   columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.dunning_case
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: payments.dunning_policy
+  columns: 7
   store: postgres
   parent: null
   writtenBy:

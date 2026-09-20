@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
@@ -15,7 +15,7 @@
   "contracts": 17,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 8
+  "operationsWithNoScreen": 12
  },
  "waves": {
   "wave1": 20,
@@ -182,15 +182,15 @@
    "operations": 4
   },
   {
+   "contract": "white-label",
+   "operations": 4
+  },
+  {
    "contract": "retail",
    "operations": 4
   },
   {
    "contract": "wallet",
-   "operations": 4
-  },
-  {
-   "contract": "white-label",
    "operations": 4
   },
   {
@@ -206,11 +206,11 @@
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -894,10 +894,34 @@
     "summary": "Badges a guest holds"
    },
    {
+    "operation": "listLeaderboard",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Standings, by nickname"
+   },
+   {
     "operation": "listRewards",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "What points can be turned into"
+   },
+   {
+    "operation": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Choose the name shown on the board"
+   },
+   {
+    "operation": "getBillingStatement",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "One statement, with its lines"
+   },
+   {
+    "operation": "listBillingStatements",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "recordRecommendationOutcome",

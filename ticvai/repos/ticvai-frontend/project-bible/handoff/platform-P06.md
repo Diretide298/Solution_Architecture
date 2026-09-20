@@ -9,20 +9,22 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 165 |
+| Operations with no screen | 171 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 165 operations with no screen here
+### 171 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
+| `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
@@ -58,9 +60,7 @@
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| `createModifierGroup` | fnb | POST | Create a modifier group |
-| `createTable` | fnb | POST | A table as a thing, not an inference |
-| … | | | 125 more |
+| … | | | 131 more |
 
 ### 1 modules split across waves
 

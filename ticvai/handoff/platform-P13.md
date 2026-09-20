@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 118 |
+| Operations with no screen | 122 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 118 operations with no screen here
+### 122 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -49,6 +49,8 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
+| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
+| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `recordBenefitUsage` | identity | POST | Consume a benefit |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
@@ -58,9 +60,7 @@
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
-| `getLoyaltyRules` | marketing-crm | GET | Every rule a loyalty programme runs on |
-| `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| … | | | 78 more |
+| … | | | 82 more |
 
 ## Modules
 

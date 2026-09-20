@@ -3,7 +3,7 @@
 
 -- Two-phase geometry extraction, following seating.ImportJob. A job that finds nothing is not a
 -- successful job. Hangs off: reaches venuemap.point through its keys; references venuemap.map.
--- Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+-- Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS venuemap.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
     map_id                            uuid,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS venuemap.path (
 
 -- What a venue places on the map (19.2.57–19.2.60) — rides, restaurants, toilets, exits.
 -- emergencyExit is separate from exit on purpose. Hangs off: a root — nothing above it in its
--- schema; references access.access_point, catalogue.product, platform.outlet. Reached by: 12
+-- schema; references access.access_point, catalogue.product, platform.outlet. Reached by: 14
 -- operations read it and 4 write it; 5 tables reference it.
 CREATE TABLE IF NOT EXISTS venuemap.point (
     id                                uuid PRIMARY KEY NOT NULL,

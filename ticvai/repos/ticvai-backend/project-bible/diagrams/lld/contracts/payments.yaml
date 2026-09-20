@@ -1,5 +1,5 @@
 id: LLD-payments
-title: payments — 35 operations
+title: payments — 39 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -41,6 +41,17 @@ operations:
   - payments.provider_connection
   writes:
   - payments.provider_connection
+- operation: getDunningPolicy
+  verb: GET
+  path: /dunning-policy
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.dunning_policy
+  writes: []
 - operation: getMixedTenderRules
   verb: GET
   path: /mixed-tender-rules
@@ -116,6 +127,17 @@ operations:
   offline: false
   reads:
   - payments.deposit_activity
+  writes: []
+- operation: listDunningCases
+  verb: GET
+  path: /dunning-cases
+  scope: venue
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.dunning_case
   writes: []
 - operation: listMerchantAccounts
   verb: GET
@@ -206,6 +228,17 @@ operations:
   - payments.deposit_activity
   writes:
   - payments.deposit_activity
+- operation: resolveDunningCase
+  verb: POST
+  path: /dunning-cases/{caseId}/resolve
+  scope: venue
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.dunning_case
+  writes: []
 - operation: setB2bPaymentTerms
   verb: PUT
   path: /b2b-credit-accounts/{accountId}/terms
@@ -218,6 +251,18 @@ operations:
   - payments.payment_terms
   writes:
   - payments.payment_terms
+- operation: setDunningPolicy
+  verb: PUT
+  path: /dunning-policy
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.dunning_policy
+  writes:
+  - payments.dunning_policy
 - operation: setHostedCheckoutConfiguration
   verb: PUT
   path: /hosted-checkout-config

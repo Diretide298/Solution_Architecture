@@ -4,7 +4,7 @@
 
 ```
 000-schemas.sql        26 schemas
-010-<schema>.sql       one file per schema, 637 tables
+010-<schema>.sql       one file per schema, 625 tables
 900-foreign-keys.sql   580 constraints, applied after every table exists
 910-indexes.sql        250 conventions and scope paths
 ```
@@ -25,7 +25,7 @@ definition won every time.
 
 **The damage was in the ordering rather than the duplication.** `900-foreign-keys.sql` attaches all
 580 keys by `ALTER TABLE` and runs *before* the V-series, because `900 < V`. The V-series then
-re-created those 637 tables and **613 foreign keys went with them.**
+re-created those 625 tables and **632 foreign keys went with them.**
 
 **And nothing reported a dangling reference**, because both generations' tables existed: the
 surviving key on `identity.principal` pointed at `platform.scope_node`, a name this generation
@@ -54,7 +54,7 @@ the parser is reading something the generator did not write.
 sorted so that every reference precedes its use — `orders` reaches `catalogue`, `catalogue` reaches
 `platform`, and something reaches back.
 
-**`enforced: no` becomes an index and a comment, never a constraint.** 157 of the 1346 relationships
+**`enforced: no` becomes an index and a comment, never a constraint.** 157 of the 1351 relationships
 are naming conventions the contracts never asserted (ADR-0011), and **enforcing one fails on the
 first row that legitimately points nowhere.**
 

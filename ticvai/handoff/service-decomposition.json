@@ -1,6 +1,6 @@
 {
- "note": "How 32 contracts and 623 tables become 17 deployable services. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own.",
- "generated": "19 September 2026",
+ "note": "How 32 contracts and 625 tables become 17 deployable services. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own.",
+ "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
   "commerce": "The sale path. Highest availability, highest write rate.",
@@ -18,7 +18,7 @@
     "identity",
     "pii"
    ],
-   "operations": 61,
+   "operations": 63,
    "tables": 30,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
@@ -129,9 +129,9 @@
     "orders",
     "payments"
    ],
-   "operations": 227,
-   "tables": 55,
-   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.",
+   "operations": 233,
+   "tables": 57,
+   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
    "risk": "**Down means no sales.** Highest availability target in the platform.",
    "readsFrom": {
@@ -169,13 +169,13 @@
    "schemas": [
     "access"
    ],
-   "operations": 180,
+   "operations": 182,
    "tables": 9,
    "why": "**The gate.** Validating an entitlement is a sub-300ms decision made forty times a minute per lane, and it must work when the network does not.",
    "scale": "Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than replayed** precisely because the gate cannot afford the arithmetic.",
    "risk": "Down means the gates stop. Runs at the edge with a local decision cache.",
    "readsFrom": {
-    "IdentityService": 8,
+    "IdentityService": 9,
     "CatalogueService": 7,
     "OrderService": 2,
     "MarketingService": 1,
@@ -327,7 +327,7 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 203,
+   "operations": 205,
    "tables": 62,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",

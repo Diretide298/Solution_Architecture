@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, five values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -108,7 +108,7 @@
   }
  },
  "totals": {
-  "operations": 2056,
+  "operations": 2068,
   "screens": 2427,
   "flows": 288
  },
@@ -294,6 +294,7 @@
     "extendCart",
     "freezeEntitlement",
     "getAvailability",
+    "getBillingStatement",
     "getBundle",
     "getCart",
     "getCouponCode",
@@ -349,6 +350,7 @@
     "linkGuestCheckout",
     "listAiConversations",
     "listBadges",
+    "listBillingStatements",
     "listCases",
     "listCatalogueBundles",
     "listConsentPurposes",
@@ -363,6 +365,7 @@
     "listFxRates",
     "listGuestDevices",
     "listGuestMemberships",
+    "listLeaderboard",
     "listLostItems",
     "listLoyaltyProgrammes",
     "listMembershipBenefits",
@@ -415,6 +418,7 @@
     "searchCatalogue",
     "sendAiMessage",
     "sendConversationMessage",
+    "setLeaderboardNickname",
     "setMarketingSubscription",
     "setSharedWalletMembers",
     "shareEntitlement",
@@ -783,7 +787,7 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 178,
+    "operations": 182,
     "screens": 130,
     "flows": 22,
     "contracts": 20,
@@ -1577,6 +1581,7 @@
     "endPromotion",
     "enrolDevice",
     "enrolFacePass",
+    "enrolFaceTag",
     "enrolMfaMethod",
     "enterCountLine",
     "escalateApprovalRequest",
@@ -1627,6 +1632,7 @@
     "getB2bCredit",
     "getBill",
     "getBillingReconciliation",
+    "getBillingStatement",
     "getBrandIdentity",
     "getBundle",
     "getCampaign",
@@ -1649,6 +1655,7 @@
     "getDeferredRevenue",
     "getDeviceTelemetry",
     "getDueMaintenance",
+    "getDunningPolicy",
     "getDynamicPriceRule",
     "getEmployee",
     "getEntitlement",
@@ -1908,6 +1915,7 @@
     "listBanners",
     "listBehavioralTransactionTargeting",
     "listBestOfferCustomer",
+    "listBillingStatements",
     "listBiometric",
     "listBiometricAccess",
     "listBiometricConsentGuardian",
@@ -2058,6 +2066,7 @@
     "listDiscountLimitGuardrail",
     "listDiscountMarginProfitability",
     "listDonationCampaigns",
+    "listDunningCases",
     "listDuplicateCandidates",
     "listDynamicAccessPolicy",
     "listDynamicBundle",
@@ -2425,6 +2434,8 @@
     "listSeededReports",
     "listSegmentMembers",
     "listSegments",
+    "listSegregationRules",
+    "listSegregationViolations",
     "listSellerSettlementPayout",
     "listSerialisedItems",
     "listServiceRootCause",
@@ -2699,6 +2710,7 @@
     "reserveMerchandise",
     "resetSandbox",
     "resolveBookingConflict",
+    "resolveDunningCase",
     "resolveInvoiceDispute",
     "resolveObligationDispute",
     "resolvePermissions",
@@ -2825,6 +2837,7 @@
     "setDigitalBarcodeTicket",
     "setDigitalCardMembership",
     "setDigitalWaiverForm",
+    "setDunningPolicy",
     "setDynamicFieldData",
     "setDynamicPriceRule",
     "setDynamicPricingStrategy",
@@ -3190,6 +3203,7 @@
     "verifyAccreditationDocument",
     "verifyAllergens",
     "verifyCustomDomain",
+    "verifyIdentity",
     "verifyMfaChallenge",
     "verifyMfaEnrolment",
     "verifyWorkOrder",
@@ -5814,6 +5828,8 @@
     "payments.credit_account",
     "payments.currency_rule",
     "payments.deposit_activity",
+    "payments.dunning_case",
+    "payments.dunning_policy",
     "payments.eligibility_rule",
     "payments.failover_policy",
     "payments.fee_rule",
@@ -6054,11 +6070,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 1929,
+    "operations": 1939,
     "screens": 2087,
     "flows": 135,
     "contracts": 32,
-    "tables": 590
+    "tables": 592
    }
   }
  }

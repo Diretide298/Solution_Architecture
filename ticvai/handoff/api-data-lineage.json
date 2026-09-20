@@ -50212,5 +50212,227 @@
    "postgres",
    "redis"
   ]
+ },
+ "enrolFaceTag": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/face-tag/enrolments",
+  "reads": [
+   "pii.subject_biometric"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Capture a same-visit facial model that dies at close of day",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getBillingStatement": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/billing-statements/{statementId}",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "One statement, with its lines",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDunningPolicy": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/dunning-policy",
+  "reads": [
+   "payments.dunning_policy"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "How a failed recurring charge is chased",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listBillingStatements": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/billing-statements",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "What was charged, when, and against which agreement",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDunningCases": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/dunning-cases",
+  "reads": [
+   "payments.dunning_case"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Recurring charges currently being chased",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listSegregationRules": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/segregation-rules",
+  "reads": [
+   "identity.segregation_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Read the conflicting-permission rules back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSegregationViolations": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/segregation-violations",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Who already holds a conflicting pair",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveDunningCase": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/dunning-cases/{caseId}/resolve",
+  "reads": [
+   "payments.dunning_case"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Stop chasing, with a reason",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setDunningPolicy": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/dunning-policy",
+  "reads": [
+   "payments.dunning_policy"
+  ],
+  "writes": [
+   "payments.dunning_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the retry schedule and what happens when it runs out",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "verifyIdentity": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/identity-verifications",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCESS_VALIDATE",
+  "offline": false,
+  "summary": "Check the person presenting against the person entitled",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

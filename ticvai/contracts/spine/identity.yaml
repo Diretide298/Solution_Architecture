@@ -263,8 +263,6 @@ paths:
   /segregation-rules:
     get:
       operationId: listSegregationRules
-      x-ticvai-consumed-by:
-        - "P09 ADM-340 Segregation of Duties Policy Manager"
       summary: Read the conflicting-permission rules back
       description: 'BL-110, 3.3.31. **`setSegregationRules` was a PUT with no GET**, so the screen
         named above manages rules it cannot load — and nobody could audit a tenant''s controls
@@ -338,9 +336,6 @@ paths:
   /segregation-violations:
     get:
       operationId: listSegregationViolations
-      x-ticvai-consumed-by:
-        - "P09 ADM-340 Segregation of Duties Policy Manager"
-        - "P09 ADM-339 Governance & Compliance Command Center"
       summary: Who already holds a conflicting pair
       description: 'BL-110, 3.3.31, 3.3.38. **The check runs at grant time, and a rule added today
         has said nothing about the grants made yesterday.** BL-147 was right that catching a

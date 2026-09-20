@@ -660,7 +660,9 @@
   "workforce.sync_conflict": "2026-09-20",
   "workforce.sync_run": "2026-09-20",
   "maintenance.inspection_item": "2026-09-20",
-  "marketing.programme_tier": "2026-09-20"
+  "marketing.programme_tier": "2026-09-20",
+  "payments.dunning_case": "2026-09-21",
+  "payments.dunning_policy": "2026-09-21"
  },
  "renames": [
   {
@@ -802,5 +804,5 @@
   "whitelabel.seo_setting": "2026-09-20"
  },
  "baseline": "2026-09-19",
- "generated": "2026-09-20"
+ "generated": "2026-09-21"
 }

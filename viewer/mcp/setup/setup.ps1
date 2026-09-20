@@ -135,15 +135,57 @@ function Stop-Setup([string]$text) {
 # The .cmd only starts bin\claude.exe beside it, so that is what is run, with
 # every argument quoted the way a Windows program reads them. A claude.exe on
 # the PATH (the native installer) is used as it is.
+#
+# An npm install can leave the .cmd without its claude.exe (a blocked or failed
+# download), so every candidate must answer --version before it is used. The
+# native installer's copy and the VS Code extension's own copy are tried too:
+# all of them keep connectors in the same ~\.claude.json.
+function Get-ClaudeVersion([string]$Path) {
+    try {
+        $info = New-Object System.Diagnostics.ProcessStartInfo
+        $info.FileName = $Path
+        $info.Arguments = '--version'
+        $info.UseShellExecute = $false
+        $info.CreateNoWindow = $true
+        $info.RedirectStandardOutput = $true
+        $info.RedirectStandardError = $true
+        $info.WorkingDirectory = $env:USERPROFILE
+        $process = [System.Diagnostics.Process]::Start($info)
+        $out = $process.StandardOutput.ReadToEndAsync()
+        $err = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit(30000)) { try { $process.Kill() } catch {}; return $null }
+        $first = (($out.Result + $err.Result).Trim() -split "`n")[0].Trim()
+        if ($process.ExitCode -eq 0 -and $first -match '^\d+\.\d+') { return $first }
+    } catch {}
+    return $null
+}
+
 function Find-Claude {
     $all = @(Get-Command claude -CommandType Application -All -ErrorAction SilentlyContinue)
-    $exe = $all | Where-Object { $_.Source -like '*.exe' } | Select-Object -First 1
-    if ($exe) { return [pscustomobject]@{ Path = $exe.Source; Safe = $true } }
+    $tried = @()
+    $safe = @()
+    $safe += $all | Where-Object { $_.Source -like '*.exe' } | ForEach-Object { $_.Source }
     foreach ($shim in $all) {
-        $inner = Join-Path (Split-Path -Parent $shim.Source) 'node_modules\@anthropic-ai\claude-code\bin\claude.exe'
-        if (Test-Path -LiteralPath $inner) { return [pscustomobject]@{ Path = $inner; Safe = $true } }
+        $safe += Join-Path (Split-Path -Parent $shim.Source) 'node_modules\@anthropic-ai\claude-code\bin\claude.exe'
     }
-    if ($all.Count) { return [pscustomobject]@{ Path = $all[0].Source; Safe = $false } }
+    $safe += Join-Path $env:USERPROFILE '.local\bin\claude.exe'
+    foreach ($editor in '.vscode', '.vscode-insiders', '.cursor', '.windsurf') {
+        $root = Join-Path $env:USERPROFILE "$editor\extensions"
+        $safe += Get-ChildItem -LiteralPath $root -Directory -Filter 'anthropic.claude-code-*' -ErrorAction SilentlyContinue |
+            Sort-Object { try { [version]($_.Name -replace '^anthropic\.claude-code-([\d.]+).*$', '$1') } catch { [version]'0.0' } } -Descending |
+            ForEach-Object { Join-Path $_.FullName 'resources\native-binary\claude.exe' }
+    }
+    foreach ($path in $safe) {
+        if (-not $path -or $tried -contains $path -or -not (Test-Path -LiteralPath $path)) { continue }
+        $tried += $path
+        $version = Get-ClaudeVersion $path
+        if ($version) { return [pscustomobject]@{ Path = $path; Safe = $true; Version = $version; Broken = $false } }
+    }
+    foreach ($shim in $all | Where-Object { $_.Source -notlike '*.exe' }) {
+        $version = Get-ClaudeVersion $shim.Source
+        if ($version) { return [pscustomobject]@{ Path = $shim.Source; Safe = $false; Version = $version; Broken = $false } }
+    }
+    if ($all.Count) { return [pscustomobject]@{ Path = $all[0].Source; Safe = $false; Version = ''; Broken = $true } }
     return $null
 }
 
@@ -347,6 +389,7 @@ $script:Claude = Find-Claude
 # ---- removing ------------------------------------------------------------------
 if ($Uninstall -or $RemoveFolder) {
     if (-not $script:Claude) { Stop-Setup 'Claude Code is not installed, so there is nothing registered to remove.' }
+    if ($script:Claude.Broken) { Stop-Setup 'Claude Code is installed but does not start, so nothing can be removed. Reinstall it (npm install -g @anthropic-ai/claude-code) and run this again.' }
     $entries = Read-Ledger
     if ($RemoveFolder) {
         Step 'Removing ADAM from one folder'
@@ -401,8 +444,12 @@ Good "Node.js $nodeVersion"
 if (-not $script:Claude) {
     Stop-Setup 'Claude Code is not installed. Install it with:  npm install -g @anthropic-ai/claude-code   then open a new window and run setup again.'
 }
-$claudeVersion = ((Invoke-Claude @('--version')).Text -split "`n")[0]
-Good "Claude Code $claudeVersion"
+if ($script:Claude.Broken) {
+    Stop-Setup ("Claude Code is installed but does not start ($($script:Claude.Path) fails - its claude.exe is missing, usually a download that was blocked). " +
+        'Reinstall it with:  npm uninstall -g @anthropic-ai/claude-code   then   npm install -g @anthropic-ai/claude-code   ' +
+        '(or use the native installer:  irm https://claude.ai/install.ps1 | iex ), open a new window and run setup again.')
+}
+Good "Claude Code $($script:Claude.Version)"
 
 # ---- 2. who you are ------------------------------------------------------------
 Step "Your ADAM account ($ViewerUrl)"

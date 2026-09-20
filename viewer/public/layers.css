@@ -2907,3 +2907,124 @@ textarea.rt-sendback-note {
 }
 
 .burst-more:hover { border-bottom-color: var(--accent); }
+
+/* ── the sectioned page: a list of sections on the left, the sections on the
+   right ─────────────────────────────────────────────────────────────────────
+   Settings was the first page shaped this way, and the admin and delivery
+   pages were rebuilt to match it, so the rules moved here from inside
+   settings.html. The `set-` prefix stayed: renaming it would have touched
+   every row of three pages to say the same thing.
+
+   A page using this owns the markup:
+
+     <div class="set-layout">
+       <nav class="set-nav"><h1 class="set-nav-title">…</h1>
+         <div class="set-nav-list"><a href="#first">…</a></div></nav>
+       <main class="set-content">
+         <section class="admin-panel set-section" id="first">…</section>
+       </main>
+     </div>
+*/
+.set-layout {
+  max-width: 1080px; margin: 0 auto;
+  padding: 26px 22px 80px;
+  display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 34px;
+  align-items: start;
+}
+/* Wider than settings, for a page whose sections are tables rather than
+   forms — the nav column stays as it is, so the two pages still line up. */
+.set-layout-wide { max-width: 1320px; }
+
+.set-nav { position: sticky; top: 84px; }
+.set-nav-title {
+  margin: 0 0 14px; font-size: 22px; font-weight: 800; letter-spacing: -.01em;
+  color: var(--text);
+}
+.set-nav-list { display: grid; gap: 2px; }
+.set-nav a {
+  display: block; padding: 8px 12px; border-radius: 7px;
+  font-size: 13px; color: var(--text-dim); text-decoration: none;
+  border-left: 2px solid transparent;
+}
+.set-nav a:hover { color: var(--text); background: var(--bg-hover); }
+.set-nav a[aria-current='true'] {
+  color: var(--accent-text); background: var(--accent-soft);
+  border-left-color: var(--accent); font-weight: 600;
+}
+.set-nav a[hidden] { display: none; }
+.set-nav-group {
+  margin: 14px 0 4px; padding: 0 12px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint);
+}
+.set-nav-group[hidden] { display: none; }
+
+/* Room below the last section, so a link to one near the end can still bring
+   it to the top instead of stopping where the page runs out. */
+.set-content { display: grid; gap: 18px; min-width: 0; padding-bottom: 55vh; }
+.set-section { scroll-margin-top: 84px; margin: 0; }
+.set-section[hidden] { display: none; }
+.set-section .admin-heading {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 0;
+}
+.set-lede { margin-top: -4px; }
+
+/* ── controls inside a section ── */
+.set-grid { display: grid; gap: 10px; }
+.set-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.set-row .auth-input { flex: 1 1 22rem; min-width: 0; margin: 0; }
+.set-fields { display: grid; gap: 2px; max-width: 420px; }
+.set-fields .auth-input { margin: 0; }
+.set-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.set-actions .auth-button { width: auto; margin: 0; padding: 8px 18px; }
+.set-state {
+  font: 500 0.82rem/1.5 'Plus Jakarta Sans', system-ui, sans-serif;
+  min-height: 1.4em; margin: 0;
+}
+.set-state[data-tone='good'] { color: var(--ok); }
+.set-state[data-tone='bad'] { color: var(--error); }
+.set-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  white-space: pre-wrap; word-break: break-all;
+  padding: 12px 14px; border-radius: 10px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+}
+.set-badge {
+  font: 600 0.72rem/1 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 5px 9px; border-radius: 999px;
+  color: var(--text-dim);
+  border: 1px solid var(--border-strong);
+}
+.set-badge[data-on='yes'] {
+  color: var(--accent-text); border-color: var(--accent-line); background: var(--accent-soft);
+}
+
+/* ── doors to other pages ── */
+.set-links { display: grid; gap: 8px; }
+.set-link {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--text); text-decoration: none;
+}
+.set-link:hover { border-color: var(--accent-line); background: var(--bg-hover); }
+.set-link small { display: block; margin-top: 2px; font-size: 12px; color: var(--text-dim); }
+.set-link::after { content: '\203A'; font-size: 18px; color: var(--text-faint); }
+
+/* ── narrow screens: the section list becomes a strip across the top ── */
+@media (max-width: 820px) {
+  /* minmax(0, …), not 1fr: a plain 1fr column is as wide as its widest
+     unbreakable content, and the strip of section chips below is exactly
+     that — it pushed the whole page past the edge of a phone. */
+  .set-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 14px 60px; }
+  .set-nav, .set-content { min-width: 0; }
+  .set-nav { position: sticky; top: 52px; z-index: 5; background: var(--bg); padding: 8px 0; }
+  .set-nav-title { display: none; }
+  .set-nav-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .set-nav-list::-webkit-scrollbar { display: none; }
+  .set-nav a { flex: none; border-left: 0; border: 1px solid var(--border); border-radius: 999px; }
+  .set-nav-group { display: none; }
+}

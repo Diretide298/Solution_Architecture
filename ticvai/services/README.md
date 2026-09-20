@@ -13,7 +13,7 @@ pip install aiohttp
 python3 tools/bench.py --topology hybrid --pattern hot-venue --rps 1000 --seconds 300
 ```
 
-**Postgres loads `backend/*.sql` on first start** — 637 tables, 613 foreign keys, 769 indexes.
+**Postgres loads `backend/*.sql` on first start** — 625 tables, 632 foreign keys, 734 indexes.
 
 ## What is measured honestly
 

@@ -1711,7 +1711,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.venue_settings
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:

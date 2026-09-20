@@ -74,10 +74,12 @@
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">accounts</span>
+        <span class="brand-sub">admin</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/tasks.html">Tasks</a>
+        <a class="chip" href="/settings.html">Settings</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
@@ -96,9 +98,31 @@
       </div>
     </main>
 
-    <main id="admin" class="admin-main" hidden>
+    <!-- The settings page's shape: the sections on the left, one column of
+         panels on the right. This page had grown to seven panels in a single
+         scroll, where the only way to reach "Close from a spreadsheet" was to
+         know it was at the bottom. -->
+    <div id="admin" class="set-layout" hidden>
+      <nav class="set-nav" aria-label="Admin sections">
+        <h1 class="set-nav-title">Admin</h1>
+        <div class="set-nav-list">
+          <div class="set-nav-group">People</div>
+          <a href="#invite">Invite someone</a>
+          <a href="#invites">Invites</a>
+          <a href="#people">Accounts</a>
+          <div class="set-nav-group">Delivery</div>
+          <a href="#projects">Projects</a>
+          <div class="set-nav-group">The register</div>
+          <a href="#export">Download a range</a>
+          <a href="#close-from-sheet">Close from a spreadsheet</a>
+          <div class="set-nav-group">You</div>
+          <a href="#password">Your password</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
       <!-- ── inviting ─────────────────────────────────────────────── -->
-      <section class="admin-panel">
+      <section class="admin-panel set-section" id="invite">
         <h2 class="admin-heading">Invite someone</h2>
         <p class="auth-note">
           The address is fixed here, by you, and cannot be changed by whoever
@@ -157,13 +181,15 @@
       </section>
 
       <!-- ── the invites ──────────────────────────────────────────── -->
-      <section class="admin-panel">
+      <section class="admin-panel set-section" id="invites">
         <h2 class="admin-heading">Invites <span id="invite-count" class="admin-count"></span></h2>
-        <div id="invites" class="admin-table"></div>
+        <!-- `invites-list`, not `invites`: the section around it is `#invites`,
+             which is what the list on the left points at. -->
+        <div id="invites-list" class="admin-table"></div>
       </section>
 
       <!-- ── the people ───────────────────────────────────────────── -->
-      <section class="admin-panel">
+      <section class="admin-panel set-section" id="people">
         <h2 class="admin-heading">Accounts <span id="account-count" class="admin-count"></span></h2>
         <p class="auth-note auth-fine">
           An account is disabled rather than deleted, because a verdict points
@@ -189,7 +215,7 @@
       </section>
 
       <!-- ── which OpenProject project each package reads ─────────── -->
-      <section class="admin-panel" id="projects">
+      <section class="admin-panel set-section" id="projects">
         <h2 class="admin-heading">Projects <span id="project-count" class="admin-count"></span></h2>
         <p class="auth-note">
           Which OpenProject project each ADAM project reads its work from. A
@@ -208,7 +234,7 @@
       </section>
 
       <!-- ── a date range, as a file ──────────────────────────────── -->
-      <section class="admin-panel">
+      <section class="admin-panel set-section" id="export">
         <h2 class="admin-heading">Download a date range</h2>
         <p class="auth-note">
           A month of the register, as a CSV. The reviews page exports the rows
@@ -244,7 +270,7 @@
       <!-- Named, because the reviews page links straight at it: somebody who
            has just taken an export is looking for this panel, not for the top
            of a page with four sections above it. -->
-      <section class="admin-panel" id="close-from-sheet">
+      <section class="admin-panel set-section" id="close-from-sheet">
         <h2 class="admin-heading">Close items from a spreadsheet</h2>
         <p class="auth-note">
           The other end of the download above. Take the range, fill in the
@@ -283,14 +309,15 @@
       <!-- Moved to the settings page, which everybody can open. Here it was
            behind the admin gate, so a reviewer had no way to change their own
            password at all. A pointer stays for whoever looks for it here. -->
-      <section class="admin-panel">
+      <section class="admin-panel set-section" id="password">
         <h2 class="admin-heading">Your password</h2>
         <p class="auth-note">
           Your own password, OpenProject token and sessions are on
           <a href="/settings.html#password">your settings page</a>.
         </p>
       </section>
-    </main>
+      </main>
+    </div>
 
     <script type="module">
       import {
@@ -300,6 +327,9 @@
         listPmsProjects, availablePmsProjects, setPmsProject, clearPmsProject,
       } from '/validation.js';
       import { attachSubSearch } from '/subsearch.js';
+      // The list on the left, following what is on screen. Shared with the
+      // settings and tasks pages, which are the same page shape.
+      import { followSections } from '/sections.js';
       import '/theme.js';                      // the saved day/night choice
       import { hideLoader } from '/loader.js'; // and the curtain over the wait
       // The CSV export lives in its own module rather than down here with the
@@ -344,6 +374,11 @@
         me = state.account;
         $('whoami').textContent = `${me.email} · admin`;
         $('admin').hidden = false;
+        followSections('invite');
+        // A link straight at a section - the reviews page sends people to
+        // #close-from-sheet - lands before the panels exist, so the browser has
+        // nothing to scroll to. Repeated here now that they do.
+        if (location.hash) $(location.hash.slice(1))?.scrollIntoView();
         // Wired before the lists are fetched, because it needs neither of them
         // — the export asks the service for its own rows when it is pressed.
         mountExport();
@@ -364,7 +399,7 @@
 
       // ── invites ────────────────────────────────────────────────
       async function refreshInvites() {
-        const box = $('invites');
+        const box = $('invites-list');
         box.innerHTML = '';
         let invites = [];
         try { ({ invites } = await listInvites()); }

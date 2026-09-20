@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS resources.booking (
 
 -- What a person resource is certified to do, and until when (BL-042). A lapsed lifeguard
 -- certificate is a safety failure, not a data-quality one. Hangs off: reaches resources.resource
--- through its keys; references assets.media_asset. Reached by: 0 operations read it and 1 write
+-- through its keys; references assets.media_asset. Reached by: 1 operations read it and 1 write
 -- it.
 CREATE TABLE IF NOT EXISTS resources.qualification (
     code                              text NOT NULL,

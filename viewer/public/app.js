@@ -12776,6 +12776,15 @@ function bindUI() {
       return;
     }
 
+    // The bell panel, for the same reason as the account panel above it: it
+    // sits over the view, so Escape means "shut this". Without this guard the
+    // key fell through to the "Escape means out" rule below and left the reader
+    // on the home page, which looks like the bell navigating somewhere.
+    if (!$('bell-panel').hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); closeBellPanel(); }
+      return;
+    }
+
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
       inPalette ? closePalette() : openPalette();

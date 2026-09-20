@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 205
+  "operationsWithNoScreen": 213
  },
  "waves": {
   "wave1": 12,
@@ -6643,6 +6643,18 @@
     "summary": "Every permission key the contracts enforce"
    },
    {
+    "operation": "listSegregationRules",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the conflicting-permission rules back"
+   },
+   {
+    "operation": "listSegregationViolations",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who already holds a conflicting pair"
+   },
+   {
     "operation": "recordBenefitUsage",
     "contract": "identity",
     "verb": "POST",
@@ -6865,10 +6877,22 @@
     "summary": "Extend a reservation"
    },
    {
+    "operation": "getBillingStatement",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "One statement, with its lines"
+   },
+   {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listBillingStatements",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -6949,6 +6973,12 @@
     "summary": ""
    },
    {
+    "operation": "getDunningPolicy",
+    "contract": "payments",
+    "verb": "GET",
+    "summary": "How a failed recurring charge is chased"
+   },
+   {
     "operation": "getPaymentRules",
     "contract": "payments",
     "verb": "GET",
@@ -6961,10 +6991,28 @@
     "summary": "Movements on a deposit"
    },
    {
+    "operation": "listDunningCases",
+    "contract": "payments",
+    "verb": "GET",
+    "summary": "Recurring charges currently being chased"
+   },
+   {
     "operation": "recordDepositActivity",
     "contract": "payments",
     "verb": "POST",
     "summary": "Record a movement on a deposit"
+   },
+   {
+    "operation": "resolveDunningCase",
+    "contract": "payments",
+    "verb": "POST",
+    "summary": "Stop chasing, with a reason"
+   },
+   {
+    "operation": "setDunningPolicy",
+    "contract": "payments",
+    "verb": "PUT",
+    "summary": "Set the retry schedule and what happens when it runs out"
    },
    {
     "operation": "setPaymentRules",

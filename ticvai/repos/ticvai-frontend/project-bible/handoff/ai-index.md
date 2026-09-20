@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 40 |
 | **Flows** | 11 |
-| **Documents** | 32 |
+| **Documents** | 36 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -231,6 +231,8 @@
 | Document | Status | Mentions |
 |---|---|---|
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
+| [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
+| [Build plan — 20 September 2026](..\docs\active\build-plan-20-september.md) |  | 1 |
 | [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 2 |
 | [Contract audit — every contract against the four things that must agree with it](..\docs\active\contract-audit-19-september.md) |  | 7 |
 | [The contract run — plan](..\docs\active\contract-run-plan-19-september.md) |  | 1 |
@@ -250,6 +252,7 @@
 | [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |
 | [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |
 | [Ch03 capability coverage - the client's list against our screens](..\docs\active\spec-coverage-19-september.md) |  | 1 |
+| [The 26 undrafted packs — what is in them and what they would cost](..\docs\active\undrafted-packs-scope-20-september.md) |  | 1 |
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
@@ -260,12 +263,13 @@
 | [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted | 3 |
 | [ADR-0034: The cheapest AI call is the one that never reaches a provider](..\docs\adr\0034-ai-retrieval-and-cost.md) | Accepted | 6 |
 | [ADR-0046: On-premise has two configurations, and the difference is a control channel](..\docs\adr\0046-on-premise-has-two-configurations.md) | Accepted | 1 |
+| [ADR-0047: How long data is kept, and where it goes next](..\docs\adr\0047-how-long-data-is-kept-and-where-it-goes-next.md) | Accepted — the RPO floor decided 21 September; one number pe | 2 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 
 ## Conflicts
 
-**1 open** — **CF-166**
+**1 open** — **CF-165**
 
-33 closed — CF-160 · CF-41 · CF-57 · CF-139 · CF-61 · CF-74 · CF-123 · CF-120 · CF-141 · CF-144 · CF-17 · CF-119 · CF-118 · CF-113 · CF-109 · CF-107 · CF-106 · CF-105 · CF-14 · CF-96 · CF-94 · CF-92 · CF-93 · CF-90 · CF-89 · CF-88 · CF-59 · CF-80 · CF-78 · CF-76 · CF-73 · CF-20 · CF-43
+34 closed — CF-160 · CF-41 · CF-57 · CF-139 · CF-61 · CF-74 · CF-123 · CF-120 · CF-141 · CF-144 · CF-17 · CF-119 · CF-118 · CF-113 · CF-109 · CF-107 · CF-106 · CF-105 · CF-14 · CF-96 · CF-94 · CF-92 · CF-93 · CF-90 · CF-89 · CF-88 · CF-59 · CF-80 · CF-78 · CF-76 · CF-73 · CF-166 · CF-20 · CF-43
 

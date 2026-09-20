@@ -1,4 +1,4 @@
--- retail — 18 tables
+-- retail — 13 tables
 -- **Derived. Do not hand-edit.**
 
 -- Goods swapped rather than returned, which settles differently
@@ -33,67 +33,6 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
     is_active                         boolean NOT NULL
 );
 
--- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS retail.price (
-    id                                uuid PRIMARY KEY,
-    list_id                           uuid NOT NULL,
-    product_id                        uuid NOT NULL,
-    variant_id                        uuid,
-    amount                            numeric(18,4) NOT NULL,
-    tax_code                          text,
-    valid_from                        timestamptz,
-    valid_to                          timestamptz,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
--- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS retail.price_list (
-    id                                uuid PRIMARY KEY,
-    scope_path                        text,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    valid_from                        timestamptz,
-    valid_to                          timestamptz,
-    channels_json                     text,
-    priority                          integer NOT NULL,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
--- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS retail.product (
-    id                                uuid PRIMARY KEY,
-    scope_path                        text,
-    category_id                       uuid NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    description                       text,
-    brand                             text,
-    tax_code                          text,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
--- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS retail.product_category (
-    id                                uuid PRIMARY KEY,
-    scope_path                        text,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    description                       text,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
@@ -117,7 +56,7 @@ CREATE TABLE IF NOT EXISTS retail.product_recommendation (
 );
 
 -- Merchandise held for collection. Hangs off: reaches retail.sale through its keys; references
--- pii.subject, platform.outlet. Reached by: 1 operations read it and 1 write it; 3 tables
+-- pii.subject, platform.outlet. Reached by: 1 operations read it and 1 write it; 1 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS retail.reservation (
     id                                text PRIMARY KEY NOT NULL,
@@ -131,7 +70,8 @@ CREATE TABLE IF NOT EXISTS retail.reservation (
 );
 
 -- One item reserved. Hangs off: a child of retail.reservation; reaches retail.sale through its
--- keys; references retail.merchandise, retail.reservation.
+-- keys; references retail.merchandise, retail.reservation. Reached by: 1 operations read it and 0
+-- write it.
 CREATE TABLE IF NOT EXISTS retail.reservation_line (
     reservation_id                    text NOT NULL,
     merchandise_id                    uuid,
@@ -236,7 +176,8 @@ CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
 );
 
 -- One item bought for later collection. Hangs off: a child of retail.shop_and_drop; reaches
--- retail.sale through its keys; references retail.merchandise, retail.shop_and_drop.
+-- retail.sale through its keys; references retail.merchandise, retail.shop_and_drop. Reached by: 3
+-- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS retail.shop_and_drop_line (
     shop_and_drop_id                  text NOT NULL,
     line_id                           text,
@@ -258,21 +199,6 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     threshold_minor                   integer,
     requires_permission               text,
     enabled                           boolean,
-    updated_at                        timestamptz
-);
-
--- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS retail.variant (
-    id                                uuid PRIMARY KEY,
-    product_id                        uuid NOT NULL,
-    sku                               text NOT NULL,
-    name                              text NOT NULL,
-    barcode                           text,
-    attributes_json                   text,
-    is_default                        boolean NOT NULL,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz
 );
 

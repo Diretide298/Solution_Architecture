@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 118
+  "operationsWithNoScreen": 122
  },
  "waves": {
   "wave2": 20,
@@ -1157,6 +1157,18 @@
     "summary": "Every permission key the contracts enforce"
    },
    {
+    "operation": "listSegregationRules",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the conflicting-permission rules back"
+   },
+   {
+    "operation": "listSegregationViolations",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who already holds a conflicting pair"
+   },
+   {
     "operation": "recordBenefitUsage",
     "contract": "identity",
     "verb": "POST",
@@ -1379,10 +1391,22 @@
     "summary": "Extend a reservation"
    },
    {
+    "operation": "getBillingStatement",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "One statement, with its lines"
+   },
+   {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listBillingStatements",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",

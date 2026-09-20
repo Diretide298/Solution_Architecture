@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 180 operations
+title: access — 182 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -102,6 +102,17 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - pii.subject_biometric
+- operation: enrolFaceTag
+  verb: POST
+  path: /face-tag/enrolments
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - pii.subject_biometric
+  writes: []
 - operation: getAccessPoint
   verb: GET
   path: /access-points/{accessPointId}
@@ -1934,3 +1945,13 @@ operations:
   writes:
   - access.scan_event
   - cache:idempotency
+- operation: verifyIdentity
+  verb: POST
+  path: /identity-verifications
+  scope: venue
+  permission: ACCESS_VALIDATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []

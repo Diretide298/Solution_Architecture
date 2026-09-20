@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2056,
+  "ofTotalOperations": 2068,
   "tables": 44,
-  "ofTotalTables": 623
+  "ofTotalTables": 625
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2022,
-    "tables": 623,
+    "operations": 2034,
+    "tables": 625,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -604,7 +604,7 @@
   {
    "table": "marketing.loyalty_position",
    "schema": "marketing",
-   "columns": 11,
+   "columns": 12,
    "burstOperations": 1,
    "written": false,
    "contention": null,

@@ -2361,9 +2361,6 @@ paths:
   /loyalty/leaderboard:
     get:
       operationId: listLeaderboard
-      x-ticvai-consumed-by:
-        - "P08 BO-831 Progress, Leaderboards & Hub"
-        - "P02 GST-036 Loyalty & Rewards"
       x-ticvai-audience:
       - guest
       summary: Standings, by nickname
@@ -2420,8 +2417,6 @@ paths:
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
-      x-ticvai-consumed-by:
-        - "P02 GST-036 Loyalty & Rewards"
       x-ticvai-audience:
       - guest
       summary: Choose the name shown on the board

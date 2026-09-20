@@ -11,12 +11,12 @@ Every number below is counted from the files in this package, not from memory.
 
 | | | Against |
 |---|---|---|
-| **API operations** | **1,974** | Every unblocked module. 267 spine, 470 satellite |
+| **API operations** | **2,068** | Every unblocked module. 267 spine, 470 satellite |
 | API schemas | 607 | Across 30 files |
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
-| **Tables designed** | **637** | 3,911 columns |
-| **Tables written as DDL** | **637** | `backend/*.sql`, 613 foreign keys. Never executed |
-| Relationships | 1,346 | 362 of 637 tables carry one; the twelve that do not are correct |
+| **Tables designed** | **625** | 3,911 columns |
+| **Tables written as DDL** | **625** | `backend/*.sql`, 632 foreign keys. Never executed |
+| Relationships | 1,351 | 362 of 625 tables carry one; the twelve that do not are correct |
 | Screens defined | **2,427** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |
@@ -24,7 +24,7 @@ Every number below is counted from the files in this package, not from memory.
 | State models | **125** | Every one carries transitions — **all modelled** |
 | Domain events | 29 | Publisher, consumers, idempotency keys |
 | User flows | **96** | 284 branches. Every contract and platform touched |
-| ADRs | 46 | |
+| ADRs | 48 | |
 | **Requirements covered by a contract** | **2,778 of 2,990 (93%)** | The remaining 212 are workshop-blocked |
 | **Requirements with an artefact** | **1,848 of 2,072 (89%)** | 12 of 15 classes closed |
 | Configuration levels decided | 321 of 321 | |

@@ -416,8 +416,6 @@ paths:
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
-      x-ticvai-consumed-by:
-        - "P08 BO-188 Face Tag Temporary Enrollment"
       x-ticvai-audience:
       - staff
       summary: Capture a same-visit facial model that dies at close of day
@@ -531,9 +529,6 @@ paths:
   /identity-verifications:
     post:
       operationId: verifyIdentity
-      x-ticvai-consumed-by:
-        - "P07 SCN-003 Ready to scan"
-        - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
       x-ticvai-audience:
       - staff
       summary: Check the person presenting against the person entitled

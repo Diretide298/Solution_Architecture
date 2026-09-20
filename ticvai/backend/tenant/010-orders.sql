@@ -1,4 +1,4 @@
--- orders — 34 tables
+-- orders — 32 tables
 -- **Derived. Do not hand-edit.**
 
 -- A partner’s credit line, drawn against and settled periodically
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 9 operations read it and 6 write it; 2 tables reference it.
+-- platform.scope. Reached by: 13 operations read it and 6 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
     token                             text,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
--- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 5 operations
+-- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 9 operations
 -- read it and 4 write it.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS orders.chargeback (
 -- a manual override of a partner credit limit, recorded with who and why. Second table on a marker
 -- the deriver only read the first half of Hangs off: a child of orders.b2b_credit; reaches
 -- orders.sales_order through its keys; references identity.principal, orders.b2b_credit,
--- orders.sales_order. Reached by: 1 operations read it and 1 write it.
+-- orders.sales_order. Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.credit_override (
     b2b_credit_id                     uuid NOT NULL,
     order_id                          text,
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit (
 -- takes their float, which is what makes a variance attributable. withdrawnTotal reduces the
 -- expected close: cash skimmed for banking is not a shortfall Hangs off: reaches
 -- orders.sales_order through its keys; references identity.principal, orders.pos_shift,
--- platform.scope. Reached by: 4 operations read it
+-- platform.scope. Reached by: 5 operations read it
 CREATE TABLE IF NOT EXISTS orders.deposit_box (
     id                                uuid PRIMARY KEY,
     cashier_principal_id              uuid NOT NULL,
@@ -180,15 +180,6 @@ CREATE TABLE IF NOT EXISTS orders.discount (
     created_at                        timestamptz NOT NULL
 );
 
--- A donation within a transaction. A line, not a flag, because one transaction may give to several
--- campaigns Hangs off: reaches orders.sales_order through its keys; references
--- catalogue.donation_campaign, orders.sales_order.
-CREATE TABLE IF NOT EXISTS orders.donation_line (
-    id                                uuid PRIMARY KEY NOT NULL,
-    campaign_id                       uuid NOT NULL,
-    order_id                          text NOT NULL
-);
-
 -- Evaluated before the charge (BL-118). It holds rather than refuses — a rule that declines
 -- outright turns a false positive into a lost sale with an angry guest
 CREATE TABLE IF NOT EXISTS orders.fraud_rule (
@@ -218,7 +209,7 @@ CREATE TABLE IF NOT EXISTS orders.group_booking (
 
 -- A complimentary entitlement issued outside the order path (8.1.3–8.1.5). No payment is expected,
 -- so nothing waits for one. Hangs off: reaches orders.sales_order through its keys; references
--- catalogue.performance, catalogue.product, identity.principal. Reached by: 0 operations read it
+-- catalogue.performance, catalogue.product, identity.principal. Reached by: 2 operations read it
 -- and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.invitation (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -254,7 +245,7 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
 CREATE TABLE IF NOT EXISTS orders.membership_renewal (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
-    plan_id                           uuid NOT NULL,
+    entitlement_template_id           uuid NOT NULL,
     order_id                          text,
     type                              text NOT NULL,
     status                            text NOT NULL,
@@ -318,14 +309,6 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
     lease_id                          text NOT NULL
 );
 
--- links an order to the media its entitlements were issued onto. What makes append-to-existing
--- possible without editing a paid order Hangs off: reaches orders.sales_order through its keys;
--- references orders.sales_order.
-CREATE TABLE IF NOT EXISTS orders.order_media_link (
-    id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL
-);
-
 -- A tender against an order, with the rate it converted at fixed on the row (CF-37). A payment
 -- reconciled next month is reconciled at the rate of the day it was taken
 CREATE TABLE IF NOT EXISTS orders.payment (
@@ -350,8 +333,8 @@ CREATE TABLE IF NOT EXISTS orders.payment (
 -- A link a guest opens to pay for a booking taken at a till (BL-072). The link is the credential —
 -- a guest holding one is anonymous, and a phone booking is exactly the case where they have not
 -- registered. The expiry releases the hold, not just the link. Hangs off: reaches
--- orders.sales_order through its keys; references identity.principal, orders.sales_order,
--- retail.reservation. Reached by: 3 operati
+-- orders.sales_order through its keys; references identity.principal, orders.reservation,
+-- orders.sales_order. Reached by: 3 operati
 CREATE TABLE IF NOT EXISTS orders.payment_link (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          text NOT NULL,
@@ -438,7 +421,7 @@ CREATE TABLE IF NOT EXISTS orders.refund_policy (
 -- that admits is always one the venue issued
 CREATE TABLE IF NOT EXISTS orders.resale_listing (
     id                                uuid PRIMARY KEY NOT NULL,
-    entitlement_id                    uuid NOT NULL,
+    entitlement_id                    text NOT NULL,
     seller_subject_id                 uuid NOT NULL,
     ask_price                         numeric(18,4) NOT NULL,
     price_cap_percent                 numeric(18,4),
@@ -486,7 +469,7 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
 
 -- A hold against any stored-value instrument (CF-126). Two-phase spend for all six, where only the
 -- retail wallet had it — a guest with 200 game credits starting a play the machine then failed had
--- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 2 operations
+-- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 3 operations
 -- read it and 5 write it; written by 3 contracts — marketing-crm, orders, resources.
 CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -544,7 +527,7 @@ CREATE TABLE IF NOT EXISTS orders.upgrade (
     new_amount                        numeric(18,4) NOT NULL,
     amount                            numeric(18,4) NOT NULL,
     status                            text NOT NULL,
-    requested_by_user_id              uuid,
+    requested_by_principal_id         uuid,
     reason                            text,
     created_at                        timestamptz NOT NULL,
     completed_at                      timestamptz,
@@ -555,7 +538,7 @@ CREATE TABLE IF NOT EXISTS orders.upgrade (
 -- pushed to is a screenshot with better rounding
 CREATE TABLE IF NOT EXISTS orders.wallet_pass (
     id                                uuid PRIMARY KEY NOT NULL,
-    entitlement_id                    uuid NOT NULL,
+    entitlement_id                    text NOT NULL,
     platform                          text NOT NULL,
     serial_number                     text NOT NULL,
     authentication_token              text,

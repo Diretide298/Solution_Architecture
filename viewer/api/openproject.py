@@ -187,9 +187,17 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         # The number, off the end of the HAL href. What the ADAM project's
         # choice is compared against — titles can repeat, ids cannot.
         "projectId": _id_from_href((links.get("project") or {}).get("href")),
+        # The ticket this one hangs under, when there is one. An epic on a
+        # delivery overview is only an epic because its children say so.
+        "parent": _id_from_href((links.get("parent") or {}).get("href")),
+        "parentSubject": _titled(links.get("parent")),
         "startDate": work_package.get("startDate"),
         "dueDate": work_package.get("dueDate"),
         "percentDone": work_package.get("percentageDone"),
+        # Both ends of the ticket's life. `createdAt` is what "how long did this
+        # take" is measured from; on a closed ticket `updatedAt` is the closest
+        # thing to a closing date this API offers without reading activities.
+        "createdAt": work_package.get("createdAt"),
         "updatedAt": work_package.get("updatedAt"),
         # What a write has to send back, so OpenProject can refuse one made
         # against a version somebody has since changed.
@@ -277,6 +285,45 @@ def projects(endpoint: str, token: str) -> list:
             break
         offset += 1
     return sorted(found.values(), key=lambda p: (p["name"] or "").lower())
+
+
+def everything(endpoint: str, token: str, project_id: int, limit: int = 2000) -> list:
+    """
+    Every work package in one OpenProject project, in every state.
+
+    The opposite end from `mine`: that answers "what am I holding", this answers
+    "where is the delivery". So the status filter is `*` — the closed and the
+    rejected are the whole point of an overview, and leaving them out would make
+    every count a count of unfinished work wearing the name of the total.
+
+    Paged the way `projects` is, and for the same reasons: nothing promises a
+    page holds them all, and an instance that ignores paging must not spin. The
+    `limit` is a ceiling on rows, not on pages — a project bigger than it is cut
+    off oldest-first, because the walk is newest first.
+    """
+    found, offset, size = {}, 1, 200
+    filters = json.dumps([
+        {"project": {"operator": "=", "values": [str(project_id)]}},
+        {"status": {"operator": "*", "values": []}},
+    ])
+    for _ in range(50):
+        page = call(endpoint, token, "work_packages", {
+            "filters": filters,
+            "pageSize": size,
+            "offset": offset,
+            "sortBy": json.dumps([["updatedAt", "desc"]]),
+        })
+        elements = page.get("_embedded", {}).get("elements", [])
+        before = len(found)
+        for raw in elements:
+            summary = summarise(raw, endpoint)
+            found[summary["key"]] = summary
+        total = page.get("total")
+        if (len(elements) < size or len(found) == before or len(found) >= limit
+                or (isinstance(total, int) and len(found) >= total)):
+            break
+        offset += 1
+    return list(found.values())[:limit]
 
 
 def mine(endpoint: str, token: str, limit: int = 100,

@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 61 operations
+title: identity — 63 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -517,6 +517,27 @@ operations:
   offline: true
   reads:
   - identity.role
+  writes: []
+- operation: listSegregationRules
+  verb: GET
+  path: /segregation-rules
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.segregation_rule
+  writes: []
+- operation: listSegregationViolations
+  verb: GET
+  path: /segregation-violations
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listSsoProviders
   verb: GET

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS reporting.dashboard (
     id                                uuid PRIMARY KEY,
     owner_principal_id                uuid,
     aggregate_cost                    text,
+    archived_at                       timestamptz,
     created_at                        timestamptz
 );
 
@@ -209,7 +210,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_definition (
 
 -- A condition applied before aggregation. Hangs off: a child of reporting.report_definition;
 -- reaches reporting.report_definition through its keys; references reporting.report_definition.
--- Reached by: 5 operations read it and 4 write it.
+-- Reached by: 6 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS reporting.report_filter (
     report_definition_id              uuid NOT NULL,
     id                                uuid PRIMARY KEY,
@@ -222,7 +223,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_filter (
 );
 
 -- Something the reader supplies at run time. Hangs off: reaches reporting.report_definition
--- through its keys; references reporting.report_definition. Reached by: 5 operations read it and 3
+-- through its keys; references reporting.report_definition. Reached by: 6 operations read it and 3
 -- write it.
 CREATE TABLE IF NOT EXISTS reporting.report_parameter (
     key                               text NOT NULL,

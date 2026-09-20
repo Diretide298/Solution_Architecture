@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS ledger.journal_entry (
     fiscal_period_id                  uuid NOT NULL,
     status                            text NOT NULL,
     source                            text NOT NULL,
-    source_id                         text,
+    source_id                         uuid,
     description                       text NOT NULL,
     reference                         text,
     total_debit                       numeric(18,4) NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS ledger.posting (
     venue_id                          uuid,
     cost_center_id                    uuid,
     source                            text,
-    source_id                         text,
+    source_id                         uuid,
     description                       text,
     posted_at                         timestamptz NOT NULL
 );

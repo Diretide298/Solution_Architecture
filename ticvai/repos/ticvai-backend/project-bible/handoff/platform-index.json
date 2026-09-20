@@ -9,7 +9,7 @@
    "contracts": 17,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 8
+   "operationsWithNoScreen": 12
   },
   "waves": {
    "wave1": 21,
@@ -27,7 +27,7 @@
    "contracts": 17,
    "modules": 16,
    "undrawn": 0,
-   "operationsWithNoScreen": 8
+   "operationsWithNoScreen": 12
   },
   "waves": {
    "wave1": 20,
@@ -45,7 +45,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 178
+   "operationsWithNoScreen": 184
   },
   "waves": {
    "wave1": 27,
@@ -62,7 +62,7 @@
    "contracts": 8,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 7
+   "operationsWithNoScreen": 11
   },
   "waves": {
    "wave2": 17
@@ -78,7 +78,7 @@
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 165
+   "operationsWithNoScreen": 171
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 42
+   "operationsWithNoScreen": 48
   },
   "waves": {
    "wave1": 11
@@ -112,7 +112,7 @@
    "contracts": 31,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 237
+   "operationsWithNoScreen": 247
   },
   "waves": {
    "wave1": 60,
@@ -130,7 +130,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 205
+   "operationsWithNoScreen": 213
   },
   "waves": {
    "wave1": 12,
@@ -181,7 +181,7 @@
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 86
+   "operationsWithNoScreen": 88
   },
   "waves": {
    "wave2": 2,
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 118
+   "operationsWithNoScreen": 122
   },
   "waves": {
    "wave2": 20,
@@ -248,7 +248,7 @@
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 125
+   "operationsWithNoScreen": 131
   },
   "waves": {
    "wave3": 69

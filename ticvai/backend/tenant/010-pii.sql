@@ -25,7 +25,9 @@ CREATE TABLE IF NOT EXISTS pii.subject (
 CREATE TABLE IF NOT EXISTS pii.subject_biometric (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
-    entitlement_id                    uuid NOT NULL,
+    entitlement_id                    text NOT NULL,
+    kind                              text NOT NULL,
+    retention_anchor                  text,
     source                            text NOT NULL,
     captured_at                       timestamptz NOT NULL,
     consent_purpose_id                uuid,

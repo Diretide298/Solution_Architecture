@@ -2209,6 +2209,94 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /billing-statements:
+    get:
+      operationId: listBillingStatements
+      x-ticvai-audience:
+      - guest
+      - staff
+      summary: What was charged, when, and against which agreement
+      description: '2.14.19-2.14.23, 5.7.96, BL-100. **A guest paying monthly could see their
+        pass and not what they had been charged for it.** Auto-renewal, grace and mandates all
+        existed; the record a guest reads was the piece missing.
+
+        **A statement is not a tax invoice.** `isTaxInvoice` is false and read-only. UAE
+        e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51
+        mandatory fields, and **CF-133 is open on it** — a statement that implied otherwise would
+        be wrong in the one direction with a regulator at the end of it.
+
+        **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying
+        another subject is 403 rather than silently honoured.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Statements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BillingStatement'
+  /billing-statements/{statementId}:
+    get:
+      operationId: getBillingStatement
+      x-ticvai-audience:
+      - guest
+      - staff
+      summary: One statement, with its lines
+      description: 'BL-100. **The lines are the point.** A total with no breakdown is what a guest
+        rings a call centre about, and the call centre has no more than they do.
+
+        **A failed attempt appears as a line.** A statement that shows only successful charges
+        cannot explain why a pass lapsed, which is the question somebody is reading it to answer.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: statementId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingStatement'
   /orders:
     get:
       operationId: listOrders
@@ -10491,6 +10579,85 @@ components:
       - b2b
       - ota
       - callCentre
+    BillingStatementLine:
+      type: object
+      description: >
+        BL-100. **One charge, refund or failed attempt.** Failures are lines rather than omissions
+        — a statement showing only what succeeded cannot explain why a pass lapsed.
+      required:
+      - occurredAt
+      - kind
+      - amount
+      properties:
+        occurredAt:
+          type: string
+          format: date-time
+        kind:
+          type: string
+          enum:
+          - charge
+          - refund
+          - failedAttempt
+          - adjustment
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        description:
+          type: string
+        declineClass:
+          type: string
+          nullable: true
+          description: >
+            **Present on `failedAttempt` only**, and it is what turns *"your payment failed"* into
+            something a guest can act on: a soft decline means try again, a hard one means the
+            card needs replacing.
+
+    BillingStatement:
+      x-ticvai-persistence: none — computed from orders.order_payment and payments.dunning_case
+      type: object
+      description: >
+        2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and
+        deliberately not a tax document.**
+
+        **Computed rather than stored**, because a statement assembled at read time cannot
+        disagree with the ledger it describes. A stored statement is a second source of truth
+        about money, and the package already has one of those.
+      required:
+      - id
+      - periodStart
+      - periodEnd
+      - total
+      - isTaxInvoice
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingStatementLine'
+        total:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        isTaxInvoice:
+          type: boolean
+          default: false
+          readOnly: true
+          description: >
+            **Always false, and stated rather than assumed.** UAE e-invoicing is Peppol
+            five-corner with the FTA as the fifth corner, PINT AE XML and 51 mandatory fields;
+            **CF-133 is open on it and AED 50m+ businesses must appoint an accredited service
+            provider by 30 October 2026.** A statement that implied it was a tax invoice would be
+            wrong in the one direction that has a regulator at the end of it.
+
     TenderKind:
       type: string
       enum:

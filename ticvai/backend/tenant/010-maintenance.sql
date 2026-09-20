@@ -1,4 +1,4 @@
--- maintenance — 9 tables
+-- maintenance — 10 tables
 -- **Derived. Do not hand-edit.**
 
 -- A physical thing with a service history — a lift, a chiller, a ride. Distinct from a resource,
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS maintenance.asset (
     document_refs                     text[],
     id                                uuid PRIMARY KEY,
     resource_id                       uuid,
+    device_id                         uuid,
     acquisition_cost                  numeric(18,4),
     acquired_on                       date,
     depreciation                      jsonb,
@@ -88,19 +89,38 @@ CREATE TABLE IF NOT EXISTS maintenance.incident (
 
 -- A completed check against a template. The responses are children
 CREATE TABLE IF NOT EXISTS maintenance.inspection (
-    id                                text PRIMARY KEY NOT NULL,
-    template_id                       uuid NOT NULL,
     template_name                     text,
-    venue_id                          uuid NOT NULL,
-    asset_id                          uuid,
     outcome                           text NOT NULL,
     failed_item_count                 integer,
     failed_safety_critical_count      integer,
     performed_by_principal_id         uuid NOT NULL,
     performed_at                      timestamptz NOT NULL,
-    recorded_at                       timestamptz,
     synced_at                         timestamptz,
-    retain_until                      date
+    retain_until                      date,
+    id                                text PRIMARY KEY NOT NULL,
+    template_id                       uuid NOT NULL,
+    venue_id                          uuid NOT NULL,
+    asset_id                          uuid,
+    signature_ref                     text,
+    recorded_at                       timestamptz NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS maintenance.inspection_item (
+    key                               text NOT NULL,
+    attachment_refs                   text[],
+    id                                uuid PRIMARY KEY NOT NULL,
+    inspection_id                     text NOT NULL,
+    template_item_id                  uuid,
+    item_key                          text NOT NULL,
+    label                             text,
+    value                             text,
+    passed                            boolean,
+    is_safety_critical                boolean,
+    note                              text,
+    attachment_asset_ids              text[],
+    recorded_at                       timestamptz
 );
 
 -- The questions an inspection asks. Versioned, because changing them changes what past answers
@@ -191,7 +211,7 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
 -- Photo, video, document, note or signature against a work order. Evidence, not decoration —
 -- captured offline and queued Hangs off: a child of maintenance.work_order; reaches
 -- maintenance.asset through its keys; references assets.media_asset, identity.principal,
--- maintenance.work_order. Reached by: 0 operations read it and 1 write it.
+-- maintenance.work_order. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS maintenance.work_order_attachment (
     id                                uuid PRIMARY KEY NOT NULL,
     work_order_id                     text NOT NULL,

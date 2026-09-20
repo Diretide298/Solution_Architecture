@@ -9,20 +9,22 @@
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 237 |
+| Operations with no screen | 247 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 237 operations with no screen here
+### 247 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
+| `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `replaceAccreditationCredential` | accreditation | POST | Reissue after loss, damage or a name change |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
@@ -58,9 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `listInterEntityObligations` | finance | GET | What one entity owes another |
-| … | | | 197 more |
+| … | | | 207 more |
 
 ### 8 modules split across waves
 

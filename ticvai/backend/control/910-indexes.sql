@@ -27,7 +27,7 @@ CREATE INDEX IF NOT EXISTS ix_cell_instance_cell_id ON control.cell_instance (ce
 CREATE INDEX IF NOT EXISTS ix_cell_tenant_cell_id ON control.cell_tenant (cell_id);
 -- convention, not declared: control.cell_tenant.instance_id -> control.cell_instance
 CREATE INDEX IF NOT EXISTS ix_cell_tenant_instance_id ON control.cell_tenant (instance_id);
--- convention, not declared: control.cell_tenant.tenant_id -> platform.tenant
+-- convention, not declared: control.cell_tenant.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_cell_tenant_tenant_id ON control.cell_tenant (tenant_id);
 -- convention, not declared: control.content_block.approved_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_content_block_approved_by_principal_id ON control.content_block (approved_by_principal_id);
@@ -37,13 +37,13 @@ CREATE INDEX IF NOT EXISTS ix_content_block_audience_segment_id ON control.conte
 CREATE INDEX IF NOT EXISTS ix_content_block_page_id ON control.content_block (page_id);
 -- convention, not declared: control.integration_listing.developer_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS ix_integration_listing_developer_id ON control.integration_listing (developer_id);
--- convention, not declared: control.migration_run.canary_tenant_id -> platform.tenant
+-- convention, not declared: control.migration_run.canary_tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_migration_run_canary_tenant_id ON control.migration_run (canary_tenant_id);
 -- convention, not declared: control.migration_run_cell.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_migration_run_cell_cell_id ON control.migration_run_cell (cell_id);
 -- convention, not declared: control.migration_run_tenant.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_migration_run_tenant_cell_id ON control.migration_run_tenant (cell_id);
--- convention, not declared: control.migration_run_tenant.tenant_id -> platform.tenant
+-- convention, not declared: control.migration_run_tenant.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_migration_run_tenant_tenant_id ON control.migration_run_tenant (tenant_id);
 -- convention, not declared: control.onboarding_application.provisioned_tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_onboarding_application_provisioned_tenant_id ON control.onboarding_application (provisioned_tenant_id);
@@ -53,13 +53,15 @@ CREATE INDEX IF NOT EXISTS ix_onboarding_application_requested_plan_id ON contro
 CREATE INDEX IF NOT EXISTS ix_partner_agreement_accepted_by_principal_id ON control.partner_agreement (accepted_by_principal_id);
 -- convention, not declared: control.partner_agreement.branding_asset_id -> assets.media_asset
 CREATE INDEX IF NOT EXISTS ix_partner_agreement_branding_asset_id ON control.partner_agreement (branding_asset_id);
+-- convention, not declared: control.partner_user.partner_id -> control.partner_agreement
+CREATE INDEX IF NOT EXISTS ix_partner_user_partner_id ON control.partner_user (partner_id);
 -- convention, not declared: control.release.created_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_release_created_by_principal_id ON control.release (created_by_principal_id);
 -- convention, not declared: control.rollout.reinventory_hold_id -> wallet.hold
 CREATE INDEX IF NOT EXISTS ix_rollout_reinventory_hold_id ON control.rollout (reinventory_hold_id);
 -- convention, not declared: control.rollout_tenant.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_rollout_tenant_cell_id ON control.rollout_tenant (cell_id);
--- convention, not declared: control.rollout_tenant.tenant_id -> platform.tenant
+-- convention, not declared: control.rollout_tenant.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS ix_rollout_tenant_tenant_id ON control.rollout_tenant (tenant_id);
 -- convention, not declared: control.sandbox.developer_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS ix_sandbox_developer_id ON control.sandbox (developer_id);

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-18",
+ "generated": "21 September 2026",
  "note": "One verdict per matrix row, written during the requirement walk. The package could show that every operation resolves and never that every requirement was designed against — 190 of 3,156 references were cited anywhere in the contracts, and the 93% coverage figure counted domains rather than requirements. This file is the evidence, and tools/check-traceability.py is what stops it becoming another hand-maintained page.",
  "keyNote": "Keyed on packageRef and xlsxRow together. Twenty-eight references name two different requirements each (CF-120), so the reference alone is not a key — see sources/requirements/reference-map.json.",
  "verdicts": {
@@ -8244,10 +8244,11 @@
    "xlsxRow": 599,
    "section": "2.13",
    "domain": "Ticketing Sales",
-   "verdict": "GAP_CONTRACT",
+   "verdict": "CONTRACTED",
    "contract": "access",
-   "note": "No identity verification. idReader and biometricReader are device kinds and **nothing performs a check** — no document read, no Emirates ID matched against the entitlement holder. access.enrolFacePass enrols a face against an entitlement, which is a different act from verifying a presented document.",
-   "backlog": "BL-096"
+   "note": "BL-096. Matching modelled apart from enrolling: documentToHolder compares a presented document with the entitlement holder, liveCaptureToEnrolment compares a capture with an existing enrolment. IdentityVerification is persistence:none and returns no evidence.",
+   "backlog": "BL-096",
+   "evidence": "verifyIdentity"
   },
   {
    "packageRef": "2.13.42",
@@ -8544,11 +8545,12 @@
    "xlsxRow": 625,
    "section": "2.14",
    "domain": "Ticketing Sales",
-   "verdict": "GAP_CONTRACT",
-   "contract": "orders",
-   "note": "No recurring guest billing — cycles, stored-payment auto-renewal, retry schedules, grace periods, dunning or billing statements. **`subscription` is the Control Plane and bills tenants for the platform**, not guests for memberships. The subscription state model mentions a dunning period and no contract declares one, which is the CF-49 shape.",
+   "verdict": "CONTRACTED",
+   "contract": "payments",
+   "note": "BL-100. All five things the requirement names: attemptOffsetDays is the configurable retry schedule, notifyGuestOnEachAttempt the reminders, graceDays the grace period, terminalAction:suspendBilling the service suspension, and resolveDunningCase the recovery workflow. listDunningCases is the queue a venue works from.",
    "backlog": "BL-100",
-   "cf": "CF-129"
+   "cf": "CF-129",
+   "evidence": "setDunningPolicy"
   },
   {
    "packageRef": "2.14.23",
@@ -8556,11 +8558,12 @@
    "xlsxRow": 626,
    "section": "2.14",
    "domain": "Ticketing Sales",
-   "verdict": "GAP_CONTRACT",
+   "verdict": "CONTRACTED_PARTIAL",
    "contract": "orders",
-   "note": "No recurring guest billing — cycles, stored-payment auto-renewal, retry schedules, grace periods, dunning or billing statements. **`subscription` is the Control Plane and bills tenants for the platform**, not guests for memberships. The subscription state model mentions a dunning period and no contract declares one, which is the CF-49 shape.",
+   "note": "BL-100. Statements, payment history and credits are contracted; BillingStatementLine carries charge, refund, failedAttempt and adjustment, and getBillingStatement returns the lines. **Not whole: no downloadable PDF and no tax breakdown.** The tax half is CF-133 -- a statement is deliberately not a tax invoice (isTaxInvoice false, read-only).",
    "backlog": "BL-100",
-   "cf": "CF-129"
+   "cf": "CF-129",
+   "evidence": "listBillingStatements"
   },
   {
    "packageRef": "2.15.1",
@@ -9134,10 +9137,10 @@
    "xlsxRow": 675,
    "section": "3.2",
    "domain": "Admission and Access",
-   "verdict": "CONTRACTED_PARTIAL",
+   "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "enrolFacePass",
-   "note": "FacePassEnrolment binds a face to an entitlement with consent purpose and guardian. **Turning biometric checking on or off per ticket type is not a setting** — enrolment is per entitlement, not per product.",
+   "evidence": "AdmissionRules",
+   "note": "BL-105. perProductRules[].biometricPolicy is disabled | offered | preferred per product, which is the activate/deactivate the requirement asks for. No `required` -- a biometric a guest cannot refuse without losing a ticket they paid for is not voluntary consent under PDPL. Inert while VenueSettings.biometrics.isEnabled is false.",
    "backlog": "BL-105"
   },
   {
@@ -9521,11 +9524,12 @@
    "xlsxRow": 710,
    "section": "3.2",
    "domain": "Admission and Access",
-   "verdict": "GAP_CONTRACT",
+   "verdict": "CONTRACTED_PARTIAL",
    "contract": "access",
-   "note": "**Face Tag — temporary facial storage discarded when the ticket expires — is not modelled.** FacePassEnrolment has expiresAt and isActive but no distinction between an enduring enrolment and a same-day tag, and the retention rule differs sharply between them under PDPL.",
+   "note": "BL-106. BiometricKind.faceTag is its own kind with its own retention anchor, registrable at a ticket counter or an entry gate, purged at close of the operating day. **Deliberate deviation: the requirement says Face Tag `does not require the customer to explicitly sign a consent form` and the package requires consent anyway.** PDPL Article 4 admits no legitimate-interests basis, so a short retention shortens what the consent is for rather than removing the need for it. Recorded on CF-35.",
    "backlog": "BL-106",
-   "cf": "CF-35"
+   "cf": "CF-35",
+   "evidence": "enrolFaceTag"
   },
   {
    "packageRef": "3.2.45",

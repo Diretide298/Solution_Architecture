@@ -9,12 +9,12 @@
 | Contracts | 17 |
 | Modules | 16 |
 | Undrawn | 0 |
-| Operations with no screen | 8 |
+| Operations with no screen | 12 |
 | Waves | wave1 20 · wave2 35 · wave3 16 |
 
 ## Gaps
 
-### 8 operations with no screen here
+### 12 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,7 +26,11 @@
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
 | `listCustomerBadges` | marketing-crm | GET | Badges a guest holds |
+| `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
+| `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
+| `getBillingStatement` | orders | GET | One statement, with its lines |
+| `listBillingStatements` | orders | GET | What was charged, when, and against which agreement |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ### 6 modules split across waves

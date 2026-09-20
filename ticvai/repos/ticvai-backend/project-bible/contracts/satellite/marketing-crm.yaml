@@ -2358,6 +2358,117 @@ paths:
                       so the interface can warn before it happens.
 
                       '
+  /loyalty/leaderboard:
+    get:
+      operationId: listLeaderboard
+      x-ticvai-audience:
+      - guest
+      summary: Standings, by nickname
+      description: '22.6. **Everyone on the board is a nickname.** A leaderboard shows one guest
+        something about another, so the entry carries a rank, a nickname and a score and **no
+        subject identifier** — a nickname beside an id the client can resolve elsewhere is
+        decoration over a disclosure.
+
+        **The caller''s own row is marked `isMe` rather than named**, which is how a client
+        highlights it without being told who anybody else is.
+
+        **A guest who has not set a nickname appears as a rank with no name.** Not hidden — the
+        standings would be wrong and a board that omits people lies about who is second — and
+        **never filled in from their real name**, which is the disclosure this exists to prevent
+        and would arrive silently on the day they first placed.
+
+        '
+      tags:
+      - loyalty
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: tenant
+      security:
+      - guestAuth: []
+      parameters:
+      - name: programmeId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: window
+        in: query
+        description: '**Monthly, confirmed 20 September.** `week` and `season` remain available and
+          the product runs on `month`.
+
+          **Bounded on purpose** — an all-time board is won once and then stops being a reason to
+          come back.'
+        schema:
+          type: string
+          enum: [week, month, season]
+          default: month
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Standings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaderboardEntry'
+  /loyalty/leaderboard-nickname:
+    put:
+      operationId: setLeaderboardNickname
+      x-ticvai-audience:
+      - guest
+      summary: Choose the name shown on the board
+      description: '22.6. **The guest''s own choice, and the only name a leaderboard ever shows.**
+        Offered whenever they reach the board, and changeable afterwards.
+
+        **Setting it is the consent.** Nothing here reads `pii.subject`: a display name held in
+        the PII vault was given for a different purpose, and reusing it on a public board is a
+        use nobody agreed to.
+
+        **Length and pattern bounded, not moderated.** That stops markup and impersonating
+        whitespace and stops nothing else — **a nickname impersonating staff needs a review
+        queue**, which is a product decision rather than a field constraint.
+
+        '
+      tags:
+      - loyalty
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      security:
+      - guestAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - nickname
+              properties:
+                nickname:
+                  type: string
+                  minLength: 2
+                  maxLength: 24
+                  pattern: '^[\p{L}\p{N}][\p{L}\p{N} _.-]{0,22}[\p{L}\p{N}]$'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyPosition'
+        '409':
+          description: Refused by moderation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /guests:
     get:
       operationId: searchGuests
@@ -13806,6 +13917,48 @@ components:
           nullable: true
         isActive:
           type: boolean
+    LeaderboardEntry:
+      x-ticvai-persistence: none — computed from marketing.loyalty_position
+      type: object
+      description: >
+        22.6. **One row of a leaderboard, and deliberately not enough to identify anybody.**
+        There is no `subjectId` here and that is the whole design: a nickname beside a resolvable
+        identifier protects nothing.
+      required:
+      - rank
+      - nickname
+      - points
+      properties:
+        rank:
+          type: integer
+          minimum: 1
+        nickname:
+          type: string
+          description: >
+            **Always present, and never their real name.** The guest's chosen
+            `leaderboardNickname` where they have set one, and otherwise a generated
+            `Player-4821`.
+
+            **Not nullable, because a rank with no name is a hole on the board.** The first cut
+            of this returned null and left second place reading as a dash, which tells somebody
+            they do not count every time they look — and being on the board is the whole point of
+            the board.
+
+            **Generated from the loyalty position's own id**, not from the subject id and not
+            from a counter: it is stable across months, so the same guest is the same
+            `Player-N` and can be congratulated by it, and it carries nothing — no rank, no join
+            date, and no sequence anybody can count backwards from to learn how many guests a
+            programme has.
+        points:
+          type: integer
+        isMe:
+          type: boolean
+          default: false
+          description: >
+            **How a client highlights the caller's own row without learning who anybody else
+            is.** The alternative — returning identifiers and letting the client match — is the
+            disclosure this schema exists to avoid.
+
     LoyaltyPosition:
       x-ticvai-persistence: marketing.loyalty_position
       type: object
@@ -13815,6 +13968,23 @@ components:
       - pointsBalance
       - tierCode
       properties:
+        leaderboardNickname:
+          type: string
+          nullable: true
+          maxLength: 24
+          description: >
+            BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever
+            they reach the board and changeable afterwards; `setLeaderboardNickname` is the only
+            thing that writes it.
+
+            **Null means the guest has not chosen one yet, and the board shows a generated
+            `Player-4821` in its place** — never `pii.subject.display_name`, which would
+            disclose silently on the day a guest first placed and is the case this field exists
+            to prevent.
+
+            **The generated name is computed at read time and not stored here.** Writing it would
+            make *"has this guest chosen a name"* unanswerable, and that flag is what the
+            prompt-on-reaching-the-board depends on.
         subjectId:
           type: string
           format: uuid

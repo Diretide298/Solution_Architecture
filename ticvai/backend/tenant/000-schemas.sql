@@ -6,7 +6,7 @@
 -- **ADR-0038 left that decomposition untouched** — what changed is that this set now
 -- exists once per tenant rather than once for everybody.
 --
--- 584 tables. Applied to every tenant database by provision-tenant.sh.
+-- 572 tables. Applied to every tenant database by provision-tenant.sh.
 --
 -- **`control` is not here.** It left the template in ADR-0039 and the count went 26 to 25.
 

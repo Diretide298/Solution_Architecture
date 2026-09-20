@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS promotions.bundle (
 
 -- Pick n from a set. The bundle price does not move with the choice (ADR-0019) — the allocation
 -- does Hangs off: a child of promotions.bundle; reaches promotions.promotion through its keys;
--- references promotions.bundle.
+-- references promotions.bundle. Reached by: 4 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS promotions.bundle_choice_group (
     id                                uuid PRIMARY KEY,
     label                             text NOT NULL,

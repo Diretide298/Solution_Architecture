@@ -2212,9 +2212,6 @@ paths:
   /billing-statements:
     get:
       operationId: listBillingStatements
-      x-ticvai-consumed-by:
-        - "P01 WEB-018 My Tickets"
-        - "P02 GST-012 My Tickets"
       x-ticvai-audience:
       - guest
       - staff
@@ -2266,9 +2263,6 @@ paths:
   /billing-statements/{statementId}:
     get:
       operationId: getBillingStatement
-      x-ticvai-consumed-by:
-        - "P01 WEB-018 My Tickets"
-        - "P02 GST-012 My Tickets"
       x-ticvai-audience:
       - guest
       - staff

@@ -1794,11 +1794,11 @@ because most boards carry each anchor twice (see Part 3).
 | 89 | Dashboards Board | wireframes | pack | yes | P01 P09 P10 P12 | 10 | 5 | 5 | 0 | yes | 98846 | 2026-08-31 |
 | 90 | Park POS | designs | single | yes | — | 0 | 0 | 0 | 0 | no | 121145 | 2026-08-25 |
 | 91 | Park POS | designs | single | yes | — | 0 | 0 | 0 | 0 | no | 46665 | 2026-08-25 |
-| 92 | Aster Invite | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 11128 | 2026-08-31 |
-| 93 | Aster Invite Day | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 11430 | 2026-08-31 |
-| 94 | Aster Landing | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 22309 | 2026-08-31 |
-| 95 | Aster Sign In | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 18810 | 2026-08-31 |
-| 96 | Aster Sign In Day | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 19106 | 2026-08-31 |
+| 92 | Adam Invite | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 11128 | 2026-08-31 |
+| 93 | Adam Invite Day | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 11430 | 2026-08-31 |
+| 94 | Adam Landing | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 22309 | 2026-08-31 |
+| 95 | Adam Sign In | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 18810 | 2026-08-31 |
+| 96 | Adam Sign In Day | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 19106 | 2026-08-31 |
 | 97 | Viewer Redesign - Topbar | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 68894 | 2026-08-31 |
 | 98 | Viewer Redesign - Topbar Night | ui-design | single | yes | — | 0 | 0 | 0 | 0 | no | 68962 | 2026-08-31 |
 | 99 | TICVAI All Boards Index | wireframes | index | yes | — | 0 | 0 | 0 | 0 | no | 970754 | 2026-08-31 |

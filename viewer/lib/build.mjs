@@ -126,7 +126,7 @@ const STAGES = [
     key: 'workbooks', act: 'design', label: 'Both workbooks',
     tools: ['build-schema-workbook', 'build-services-workbook'],
     writes: [
-      'TICVAI_Schema_Reference.xlsx', 'handoff/TICVAI_Schema_Reference.xlsx',
+      'handoff/TICVAI_Schema_Reference.xlsx',
       'handoff/TICVAI_Services_and_Data_Segregation.xlsx',
     ],
     figure: { of: 'files', glob: 'handoff/TICVAI_*.xlsx', unit: 'workbooks' },

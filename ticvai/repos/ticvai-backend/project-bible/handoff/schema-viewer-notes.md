@@ -2,14 +2,14 @@
 
 **Why clicking a catalogue table takes you to `platform`.**
 
-Re-measured 20 September against 623 tables and 1,349 edges. Every number below comes from
+Re-measured 21 September against 625 tables and 1,352 edges. Every number below comes from
 `handoff/relationships.csv` and `handoff/schema-reference.json`; run `tools/derive-relationships.py`
 to reproduce them.
 
 ## The cause is the data, not the viewer
 
-`identity.principal` is the target of **143 edges**. `platform.scope` of **94**. `pii.subject`
-of **68**. (Previously 108, 72 and 55 at 564 tables, and 69, 64 and 25 at 378. **The order of
+`identity.principal` is the target of **144 edges**. `platform.scope` of **94**. `pii.subject`
+of **69**. (Previously 108, 72 and 55 at 564 tables, and 69, 64 and 25 at 378. **The order of
 the three has never changed and neither has the shape of the problem.**)
 
 **`platform.org_unit` is now `platform.scope`** — the earlier drafts of this file name a table
@@ -84,7 +84,7 @@ appears in no contract, migration or workbook — only in derived handoff artefa
 copied it forward. It is also invisible to `audit-unwired-tables`, which classifies tables from
 the column reference and never sees a table that exists only in storage.
 
-**66 of 623 tables carry no edge at all.** `derive-relationships` reports 70 of 627 because its
+**67 of 625 tables carry no edge at all.** `derive-relationships` reports 71 of 629 because its
 table set includes the four column-less storage tables above.
 
 ## What a good default view looks like

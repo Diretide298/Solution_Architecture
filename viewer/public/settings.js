@@ -23,6 +23,7 @@ import {
   saveOpenProjectToken, forgetOpenProjectToken,
   changePassword, signOut, logoutAll, project,
 } from '/validation.js';
+import { followSections } from '/sections.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -134,25 +135,9 @@ async function load() {
   return state;
 }
 
-/** Marks the section being read in the list on the left. */
-function followScroll() {
-  const links = new Map(
-    [...document.querySelectorAll('.set-nav a[href^="#"]')].map((a) => [a.getAttribute('href').slice(1), a]),
-  );
-  const mark = (id) => {
-    for (const [key, link] of links) link.setAttribute('aria-current', String(key === id));
-  };
-  for (const [id, link] of links) link.addEventListener('click', () => mark(id));
-
-  const watcher = new IntersectionObserver((entries) => {
-    const showing = entries.filter((e) => e.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-    if (showing.length) mark(showing[0].target.id);
-  }, { rootMargin: '-90px 0px -55% 0px' });
-  for (const section of document.querySelectorAll('.set-section')) watcher.observe(section);
-
-  mark(location.hash.slice(1) || 'account');
-}
+/** Marks the section being read in the list on the left. Shared with the admin
+ *  and tasks pages, which are the same page shape. */
+const followScroll = () => followSections('account');
 
 function wirePassword() {
   $('pw-submit').addEventListener('click', async () => {

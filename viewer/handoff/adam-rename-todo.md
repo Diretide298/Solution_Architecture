@@ -137,3 +137,29 @@ it can be cut from `adam_light.png` the same way.
 `aster/ticvai` in prose became `adam/ticvai`, but the delivery package itself
 is under a one-writer protocol and was not touched. Anything the package needs
 belongs in a diff in `viewer/handoff/`, not in an edit.
+
+### 18 September: `ticvai/ui-design/` was renamed in place
+
+The design handoff was the last of the old name outside this file, and it was
+renamed directly rather than as a diff. It is a specification of the viewer's
+own chrome, not contracts, screens or flows — nothing generates it and nothing
+reads it at runtime — so the one-writer rule above did not have anything to
+protect. **The rest of the package still stands behind that rule.**
+
+What moved: the six `Aster *.dc.html` design references and the sixteen
+`brand/aster-*` assets (both the `assets/` and `designs/` copies) took the Adam
+name, along with the prose in `README.md`, `AUTH.md`, `INVITE.md`, `LANDING.md`
+and the `DAY_FILES` set in `repalette.py`. The file-local CSS keyframes went
+with them — `asterRise`, `asterHint`, `aster-caret` and the seven topbar
+animations are defined and used inside one file each, so the rename cannot
+reach past it.
+
+Two consumers name those files and were rewritten in the same pass:
+`docs/active/board-count-handoff.md` and the `Aster *` exclusion note in
+`tools/derive-wireframes.py` — in the source and in all six `repos/*` mirrors —
+plus `viewer/handoff/board-list.csv` and `worklists-itemised.md`, which list
+the design files by name.
+
+**Sections 1 and 2 above are still open, and still deliberate.** The hostnames
+and the four storage keys are the only `aster` left in the tree; everything a
+reader sees now says Adam.

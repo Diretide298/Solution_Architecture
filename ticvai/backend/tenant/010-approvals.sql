@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 2 operations read it and 1 write it.
+-- identity.principal. Reached by: 7 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
     id                                uuid PRIMARY KEY,
     level                             integer NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision_record (
 
 -- Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody
 -- remembers Hangs off: reaches approvals.request through its keys; references identity.principal.
--- Reached by: 4 operations read it and 2 write it; 1 tables reference it.
+-- Reached by: 5 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.delegation (
     id                                uuid PRIMARY KEY,
     delegator_principal_id            uuid NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
 -- off: a root — nothing above it in its schema; references identity.principal, pii.subject.
--- Reached by: 6 operations read it and 8 write it; 16 tables reference it; written by 3 contracts
+-- Reached by: 7 operations read it and 8 write it; 16 tables reference it; written by 3 contracts
 -- — approvals, subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 );
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
--- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 5
+-- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 6
 -- operations read it and 1 write it; 5 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,

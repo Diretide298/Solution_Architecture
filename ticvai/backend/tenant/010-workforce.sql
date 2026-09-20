@@ -3,7 +3,7 @@
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
 -- workforce.employee through its keys; references identity.principal, platform.scope. Reached by:
--- 2 operations read it and 2 write it; 1 tables reference it.
+-- 3 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.announcement (
     id                                uuid PRIMARY KEY,
     title                             text NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
 
 -- Who actually turned up. occurredAt and recordedAt are both kept — a steward clocking in offline
 -- is not late because the sync was Hangs off: reaches workforce.employee through its keys;
--- references access.access_point, identity.principal, platform.scope. Reached by: 2 operations
+-- references access.access_point, identity.principal, platform.scope. Reached by: 3 operations
 -- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.attendance (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
 CREATE TABLE IF NOT EXISTS workforce.employee (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
-    user_id                           uuid,
+    principal_id                      uuid,
     code                              text NOT NULL,
     first_name                        text NOT NULL,
     last_name                         text NOT NULL,
@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS workforce.employment (
     created_at                        timestamptz NOT NULL
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.field_ownership (
     id                                uuid PRIMARY KEY,
     table_name                        text NOT NULL,
@@ -94,6 +96,8 @@ CREATE TABLE IF NOT EXISTS workforce.field_ownership (
     scope_path                        text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.integration_source (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -144,7 +148,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
     half_day                          boolean,
     reason                            text,
     status                            text,
-    approval_request_id               uuid,
+    approval_request_id               text,
     scope_path                        text
 );
 
@@ -184,7 +188,7 @@ CREATE TABLE IF NOT EXISTS workforce.open_shift (
 
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
 -- on a rota never touch a till Hangs off: reaches workforce.employee through its keys; references
--- identity.principal, identity.role, platform.scope. Reached by: 6 operations read it and 2 write
+-- identity.principal, identity.role, platform.scope. Reached by: 7 operations read it and 2 write
 -- it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     overtime_minutes                  integer,
@@ -223,7 +227,7 @@ CREATE TABLE IF NOT EXISTS workforce.shift (
 
 -- Both parties agree before the supervisor sees it. Routed through approvals rather than a second
 -- mechanism Hangs off: reaches workforce.employee through its keys; references approvals.request,
--- identity.principal, workforce.rota_assignment. Reached by: 1 operations read it and 1 write it.
+-- identity.principal, workforce.rota_assignment. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS workforce.shift_swap (
     id                                uuid PRIMARY KEY NOT NULL,
     assignment_id                     uuid NOT NULL,
@@ -264,6 +268,8 @@ CREATE TABLE IF NOT EXISTS workforce.staffing_rules (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
     id                                uuid PRIMARY KEY,
     source_id                         uuid NOT NULL,
@@ -280,6 +286,8 @@ CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
     scope_path                        text
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.sync_run (
     id                                uuid PRIMARY KEY,
     source_id                         uuid NOT NULL,

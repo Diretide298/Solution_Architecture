@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 173 operations
+title: orders — 175 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -535,6 +535,17 @@ operations:
   - orders.b2b_credit
   - orders.credit_override
   writes: []
+- operation: getBillingStatement
+  verb: GET
+  path: /billing-statements/{statementId}
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getCart
   verb: GET
   path: /carts/{cartId}
@@ -752,6 +763,17 @@ operations:
   scope: venue
   permission: ORDER_VIEW
   audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBillingStatements
+  verb: GET
+  path: /billing-statements
+  scope: tenant
+  permission: null
+  audience:
+  - guest
   - staff
   offline: false
   reads: []

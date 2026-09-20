@@ -34,7 +34,7 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 61
+    operations: 63
     tables: 30
     schemas:
     - identity
@@ -66,8 +66,8 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 227
-    tables: 56
+    operations: 233
+    tables: 58
     schemas:
     - orders
     - payments
@@ -80,7 +80,7 @@ tiers:
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
-    operations: 180
+    operations: 182
     tables: 10
     schemas:
     - access
@@ -183,7 +183,7 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 203
+    operations: 205
     tables: 62
     schemas:
     - marketing
@@ -329,7 +329,7 @@ crossServiceWrites:
 - from: AccessService
   to: IdentityService
   writes: 2
-  reads: 9
+  reads: 10
   kind: ordinary
 - from: CatalogueService
   to: TenancyService

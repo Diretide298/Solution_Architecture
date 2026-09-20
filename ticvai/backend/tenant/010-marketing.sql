@@ -1,4 +1,4 @@
--- marketing — 61 tables
+-- marketing — 62 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
 -- One message. The sender is resolved, never declared, and the assistant is labelled as one — a
 -- guest talking to a bot that presents as a person is a complaint waiting to happen Hangs off: a
 -- child of marketing.conversation; reaches marketing.guest_profile through its keys; references
--- ai.activity, identity.principal, marketing.conversation. Reached by: 1 operations read it and 1
+-- ai.activity, identity.principal, marketing.conversation. Reached by: 7 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -309,7 +309,8 @@ CREATE TABLE IF NOT EXISTS marketing.form_definition (
 
 -- The acceptance record, and it is evidence (2.15.13). Bound to the version accepted, not to the
 -- form. Hangs off: reaches marketing.guest_profile through its keys; references
--- assets.media_asset, pii.subject. Reached by: 2 operations read it and 1 write it.
+-- assets.media_asset, marketing.form_definition, pii.subject. Reached by: 3 operations read it and
+-- 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.form_submission (
     id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,
@@ -541,7 +542,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey_step (
 -- A staff member acting on a kiosk session remotely (2.1.25). The guest can always see it and
 -- always end it — assistance a guest cannot stop is surveillance Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, orders.cart,
--- platform.device. Reached by: 1 operations read it and 2 write it; 1 tables reference it.
+-- platform.device. Reached by: 2 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS marketing.kiosk_assist_session (
     id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid NOT NULL,
@@ -607,10 +608,12 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_points (
 
 -- Where a guest stands — points, tier, progress. A balance, not a history
 CREATE TABLE IF NOT EXISTS marketing.loyalty_position (
+    leaderboard_nickname              text,
     subject_id                        uuid NOT NULL,
     programme_id                      uuid NOT NULL,
     points_balance                    integer NOT NULL,
     lifetime_points                   integer,
+    tier_id                           uuid,
     tier_code                         text NOT NULL,
     tier_name                         text,
     points_to_next_tier               integer,
@@ -738,6 +741,20 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_incident (
     scope_path                        text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.programme_tier (
+    id                                uuid PRIMARY KEY,
+    loyalty_programme_id              uuid NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    rank                              integer NOT NULL,
+    min_lifetime_points               integer,
+    retain_lifetime_points            integer,
+    validity_months                   integer,
+    is_active                         boolean
+);
+
 -- A referral code and its reward (BL-034). The reward is conditional on the referred guest doing
 -- something, not on the referral being sent
 CREATE TABLE IF NOT EXISTS marketing.referral (
@@ -795,7 +812,7 @@ CREATE TABLE IF NOT EXISTS marketing.review_response (
     review_id                         uuid NOT NULL,
     text                              text NOT NULL,
     status                            text NOT NULL,
-    responded_by_user_id              uuid,
+    responded_by_principal_id         uuid,
     responded_at                      timestamptz NOT NULL,
     updated_at                        timestamptz
 );
@@ -845,7 +862,7 @@ CREATE TABLE IF NOT EXISTS marketing.segment (
 );
 
 -- One condition in a segment rule. Hangs off: a child of marketing.segment; reaches
--- marketing.guest_profile through its keys; references marketing.segment. Reached by: 4 operations
+-- marketing.guest_profile through its keys; references marketing.segment. Reached by: 7 operations
 -- read it and 4 write it.
 CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     segment_id                        uuid NOT NULL,

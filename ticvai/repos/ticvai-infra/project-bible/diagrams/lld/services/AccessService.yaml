@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 180 operations, 10 tables
+title: AccessService — 182 operations, 10 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 180
+  operations: 182
   inAFlow: 17
   percent: 57%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: access.entitlement
 operationsByContract:
 - contract: access
-  count: 180
+  count: 182
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -80,6 +80,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: enrolFaceTag
+    verb: POST
+    path: /face-tag/enrolments
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getAccessPoint
     verb: GET
     path: /access-points/{accessPointId}
@@ -1464,6 +1472,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 2
+  - operation: verifyIdentity
+    verb: POST
+    path: /identity-verifications
+    scope: venue
+    permission: ACCESS_VALIDATE
+    offline: false
+    reads: 0
+    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1553,7 +1569,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 8
+  operations: 9
 - service: CatalogueService
   operations: 7
 - service: OrderService

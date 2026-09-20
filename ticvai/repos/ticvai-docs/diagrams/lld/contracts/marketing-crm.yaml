@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 203 operations
+title: marketing-crm — 205 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -1170,6 +1170,16 @@ operations:
   reads:
   - marketing.journey
   writes: []
+- operation: listLeaderboard
+  verb: GET
+  path: /loyalty/leaderboard
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: listLostItems
   verb: GET
   path: /lost-items
@@ -2130,6 +2140,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: setLeaderboardNickname
+  verb: PUT
+  path: /loyalty/leaderboard-nickname
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.loyalty_position
   writes: []
 - operation: setLocalizationBrandingCustomer
   verb: PUT

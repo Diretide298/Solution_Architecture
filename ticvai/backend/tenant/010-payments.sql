@@ -1,4 +1,4 @@
--- payments — 23 tables
+-- payments — 25 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -64,13 +64,38 @@ CREATE TABLE IF NOT EXISTS payments.currency_rule (
 CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     id                                uuid PRIMARY KEY,
     deposit_id                        uuid NOT NULL,
-    payment_id                        uuid,
+    payment_id                        text,
     type                              text NOT NULL,
     amount                            numeric(18,4) NOT NULL,
     reason                            text,
-    created_by_user_id                uuid,
+    created_by_principal_id           uuid,
     occurred_at                       timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payments.dunning_case (
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid,
+    order_id                          text,
+    amount                            numeric(18,4),
+    state                             text NOT NULL,
+    decline_class                     text,
+    attempts_made                     integer NOT NULL,
+    next_attempt_at                   timestamptz,
+    first_failed_at                   timestamptz NOT NULL,
+    resolved_at                       timestamptz,
+    resolution                        text,
+    scope_path                        text
+);
+
+CREATE TABLE IF NOT EXISTS payments.dunning_policy (
+    id                                uuid PRIMARY KEY,
+    max_attempts                      integer NOT NULL,
+    attempt_offset_days               text[],
+    minimum_hours_between_attempts    integer,
+    notify_guest_on_each_attempt      boolean,
+    terminal_action                   text NOT NULL,
+    scope_path                        text
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing

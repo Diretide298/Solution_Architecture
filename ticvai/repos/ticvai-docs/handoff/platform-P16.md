@@ -9,20 +9,22 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 125 |
+| Operations with no screen | 131 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 125 operations with no screen here
+### 131 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
+| `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
@@ -58,9 +60,7 @@
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
-| `getMembership` | identity | GET | A membership with its history, usage and renewals |
-| … | | | 85 more |
+| … | | | 91 more |
 
 ## Modules
 

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/index-packs.py",
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "One record per client document under `sources/`, keyed by content hash. **The folder a document sat in was the only record of what it meant** \u2014 this makes that a field. `authority` keeps every rank any location gave it, and `platforms` is derived twice from independent evidence: `platformsConfirmed` is where the contracts and the pack's own screens agree.",
  "counts": {
   "documents": 112,
@@ -493,7 +493,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Access Control Module_Reference.pdf",
@@ -654,7 +654,7 @@
    "packScreensMatched": 120,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "ACCREDITATION.pdf",
@@ -688,7 +688,7 @@
    "packScreensMatched": 80,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "AI_Configuration_Assistant_Reference.pdf",
@@ -722,7 +722,7 @@
    "packScreensMatched": 30,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
@@ -756,7 +756,7 @@
    "packScreensMatched": 20,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "AI_Governance_Reference.pdf",
@@ -790,7 +790,7 @@
    "packScreensMatched": 40,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Approval_Workflows_and_Governance_Reference.pdf",
@@ -830,7 +830,7 @@
    "packScreensMatched": 80,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "B2B, Reseller & OTA Partner Management_Reference.pdf",
@@ -905,7 +905,7 @@
    "packScreensMatched": 30,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch01_Executive_Overview_v1_4.docx",
@@ -933,7 +933,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch02_Technical_Architecture_v1_4.docx",
@@ -961,7 +961,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch03_Functional_Domain_Coverage_v1_4.docx",
@@ -989,7 +989,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch04_Finance_and_Commerce_v1_4.docx",
@@ -1017,7 +1017,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch05_AI_and_Intelligence_v1_4.docx",
@@ -1045,7 +1045,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch06_Integrations_and_Infrastructure_v1_4.docx",
@@ -1073,7 +1073,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch07_Security_Offline_Mobile_v1_4.docx",
@@ -1101,7 +1101,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch08_Implementation_and_Delivery_v1_4.docx",
@@ -1129,7 +1129,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ch09_Platform_Vision_v1_4.docx",
@@ -1157,7 +1157,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Communication & Notification Platform Services_Reference.pdf",
@@ -1209,7 +1209,7 @@
    "packScreensMatched": 10,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Customer Service_Reference.pdf",
@@ -1270,7 +1270,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Dev01_Engineering_Handbook_v1_0.docx",
@@ -1298,7 +1298,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
@@ -1326,7 +1326,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Dev03_Local_Development_Environment_v1_0.docx",
@@ -1354,7 +1354,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Digital Asset Management DAM.pdf",
@@ -1388,7 +1388,7 @@
    "packScreensMatched": 40,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Email_Attachments_TICVAI.xlsx",
@@ -1417,7 +1417,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Email_Attachments_TICVAI.xlsx",
@@ -1445,7 +1445,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Entitlement Lifecycle.pdf",
@@ -1473,7 +1473,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
@@ -1510,7 +1510,7 @@
    "packScreensMatched": 33,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "F&B Dashboard Screens v1.0.pdf",
@@ -1541,7 +1541,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
@@ -1581,7 +1581,7 @@
    "packScreensMatched": 20,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Game_and_Ride_Module.pdf",
@@ -1615,7 +1615,7 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
@@ -1673,7 +1673,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Inventory_Procurement_Dashboard_Screens.pdf",
@@ -1701,7 +1701,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -1735,7 +1735,7 @@
    "packScreensMatched": 120,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Marketing_CRM_Dashboard_Screens v1.0.pdf",
@@ -1763,7 +1763,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Membership___Annual_Pass_Management_Reference.pdf",
@@ -1825,7 +1825,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
@@ -1853,7 +1853,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "MultiTenant_Hierarchy_Diagram.png",
@@ -1881,7 +1881,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Order___Reservation_Management_Reference.pdf",
@@ -1952,7 +1952,7 @@
    "packScreensMatched": 30,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Payment_Payment_Orchestration.pdf",
@@ -1986,7 +1986,7 @@
    "packScreensMatched": 80,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Pricing___Revenue_Management_Reference.pdf",
@@ -2098,7 +2098,7 @@
    "packScreensMatched": 70,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Privacy__Consent___Preference_Management_Reference.pdf",
@@ -2159,7 +2159,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
@@ -2219,7 +2219,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Promotions___Bundles_Management_Reference.pdf",
@@ -2360,7 +2360,7 @@
    "packScreensMatched": 100,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Rental_Management.pdf",
@@ -2397,7 +2397,7 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Resource_Management_Configuration_Reference.pdf",
@@ -2437,7 +2437,7 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Retail_Backend_Structure_Module_Reference_v1.0.pdf",
@@ -2468,7 +2468,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Retail_Dashboard_Screens_Only.pdf",
@@ -2496,7 +2496,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
@@ -2558,7 +2558,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Sales_Channel_Management_Reference.pdf",
@@ -2620,7 +2620,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Sample - Technical Product Sheet.xlsx",
@@ -2651,7 +2651,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "SampleAmpitheater_Seating_1.pdf",
@@ -2683,7 +2683,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Seat_Management_Dashboard_Screens_Reference.pdf",
@@ -2711,7 +2711,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
@@ -2751,7 +2751,7 @@
    "packScreensMatched": 129,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Seating Manifest.xlsx",
@@ -2779,7 +2779,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Seating_Manifest_1.xlsx",
@@ -2807,7 +2807,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -2847,7 +2847,7 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TAIS Platform RFP From Miracle Star Trading.pdf",
@@ -2876,7 +2876,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
@@ -2904,7 +2904,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticket Resale Marketplace_Reference.pdf",
@@ -2972,7 +2972,7 @@
    "packScreensMatched": 30,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
@@ -3020,7 +3020,7 @@
    "packScreensMatched": 10,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticket_Media___Credential_Management_Reference.pdf",
@@ -3088,7 +3088,7 @@
    "packScreensMatched": 30,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
@@ -3116,7 +3116,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI Finance Backend Structure Reference v1.0.pdf",
@@ -3150,7 +3150,7 @@
    "packScreensMatched": 2,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
@@ -3178,7 +3178,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticvai_Design_Vision_Book_v1_1.pdf",
@@ -3206,7 +3206,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
@@ -3234,7 +3234,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Employee_App_UI_Reference_1.pdf",
@@ -3262,7 +3262,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_FnB_POS_Visual_Reference_Revised.pdf",
@@ -3290,7 +3290,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Followup_MoM_31Jul2026.docx",
@@ -3318,7 +3318,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Hardware_Integration v1.0.xlsx",
@@ -3346,7 +3346,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Inventory_and_Procurement_Backend_Structure_Sample v1.0.pdf",
@@ -3377,7 +3377,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Kickoff_MoM_12Aug2026.docx",
@@ -3405,7 +3405,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Kickoff_MoM_2026-08-05.docx",
@@ -3433,7 +3433,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Kickoff_MoM_2026-08-10.docx",
@@ -3461,7 +3461,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Kickoff_MoM_30Jul2026__2_.docx",
@@ -3489,7 +3489,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticvai_matrix_20260621_2.xlsx",
@@ -3517,7 +3517,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Ticvai_matrix_20260621_2_2_2.xlsx",
@@ -3548,7 +3548,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-14.docx",
@@ -3576,7 +3576,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
@@ -3604,7 +3604,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
@@ -3632,7 +3632,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
@@ -3660,7 +3660,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
@@ -3688,7 +3688,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
@@ -3716,7 +3716,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
@@ -3744,7 +3744,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
@@ -3772,7 +3772,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
@@ -3800,7 +3800,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
@@ -3828,7 +3828,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-02_AccessControl.docx",
@@ -3856,7 +3856,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
@@ -3884,7 +3884,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
@@ -3912,7 +3912,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
@@ -3940,7 +3940,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-10_LicensingSubscription.docx",
@@ -3968,7 +3968,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
@@ -3996,7 +3996,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
@@ -4024,7 +4024,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_MoM_31Jul2026__1_.docx",
@@ -4052,7 +4052,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf",
@@ -4083,7 +4083,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf",
@@ -4111,7 +4111,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Resource_Management_All_Screens v1.0.pdf",
@@ -4142,7 +4142,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Task_Track_From_Workshops.xlsx",
@@ -4170,7 +4170,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Task_Track_From_Workshops_1.xlsx",
@@ -4198,7 +4198,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Task_Tracker.xlsx",
@@ -4226,7 +4226,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
@@ -4257,7 +4257,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
@@ -4288,7 +4288,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Ticketing_Configuration_Reference v1.0.jpeg",
@@ -4316,7 +4316,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
@@ -4344,7 +4344,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_UIUX_MoM_03Aug2026.docx",
@@ -4372,7 +4372,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
@@ -4400,7 +4400,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
@@ -4437,7 +4437,7 @@
    "packScreensMatched": 60,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Upsell,CrossSellEngine.pdf",
@@ -4474,7 +4474,7 @@
    "packScreensMatched": 60,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Virtual_Queue.pdf",
@@ -4502,7 +4502,7 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Waiver, Consent & Digital Form Management_Reference.pdf",
@@ -4567,7 +4567,7 @@
    "packScreensMatched": 20,
    "drafted": true,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   },
   {
    "document": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
@@ -4601,7 +4601,7 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
-   "lastSeen": "2026-09-20"
+   "lastSeen": "2026-09-21"
   }
  ]
 }

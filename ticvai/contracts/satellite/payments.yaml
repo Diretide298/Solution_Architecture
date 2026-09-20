@@ -55,8 +55,6 @@ paths:
   /dunning-policy:
     get:
       operationId: getDunningPolicy
-      x-ticvai-consumed-by:
-        - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
       summary: How a failed recurring charge is chased
       description: '2.14.19-2.14.23, BL-100. **Recurring guest billing had auto-renewal and no
         answer for the renewal that fails**, which is the case that actually happens.
@@ -78,8 +76,6 @@ paths:
                 $ref: '#/components/schemas/DunningPolicy'
     put:
       operationId: setDunningPolicy
-      x-ticvai-consumed-by:
-        - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
       summary: Set the retry schedule and what happens when it runs out
       description: '2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes
         and must never share a counter.** `setPaymentFailoverPolicy` governs retry *inside* one
@@ -133,8 +129,6 @@ paths:
   /dunning-cases:
     get:
       operationId: listDunningCases
-      x-ticvai-consumed-by:
-        - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
       summary: Recurring charges currently being chased
       description: '2.14.19-2.14.23, BL-100. **The work queue, and the number a venue actually
         manages by.** A dunning policy with no view of what it is doing is a schedule running in
@@ -170,8 +164,6 @@ paths:
   /dunning-cases/{caseId}/resolve:
     post:
       operationId: resolveDunningCase
-      x-ticvai-consumed-by:
-        - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
       summary: Stop chasing, with a reason
       description: 'BL-100. **The manual exit, and it is an operation rather than a status edit
         because somebody has to own it.** A guest who paid at a counter, a card replaced over the
@@ -1596,6 +1588,26 @@ components:
           - writeOff
           - cancelledByGuest
           - null
+        resolutionNote:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: >
+            **What `resolveDunningCase` was told, which had nowhere to land until now.** The enum
+            above tells `writeOff` from `cardReplaced`; **which invoice, whose phone call and on
+            what authority is the sentence beside it**, and the operation's own reasoning — that
+            these reasons must be told apart afterwards — only works if the sentence survives.
+
+            **Same shape as `marketing.case.resolution_note`**, which is a RAG source for exactly
+            this reason: a resolution note is the most useful free text a support record holds.
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: >
+            **Who closed it.** A write-off with no name against it is the one resolution nobody
+            can follow up, and it is also the one that moves money.
         scopePath:
           type: string
           description: >

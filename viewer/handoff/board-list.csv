@@ -73,11 +73,11 @@ path,board,folder,kind,in_git,platforms,raw_id_matches,frames,claimed,unclaimed,
 "wireframes/Seat Board 2.dc.html","Seat Board 2",wireframes,pack,yes,"P08",10,7,5,2,yes,113050,2026-08-31
 "wireframes/Seat Board 3.dc.html","Seat Board 3",wireframes,pack,yes,"P01 P04 P10",8,6,4,2,yes,76826,2026-08-31
 "wireframes/Seat Board 1.dc.html","Seat Board 1",wireframes,pack,yes,"P08",6,4,3,1,yes,70498,2026-08-31
-"ui-design/designs/Aster Invite Day.dc.html","Aster Invite Day",ui-design,single,yes,"",0,0,0,0,no,11430,2026-08-31
-"ui-design/designs/Aster Invite.dc.html","Aster Invite",ui-design,single,yes,"",0,0,0,0,no,11128,2026-08-31
-"ui-design/designs/Aster Landing.dc.html","Aster Landing",ui-design,single,yes,"",0,0,0,0,no,22309,2026-08-31
-"ui-design/designs/Aster Sign In Day.dc.html","Aster Sign In Day",ui-design,single,yes,"",0,0,0,0,no,19106,2026-08-31
-"ui-design/designs/Aster Sign In.dc.html","Aster Sign In",ui-design,single,yes,"",0,0,0,0,no,18810,2026-08-31
+"ui-design/designs/Adam Invite Day.dc.html","Adam Invite Day",ui-design,single,yes,"",0,0,0,0,no,11430,2026-08-31
+"ui-design/designs/Adam Invite.dc.html","Adam Invite",ui-design,single,yes,"",0,0,0,0,no,11128,2026-08-31
+"ui-design/designs/Adam Landing.dc.html","Adam Landing",ui-design,single,yes,"",0,0,0,0,no,22309,2026-08-31
+"ui-design/designs/Adam Sign In Day.dc.html","Adam Sign In Day",ui-design,single,yes,"",0,0,0,0,no,19106,2026-08-31
+"ui-design/designs/Adam Sign In.dc.html","Adam Sign In",ui-design,single,yes,"",0,0,0,0,no,18810,2026-08-31
 "wireframes/Dashboards Board.dc.html","Dashboards Board",wireframes,pack,yes,"P01 P09 P10 P12",10,5,5,0,yes,98846,2026-08-31
 "wireframes/Kiosk Board 1.dc.html","Kiosk Board 1",wireframes,pack,no,"P05",18,9,9,0,yes,50444,2026-08-31
 "wireframes/Kiosk Board 2.dc.html","Kiosk Board 2",wireframes,pack,no,"P05",16,8,8,0,yes,45509,2026-08-31

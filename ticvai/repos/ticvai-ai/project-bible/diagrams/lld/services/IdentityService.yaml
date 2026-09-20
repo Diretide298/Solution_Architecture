@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 61 operations, 30 tables
+title: IdentityService — 63 operations, 30 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 61
+  operations: 63
   inAFlow: 21
   percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -28,7 +28,7 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 61
+  count: 63
   operations:
   - operation: completeSsoAuthorization
     verb: POST
@@ -333,6 +333,22 @@ operationsByContract:
     permission: ROLE_MANAGE
     offline: true
     reads: 1
+    writes: 0
+  - operation: listSegregationRules
+    verb: GET
+    path: /segregation-rules
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSegregationViolations
+    verb: GET
+    path: /segregation-violations
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listSsoProviders
     verb: GET
@@ -683,7 +699,7 @@ tables:
   foreignWriters:
   - tenancy
 - table: identity.segregation_rule
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -720,7 +736,7 @@ tables:
   foreignWriters:
   - marketing-crm
 - table: pii.subject_biometric
-  columns: 10
+  columns: 12
   store: postgres
   parent: pii.subject
   writtenBy:

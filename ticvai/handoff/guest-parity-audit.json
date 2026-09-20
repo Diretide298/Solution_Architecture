@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "screens": {
   "P01": 46,
   "P02": 71
@@ -1582,7 +1582,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "docs/registers/conflicts.md:149",
+   "where": "docs/registers/conflicts.md:146",
    "detail": "\"stay app-only by design\" — CF-93 predates WEB-036–046 and the 10 September decision",
    "fix": "rewrite to the 12 September rule"
   },

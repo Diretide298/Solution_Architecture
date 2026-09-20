@@ -1,4 +1,4 @@
--- whitelabel — 15 tables
+-- whitelabel — 13 tables
 -- **Derived. Do not hand-edit.**
 
 -- A notice on a tenant storefront, scheduled
@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
 -- A tenant's own hostname and its certificate (24 August). No domain or certificate operation
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
--- whitelabel.tenant_config through its keys; references platform.tenant. Reached by: 3 operations
--- read it and 2 write it.
+-- whitelabel.tenant_config through its keys; references whitelabel.tenant_config. Reached by: 3
+-- operations read it and 2 write i
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
@@ -150,42 +150,6 @@ CREATE TABLE IF NOT EXISTS whitelabel.promo_block (
     state                             text,
     sort_order                        integer,
     scope_path                        text
-);
-
--- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS whitelabel.redirect (
-    id                                uuid PRIMARY KEY,
-    tenant_config_id                  uuid NOT NULL,
-    source_path                       text NOT NULL,
-    destination_path                  text NOT NULL,
-    status_code                       integer NOT NULL,
-    reason                            text,
-    hit_count                         integer NOT NULL,
-    is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
-);
-
--- Holds 16 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS whitelabel.seo_setting (
-    id                                uuid PRIMARY KEY,
-    tenant_config_id                  uuid NOT NULL,
-    entity_type                       text NOT NULL,
-    entity_id                         uuid,
-    locale                            text NOT NULL,
-    title                             text NOT NULL,
-    meta_description                  text,
-    keywords                          text,
-    canonical_url                     text,
-    slug                              text,
-    hreflang_json                     text,
-    schema_org_type                   text,
-    open_graph_json                   text,
-    is_auto_generated                 boolean NOT NULL,
-    no_index                          boolean NOT NULL,
-    updated_at                        timestamptz
 );
 
 -- Everything a tenant has branded or switched on. Versioned, published, and the reason a guest

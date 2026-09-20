@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/tasks.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+    <script>
+      // The curtain's dead man's switch. A wrong loading screen is a bad page;
+      // one that never lifts is no page, so this fires whatever else breaks.
+      window.__adamLoader = { claimed: false };
+      (function () {
+        var down = function () {
+          var box = document.getElementById('adam-loader');
+          if (box) { box.classList.add('is-done'); setTimeout(function () { box.remove(); }, 700); }
+        };
+        window.__adamLoader.timer = setTimeout(down, 12000);
+        window.addEventListener('load', function () {
+          setTimeout(function () { if (!window.__adamLoader.claimed) down(); }, 300);
+        });
+      })();
+    </script>
+  </head>
+  <body class="admin-page">
+    <div class="adam-loader" id="adam-loader" role="status" aria-live="polite">
+      <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+        <g class="al-links">
+          <path class="al-link" d="M105 105 41 46" /><path class="al-link" d="M105 105 169 46" />
+          <path class="al-link" d="M105 105 41 164" /><path class="al-link" d="M105 105 169 164" />
+        </g>
+        <g class="al-nodes">
+          <circle class="al-node" style="--i:0" cx="41" cy="46" r="9" />
+          <circle class="al-node" style="--i:1" cx="169" cy="46" r="9" />
+          <circle class="al-node" style="--i:2" cx="41" cy="164" r="9" />
+          <circle class="al-node" style="--i:3" cx="169" cy="164" r="9" />
+        </g>
+        <circle class="al-glyph" cx="105" cy="105" r="15" />
+      </svg>
+      <p class="al-text">Reading the delivery board…</p>
+    </div>
+
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">tasks</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/admin.html">Admin</a>
+        <a class="chip" href="/changes.html">Change requests</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <!-- Not signed in, and not an admin: the two ways in that end here. The
+         service refuses the overview to anyone else regardless; these panels
+         exist so nobody is shown an empty page and left guessing why. -->
+    <main id="signed-out" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Sign in first</h1>
+        <p class="auth-note">This reads your team's work from OpenProject, so there has to be an account.</p>
+        <a class="auth-button" href="/login.html">Sign in</a>
+      </div>
+    </main>
+
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          This page shows every ticket in the project and what each person is
+          holding, which only an administrator can see. If you think that should
+          be you, ask one of them. Your own work is on the viewer's board.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <!-- The whole page needs OpenProject: no token, or no OpenProject project
+         chosen for this ADAM project, and there is nothing to count. Both say
+         which of the two it is, and where to fix it. -->
+    <main id="unconnected" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">OpenProject is not connected</h1>
+        <p class="auth-note" id="unconnected-why"></p>
+        <a class="auth-button" id="unconnected-go" href="/settings.html#openproject">Go to settings</a>
+      </div>
+    </main>
+
+    <div id="tasks" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Tasks</h1>
+        <div class="set-nav-list">
+          <a href="#overview">Overview</a>
+          <div class="set-nav-group">Where the work is</div>
+          <a href="#states">States</a>
+          <a href="#people">People</a>
+          <a href="#dates">Overdue and due</a>
+          <div class="set-nav-group">What is being delivered</div>
+          <a href="#deliverables">Deliverables</a>
+          <a href="#parents">Epics</a>
+          <div class="set-nav-group">Over time</div>
+          <a href="#throughput">Throughput</a>
+          <div class="set-nav-group">Everything</div>
+          <a href="#tickets">All tickets</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
+        <!-- ── overview ──────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="overview">
+          <h2 class="admin-heading">
+            Overview
+            <select class="scope-select" id="tk-project" aria-label="Project"></select>
+          </h2>
+          <p class="auth-note set-lede" id="tk-lede">…</p>
+          <p class="auth-error" id="tk-error" hidden></p>
+          <div class="set-actions">
+            <button id="tk-refresh" class="chip" type="button"
+                    title="Reads OpenProject again, now">Refresh</button>
+            <p class="set-state" id="tk-asof" role="status"></p>
+          </div>
+          <section class="stat-strip" id="tk-stats"></section>
+        </section>
+
+        <!-- ── states ────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="states">
+          <h2 class="admin-heading">States <span class="admin-count" id="tk-states-count"></span></h2>
+          <p class="auth-note set-lede">
+            Every status OpenProject has for this project's tickets, in its own
+            order. ADAM does not keep a list of its own — a team that renames a
+            column keeps its numbers.
+          </p>
+          <div class="admin-table" id="tk-states"></div>
+        </section>
+
+        <!-- ── people ────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="people">
+          <h2 class="admin-heading">People <span class="admin-count" id="tk-people-count"></span></h2>
+          <p class="auth-note set-lede">
+            What each person is holding: open tickets, and how many of those are
+            on hold or past their due date. Finished work is counted apart, so a
+            long-serving account does not read as overloaded.
+          </p>
+          <div class="admin-table" id="tk-people"></div>
+        </section>
+
+        <!-- ── dates ─────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="dates">
+          <h2 class="admin-heading">Overdue and due <span class="admin-count" id="tk-dates-count"></span></h2>
+          <p class="auth-note set-lede">
+            Open tickets whose due date has passed, then what lands in the next
+            seven days. A ticket with no due date cannot appear in either, which
+            is worth knowing about a board that looks empty here.
+          </p>
+          <h3 class="tk-sub" id="tk-overdue-title">Overdue</h3>
+          <div class="admin-table" id="tk-overdue"></div>
+          <h3 class="tk-sub" id="tk-soon-title">Due in the next seven days</h3>
+          <div class="admin-table" id="tk-soon"></div>
+        </section>
+
+        <!-- ── deliverables ──────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="deliverables">
+          <h2 class="admin-heading">Deliverables <span class="admin-count" id="tk-deliverables-count"></span></h2>
+          <p class="auth-note set-lede">
+            The parts of the package that tickets are linked to — a screen, a
+            contract operation, a table — each with the tickets working on it.
+            This is the join only ADAM can make: OpenProject knows the ticket,
+            the package knows the artefact, and a link says they are the same
+            piece of work.
+          </p>
+          <div id="tk-deliverables"></div>
+          <p class="auth-note auth-fine" id="tk-unlinked"></p>
+        </section>
+
+        <!-- ── epics ─────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="parents">
+          <h2 class="admin-heading">Epics <span class="admin-count" id="tk-parents-count"></span></h2>
+          <p class="auth-note set-lede">
+            Tickets grouped under their parent in OpenProject, with how far each
+            group has got. Progress counts tickets finished, not percentages
+            typed on them.
+          </p>
+          <div class="admin-table" id="tk-parents"></div>
+        </section>
+
+        <!-- ── throughput ────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="throughput">
+          <h2 class="admin-heading">Throughput</h2>
+          <p class="auth-note set-lede" id="tk-throughput-lede"></p>
+          <div id="tk-weeks" class="tk-weeks"></div>
+        </section>
+
+        <!-- ── every ticket ──────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="tickets">
+          <h2 class="admin-heading">All tickets <span class="admin-count" id="tk-tickets-count"></span></h2>
+          <div class="signoff-controls">
+            <input id="tk-search" class="auth-input signoff-filter" type="search"
+                   autocomplete="off" placeholder="Search subject, assignee, epic or number" />
+            <select class="scope-select" id="tk-status" aria-label="Status"></select>
+            <select class="scope-select" id="tk-person" aria-label="Assignee"></select>
+            <label class="signoff-toggle">
+              <input type="checkbox" id="tk-open-only" /> Open only
+            </label>
+            <button id="tk-export" class="chip" type="button"
+                    title="Exports exactly the rows shown - every filter applies">Export CSV</button>
+          </div>
+          <div class="admin-table" id="tk-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/tasks.js"></script>
+  </body>
+</html>

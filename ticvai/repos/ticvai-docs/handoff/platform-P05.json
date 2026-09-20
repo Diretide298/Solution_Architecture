@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 7
+  "operationsWithNoScreen": 11
  },
  "waves": {
   "wave2": 17
@@ -42,11 +42,11 @@
    "operations": 7
   },
   {
-   "contract": "catalogue",
+   "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "catalogue",
    "operations": 4
   },
   {
@@ -54,19 +54,19 @@
    "operations": 2
   },
   {
-   "contract": "marketing-crm",
-   "operations": 2
-  },
-  {
    "contract": "white-label",
    "operations": 2
   },
   {
-   "contract": "promotions",
-   "operations": 1
+   "contract": "marketing-crm",
+   "operations": 2
   },
   {
    "contract": "ai",
+   "operations": 1
+  },
+  {
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -258,10 +258,34 @@
     "summary": "Badges a guest holds"
    },
    {
+    "operation": "listLeaderboard",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Standings, by nickname"
+   },
+   {
     "operation": "listRewards",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "What points can be turned into"
+   },
+   {
+    "operation": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Choose the name shown on the board"
+   },
+   {
+    "operation": "getBillingStatement",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "One statement, with its lines"
+   },
+   {
+    "operation": "listBillingStatements",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "recordRecommendationOutcome",

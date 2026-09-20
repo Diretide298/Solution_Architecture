@@ -88,7 +88,8 @@ owning service should publish anyway, and other consumers want them. 30 events a
 
 ## The six missing text fields: four closed, two not
 
-**Verified column by column on 20 September against `handoff/schema-reference.json`.** All
+**Verified column by column on 20 September against `handoff/schema-reference.json`, and re-checked on 21 September.**
+**No source was added**: the two tables that arrived that day — `payments.dunning_policy` and `payments.dunning_case` — carry no retrievable text, and a dunning queue is transactional rather than knowledge. **The check did find one thing**: `resolveDunningCase` accepted a `note` that `DunningCase` had nowhere to store, so it was being dropped. `resolutionNote` now exists, modelled on `marketing.case.resolution_note`, which is a source here for exactly that reason — **and it is deliberately not added to the eleven**, because a note about somebody's failed payment is not knowledge anybody should be able to retrieve by asking. All
 eleven tables exist and every one is read by an AI operation in the lineage, which is what
 `check-package` enforces. **Two of the six fields added on 19 September are not where this
 register says they are**, and both are sources whose whole value is the missing field.

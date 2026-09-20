@@ -261,6 +261,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/PasswordPolicy'
   /segregation-rules:
+    get:
+      operationId: listSegregationRules
+      summary: Read the conflicting-permission rules back
+      description: 'BL-110, 3.3.31. **`setSegregationRules` was a PUT with no GET**, so the screen
+        named above manages rules it cannot load — and nobody could audit a tenant''s controls
+        without reaching the database.
+
+        **Rules are evidence as much as configuration.** An auditor asking *"what does this venue
+        forbid"* is asking a question the platform should answer without a query.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SegregationRule'
     put:
       operationId: setSegregationRules
       x-ticvai-consumed-by:
@@ -306,6 +333,52 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SegregationRule'
+  /segregation-violations:
+    get:
+      operationId: listSegregationViolations
+      summary: Who already holds a conflicting pair
+      description: 'BL-110, 3.3.31, 3.3.38. **The check runs at grant time, and a rule added today
+        has said nothing about the grants made yesterday.** BL-147 was right that catching a
+        conflict at use time catches it too late — but a rule that only polices future grants
+        leaves the venue holding the control and not the finding.
+
+        **This is deliberately a report and not an action.** The two automatic answers are both
+        wrong: revoking on rule creation strands a venue mid-shift, and doing nothing leaves real
+        exposure unreported. **A person decides, and this is what they read.**
+
+        **Violations covered by `allowWithCompensatingControl` are flagged rather than filtered.**
+        A queue that hides what has been excused stops measuring the thing it exists to measure.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: ruleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: severity
+        in: query
+        schema:
+          type: string
+          enum: [block, requireApproval, warn]
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Violations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SegregationViolation'
   /guests/{subjectId}/data-export:
     parameters:
     - name: subjectId
@@ -3781,6 +3854,68 @@ components:
             '
           items:
             type: string
+    SegregationViolation:
+      type: object
+      x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
+      description: 'BL-110, 3.3.31, 3.3.38. **One principal currently holding both halves of a
+        rule.**
+
+        **Computed rather than stored.** A violation row that survived the grant behind it would be
+        a queue item nobody could close, and a compliance queue that cannot reach zero is one
+        people stop opening.
+
+        '
+      required:
+      - ruleId
+      - principalId
+      - permissionA
+      - permissionB
+      properties:
+        ruleId:
+          type: string
+          format: uuid
+        ruleName:
+          type: string
+        severity:
+          type: string
+          enum:
+          - block
+          - requireApproval
+          - warn
+          description: '**From the rule.** A `warn` violation and a `block` violation are the same
+            finding with very different urgency, and a queue that does not carry it sorts by
+            nothing useful.
+
+            '
+        principalId:
+          type: string
+          format: uuid
+        principalName:
+          type: string
+        permissionA:
+          type: string
+        permissionB:
+          type: string
+        atScopePath:
+          type: string
+          description: '**Where the two overlap**, and the field that makes a finding actionable:
+            the answer is usually to narrow one grant rather than to remove it.
+
+            **Null where the rule is not `scopeSensitive`**, which is the estate-wide case.
+
+            '
+        compensatingControlNoted:
+          type: boolean
+          default: false
+          description: '**True where `allowWithCompensatingControl` covers this one.** Flagged
+            rather than filtered out — a small venue that cannot separate duties is a fact somebody
+            accepted, and it should stay visible rather than disappearing from the count.
+
+            '
+        detectedAt:
+          type: string
+          format: date-time
+
     SegregationRule:
       type: object
       x-ticvai-persistence: identity.segregation_rule
@@ -3818,6 +3953,24 @@ components:
           type: string
           description: '**Why these two conflict, in words an auditor reads.** A rule with no rationale
             is a rule somebody removes when it becomes inconvenient.
+
+            '
+        scopeSensitive:
+          type: boolean
+          default: true
+          description: '**Whether the two permissions must overlap in scope to conflict**, and this
+            is not `scopePath` below — that one is the partition key and says where the rule *row*
+            lives (ADR-0005), not where the *conflict* applies.
+
+            **True, and it should rarely be false.** `ACCREDITATION_ISSUE` at Yas Island beside
+            `ACCREDITATION_MANAGE` at Warner Bros is two jobs at two sites; flagging it is a
+            control crying wolf, and the first thing a venue does with one of those is switch it
+            off. The comparison walks `scopePath` prefixes the same way `resolvePermissions`
+            already does — `uae.dubai` contains `uae.dubai.marina`, so one is an overlap and two
+            siblings are not.
+
+            **False is for conflicts that are genuinely estate-wide**, such as holding both sides
+            of a financial reconciliation anywhere at all.
 
             '
         allowWithCompensatingControl:

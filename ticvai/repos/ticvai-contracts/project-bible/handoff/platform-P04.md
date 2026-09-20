@@ -9,20 +9,22 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 178 |
+| Operations with no screen | 184 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 178 operations with no screen here
+### 184 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
+| `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -58,9 +60,7 @@
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
-| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
-| … | | | 138 more |
+| … | | | 144 more |
 
 ### 2 modules split across waves
 

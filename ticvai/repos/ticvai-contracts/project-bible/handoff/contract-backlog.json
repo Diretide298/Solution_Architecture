@@ -2915,8 +2915,8 @@
     "2.14.7",
     "5.3.21"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "access"
    ],
@@ -2928,10 +2928,10 @@
    "why": "`idReader` and `biometricReader` are device kinds; `enrolFacePass` binds a face to an entitlement, which is enrolment rather than verification. 2.13.41 wants a document read and matched at the point of sale or gate, and 2.14.7 wants an annual-pass quota keyed to biometric identity. **CF-35 is open on biometric data under PDPL** — heightened protection, explicit consent, DPIA — so the design question and the legal one arrive together.",
    "fix": "Model verification distinctly from enrolment, with the PDPL position settled first.",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-35"
-   ],
-   "blockedOnDomains": []
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-21",
+   "closedBy": "**Closed 21 September.** `verifyIdentity` models matching apart from enrolling, which is what the entry asked for and what the package could not do — `enrolFacePass` binds a face to an entitlement, and nothing anywhere read a presented document and checked it against the holder.\n\n**Two methods, because 2.13.41 asks two different questions.** `documentToHolder` compares a presented document with the entitlement holder's recorded details; `liveCaptureToEnrolment` compares a capture with an existing `facePass` or `faceTag` and **requires one to exist** — it is the check, never a back door to enrolment.\n\n**`IdentityVerification` is `x-ticvai-persistence: none` and carries no evidence.** The document image and the live template are write-only, compared and discarded; `access.scan_event` records that a verification happened and what it concluded and **never what was compared**. That is the same line BL-179 drew for the gender advisory a day earlier, and for the same reason — a scanned or inferred attribute kept against a guest is sensitive personal data with no consent behind it.\n\n**`inconclusive` is a real outcome and the one the counter screen is designed around.** A matcher that never returns it has been tuned to look confident, and a guest at a counter pays for that tuning by being told they are not themselves. **Advisory, not decisive** — the entitlement admits, and a `noMatch` tells an agent to ask a question rather than refusing entry, because a document that does not match is far more often a bad scan than a fraud.\n\n**`maxPassesPerBiometricIdentity` caps how many passes one face may hold.** `enrolFacePass` already answered 409 where a face was on another annual pass; the number behind that refusal was one and was invisible. **Null means unlimited**, which is right for everything that is not an annual pass — a quota applied where nobody asked for one turns a family sharing a day ticket into a fraud alert.\n\n**Correction, 21 September: this closure first claimed 2.14.7 and should not have.** That requirement is an *\"annual-pass **reservation** quota engine linked to biometric identity, with self-service reschedule/cancel\"* — visit slots booked by a pass holder, not a cap on passes per face. A different thing wearing a similar word, and the row stays `CONTRACTED_PARTIAL`.\n\n**Built as one piece with BL-096, BL-105 and BL-106**, because all three were stalled on CF-35 and building any one alone would have decided the legal posture for the other two by accident. **CF-35 stays open** — counsel has not answered — and the shape chosen is the one that stays correct either way: **the capability exists and nothing is on by default.**"
   },
   {
    "id": "BL-097",
@@ -3025,8 +3025,8 @@
     "5.7.96",
     "13.3.3"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "orders",
     "finance"
@@ -3035,13 +3035,17 @@
     "orders",
     "finance"
    ],
-   "what": "No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements.",
-   "why": "**`subscription` looks like the answer and is not.** It is the Control Plane, running outside any cell because it provisions cells, and it bills tenants for the platform. A guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode. **The `subscription` state model already mentions a dunning period and no contract declares one** — the capability search flagged it as present only in states, which is CF-49's shape. Recurring guest billing also brings stored card credentials, mandates and PCI scope that the current payment model does not carry.",
+   "what": "No dunning, no retry schedule and no billing statement. **Auto-renewal, grace periods, billing cycles, downgrade and mandates now exist** — `setRenewalAutoMembership`, `listRenewalAuto`, `autoRenewEligible`, `graceDays`, and mandates in `payments`. The three that remain appear nowhere in `contracts/`.",
+   "why": "**`subscription` looks like the answer and is not.** It is the Control Plane, running outside any cell because it provisions cells, and it bills tenants for the platform. A guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode. **The `subscription` state model already mentions a dunning period and no contract declares one** — the capability search flagged it as present only in states, which is CF-49's shape. Recurring guest billing also brings stored card credentials, mandates and PCI scope that the current payment model does not carry.\n\n**Narrowed 20 September, and the entry's own argument has been overtaken.** It said *\"`subscription` looks like the answer and is not — it is the Control Plane, and a guest paying monthly for an annual pass is a different ledger, a different payer and a different failure mode.\"* `setRenewalAutoMembership` and `listMembershipRenewalRetention` are guest membership billing and **they are in `subscription.yaml`**. Either the boundary moved deliberately or guest billing landed in the control-plane contract; **that is a boundary decision and it is recorded rather than made.** Five of the eight capabilities this entry named are served; the stored-card and PCI scope it warned about arrived with them and has not been re-examined.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "cf": "CF-129"
+   "cf": "CF-129",
+   "narrowed": "2026-09-20",
+   "whatBefore": "No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements.",
+   "closed": "2026-09-21",
+   "closedBy": "**Closed 21 September.** The entry named eight capabilities and five had arrived without it noticing — auto-renewal, grace periods, billing cycles, downgrade and mandates. **Three were genuinely absent from `contracts/` entirely**: dunning, a retry schedule and a billing statement. `dunning` appeared only inside a state model, which is CF-49's exact shape — a capability present in states and in no contract.\n\n**The boundary is decided and recorded: [ADR-0048](../adr/0048-guest-recurring-billing-is-commerce.md).** The entry's own argument was right — `subscription` is the Control Plane, it runs outside every cell because it provisions cells, and it bills tenants — and `subscription.yaml` had drifted across it, carrying seventeen membership operations including `setRenewalAutoMembership` and `listMembershipRenewalRetention`. **All seventeen are provisional**, read off a workshop pack and never specified: nobody decided this, a filename did. **The residency row is the one that is not negotiable** — a guest's payment history in a control-plane table is personal data outside its jurisdiction, which is what the cell model exists to prevent.\n\n**Built where the rest of the billing is.** The policy in `payments.yaml` — `DunningPolicy`, `DunningCase`, `DeclineClass`, and the queue a venue actually works from, ordered by attempts remaining rather than by age because the ones about to exhaust are the ones somebody can still save by calling the guest. The record in `orders.yaml` — `BillingStatement`, computed rather than stored, because a statement assembled at read time cannot disagree with the ledger it describes.\n\n**Dunning retry and gateway retry are different axes and must never share a counter.** `setPaymentFailoverPolicy` governs retry inside one attempt — seconds, a different provider, and a decline is final there. Dunning governs retry across days: a fresh authorisation on a card that may since have been replaced. **Both are called retry, and treating one as the other is how a guest is charged twice.**\n\n**A hard decline is never scheduled.** A closed account, a stolen card or a do-not-honour put on a timetable is how a merchant ID gets flagged by the scheme, and the venue finds out when its acquirer calls. `retryableDeclineClasses` defaults to `soft` alone, and `unknown` is treated as hard because guessing soft optimises for one more attempt and risks the thing that cannot be undone.\n\n**The attempt spacing is the part that matters, so it is a field rather than a constant.** `[0, 3, 7, 14]` straddles a payday; retrying at the same hour each day hits the same daily limit on the same card and tells the venue nothing it did not already know.\n\n**Dunning cannot revoke admission.** `terminalAction` stops at `suspendBilling` and `cancelRenewal`; `graceDays` already governs how long a pass keeps working. The case this protects is concrete — **a guest at a gate on a family day out, refused because a card expired and a retry ran at 3am.** Ending somebody's access stays a staff decision with a name attached.\n\n**A statement is not a tax invoice**, and `isTaxInvoice` is false and read-only rather than absent. UAE e-invoicing is Peppol five-corner with the FTA as the fifth, PINT AE XML and 51 mandatory fields; **CF-133 is open and AED 50m+ businesses must appoint an accredited service provider by 30 October 2026.** A statement implying otherwise would be wrong in the one direction with a regulator at the end of it.\n\n**Two things deliberately not done.** The seventeen provisional drafts are **not moved** — they are unreviewed workshop text awaiting a CF-171 session, and relocating operations nobody has agreed would assert a home rather than record one; ADR-0048 is the instruction to the session that reads them. And **the stored-card and PCI scope this entry warned about is still not re-examined** — it arrived with the mandate model, it is a security review rather than a contract question, and it is named here rather than quietly closed with the rest."
   },
   {
    "id": "BL-101",
@@ -3193,8 +3197,8 @@
    "refs": [
     "3.2.9"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "access",
     "catalogue"
@@ -3207,10 +3211,10 @@
    "why": "`FacePassEnrolment` binds a face to a subject and entitlement. The requirement wants the *requirement* for a biometric check to be a property of the product — memberships checked, day tickets not — which belongs on the entitlement template or the admission profile, neither of which carries it. **CF-35 is open on biometric data under PDPL**, and a per-product switch is how a venue limits the population it enrols.",
    "fix": "A biometric-required flag on the admission profile.",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-35"
-   ],
-   "blockedOnDomains": []
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-21",
+   "closedBy": "**Closed 21 September.** `AdmissionRules.perProductRules[].biometricPolicy` makes the biometric check a property of the product, which is what 3.2.9 asks for — memberships checked, day tickets not. It sits on `perProductRules` rather than on the profile because **that is already where a ticket type states its own terms** (BL-059 put it there), and a profile per product would multiply profiles to carry one flag.\n\n**`disabled`, `offered`, `preferred` — and deliberately no `required`.** A guest refused entry to a ticket they have paid for unless they surrender a biometric has not consented voluntarily, and **consent that cannot be refused without losing what you bought is not consent under PDPL**: it fails the voluntary and the withdrawable tests in the same moment. `preferred` gives the venue the lever it actually wants — a faster lane — without the platform shipping a switch that turns a ticket into a condition.\n\n**Absent means `disabled`, and the whole thing is inert while `VenueSettings.biometrics.isEnabled` is false.** A rules profile copied to another venue cannot begin capturing faces at the destination, which is the failure a per-product flag with no venue gate would have introduced.\n\n**CF-35's warning is `VenueSettings.biometrics`, and it is stronger than a warning.** `isEnabled` is false by default and cannot be set true without a `dpiaReference` and a `consentNoticeAcknowledgedAt`, with `acknowledgedByPrincipalId` recording who confirmed it; `setVenueSettings` answers 422 otherwise. **PDPL Article 21 requires the assessment before the processing**, so the field is the law rather than a courtesy — and a venue that cannot name its assessment has not done one. The person switching it on is asked at the moment they switch it on, rather than by an auditor a year later.\n\n**Built as one piece with BL-096, BL-105 and BL-106**, because all three were stalled on CF-35 and building any one alone would have decided the legal posture for the other two by accident. **CF-35 stays open** — counsel has not answered — and the shape chosen is the one that stays correct either way: **the capability exists and nothing is on by default.**"
   },
   {
    "id": "BL-106",
@@ -3218,8 +3222,8 @@
    "refs": [
     "3.2.44"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "access"
    ],
@@ -3230,10 +3234,10 @@
    "why": "`FacePassEnrolment` carries `expiresAt` and `isActive`, so a lifetime exists. **The retention obligation is what differs**: an enduring enrolment with explicit consent is one legal posture, a same-day tag deleted at close is another, and under PDPL the second is far easier to justify. Storing both as one record with a date makes the stricter rule depend on a field nobody enforces.",
    "fix": "Model tag and enrolment as distinct kinds with distinct retention.",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-35"
-   ],
-   "blockedOnDomains": []
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-21",
+   "closedBy": "**Closed 21 September.** `BiometricKind` splits `facePass` from `faceTag`, and `BiometricRetentionAnchor` gives each its own anchor — which is exactly what [ADR-0047](../adr/0047-how-long-data-is-kept-and-where-it-goes-next.md) said this entry needed: *a kind and two different anchors, not a new model*. `pii.subject_biometric` already carried `expires_at`, `is_active`, `consent_purpose_id` and `consent_given_at`.\n\n**The two are different legal postures rather than two settings on one record.** A `facePass` is enduring, enrolled deliberately on the three surfaces 3.2.43 names, revocable by the guest, and anchored to the validity of its entitlement. A `faceTag` is same-visit, taken at a ticket counter **or an entry gate** — a gate is present here exactly where 3.2.43 omits it from Face Pass — and anchored to the ticket or to the close of the operating day. **Storing both as one record with a date made the stricter rule depend on a field nobody enforced**, which is what this entry was raised to stop.\n\n**Face Tag still takes explicit consent.** PDPL Article 4 is a closed list of exceptions with **no legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free — only one that makes the consent shorter-lived. A design that skipped it because the data dies at midnight would have been wrong about the law rather than lenient about it.\n\n**`retentionAnchor` is derived from `kind` and never sent.** A retention period somebody can type is a retention period somebody will type wrongly. The anchors are ceilings and cannot be configured upward, per ADR-0047.\n\n**The schema is still named `FacePassEnrolment` and that is a deliberate non-rename.** Its 19 references are all inside `access.yaml`, but the derived design bundles already handed to designers carry the name, and renaming for tidiness would make delivered work inconsistent to fix nothing.\n\n**Built as one piece with BL-096, BL-105 and BL-106**, because all three were stalled on CF-35 and building any one alone would have decided the legal posture for the other two by accident. **CF-35 stays open** — counsel has not answered — and the shape chosen is the one that stays correct either way: **the capability exists and nothing is on by default.**"
   },
   {
    "id": "BL-107",
@@ -3354,8 +3358,8 @@
     "7.1.46",
     "7.1.47"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "identity"
    ],
@@ -3363,13 +3367,17 @@
     "identity",
     "access"
    ],
-   "what": "Attribute-based access control does not exist — forty-eight requirements against a role-based model chosen deliberately.",
-   "why": "`Grant` is principal, role, permission, scopePath, effect and a validity window. **That is role-based with scope inheritance, and it is a decision rather than an omission** — ADR-0002 makes authorisation user-driven rather than workstation-driven, ADR-0018 resolves up the scope tree nearest-ancestor-wins, and `resolvePermissions` and `Session.permissionsByScope` implement it. 3.3 asks for policies evaluated against membership, accreditation, customer segment, venue, attraction, device, capacity, occupancy and risk attributes, with a visual builder, reusable templates, versioning, pre-deployment simulation and an approval workflow. **That is a policy engine, and roughly a third of the requirements are already met by the existing model** — real-time evaluation, caching, offline evaluation, least privilege, temporary grants with automatic expiry, audit, tenant and venue scoping, inheritance. **The decision is whether the remaining two thirds justify replacing a settled architecture**, and it is worth noting that 3.3 mixes staff authorisation with guest admission rules, which the package deliberately separates into `identity` and `access`.",
+   "what": "Attribute-based access control, walked requirement by requirement on 20 September: **17 of the 48 are already served, 14 are a condition on an existing `Grant`, 11 are a screen or a report, and 6 are new** — of which 5 are live venue state belonging at the gate rather than in `identity`. The one real authorisation gap is segregation of duties.",
+   "why": "`Grant` is principal, role, permission, scopePath, effect and a validity window. **That is role-based with scope inheritance, and it is a decision rather than an omission** — ADR-0002 makes authorisation user-driven rather than workstation-driven, ADR-0018 resolves up the scope tree nearest-ancestor-wins, and `resolvePermissions` and `Session.permissionsByScope` implement it. 3.3 asks for policies evaluated against membership, accreditation, customer segment, venue, attraction, device, capacity, occupancy and risk attributes, with a visual builder, reusable templates, versioning, pre-deployment simulation and an approval workflow. **That is a policy engine, and roughly a third of the requirements are already met by the existing model** — real-time evaluation, caching, offline evaluation, least privilege, temporary grants with automatic expiry, audit, tenant and venue scoping, inheritance. **The decision is whether the remaining two thirds justify replacing a settled architecture**, and it is worth noting that 3.3 mixes staff authorisation with guest admission rules, which the package deliberately separates into `identity` and `access`.\n\n**Narrowed 20 September — see [the walk](../../docs/active/bl-110-abac-walk-20-september.md).** Its 43 traceability rows carry **one note repeated forty times**, which is a verdict stamped across a section rather than forty-eight judgements. It is not wrong; it is just not an answer to *how much of this must be built*.\n\n**Eleven of the seventeen already-served requirements are the scope tree and the audit tables** — location, venue, tenant, inheritance, least privilege, caching and offline evaluation — which is the whole reason the role-based model was chosen deliberately. Plus `identity.delegated_access`, the `approvals` contract and `identity.authz_audit`.\n\n**Every attribute the fourteen conditions name already exists as a modelled thing**: shifts in `workforce`, tiers in `membership`, profiles in `accreditation`, segments in `marketing`, classifications in `catalogue`. They need referencing from a grant condition, not inventing.\n\n**Capacity and occupancy are not permissions.** They are live venue state and they belong in `access`, at the gate, where the state already is — treating *\"the park is full\"* as an authorisation decision is what would force a policy engine onto the hot path of all 2,056 operations and reverse `Session.scope`'s stated design.\n\n**One question for the client before any of it**: 3.3.27 asks for *\"real-time authorization\"*. Read literally it contradicts resolving permissions once at login; read as *\"a revoked permission takes effect promptly\"* it is session invalidation, which `forceLogout` already answers. One sentence, and it decides whether the hot path changes.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "cf": "CF-130"
+   "cf": "CF-130",
+   "narrowed": "2026-09-20",
+   "whatBefore": "Attribute-based access control does not exist — forty-eight requirements against a role-based model chosen deliberately.",
+   "closed": "2026-09-21",
+   "closedBy": "**Closed 21 September, and most of it was already built when the walk measured it.**\n\nThe 20 September walk reduced 48 requirements to *\"one schema change and one small new rule\"*. **Both were done.** The schema change is `AccessPolicy` and `AccessCondition` — twenty-six attributes covering 3.3.2 through 3.3.21, deny-wins combining, versions, templates, `simulateAccessPolicy` and a signed offline `AccessPolicyBundle` — landed in *\"Phase 2: the forty-two identity rows were one gap, and it was ABAC\"*. The new rule is `SegregationRule` and `setSegregationRules`, **built by BL-147**, checked at grant time with `allowWithCompensatingControl` for the small venue that cannot separate duties.\n\n**This is the fifth stale measurement in two days and this one was mine.** I searched `contracts/` for `segregat`, piped it through `head -10`, saw `approvals`, `access`, `workforce` and `permissions`, and concluded `identity` had none. **The identity rows were lines 11 to 14 of a list truncated to 10.** Same failure as concluding no operation retires a device because no operationId contains *retire* — a conclusion drawn from an absence that was an artefact of how I looked.\n\n**Three real holes were found and closed, all smaller than what the entry carried:**\n\n**`setSegregationRules` was a PUT with no GET.** `P09 ADM-340 Segregation of Duties Policy Manager` is a screen that manages rules and had nothing to load them with, and nobody could audit a tenant's controls without database access. `listSegregationRules` added — **rules are evidence as much as configuration.**\n\n**Nothing listed who already violates a rule.** BL-147 was right that grant-time beats use-time — *discovering the conflict when somebody exercises it means the conflict already existed* — but **a rule added today had said nothing about the grants made yesterday**, so a venue held the control and not the finding. `listSegregationViolations` is deliberately a report rather than an action: revoking on rule creation strands a venue mid-shift, doing nothing leaves real exposure unreported, and a person decides between them. Compensating-control cases are flagged rather than filtered, because a queue that hides what has been excused stops measuring the thing it exists to measure.\n\n**Scope was not part of the conflict, and `scopePath` is not it** — that one is the partition key and says where the rule row lives (ADR-0005), not where the conflict applies. `ACCREDITATION_ISSUE` at Yas Island beside `ACCREDITATION_MANAGE` at Warner Bros read as a toxic pair when it is two jobs at two sites, and **the first thing a venue does with a control that cries wolf is switch it off.** `scopeSensitive` defaults true and walks `scopePath` prefixes the way `resolvePermissions` already does.\n\n**`approvals.yaml` described a model that was never built.** Its `listApprovalControlPolicies` said *\"`identity.setSegregationRules` says which **roles** one person may not hold at once\"*; the operation has always been over permission pairs. Corrected — and a rule over roles would be the weaker control anyway, defeated by adding `ORDER_REFUND_APPROVE` to a third role while still reporting compliant.\n\n**Not rebuilt: the exception path.** `allowWithCompensatingControl` already covers it and covers it better than a separate object would.\n\n**Still open and not closed by this: one sentence from the client.** 3.3.27 asks for *\"real-time authorization\"*. Read literally it contradicts resolving permissions once at login and would put a policy engine on the hot path of all 2,056 operations; read as *\"a revoked permission takes effect promptly\"* it is session invalidation, which `forceLogout` already answers. **That is a question rather than a blocker** — everything else in 3.3 is built either way, which is why this closes."
   },
   {
    "id": "BL-111",
@@ -4213,10 +4221,12 @@
     "finance"
    ],
    "what": "No invoice, no credit memo, and no statement of what a compliant receipt must show.",
-   "why": "`subscription.generateInvoice` bills tenants for the platform. **A tax invoice in the UAE has a mandated format** — supplier TRN, sequential number, prescribed fields, Arabic where required — and issuing one that does not comply is a VAT matter rather than a document-formatting one. `LegalEntity.taxRegistrationNumber` exists, so the data is there and the document is not. Credit memos are the paired obligation: a refund against a tax invoice needs one. **5.10.3 is the same gap at the till** — nothing states which fields a VAT receipt must carry.",
+   "why": "`subscription.generateInvoice` bills tenants for the platform. **A tax invoice in the UAE has a mandated format** — supplier TRN, sequential number, prescribed fields, Arabic where required — and issuing one that does not comply is a VAT matter rather than a document-formatting one. `LegalEntity.taxRegistrationNumber` exists, so the data is there and the document is not. Credit memos are the paired obligation: a refund against a tax invoice needs one. **5.10.3 is the same gap at the till** — nothing states which fields a VAT receipt must carry.\n\n**Blocked on CF-133 from 20 September, which it always was.** This entry recorded no blocker while CF-133 — open with the client — opens *\"the platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices...\"* **5.7.93 is this entry's own first reference.** The inverse of BL-155, where a blocker outlived its conflict: here a conflict never reached its entry, and both leave the register wrong about what is ready to work.",
    "fix": null,
    "blockedOnSections": [],
-   "blockedOnConflicts": [],
+   "blockedOnConflicts": [
+    "CF-133"
+   ],
    "blockedOnDomains": [],
    "cf": "CF-133"
   },
@@ -4962,8 +4972,8 @@
     "16.7.39",
     "16.7.40"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "tenancy",
     "identity"
@@ -4977,10 +4987,10 @@
    "fix": null,
    "cf": "CF-136",
    "blockedOnSections": [],
-   "blockedOnConflicts": [
-    "CF-64"
-   ],
-   "blockedOnDomains": []
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": "2026-09-20",
+   "closedBy": "**All six requirements are contracted in `contracts/spine/tenancy.yaml`, each naming its ref.** 16.7.35–37: `issueDeviceCredential` — *\"give the device an identity it can prove\"*, with `revokeDeviceCredential` and the `DeviceCredential` schema on `tenancy.device_credential`, per device and with an expiry, because **a device that authenticates with a shared key is a device that cannot be revoked alone** and one compromised scanner should not mean re-keying an estate. 16.7.38–39: `listDeviceAuditRecords` on `tenancy.device_audit`, administration and access interleaved *\"because an investigation needs the order\"*. 16.7.40: `listDeviceTamperEvents` and `recordDeviceTamperEvent` on `tenancy.device_tamper_event` — **a state, not a log line**, so a device that reported tampering is untrusted until somebody clears it.\n\n**Blocked on CF-64, which is retention and RPO and has nothing to do with device authentication.** Second instance today of a blocker naming an unrelated conflict, after BL-155 on CF-21 — the register was holding two entries shut against subjects they do not share. `offlineScope` on `RegisteredDevice` answers the entry's remaining question of what an unattended device may do without a connection; **`fullVenue` on a personal handset is a decision, not a default.**"
   },
   {
    "id": "BL-162",
@@ -5364,21 +5374,25 @@
     "22.6.17",
     "22.6.20"
    ],
-   "lane": "decision",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "marketing-crm"
    ],
    "candidateHomes": [
     "marketing-crm"
    ],
-   "what": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards.",
-   "why": "**Nothing anywhere**, and this is the third appearance: 19.2.73–75 in the guest app, `white-label.ModuleKey.gamification` as a toggle pointing at nothing, and twenty requirements here. **The currencies it would award into all exist** — loyalty points with `earnRules` and tiers, wallet, membership — so the missing piece is the game rather than the reward. Family and team challenges also depend on CF-132.",
+   "what": "No leaderboard. **Challenges, streaks, milestones, badges and achievements are built** — `createChallenge`, `getMyChallenges`, `listBadges`, `setBadge`, `awardBadge`, `listCustomerBadges`, and `Challenge.kind` carries `streak` and `milestone`. **Ranking guests against each other is not.** `BO-831 Progress, Leaderboards & Hub` is served by `getLoyaltyPosition`, which returns a guest their own points and tier, and `Challenge` has no ranking field.",
+   "why": "**Nothing anywhere**, and this is the third appearance: 19.2.73–75 in the guest app, `white-label.ModuleKey.gamification` as a toggle pointing at nothing, and twenty requirements here. **The currencies it would award into all exist** — loyalty points with `earnRules` and tiers, wallet, membership — so the missing piece is the game rather than the reward. Family and team challenges also depend on CF-132.\n\n**Narrowed 20 September.** The traceability rows read `CONTRACTED` against `Challenge` and the entry stayed open — correctly, because it names leaderboards and `Challenge` does not address them. **Closing it on the strength of that schema resolving would repeat the BL-160 mistake**: a schema that exists is not evidence for a gap it does not answer. A leaderboard also asks a question the rest of gamification does not — **what one guest may see of another**, which is a privacy decision before it is an operation.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "cf": "CF-137"
+   "cf": "CF-137",
+   "narrowed": "2026-09-20",
+   "whatBefore": "No gamification — challenges, achievements, badges, streaks, milestones or leaderboards.",
+   "closed": "2026-09-20",
+   "closedBy": "**Closed 20 September.** Challenges, streaks, milestones, badges and achievements were already built — `createChallenge`, `getMyChallenges`, `listBadges`, `setBadge`, `awardBadge`, `listCustomerBadges`, and `Challenge.kind` carrying `streak` and `milestone`. **The leaderboard was the last piece, and it was a privacy decision before it was an operation**: a leaderboard shows one guest something about another.\n\n**Decided by Chinmay: a guest always gets to add a nickname when they reach the board, and the nickname is what is shown. Always.** `setLeaderboardNickname` writes `marketing.loyalty_position.leaderboard_nickname`, and **setting it is the consent** — nothing reads `pii.subject.display_name`, because a name given for one purpose and reused on a public board is a use nobody agreed to.\n\n**`LeaderboardEntry` carries `rank`, `nickname`, `points` and no subject identifier, and that is the whole design.** A nickname beside an id the client can resolve elsewhere is decoration over a disclosure. The caller finds their own row by `isMe` rather than by matching identifiers — which is also why the apply script asserts that `subjectId` is absent rather than trusting it to stay so.\n\n**A guest with no nickname yet appears as a rank with no name.** Not hidden — standings that skip people are wrong about who is second — and **never filled in from their real name**, which would disclose silently on the day they first placed.\n\n**The window is bounded** (`week`, `month`, `season`): an all-time board is won once and then stops being a reason to come back. **Moderation is named rather than invented** — length and pattern stop markup and impersonating whitespace and nothing else, and a nickname impersonating staff needs a review queue, which is a product decision.\n\n`x-ticvai-config-scope: subject` is declared on the setter rather than the checker being widened to excuse it: a nickname is a setting the guest holds, and `subject` is a level five other operations already use."
   },
   {
    "id": "BL-174",
@@ -5530,8 +5544,8 @@
    "refs": [
     "3.2.45"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "tenancy",
     "access"
@@ -5542,8 +5556,8 @@
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "closed": null,
-   "closedBy": null
+   "closed": "2026-09-20",
+   "closedBy": "**Closed 20 September.** `RegisteredDevice.capabilities` carries a `DeviceCapability`, whose first member is `genderClassification` — so a driver can now report what it does, and `segregatedAccess.genderVerification: deviceAssisted` stops being a switch with nothing behind it. **A capability absent is a capability unavailable, not one assumed**: a venue setting that needs hardware is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n\n`ValidationResult.advisory` is the path to the steward — a classification, a **confidence** and the device that reported it. The confidence is not decoration: `overrideRateAlertThreshold` already exists to catch a steward who has stopped deciding, and **that number means nothing unless the steward could see how sure the device was.**\n\n**It is never persisted, and that is a PDPL position rather than a storage preference.** An inferred classification kept against a guest is sensitive personal data with no consent behind it — **a guest agreed to be admitted, not to be classified.** Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled; **nobody enrols in being looked at by a turnstile.** `ValidationResult` stays `x-ticvai-persistence: none`, so `access.scan_event` records that an override happened and never what the device thought — which keeps the override-rate metric working without building a register nobody agreed to.\n\n**Advisory, never decisive.** It cannot reach `outcome` or `denyReason`, and `entitlementGated` stays `true` and read-only: the gate admits on the entitlement and everything else sits on top without replacing it. 3.2.45 asks for rejection and CF-130 records why the package deviates — a Ladies Night ticket is already gendered at the point of sale, and these events are staffed.\n\n**Remaining: the steward's display, which is a screen rather than a contract.**"
   }
  ],
  "phase": "discovery",

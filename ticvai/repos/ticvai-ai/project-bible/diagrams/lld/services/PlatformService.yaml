@@ -28,7 +28,7 @@ schemas:
   tables: 13
   stores:
   - postgres
-  largestTable: subscription.plan
+  largestTable: subscription.module_listing
 operationsByContract:
 - contract: subscription
   count: 129
@@ -1587,7 +1587,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.cell_instance
-  columns: 7
+  columns: 9
   store: postgres
   parent: control.cell
   writtenBy: []
@@ -1600,7 +1600,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.cell_tenant
-  columns: 9
+  columns: 10
   store: postgres
   parent: control.cell
   writtenBy: []

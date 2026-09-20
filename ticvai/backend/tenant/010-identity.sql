@@ -1,4 +1,4 @@
--- identity — 25 tables
+-- identity — 24 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
 CREATE TABLE IF NOT EXISTS identity.customer_membership (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
-    plan_id                           uuid NOT NULL,
+    entitlement_template_id           uuid NOT NULL,
     number                            text NOT NULL,
     source_order_id                   uuid,
     start_at                          timestamptz NOT NULL,
@@ -123,6 +123,8 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     is_revocable_by_subject           boolean,
     scope_path                        text NOT NULL,
     effect                            text NOT NULL,
+    permission_id                     uuid,
+    revoked_at                        timestamptz,
     valid_from                        timestamptz,
     valid_to                          timestamptz,
     created_by_principal_id           uuid,
@@ -140,7 +142,7 @@ CREATE TABLE IF NOT EXISTS identity.membership_history (
     from_status                       text,
     to_status                         text NOT NULL,
     reason                            text,
-    changed_by_user_account_id        uuid,
+    changed_by_principal_id           uuid,
     changed_at                        timestamptz NOT NULL
 );
 
@@ -255,7 +257,7 @@ CREATE TABLE IF NOT EXISTS identity.principal_credential (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.refresh_token (
     id                                uuid PRIMARY KEY,
-    user_id                           uuid NOT NULL,
+    principal_id                      uuid NOT NULL,
     hash                              text NOT NULL,
     expires_at                        timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL,
@@ -300,6 +302,7 @@ CREATE TABLE IF NOT EXISTS identity.segregation_rule (
     permission_b                      text NOT NULL,
     severity                          text NOT NULL,
     rationale                         text,
+    scope_sensitive                   boolean,
     allow_with_compensating_control   boolean,
     scope_path                        text
 );
@@ -329,22 +332,5 @@ CREATE TABLE IF NOT EXISTS identity.sso_provider (
     auto_provision_principals         boolean,
     is_enforced                       boolean,
     is_active                         boolean
-);
-
--- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS identity.user_access (
-    id                                uuid PRIMARY KEY,
-    user_id                           uuid NOT NULL,
-    role_id                           uuid,
-    permission_id                     uuid,
-    scope_path                        text,
-    effect                            text NOT NULL,
-    valid_from                        timestamptz,
-    valid_to                          timestamptz,
-    granted_by_user_account_id        uuid,
-    revoked_at                        timestamptz,
-    revoked_by_user_account_id        uuid,
-    created_at                        timestamptz NOT NULL
 );
 

@@ -2347,6 +2347,19 @@ components:
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceCapability'
+          description: >
+            BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is
+            standards-first — the device does what the device does — and until now a venue could
+            switch on a feature that depended on hardware without anything being able to say
+            whether the hardware was there.
+
+            **A capability absent is a capability unavailable**, not a capability assumed. A
+            venue setting that requires one is refused where no device in scope reports it,
+            rather than silently doing nothing at the gate.
         enrolmentState:
           type: string
           enum: [registered, enrolled, provisioned, active, deactivated, retired]
@@ -2422,6 +2435,22 @@ components:
             **Recorded on the `tenancy.device_audit` row, not on the device.** Required in
             practice for `deactivated` and `retired`, where an investigation six months later
             needs to know why a gate stopped working.
+
+    DeviceCapability:
+      type: string
+      description: >
+        BL-179. **Something a driver reports, not something the platform provides.** The list
+        grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a
+        driver plus configuration rather than a core change.
+
+        **`genderClassification` is here because `VenueSettings.segregatedAccess.
+        genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch
+        with no driver behind it. Where a venue's access hardware performs the check and the
+        venue chooses to use it, the result is **advisory to the steward and never decisive at
+        the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package
+        deviates deliberately and CF-130 records why.
+      enum:
+      - genderClassification
 
     ScopeLevel:
       type: string
@@ -2558,6 +2587,67 @@ components:
           properties:
             from: { type: string }
             to: { type: string }
+        biometrics:
+          type: object
+          nullable: true
+          description: >
+            CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a
+            person is asked whether the paperwork exists.** Biometric data is sensitive under
+            PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an
+            Article 21 assessment before the processing rather than after it.
+
+            **Nothing below this switch operates while it is off.** `AdmissionRules` may carry a
+            `biometricPolicy` per ticket type and those rules are inert until a venue enables
+            biometrics here, which means a profile copied between venues cannot start capturing
+            faces at the destination.
+
+            **Venue level because that is where the assessment is filed.** Region owns tax and
+            currency; the DPIA, the consent notice and the hardware are a venue's.
+          properties:
+            isEnabled:
+              type: boolean
+              default: false
+              description: >
+                **Off by default, and turning it on is refused without the two fields below.**
+                `setVenueSettings` answers 422 rather than accepting an enable it cannot
+                evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the
+                refusal is that the person switching this on is asked at the moment they switch
+                it on rather than by an auditor a year later.
+            dpiaReference:
+              type: string
+              nullable: true
+              maxLength: 200
+              description: >
+                **The venue's own reference for its Article 21 assessment.** The platform does
+                not hold the document and does not judge it; it records that one was named, by
+                whom, and when — which is what an audit asks for and what the venue can produce.
+            consentNoticeAcknowledgedAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: >
+                **When somebody confirmed the consent forms are in place at the point of
+                capture.** A guest consenting in an app is a record; a guest consenting at a
+                ticket counter is a notice somebody has to have printed and a question somebody
+                has to have asked.
+            acknowledgedByPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                **Who confirmed it.** An acknowledgement with no name behind it cannot be
+                followed up, and this is the field that makes the switch an act rather than a
+                setting.
+            faceTagPurgeMinutesAfterClose:
+              type: integer
+              nullable: true
+              default: 0
+              description: >
+                BL-106. **How long a same-visit Face Tag survives past the close of the
+                operating day**, and zero is the default because that is what 3.2.44 describes.
+                A non-zero value is an operational allowance for a late reconciliation, not a
+                retention period — **`facePass` ignores this entirely** and is bounded by its
+                entitlement.
         segregatedAccess:
           type: object
           nullable: true

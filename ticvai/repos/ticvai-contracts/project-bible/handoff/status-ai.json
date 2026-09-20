@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-20",
+ "generated": "2026-09-21",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,
@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 32,
+  "documents": 36,
   "openConflicts": 1
  },
  "metrics": {
@@ -169,9 +169,9 @@
  "inboundKeys": [],
  "conflicts": {
   "open": 1,
-  "closed": 33,
+  "closed": 34,
   "openIds": [
-   "CF-166"
+   "CF-165"
   ]
  },
  "unmodelledLifecycles": [],
@@ -179,6 +179,16 @@
   {
    "file": "docs\\active\\ai-scope-for-confirmation.md",
    "title": "AI scope \u2014 for confirmation",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\bl-073-cookie-consent-20-september.md",
+   "title": "BL-073 \u2014 cookie consent: what to buy, what to build, what is ours either way",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\build-plan-20-september.md",
+   "title": "Build plan \u2014 20 September 2026",
    "status": ""
   },
   {
@@ -277,6 +287,11 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\undrafted-packs-scope-20-september.md",
+   "title": "The 26 undrafted packs \u2014 what is in them and what they would cost",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\viewer-update-brief-20aug.md",
    "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": ""
@@ -325,6 +340,11 @@
    "file": "docs\\adr\\0046-on-premise-has-two-configurations.md",
    "title": "ADR-0046: On-premise has two configurations, and the difference is a control channel",
    "status": "Accepted"
+  },
+  {
+   "file": "docs\\adr\\0047-how-long-data-is-kept-and-where-it-goes-next.md",
+   "title": "ADR-0047: How long data is kept, and where it goes next",
+   "status": "Accepted \u2014 the RPO floor decided 21 September; one number pe"
   },
   {
    "file": "docs\\architecture\\ai-credentials.md",

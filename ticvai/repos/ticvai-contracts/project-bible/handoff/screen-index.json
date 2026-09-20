@@ -51816,7 +51816,8 @@
    "platform.device"
   ],
   "writes": [
-   "games.reader"
+   "games.reader",
+   "platform.device"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -127884,7 +127885,8 @@
    "platform.device"
   ],
   "writes": [
-   "payments.terminal"
+   "payments.terminal",
+   "platform.device"
   ],
   "storedProcedures": [],
   "wave": 3,

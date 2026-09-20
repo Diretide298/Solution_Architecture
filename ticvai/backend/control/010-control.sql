@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 );
 
 -- Rate limits per client (13.1.36). A quota protects the venue, not the developer. Hangs off:
--- reaches control.cell through its keys; references control.api_client. Reached by: 0 operations
+-- reaches control.cell through its keys; references control.api_client. Reached by: 1 operations
 -- read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_limit (
     id                                uuid PRIMARY KEY,
@@ -167,6 +167,8 @@ CREATE TABLE IF NOT EXISTS control.cell_instance (
     cell_id                           uuid NOT NULL,
     name                              text NOT NULL,
     status                            text NOT NULL,
+    role                              text,
+    supports_synchronous_replication  boolean,
     max_connections                   integer,
     created_at                        timestamptz,
     retired_at                        timestamptz
@@ -196,6 +198,7 @@ CREATE TABLE IF NOT EXISTS control.cell_tenant (
     cell_id                           uuid NOT NULL,
     tenant_id                         uuid NOT NULL,
     instance_id                       uuid NOT NULL,
+    replication_mode                  text,
     pinned_instance                   boolean,
     database_name                     text NOT NULL,
     status                            text NOT NULL,
@@ -448,7 +451,7 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
 
 -- Net rate or commission, credit terms, validity. Versioned — an order placed last week used last
 -- week’s rate Hangs off: reaches control.cell through its keys; references approvals.request,
--- assets.media_asset, identity.principal. Reached by: 6 operations read it and 3 write it; 1
+-- assets.media_asset, identity.principal. Reached by: 8 operations read it and 3 write it; 1
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS control.partner_agreement (
     id                                uuid PRIMARY KEY,
@@ -604,7 +607,7 @@ CREATE TABLE IF NOT EXISTS control.scaling_policy (
 
 -- Titles, canonicals, hreflang and schema markup (22.11). An attraction that does not appear in
 -- search sells through OTAs at OTA commission. Hangs off: reaches control.cell through its keys;
--- references ledger.legal_entity. Reached by: 0 operations read it and 1 write it.
+-- references ledger.legal_entity. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.seo_metadata (
     id                                uuid PRIMARY KEY NOT NULL,
     entity_kind                       text NOT NULL,
@@ -719,6 +722,7 @@ CREATE TABLE IF NOT EXISTS control.url_redirect (
     to_path                           text NOT NULL,
     status_code                       text NOT NULL,
     reason                            text,
+    created_at                        timestamptz,
     hit_count                         integer,
     is_active                         boolean,
     scope_path                        text
@@ -777,7 +781,7 @@ CREATE TABLE IF NOT EXISTS control.webhook_delivery (
 
 -- An external subscriber to business events (13.1.26, 13.3.18). The 29 events existed and nothing
 -- outside could receive one. Hangs off: reaches control.cell through its keys; references
--- control.api_client. Reached by: 2 operations read it and 1 write it.
+-- control.api_client. Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.webhook_subscription (
     id                                uuid PRIMARY KEY NOT NULL,
     client_id                         uuid NOT NULL,

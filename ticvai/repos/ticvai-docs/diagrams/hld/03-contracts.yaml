@@ -17,16 +17,16 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 203
+  operations: 205
   holds: null
   service: MarketingService
   verbs:
-    GET: 101
+    GET: 102
     POST: 62
-    PUT: 34
+    PUT: 35
     PATCH: 4
     DELETE: 2
-  guestCallable: 33
+  guestCallable: 35
   offlineCapable: 9
   events: null
   ref: diagrams/lld/contracts/marketing-crm.yaml
@@ -50,13 +50,13 @@ contracts:
   ref: diagrams/lld/contracts/catalogue.yaml
 - contract: access
   tier: spine
-  operations: 180
+  operations: 182
   holds: null
   service: AccessService
   verbs:
     GET: 122
     PUT: 45
-    POST: 9
+    POST: 11
     PATCH: 2
     DELETE: 2
   guestCallable: 11
@@ -66,16 +66,16 @@ contracts:
   ref: diagrams/lld/contracts/access.yaml
 - contract: orders
   tier: spine
-  operations: 173
+  operations: 175
   holds: null
   service: OrderService
   verbs:
-    GET: 91
+    GET: 93
     POST: 54
     PUT: 24
     DELETE: 3
     PATCH: 1
-  guestCallable: 29
+  guestCallable: 31
   offlineCapable: 13
   events:
   - cart-abandoned
@@ -132,12 +132,12 @@ contracts:
   ref: diagrams/lld/contracts/fnb.yaml
 - contract: identity
   tier: spine
-  operations: 61
+  operations: 63
   holds: null
   service: IdentityService
   verbs:
     POST: 30
-    GET: 22
+    GET: 24
     DELETE: 4
     PUT: 4
     PATCH: 1
@@ -294,6 +294,19 @@ contracts:
   offlineCapable: 5
   events: null
   ref: diagrams/lld/contracts/workforce.yaml
+- contract: payments
+  tier: satellite
+  operations: 39
+  holds: null
+  service: OrderService
+  verbs:
+    GET: 16
+    PUT: 14
+    POST: 9
+  guestCallable: 0
+  offlineCapable: 0
+  events: null
+  ref: diagrams/lld/contracts/payments.yaml
 - contract: tenancy
   tier: spine
   operations: 39
@@ -340,19 +353,6 @@ contracts:
   offlineCapable: 5
   events: null
   ref: diagrams/lld/contracts/games.yaml
-- contract: payments
-  tier: satellite
-  operations: 35
-  holds: null
-  service: OrderService
-  verbs:
-    GET: 14
-    PUT: 13
-    POST: 8
-  guestCallable: 0
-  offlineCapable: 0
-  events: null
-  ref: diagrams/lld/contracts/payments.yaml
 - contract: platform-ops
   tier: satellite
   operations: 33

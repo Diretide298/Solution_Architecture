@@ -18,6 +18,7 @@ import base64
 import json
 import os
 import re
+import time
 import urllib.error
 import urllib.request
 from datetime import date, timedelta
@@ -1407,6 +1408,96 @@ def my_board(
                 f"'{scope['pmsName'] or scope['pmsIdentifier']}'. If its work has not "
                 f"been loaded there yet, that is why.",
     }
+
+
+# ── the delivery overview: every ticket in the project, for an admin ─
+#
+# `/api/board/mine` answers "what am I holding". This answers "where is the
+# delivery", which is a different question with a different cost: every ticket in
+# every state, so the closed and the rejected are counted too, paged out of
+# OpenProject a few hundred at a time.
+#
+# That cost is why this one is cached and the board is not. A board is read by
+# the person whose work it is, once, and a minute-old board is a wrong board. An
+# overview is a page several admins leave open, and the number it exists to show
+# — how the project is going — does not change between two reads a minute apart.
+# So: one read per project per five minutes, and a Refresh button for the
+# impatient, which is `refresh=1` and skips the cache.
+#
+# Admin-only, unlike the rest of the PMS routes. It carries every assignee's
+# workload, which is the one PMS shape that is nobody's business but the team's.
+
+OVERVIEW_TTL_SECONDS = 300
+OVERVIEW_LIMIT = 2000
+# {(adam project, openproject id): {"at": monotonic, "payload": {...}}}
+_overview_cache: dict = {}
+
+
+def _overview_payload(account: dict, scope: dict) -> dict:
+    """One live read of a whole project, with the artefact links joined in."""
+    endpoint, token = _pms_for(account["id"])
+    try:
+        items = openproject.everything(
+            endpoint, token, scope["pmsId"], limit=OVERVIEW_LIMIT)
+        known = openproject.statuses(endpoint, token)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    # Same belt-and-braces as the board: an instance that ignores the project
+    # filter must not turn an overview of one product into an overview of all.
+    items = [item for item in items if item.get("projectId") == scope["pmsId"]]
+
+    touching: dict = {}
+    for row in db.all_rows(
+        "SELECT external_key, target_kind, target_id FROM artefact_link "
+        "WHERE external_system = 'openproject' AND project_id = ?", (scope["project"],)
+    ):
+        touching.setdefault(row["external_key"], []).append(
+            {"kind": row["target_kind"], "id": row["target_id"]})
+
+    return {
+        "project": scope["project"],
+        "endpoint": endpoint,
+        "openproject": {
+            "id": scope["pmsId"],
+            "identifier": scope["pmsIdentifier"],
+            "name": scope["pmsName"],
+            "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
+        },
+        # Named by OpenProject, not by ADAM. Which of them count as finished is
+        # `isClosed`, which is the instance's own answer and survives a team
+        # renaming its columns.
+        "statuses": known,
+        "total": len(items),
+        # Said out loud rather than left to look like a small project.
+        "truncated": len(items) >= OVERVIEW_LIMIT,
+        "items": [{**item, "touches": touching.get(item["key"], [])} for item in items],
+        "note": None if items else
+                f"The OpenProject project '{scope['pmsName'] or scope['pmsIdentifier']}' "
+                f"has no work packages yet.",
+    }
+
+
+@app.get("/api/board/overview")
+def delivery_overview(
+    project_id: str = Query(default=""),
+    refresh: int = Query(default=0),
+    account: dict = Depends(require_admin),
+):
+    """Every ticket in the project's OpenProject project, cached for five minutes."""
+    scope = _pms_scope(account, project_id)
+    key = (scope["project"], scope["pmsId"])
+    now = time.monotonic()
+    held = _overview_cache.get(key)
+    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
+        age = int(now - held["at"])
+        return {**held["payload"], "asOf": held["asOf"], "ageSeconds": age,
+                "fromCache": True, "cacheSeconds": OVERVIEW_TTL_SECONDS}
+
+    payload = _overview_payload(account, scope)
+    asOf = security.stamp()
+    _overview_cache[key] = {"at": now, "asOf": asOf, "payload": payload}
+    return {**payload, "asOf": asOf, "ageSeconds": 0, "fromCache": False,
+            "cacheSeconds": OVERVIEW_TTL_SECONDS}
 
 
 # ── changing a work package: proposed, shown, then applied ───────────
