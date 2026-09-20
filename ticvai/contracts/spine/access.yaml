@@ -8681,6 +8681,50 @@ components:
         serverEvaluatedAt:
           type: string
           format: date-time
+        advisory:
+          type: object
+          nullable: true
+          description: >
+            BL-179, CF-130. **What a device observed, for the steward, never for the gate.**
+            Present only where an access point's device reports the matching
+            `DeviceCapability` and the venue has turned the corresponding setting on.
+
+            **Never persisted.** This schema is computed and stored as `access.scan_event`, and
+            the advisory is deliberately not part of what is stored: an inferred classification
+            kept against a guest is sensitive personal data with no consent behind it. **A guest
+            agreed to be admitted, not to be classified** — Face Pass and Face Tag carry
+            `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody
+            enrols in being looked at by a turnstile. `scan_event` records that an override
+            happened and never what the device thought, which keeps
+            `overrideRateAlertThreshold` working without building a register nobody agreed to.
+
+            **It cannot reach `outcome` or `denyReason`.** Those are decisive and
+            `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and
+            everything here sits on top of that without replacing any of it.
+          properties:
+            genderClassification:
+              type: string
+              enum: [women, men, undetermined]
+              description: >
+                **`undetermined` is a real answer and the most common one to design for.** A
+                classifier that never returns it is one that has been tuned to look confident.
+            confidence:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: >
+                **Required reading for the steward, not decoration.** An advisory with no
+                confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch
+                exactly the failure that produces — *an override rate near zero means the steward
+                has stopped deciding.* That number only means anything if the steward could see
+                how sure the device was.
+            reportedByDeviceId:
+              type: string
+              format: uuid
+              description: >
+                **Which device said it.** A classifier that degrades is one camera, not a venue,
+                and an advisory nobody can trace to hardware cannot be investigated or switched
+                off alone.
     TicketStatus:
       x-ticvai-persistence: none — computed from entitlement and scans
       description: '**A validation result, not a lifecycle**, despite the name. Computed at scan time

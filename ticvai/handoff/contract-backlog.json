@@ -5538,8 +5538,8 @@
    "refs": [
     "3.2.45"
    ],
-   "lane": "deferred",
-   "status": "open",
+   "lane": "settled",
+   "status": "done",
    "contracts": [
     "tenancy",
     "access"
@@ -5550,8 +5550,8 @@
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "closed": null,
-   "closedBy": null
+   "closed": "2026-09-20",
+   "closedBy": "**Closed 20 September.** `RegisteredDevice.capabilities` carries a `DeviceCapability`, whose first member is `genderClassification` — so a driver can now report what it does, and `segregatedAccess.genderVerification: deviceAssisted` stops being a switch with nothing behind it. **A capability absent is a capability unavailable, not one assumed**: a venue setting that needs hardware is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n\n`ValidationResult.advisory` is the path to the steward — a classification, a **confidence** and the device that reported it. The confidence is not decoration: `overrideRateAlertThreshold` already exists to catch a steward who has stopped deciding, and **that number means nothing unless the steward could see how sure the device was.**\n\n**It is never persisted, and that is a PDPL position rather than a storage preference.** An inferred classification kept against a guest is sensitive personal data with no consent behind it — **a guest agreed to be admitted, not to be classified.** Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled; **nobody enrols in being looked at by a turnstile.** `ValidationResult` stays `x-ticvai-persistence: none`, so `access.scan_event` records that an override happened and never what the device thought — which keeps the override-rate metric working without building a register nobody agreed to.\n\n**Advisory, never decisive.** It cannot reach `outcome` or `denyReason`, and `entitlementGated` stays `true` and read-only: the gate admits on the entitlement and everything else sits on top without replacing it. 3.2.45 asks for rejection and CF-130 records why the package deviates — a Ladies Night ticket is already gendered at the point of sale, and these events are staffed.\n\n**Remaining: the steward's display, which is a screen rather than a contract.**"
   }
  ],
  "phase": "discovery",

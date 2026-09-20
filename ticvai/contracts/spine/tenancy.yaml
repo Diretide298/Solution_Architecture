@@ -2347,6 +2347,19 @@ components:
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceCapability'
+          description: >
+            BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is
+            standards-first — the device does what the device does — and until now a venue could
+            switch on a feature that depended on hardware without anything being able to say
+            whether the hardware was there.
+
+            **A capability absent is a capability unavailable**, not a capability assumed. A
+            venue setting that requires one is refused where no device in scope reports it,
+            rather than silently doing nothing at the gate.
         enrolmentState:
           type: string
           enum: [registered, enrolled, provisioned, active, deactivated, retired]
@@ -2422,6 +2435,22 @@ components:
             **Recorded on the `tenancy.device_audit` row, not on the device.** Required in
             practice for `deactivated` and `retired`, where an investigation six months later
             needs to know why a gate stopped working.
+
+    DeviceCapability:
+      type: string
+      description: >
+        BL-179. **Something a driver reports, not something the platform provides.** The list
+        grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a
+        driver plus configuration rather than a core change.
+
+        **`genderClassification` is here because `VenueSettings.segregatedAccess.
+        genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch
+        with no driver behind it. Where a venue's access hardware performs the check and the
+        venue chooses to use it, the result is **advisory to the steward and never decisive at
+        the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package
+        deviates deliberately and CF-130 records why.
+      enum:
+      - genderClassification
 
     ScopeLevel:
       type: string
