@@ -1565,9 +1565,20 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Remove one record from the index
-      description: '**The erasure path.** When a subject is erased (`pii.erase_subject`) or a page is
-        unpublished, its vectors must go too — a knowledge base that keeps answering from a deleted document
-        is a deletion that did not happen.
+      description: '**The erasure path.** When a subject is erased — by `deleteGuestAccount`, the
+        guest''s own request, or by `eraseSubject` where it arrived some other way — or a page is
+        unpublished, its vectors must go too: a knowledge base that keeps answering from a deleted
+        document is a deletion that did not happen.
+
+
+        **Called at archive as well as at erasure** (ADR-0047). Archived personal data moves to a
+        separate instance and is no longer operationally readable, so a knowledge base still
+        answering from it is an archive that did not happen — the same rule one stage earlier.
+
+
+        **This used to cite `pii.erase_subject`, which is not a table and not an operation.** `pii`
+        holds `subject`, `subject_contact`, `subject_document` and `subject_biometric`. The dangling
+        name was read as evidence that erasure did not exist, and an ADR was drafted on it.
 
         Deleting from Postgres does not delete from Qdrant. Nothing cascades between the two stores, which
         is why this operation exists rather than being implied.

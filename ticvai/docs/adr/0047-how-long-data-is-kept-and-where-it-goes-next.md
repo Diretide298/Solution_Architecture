@@ -34,8 +34,33 @@ and cannot say when it will stop holding them has answered the easier question.
     listDataRetentionExpiry     the screen exists (CMS-037); the operation is one of the 577
                                 provisional drafts read off a workshop PDF and never specified
 
-**And the gap the whole policy hangs off: there is no erase operation.** `ai.yaml` names
-`pii.erase_subject` as *"the erasure path"* and nothing implements it.
+### Correction, same day — erasure exists and this ADR first said it did not
+
+**This section originally read "there is no erase operation".** That was wrong, and wrong in a
+way worth recording because it is the third time in one day: I searched for an operationId
+containing `erase`, found none, and concluded from its absence.
+
+**`deleteGuestAccount` is the erasure path and has been all along.** It *"raises an erasure
+request rather than deleting immediately. PII is removed from the erasable store; ledger entries
+keep their opaque subject reference and stay intact"*, and **where the guest is linked across
+cells the request fans out (ADR-0010)**. It returns `202` with a `requestId` and an
+`estimatedCompletionAt`, which is the correct shape for an erasure that cannot be synchronous.
+
+**What is actually missing is narrower and still real:**
+
+    staff-initiated erasure   deleteGuestAccount is `security: guestAuth` with
+                              `x-ticvai-self-scoped: subject`. **A DSAR erasure request that
+                              arrives by phone or email has no operation** -- only the guest
+                              can erase the guest, and that is not how most requests arrive
+    retention-triggered       nothing erases on a schedule. The whole of this ADR describes
+                              when data should go and no operation takes it
+    the archive stage         absent entirely, in both directions
+
+**And `pii.erase_subject` does not exist.** `ai.yaml`'s `removeIndexEntry` cites it as *"the
+erasure path"* in `schema.table` form; `pii` holds `subject`, `subject_contact`,
+`subject_document` and `subject_biometric` and nothing else. **A dangling reference in prose that
+names the mechanism the rest of the package relies on**, which is how it came to be read — by me
+— as evidence that the mechanism was missing.
 
 ---
 
@@ -136,11 +161,26 @@ first. `listDataRetentionExpiry` is the screen for exactly this and is currently
 read out of a PDF — **promoting it out of provisional is what makes the policy operable** rather
 than declared.
 
-### 7. The erase operation gets written
+### 7. Erasure gains the two paths it does not have, and keeps the one it does
 
-The whole of this hangs on an operation that is referenced and does not exist. It tombstones rather
-than deletes, because `pii.subject.is_erased` already says that is the pattern, and because an
-erasure with no record that it happened cannot be proven to a regulator.
+**`deleteGuestAccount` stays exactly as it is.** It is the guest's own path, it already tombstones
+rather than deletes — `pii.subject.is_erased`, `erased_at`, `erasure_request_id` — and it already
+fans out across cells. Nothing here replaces it.
+
+What is added beside it:
+
+    eraseSubject          staff-initiated, for a request that arrives by phone or email
+                          rather than through the app. Same tombstone, same fan-out,
+                          `x-ticvai-permission` rather than `guestAuth`, and an
+                          `x-ticvai-audit` reason, because an erasure somebody else
+                          asked for needs to say who asked
+    archiveSubject        the stage transition, with the derived-store purge in the same
+                          call. restoreSubject is its inverse and is deliberately
+                          permissioned harder than the archive itself
+
+**Retention-triggered erasure is a scheduled job calling `eraseSubject`, not a third operation.**
+A schedule that erases through its own private path is a schedule whose effects cannot be
+reproduced by hand when somebody disputes one.
 
 ---
 
@@ -168,11 +208,15 @@ carries the pin.
     1. control.cell_instance.role          primary | archive | burst, and placement
                                            reads it -- this is a live defect, not a feature
     2. the retention policy model          class, default, floor, ceiling, anchor + grace
-    3. eraseSubject                        the operation the erasure path already names
+    3. eraseSubject                        staff-initiated, beside deleteGuestAccount
+                                           rather than replacing it
     4. archiveSubject / restoreSubject     the stage transition, with the derived-store
                                            purge in the same call
     5. listDataRetentionExpiry             promoted out of provisional against this ADR
                                            rather than against a screen title
+    6. ai.yaml removeIndexEntry            its description cites `pii.erase_subject`,
+                                           which does not exist -- point it at
+                                           `deleteGuestAccount` and `eraseSubject`
 
 **What this does not decide.** Backup schedules, replication topology and restore drills stay
 infrastructure — CF-60 was right that 62 of the DR sheet is Dinesh's layer and not a contract.
