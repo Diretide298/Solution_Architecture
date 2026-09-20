@@ -22,17 +22,17 @@ ROOT = Path(__file__).resolve().parents[1]
 # Ships in two layouts: inside ticvai-docs, and flat in the delivery package where the
 # register sits under docs/. A generator that cannot run where it ships is one nobody runs.
 REGISTER = ROOT / "registers/conflicts.md"
-INDEX = ROOT / "registers/conflict-status.md"
 if not REGISTER.exists():
-    # **The index has to move with the register.** This redirected REGISTER into
-    # `docs/registers/` and left INDEX at the root, so every run in the flat layout wrote
-    # `conflict-status.md` beside the tools while everybody read
-    # `docs/registers/conflict-status.md` — last correct on 25 August, and 51 conflicts behind
-    # by 20 September. **The tool reported 175 and the file people opened said 124**, which is
-    # the failure mode the register's own header describes: a register that loses its most
-    # expensive open item is worse than no register, because it is trusted.
     REGISTER = ROOT / "docs/registers/conflicts.md"
-    INDEX = ROOT / "docs/registers/conflict-status.md"
+# **The index is derived from the register's own directory, so the two cannot diverge.**
+# They used to be two independent assignments with a fallback that redirected only the first,
+# so every run in the flat layout wrote `conflict-status.md` beside the tools while everybody
+# read `docs/registers/conflict-status.md` — last correct on 25 August, **51 conflicts behind
+# by 20 September. The tool reported 175 and the file people opened said 124.** That was fixed
+# by correcting the second assignment, which left the same mistake one edit away; writing it
+# this way makes the layouts impossible to separate. `tools/check-output-paths.py` exists
+# because nothing in the package noticed for seven weeks.
+INDEX = REGISTER.parent / "conflict-status.md"
 
 STATE = {
     "Open — needs a client decision": "OPEN — client",
