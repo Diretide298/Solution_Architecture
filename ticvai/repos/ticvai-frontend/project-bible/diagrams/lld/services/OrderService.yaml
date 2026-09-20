@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 217 operations, 58 tables
+title: OrderService — 227 operations, 56 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -20,14 +20,14 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 217
+  operations: 227
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 35
+  tables: 33
   stores:
   - postgres
   largestTable: orders.pos_shift
@@ -35,10 +35,10 @@ schemas:
   tables: 23
   stores:
   - postgres
-  largestTable: payments.method
+  largestTable: payments.fee_rule
 operationsByContract:
 - contract: orders
-  count: 167
+  count: 173
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -54,7 +54,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
+    reads: 6
     writes: 4
   - operation: addTip
     verb: POST
@@ -118,7 +118,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: cancelReservation
     verb: DELETE
@@ -150,7 +150,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
+    reads: 7
     writes: 4
   - operation: claimCart
     verb: POST
@@ -158,7 +158,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: claimTicketTransfer
     verb: POST
@@ -198,7 +198,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 5
     writes: 2
   - operation: createListingSeller
     verb: POST
@@ -262,7 +262,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: createReservation
     verb: POST
@@ -294,7 +294,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: extendReservation
     verb: POST
@@ -310,7 +310,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getCart
     verb: GET
@@ -398,7 +398,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: issueWalletPass
     verb: POST
@@ -406,7 +406,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: listAbandonedCarts
     verb: GET
@@ -503,6 +503,14 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listDeposits
+    verb: GET
+    path: /deposits
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listExternalPaymentPartner
     verb: GET
@@ -648,13 +656,21 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listMembershipRenewals
+    verb: GET
+    path: /memberships/{membershipId}/renewals
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listMyOrders
     verb: GET
     path: /my/orders
     scope: tenant
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: listOfficialResaleMarketplace
     verb: GET
@@ -663,6 +679,22 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listOrderDiscounts
+    verb: GET
+    path: /order-discounts
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOrderFees
+    verb: GET
+    path: /orders/{orderId}/fees
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listOrderFinancialReconciliation
     verb: GET
@@ -1008,6 +1040,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listUpgrades
+    verb: GET
+    path: /upgrades
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listVoidReversalSame
     verb: GET
     path: /void-reversal-same
@@ -1102,8 +1142,16 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
+  - operation: renewMembership
+    verb: POST
+    path: /memberships/{membershipId}/renewals
+    scope: venue
+    permission: ORDER_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: reprintOrder
     verb: POST
     path: /orders/{orderId}/reprints
@@ -1166,7 +1214,7 @@ operationsByContract:
     scope: venue
     permission: CREDIT_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setCancellationPartialPolicy
     verb: PUT
@@ -1334,7 +1382,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: syncOrders
     verb: POST
@@ -1358,7 +1406,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: voidOrder
     verb: POST
@@ -1377,7 +1425,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: payments
-  count: 31
+  count: 35
   operations:
   - operation: createB2bCreditAccount
     verb: POST
@@ -1435,10 +1483,26 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: getPaymentRules
+    verb: GET
+    path: /payments/rules
+    scope: venue
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
   - operation: listB2bCreditAccounts
     verb: GET
     path: /b2b-credit-accounts
     scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDepositActivity
+    verb: GET
+    path: /deposits/{depositId}/activity
+    scope: venue
     permission: PAYMENT_VIEW
     offline: false
     reads: 1
@@ -1499,6 +1563,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: recordDepositActivity
+    verb: POST
+    path: /deposits/{depositId}/activity
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setB2bPaymentTerms
     verb: PUT
     path: /b2b-credit-accounts/{accountId}/terms
@@ -1563,6 +1635,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setPaymentRules
+    verb: PUT
+    path: /payments/rules
+    scope: venue
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: setPaymentTerminalConfiguration
     verb: PUT
     path: /payment-terminals
@@ -1652,7 +1732,7 @@ operationsByContract:
     scope: venue
     permission: SHIFT_OPEN
     offline: true
-    reads: 3
+    reads: 4
     writes: 3
   - operation: approveShiftOpen
     verb: POST
@@ -1865,12 +1945,6 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: orders.donation_line
-  columns: 3
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: orders.fraud_rule
   columns: 7
   store: postgres
@@ -1902,7 +1976,8 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - orders
   foreignWriters: null
 - table: orders.no_sale_event
   columns: 8
@@ -1928,12 +2003,6 @@ tables:
   foreignWriters:
   - fnb
   - subscription
-- table: orders.order_media_link
-  columns: 2
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: orders.payment
   columns: 16
   store: postgres
@@ -2070,19 +2139,22 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - payments
   foreignWriters: null
 - table: payments.deposit_activity
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - payments
   foreignWriters: null
 - table: payments.eligibility_rule
   columns: 14
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - payments
   foreignWriters: null
 - table: payments.failover_policy
   columns: 7
@@ -2095,7 +2167,8 @@ tables:
   columns: 16
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - payments
   foreignWriters: null
 - table: payments.hosted_checkout
   columns: 9
@@ -2203,41 +2276,41 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: CatalogueService
-  operations: 19
+  operations: 14
 - service: IdentityService
   operations: 14
 - service: AccessService
-  operations: 12
+  operations: 11
 - service: TenancyService
-  operations: 8
+  operations: 6
 - service: LedgerService
   operations: 5
-- service: WalletService
-  operations: 2
 - service: CrossRegionService
   operations: 1
 - service: MarketingService
   operations: 1
+- service: WalletService
+  operations: 1
 writesOutside:
-- service: LedgerService
-  operations: 7
-  why: '**The owner defines the row; this service may only append to it.**'
 - service: AccessService
   operations: 7
   why: '**The owner defines the row; this service may only append to it.**'
-- service: TenancyService
+- service: CatalogueService
   operations: 5
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CatalogueService
+- service: LedgerService
+  operations: 5
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
   operations: 5
   why: '**The owner defines the row; this service may only append to it.**'
 - service: MarketingService
   operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
-- service: WalletService
+- service: IdentityService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
-- service: IdentityService
+- service: WalletService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:

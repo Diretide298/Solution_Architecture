@@ -8373,6 +8373,215 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WhiteLabelMarketplaceDeploymentExperienceArchitecturView'
+  /memberships/{membershipId}/renewals:
+    get:
+      operationId: listMembershipRenewals
+      summary: Renewal attempts and why they failed
+      description: '**A failed renewal is the thing a guest phones about**, and until 20 September
+        there was nowhere to read one. `failureReason` is on the row precisely so the answer does not
+        require reading a payment provider''s logs.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Renewals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdersMembershipRenewal'
+    post:
+      operationId: renewMembership
+      summary: Renew a membership
+      description: '**The term, the grace period and what a renewal sells come from the entitlement
+        template**, which is the plan. Until those four columns were added on 20 September this
+        operation could not have computed `newExpiryAt` — the number to add did not exist anywhere.
+
+        A renewal inside the grace period extends from the old expiry, not from today; outside it,
+        the membership is rejoined rather than renewed, and the two produce different dates.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdersMembershipRenewal'
+      responses:
+        '201':
+          description: Renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersMembershipRenewal'
+        '409':
+          description: Outside the grace period, or already renewed for this term
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /deposits:
+    get:
+      operationId: listDeposits
+      summary: Deposits and their authorisation state
+      description: >
+        **The authorisation lifecycle, not the accounting one.** `required`, `authorized`,
+        `captured`, `released` and `forfeited` are what the card company knows; `ledger.deposit`
+        holds the liability posting and its `refundableUntil`. Two tables called deposit, two
+        different questions.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Deposits and their authorisation state
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersDeposit'
+  /order-discounts:
+    get:
+      operationId: listOrderDiscounts
+      summary: Discounts applied to orders
+      description: >
+        **Distinct from `promotions`, which decides whether a discount applies.** This records that
+        one did, to this order, for this amount — the row a refund has to reverse and a report has
+        to total.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Discounts applied to orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersDiscount'
+  /orders/{orderId}/fees:
+    get:
+      operationId: listOrderFees
+      summary: Fees charged on an order
+      description: >
+        **A booking fee is not a line and not a tax**, and putting it in either makes one of the two
+        wrong. A guest disputing a total is usually disputing a fee, and until now there was nowhere
+        to read them.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Fees charged on an order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrdersOrderFee'
+  /upgrades:
+    get:
+      operationId: listUpgrades
+      summary: Upgrade requests and their outcome
+      description: >
+        **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
+        the cheap half; the record is what a guest arriving with an upgraded entitlement is checked
+        against.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Upgrade requests and their outcome
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrdersUpgrade'
 components:
   schemas:
     OrdersDeposit:
@@ -8475,7 +8684,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Stores membership renewal transactions and the result of each renewal attempt.'
       required:
       - customerMembershipId
-      - planId
+      - entitlementTemplateId
       - type
       - status
       - attemptedAt
@@ -8486,7 +8695,7 @@ components:
         customerMembershipId:
           type: string
           format: uuid
-        planId:
+        entitlementTemplateId:
           type: string
           format: uuid
         orderId:
@@ -8607,7 +8816,7 @@ components:
         status:
           type: string
           maxLength: 30
-        requestedByUserId:
+        requestedByPrincipalId:
           type: string
           format: uuid
           nullable: true

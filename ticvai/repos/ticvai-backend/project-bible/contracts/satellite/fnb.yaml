@@ -5215,6 +5215,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+  /recipes/{recipeId}/substitutes:
+    get:
+      operationId: listIngredientSubstitutes
+      summary: Approved substitutions for a recipe's ingredients
+      description: >
+        **A kitchen out of an ingredient substitutes it whether or not the system says so.**
+        Recording which swaps are approved is how an allergen declaration survives a delivery that
+        did not arrive.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: recipeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Approved substitutions for a recipe's ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbIngredientSubstitute'
+    put:
+      operationId: setIngredientSubstitutes
+      summary: Define approved substitutions
+      description: >
+        Set whole per recipe: a substitution list is reviewed as a list, usually against an allergen
+        matrix.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: recipeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FnbIngredientSubstitute'
+      responses:
+        '200':
+          description: Define approved substitutions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbIngredientSubstitute'
+  /product-recommendations:
+    get:
+      operationId: listFnbRecommendations
+      summary: Upsell and pairing suggestions for F&B
+      description: >
+        **Seventeen columns and no way to read them.** Kept whole from the backend workbook when the
+        ten duplicate catalogue tables were collapsed, because we have nothing like it —
+        `promotions.getUpsellSuggestions` computes, and this is what a venue configured.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Upsell and pairing suggestions for F&B
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FnbProductRecommendation'
 components:
   schemas:
     FnbIngredientSubstitute:
@@ -5276,194 +5374,6 @@ components:
           type: integer
         isActive:
           type: boolean
-    FnbPrice:
-      type: object
-      x-ticvai-persistence: fnb.price
-      description: '**Taken from the backend workbook, 20 September.** Stores the selling price of an F&B product or variant within an F&B price list.'
-      required:
-      - listId
-      - productId
-      - amount
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        listId:
-          type: string
-          format: uuid
-        productId:
-          type: string
-          format: uuid
-        variantId:
-          type: string
-          format: uuid
-          nullable: true
-        amount:
-          type: number
-        taxCode:
-          type: string
-          maxLength: 50
-          nullable: true
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    FnbPriceList:
-      type: object
-      x-ticvai-persistence: fnb.price_list
-      description: '**Taken from the backend workbook, 20 September.** Defines F&B prices for a currency, scope, channel and validity period.'
-      required:
-      - code
-      - name
-      - currencyCode
-      - priority
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        currencyCode:
-          type: string
-          maxLength: 10
-          x-ticvai-persisted: false
-          description: '**Resolved from the region, not stored** (ADR-0018). The same rule
-            catalogue.price_list already follows: a price list in a UAE region is AED and
-            cannot be anything else, so the column would hold millions of copies of one
-            region-owned answer and would let a price list disagree with its own region.
-            **Kept on the wire, removed from the table.** Taken from the backend workbook,
-            which stored it.'
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        channelsJson:
-          type: string
-          nullable: true
-        priority:
-          type: integer
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    FnbProduct:
-      type: object
-      x-ticvai-persistence: fnb.product
-      description: '**Taken from the backend workbook, 20 September.** Stores the independent master record for each sellable F&B item. This table does not depend on Ticketing Catalogue.'
-      required:
-      - categoryId
-      - code
-      - name
-      - type
-      - isStockTracked
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        categoryId:
-          type: string
-          format: uuid
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 200
-        description:
-          type: string
-          maxLength: 1000
-          nullable: true
-        type:
-          type: string
-          maxLength: 30
-        taxCode:
-          type: string
-          maxLength: 50
-          nullable: true
-        isStockTracked:
-          type: boolean
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    FnbProductCategory:
-      type: object
-      x-ticvai-persistence: fnb.product_category
-      description: '**Taken from the backend workbook, 20 September.** Groups F&B products into categories such as Food, Beverage, Combo, Dessert or Add-on.'
-      required:
-      - code
-      - name
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
     FnbProductRecommendation:
       type: object
       x-ticvai-persistence: fnb.product_recommendation
@@ -5550,45 +5460,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    FnbVariant:
-      type: object
-      x-ticvai-persistence: fnb.variant
-      description: '**Taken from the backend workbook, 20 September.** Stores F&B product variants such as Small/Medium/Large size or flavour/SKU variations.'
-      required:
-      - productId
-      - sku
-      - name
-      - isDefault
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        productId:
-          type: string
-          format: uuid
-        sku:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        barcode:
-          type: string
-          maxLength: 100
-          nullable: true
-        isDefault:
-          type: boolean
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
     TableReservationStatus:
       type: string
       enum:
@@ -6372,6 +6243,8 @@ components:
     TableReservation:
       type: object
       x-ticvai-persistence: fnb.table_reservation
+      x-ticvai-retired-columns:
+      - table_ids
       required:
       - outletId
       - startsAt
@@ -6404,15 +6277,24 @@ components:
             this to be real, or the second sitting cannot be booked.
 
             '
-        tableIds:
+        tables:
           type: array
-          description: 'Usually empty until seating. **Committing a specific table at booking time refuses
-            later bookings against a constraint that did not need to exist.**
+          description: >
+            The dining tables assigned to this reservation, one row each.
 
-            '
+            **Usually empty until seating.** Committing a specific table at booking time refuses
+            later bookings against a constraint that did not need to exist — that was true of the
+            `tableIds` array this replaces and it is still true, because it is about *when* a
+            table is assigned rather than how the assignment is stored.
+
+            **Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state,
+            which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`,
+            `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the
+            backend workbook. A party seated across three tables that releases one early has
+            nowhere to say so in an array, and *"which reservations are on table 7 tonight"* is a
+            GIN scan over every reservation instead of an index seek.
           items:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/FnbReservationTable'
         status:
           $ref: '#/components/schemas/TableReservationStatus'
         groupId:

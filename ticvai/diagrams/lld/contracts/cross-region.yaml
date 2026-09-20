@@ -1,5 +1,5 @@
 id: LLD-cross-region
-title: cross-region — 16 operations
+title: cross-region — 18 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -118,6 +118,28 @@ operations:
   offline: true
   reads:
   - platform.wallet_authorisation
+  writes: []
+- operation: listCellConnections
+  verb: GET
+  path: /cell-connections
+  scope: tenant
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - sync.cell_connection
+  writes: []
+- operation: listCrossCellRequests
+  verb: GET
+  path: /cross-cell-requests
+  scope: tenant
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - sync.cross_cell_request
   writes: []
 - operation: propagateCrossRegionEntitlement
   verb: POST

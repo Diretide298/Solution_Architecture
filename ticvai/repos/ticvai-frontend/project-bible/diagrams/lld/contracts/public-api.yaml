@@ -31,6 +31,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.api_client
   - control.api_licence
   - control.developer_account
   writes:
@@ -48,6 +49,7 @@ operations:
   reads:
   - cache:idempotency
   - control.developer_account
+  - control.sandbox
   writes:
   - cache:idempotency
   - control.sandbox
@@ -63,6 +65,7 @@ operations:
   reads:
   - cache:idempotency
   - control.api_client
+  - control.webhook_subscription
   writes:
   - cache:idempotency
   - control.webhook_subscription
@@ -278,6 +281,7 @@ operations:
   reads:
   - cache:idempotency
   - control.api_client
+  - control.api_limit
   writes:
   - cache:idempotency
   - cache:resolution
@@ -309,6 +313,7 @@ operations:
   reads:
   - cache:idempotency
   - control.developer_account
+  - control.integration_listing
   writes:
   - cache:idempotency
   - control.integration_listing

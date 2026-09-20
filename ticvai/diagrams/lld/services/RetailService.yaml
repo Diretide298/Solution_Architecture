@@ -1,5 +1,5 @@
 id: LLD-RetailService
-title: RetailService — 24 operations, 18 tables
+title: RetailService — 25 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -8,20 +8,20 @@ why: Merchandise, wallets and gift cards. Modest at 35 operations, and separate 
 scale: Follows the sale. Nothing unusual.
 ifDown: Down means the shop stops; the gates and the restaurant do not.
 coverage:
-  operations: 24
+  operations: 25
   inAFlow: 15
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: retail
-  tables: 18
+  tables: 13
   stores:
   - postgres
   largestTable: retail.product_recommendation
 operationsByContract:
 - contract: retail
-  count: 24
+  count: 25
   operations:
   - operation: cancelMerchandiseReservation
     verb: POST
@@ -45,7 +45,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createMerchandise
     verb: POST
@@ -69,7 +69,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createRetailSale
     verb: POST
@@ -77,7 +77,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createShopAndDrop
     verb: POST
@@ -85,7 +85,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: disposeShopAndDrop
     verb: POST
@@ -109,7 +109,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getReturnPolicy
     verb: GET
@@ -127,13 +127,21 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listRetailRecommendations
+    verb: GET
+    path: /product-recommendations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listRetailReturns
     verb: GET
     path: /retail-returns
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listRetailSales
     verb: GET
@@ -141,7 +149,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listStoreRules
     verb: GET
@@ -165,7 +173,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: lookupShopAndDrop
     verb: GET
@@ -173,7 +181,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: reprintReceipt
     verb: POST
@@ -189,7 +197,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setReturnPolicy
     verb: PUT
@@ -243,30 +251,6 @@ tables:
   parent: null
   writtenBy:
   - retail
-  foreignWriters: null
-- table: retail.price
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: retail.price_list
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: retail.product
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: retail.product_category
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy: []
   foreignWriters: null
 - table: retail.product_recommendation
   columns: 17
@@ -339,12 +323,6 @@ tables:
   parent: null
   writtenBy:
   - retail
-  foreignWriters: null
-- table: retail.variant
-  columns: 10
-  store: postgres
-  parent: null
-  writtenBy: []
   foreignWriters: null
 readsFrom:
 - service: TenancyService

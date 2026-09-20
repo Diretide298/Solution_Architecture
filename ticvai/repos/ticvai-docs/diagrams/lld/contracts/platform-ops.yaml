@@ -16,7 +16,10 @@ operations:
   reads:
   - cache:idempotency
   - control.migration_run
+  - control.migration_run_cell
+  - control.migration_run_tenant
   - control.rollout_cell
+  - control.rollout_tenant
   writes:
   - cache:idempotency
   - control.migration_run
@@ -45,7 +48,10 @@ operations:
   offline: false
   reads:
   - control.migration_run
+  - control.migration_run_cell
+  - control.migration_run_tenant
   - control.rollout_cell
+  - control.rollout_tenant
   writes: []
 - operation: getRelease
   verb: GET
@@ -325,7 +331,10 @@ operations:
   reads:
   - cache:idempotency
   - control.migration_run
+  - control.migration_run_cell
+  - control.migration_run_tenant
   - control.rollout_cell
+  - control.rollout_tenant
   writes:
   - cache:idempotency
   - control.migration_run

@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 182 operations, 62 tables
+title: PlatformService — 184 operations, 62 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -13,7 +13,7 @@ why: '**Three contracts, one schema, 41 tables.** Subscription, platform operati
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 182
+  operations: 184
   inAFlow: 40
   percent: 39%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -31,7 +31,7 @@ schemas:
   largestTable: subscription.plan
 operationsByContract:
 - contract: subscription
-  count: 127
+  count: 129
   operations:
   - operation: addCapacityPack
     verb: POST
@@ -103,7 +103,7 @@ operationsByContract:
     scope: tenant
     permission: PARTNER_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: createPartnerQuote
     verb: POST
@@ -119,7 +119,7 @@ operationsByContract:
     scope: tenant
     permission: PARTNER_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: createPlan
     verb: POST
@@ -151,7 +151,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 2
   - operation: decommissionCell
     verb: POST
@@ -175,7 +175,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 1
   - operation: executeTenantMigration
     verb: POST
@@ -199,7 +199,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_BILLING_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: getBillingReconciliation
     verb: GET
@@ -273,6 +273,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getPlanTiers
+    verb: GET
+    path: /plans/{planId}/tiers
+    scope: tenant
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 2
+    writes: 0
   - operation: getSubscription
     verb: GET
     path: /tenants/{tenantId}/subscription
@@ -327,7 +335,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listCellClusters
     verb: GET
@@ -671,7 +679,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_BILLING_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listTenantCells
     verb: GET
@@ -783,7 +791,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 1
+    reads: 2
     writes: 3
   - operation: removeLicenceAddOn
     verb: DELETE
@@ -799,7 +807,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 1
   - operation: resolveInvoiceDispute
     verb: POST
@@ -847,7 +855,7 @@ operationsByContract:
     scope: venue
     permission: PARTNER_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: setFamilyHouseholdDependent
     verb: PUT
@@ -945,6 +953,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setPlanTiers
+    verb: PUT
+    path: /plans/{planId}/tiers
+    scope: tenant
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setRenewalAutoMembership
     verb: PUT
     path: /renewal-auto-membership
@@ -1007,7 +1023,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: suspendTenant
     verb: POST
@@ -1058,7 +1074,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_MIGRATION_APPLY
     offline: false
-    reads: 3
+    reads: 6
     writes: 3
   - operation: createRelease
     verb: POST
@@ -1074,7 +1090,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_MIGRATION_VIEW
     offline: false
-    reads: 2
+    reads: 5
     writes: 0
   - operation: getRelease
     verb: GET
@@ -1258,7 +1274,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_MIGRATION_APPLY
     offline: false
-    reads: 3
+    reads: 6
     writes: 3
   - operation: rollbackRollout
     verb: POST
@@ -1333,7 +1349,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createSandbox
     verb: POST
@@ -1341,7 +1357,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createWebhookSubscription
     verb: POST
@@ -1349,7 +1365,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: deprecateApiVersion
     verb: POST
@@ -1477,7 +1493,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_ADMIN
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setDeveloperMembers
     verb: PUT
@@ -1493,7 +1509,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
 tables:
 - store: cache:idempotency
@@ -1742,7 +1758,7 @@ tables:
 - table: control.rollout_tenant
   columns: 12
   store: postgres
-  parent: platform.tenant
+  parent: control.tenant
   writtenBy: []
   foreignWriters: null
 - table: control.sandbox
@@ -1803,7 +1819,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.url_redirect
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1868,7 +1884,7 @@ tables:
 - table: subscription.go_live_readiness
   columns: 8
   store: postgres
-  parent: control.tenant
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: subscription.licensing_model
@@ -1903,13 +1919,15 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: subscription.tier_module
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: subscription.trial_config
   columns: 10
@@ -1934,25 +1952,25 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: TenancyService
-  operations: 7
+  operations: 6
 - service: LedgerService
-  operations: 6
+  operations: 5
 - service: CatalogueService
-  operations: 6
-- service: OrderService
   operations: 4
-- service: AiService
-  operations: 3
 - service: IdentityService
   operations: 3
+- service: OrderService
+  operations: 3
+- service: AiService
+  operations: 2
 - service: AccessService
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 7
+  operations: 6
   why: '**The owner defines the row; this service may only append to it.**'
-- service: OrderService
-  operations: 3
+- service: CrossRegionService
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: IdentityService
   operations: 1
@@ -1960,7 +1978,7 @@ writesOutside:
 - service: MarketingService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CrossRegionService
+- service: OrderService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:

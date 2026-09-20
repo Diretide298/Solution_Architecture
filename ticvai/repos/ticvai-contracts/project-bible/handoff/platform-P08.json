@@ -15,7 +15,7 @@
   "contracts": 31,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 157
+  "operationsWithNoScreen": 237
  },
  "waves": {
   "wave1": 60,
@@ -222,11 +222,11 @@
    "operations": 11
   },
   {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 10
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 10
   },
   {
@@ -10897,6 +10897,24 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
+    "operation": "listAccessChanges",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Changes made to an entitlement's access"
+   },
+   {
+    "operation": "listEntryRulePoints",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Which access points an admission rule covers"
+   },
+   {
+    "operation": "setEntryRulePoints",
+    "contract": "access",
+    "verb": "PUT",
+    "summary": "Set the access points an admission rule covers"
+   },
+   {
     "operation": "replaceAccreditationCredential",
     "contract": "accreditation",
     "verb": "POST",
@@ -10999,10 +11017,40 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
+    "operation": "getDynamicPriceRule",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "One rule with its conditions and actions"
+   },
+   {
+    "operation": "getPlanBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Which benefits a plan grants, and how much of each"
+   },
+   {
     "operation": "listDonationCampaigns",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Campaigns a guest can give to"
+   },
+   {
+    "operation": "listDynamicPriceRules",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Dynamic pricing rules"
+   },
+   {
+    "operation": "listMembershipBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Benefits a plan can grant"
+   },
+   {
+    "operation": "listMembershipProgrammes",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Membership schemes, the level above a plan"
    },
    {
     "operation": "listWaitlistEntries",
@@ -11027,6 +11075,30 @@
     "contract": "catalogue",
     "verb": "POST",
     "summary": "Put a previous version back"
+   },
+   {
+    "operation": "setDynamicPriceRule",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Replace a rule, its conditions and its actions"
+   },
+   {
+    "operation": "setMembershipBenefit",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Define a benefit"
+   },
+   {
+    "operation": "setMembershipProgramme",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Define a membership programme"
+   },
+   {
+    "operation": "setPlanBenefits",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Replace the benefits a plan grants"
    },
    {
     "operation": "suspendEntitlement",
@@ -11125,6 +11197,18 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "listFnbRecommendations",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Upsell and pairing suggestions for F&B"
+   },
+   {
+    "operation": "listIngredientSubstitutes",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Approved substitutions for a recipe's ingredients"
+   },
+   {
     "operation": "rebalanceStationLoad",
     "contract": "fnb",
     "verb": "POST",
@@ -11159,6 +11243,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "What the guest chooses, and what it costs extra"
+   },
+   {
+    "operation": "setIngredientSubstitutes",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define approved substitutions"
    },
    {
     "operation": "setKitchenSla",
@@ -11203,6 +11293,12 @@
     "summary": "The policies a device needs to decide for itself"
    },
    {
+    "operation": "getMembership",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "A membership with its history, usage and renewals"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -11221,6 +11317,30 @@
     "summary": "Reusable policy shapes"
    },
    {
+    "operation": "listCustomerMemberships",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listModules",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The module tree permissions are grouped under"
+   },
+   {
+    "operation": "listPermissions",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Every permission key the contracts enforce"
+   },
+   {
+    "operation": "recordBenefitUsage",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Consume a benefit"
+   },
+   {
     "operation": "setAccessPolicyState",
     "contract": "identity",
     "verb": "POST",
@@ -11231,6 +11351,12 @@
     "contract": "identity",
     "verb": "PUT",
     "summary": "Change a policy, as a new version"
+   },
+   {
+    "operation": "listStockReservations",
+    "contract": "inventory",
+    "verb": "GET",
+    "summary": "Soft holds on stock"
    },
    {
     "operation": "submitCountLines",
@@ -11251,10 +11377,22 @@
     "summary": "Suppress an address"
    },
    {
+    "operation": "awardBadge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Award a badge"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "getGuestExtraValues",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What a guest answered"
    },
    {
     "operation": "getLostItemMatches",
@@ -11263,10 +11401,64 @@
     "summary": "Candidate matches, scored"
    },
    {
+    "operation": "getLoyaltyRules",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Every rule a loyalty programme runs on"
+   },
+   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "issueReward",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a reward to a guest"
+   },
+   {
+    "operation": "listBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest can be awarded"
+   },
+   {
+    "operation": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Badges a guest holds"
+   },
+   {
+    "operation": "listGuestExtraFields",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Venue-defined guest fields and their options"
+   },
+   {
+    "operation": "listLoyaltyCampaigns",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Time-boxed campaigns inside a programme"
+   },
+   {
+    "operation": "listLoyaltyPointEntries",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The ledger behind a points balance"
+   },
+   {
+    "operation": "listRewardAssignments",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Rewards issued to guests, and whether they were used"
+   },
+   {
+    "operation": "listRewards",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What points can be turned into"
    },
    {
     "operation": "listSegmentMembers",
@@ -11275,16 +11467,70 @@
     "summary": "List guests currently matching a segment"
    },
    {
+    "operation": "listSlaPolicies",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Response and resolution targets for cases"
+   },
+   {
+    "operation": "listWaiverSignatures",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Signed waivers"
+   },
+   {
     "operation": "recordLostItem",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Report something lost, or hand something in"
    },
    {
+    "operation": "setBadge",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a badge"
+   },
+   {
     "operation": "setCallDisposition",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setGuestExtraFields",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define the extra guest fields"
+   },
+   {
+    "operation": "setGuestExtraValues",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Record a guest's answers"
+   },
+   {
+    "operation": "setLoyaltyCampaign",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a loyalty campaign and its window"
+   },
+   {
+    "operation": "setLoyaltyRules",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Replace a programme's rules as one set"
+   },
+   {
+    "operation": "setReward",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define a reward and its points cost"
+   },
+   {
+    "operation": "setSlaPolicy",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Define an SLA policy"
    },
    {
     "operation": "startKioskAssist",
@@ -11329,6 +11575,12 @@
     "summary": "Issue a complimentary entitlement, with no payment expected"
    },
    {
+    "operation": "listDeposits",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Deposits and their authorisation state"
+   },
+   {
     "operation": "listFraudRules",
     "contract": "orders",
     "verb": "GET",
@@ -11341,10 +11593,34 @@
     "summary": "Who may issue comps, and how many are left"
    },
    {
+    "operation": "listMembershipRenewals",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Renewal attempts and why they failed"
+   },
+   {
+    "operation": "listOrderDiscounts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Discounts applied to orders"
+   },
+   {
+    "operation": "listOrderFees",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Fees charged on an order"
+   },
+   {
     "operation": "listPaymentProviders",
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "listUpgrades",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Upgrade requests and their outcome"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -11365,10 +11641,40 @@
     "summary": "Push a change to every device holding it"
    },
    {
+    "operation": "renewMembership",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Renew a membership"
+   },
+   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
+   },
+   {
+    "operation": "getPaymentRules",
+    "contract": "payments",
+    "verb": "GET",
+    "summary": "Currency, eligibility and fee rules as one set"
+   },
+   {
+    "operation": "listDepositActivity",
+    "contract": "payments",
+    "verb": "GET",
+    "summary": "Movements on a deposit"
+   },
+   {
+    "operation": "recordDepositActivity",
+    "contract": "payments",
+    "verb": "POST",
+    "summary": "Record a movement on a deposit"
+   },
+   {
+    "operation": "setPaymentRules",
+    "contract": "payments",
+    "verb": "PUT",
+    "summary": "Replace the payment rule set"
    },
    {
     "operation": "skipRolloutCell",
@@ -11467,10 +11773,34 @@
     "summary": "Admit a party at the ride"
    },
    {
+    "operation": "createRentalAgreement",
+    "contract": "rental",
+    "verb": "POST",
+    "summary": "Raise a rental agreement"
+   },
+   {
+    "operation": "getRentalAgreement",
+    "contract": "rental",
+    "verb": "GET",
+    "summary": "One agreement with its items"
+   },
+   {
     "operation": "importRentalCatalogue",
     "contract": "rental",
     "verb": "POST",
     "summary": "Load a client's rental items and inventory at onboarding"
+   },
+   {
+    "operation": "listRentalAgreements",
+    "contract": "rental",
+    "verb": "GET",
+    "summary": "Rental agreements"
+   },
+   {
+    "operation": "deleteDashboard",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Archive a dashboard"
    },
    {
     "operation": "deleteReportSchedule",
@@ -11527,6 +11857,12 @@
     "summary": "Dispose of an uncollected item"
    },
    {
+    "operation": "listRetailRecommendations",
+    "contract": "retail",
+    "verb": "GET",
+    "summary": "Upsell and pairing suggestions for retail"
+   },
+   {
     "operation": "listRetailReturns",
     "contract": "retail",
     "verb": "GET",
@@ -11567,6 +11903,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Partner invoice and settlement, in an ERP format"
+   },
+   {
+    "operation": "getPlanTiers",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "What a plan tier allows and includes"
    },
    {
     "operation": "launchCellCluster",
@@ -11635,6 +11977,12 @@
     "summary": "Roll a cutover back"
    },
    {
+    "operation": "setPlanTiers",
+    "contract": "subscription",
+    "verb": "PUT",
+    "summary": "Set a plan tier's allowances and modules"
+   },
+   {
     "operation": "settleAiUsage",
     "contract": "subscription",
     "verb": "POST",
@@ -11645,6 +11993,12 @@
     "contract": "tenancy",
     "verb": "POST",
     "summary": "Give the device an identity it can prove"
+   },
+   {
+    "operation": "listCellEndpoints",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Where each service answers inside a cell"
    },
    {
     "operation": "listDeviceAuditRecords",
@@ -11711,6 +12065,18 @@
     "contract": "wallet",
     "verb": "POST",
     "summary": "Close a wallet"
+   },
+   {
+    "operation": "getWalletBalance",
+    "contract": "wallet",
+    "verb": "GET",
+    "summary": "A wallet's balance"
+   },
+   {
+    "operation": "listWalletHolds",
+    "contract": "wallet",
+    "verb": "GET",
+    "summary": "Funds held against a wallet"
    },
    {
     "operation": "reinstateWallet",
@@ -11837,6 +12203,120 @@
     "contract": "workforce",
     "verb": "POST",
     "summary": ""
+   },
+   {
+    "operation": "getEmployee",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "One person, with their employment, postings and leave balances"
+   },
+   {
+    "operation": "getFieldOwnership",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Which fields this source masters"
+   },
+   {
+    "operation": "listEmployees",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "People, as the HR system of record has them"
+   },
+   {
+    "operation": "listIntegrationSources",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "External systems that master workforce data, and their health"
+   },
+   {
+    "operation": "listJobTitles",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "The job titles a posting can name"
+   },
+   {
+    "operation": "listLeaveBalances",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "What each person has left, by leave type"
+   },
+   {
+    "operation": "listLeaveTypes",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Leave types and how each accrues"
+   },
+   {
+    "operation": "listShiftPatterns",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Named shift patterns"
+   },
+   {
+    "operation": "listSyncConflicts",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Disagreements a person has to settle"
+   },
+   {
+    "operation": "listSyncRuns",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Synchronisation history, with counts"
+   },
+   {
+    "operation": "listWorkAssignments",
+    "contract": "workforce",
+    "verb": "GET",
+    "summary": "Where each person is posted, and from when"
+   },
+   {
+    "operation": "resolveSyncConflict",
+    "contract": "workforce",
+    "verb": "POST",
+    "summary": "Settle a disagreement"
+   },
+   {
+    "operation": "setFieldOwnership",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Declare who masters each field"
+   },
+   {
+    "operation": "setIntegrationSource",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Connect or reconfigure an external workforce system"
+   },
+   {
+    "operation": "setJobTitle",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Define a job title"
+   },
+   {
+    "operation": "setLeaveType",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Define a leave type"
+   },
+   {
+    "operation": "setShiftPattern",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Define a shift pattern and its break"
+   },
+   {
+    "operation": "setWorkAssignment",
+    "contract": "workforce",
+    "verb": "PUT",
+    "summary": "Post a person to a job title at a venue"
+   },
+   {
+    "operation": "startSync",
+    "contract": "workforce",
+    "verb": "POST",
+    "summary": "Run a synchronisation now"
    }
   ],
   "modulesSplitAcrossWaves": [

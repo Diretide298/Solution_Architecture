@@ -44,6 +44,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.content_block
   - marketing.segment
   writes:
   - cache:idempotency
@@ -250,6 +251,7 @@ operations:
   offline: false
   reads:
   - cache:resolution
+  - control.footer_config
   - whitelabel.feature_toggle
   - whitelabel.homepage_section
   - whitelabel.module_enablement
@@ -326,6 +328,7 @@ operations:
   offline: true
   reads:
   - whitelabel.faq_category
+  - whitelabel.faq_entry
   writes: []
 - operation: listPolicies
   verb: GET
@@ -401,6 +404,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.footer_config
   - whitelabel.feature_toggle
   - whitelabel.homepage_section
   - whitelabel.module_enablement
@@ -453,9 +457,11 @@ operations:
   reads:
   - cache:idempotency
   - whitelabel.faq_category
+  - whitelabel.faq_entry
   writes:
   - cache:idempotency
   - whitelabel.faq_category
+  - whitelabel.faq_entry
 - operation: setFeatureToggles
   verb: PUT
   path: /tenant-config/features

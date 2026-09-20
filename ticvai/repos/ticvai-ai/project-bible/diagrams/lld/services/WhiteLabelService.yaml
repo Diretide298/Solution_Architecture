@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 50 operations, 15 tables
+title: WhiteLabelService — 50 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 15
+  tables: 13
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
@@ -46,7 +46,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createContentPage
     verb: POST
@@ -174,7 +174,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 6
+    reads: 7
     writes: 1
   - operation: getTheme
     verb: GET
@@ -222,7 +222,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listPolicies
     verb: GET
@@ -270,7 +270,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 6
+    reads: 7
     writes: 7
   - operation: setAppIcons
     verb: PUT
@@ -294,8 +294,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setFeatureToggles
     verb: PUT
     path: /tenant-config/features
@@ -478,7 +478,8 @@ tables:
   columns: 6
   store: postgres
   parent: whitelabel.faq_category
-  writtenBy: []
+  writtenBy:
+  - white-label
   foreignWriters: null
 - table: whitelabel.feature_toggle
   columns: 7
@@ -522,18 +523,6 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
-- table: whitelabel.redirect
-  columns: 10
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: whitelabel.seo_setting
-  columns: 16
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: whitelabel.tenant_config
   columns: 17
   store: postgres
@@ -543,10 +532,10 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: PlatformService
-  operations: 3
-- service: MarketingService
-  operations: 1
+  operations: 6
 - service: IdentityService
+  operations: 1
+- service: MarketingService
   operations: 1
 writesOutside:
 - service: PlatformService

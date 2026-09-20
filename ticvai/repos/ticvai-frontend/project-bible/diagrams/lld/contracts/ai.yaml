@@ -97,6 +97,7 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.layout_draft
   - ai.provider
   - assets.media_asset
   - cache:idempotency
@@ -302,6 +303,7 @@ operations:
   offline: false
   reads:
   - ai.suggestion
+  - ai.suggestion_outcome
   - cache:idempotency
   writes:
   - ai.suggestion_outcome
@@ -315,6 +317,7 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.index_job
   - ai.index_source
   - assets.media_asset
   - cache:embedding

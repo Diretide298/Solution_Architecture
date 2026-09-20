@@ -1,19 +1,19 @@
 # Contract backlog — index
 
-**179 edits raised by the requirement walk — 11 open, 166 done, 2 withdrawn.**
+**179 edits raised by the requirement walk — 12 open, 165 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
 
 | Lane | Open |
 |---|---|
-| Needs a decision | **6** |
+| Needs a decision | **7** |
 | Deferred | **5** |
 | Settled | **0** |
-| **Total open** | **11** |
+| **Total open** | **12** |
 
 
-## Needs a decision — tracked as a conflict — 6
+## Needs a decision — tracked as a conflict — 7
 
 Each of these has a CF. The register holds the reasoning; this is the index.
 
@@ -23,6 +23,7 @@ Each of these has a CF. The register holds the reasoning; this is the index.
 | **BL-100** | 2.14 | 2.14.19, 2.14.20, 2.14.21, 2.14.22, 2.14.23… | No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements. | `orders, finance` | — | CF-129 |
 | **BL-110** | 3.3 | 3.3.1, 3.3.2, 3.3.3, 3.3.4, 3.3.5, 3.3.6, 3… | Attribute-based access control does not exist — forty-eight requirements against a role-based model chosen deliberately. | `identity` | — | CF-130 |
 | **BL-140** | 5.7 | 5.7.93, 5.7.94, 5.10.3, 6.1.1, 6.1.23, 20.7.7 | No invoice, no credit memo, and no statement of what a compliant receipt must show. | `finance` | — | CF-133 |
+| **BL-160** | 16.1 | 16.1.2, 16.1.3, 16.1.6, 16.2.9, 16.2.10, 16… | No firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. | `tenancy, maintenance` | — | CF-136 |
 | **BL-161** | 16.7 | 16.7.35, 16.7.36, 16.7.37, 16.7.38, 16.7.39… | A device does not authenticate to the platform, and there is no tamper detection. | `tenancy, identity` | — | CF-136 |
 | **BL-173** | 22.6 | 22.6.1, 22.6.2, 22.6.3, 22.6.4, 22.6.5, 22.… | No gamification — challenges, achievements, badges, streaks, milestones or leaderboards. | `marketing-crm` | — | CF-137 |
 
@@ -191,7 +192,6 @@ Crosses contracts, or has no precedent to copy. Deciding now would design it in 
 | **BL-156** | 13.1 | No developer portal, no developer identity, no rate limiting, no API lifecycle management and no extension marketplace. | **Done.** The public-api contract (CF-135). Developer portal, developer identity, rate limiting and API lifecycle. **A partner resells tickets and a developer writes software** — DeveloperAccount.partnerId links them and keeps them separate. |
 | **BL-157** | 13.2 | No developer sandbox — provisioning, reset, cloning, test data, masking or lifecycle. | **Done.** Sandbox with SyntheticDataProfile and resetSandbox (D2, D3). **Synthetic only, one shared sandbox** — no cloning, no masking, no production data to isolate. |
 | **BL-159** | 15.3 | No request for quotation, no blanket purchase orders and no contract purchasing. | **Done.** PurchaseOrder.kind with blanket and release, plus rfqId. **A blanket order is a price and a commitment, not a delivery**, and modelling each release as its own order loses the contract that makes the price valid. |
-| **BL-160** | 16.1 | No firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. | **Done.** RegisteredDevice gained batteryPercent, lastCheckedAt and health; Workstation gained healthScore and configurationProfileId (CF-136, closed 20 August). **All nine device kinds the client board names already existed in DeviceKind, which carries twenty** — the list was never the gap. **lastCheckedAt is separate from lastHeartbeatAt because a printer with no paper heartbeats perfectly.** |
 | **BL-162** | 17.3 | No downtime measurement, no structured root cause, no work-order escalation, no corrective action as a tracked item, and no spare-parts reservation. | **Done.** WorkOrder.downtimeMinutes, rootCause and escalationLevel. **Downtime is measured out-of-service to back-in-service, not work start to work end** — a ride down six hours of which two were worked is down six hours, and the gap is the thing worth managing. **rootCause is structured because free text cannot be counted**, and deferredMaintenance is the value a venue least wants to see and most needs to. **Escalation is a clock, not a decision.** |
 | **BL-163** | 18.1 | Staff devices cannot be registered for push, offline scope is unstated for the staff app, and there is no staff-to-staff messaging. | **Done.** RegisteredDevice.pushToken, pushPlatform, pushFailureCount and offlineScope. **Guest devices registered for push and staff devices did not** — a scanner that cannot be told anything is a scanner somebody has to walk to. **fullVenue on a personal handset is a decision, not a default**: a device that can do everything offline carries the whole venue data in somebody pocket. |
 | **BL-164** | 18.10 | No voice interaction — `AiCapability` is chat, embedding, vision and rerank. | **Done.** AiCapability speechToText and textToSpeech. **Voice added rather than declined, with its own residency position** — speech is the capability where UAE residency is hardest to satisfy, and a guest speaking into a kiosk is producing personal data in the moment. |

@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 167 operations
+title: orders — 173 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -34,6 +34,8 @@ operations:
   - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.variant
+  - orders.cart
+  - orders.cart_line
   writes:
   - cache:idempotency
   - catalogue.inventory_hold
@@ -147,6 +149,7 @@ operations:
   - device
   offline: false
   reads:
+  - orders.stored_value_authorisation
   - promotions.voucher
   - wallet.gift_card
   - wallet.wallet
@@ -214,6 +217,9 @@ operations:
   - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
   writes:
   - cache:idempotency
   - orders.cart
@@ -230,6 +236,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.cart
+  - orders.cart_line
   - pii.subject
   writes:
   - cache:idempotency
@@ -308,6 +315,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.cart
+  - orders.cart_line
   - pii.subject
   - platform.scope
   writes:
@@ -438,6 +447,7 @@ operations:
   - access.entitlement
   - cache:idempotency
   - catalogue.entitlement_template
+  - orders.resale_listing
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -493,6 +503,7 @@ operations:
   - cache:idempotency
   - catalogue.inventory_hold
   - orders.cart
+  - orders.cart_line
   writes:
   - cache:idempotency
   - catalogue.inventory_hold
@@ -522,6 +533,7 @@ operations:
   offline: false
   reads:
   - orders.b2b_credit
+  - orders.credit_override
   writes: []
 - operation: getCart
   verb: GET
@@ -687,6 +699,7 @@ operations:
   - cache:idempotency
   - catalogue.product
   - identity.principal
+  - orders.invitation
   - orders.invitation_allowance
   writes:
   - access.entitlement
@@ -706,6 +719,7 @@ operations:
   - access.entitlement
   - cache:idempotency
   - orders.ticket_template
+  - orders.wallet_pass
   writes:
   - cache:idempotency
   - orders.wallet_pass
@@ -833,6 +847,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listDeposits
+  verb: GET
+  path: /deposits
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.deposit
   writes: []
 - operation: listExternalPaymentPartner
   verb: GET
@@ -1017,6 +1042,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listMembershipRenewals
+  verb: GET
+  path: /memberships/{membershipId}/renewals
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.membership_renewal
+  writes: []
 - operation: listMyOrders
   verb: GET
   path: /my/orders
@@ -1027,6 +1063,7 @@ operations:
   offline: false
   reads:
   - orders.order_line
+  - orders.payment
   - orders.sales_order
   - pii.subject
   writes: []
@@ -1039,6 +1076,28 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listOrderDiscounts
+  verb: GET
+  path: /order-discounts
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.discount
+  writes: []
+- operation: listOrderFees
+  verb: GET
+  path: /orders/{orderId}/fees
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.order_fee
   writes: []
 - operation: listOrderFinancialReconciliation
   verb: GET
@@ -1483,6 +1542,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listUpgrades
+  verb: GET
+  path: /upgrades
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.upgrade
+  writes: []
 - operation: listVoidReversalSame
   verb: GET
   path: /void-reversal-same
@@ -1656,11 +1726,25 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.cart
   - orders.cart_line
   writes:
   - cache:idempotency
   - catalogue.inventory_hold
   - orders.cart_line
+- operation: renewMembership
+  verb: POST
+  path: /memberships/{membershipId}/renewals
+  scope: venue
+  permission: ORDER_MANAGE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - orders.membership_renewal
+  writes:
+  - orders.membership_renewal
 - operation: reprintOrder
   verb: POST
   path: /orders/{orderId}/reprints
@@ -1777,6 +1861,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.b2b_credit
+  - orders.credit_override
   writes:
   - cache:idempotency
   - orders.b2b_credit
@@ -2023,6 +2108,7 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - payments.provider
+  - payments.token
   writes:
   - cache:idempotency
   - marketing.consent_record
@@ -2067,6 +2153,7 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.channel_capacity
+  - orders.cart
   - orders.cart_line
   writes:
   - cache:idempotency

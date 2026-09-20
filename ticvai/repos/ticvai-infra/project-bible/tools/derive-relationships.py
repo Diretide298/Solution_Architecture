@@ -94,13 +94,31 @@ def main() -> int:
     # Exact match wins over prefix, and a prefix that matches two tables is ambiguous and is
     # skipped — **guessing between `control.tenant` and `platform.tenant` would be worse than
     # leaving the column unlinked.**
+    # **An exact short name can be ambiguous too, and this refused it for prefixes and
+    # suffixes while `setdefault` silently took the first arrival for exact matches.** The
+    # comment directly above has always said that guessing between `control.tenant` and
+    # `platform.tenant` is worse than a gap; the exact path did exactly that.
+    #
+    # **23 short names are held by two or more schemas** — `provider` by `ai` and `payments`,
+    # `policy` by `whitelabel` and `ai`, `product` by `catalogue` and `rental`, `deposit` by
+    # `ledger` and `orders`. `payments.fee_rule.provider_id` resolved to `ai.provider`: a card
+    # fee pointing at a language-model vendor.
+    #
+    # **Resolution is now per referring schema.** A column on `payments.fee_rule` prefers
+    # `payments.provider`, because a table's own schema is the strongest evidence available
+    # about what it meant. Only when no same-schema candidate exists does the global map apply,
+    # and then only if it is unambiguous.
+    exact: dict[str, list] = {}
     stems: dict[str, str] = {}
     prefixes: dict[str, list] = {}
     for t in tables:
         short = t.split(".", 1)[1]
-        stems.setdefault(short, t)
+        exact.setdefault(short, []).append(t)
         head = short.split("_")[0]
         prefixes.setdefault(head, []).append(t)
+    for short, matches in exact.items():
+        if len(matches) == 1:
+            stems[short] = matches[0]
     suffixes: dict[str, list] = {}
     for t in tables:
         short = t.split(".", 1)[1]
@@ -127,9 +145,60 @@ def main() -> int:
             name = c["column"]
             if not name.endswith("_id") or c.get("references"):
                 continue
+            schema = table.split(".", 1)[0]
             parts = name[:-3].split("_")
-            target = next((stems["_".join(parts[i:])] for i in range(len(parts))
-                           if "_".join(parts[i:]) in stems), None)
+            target = None
+            for i in range(len(parts)):
+                stem = "_".join(parts[i:])
+                # **Longest match first, and within a match the referring schema wins** — for
+                # exact names, prefixes and suffixes alike. Applying it only to exact names
+                # refused `payments.reconciliation_source.connection_id`, which is unambiguously
+                # `payments.provider_connection`, because `sync.cell_connection` shares the
+                # suffix. Every `parent_category_id` self-reference failed the same way.
+                # **Four tests in strict order, and the order is the whole of it.**
+                #
+                #   1. an EXACT name in the referring schema
+                #   2. an exact name anywhere, if only one table has it
+                #   3. a prefix or suffix in the referring schema
+                #   4. a prefix or suffix anywhere, if unambiguous
+                #
+                # Collapsing 1 and 3 into one same-schema test breaks
+                # `payments.fee_rule.provider_id`: `payments.provider` is the exact match and
+                # `payments.provider_connection` shares the prefix, so both are same-schema, the
+                # test sees two and gives up — landing on `identity.sso_provider` through the
+                # global suffix. **An exact name in your own schema is the strongest evidence
+                # there is** and has to be asked for on its own.
+                #
+                # Running 3 only after 2 fails is what finds
+                # `fnb.reservation_table.reservation_id`: `retail.reservation` and
+                # `orders.reservation` are two exact matches and neither is in `fnb`, so the
+                # global test refuses, and `fnb.table_reservation` — six operations, one schema
+                # away — is waiting in the suffix set.
+                #
+                # **The table itself is never a candidate.** `fnb.reservation_table` is its own
+                # prefix match, and a self-reference needs the declared form: guessing one from a
+                # name is how a join table becomes its own parent.
+                ex = list(exact.get(stem) or [])
+                px = list(set(prefixes.get(stem) or []) | set(suffixes.get(stem) or []))
+                ex_same = [t for t in ex if t.split(".", 1)[0] == schema]
+                px_same = [t for t in px if t.split(".", 1)[0] == schema]
+                for pick in (ex_same, ex, px_same, px):
+                    # **Another table beats the table itself, and the table itself beats
+                    # nothing.** `maintenance.asset_category.parent_category_id` is a real
+                    # self-reference and dropping self outright unlinked every `parent_*_id` in
+                    # the package; keeping self in the running let `fnb.reservation_table` match
+                    # its own prefix and tie with `fnb.table_reservation`, which is the case that
+                    # started this.
+                    ns = [t for t in pick if t != table]
+                    if len(ns) == 1:
+                        target = ns[0]
+                        break
+                    if not ns and len(pick) == 1:
+                        target = pick[0]
+                        break
+                if target:
+                    break
+
             if target:
                 add(table, name, target, "convention", "foreignKey")
 

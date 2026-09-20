@@ -39,7 +39,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: beginPeriodClose
     verb: POST
@@ -87,7 +87,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_POST
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createLegalEntity
     verb: POST
@@ -167,7 +167,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getSettlement
     verb: GET
@@ -263,7 +263,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listLedgerEntries
     verb: GET
@@ -335,7 +335,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: recordSettlement
     verb: POST
@@ -391,7 +391,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: reviewPriceVariance
     verb: POST
@@ -407,7 +407,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 4
+    reads: 6
     writes: 3
   - operation: runRecognition
     verb: POST
@@ -615,14 +615,14 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 6
+  operations: 5
 - service: TenancyService
   operations: 3
-- service: WalletService
+- service: CatalogueService
   operations: 1
 - service: PlatformService
   operations: 1
-- service: CatalogueService
+- service: WalletService
   operations: 1
 writesOutside:
 - service: TenancyService

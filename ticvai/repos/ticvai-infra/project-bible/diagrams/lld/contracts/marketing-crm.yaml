@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 183 operations
+title: marketing-crm — 203 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -113,9 +113,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.loyalty_points
   - marketing.loyalty_position
   writes:
   - cache:idempotency
+  - marketing.loyalty_points
   - marketing.loyalty_position
 - operation: approvePrivacyTesting
   verb: PUT
@@ -137,6 +139,19 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: awardBadge
+  verb: POST
+  path: /customers/{customerId}/badges
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - marketing.customer_badge
+  writes:
+  - marketing.customer_badge
 - operation: claimConversation
   verb: POST
   path: /conversations/{conversationId}/claim
@@ -149,6 +164,7 @@ operations:
   - cache:idempotency
   - marketing.agent_availability
   - marketing.conversation
+  - marketing.conversation_message
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -163,6 +179,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.conversation
+  - marketing.conversation_message
   writes:
   - cache:idempotency
   - marketing.case
@@ -220,6 +237,7 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.event
+  - marketing.challenge
   - marketing.loyalty_programme
   writes:
   - cache:idempotency
@@ -251,6 +269,7 @@ operations:
   - cache:idempotency
   - catalogue.event
   - catalogue.product
+  - marketing.invitation_campaign
   writes:
   - cache:idempotency
   - marketing.invitation_campaign
@@ -280,9 +299,11 @@ operations:
   reads:
   - cache:idempotency
   - marketing.loyalty_programme
+  - marketing.points_earning_rule
   writes:
   - cache:idempotency
   - marketing.loyalty_programme
+  - marketing.points_earning_rule
 - operation: createMessageTemplate
   verb: POST
   path: /message-templates
@@ -309,6 +330,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.guest_profile
+  - marketing.referral
   - promotions.promotion
   writes:
   - cache:idempotency
@@ -404,6 +426,7 @@ operations:
   offline: false
   reads:
   - marketing.campaign
+  - marketing.segment_criterion
   writes: []
 - operation: getCampaignPerformance
   verb: GET
@@ -479,6 +502,17 @@ operations:
   - marketing.consent_purpose
   - marketing.consent_record
   - pii.subject
+  writes: []
+- operation: getGuestExtraValues
+  verb: GET
+  path: /guests/{guestId}/extra-values
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_extra_value
   writes: []
 - operation: getGuestIntelligence
   verb: GET
@@ -585,6 +619,19 @@ operations:
   reads:
   - marketing.loyalty_programme
   writes: []
+- operation: getLoyaltyRules
+  verb: GET
+  path: /loyalty/programmes/{programmeId}/rules
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.loyalty_rule
+  - marketing.points_redemption_rule
+  - marketing.programme_tier
+  writes: []
 - operation: getMarketingSubscription
   verb: GET
   path: /marketing-subscriptions
@@ -671,6 +718,7 @@ operations:
   - cache:idempotency
   - marketing.agent_availability
   - marketing.conversation
+  - marketing.conversation_message
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -703,6 +751,18 @@ operations:
   - marketing.audience_list
   writes:
   - marketing.audience_list
+- operation: issueReward
+  verb: POST
+  path: /loyalty/reward-assignments
+  scope: venue
+  permission: LOYALTY_REDEEM
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.reward_assignment
+  writes:
+  - marketing.reward_assignment
 - operation: launchCampaign
   verb: POST
   path: /campaigns/{campaignId}/launch
@@ -749,6 +809,18 @@ operations:
   reads:
   - marketing.audience_list
   writes: []
+- operation: listBadges
+  verb: GET
+  path: /badges
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.badge
+  writes: []
 - operation: listBusinessEventNotification
   verb: GET
   path: /business-event-notification
@@ -769,6 +841,7 @@ operations:
   offline: false
   reads:
   - marketing.campaign
+  - marketing.segment_criterion
   writes: []
 - operation: listCaseResolutionClosure
   verb: GET
@@ -878,6 +951,7 @@ operations:
   reads:
   - identity.principal
   - marketing.conversation
+  - marketing.conversation_message
   writes: []
 - operation: listCookieBannerPreference
   verb: GET
@@ -898,6 +972,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listCustomerBadges
+  verb: GET
+  path: /customers/{customerId}/badges
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.customer_badge
   writes: []
 - operation: listCustomerPrivacyConsent
   verb: GET
@@ -1061,6 +1147,18 @@ operations:
   reads:
   - marketing.guest_device
   writes: []
+- operation: listGuestExtraFields
+  verb: GET
+  path: /guest-extra-fields
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_extra_field
+  - marketing.guest_extra_option
+  writes: []
 - operation: listJourneys
   verb: GET
   path: /journeys
@@ -1084,6 +1182,28 @@ operations:
   - marketing.lost_item
   - venuemap.point
   writes: []
+- operation: listLoyaltyCampaigns
+  verb: GET
+  path: /loyalty/campaigns
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.loyalty_campaign
+  writes: []
+- operation: listLoyaltyPointEntries
+  verb: GET
+  path: /loyalty/points
+  scope: venue
+  permission: LOYALTY_ACCRUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.loyalty_points
+  writes: []
 - operation: listLoyaltyProgrammes
   verb: GET
   path: /loyalty/programmes
@@ -1095,6 +1215,7 @@ operations:
   offline: true
   reads:
   - marketing.loyalty_programme
+  - marketing.points_earning_rule
   writes: []
 - operation: listMessageTemplates
   verb: GET
@@ -1251,6 +1372,29 @@ operations:
   reads:
   - marketing.review
   writes: []
+- operation: listRewardAssignments
+  verb: GET
+  path: /loyalty/reward-assignments
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.reward_assignment
+  writes: []
+- operation: listRewards
+  verb: GET
+  path: /loyalty/rewards
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.reward
+  writes: []
 - operation: listRoutingPriorityThrottling
   verb: GET
   path: /routing-priority-throttling
@@ -1282,6 +1426,7 @@ operations:
   offline: false
   reads:
   - marketing.segment
+  - marketing.segment_criterion
   writes: []
 - operation: listServiceRootCause
   verb: GET
@@ -1302,6 +1447,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listSlaPolicies
+  verb: GET
+  path: /sla-policies
+  scope: venue
+  permission: CASE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.sla_policy
   writes: []
 - operation: listSlaPolicyService
   verb: GET
@@ -1382,6 +1538,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listWaiverSignatures
+  verb: GET
+  path: /waiver-signatures
+  scope: venue
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.waiver_signature
   writes: []
 - operation: listWaiverTemplateMaster
   verb: GET
@@ -1543,6 +1710,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.privacy_incident
   - pii.subject
   writes:
   - cache:idempotency
@@ -1559,6 +1727,7 @@ operations:
   - cache:idempotency
   - marketing.campaign
   - marketing.journey
+  - marketing.touch_point
   writes:
   - cache:idempotency
   - marketing.touch_point
@@ -1649,6 +1818,7 @@ operations:
   - cache:idempotency
   - marketing.invitation
   - marketing.invitation_campaign
+  - orders.invitation
   writes:
   - cache:idempotency
   - marketing.invitation
@@ -1730,6 +1900,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.conversation
+  - marketing.conversation_message
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -1763,6 +1934,18 @@ operations:
   writes:
   - cache:idempotency
   - marketing.agent_availability
+- operation: setBadge
+  verb: PUT
+  path: /badges
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.badge
+  writes:
+  - marketing.badge
 - operation: setCallDisposition
   verb: POST
   path: /conversations/{conversationId}/disposition
@@ -1888,6 +2071,32 @@ operations:
   - marketing.guest_attribute_model
   writes:
   - marketing.guest_attribute_model
+- operation: setGuestExtraFields
+  verb: PUT
+  path: /guest-extra-fields
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_extra_field
+  - marketing.guest_extra_option
+  writes:
+  - marketing.guest_extra_field
+  - marketing.guest_extra_option
+- operation: setGuestExtraValues
+  verb: PUT
+  path: /guests/{guestId}/extra-values
+  scope: venue
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_extra_value
+  writes:
+  - marketing.guest_extra_value
 - operation: setGuestRelationships
   verb: PUT
   path: /guests/{guestId}/relationships
@@ -1932,6 +2141,34 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setLoyaltyCampaign
+  verb: PUT
+  path: /loyalty/campaigns
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.loyalty_campaign
+  writes:
+  - marketing.loyalty_campaign
+- operation: setLoyaltyRules
+  verb: PUT
+  path: /loyalty/programmes/{programmeId}/rules
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.loyalty_rule
+  - marketing.points_redemption_rule
+  - marketing.programme_tier
+  writes:
+  - marketing.loyalty_rule
+  - marketing.points_redemption_rule
+  - marketing.programme_tier
 - operation: setMarketingSubscription
   verb: PUT
   path: /marketing-subscriptions
@@ -1999,6 +2236,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setReward
+  verb: PUT
+  path: /loyalty/rewards
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.reward
+  writes:
+  - marketing.reward
 - operation: setSenderIdentityDomain
   verb: PUT
   path: /sender-identity-domain
@@ -2020,6 +2269,7 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - control.seo_metadata
   writes:
   - cache:idempotency
   - cache:resolution
@@ -2034,6 +2284,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setSlaPolicy
+  verb: PUT
+  path: /sla-policies
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.sla_policy
+  writes:
+  - marketing.sla_policy
 - operation: setWaiverVerificationValidation
   verb: PUT
   path: /waiver-verification-validation
@@ -2054,6 +2316,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.kiosk_assist_session
   - orders.cart
   - platform.device
   writes:
@@ -2087,6 +2350,7 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - marketing.form_definition
+  - marketing.form_submission
   - pii.subject
   writes:
   - cache:idempotency
@@ -2132,6 +2396,7 @@ operations:
   - cache:idempotency
   - identity.principal
   - marketing.conversation
+  - marketing.conversation_message
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -2238,6 +2503,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.consent_record
+  - marketing.guest_document
   - pii.subject
   writes:
   - cache:idempotency

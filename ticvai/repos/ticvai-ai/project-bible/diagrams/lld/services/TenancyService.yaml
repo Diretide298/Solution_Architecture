@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 136 operations, 82 tables
+title: TenancyService — 156 operations, 82 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 136
+  operations: 156
   inAFlow: 32
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -93,7 +93,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createApprovalEvidencePackage
     verb: POST
@@ -109,7 +109,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 5
+    reads: 7
     writes: 2
   - operation: createAutomationAutonomouAction
     verb: POST
@@ -125,7 +125,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: escalateApprovalRequest
     verb: POST
@@ -133,7 +133,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: evaluateApprovalRequirement
     verb: POST
@@ -157,7 +157,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: issueAccreditationBadge
     verb: POST
@@ -309,7 +309,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: revokeApprovalDelegation
     verb: DELETE
@@ -333,7 +333,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setApprovalRetentionPolicy
     verb: PUT
@@ -413,10 +413,357 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
+    reads: 3
+    writes: 2
+- contract: workforce
+  count: 43
+  operations:
+  - operation: acknowledgeAnnouncement
+    verb: POST
+    path: /announcements/{announcementId}/acknowledge
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
     reads: 2
     writes: 2
+  - operation: amendAttendance
+    verb: POST
+    path: /attendance/{recordId}/amend
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: broadcastToGuests
+    verb: POST
+    path: /guest-broadcast
+    scope: venue
+    permission: ANNOUNCEMENT_PUBLISH
+    offline: false
+    reads: 5
+    writes: 3
+  - operation: claimOpenShift
+    verb: POST
+    path: /shift-marketplace
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createRotaAssignment
+    verb: POST
+    path: /rota-assignments
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: getAnnouncementReach
+    verb: GET
+    path: /announcements/{announcementId}/reach
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getEmployee
+    verb: GET
+    path: /employees/{employeeId}
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getFieldOwnership
+    verb: GET
+    path: /integration-sources/{sourceId}/field-ownership
+    scope: tenant
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getLabourCost
+    verb: GET
+    path: /labour-cost
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getStaffingCoverage
+    verb: GET
+    path: /staffing-coverage
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAnnouncements
+    verb: GET
+    path: /announcements
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listAttendance
+    verb: GET
+    path: /attendance
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listEmployees
+    verb: GET
+    path: /employees
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIntegrationSources
+    verb: GET
+    path: /integration-sources
+    scope: tenant
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listJobTitles
+    verb: GET
+    path: /job-titles
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLeaveBalances
+    verb: GET
+    path: /leave-balances
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLeaveRequests
+    verb: GET
+    path: /leave-requests
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLeaveTypes
+    verb: GET
+    path: /leave-types
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOpenShifts
+    verb: GET
+    path: /shift-marketplace
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listRotaAssignments
+    verb: GET
+    path: /rota-assignments
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listShiftPatterns
+    verb: GET
+    path: /shift-patterns
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listShiftSwapRequests
+    verb: GET
+    path: /shift-swaps
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listShiftTemplates
+    verb: GET
+    path: /shift-templates
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSyncConflicts
+    verb: GET
+    path: /sync-conflicts
+    scope: tenant
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSyncRuns
+    verb: GET
+    path: /sync-runs
+    scope: tenant
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTrainingRecords
+    verb: GET
+    path: /training-records
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWorkAssignments
+    verb: GET
+    path: /work-assignments
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: publishAnnouncement
+    verb: POST
+    path: /announcements
+    scope: venue
+    permission: ANNOUNCEMENT_PUBLISH
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: recordAttendance
+    verb: POST
+    path: /attendance/clock
+    scope: venue
+    permission: ATTENDANCE_RECORD
+    offline: true
+    reads: 4
+    writes: 2
+  - operation: requestLeave
+    verb: POST
+    path: /leave-requests
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: requestShiftSwap
+    verb: POST
+    path: /rota-assignments/{assignmentId}/swap
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: resolveSyncConflict
+    verb: POST
+    path: /sync-conflicts
+    scope: tenant
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setFieldOwnership
+    verb: PUT
+    path: /integration-sources/{sourceId}/field-ownership
+    scope: tenant
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setIntegrationSource
+    verb: PUT
+    path: /integration-sources
+    scope: tenant
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setJobTitle
+    verb: PUT
+    path: /job-titles
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setLeaveType
+    verb: PUT
+    path: /leave-types
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setShiftPattern
+    verb: PUT
+    path: /shift-patterns
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setShiftTemplate
+    verb: PUT
+    path: /shift-templates
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setStaffingRules
+    verb: PUT
+    path: /staffing-rules
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWorkAssignment
+    verb: PUT
+    path: /work-assignments
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: startSync
+    verb: POST
+    path: /sync-runs
+    scope: tenant
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateRotaAssignment
+    verb: PATCH
+    path: /rota-assignments/{assignmentId}
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateWorkforceCompliance
+    verb: GET
+    path: /workforce-compliance
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
 - contract: tenancy
-  count: 38
+  count: 39
   operations:
   - operation: configureWorkstation
     verb: PUT
@@ -456,7 +803,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: enrolDevice
     verb: POST
@@ -465,7 +812,7 @@ operationsByContract:
     permission: DEVICE_MANAGE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: getDeviceTelemetry
     verb: GET
     path: /devices/{deviceId}/telemetry
@@ -530,6 +877,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 1
+  - operation: listCellEndpoints
+    verb: GET
+    path: /cells/{cellId}/endpoints
+    scope: tenant
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDeviceAuditRecords
     verb: GET
     path: /devices/{deviceId}/audit
@@ -957,201 +1312,6 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
-- contract: workforce
-  count: 24
-  operations:
-  - operation: acknowledgeAnnouncement
-    verb: POST
-    path: /announcements/{announcementId}/acknowledge
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: amendAttendance
-    verb: POST
-    path: /attendance/{recordId}/amend
-    scope: venue
-    permission: WORKFORCE_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: broadcastToGuests
-    verb: POST
-    path: /guest-broadcast
-    scope: venue
-    permission: ANNOUNCEMENT_PUBLISH
-    offline: false
-    reads: 5
-    writes: 3
-  - operation: claimOpenShift
-    verb: POST
-    path: /shift-marketplace
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: createRotaAssignment
-    verb: POST
-    path: /rota-assignments
-    scope: venue
-    permission: WORKFORCE_MANAGE
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: getAnnouncementReach
-    verb: GET
-    path: /announcements/{announcementId}/reach
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: getLabourCost
-    verb: GET
-    path: /labour-cost
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: getStaffingCoverage
-    verb: GET
-    path: /staffing-coverage
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: listAnnouncements
-    verb: GET
-    path: /announcements
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: listAttendance
-    verb: GET
-    path: /attendance
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listLeaveRequests
-    verb: GET
-    path: /leave-requests
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listOpenShifts
-    verb: GET
-    path: /shift-marketplace
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listRotaAssignments
-    verb: GET
-    path: /rota-assignments
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: listShiftSwapRequests
-    verb: GET
-    path: /shift-swaps
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listShiftTemplates
-    verb: GET
-    path: /shift-templates
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listTrainingRecords
-    verb: GET
-    path: /training-records
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: publishAnnouncement
-    verb: POST
-    path: /announcements
-    scope: venue
-    permission: ANNOUNCEMENT_PUBLISH
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: recordAttendance
-    verb: POST
-    path: /attendance/clock
-    scope: venue
-    permission: ATTENDANCE_RECORD
-    offline: true
-    reads: 3
-    writes: 2
-  - operation: requestLeave
-    verb: POST
-    path: /leave-requests
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: requestShiftSwap
-    verb: POST
-    path: /rota-assignments/{assignmentId}/swap
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: setShiftTemplate
-    verb: PUT
-    path: /shift-templates
-    scope: venue
-    permission: WORKFORCE_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setStaffingRules
-    verb: PUT
-    path: /staffing-rules
-    scope: venue
-    permission: WORKFORCE_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: updateRotaAssignment
-    verb: PATCH
-    path: /rota-assignments/{assignmentId}
-    scope: venue
-    permission: WORKFORCE_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: validateWorkforceCompliance
-    verb: GET
-    path: /workforce-compliance
-    scope: venue
-    permission: WORKFORCE_VIEW
-    offline: false
-    reads: 0
-    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1421,7 +1581,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.device
-  columns: 17
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -1654,19 +1814,22 @@ tables:
   columns: 7
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.integration_source
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.job_title
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.leave_balance
   columns: 9
@@ -1685,7 +1848,8 @@ tables:
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.open_shift
   columns: 16
@@ -1704,7 +1868,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.shift_swap
   columns: 8
@@ -1749,11 +1914,12 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - workforce
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 17
+  operations: 13
 - service: AccessService
   operations: 3
 - service: MarketingService

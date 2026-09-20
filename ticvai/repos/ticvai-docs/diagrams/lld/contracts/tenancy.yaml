@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 38 operations
+title: tenancy — 39 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -75,6 +75,7 @@ operations:
   reads:
   - cache:idempotency
   - platform.configuration_profile
+  - platform.profile_deployment
   - platform.workstation
   writes:
   - cache:idempotency
@@ -90,7 +91,8 @@ operations:
   offline: false
   reads:
   - platform.device
-  writes: []
+  writes:
+  - platform.device
 - operation: getDeviceTelemetry
   verb: GET
   path: /devices/{deviceId}/telemetry
@@ -191,6 +193,17 @@ operations:
   - platform.scope
   writes:
   - platform.audit_read
+- operation: listCellEndpoints
+  verb: GET
+  path: /cells/{cellId}/endpoints
+  scope: tenant
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.cell_endpoint
+  writes: []
 - operation: listDeviceAuditRecords
   verb: GET
   path: /devices/{deviceId}/audit

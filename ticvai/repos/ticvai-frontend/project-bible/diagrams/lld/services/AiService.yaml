@@ -68,7 +68,7 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: getAiPolicy
     verb: GET
@@ -188,7 +188,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: reindexSource
     verb: POST
@@ -196,7 +196,7 @@ operationsByContract:
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
-    reads: 14
+    reads: 15
     writes: 5
   - operation: removeIndexEntry
     verb: DELETE
@@ -427,23 +427,23 @@ tables:
   - ai
   foreignWriters: null
 readsFrom:
-- service: CatalogueService
-  operations: 17
 - service: VenueOpsService
-  operations: 8
-- service: WhiteLabelService
+  operations: 4
+- service: CatalogueService
   operations: 3
 - service: MarketingService
   operations: 2
-- service: TenancyService
-  operations: 2
 - service: FnbService
+  operations: 1
+- service: PlatformService
   operations: 1
 - service: ReportingService
   operations: 1
 - service: RetailService
   operations: 1
-- service: PlatformService
+- service: TenancyService
+  operations: 1
+- service: WhiteLabelService
   operations: 1
 writesOutside: []
 screens:

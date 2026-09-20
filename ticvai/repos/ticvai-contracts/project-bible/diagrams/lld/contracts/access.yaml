@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 177 operations
+title: access — 180 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -77,6 +77,7 @@ operations:
   - guest
   offline: false
   reads:
+  - access.parking_entitlement
   - access.parking_facility
   - cache:idempotency
   - orders.sales_order
@@ -96,6 +97,7 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - pii.subject
+  - pii.subject_biometric
   writes:
   - cache:idempotency
   - marketing.consent_record
@@ -202,6 +204,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listAccessChanges
+  verb: GET
+  path: /access-changes
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_change
   writes: []
 - operation: listAccessExecutiveInsight
   verb: GET
@@ -678,6 +691,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listEntryRulePoints
+  verb: GET
+  path: /admission-rules/{ruleId}/points
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entry_rule_point
   writes: []
 - operation: listEntryTemporaryExit
   verb: GET
@@ -1570,6 +1594,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setEntryRulePoints
+  verb: PUT
+  path: /admission-rules/{ruleId}/points
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entry_rule_point
+  writes:
+  - access.entry_rule_point
 - operation: setFacePassEnrollment
   verb: PUT
   path: /face-pass-enrollment

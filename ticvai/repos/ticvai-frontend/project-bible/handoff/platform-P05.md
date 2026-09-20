@@ -9,17 +9,23 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 1 |
+| Operations with no screen | 7 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 1 operations with no screen here
+### 7 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
+| `listCustomerBadges` | marketing-crm | GET | Badges a guest holds |
+| `listRewards` | marketing-crm | GET | What points can be turned into |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ## Modules

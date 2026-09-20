@@ -129,29 +129,31 @@ def load_state():
 
 
 def table_count():
-    """**Counted from the contracts, not from `schema-reference.json`.**
+    """**Counted from `schema-reference.json`, changed 20 September — and the principle that
+    put the old count here is the same one that moves it.**
 
-    The derived reference counts a few synthetic and projected tables, so it reports 561
-    where the contracts declare 520 — and `service-decomposition.json` is written from the
-    contracts. Two artefacts that each count tables their own way disagree forever, and
-    the one doing the checking should count the way the one being checked does.
+    This used to count `x-ticvai-persistence` tags in the deployable contracts, on the rule
+    that *the one doing the checking should count the way the one being checked does*, because
+    `service-decomposition.json` was written by hand from the contracts. **It is not any more.**
+    `derive-service-counts.py` has derived its `tables`, `operations`, `readsFrom` and
+    `writesOutside` from the schema reference since 20 September, so counting the old way made
+    the checker and the file it checks disagree forever — the exact failure the old docstring
+    was written to prevent.
+
+    **The old count was also 33 tables short, and they are the ones that matter most.** A table
+    earns an `x-ticvai-persistence` tag by being *serialised into a response*, so the ones
+    without a tag are the internal ones: `identity.session`, `identity.mfa_challenge`,
+    `identity.otp_challenge`, `identity.principal_credential`, `platform.audit_record`,
+    `pii.subject` and its contact and document tables. **All 33 have columns and 25 are touched
+    by operations** — `pii.subject` by 41 of them and `identity.session` by 15. A note telling
+    the backend team how many tables they deploy that omits the session store and the PII vault
+    is not counting conservatively; it is wrong by the most security-sensitive third.
+
+    Same filter as `derive-service-counts`: `:` excludes the cache and queue pseudo-tables.
     """
-    t = set()
-    # `deployable_only`: contracts/shared/ declares one table, and the
-    # decomposition counts only what a service owns.
-    for f in contract_files(deployable_only=True):
-        try:
-            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
-        except Exception:
-            continue
-        for _n, sc in ((d.get("components") or {}).get("schemas") or {}).items():
-            p = (sc or {}).get("x-ticvai-persistence")
-            if isinstance(p, str) and "." in p and not p.startswith("none"):
-                for part in p.split("+"):
-                    part = part.strip()
-                    if "." in part:
-                        t.add(part)
-    return len(t)
+    S = json.load(io.open(os.path.join(ROOT, "handoff", "schema-reference.json"),
+                          encoding="utf-8"))
+    return len([t for t in (S.get("cols") or {}) if "." in t and ":" not in t])
 
 
 def check_decomposition(problems):

@@ -8668,8 +8668,295 @@ paths:
         '200':
           description: Assigned
 
+  /membership-programmes:
+    get:
+      operationId: listMembershipProgrammes
+      summary: Membership schemes, the level above a plan
+      description: 'Decision 9 of the schema merge. **A programme groups plans**; the plan itself is
+        `catalogue.entitlement_template`, which the TAKE BODY verdict settled — validity kind,
+        entries, transferability, eligibility and stored value were already there.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Programmes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogueMembershipProgramme'
+    put:
+      operationId: setMembershipProgramme
+      summary: Define a membership programme
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogueMembershipProgramme'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogueMembershipProgramme'
+  /membership-benefits:
+    get:
+      operationId: listMembershipBenefits
+      summary: Benefits a plan can grant
+      description: 'Decision 9. **Benefits were columns on `entitlement_template`**, so adding one
+        was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15
+        operations and 34 screens read 34 columns to get three.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Benefits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogueMembershipBenefit'
+    put:
+      operationId: setMembershipBenefit
+      summary: Define a benefit
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogueMembershipBenefit'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogueMembershipBenefit'
+  /entitlement-templates/{templateId}/benefits:
+    get:
+      operationId: getPlanBenefits
+      summary: Which benefits a plan grants, and how much of each
+      description: '**Keyed by the entitlement template because that is the plan.** `plan_benefit`
+        carries the usage limit and the period, which is the part a benefit definition cannot hold —
+        four free coffees a month is the same benefit as one a year.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Benefits granted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CataloguePlanBenefit'
+    put:
+      operationId: setPlanBenefits
+      summary: Replace the benefits a plan grants
+      description: '**Set whole.** A plan losing one benefit and gaining another is one change to a
+        guest, and applying it in two steps sells a plan that briefly has neither or both.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CataloguePlanBenefit'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CataloguePlanBenefit'
+  /pricing/dynamic-rules:
+    get:
+      operationId: listDynamicPriceRules
+      summary: Dynamic pricing rules
+      description: >
+        Decision 5 of the schema merge took all three `pricing` tables and said the schema needed an
+        owner. **It had none because it had no operations** — a service is inferred from the
+        contract that declares them, and nothing declared any. They live here because a price
+        belongs to the catalogue.
+
+        **Read from a replica inside the cell.** A dynamic price is evaluated at a till; a rule
+        fetched across a cell boundary at the moment of sale is a queue.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Dynamic pricing rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PricingDynamicPriceRule'
+  /pricing/dynamic-rules/{ruleId}:
+    get:
+      operationId: getDynamicPriceRule
+      summary: One rule with its conditions and actions
+      description: >
+        **A rule is unreadable without both halves.** The conditions say when it fires and the
+        actions say what it does to the price, and a screen showing one without the other cannot
+        tell a reviewer whether the rule is safe. `minPrice` and `maxPrice` on the action are the
+        guard rails, and they are the first thing anyone looks for.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: One rule with its conditions and actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamicPriceRuleDetail'
+    put:
+      operationId: setDynamicPriceRule
+      summary: Replace a rule, its conditions and its actions
+      description: >
+        **Applied whole.** A rule whose conditions have been updated and whose actions have not is a
+        rule that fires on the new trigger with the old discount, and for a live price that is a
+        loss taken silently.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DynamicPriceRuleDetail'
+      responses:
+        '200':
+          description: Replace a rule, its conditions and its actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamicPriceRuleDetail'
 components:
   schemas:
+    DynamicPriceRuleDetail:
+      type: object
+      x-ticvai-persistence: none — composed from a rule, its conditions and its actions
+      description: >
+        **A rule is unreadable without both halves.** The conditions say when it fires, the
+        actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the
+        guard rails a reviewer looks for first.
+      required:
+      - rule
+      properties:
+        rule:
+          $ref: '#/components/schemas/PricingDynamicPriceRule'
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDynamicPriceCondition'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDynamicPriceAction'
     CatalogueMembershipBenefit:
       type: object
       x-ticvai-persistence: catalogue.membership_benefit
@@ -8751,13 +9038,13 @@ components:
       x-ticvai-persistence: catalogue.plan_benefit
       description: '**Taken from the backend workbook, 20 September.** Maps membership benefits to plans and defines usage limits for each benefit.'
       required:
-      - membershipPlanId
+      - entitlementTemplateId
       - membershipBenefitId
       - priority
       - isActive
       - createdAt
       properties:
-        membershipPlanId:
+        entitlementTemplateId:
           type: string
           format: uuid
         membershipBenefitId:
@@ -8782,14 +9069,14 @@ components:
       x-ticvai-persistence: pricing.dynamic_price_action
       description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.'
       required:
-      - ruleId
+      - dynamicPriceRuleId
       - type
       - value
       properties:
         id:
           type: string
           format: uuid
-        ruleId:
+        dynamicPriceRuleId:
           type: string
           format: uuid
         type:
@@ -8809,7 +9096,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.'
       required:
       - actionId
-      - ruleId
+      - dynamicPriceRuleId
       - type
       - ruleOperator
       - valueJson
@@ -8818,7 +9105,7 @@ components:
         actionId:
           type: string
           format: uuid
-        ruleId:
+        dynamicPriceRuleId:
           type: string
           format: uuid
         type:
@@ -9471,6 +9758,14 @@ components:
           format: uuid
         name:
           type: string
+        code:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            **Taken from their category tables, 20 September.** Ours had a uuid and a localised
+            name, so an importer matching *Beverages* had to match on a display string that a
+            venue is free to translate.
         nameLocalised:
           type: object
           additionalProperties:
@@ -10062,6 +10357,34 @@ components:
             entitlement are separate concerns.
 
             '
+        autoRenewDefault:
+          type: boolean
+          default: false
+          description: >
+            **Taken from their `membership_plan`, 20 September — the "take those" half of the
+            TAKE BODY verdict.** `identity.customer_membership.auto_renew` carries the flag per
+            holder and nothing said what it should start as.
+        renewalTermDays:
+          type: integer
+          nullable: true
+          description: >
+            What a renewal extends the membership by. `orders.membership_renewal` records
+            `previousExpiryAt` and `newExpiryAt` and **the number between them lived nowhere**.
+        renewalGraceDays:
+          type: integer
+          default: 0
+          description: >
+            How long after expiry a membership can still be renewed rather than rejoined.
+            `membership_renewal.failureReason` implies a window and there was none, so a failed
+            card on the expiry date had no defined consequence.
+        renewalVariantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **What a renewal sells, which is usually not what joining sold.** A first-year price
+            and a renewal price are different products, and pointing both at one variant makes a
+            loyalty discount unrepresentable. Null means renewal sells the same thing.
         crossesCells:
           type: boolean
           default: false
@@ -10320,6 +10643,15 @@ components:
             stops selling and every order that referenced it still resolves.
 
             '
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Taken from their `fnb.product` and `retail.product`, 20 September.**
+            `catalogue.product_category` has existed since 20 August with two operations and
+            nothing could be filed under it — a merchandise hierarchy with a tree and no leaves.
+            Their per-domain product tables both carried this column and ours did not.
         lifecycleState:
           $ref: '#/components/schemas/ProductLifecycleState'
         isSellable:
@@ -10328,6 +10660,14 @@ components:
             are different acts.
 
             '
+        isStockTracked:
+          type: boolean
+          default: false
+          description: >
+            **Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock,
+            which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a
+            bottle of water is both. Without it, an F&B sale cannot tell inventory whether to
+            move.
         hasVariants:
           type: boolean
         variantCount:
@@ -10479,6 +10819,30 @@ components:
           type: object
           additionalProperties:
             type: string
+        name:
+          type: string
+          maxLength: 150
+          nullable: true
+          description: >
+            **Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}`
+            and no string a guest can read. A menu showing *Large* needs somewhere for the word
+            to live.
+        barcode:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            **Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a
+            partner's own code for a variant and **requires `partnerId`**, so a manufacturer's
+            EAN had nowhere to go. One per variant against many per variant is a different
+            cardinality and belongs in a different place — and a POS scan should be an indexed
+            column lookup, not a join.
+        isDefault:
+          type: boolean
+          default: false
+          description: >
+            Taken from their variant tables. Which variant a product page opens on. Ours had no
+            way to say, so a three-size drink opened on whichever row sorted first.
         isActive:
           type: boolean
           description: False when retired. Retired variants are never deleted — orders reference them.

@@ -2746,8 +2746,238 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmergencyAccessOverride'
 
+  /customers/{customerId}/memberships:
+    get:
+      operationId: listCustomerMemberships
+      summary: Memberships a customer holds
+      description: '**We had `entitlement_template` and no holder record** — the plan existed and
+        nothing said who was on it. Decision 9 took `identity.customer_membership` for exactly that.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Memberships
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityCustomerMembership'
+  /memberships/{membershipId}:
+    get:
+      operationId: getMembership
+      summary: A membership with its history, usage and renewals
+      description: '**Composed because of where the data lives.** A guest''s membership sits in their
+        home cell (`platform.guest_link.homeCellName`), so a venue in another cell reading the
+        membership, its status history, its benefit usage and its renewal attempts as four calls
+        makes **four cross-cell round trips at a counter**. One composed read is one.
+
+        This follows ADR-0010 rather than adding to it: `EntitlementTemplate.crossesCells` already
+        propagates a redemption right on issue, so the hot path — is this pass valid — stays local.
+        This endpoint is the cold path, where somebody is asking why.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Membership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipDetail'
+        '404':
+          description: No such membership
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /memberships/{membershipId}/benefit-usage:
+    post:
+      operationId: recordBenefitUsage
+      summary: Consume a benefit
+      description: '**`remaining_quantity` is written on the row, not computed on read.** A counter
+        asking whether a guest has a free coffee left must not sum a usage history across a cell
+        boundary, and a benefit with a monthly limit has a period the sum would have to know about
+        anyway.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: membershipId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityBenefitUsage'
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityBenefitUsage'
+        '409':
+          description: The benefit is exhausted for this period, or the membership is not active
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /modules:
+    get:
+      operationId: listModules
+      summary: The module tree permissions are grouped under
+      description: '**Read-only, and that is the point.** A module exists because the product has
+        one; inventing modules over an API would create groups no permission belongs to.
+
+        `parentModuleId` builds one tree rather than a fixed two levels, for the same reason
+        `ProductCategory` does — a venue that nests its modules differently should not need a schema
+        change.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityModule'
+  /permissions:
+    get:
+      operationId: listPermissions
+      summary: Every permission key the contracts enforce
+      description: '**The catalogue that makes a role reviewable.** Every refresh reports *154
+        permission keys on operations, 35 in roles.yaml, 0 shared* — the keys the contracts enforce
+        and the keys the roles grant have been two vocabularies with no overlap, and nothing could
+        reconcile them because there was no list of what exists.
+
+        **Read-only.** A permission key exists because an operation declares
+        `x-ticvai-permission`; this catalogue is derived from the contracts. An endpoint that let
+        somebody create one would produce a key no operation checks, which is worse than a missing
+        key because it looks granted.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: moduleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityPermission'
 components:
   schemas:
+    MembershipDetail:
+      type: object
+      x-ticvai-persistence: none — composed from the membership and three related tables
+      description: >
+        **One cross-cell round trip instead of three.** A membership lives in the guest's home
+        cell and its status history and benefit usage live beside it, in the same service. A venue
+        in another cell asking why a pass was refused needs all three, and asking three times is
+        three round trips at a counter with somebody waiting.
+
+        The hot path is not this: `EntitlementTemplate.crossesCells` propagates the redemption
+        right on issue (ADR-0010), so *is this valid* stays local. This is the cold path, where
+        somebody is asking why.
+      required:
+      - membership
+      properties:
+        membership:
+          $ref: '#/components/schemas/IdentityCustomerMembership'
+        history:
+          type: array
+          description: Status changes, most recent first.
+          items:
+            $ref: '#/components/schemas/IdentityMembershipHistory'
+        benefitUsage:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityBenefitUsage'
+
+      # **Renewals are deliberately not here, and the reason is the cross-cell criterion itself.**
+      # `orders.membership_renewal` belongs to OrderService; this schema belongs to
+      # IdentityService. **The package has no cross-contract `$ref` anywhere** — every contract is
+      # self-contained, one per service — so including them would make IdentityService call
+      # OrderService to build every membership read.
+      #
+      # That trades one in-cell service hop on EVERY read for one cross-cell call on the rare
+      # read where somebody is disputing a renewal. `history` already records the lapse
+      # transition, so the common question is answered without leaving the service. When the
+      # renewal attempts themselves are wanted, `listMembershipRenewals` is one more call and
+      # only then.
     IdentityBenefitUsage:
       type: object
       x-ticvai-persistence: identity.benefit_usage
@@ -2793,7 +3023,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Stores the membership subscription currently owned by a customer.'
       required:
       - customerId
-      - planId
+      - entitlementTemplateId
       - number
       - startAt
       - status
@@ -2806,7 +3036,7 @@ components:
         customerId:
           type: string
           format: uuid
-        planId:
+        entitlementTemplateId:
           type: string
           format: uuid
         number:
@@ -2865,7 +3095,7 @@ components:
           type: string
           maxLength: 500
           nullable: true
-        changedByUserAccountId:
+        changedByPrincipalId:
           type: string
           format: uuid
           nullable: true
@@ -2966,7 +3196,7 @@ components:
       x-ticvai-persistence: identity.refresh_token
       description: '**Taken from the backend workbook, 20 September.** Stores hashed refresh tokens and tracks token expiry, rotation, and revocation.'
       required:
-      - userId
+      - principalId
       - hash
       - expiresAt
       - createdAt
@@ -2974,7 +3204,7 @@ components:
         id:
           type: string
           format: uuid
-        userId:
+        principalId:
           type: string
           format: uuid
         hash:
@@ -3006,58 +3236,6 @@ components:
           type: string
           format: uuid
           nullable: true
-    IdentityUserAccess:
-      type: object
-      x-ticvai-persistence: identity.user_access
-      description: '**Taken from the backend workbook, 20 September.** Assigns a role or direct permission to a principal within a specific scope and validity period.'
-      required:
-      - userId
-      - effect
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        userId:
-          type: string
-          format: uuid
-        roleId:
-          type: string
-          format: uuid
-          nullable: true
-        permissionId:
-          type: string
-          format: uuid
-          nullable: true
-        scopePath:
-          type: string
-          nullable: true
-        effect:
-          type: string
-          maxLength: 10
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        grantedByUserAccountId:
-          type: string
-          format: uuid
-          nullable: true
-        revokedAt:
-          type: string
-          format: date-time
-          nullable: true
-        revokedByUserAccountId:
-          type: string
-          format: uuid
-          nullable: true
-        createdAt:
-          type: string
-          format: date-time
     AccessPolicy:
       type: object
       x-ticvai-persistence: identity.access_policy
@@ -4228,6 +4406,28 @@ components:
           enum:
           - ALLOW
           - DENY
+        permissionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Taken from `identity.user_access`, 20 September, when that table was collapsed into
+            this one.** `permission` above is free text; this names a row in
+            `identity.permission`, the catalogue wired the same day. A grant that names a
+            catalogue row can be checked against the keys the contracts actually enforce — which
+            is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml,
+            0 shared*.
+
+            Nullable because a role grant carries no permission at all.
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >
+            Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so
+            it could say who revoked a grant and not whether it was before or after the thing
+            somebody is asking about.
         validFrom:
           type: string
           format: date-time

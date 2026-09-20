@@ -9,28 +9,40 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 107 |
+| Operations with no screen | 178 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 107 operations with no screen here
+### 178 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `listAccessChanges` | access | GET | Changes made to an entitlement's access |
+| `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
+| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
+| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
+| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
+| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
+| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
+| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
@@ -47,20 +59,8 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
-| `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
-| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
-| `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
-| `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
-| `updateTable` | fnb | PUT | Change what a table is |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
-| `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
-| … | | | 67 more |
+| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
+| … | | | 138 more |
 
 ### 2 modules split across waves
 

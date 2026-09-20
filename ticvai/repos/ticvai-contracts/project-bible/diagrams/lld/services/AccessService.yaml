@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 177 operations, 10 tables
+title: AccessService — 180 operations, 10 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 177
+  operations: 180
   inAFlow: 17
   percent: 57%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: access.entitlement
 operationsByContract:
 - contract: access
-  count: 177
+  count: 180
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -70,7 +70,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: enrolFacePass
     verb: POST
@@ -78,7 +78,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: getAccessPoint
     verb: GET
@@ -143,6 +143,14 @@ operationsByContract:
     permission: SCOPE_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listAccessChanges
+    verb: GET
+    path: /access-changes
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listAccessExecutiveInsight
     verb: GET
@@ -519,6 +527,14 @@ operationsByContract:
     permission: SCOPE_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listEntryRulePoints
+    verb: GET
+    path: /admission-rules/{ruleId}/points
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listEntryTemporaryExit
     verb: GET
@@ -1208,6 +1224,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setEntryRulePoints
+    verb: PUT
+    path: /admission-rules/{ruleId}/points
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setFacePassEnrollment
     verb: PUT
     path: /face-pass-enrollment
@@ -1497,7 +1521,8 @@ tables:
   columns: 5
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - access
   foreignWriters: null
 - table: access.parking_entitlement
   columns: 12
@@ -1527,15 +1552,15 @@ tables:
   writtenBy: []
   foreignWriters: null
 readsFrom:
-- service: CatalogueService
-  operations: 8
 - service: IdentityService
   operations: 8
-- service: VenueOpsService
-  operations: 3
+- service: CatalogueService
+  operations: 7
 - service: OrderService
   operations: 2
 - service: MarketingService
+  operations: 1
+- service: VenueOpsService
   operations: 1
 writesOutside:
 - service: IdentityService

@@ -1,5 +1,5 @@
 id: LLD-InventoryService
-title: InventoryService — 50 operations, 21 tables
+title: InventoryService — 51 operations, 21 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**Stock, counting and procurement.** Its own service because `inventory.st
 scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
-  operations: 50
+  operations: 51
   inAFlow: 48
   percent: 96%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: inventory.item
 operationsByContract:
 - contract: inventory
-  count: 50
+  count: 51
   operations:
   - operation: acknowledgePurchaseOrder
     verb: POST
@@ -39,7 +39,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_ACT
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: bulkUpdateProducts
     verb: POST
@@ -55,7 +55,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CANCEL
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: cancelRequisition
     verb: POST
@@ -95,7 +95,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: createGoodsReceipt
     verb: POST
@@ -103,7 +103,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: true
-    reads: 2
+    reads: 3
     writes: 3
   - operation: createInventoryItem
     verb: POST
@@ -119,7 +119,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createRequisition
     verb: POST
@@ -127,7 +127,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createStockLocation
     verb: POST
@@ -151,7 +151,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createSupplier
     verb: POST
@@ -183,7 +183,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getStockPositions
     verb: GET
@@ -231,7 +231,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listInventoryItems
     verb: GET
@@ -247,7 +247,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listRequisitions
     verb: GET
@@ -255,7 +255,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listSerialisedItems
     verb: GET
@@ -271,7 +271,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listStockLocations
     verb: GET
@@ -289,13 +289,21 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listStockReservations
+    verb: GET
+    path: /stock-reservations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listStockTransfers
     verb: GET
     path: /stock-transfers
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listSuppliers
     verb: GET
@@ -319,7 +327,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: receiveStockTransfer
     verb: POST
@@ -327,7 +335,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: recordQuotation
     verb: POST
@@ -335,7 +343,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: recountStockCount
     verb: POST
@@ -351,7 +359,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: rejectRequisition
     verb: POST
@@ -391,7 +399,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: submitCountLines
     verb: POST
@@ -584,17 +592,17 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: CatalogueService
-  operations: 2
-- service: LedgerService
   operations: 1
 - service: FnbService
+  operations: 1
+- service: LedgerService
   operations: 1
 writesOutside:
 - service: TenancyService
   operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
 - service: CatalogueService
-  operations: 2
+  operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P04:POS-011 Returns, Refunds & Exchanges

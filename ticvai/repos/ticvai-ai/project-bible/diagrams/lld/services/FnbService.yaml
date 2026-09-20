@@ -1,5 +1,5 @@
 id: LLD-FnbService
-title: FnbService — 99 operations, 43 tables
+title: FnbService — 102 operations, 37 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ why: '**96 operations and 34 tables — the largest single domain after marketin
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 99
+  operations: 102
   inAFlow: 70
   percent: 73%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 43
+  tables: 37
   stores:
   - postgres
   largestTable: fnb.product_recommendation
 operationsByContract:
 - contract: fnb
-  count: 99
+  count: 102
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -30,7 +30,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: amendFnbOrder
     verb: PATCH
@@ -38,7 +38,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: applyMenuActions
     verb: POST
@@ -62,7 +62,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: cancelFnbOrder
     verb: POST
@@ -70,7 +70,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: chaseStation
     verb: POST
@@ -118,7 +118,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: compItem
     verb: POST
@@ -126,7 +126,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 5
     writes: 2
   - operation: completeProductionRun
     verb: POST
@@ -142,7 +142,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 5
     writes: 3
   - operation: createFnbOrder
     verb: POST
@@ -150,7 +150,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createGuestFnbOrder
     verb: POST
@@ -174,15 +174,15 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createTable
     verb: POST
     path: /tables
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 3
   - operation: createTableReservation
     verb: POST
@@ -190,8 +190,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: enterCountLine
     verb: POST
     path: /stock-counts/{countId}/lines
@@ -214,7 +214,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: getBill
     verb: GET
@@ -230,7 +230,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getGuestBill
     verb: GET
@@ -246,7 +246,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getGuestOrderStatus
     verb: GET
@@ -294,7 +294,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: holdCourse
     verb: POST
@@ -302,7 +302,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: joinRestaurantWaitlist
     verb: POST
@@ -310,7 +310,7 @@ operationsByContract:
     scope: venue
     permission: FNB_SERVE
     offline: true
-    reads: 3
+    reads: 4
     writes: 2
   - operation: list86Events
     verb: GET
@@ -342,6 +342,22 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
+    reads: 2
+    writes: 0
+  - operation: listFnbRecommendations
+    verb: GET
+    path: /product-recommendations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIngredientSubstitutes
+    verb: GET
+    path: /recipes/{recipeId}/substitutes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: listKitchenStations
@@ -358,7 +374,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listMenus
     verb: GET
@@ -366,7 +382,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listModifierGroups
     verb: GET
@@ -374,7 +390,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listProductionRuns
     verb: GET
@@ -390,7 +406,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listTableReservations
     verb: GET
@@ -398,7 +414,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: logColdChain
     verb: POST
@@ -422,7 +438,7 @@ operationsByContract:
     scope: venue
     permission: INCIDENT_REPORT
     offline: true
-    reads: 3
+    reads: 4
     writes: 3
   - operation: markOrderCollected
     verb: POST
@@ -438,7 +454,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: moveTableVisit
     verb: POST
@@ -446,7 +462,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 4
+    reads: 6
     writes: 3
   - operation: notifyServer
     verb: POST
@@ -462,7 +478,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: openTableVisit
     verb: POST
@@ -470,7 +486,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 3
+    reads: 4
     writes: 3
   - operation: planProductionRun
     verb: POST
@@ -478,7 +494,7 @@ operationsByContract:
     scope: venue
     permission: FNB_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: printOrderLabel
     verb: POST
@@ -494,7 +510,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: publishMenu
     verb: POST
@@ -518,7 +534,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 5
     writes: 2
   - operation: rebalanceStationLoad
     verb: POST
@@ -534,7 +550,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: recordCorrectiveAction
     verb: POST
@@ -582,7 +598,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 4
     writes: 2
   - operation: requestRecount
     verb: POST
@@ -622,7 +638,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 3
+    reads: 4
     writes: 4
   - operation: sendBookingConfirmation
     verb: POST
@@ -646,7 +662,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: setCourseRules
     verb: PUT
@@ -656,6 +672,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 2
+  - operation: setIngredientSubstitutes
+    verb: PUT
+    path: /recipes/{recipeId}/substitutes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setItemAvailability
     verb: PUT
     path: /menu-items/{itemId}/availability
@@ -686,7 +710,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setMenuSections
     verb: PUT
@@ -702,8 +726,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setSectionLayout
     verb: PUT
     path: /outlets/{outletId}/sections
@@ -718,7 +742,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 4
     writes: 2
   - operation: setSubstitutionRules
     verb: PUT
@@ -758,7 +782,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: transferOrderItems
     verb: POST
@@ -766,7 +790,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 5
     writes: 3
   - operation: transferTableVisit
     verb: POST
@@ -798,15 +822,15 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: updateTableVisit
     verb: PATCH
     path: /table-visits/{visitId}
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 4
     writes: 3
   - operation: verifyAllergens
     verb: POST
@@ -895,7 +919,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.kitchen_exception
   columns: 9
@@ -924,12 +949,6 @@ tables:
   parent: fnb.kitchen_ticket
   writtenBy:
   - fnb
-  foreignWriters: null
-- table: fnb.location_code
-  columns: 2
-  store: postgres
-  parent: null
-  writtenBy: []
   foreignWriters: null
 - table: fnb.location_session
   columns: 10
@@ -976,31 +995,8 @@ tables:
   columns: 6
   store: postgres
   parent: fnb.modifier_group
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.price
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.price_list
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.product
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: fnb.product_category
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.product_recommendation
   columns: 17
@@ -1033,13 +1029,15 @@ tables:
   columns: 6
   store: postgres
   parent: fnb.recipe
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.reservation_table
   columns: 4
   store: postgres
-  parent: retail.reservation
-  writtenBy: []
+  parent: null
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.service_order
   columns: 16
@@ -1074,7 +1072,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_reservation
-  columns: 15
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1101,12 +1099,6 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
-- table: fnb.variant
-  columns: 9
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: fnb.waitlist_entry
   columns: 9
   store: postgres
@@ -1118,7 +1110,7 @@ readsFrom:
 - service: IdentityService
   operations: 10
 - service: InventoryService
-  operations: 7
+  operations: 6
 - service: TenancyService
   operations: 5
 - service: OrderService
@@ -1134,10 +1126,10 @@ writesOutside:
 - service: InventoryService
   operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
-- service: OrderService
-  operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
 - service: CatalogueService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: OrderService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 - service: TenancyService

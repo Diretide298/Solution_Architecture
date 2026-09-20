@@ -1859,8 +1859,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalIncident'
+  /agreements:
+    get:
+      operationId: listRentalAgreements
+      summary: Rental agreements
+      description: >
+        **We held `agreement_rules` and `agreement_signature` and no agreement.** The signature
+        referenced a participant and a version *string*, so it signed a version number rather than a
+        document. Decision 1 took their `rental_agreement` for exactly this.
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Rental agreements
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/RentalAgreement'
+    post:
+      operationId: createRentalAgreement
+      summary: Raise a rental agreement
+      description: >
+        **Raised before signature, not after.** `rental.agreement_signature` points at an agreement,
+        so the document has to exist for a participant to sign it — which is the gap that made the
+        signature reference a version string.
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalAgreementDetail'
+      responses:
+        '201':
+          description: Raise a rental agreement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAgreementDetail'
+  /agreements/{agreementId}:
+    get:
+      operationId: getRentalAgreement
+      summary: One agreement with its items
+      description: >
+        **The items are what was actually handed over**, merged with our `equipment_assignment`
+        under decision 1. A signed agreement that cannot list its equipment settles no dispute about
+        a missing helmet.
+      tags:
+      - rental
+      x-ticvai-permission: RENTAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: One agreement with its items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalAgreementDetail'
 components:
   schemas:
+    RentalAgreementDetail:
+      type: object
+      x-ticvai-persistence: none — composed from an agreement and its items
+      description: >
+        **The items are what was actually handed over.** A signed agreement that cannot list its
+        equipment settles no dispute about a missing helmet.
+      required:
+      - agreement
+      properties:
+        agreement:
+          $ref: '#/components/schemas/RentalAgreement'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalAgreementItem'
     RentalAgreement:
       type: object
       x-ticvai-persistence: rental.agreement

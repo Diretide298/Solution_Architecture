@@ -226,6 +226,7 @@ operations:
   reads:
   - cache:idempotency
   - games.redemption
+  - games.redemption_line
   writes:
   - cache:idempotency
   - games.redemption

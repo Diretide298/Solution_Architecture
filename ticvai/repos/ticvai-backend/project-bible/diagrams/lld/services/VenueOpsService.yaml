@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 218 operations, 89 tables
+title: VenueOpsService — 221 operations, 90 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -10,7 +10,7 @@ why: '**Six small domains, 102 operations, one team.** Queue, maintenance, booka
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 218
+  operations: 221
   inAFlow: 48
   percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 9
+  tables: 10
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -45,7 +45,7 @@ schemas:
   tables: 21
   stores:
   - postgres
-  largestTable: games.entitlement
+  largestTable: games.game
 - schema: rental
   tables: 23
   stores:
@@ -141,8 +141,8 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createResourceType
     verb: POST
     path: /resource-types
@@ -213,7 +213,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getResourceSchedule
     verb: GET
@@ -277,7 +277,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listResourceTypes
     verb: GET
@@ -349,8 +349,8 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setResourceLifecycleState
     verb: POST
     path: /resources/{resourceId}/state
@@ -365,7 +365,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: setResourceSchedule
     verb: PUT
@@ -429,8 +429,8 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateResourceType
     verb: PUT
     path: /resource-types/{resourceTypeId}
@@ -440,7 +440,7 @@ operationsByContract:
     reads: 1
     writes: 1
 - contract: rental
-  count: 40
+  count: 43
   operations:
   - operation: assessRentalDamage
     verb: POST
@@ -464,8 +464,16 @@ operationsByContract:
     scope: venue
     permission: RENTAL_OPERATE
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
+  - operation: createRentalAgreement
+    verb: POST
+    path: /agreements
+    scope: venue
+    permission: RENTAL_BOOK
+    offline: false
+    reads: 2
+    writes: 2
   - operation: createRentalBlackout
     verb: POST
     path: /rental-blackouts
@@ -480,8 +488,8 @@ operationsByContract:
     scope: venue
     permission: RENTAL_BOOK
     offline: false
-    reads: 1
-    writes: 0
+    reads: 2
+    writes: 1
   - operation: createRentalCategory
     verb: POST
     path: /rental-categories
@@ -520,7 +528,15 @@ operationsByContract:
     scope: venue
     permission: RENTAL_OPERATE
     offline: false
-    reads: 1
+    reads: 2
+    writes: 0
+  - operation: getRentalAgreement
+    verb: GET
+    path: /agreements/{agreementId}
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: getRentalAvailability
     verb: GET
@@ -536,7 +552,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getRentalProduct
     verb: GET
@@ -560,6 +576,14 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
+    reads: 2
+    writes: 0
+  - operation: listRentalAgreements
+    verb: GET
+    path: /agreements
+    scope: venue
+    permission: RENTAL_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: listRentalBookings
@@ -568,7 +592,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listRentalCategories
     verb: GET
@@ -641,7 +665,7 @@ operationsByContract:
     permission: RENTAL_OPERATE
     offline: true
     reads: 1
-    writes: 0
+    writes: 2
   - operation: setRentalAgreementRequirements
     verb: PUT
     path: /rental-products/{productId}/agreement
@@ -728,7 +752,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_OPERATE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: updateRentalBooking
     verb: PATCH
@@ -736,7 +760,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_BOOK
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: updateRentalPricingProfile
     verb: PUT
@@ -779,7 +803,7 @@ operationsByContract:
     scope: venue
     permission: MAINTENANCE_EXECUTE
     offline: true
-    reads: 3
+    reads: 4
     writes: 2
   - operation: cancelWorkOrder
     verb: POST
@@ -819,8 +843,8 @@ operationsByContract:
     scope: tenant
     permission: INSPECTION_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createMaintenancePlan
     verb: POST
     path: /maintenance-plans
@@ -899,7 +923,7 @@ operationsByContract:
     scope: venue
     permission: INSPECTION_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listInspections
     verb: GET
@@ -1011,8 +1035,8 @@ operationsByContract:
     scope: venue
     permission: INSPECTION_SUBMIT
     offline: true
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: updateAsset
     verb: PATCH
     path: /assets/{assetId}
@@ -1206,7 +1230,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setAttractionType
     verb: PUT
@@ -1727,7 +1751,7 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: acceptWalkwayProposals
     verb: POST
@@ -1775,7 +1799,7 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 4
   - operation: listVenueMaps
     verb: GET
@@ -1807,7 +1831,7 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_MANAGE
     offline: false
-    reads: 5
+    reads: 6
     writes: 2
   - operation: validateVenueMapGraph
     verb: POST
@@ -2059,7 +2083,7 @@ tables:
   - games
   foreignWriters: null
 - table: maintenance.asset
-  columns: 30
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -2080,9 +2104,16 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.inspection
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.inspection_item
+  columns: 13
+  store: postgres
+  parent: maintenance.inspection
   writtenBy:
   - maintenance
   foreignWriters: null
@@ -2097,7 +2128,8 @@ tables:
   columns: 11
   store: postgres
   parent: maintenance.inspection_template
-  writtenBy: []
+  writtenBy:
+  - maintenance
   foreignWriters: null
 - table: maintenance.preventive_plan
   columns: 11
@@ -2152,13 +2184,15 @@ tables:
   columns: 13
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.agreement_item
   columns: 19
   store: postgres
   parent: rental.agreement
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.agreement_rules
   columns: 10
@@ -2281,7 +2315,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.pricing_profile
   columns: 22
@@ -2376,7 +2411,8 @@ tables:
   columns: 6
   store: postgres
   parent: resources.resource
-  writtenBy: []
+  writtenBy:
+  - resources
   foreignWriters: null
 - table: resources.resource_requirement
   columns: 10

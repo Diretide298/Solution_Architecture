@@ -56,12 +56,12 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-039 | decision | No resource entity — no type, category, parent-child relationship or configurable attribute. |
+| BL-039 | decision | No resource entity â€” no type, category, parent-child relationship or configurable attribute. |
 | BL-040 | decision | No resource calendar, conflict detection, recurring reservation, setup and teardown window, or resource package. |
 | BL-041 | decision | No rental check-out and check-in, no deposit taken against a resource, no resource held by a named guest for a period. |
 | BL-042 | decision | No staff skill profile, no certification with expiry, no qualification validated before assignment, no dynamic or priority-based allocation. |
 | BL-043 | deferred | Assets cannot be allocated to an event or activity, and have no depreciation schedule or retirement transition. |
-| BL-045 | deferred | No session participant manifest — who is in a session, in what order, with what package, and reordered by an operator mid-session. |
+| BL-045 | deferred | No session participant manifest â€” who is in a session, in what order, with what package, and reordered by an operator mid-session. |
 | BL-135 | deferred | Lockers are not modelled, and parking is an entitlement of a different shape. |
 | BL-049 | deferred | No event budget, cost tracking or profitability analysis. |
 | BL-050 | deferred | No sponsor packages, sponsor entitlements, sponsorship inventory or sponsor reporting. |
@@ -76,17 +76,17 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-170 | decision | No journey automation — no steps, branches, waits or lifecycle sequences. |
-| BL-173 | decision | No gamification — challenges, achievements, badges, streaks, milestones or leaderboards. |
+| BL-170 | decision | No journey automation â€” no steps, branches, waits or lifecycle sequences. |
+| BL-173 | decision | No gamification â€” challenges, achievements, badges, streaks, milestones or leaderboards. |
 | BL-175 | decision | No SEO capability at all. |
-| BL-172 | deferred | The CMS models configuration and not authoring — no page builder, content scheduling, personalisation, form builder or site search. Email deliverability is also absent. |
+| BL-172 | deferred | The CMS models configuration and not authoring â€” no page builder, content scheduling, personalisation, form builder or site search. Email deliverability is also absent. |
 | BL-177 | deferred | Attribution is single-touch, and there is no audience export. |
 | BL-034 | deferred | No referral model. |
 | BL-018 | deferred | A guest can see loyalty points and cannot spend them, and there is no rewards catalogue. |
 | BL-022 | deferred | No gamification, badges or challenges. |
 | BL-021 | deferred | Lost and found rides generic case management with no item model. |
 | BL-082 | deferred | No call disposition and no callback or follow-up activity. |
-| BL-083 | deferred | No telephony integration — no screen pop, call control, recording or agent state from a phone system. |
+| BL-083 | deferred | No telephony integration â€” no screen pop, call control, recording or agent state from a phone system. |
 
 ## CL-03 — Something happens, someone is told
 
@@ -115,9 +115,9 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-101 | decision | No digital waiver anywhere — no document, no version, no acceptance, no signature, no linkage to ticket issuance. |
+| BL-101 | decision | No digital waiver anywhere â€” no document, no version, no acceptance, no signature, no linkage to ticket issuance. |
 | BL-062 | deferred | No configurable demographic or survey capture at the point of sale. |
-| BL-171 | decision | No survey model — builder, question library, formats, NPS, CSAT or CES. |
+| BL-171 | decision | No survey model â€” builder, question library, formats, NPS, CSAT or CES. |
 | BL-133 | deferred | No store for guest photos, avatars, IDs or signed documents. |
 
 ## CL-16 — Finance ledger completeness
@@ -151,7 +151,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-110 | decision | Attribute-based access control does not exist — forty-eight requirements against a role-based model chosen deliberately. |
+| BL-110 | decision | Attribute-based access control does not exist â€” forty-eight requirements against a role-based model chosen deliberately. |
 | BL-147 | deferred | No segregation-of-duties enforcement, no privileged-user governance, no permission review, and no permission delegation. |
 | BL-146 | deferred | No device, browser, IP or location restriction on access. |
 | BL-161 | decision | A device does not authenticate to the platform, and there is no tamper detection. |
@@ -169,8 +169,8 @@ edit `handoff/backlog-clusters.json`, never this file.
 | Entry | Lane | What |
 |---|---|---|
 | BL-156 | decision | No developer portal, no developer identity, no rate limiting, no API lifecycle management and no extension marketplace. |
-| BL-157 | deferred | No developer sandbox — provisioning, reset, cloning, test data, masking or lifecycle. |
-| BL-080 | deferred | No partner API credential lifecycle — request, generate, rotate, revoke, scope. |
+| BL-157 | deferred | No developer sandbox â€” provisioning, reset, cloning, test data, masking or lifecycle. |
+| BL-080 | deferred | No partner API credential lifecycle â€” request, generate, rotate, revoke, scope. |
 | BL-069 | deferred | A distinct webstore API surface per venue is not stated. |
 
 ## CL-05 — Portfolio, household and organisation
@@ -199,16 +199,16 @@ edit `handoff/backlog-clusters.json`, never this file.
 | Entry | Lane | What |
 |---|---|---|
 | BL-116 | deferred | No payment gateway abstraction, no routing, and no card tokenisation. |
-| BL-100 | decision | No recurring guest billing — cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements. |
+| BL-100 | decision | No recurring guest billing â€” cycles, auto-renewal on a stored payment method, retry schedules, grace periods, dunning, downgrade or billing statements. |
 | BL-074 | deferred | Payment is contracted; no payment provider is. |
-| BL-119 | deferred | Payment-terminal behaviour is unstated — EMV certification, offline floor limits, payment-server topology. |
+| BL-119 | deferred | Payment-terminal behaviour is unstated â€” EMV certification, offline floor limits, payment-server topology. |
 | BL-118 | deferred | No payment fraud rules and no chargeback or dispute management. |
 | BL-115 | deferred | Which tenders a sales channel accepts is not configurable. |
 | BL-072 | deferred | No payment link. A booking taken at POS cannot be paid later by the guest. |
 | BL-113 | deferred | No payment-type or card-issuer promotion condition. |
 | BL-086 | deferred | A refund cannot settle into an advance balance or by wire transfer. |
 | BL-087 | deferred | Which exchange rate a cross-currency refund uses is unstated. |
-| BL-070 | deferred | No presentment currency — a storefront cannot show prices in a guest's currency. |
+| BL-070 | deferred | No presentment currency â€” a storefront cannot show prices in a guest's currency. |
 
 ## CL-13 — Catalogue product model
 
@@ -300,7 +300,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 | BL-160 | decision | No firmware deployment, no device-to-asset link, and no device enrolment or retirement lifecycle. |
 | BL-163 | deferred | Staff devices cannot be registered for push, offline scope is unstated for the staff app, and there is no staff-to-staff messaging. |
 | BL-061 | deferred | Cashier input mode, guest-facing display content and a web-like POS journey are stated nowhere. |
-| BL-119 | deferred | Payment-terminal behaviour is unstated — EMV certification, offline floor limits, payment-server topology. |
+| BL-119 | deferred | Payment-terminal behaviour is unstated â€” EMV certification, offline floor limits, payment-server topology. |
 
 ## CL-09 — Guest self-service and identity
 
@@ -330,7 +330,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 | BL-129 | deferred | No production planning, batch runs, production sheets or central kitchen. |
 | BL-125 | deferred | No server assignment, and no transfer of a check between operators. |
 | BL-127 | deferred | No allergen register, no nutritional values, and no approved substitution path. |
-| BL-131 | deferred | No coursing — fire-and-forget, hold-and-fire, phased, timed or delayed ordering. |
+| BL-131 | deferred | No coursing â€” fire-and-forget, hold-and-fire, phased, timed or delayed ordering. |
 | BL-126 | deferred | Theoretical recipe cost is never compared with actual consumption. |
 | BL-130 | deferred | Restaurant waitlist, overbooking controls and no-show policy are thin. |
 | BL-066 | deferred | A kiosk cannot sell food or merchandise, though every operation it would need exists. |
@@ -345,11 +345,11 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-073 | decision | No cookie consent management — banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. |
+| BL-073 | decision | No cookie consent management â€” banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. |
 | BL-176 | settled | No privacy incident tracking. |
 | BL-096 | deferred | No identity verification. A presented document is never checked against the entitlement holder. |
-| BL-106 | deferred | Face Tag — temporary facial storage discarded when the ticket expires — is not distinguished from Face Pass. |
-| BL-065 | deferred | POS and kiosk accessibility — large text, high contrast, simplified navigation — is stated nowhere. |
+| BL-106 | deferred | Face Tag â€” temporary facial storage discarded when the ticket expires â€” is not distinguished from Face Pass. |
+| BL-065 | deferred | POS and kiosk accessibility â€” large text, high contrast, simplified navigation â€” is stated nowhere. |
 | BL-134 | deferred | Dietary, accessibility and internal-note fields have no structured home, and a guest-level blacklist does not exist. |
 
 ## CL-10 — Versioning as one mechanism
@@ -378,7 +378,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 | Entry | Lane | What |
 |---|---|---|
 | BL-102 | deferred | No ticket template, no proof print, and no automatic media-type selection. |
-| BL-095 | deferred | Media stock is not modelled — neither which stock a printer is loaded with, nor how much of it is left. |
+| BL-095 | deferred | Media stock is not modelled â€” neither which stock a printer is loaded with, nor how much of it is left. |
 | BL-103 | deferred | Media cannot be recycled, and replacement does not automatically disable the previous medium. |
 | BL-029 | deferred | No Apple or Google Wallet pass mechanism. |
 
@@ -392,7 +392,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 | Entry | Lane | What |
 |---|---|---|
-| BL-166 | deferred | A seat map holds seats and nothing else — no standing zone, suite, stage, entry, exit or seat view. |
+| BL-166 | deferred | A seat map holds seats and nothing else â€” no standing zone, suite, stage, entry, exit or seat view. |
 | BL-168 | deferred | Seat filtering is limited to eight attributes, automatic assignment is not an operation, and the assistant has no seat tool. |
 | BL-167 | settled | Native CAD and raster image import are not supported formats. |
 
@@ -408,7 +408,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 |---|---|---|
 | BL-136 | deferred | A queue has one capacity, no type and no operating window. |
 | BL-137 | deferred | No load balancing, no automatic queue assignment and no in-queue offers. |
-| BL-011 | decision | No venue wayfinding map — no point of interest, coordinate or route in any contract. |
+| BL-011 | decision | No venue wayfinding map â€” no point of interest, coordinate or route in any contract. |
 | BL-023 | deferred | Nothing helps a guest find their vehicle. |
 
 ## Singletons
@@ -422,7 +422,7 @@ Entries that stand alone — each is its own small decision.
 | BL-092 | deferred | Pro-rata upgrade pricing is not computed. |
 | BL-120 | deferred | The wallet holds one balance and one bonus balance, with one expiry. |
 | BL-153 | deferred | A game reader has no display behaviour, no per-game entitlement, no retry pricing and no re-tap delay. |
-| BL-150 | deferred | No invitation model — campaigns, responses, quotas, lifecycle or per-invitee tokens. |
+| BL-150 | deferred | No invitation model â€” campaigns, responses, quotas, lifecycle or per-invitee tokens. |
 | BL-151 | deferred | No AI-generated dashboards, no provider failover, and no embedded analytics. |
 | BL-162 | deferred | No downtime measurement, no structured root cause, no work-order escalation, no corrective action as a tracked item, and no spare-parts reservation. |
 | BL-122 | deferred | No batch or lot instance carrying its own expiry date, and no expiry alerting. |
@@ -435,7 +435,7 @@ Entries that stand alone — each is its own small decision.
 | BL-033 | deferred | A ticket cannot carry stored value, and a gate cannot deduct it. |
 | BL-071 | deferred | No AI first-pass translation with human editing. |
 | BL-099 | settled | No benign membership freeze. |
-| BL-104 | deferred | No fraud detection over scan behaviour — device sharing, simultaneous sessions, excessive activations, face-change audit. |
+| BL-104 | deferred | No fraud detection over scan behaviour â€” device sharing, simultaneous sessions, excessive activations, face-change audit. |
 | BL-178 | deferred | Asset metadata is fixed, and cross-tenant sharing is refused by design. |
 | BL-002 | deferred | Footer configuration does not exist. `setHeader` and `HeaderConfig` are present; the string "footer" appears nowhere in the contract. |
 | BL-003 | deferred | Tenant-specific notifications have no contract. `marketing-crm` has `listMessageTemplates` and `createMessageTemplate`; nothing joins a template to tenant branding, and `FeatureToggle.pushNotifications` is on or off rather than content. |
@@ -450,9 +450,9 @@ Entries that stand alone — each is its own small decision.
 | BL-097 | deferred | No incident or exception log at the till. |
 | BL-107 | settled | Emergency drop-arm mode is not distinguished from a closed turnstile. |
 | BL-108 | deferred | No hotel room-card integration at access points. |
-| BL-109 | deferred | No podium feature — a supervised validation position directing groups, with its own device behaviour and reporting. |
+| BL-109 | deferred | No podium feature â€” a supervised validation position directing groups, with its own device behaviour and reporting. |
 | BL-128 | settled | No buzzer or pager association with an order. |
-| BL-164 | deferred | No voice interaction — `AiCapability` is chat, embedding, vision and rerank. |
+| BL-164 | deferred | No voice interaction â€” `AiCapability` is chat, embedding, vision and rerank. |
 | BL-169 | settled | A campaign has no budget cap. |
 | BL-007 | settled | `layerMapping` declares each role as a single string and cannot express the client's plan. |
 | BL-008 | settled | Section codes carrying Arabic-Indic digits never join to the manifest. |

@@ -840,6 +840,66 @@ paths:
                 $ref: '#/components/schemas/DsarRequest'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+  /cell-connections:
+    get:
+      operationId: listCellConnections
+      summary: Which cells may talk to which
+      description: >
+        **A connection has a validity window, which is what makes this a table rather than a config
+        flag.** A link opened for a summer festival and never closed is a standing cross-cell path
+        nobody remembers authorising.
+      tags:
+      - cross-region
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Which cells may talk to which
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SyncCellConnection'
+  /cross-cell-requests:
+    get:
+      operationId: listCrossCellRequests
+      summary: Calls that had to leave a cell
+      description: >
+        **This is how anyone finds out the topology is wrong.** A pair of cells exchanging thousands
+        of these is usually a tenant homed in the wrong cell, and until now the evidence existed and
+        could not be read.
+
+        `correlationId` is what joins a slow guest-facing request to the hop that made it slow.
+        Routed to the analytical replica: this is diagnosis, and it must not compete with the
+        traffic it is diagnosing.
+      tags:
+      - cross-region
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: analytical
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Calls that had to leave a cell
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SyncCrossCellRequest'
 components:
   schemas:
     SyncCellConnection:

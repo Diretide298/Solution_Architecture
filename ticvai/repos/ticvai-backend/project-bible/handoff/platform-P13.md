@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 82 |
+| Operations with no screen | 118 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 82 operations with no screen here
+### 118 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,12 +26,15 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
+| `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setIngredientSubstitutes` | fnb | PUT | Define approved substitutions |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
 | `updateTable` | fnb | PUT | Change what a table is |
@@ -39,28 +42,25 @@
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `listModules` | identity | GET | The module tree permissions are grouped under |
+| `listPermissions` | identity | GET | Every permission key the contracts enforce |
+| `recordBenefitUsage` | identity | POST | Consume a benefit |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
+| `awardBadge` | marketing-crm | POST | Award a badge |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
+| `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
+| `getLoyaltyRules` | marketing-crm | GET | Every rule a loyalty programme runs on |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
-| `startKioskAssist` | marketing-crm | POST | A staff member helps a guest at a kiosk, remotely |
-| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `convertReservation` | orders | POST | Convert a reservation into an order |
-| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| `createReservation` | orders | POST | Hold without payment |
-| `extendReservation` | orders | POST | Extend a reservation |
-| `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
-| `listFraudRules` | orders | GET |  |
-| … | | | 42 more |
+| … | | | 78 more |
 
 ## Modules
 

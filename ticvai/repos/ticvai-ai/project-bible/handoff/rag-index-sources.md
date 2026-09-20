@@ -19,7 +19,7 @@ must not become a failure to publish a product.
 | `fnb.menu_item` | name, description, allergens | catalogue | venue | wholeRecord | `fnb.menuPublished` |
 | `retail.merchandise` | name, description | catalogue | venue | wholeRecord | `retail.merchandisePublished` |
 | `maintenance.inspection_template` | name, instructions | knowledge | venue | section | `maintenance.templatePublished` |
-| `marketing.case` | subject, resolution | knowledge | tenant | wholeRecord | `marketing.caseClosed` |
+| `marketing.case` | subject, resolutionNote | knowledge | tenant | wholeRecord | `marketing.caseClosed` |
 | `reporting.report_definition` | name, description | knowledge | tenant | wholeRecord | `reporting.definitionPublished` |
 | `assets.media_asset` | title, extractedText | knowledge | tenant | section | `assets.documentIndexed` |
 
@@ -84,21 +84,38 @@ declared in `events/`, and `catalogue.productPublished` is no longer the only mo
 | `assets.documentIndexed` | `events/assets-documentIndexed.yaml` | assets |
 
 **None of them is AI-specific and that was the argument for writing them** — each is a fact the
-owning service should publish anyway, and other consumers want them. 29 events are now declared.
+owning service should publish anyway, and other consumers want them. 30 events are now declared.
 
-## The six missing text fields, closed
+## The six missing text fields: four closed, two not
 
-**All eleven sources now have every column they name.** Six declared a field the schema did
-not have, which is not a silent failure but a missing source — an index built on a column
-that does not exist embeds a name and nothing else. Added to the contracts on 19 September:
+**Verified column by column on 20 September against `handoff/schema-reference.json`.** All
+eleven tables exist and every one is read by an AI operation in the lineage, which is what
+`check-package` enforces. **Two of the six fields added on 19 September are not where this
+register says they are**, and both are sources whose whole value is the missing field.
 
-| Source | Column added | Why it is the one that mattered |
+| Source | Column | State |
 |---|---|---|
-| `marketing.case` | **`resolution`** | The source whose whole value is how the last complaint was resolved could only embed a subject line |
-| `assets.media_asset` | **`extractedText`** | The generic path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads |
-| `maintenance.inspection_template` | **`instructions`** | The staff-assistant source that matters most; a technician isolating a chiller is asking a safety question |
-| `whitelabel.policy` | `title` | The heading a refund question retrieves against |
-| `catalogue.entitlement_template` | `description` | "Can I leave and come back" is answered here, and a name cannot answer it |
-| `retail.merchandise` | `description` | Guest-app search |
+| `whitelabel.policy` | `title` | present |
+| `catalogue.entitlement_template` | `description` | present |
+| `retail.merchandise` | `description` | present |
+| `maintenance.inspection_template` | `instructions` | present |
+| `marketing.case` | `resolution` | **landed as `resolution_note`.** Register corrected to `resolutionNote`; the column is right and the name here was wrong |
+| `assets.media_asset` | `extractedText` | **on the wrong schema — open** |
 
-Each was prose the contract already described and never gave a field.
+### `extractedText` is on `MediaUsage`, not `MediaAsset`
+
+`contracts/satellite/assets.yaml` carries `extractedText` on **`MediaUsage`**, whose
+`x-ticvai-persistence` is `assets.media_usage` — the row recording *where an asset is used*,
+required fields `surface` and `referenceId`. The asset itself, `MediaAsset` on
+`assets.media_asset`, does not have it.
+
+**So the generic upload path indexes a column that does not exist**, which this register's own
+rule calls out: an index built on a missing column embeds a title and nothing else, and a PDF
+nobody can search is a PDF nobody reads. It is also inserted above `id:` at the top of
+`MediaUsage`'s properties rather than in place, which is the signature of an insertion that
+matched the wrong anchor.
+
+**This is a contract change and contracts are frozen**, so it is recorded rather than made. The
+fix is to move the property to `MediaAsset`; nothing reads it yet, so nothing breaks in the
+meantime except the source it was written for.
+

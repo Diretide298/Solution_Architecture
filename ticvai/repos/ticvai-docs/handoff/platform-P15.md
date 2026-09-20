@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 26 |
+| Operations with no screen | 31 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 26 operations with no screen here
+### 31 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,19 +26,24 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
+| `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setIngredientSubstitutes` | fnb | PUT | Define approved substitutions |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
 | `updateTable` | fnb | PUT | Change what a table is |
+| `deleteDashboard` | reporting | DELETE | Archive a dashboard |
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
 | `listAlertRules` | reporting | GET | What raises an alert, and when |
 | `updateReportSchedule` | reporting | PATCH | Amend, pause or resume a schedule |
 | `issueDeviceCredential` | tenancy | POST | Give the device an identity it can prove |
+| `listCellEndpoints` | tenancy | GET | Where each service answers inside a cell |
 | `listDeviceAuditRecords` | tenancy | GET | What was done to this device, and what it did |
 | `listDeviceFirmware` | tenancy | GET | Firmware and software versions, and what is running where |
 | `listDeviceTamperEvents` | tenancy | GET | Devices that report having been interfered with |

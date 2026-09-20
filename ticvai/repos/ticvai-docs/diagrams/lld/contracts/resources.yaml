@@ -151,8 +151,10 @@ operations:
   offline: false
   reads:
   - resources.resource_package
+  - resources.resource_requirement
   writes:
   - resources.resource_package
+  - resources.resource_requirement
 - operation: createResourceType
   verb: POST
   path: /resource-types
@@ -252,7 +254,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - resources.resource_relation
   writes: []
 - operation: getResourceSchedule
   verb: GET
@@ -342,6 +345,7 @@ operations:
   offline: false
   reads:
   - resources.resource_package
+  - resources.resource_requirement
   writes: []
 - operation: listResourceTypes
   verb: GET
@@ -444,8 +448,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - resources.resource_relation
+  writes:
+  - resources.resource_relation
 - operation: setResourceLifecycleState
   verb: POST
   path: /resources/{resourceId}/state
@@ -468,6 +474,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.principal
+  - resources.qualification
   - resources.resource
   writes:
   - cache:idempotency
@@ -562,8 +569,10 @@ operations:
   offline: false
   reads:
   - resources.resource_package
+  - resources.resource_requirement
   writes:
   - resources.resource_package
+  - resources.resource_requirement
 - operation: updateResourceType
   verb: PUT
   path: /resource-types/{resourceTypeId}

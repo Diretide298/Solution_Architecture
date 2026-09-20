@@ -1,15 +1,21 @@
 id: LLD-CatalogueService
-title: CatalogueService — 389 operations, 66 tables
+title: CatalogueService — 398 operations, 69 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
 why: '**What is sold, at what price, in which seat.** Promotions and seating are folded in because both
   are pricing and availability against the same product — a promotion that cannot see a price list and
-  a seat that cannot see a product are two round trips on the hot path of every sale.'
+  a seat that cannot see a product are two round trips on the hot path of every sale. **`pricing` joined
+  it on 20 September**, which closes decision 5 of the schema merge — it took all three `pricing` tables
+  and said the schema needed an owner, and that stayed open because the tables had no operations and
+  a service is inferred from the contract that declares them. The operations were written into `catalogue.yaml`,
+  beside the price lists and products a dynamic rule adjusts: a rule that reads `catalogue.price_list`
+  and `catalogue.product` to compute a price belongs on the side of the boundary those live on, or every
+  evaluation is a cross-service call on the sale path.'
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 389
+  operations: 398
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -20,6 +26,11 @@ schemas:
   stores:
   - postgres
   largestTable: catalogue.entitlement_template
+- schema: pricing
+  tables: 3
+  stores:
+  - postgres
+  largestTable: pricing.dynamic_price_rule
 - schema: promotions
   tables: 16
   stores:
@@ -32,7 +43,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 190
+  count: 199
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -160,7 +171,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: createEntitlementTemplate
     verb: POST
@@ -242,6 +253,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getDynamicPriceRule
+    verb: GET
+    path: /pricing/dynamic-rules/{ruleId}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
   - operation: getEvent
     verb: GET
     path: /events/{eventId}
@@ -282,6 +301,14 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: getPlanBenefits
+    verb: GET
+    path: /entitlement-templates/{templateId}/benefits
+    scope: venue
+    permission: CATALOGUE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getPriceList
     verb: GET
     path: /price-lists/{priceListId}
@@ -304,7 +331,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: joinWaitlist
     verb: POST
@@ -312,7 +339,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: leaveWaitlist
     verb: DELETE
@@ -554,6 +581,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listDynamicPriceRules
+    verb: GET
+    path: /pricing/dynamic-rules
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDynamicPricingAutomation
     verb: GET
     path: /dynamic-pricing-automation
@@ -706,6 +741,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listMembershipBenefits
+    verb: GET
+    path: /membership-benefits
+    scope: venue
+    permission: CATALOGUE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listMembershipLoyaltyPricing
     verb: GET
     path: /membership-loyalty-pricing
@@ -713,6 +756,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listMembershipProgrammes
+    verb: GET
+    path: /membership-programmes
+    scope: venue
+    permission: CATALOGUE_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listNearbyEventExhibition
     verb: GET
@@ -1160,7 +1211,7 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: relinquishInventoryHold
     verb: DELETE
@@ -1274,6 +1325,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setDynamicPriceRule
+    verb: PUT
+    path: /pricing/dynamic-rules/{ruleId}
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: setDynamicPricingStrategy
     verb: PUT
     path: /dynamic-pricing-strategy
@@ -1346,6 +1405,30 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setMembershipBenefit
+    verb: PUT
+    path: /membership-benefits
+    scope: venue
+    permission: CATALOGUE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setMembershipProgramme
+    verb: PUT
+    path: /membership-programmes
+    scope: venue
+    permission: CATALOGUE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPlanBenefits
+    verb: PUT
+    path: /entitlement-templates/{templateId}/benefits
+    scope: venue
+    permission: CATALOGUE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPrepaidMinutePackage
     verb: PUT
     path: /prepaid-minute-packages
@@ -1603,8 +1686,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
-    writes: 4
+    reads: 5
+    writes: 5
   - operation: createCouponCampaign
     verb: POST
     path: /coupon-campaigns
@@ -1699,7 +1782,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getCouponCode
     verb: GET
@@ -1891,7 +1974,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 4
     writes: 0
   - operation: listCampaignCalendarTimeline
     verb: GET
@@ -2484,7 +2567,7 @@ operationsByContract:
     permission: LEDGER_VIEW
     offline: false
     reads: 3
-    writes: 1
+    writes: 2
   - operation: publishPromotion
     verb: POST
     path: /promotions/{promotionId}/publish
@@ -2683,7 +2766,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: updatePromotion
     verb: PATCH
@@ -3086,7 +3169,7 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: setSeatHoldType
     verb: PUT
@@ -3196,7 +3279,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 35
+  columns: 39
   store: postgres
   parent: access.entitlement
   writtenBy:
@@ -3271,13 +3354,15 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - catalogue
   foreignWriters: null
 - table: catalogue.membership_programme
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - catalogue
   foreignWriters: null
 - table: catalogue.performance
   columns: 10
@@ -3289,8 +3374,9 @@ tables:
 - table: catalogue.plan_benefit
   columns: 8
   store: postgres
-  parent: null
-  writtenBy: []
+  parent: catalogue.entitlement_template
+  writtenBy:
+  - catalogue
   foreignWriters: null
 - table: catalogue.prepaid_minutes
   columns: 13
@@ -3317,7 +3403,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 21
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -3326,7 +3412,7 @@ tables:
   foreignWriters:
   - inventory
 - table: catalogue.product_category
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -3363,7 +3449,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.variant
-  columns: 5
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -3377,6 +3463,27 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.waitlist_entry
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: pricing.dynamic_price_action
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: pricing.dynamic_price_condition
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: pricing.dynamic_price_rule
   columns: 11
   store: postgres
   parent: null
@@ -3407,7 +3514,8 @@ tables:
   columns: 6
   store: postgres
   parent: promotions.bundle
-  writtenBy: []
+  writtenBy:
+  - promotions
   foreignWriters: null
 - table: promotions.bundle_component
   columns: 7
@@ -3558,7 +3666,7 @@ tables:
 - table: seating.seat_block_item
   columns: 4
   store: postgres
-  parent: seating.seat
+  parent: seating.seat_block
   writtenBy: []
   foreignWriters: null
 - table: seating.seat_category
@@ -3630,15 +3738,15 @@ tables:
   - seating
   foreignWriters: null
 readsFrom:
-- service: OrderService
-  operations: 6
 - service: AccessService
   operations: 5
+- service: OrderService
+  operations: 4
 - service: MarketingService
   operations: 2
-- service: TenancyService
-  operations: 1
 - service: LedgerService
+  operations: 1
+- service: TenancyService
   operations: 1
 - service: VenueOpsService
   operations: 1

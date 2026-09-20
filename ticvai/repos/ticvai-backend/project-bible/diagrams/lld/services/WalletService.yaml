@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 48 operations, 25 tables
+title: WalletService — 50 operations, 25 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -17,7 +17,7 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 48
+  operations: 50
   inAFlow: 0
   percent: 0%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -30,7 +30,7 @@ schemas:
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 48
+  count: 50
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -46,7 +46,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: adjustWallet
     verb: POST
@@ -86,8 +86,8 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createVoucherType
     verb: POST
     path: /voucher-types
@@ -133,6 +133,14 @@ operationsByContract:
     path: /wallets/{subjectId}
     scope: venue
     permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWalletBalance
+    verb: GET
+    path: /wallets/{walletId}/balance
+    scope: venue
+    permission: WALLET_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -198,7 +206,7 @@ operationsByContract:
     scope: venue
     permission: WALLET_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listVoucherTypes
     verb: GET
@@ -211,6 +219,14 @@ operationsByContract:
   - operation: listWalletDisputes
     verb: GET
     path: /wallet-disputes
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWalletHolds
+    verb: GET
+    path: /wallets/{walletId}/holds
     scope: venue
     permission: WALLET_VIEW
     offline: false
@@ -238,7 +254,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: publishWalletConfiguration
     verb: POST

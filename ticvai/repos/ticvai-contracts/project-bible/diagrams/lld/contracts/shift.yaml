@@ -46,6 +46,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.principal
+  - orders.deposit_box
   - platform.workstation
   writes:
   - cache:idempotency

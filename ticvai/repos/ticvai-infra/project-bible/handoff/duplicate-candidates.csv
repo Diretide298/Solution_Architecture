@@ -1,0 +1,18 @@
+suspect,suspect_columns,original,original_columns,original_operations,same_short_name,domain_already_reads_it,column_overlap,shared,other_candidates
+fnb.product,12,catalogue.product,21,40,yes,yes,0.0,,rental.product
+fnb.price,11,catalogue.price,5,7,yes,yes,0.222,amount variant_id,
+inventory.stock_reservation,10,inventory.stock_batch,10,2,,yes,0.364,expires_at item_id location_id quantity,
+retail.product,11,catalogue.product,21,40,yes,,0.0,,rental.product
+fnb.price_list,11,catalogue.price_list,7,10,yes,,0.75,priority valid_from valid_to,
+retail.price_list,11,catalogue.price_list,7,10,yes,,0.75,priority valid_from valid_to,
+retail.price,11,catalogue.price,5,7,yes,,0.222,amount variant_id,
+fnb.variant,9,catalogue.variant,5,6,yes,,0.4,product_id sku,
+retail.variant,10,catalogue.variant,5,6,yes,,0.333,product_id sku,
+fnb.product_category,8,catalogue.product_category,9,2,yes,,0.0,,
+orders.deposit,14,ledger.deposit,10,2,yes,,0.125,order_id settled_at,
+retail.product_category,8,catalogue.product_category,9,2,yes,,0.0,,
+marketing.sla_policy,12,approvals.sla_policy,10,1,yes,,0.091,business_hours_only,
+pricing.dynamic_price_rule,11,catalogue.price_list,7,10,,,0.429,priority valid_from valid_to,
+orders.donation_line,3,marketing.message_delivery,2,1,,,0.5,campaign_id,
+whitelabel.redirect,10,control.url_redirect,8,1,,,0.375,hit_count reason status_code,
+whitelabel.seo_setting,16,control.seo_metadata,15,1,,,0.588,canonical_url entity_id is_auto_generated keywords locale meta_description no_index schema_org_type,

@@ -7856,6 +7856,109 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiAccessIntelligenceForecastingExecutiveInsightsView'
+  /access-changes:
+    get:
+      operationId: listAccessChanges
+      summary: Changes made to an entitlement's access
+      description: >
+        **Who changed what a pass could do, and when.** An entitlement that stopped working at a
+        gate is answered from here or from nowhere.
+      tags:
+      - access
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Changes made to an entitlement's access
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccessAccessChange'
+  /admission-rules/{ruleId}/points:
+    get:
+      operationId: listEntryRulePoints
+      summary: Which access points an admission rule covers
+      description: >
+        **This is `access.admission_rules.allowedAccessPointIds` as a table**, and it is the
+        clearest case in the merge: their normalisation was taken because an array cannot carry
+        per-row state. A point that is temporarily closed under one rule and open under another has
+        nowhere to live in an array.
+      tags:
+      - access
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Which access points an admission rule covers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessEntryRulePoint'
+    put:
+      operationId: setEntryRulePoints
+      summary: Set the access points an admission rule covers
+      description: >
+        Set whole: a rule's coverage is decided as a set, and applying it point by point leaves
+        gates admitting on a rule that is half-applied.
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccessEntryRulePoint'
+      responses:
+        '200':
+          description: Set the access points an admission rule covers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessEntryRulePoint'
 components:
   schemas:
     AccessAccessChange:
@@ -7892,7 +7995,7 @@ components:
           type: string
           maxLength: 500
           nullable: true
-        changedByUserId:
+        changedByPrincipalId:
           type: string
           format: uuid
           nullable: true

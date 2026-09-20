@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 56 operations, 31 tables
+title: IdentityService — 61 operations, 30 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,14 +9,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 56
+  operations: 61
   inAFlow: 21
   percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 27
+  tables: 26
   stores:
   - postgres
   - redis
@@ -28,7 +28,7 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 56
+  count: 61
   operations:
   - operation: completeSsoAuthorization
     verb: POST
@@ -148,7 +148,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: true
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getCurrentSession
     verb: GET
@@ -165,6 +165,14 @@ operationsByContract:
     permission: null
     offline: true
     reads: 2
+    writes: 0
+  - operation: getMembership
+    verb: GET
+    path: /memberships/{membershipId}
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 3
     writes: 0
   - operation: getPrincipal
     verb: GET
@@ -244,7 +252,7 @@ operationsByContract:
     scope: tenant
     permission: PERMISSION_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listAccessPolicyTemplates
     verb: GET
@@ -261,6 +269,14 @@ operationsByContract:
     permission: SESSION_FORCE_LOGOUT
     offline: false
     reads: 2
+    writes: 0
+  - operation: listCustomerMemberships
+    verb: GET
+    path: /customers/{customerId}/memberships
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listDelegatedAccess
     verb: GET
@@ -283,6 +299,22 @@ operationsByContract:
     path: /auth/mfa/methods
     scope: tenant
     permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listModules
+    verb: GET
+    path: /modules
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPermissions
+    verb: GET
+    path: /permissions
+    scope: tenant
+    permission: PERMISSION_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -326,6 +358,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: recordBenefitUsage
+    verb: POST
+    path: /memberships/{membershipId}/benefit-usage
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: true
+    reads: 1
+    writes: 1
   - operation: refreshToken
     verb: POST
     path: /auth/refresh
@@ -528,7 +568,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.customer_membership
   columns: 12
@@ -537,7 +578,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.delegated_access
-  columns: 19
+  columns: 21
   store: postgres
   parent: null
   writtenBy:
@@ -669,12 +710,6 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
-- table: identity.user_access
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: pii.subject
   columns: 13
   store: postgres
@@ -708,12 +743,12 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: MarketingService
-  operations: 5
+  operations: 2
 - service: OrderService
   operations: 2
-- service: TenancyService
-  operations: 1
 - service: AccessService
+  operations: 1
+- service: TenancyService
   operations: 1
 writesOutside:
 - service: OrderService

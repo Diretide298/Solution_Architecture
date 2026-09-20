@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 42 operations, 20 tables
+title: ReportingService — 43 operations, 20 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**Reads almost everything and writes only its own definitions.** Separate 
 scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
-  operations: 42
+  operations: 43
   inAFlow: 18
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: reporting.report_definition
 operationsByContract:
 - contract: reporting
-  count: 42
+  count: 43
   operations:
   - operation: acknowledgeAlert
     verb: POST
@@ -89,6 +89,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: deleteDashboard
+    verb: DELETE
+    path: /dashboards/{dashboardId}
+    scope: tenant
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: deleteReport
     verb: DELETE
     path: /reports/{reportId}
@@ -271,7 +279,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listReportSubscriptions
     verb: GET
@@ -287,7 +295,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 1
+    reads: 4
     writes: 0
   - operation: listSeededReports
     verb: GET
@@ -390,7 +398,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: reporting.dashboard
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -507,11 +515,11 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: AiService
-  operations: 4
-- service: InventoryService
-  operations: 4
+  operations: 2
 - service: IdentityService
   operations: 2
+- service: InventoryService
+  operations: 1
 writesOutside:
 - service: AiService
   operations: 2

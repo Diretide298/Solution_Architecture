@@ -42,8 +42,21 @@ LINEAGE = ROOT / "handoff" / "api-data-lineage.json"
 SERVICE_OF = {}
 
 
+def schema_defs() -> dict:
+    """Schema name -> its definition, across every contract, so a `$ref` can be followed."""
+    out = {}
+    for c in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            doc = yaml.safe_load(c.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for n, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
+            out.setdefault(n, sch)
+    return out
+
+
 def persistence_map() -> dict:
-    """Schema name -> the table it persists to, across every contract."""
+    """Schema name -> the table(s) it persists to, across every contract."""
     out = {}
     for c in sorted((ROOT / "contracts").rglob("*.yaml")):
         try:
@@ -62,14 +75,54 @@ def persistence_map() -> dict:
             # to refuse a table the schema reference has never heard of.
             if t.lower().startswith("none"):
                 continue
-            out[n] = t
+            # **A schema may persist to more than one table and twenty-four of them do.**
+            # `x-ticvai-persistence: orders.sales_order + orders.order_line` is an order and its
+            # lines returned as one object. Taken whole it is a table name with a plus sign in
+            # it, which is in no schema reference and which `derive-schema` would then rebuild
+            # as a real table from these very entries.
+            #
+            # This was invisible while `tables_in` looked one level deep: the stored entries were
+            # hand-mapped with the tables split correctly, and nothing re-derived them. Following
+            # refs reached the composed schemas and put the unsplit string into six operations
+            # before `check-lineage` caught it.
+            parts = [x.strip() for x in t.split("+") if x.strip() and "." in x]
+            if parts:
+                out[n] = parts
     return out
 
 
-def tables_in(node, persist: dict) -> list:
-    """Every persisted table reachable from a `$ref` inside this node."""
+def tables_in(node, persist: dict, defs: dict = None, depth: int = 6) -> list:
+    """Every persisted table reachable from a `$ref` inside this node.
+
+    **This said "reachable" and only looked one level deep.** A response that returns a composed
+    schema — `WorkforceEmployeeProfile`, `TenantConfig`, `BundleDetail` — has one `$ref` in the
+    operation and the tables underneath it, and reading only the operation node found the wrapper,
+    which persists nothing, and stopped.
+
+    **151 operations under-reported, 217 table mentions missing.** `getTenantConfig` returns the
+    feature toggles, the homepage sections and the module enablement and named none of them;
+    `getEmployee` returned a profile over five tables and derived an empty read set.
+
+    The refs are followed to a fixed point, with a depth bound because a schema may legitimately
+    refer to itself — a category with a parent, a scope with a parent — and a self-reference adds
+    no table the first visit did not.
+    """
     refs = set(re.findall(r"#/components/schemas/([A-Za-z0-9_]+)", json.dumps(node or {})))
-    return sorted({persist[r] for r in refs if r in persist})
+    if defs:
+        seen, frontier = set(refs), set(refs)
+        for _ in range(depth):
+            nxt = set()
+            for n in frontier:
+                if n in defs:
+                    nxt |= set(re.findall(r"#/components/schemas/([A-Za-z0-9_]+)",
+                                          json.dumps(defs[n])))
+            nxt -= seen
+            if not nxt:
+                break
+            seen |= nxt
+            frontier = nxt
+        refs = seen
+    return sorted({t for r in refs if r in persist for t in persist[r]})
 
 
 # **A contract with no stored entry needs a person, and on 19 September five arrived at once.**
@@ -158,6 +211,7 @@ def stores_by_contract(stored: dict) -> dict:
 
 def derive(stored: dict) -> dict:
     persist = persistence_map()
+    defs = schema_defs()
     svc = service_by_contract(stored)
     sto = stores_by_contract(stored)
     out = {}
@@ -176,8 +230,12 @@ def derive(stored: dict) -> dict:
                     "contract": contract,
                     "verb": verb.upper(),
                     "path": path,
-                    "reads": tables_in(op.get("responses"), persist),
-                    "writes": tables_in(op.get("requestBody"), persist),
+                    "reads": tables_in(op.get("responses"), persist, defs),
+                    "writes": tables_in(op.get("requestBody"), persist, defs),
+                    # Kept only long enough for the repair below to tell which tables are new
+                    # *because refs are now followed*, and stripped before anything is written.
+                    "_direct_reads": tables_in(op.get("responses"), persist),
+                    "_direct_writes": tables_in(op.get("requestBody"), persist),
                     "routing": op.get("x-ticvai-read-routing"),
                     "scope": op.get("x-ticvai-scope-level"),
                     "perm": op.get("x-ticvai-permission"),
@@ -246,9 +304,37 @@ def main() -> int:
     # operation's owning contract is read straight off the file that declares it, so when the
     # two disagree the stored one is simply out of date, and the service inferred from it with
     # it. A hand-narrowed `audience` or a deliberate service override is still left alone.
-    repaired = moved = rehomed = 0
+    repaired = moved = rehomed = followed = 0
     svc = service_by_contract(stored)
     if a.apply:
+        # **The one repair to an existing entry's reads and writes, and it is narrow on purpose.**
+        # Until 20 September `tables_in` looked one level deep, so an operation returning a
+        # composed schema recorded the wrapper's tables and not the ones underneath. The repair
+        # adds ONLY the tables that appear because refs are now followed — the difference between
+        # the transitive walk and the old direct one.
+        #
+        # **Nothing is ever removed and no other difference is touched.** A stored set that
+        # disagrees with the contract for any other reason is a judgement somebody made, and
+        # `--audit` reports it rather than overwriting it. This fixes a derivation that was
+        # incomplete, not a decision that was wrong.
+        for o in sorted(set(stored) & set(fresh)):
+            for key, direct_key in (("reads", "_direct_reads"), ("writes", "_direct_writes")):
+                # **Widened on 20 September from "transitive gains" to "anything the contract
+                # demonstrably refs".** The narrow version missed 82 tables, because a
+                # hand-mapped entry can be short for reasons that have nothing to do with
+                # composed schemas: `listBurstEnvironments` returns `BurstEnvironment` and its
+                # 31 August entry lists `catalogue.performance` and not
+                # `control.burst_environment`.
+                #
+                # **A short lineage entry is indistinguishable from a missing API**, and the
+                # unwired audit reported four operations' worth of burst-environment API as a
+                # gap on exactly that basis. Reads and writes derived from a `$ref` are a
+                # derivation, not a judgement — so a missing one is filled. Nothing is ever
+                # removed; a narrowing IS a judgement and `--audit` reports it instead.
+                add = sorted(set(fresh[o].get(key) or []) - set(stored[o].get(key) or []))
+                if add:
+                    stored[o][key] = sorted(set(stored[o].get(key) or []) | set(add))
+                    followed += len(add)
         for o in sorted(set(stored) & set(fresh)):
             if not stored[o].get("service") and fresh[o].get("service"):
                 stored[o]["service"] = fresh[o]["service"]
@@ -273,6 +359,9 @@ def main() -> int:
                 if fresh[o].get("service"):
                     stored[o]["service"] = fresh[o]["service"]
                 moved += 1
+    if followed:
+        print("  %d table mention(s) added to existing entries by following refs into composed "
+              "schemas" % followed)
     if repaired:
         print("  repaired %d entry(s) that had no service" % repaired)
     if moved:
@@ -283,11 +372,11 @@ def main() -> int:
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    if not missing and not repaired and not moved and not rehomed:
+    if not missing and not repaired and not moved and not rehomed and not followed:
         print("  nothing to add")
         return 0
     for o in missing:
-        stored[o] = fresh[o]
+        stored[o] = {k: v for k, v in fresh[o].items() if not k.startswith("_")}
     LINEAGE.write_text(json.dumps(stored, indent=1, ensure_ascii=False), encoding="utf-8")
     print("  added %d · %d operations total -> handoff/%s" % (len(missing), len(stored),
                                                               LINEAGE.name))

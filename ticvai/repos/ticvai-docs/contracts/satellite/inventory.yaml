@@ -2437,6 +2437,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GoodsReceipt'
+  /stock-reservations:
+    get:
+      operationId: listStockReservations
+      summary: Soft holds on stock
+      description: >
+        **A reservation is not a batch and not a movement.** `rental.agreement_item` points here:
+        equipment promised to a booking that has not been collected is neither available nor gone,
+        and without this it was one or the other.
+
+        `expiresAt` is what stops a hold outliving the booking that made it.
+      tags:
+      - inventory
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Soft holds on stock
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/InventoryStockReservation'
 components:
   schemas:
     InventoryStockReservation:
@@ -2528,7 +2562,7 @@ components:
         status:
           type: string
           maxLength: 30
-        createdByUserId:
+        createdByPrincipalId:
           type: string
           format: uuid
           nullable: true

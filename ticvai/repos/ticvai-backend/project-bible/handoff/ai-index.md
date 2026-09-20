@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 40 |
 | **Flows** | 11 |
-| **Documents** | 31 |
+| **Documents** | 32 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -245,6 +245,7 @@
 | [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |
 | [> **SUPERSEDED, 20 September.** Written when 151 of 223 were reviewed and the review was](..\docs\active\rename-worklist-20-september.md) |  | 2 |
 | [Schema merge — the decision log](..\docs\active\schema-merge-decision-log.md) |  | 2 |
+| [Schema merge — final report](..\docs\active\schema-merge-final-report-20-september.md) |  | 2 |
 | [Identical operation sets — what each cluster actually is](..\docs\active\screen-duplicate-triage.md) |  | 5 |
 | [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |
 | [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |

@@ -54,6 +54,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.delegation
   - cache:idempotency
   - identity.delegated_access
   - identity.principal
@@ -80,8 +81,10 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.decision
   - approvals.delegation
   - approvals.matrix
+  - approvals.request
   - approvals.rule
   - cache:idempotency
   - identity.principal
@@ -107,6 +110,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.decision
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -125,6 +129,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.decision
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -172,6 +177,7 @@ operations:
   offline: false
   reads:
   - approvals.decision_record
+  - approvals.signature
   writes: []
 - operation: issueAccreditationBadge
   verb: POST
@@ -373,6 +379,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.decision
   - approvals.request
   - cache:idempotency
   writes:
@@ -414,6 +421,7 @@ operations:
   offline: false
   reads:
   - approvals.matrix
+  - approvals.rule
   - cache:idempotency
   writes:
   - approvals.matrix
@@ -527,6 +535,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.decision
   - approvals.request
   - cache:idempotency
   writes:

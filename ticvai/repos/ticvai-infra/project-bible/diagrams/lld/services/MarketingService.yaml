@@ -1,5 +1,5 @@
 id: LLD-MarketingService
-title: MarketingService — 183 operations, 61 tables
+title: MarketingService — 203 operations, 62 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -12,20 +12,20 @@ why: '**93 operations and 37 tables — the biggest thing in the package, and pr
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 183
+  operations: 203
   inAFlow: 39
   percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 61
+  tables: 62
   stores:
   - postgres
   largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
-  count: 183
+  count: 203
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -89,8 +89,8 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: approvePrivacyTesting
     verb: PUT
     path: /privacy-testing
@@ -107,13 +107,21 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: awardBadge
+    verb: POST
+    path: /customers/{customerId}/badges
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: claimConversation
     verb: POST
     path: /conversations/{conversationId}/claim
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: closeConversation
     verb: POST
@@ -121,7 +129,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: createCampaign
     verb: POST
@@ -153,7 +161,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createForm
     verb: POST
@@ -169,7 +177,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createJourney
     verb: POST
@@ -185,8 +193,8 @@ operationsByContract:
     scope: tenant
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createMessageTemplate
     verb: POST
     path: /message-templates
@@ -201,7 +209,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createSegment
     verb: POST
@@ -257,7 +265,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getCampaignPerformance
     verb: GET
@@ -306,6 +314,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getGuestExtraValues
+    verb: GET
+    path: /guests/{guestId}/extra-values
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getGuestIntelligence
     verb: GET
@@ -379,6 +395,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getLoyaltyRules
+    verb: GET
+    path: /loyalty/programmes/{programmeId}/rules
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 3
+    writes: 0
   - operation: getMarketingSubscription
     verb: GET
     path: /marketing-subscriptions
@@ -433,7 +457,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: identifyGuest
     verb: POST
@@ -448,6 +472,14 @@ operationsByContract:
     path: /audience-lists
     scope: tenant
     permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: issueReward
+    verb: POST
+    path: /loyalty/reward-assignments
+    scope: venue
+    permission: LOYALTY_REDEEM
     offline: false
     reads: 1
     writes: 1
@@ -483,6 +515,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listBadges
+    verb: GET
+    path: /badges
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listBusinessEventNotification
     verb: GET
     path: /business-event-notification
@@ -497,7 +537,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listCaseResolutionClosure
     verb: GET
@@ -577,7 +617,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listCookieBannerPreference
     verb: GET
@@ -594,6 +634,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listCustomerBadges
+    verb: GET
+    path: /customers/{customerId}/badges
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listCustomerPrivacyConsent
     verb: GET
@@ -723,6 +771,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listGuestExtraFields
+    verb: GET
+    path: /guest-extra-fields
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listJourneys
     verb: GET
     path: /journeys
@@ -739,13 +795,29 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listLoyaltyCampaigns
+    verb: GET
+    path: /loyalty/campaigns
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLoyaltyPointEntries
+    verb: GET
+    path: /loyalty/points
+    scope: venue
+    permission: LOYALTY_ACCRUE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listLoyaltyProgrammes
     verb: GET
     path: /loyalty/programmes
     scope: venue
     permission: MARKETING_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listMessageTemplates
     verb: GET
@@ -867,6 +939,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listRewardAssignments
+    verb: GET
+    path: /loyalty/reward-assignments
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRewards
+    verb: GET
+    path: /loyalty/rewards
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listRoutingPriorityThrottling
     verb: GET
     path: /routing-priority-throttling
@@ -889,7 +977,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listServiceRootCause
     verb: GET
@@ -906,6 +994,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listSlaPolicies
+    verb: GET
+    path: /sla-policies
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listSlaPolicyService
     verb: GET
@@ -970,6 +1066,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listWaiverSignatures
+    verb: GET
+    path: /waiver-signatures
+    scope: venue
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 1
     writes: 0
   - operation: listWaiverTemplateMaster
     verb: GET
@@ -1065,7 +1169,7 @@ operationsByContract:
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: recordTouchPoint
     verb: POST
@@ -1073,7 +1177,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: redeemLoyaltyPoints
     verb: POST
@@ -1121,7 +1225,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: respondToReview
     verb: POST
@@ -1169,7 +1273,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: sendTransactionalMessage
     verb: POST
@@ -1187,6 +1291,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setBadge
+    verb: PUT
+    path: /badges
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setCallDisposition
     verb: POST
     path: /conversations/{conversationId}/disposition
@@ -1275,6 +1387,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setGuestExtraFields
+    verb: PUT
+    path: /guest-extra-fields
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setGuestExtraValues
+    verb: PUT
+    path: /guests/{guestId}/extra-values
+    scope: venue
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setGuestRelationships
     verb: PUT
     path: /guests/{guestId}/relationships
@@ -1307,6 +1435,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setLoyaltyCampaign
+    verb: PUT
+    path: /loyalty/campaigns
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setLoyaltyRules
+    verb: PUT
+    path: /loyalty/programmes/{programmeId}/rules
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: setMarketingSubscription
     verb: PUT
     path: /marketing-subscriptions
@@ -1355,6 +1499,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setReward
+    verb: PUT
+    path: /loyalty/rewards
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setSenderIdentityDomain
     verb: PUT
     path: /sender-identity-domain
@@ -1369,7 +1521,7 @@ operationsByContract:
     scope: tenant
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setSignatorySignatureGuardian
     verb: PUT
@@ -1379,6 +1531,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setSlaPolicy
+    verb: PUT
+    path: /sla-policies
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setWaiverVerificationValidation
     verb: PUT
     path: /waiver-verification-validation
@@ -1393,7 +1553,7 @@ operationsByContract:
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: stopCampaign
     verb: POST
@@ -1409,7 +1569,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: true
-    reads: 4
+    reads: 5
     writes: 3
   - operation: submitReview
     verb: POST
@@ -1433,7 +1593,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: unscheduleCampaign
     verb: POST
@@ -1489,7 +1649,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW_PII
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
 tables:
 - store: cache:idempotency
@@ -1537,7 +1697,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.campaign
   columns: 20
@@ -1615,7 +1776,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.duplicate_candidate
   columns: 10
@@ -1662,19 +1824,22 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.guest_extra_option
   columns: 5
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.guest_extra_value
   columns: 6
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.guest_profile
   columns: 22
@@ -1748,16 +1913,18 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.loyalty_points
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.loyalty_position
-  columns: 10
+  columns: 11
   store: postgres
   parent: pii.subject
   writtenBy:
@@ -1774,7 +1941,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.message_delivery
   columns: 2
@@ -1817,16 +1985,25 @@ tables:
   columns: 6
   store: postgres
   parent: marketing.loyalty_programme
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.points_redemption_rule
   columns: 13
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.privacy_incident
   columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.programme_tier
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1863,13 +2040,15 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.reward_assignment
   columns: 11
   store: postgres
   parent: marketing.reward
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.segment
   columns: 9
@@ -1889,7 +2068,8 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.subscription
   columns: 8
@@ -1927,18 +2107,18 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 15
+  operations: 14
 - service: CatalogueService
-  operations: 7
-- service: AccessService
-  operations: 3
+  operations: 6
 - service: OrderService
+  operations: 3
+- service: AccessService
+  operations: 2
+- service: PlatformService
   operations: 2
 - service: VenueOpsService
   operations: 2
 - service: TenancyService
-  operations: 1
-- service: PlatformService
   operations: 1
 writesOutside:
 - service: IdentityService

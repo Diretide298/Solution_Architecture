@@ -74,11 +74,13 @@ operations:
   - cache:idempotency
   - promotions.allocation_component
   - promotions.bundle
+  - promotions.bundle_choice_group
   - promotions.bundle_component
   writes:
   - cache:idempotency
   - promotions.allocation_component
   - promotions.bundle
+  - promotions.bundle_choice_group
   - promotions.bundle_component
 - operation: createCouponCampaign
   verb: POST
@@ -242,6 +244,7 @@ operations:
   reads:
   - promotions.allocation_component
   - promotions.bundle
+  - promotions.bundle_choice_group
   - promotions.bundle_component
   writes: []
 - operation: getCouponCode
@@ -502,7 +505,10 @@ operations:
   - staff
   offline: false
   reads:
+  - promotions.allocation_component
   - promotions.bundle
+  - promotions.bundle_choice_group
+  - promotions.bundle_component
   writes: []
 - operation: listCampaignCalendarTimeline
   verb: GET
@@ -1263,6 +1269,7 @@ operations:
   - promotions.allocation_component
   writes:
   - cache:idempotency
+  - promotions.allocation_component
 - operation: publishPromotion
   verb: POST
   path: /promotions/{promotionId}/publish
@@ -1544,6 +1551,7 @@ operations:
   - cache:idempotency
   - promotions.allocation_component
   - promotions.bundle
+  - promotions.bundle_choice_group
   - promotions.bundle_component
   writes:
   - cache:idempotency

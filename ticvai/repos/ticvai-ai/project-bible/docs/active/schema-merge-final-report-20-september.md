@@ -5,7 +5,7 @@
 > before the criteria below were agreed.
 >
 > Every row: `handoff/TICVAI_Schema_Merge_Tasks.xlsx`. Every reason:
-> `handoff/merge-verdicts.json`. The eleven structural decisions, scored:
+> `handoff/merge-verdicts.json`. The fifteen structural decisions, scored:
 > [schema-merge-decision-log.md](schema-merge-decision-log.md).
 
 ---
@@ -46,23 +46,53 @@ moved **38 rows**, almost all of them in your favour.
 **Fourteen of these are ours to fix and would have been fixed whatever you had sent.** Your workbook
 is how we found most of them.
 
-### The biggest thing you found, and we had it the wrong way round — 15 tables
+### The biggest thing you found — and we got it wrong twice before getting it right
 
-**We said we had reached this conclusion independently. We had not.** F&B and Retail have their
-own schemas and their own services in our package, but **not their own catalogue data**:
+**We first said we had reached this conclusion independently. We had not.** F&B and Retail have
+their own schemas and their own services in our package, but not their own catalogue data:
 
     fnb.menu_item.product_variant_id   ->  catalogue.variant
     retail.merchandise.variant_id      ->  catalogue.variant
     retail.merchandise.price           ->  a column, not a price table
 
-There is no `fnb.product`, `fnb.price`, `fnb.price_list`, `fnb.variant` or `fnb.product_category`
-in our package, and no `retail.` equivalent either. **Both read `catalogue.variant` on every
-sale.**
+**Then we took all ten of your tables, and that was wrong too.** Here is the measurement that
+settled it:
 
-That is exactly the contention we argue `catalogue` must be protected from. We make that argument
-against your `rental_rate` in §2 — while our own F&B and Retail sit on the hot table while we make
-it. **Your fifteen tables are the single most valuable thing in this workbook**, and we are taking
-every one of them.
+| | columns | operations |
+|---|---|---|
+| `catalogue.product` | 21 | **40**, across twelve contracts |
+| `fnb.product` | 12 | 0 |
+| `retail.product` | 11 | 0 |
+
+The same holds for `product_category`, `variant`, `price` and `price_list`. **No retail operation
+reads `catalogue.product` at all**, and `fnb` reads it exactly once.
+
+**A split that relieves contention requires moving the reads, not adding the tables.** We added
+ten tables and moved nothing — all of the maintenance cost, none of the isolation, and three
+models to keep in step where a tax rule or an allergen flag now has three homes. The contention we
+were protecting `catalogue` from is not in the contracts on either side.
+
+So the ten come out, and `catalogue.*` stays the one product model. Where contention turns out to
+be real we have `x-ticvai-read-routing: analytical`, which does not cost a second copy.
+
+**Six of your columns stay, and one of them is the best single find in the workbook:**
+
+| Column | Why |
+|---|---|
+| `catalogue.product.categoryId` | **`catalogue.product_category` has had two operations since 20 August and nothing could be filed under it.** A merchandise hierarchy with a tree and no leaves. Both your product tables carried this link and ours did not |
+| `catalogue.product.isStockTracked` | whether a sale decrements stock — not what `isSellable` asks. A ticket does not, a bottle of water does |
+| `catalogue.variant.name` | `axisValues` gives `{size: L}` and no string a guest can read |
+| `catalogue.variant.barcode` | our `alternative_code` is a *partner's* code and requires `partnerId`, so a manufacturer's EAN had nowhere to live |
+| `catalogue.variant.isDefault` | which variant a product page opens on |
+| `catalogue.product_category.code` | a stable import key. Ours had a uuid and a localised name |
+
+**`fnb.product_recommendation` and `retail.product_recommendation` are kept whole** — 17 columns
+each, and we have nothing like them.
+
+**How we caught it is worth more than the correction.** Our phase 3 tested *"already a table of
+ours"* by name, so anything you sent under a name we did not use looked like a gap. That is also
+what produced a duplicate `fnb.order` beside our `fnb.service_order`. There is now a check for it
+that runs on every build, and it found all ten of these plus two in `whitelabel` on its first run.
 
 ### Things that are wrong today
 
@@ -109,7 +139,7 @@ screen changes** — your table names already carry the domain.
 
 | | move | to | why |
 |---|---|---|---|
-| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** That is the flash-sale contention argument — the same one that says F&B and Retail need their own price tables, which §1 now concedes they do not yet have. Your layout also splits rental across CatalogueService and VenueOpsService |
+| **rental** | 10 tables from `catalogue`, `resources`, `maintenance` | `rental` | **`catalogue.rental_rate` puts rental pricing inside the hottest table set in the system.** `catalogue.product` alone is read by twelve contracts across 40 operations, so a rental rate change takes write locks in the middle of that. (§1 explains why we are *not* splitting F&B and Retail off it — the fix for a hot table is routing, not a second copy of the model.) Your layout also splits rental across CatalogueService and VenueOpsService |
 | **payments** | 5 tables from `orders` | `payments` | all five are **configuration**. `orders` is the highest-churn schema in the system, and config read on every checkout should not share a schema with rows written on every sale |
 | **subscription** | 2 tables from `platform` | `subscription` | your placement puts billing in TenancyService and licensing in PlatformService. **A plan lookup becomes a cross-service call** |
 | **accreditation** | 4 tables from `access` | `accreditation` | same principle |
@@ -234,7 +264,61 @@ tables usually look like. **It cannot know that a region owns the answer here** 
 a criticism, it is an argument for reading both workbooks against the decisions rather than
 against each other.
 
-## 6 · Corrections to things we told you earlier
+## 6 · Twenty-one of your columns point at the wrong table in our package, and the pattern is the useful part
+
+**None of these is a mistake on your side.** Every one is a column whose name is correct in your
+schema and resolves to something else in ours, because our relationship deriver matches a column
+stem against table names and **our names are not your names**. We found them by wiring your
+tables and watching where the edges landed.
+
+| Your column | Resolved to | Should be |
+|---|---|---|
+| `*_user_id` on eight tables | **`identity.user_access`** | `identity.principal` |
+| `*_user_account_id` on three | **`ledger.account`** | `identity.principal` |
+| `customer_membership.plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `plan_benefit.membership_plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `membership_renewal.plan_id` | **`subscription.plan`** | `catalogue.entitlement_template` |
+| `*_rule.payment_policy_id` on three | **`whitelabel.policy`** | nothing — dropped |
+| `fee_rule.provider_id` | **`ai.provider`** | `payments.provider` |
+| `dynamic_price_condition.rule_id` | **`approvals.rule`** | renamed to `dynamic_price_rule_id` |
+
+**Three of these are worth reading twice.** `identity.user_access.user_id` resolved to
+`identity.user_access` — a permission grant whose subject is another grant.
+`granted_by_user_account_id` resolved to a general-ledger account: the person who granted a
+permission, pointing at a chart-of-accounts row. And `customer_membership.plan_id` resolved to
+`subscription.plan`, **which is what a venue pays us for the platform** — so a guest's annual
+pass pointed at whether that venue's SaaS tier includes a branded app.
+
+### What causes it, because it will happen again
+
+Our deriver matches a stem as a whole name, then as a prefix, then as a suffix. **A prefix rule
+cannot tell a missing table from a differently-named one** — it finds the nearest thing. There is
+no `identity.user` in our package because the user is `identity.principal`, so `user` found
+`user_access`. There is no `catalogue.membership_plan` because the plan is
+`catalogue.entitlement_template`, so `plan` found `subscription.plan`.
+
+**We have changed the deriver rather than only the columns.** It now prefers a table in the
+referring schema and refuses an ambiguous match outright, which is why
+`payments.fee_rule.provider_id` now reaches `payments.provider` instead of `ai.provider`.
+Twenty-three short names are held by two or more of our schemas, and every column whose stem hit
+one of them had been resolved to whichever table happened to be loaded first.
+
+### The one that would have been more than untidy
+
+`identity.user_access` is our `identity.delegated_access` with six columns missing — and
+**`resolvePermissions`, `login` and `getCurrentSession` all read ours and none reads yours.**
+`effect` carries DENY, so a grant written to the second table would have been invisible to
+permission resolution: a permission somebody believes is revoked and is not. We collapsed it and
+kept your `permission_id`, which is better than our free-text `permission` because it names a row
+in the catalogue rather than a string.
+
+**What we would ask of you:** where a column names a concept rather than a table — `plan`,
+`user`, `policy`, `provider` — tell us which of your tables it points at, even informally. Our
+matcher will guess, and it guesses from our vocabulary.
+
+---
+
+## 7 · Corrections to things we told you earlier
 
 **We said we had no dynamic pricing at all.** We do — three guardrail columns on
 `rental.pricing_profile`: `dynamic_enabled`, and a maximum increase and decrease percent. **A

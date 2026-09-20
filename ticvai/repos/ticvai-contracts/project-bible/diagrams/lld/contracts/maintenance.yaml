@@ -31,6 +31,7 @@ operations:
   - assets.media_asset
   - cache:idempotency
   - maintenance.work_order
+  - maintenance.work_order_attachment
   writes:
   - cache:idempotency
   - maintenance.work_order_attachment
@@ -103,9 +104,11 @@ operations:
   reads:
   - cache:idempotency
   - maintenance.inspection_template
+  - maintenance.inspection_template_item
   writes:
   - cache:idempotency
   - maintenance.inspection_template
+  - maintenance.inspection_template_item
 - operation: createMaintenancePlan
   verb: POST
   path: /maintenance-plans
@@ -224,6 +227,7 @@ operations:
   offline: true
   reads:
   - maintenance.inspection_template
+  - maintenance.inspection_template_item
   writes: []
 - operation: listInspections
   verb: GET
@@ -409,9 +413,11 @@ operations:
   reads:
   - cache:idempotency
   - maintenance.inspection
+  - maintenance.inspection_item
   writes:
   - cache:idempotency
   - maintenance.inspection
+  - maintenance.inspection_item
 - operation: updateAsset
   verb: PATCH
   path: /assets/{assetId}

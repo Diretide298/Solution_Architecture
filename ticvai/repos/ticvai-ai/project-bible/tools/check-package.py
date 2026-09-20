@@ -737,6 +737,66 @@ def main() -> int:
                             f"({[t for t in _L[_oid]['reads'] if t.startswith(_BIG)][:2]}) — an "
                             "unbounded list over a table that grows without limit")
 
+    # 35b. **Two operations with one `operationId` means one of them has the other's lineage.**
+    # `api-data-lineage.json` is keyed by `operationId` and so are the generated client, the
+    # screen bindings and the traceability index — everything downstream assumes it identifies
+    # an operation. A collision does not fail anything; the second entry silently overwrites the
+    # first, and the losing operation reports reads and writes belonging to a different endpoint.
+    #
+    # **Found on 20 September by reading a lineage that made no sense**: a freshly written
+    # `adjustLoyaltyPoints` came back reading `marketing.loyalty_position`, which was the other
+    # `adjustLoyaltyPoints`. The package had never had a duplicate before, so nothing looked.
+    #
+    # `listShifts` was the other, and it is the honest kind: `shift.yaml` reconciles a cash
+    # drawer and `workforce.shift` is a staffing pattern. **Both are called a shift by the people
+    # who use them** — which is exactly why the check has to be mechanical.
+    _seen = {}
+    for _f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        try:
+            _d = yaml.safe_load(_f.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue
+        for _path, _item in (_d.get("paths") or {}).items():
+            for _v, _o in (_item or {}).items():
+                if not isinstance(_o, dict) or not _o.get("operationId"):
+                    continue
+                _oid = _o["operationId"]
+                _here = f"{_f.stem} {_v.upper()} {_path}"
+                if _oid in _seen:
+                    ERRORS.append(
+                        f"operationId {_oid} is declared twice — {_seen[_oid]} and {_here}. The "
+                        "lineage, the bindings and the generated client are all keyed by it, so "
+                        "one of the two silently takes the other's reads and writes")
+                else:
+                    _seen[_oid] = _here
+
+    # 35c. **A duplicate path key is legal YAML and silently deletes operations.**
+    # A mapping with the same key twice keeps the last, so adding `/burst-environments:` to a
+    # file that already had one made four operations vanish — `requestBurstEnvironment`,
+    # `drainBurstEnvironment`, `decommissionBurstEnvironment` and the original list. **The file
+    # still parsed and still contained their text**, which is why nothing noticed: a `yaml.safe_load`
+    # check passes and `grep operationId` finds them.
+    #
+    # Counting the text against the parse is the only way to see it, so that is what this does.
+    for _f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        _raw = _f.read_text(encoding="utf-8")
+        try:
+            _d = yaml.safe_load(_raw) or {}
+        except Exception:
+            continue
+        _text_n = len(re.findall(r"^      operationId:", _raw, re.M))
+        _parsed_n = sum(1 for _p in (_d.get("paths") or {}).values()
+                        for _o in (_p or {}).values()
+                        if isinstance(_o, dict) and _o.get("operationId"))
+        if _text_n != _parsed_n:
+            _keys = re.findall(r"^  (/[^:\n]*):\s*$", _raw, re.M)
+            _dup = sorted({k for k in _keys if _keys.count(k) > 1})
+            ERRORS.append(
+                f"{_f.stem}: {_text_n} operationId lines in the file and {_parsed_n} after "
+                f"parsing — {_text_n - _parsed_n} operation(s) are being silently discarded"
+                + (f", duplicate path key(s): {_dup}" if _dup else
+                   ", check for a duplicate mapping key"))
+
     # 36. **A table written by something and read by nothing is a feature that half-exists.**
     # A guest joins a restaurant waitlist and no operation lists the waitlist; a steward attaches a
     # photograph to a work order and nothing retrieves it. **`platform.audit_record` was exactly

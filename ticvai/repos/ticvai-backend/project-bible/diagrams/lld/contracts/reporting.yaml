@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 42 operations
+title: reporting — 43 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -131,6 +131,16 @@ operations:
   - reporting.subscription
   writes:
   - reporting.subscription
+- operation: deleteDashboard
+  verb: DELETE
+  path: /dashboards/{dashboardId}
+  scope: tenant
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: deleteReport
   verb: DELETE
   path: /reports/{reportId}
@@ -400,6 +410,7 @@ operations:
   offline: false
   reads:
   - reporting.schedule
+  - reporting.schedule_recipient
   writes: []
 - operation: listReportSubscriptions
   verb: GET
@@ -422,7 +433,10 @@ operations:
   - partner
   offline: false
   reads:
+  - reporting.report_column
   - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
   writes: []
 - operation: listSeededReports
   verb: GET

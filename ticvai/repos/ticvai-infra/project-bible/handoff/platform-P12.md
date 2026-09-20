@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 60 |
+| Operations with no screen | 86 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 60 operations with no screen here
+### 86 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,25 +42,25 @@
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `listModules` | identity | GET | The module tree permissions are grouped under |
+| `listPermissions` | identity | GET | Every permission key the contracts enforce |
+| `recordBenefitUsage` | identity | POST | Consume a benefit |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
 | `addSuppression` | marketing-crm | POST | Suppress an address |
+| `awardBadge` | marketing-crm | POST | Award a badge |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
+| `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
+| `getLoyaltyRules` | marketing-crm | GET | Every rule a loyalty programme runs on |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
-| `startKioskAssist` | marketing-crm | POST | A staff member helps a guest at a kiosk, remotely |
-| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `overrideWaitingGuest` | queue | POST | Admit against a failed redemption |
-| `redeemWaitingGuest` | queue | POST | Admit a party at the ride |
-| `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
-| … | | | 20 more |
+| … | | | 46 more |
 
 ## Modules
 

@@ -30,6 +30,7 @@ operations:
   reads:
   - cache:idempotency
   - ledger.journal_entry
+  - ledger.journal_line
   writes:
   - cache:idempotency
   - ledger.journal_entry
@@ -116,6 +117,7 @@ operations:
   reads:
   - cache:idempotency
   - ledger.journal_entry
+  - ledger.journal_line
   writes:
   - cache:idempotency
   - ledger.journal_entry
@@ -251,6 +253,7 @@ operations:
   offline: false
   reads:
   - ledger.journal_entry
+  - ledger.journal_line
   writes: []
 - operation: getSettlement
   verb: GET
@@ -399,6 +402,7 @@ operations:
   offline: false
   reads:
   - ledger.journal_entry
+  - ledger.journal_line
   writes: []
 - operation: listLedgerEntries
   verb: GET
@@ -502,6 +506,7 @@ operations:
   reads:
   - cache:idempotency
   - ledger.account
+  - ledger.deposit
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -606,6 +611,7 @@ operations:
   reads:
   - cache:idempotency
   - ledger.journal_entry
+  - ledger.journal_line
   writes:
   - cache:idempotency
   - ledger.journal_entry
@@ -633,9 +639,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - ledger.account
   - ledger.fiscal_period
   - ledger.fx_rate
   - ledger.inter_entity_obligation
+  - ledger.legal_entity
   writes:
   - cache:idempotency
   - ledger.journal_entry

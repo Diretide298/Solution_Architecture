@@ -1,5 +1,5 @@
 id: LLD-retail
-title: retail — 24 operations
+title: retail — 25 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -44,6 +44,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.shop_and_drop
+  - retail.shop_and_drop_line
   writes:
   - cache:idempotency
   - retail.shop_and_drop
@@ -86,6 +87,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.return
+  - retail.return_line
   writes:
   - cache:idempotency
   - retail.return
@@ -100,6 +102,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.sale
+  - retail.sale_line
   writes:
   - cache:idempotency
   - retail.sale
@@ -114,6 +117,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.shop_and_drop
+  - retail.shop_and_drop_line
   writes:
   - cache:idempotency
   - retail.shop_and_drop
@@ -152,6 +156,7 @@ operations:
   offline: false
   reads:
   - retail.sale
+  - retail.sale_line
   writes: []
 - operation: getReturnPolicy
   verb: GET
@@ -178,6 +183,17 @@ operations:
   reads:
   - retail.merchandise
   writes: []
+- operation: listRetailRecommendations
+  verb: GET
+  path: /product-recommendations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.product_recommendation
+  writes: []
 - operation: listRetailReturns
   verb: GET
   path: /retail-returns
@@ -188,6 +204,7 @@ operations:
   offline: false
   reads:
   - retail.return
+  - retail.return_line
   writes: []
 - operation: listRetailSales
   verb: GET
@@ -199,6 +216,7 @@ operations:
   offline: false
   reads:
   - retail.sale
+  - retail.sale_line
   writes: []
 - operation: listStoreRules
   verb: GET
@@ -233,6 +251,7 @@ operations:
   offline: false
   reads:
   - retail.sale
+  - retail.sale_line
   writes: []
 - operation: lookupShopAndDrop
   verb: GET
@@ -245,6 +264,7 @@ operations:
   offline: false
   reads:
   - retail.shop_and_drop
+  - retail.shop_and_drop_line
   writes: []
 - operation: reprintReceipt
   verb: POST
@@ -272,6 +292,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.reservation
+  - retail.reservation_line
   writes:
   - cache:idempotency
   - retail.reservation

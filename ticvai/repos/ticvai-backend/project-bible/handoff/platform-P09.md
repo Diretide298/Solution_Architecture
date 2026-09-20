@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 134 |
+| Operations with no screen | 205 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 134 operations with no screen here
+### 205 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -36,31 +36,31 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
+| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
+| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
+| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
+| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
+| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
+| `listCellConnections` | cross-region | GET | Which cells may talk to which |
+| `listCrossCellRequests` | cross-region | GET | Calls that had to leave a cell |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
-| `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `listInterEntityObligations` | finance | GET | What one entity owes another |
-| `recordWriteOff` | finance | POST | Write off an uncollectable balance |
-| `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
-| `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
-| … | | | 94 more |
+| … | | | 165 more |
 
 ### 4 modules split across waves
 

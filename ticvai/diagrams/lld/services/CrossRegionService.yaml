@@ -1,5 +1,5 @@
 id: LLD-CrossRegionService
-title: CrossRegionService — 16 operations, 3 tables
+title: CrossRegionService — 18 operations, 3 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -12,7 +12,7 @@ why: '**The only service that reaches another region** (ADR-0010, ADR-0014). Sep
 scale: Low volume, high scrutiny.
 ifDown: Down blocks cross-region entitlements. Each region continues alone.
 coverage:
-  operations: 16
+  operations: 18
   inAFlow: 5
   percent: 31%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -25,7 +25,7 @@ schemas:
   largestTable: sync.cross_cell_request
 operationsByContract:
 - contract: cross-region
-  count: 16
+  count: 18
   operations:
   - operation: authoriseWalletSpend
     verb: POST
@@ -97,6 +97,22 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: listCellConnections
+    verb: GET
+    path: /cell-connections
+    scope: tenant
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCrossCellRequests
+    verb: GET
+    path: /cross-cell-requests
+    scope: tenant
+    permission: ORDER_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: propagateCrossRegionEntitlement

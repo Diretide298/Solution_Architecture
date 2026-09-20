@@ -1,5 +1,5 @@
 id: LLD-inventory
-title: inventory — 50 operations
+title: inventory — 51 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -30,6 +30,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
@@ -63,6 +64,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes:
   - cache:idempotency
   - inventory.purchase_order
@@ -132,6 +134,7 @@ operations:
   offline: false
   reads:
   - inventory.quotation
+  - inventory.quotation_line
   writes: []
 - operation: createGoodsReceipt
   verb: POST
@@ -144,6 +147,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.goods_receipt
+  - inventory.goods_receipt_line
   writes:
   - cache:idempotency
   - inventory.goods_receipt
@@ -173,6 +177,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes:
   - cache:idempotency
   - inventory.purchase_order
@@ -187,6 +192,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
@@ -229,6 +235,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.transfer
+  - inventory.transfer_line
   writes:
   - cache:idempotency
   - inventory.transfer
@@ -278,6 +285,7 @@ operations:
   offline: false
   reads:
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes: []
 - operation: getStockPositions
   verb: GET
@@ -350,6 +358,7 @@ operations:
   offline: false
   reads:
   - inventory.goods_receipt
+  - inventory.goods_receipt_line
   writes: []
 - operation: listInventoryItems
   verb: GET
@@ -372,6 +381,7 @@ operations:
   offline: false
   reads:
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes: []
 - operation: listRequisitions
   verb: GET
@@ -383,6 +393,7 @@ operations:
   offline: true
   reads:
   - inventory.requisition
+  - inventory.requisition_line
   writes: []
 - operation: listSerialisedItems
   verb: GET
@@ -407,6 +418,7 @@ operations:
   offline: false
   reads:
   - inventory.count
+  - inventory.count_line
   writes: []
 - operation: listStockLocations
   verb: GET
@@ -430,6 +442,17 @@ operations:
   reads:
   - inventory.movement
   writes: []
+- operation: listStockReservations
+  verb: GET
+  path: /stock-reservations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.stock_reservation
+  writes: []
 - operation: listStockTransfers
   verb: GET
   path: /stock-transfers
@@ -440,6 +463,7 @@ operations:
   offline: false
   reads:
   - inventory.transfer
+  - inventory.transfer_line
   writes: []
 - operation: listSuppliers
   verb: GET
@@ -474,6 +498,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
   writes:
   - cache:idempotency
   - inventory.count
@@ -489,6 +514,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.transfer
+  - inventory.transfer_line
   writes:
   - cache:idempotency
   - inventory.transfer
@@ -503,6 +529,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.quotation
+  - inventory.quotation_line
   writes:
   - cache:idempotency
   - inventory.quotation
@@ -531,6 +558,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.goods_receipt
+  - inventory.goods_receipt_line
   writes:
   - cache:idempotency
   - inventory.goods_receipt
@@ -601,6 +629,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
   writes:
   - cache:idempotency
   - inventory.count

@@ -576,6 +576,7 @@ operations:
   - cache:idempotency
   - seating.seat
   - seating.seat_map
+  - seating.zone
   writes:
   - cache:idempotency
   - seating.zone

@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 24 operations
+title: workforce — 43 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -75,6 +75,7 @@ operations:
   - identity.delegated_access
   - identity.principal
   - platform.workstation
+  - workforce.rota_assignment
   writes:
   - cache:idempotency
   - workforce.rota_assignment
@@ -90,6 +91,32 @@ operations:
   - identity.principal
   - workforce.announcement_receipt
   - workforce.rota_assignment
+  writes: []
+- operation: getEmployee
+  verb: GET
+  path: /employees/{employeeId}
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.employee
+  - workforce.employment
+  - workforce.job_title
+  - workforce.leave_balance
+  - workforce.work_assignment
+  writes: []
+- operation: getFieldOwnership
+  verb: GET
+  path: /integration-sources/{sourceId}/field-ownership
+  scope: tenant
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.field_ownership
   writes: []
 - operation: getLabourCost
   verb: GET
@@ -135,6 +162,50 @@ operations:
   - workforce.attendance
   - workforce.rota_assignment
   writes: []
+- operation: listEmployees
+  verb: GET
+  path: /employees
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.employee
+  writes: []
+- operation: listIntegrationSources
+  verb: GET
+  path: /integration-sources
+  scope: tenant
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.integration_source
+  writes: []
+- operation: listJobTitles
+  verb: GET
+  path: /job-titles
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.job_title
+  writes: []
+- operation: listLeaveBalances
+  verb: GET
+  path: /leave-balances
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.leave_balance
+  writes: []
 - operation: listLeaveRequests
   verb: GET
   path: /leave-requests
@@ -145,6 +216,17 @@ operations:
   offline: false
   reads:
   - workforce.leave_request
+  writes: []
+- operation: listLeaveTypes
+  verb: GET
+  path: /leave-types
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.leave_type
   writes: []
 - operation: listOpenShifts
   verb: GET
@@ -169,6 +251,17 @@ operations:
   - identity.principal
   - workforce.rota_assignment
   writes: []
+- operation: listShiftPatterns
+  verb: GET
+  path: /shift-patterns
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift
+  writes: []
 - operation: listShiftSwapRequests
   verb: GET
   path: /shift-swaps
@@ -191,6 +284,28 @@ operations:
   reads:
   - workforce.shift_template
   writes: []
+- operation: listSyncConflicts
+  verb: GET
+  path: /sync-conflicts
+  scope: tenant
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.sync_conflict
+  writes: []
+- operation: listSyncRuns
+  verb: GET
+  path: /sync-runs
+  scope: tenant
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.sync_run
+  writes: []
 - operation: listTrainingRecords
   verb: GET
   path: /training-records
@@ -201,6 +316,17 @@ operations:
   offline: false
   reads:
   - workforce.training_record
+  writes: []
+- operation: listWorkAssignments
+  verb: GET
+  path: /work-assignments
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.work_assignment
   writes: []
 - operation: publishAnnouncement
   verb: POST
@@ -214,6 +340,7 @@ operations:
   - cache:idempotency
   - identity.role
   - platform.scope
+  - workforce.announcement
   writes:
   - cache:idempotency
   - workforce.announcement
@@ -229,6 +356,7 @@ operations:
   reads:
   - access.access_point
   - cache:idempotency
+  - workforce.attendance
   - workforce.rota_assignment
   writes:
   - cache:idempotency
@@ -257,10 +385,82 @@ operations:
   - cache:idempotency
   - identity.principal
   - workforce.rota_assignment
+  - workforce.shift_swap
   writes:
   - approvals.request
   - cache:idempotency
   - workforce.shift_swap
+- operation: resolveSyncConflict
+  verb: POST
+  path: /sync-conflicts
+  scope: tenant
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.sync_conflict
+  writes: []
+- operation: setFieldOwnership
+  verb: PUT
+  path: /integration-sources/{sourceId}/field-ownership
+  scope: tenant
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.field_ownership
+  writes:
+  - workforce.field_ownership
+- operation: setIntegrationSource
+  verb: PUT
+  path: /integration-sources
+  scope: tenant
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.integration_source
+  writes:
+  - workforce.integration_source
+- operation: setJobTitle
+  verb: PUT
+  path: /job-titles
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.job_title
+  writes:
+  - workforce.job_title
+- operation: setLeaveType
+  verb: PUT
+  path: /leave-types
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.leave_type
+  writes:
+  - workforce.leave_type
+- operation: setShiftPattern
+  verb: PUT
+  path: /shift-patterns
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift
+  writes:
+  - workforce.shift
 - operation: setShiftTemplate
   verb: PUT
   path: /shift-templates
@@ -285,6 +485,29 @@ operations:
   - workforce.staffing_rules
   writes:
   - workforce.staffing_rules
+- operation: setWorkAssignment
+  verb: PUT
+  path: /work-assignments
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.work_assignment
+  writes:
+  - workforce.work_assignment
+- operation: startSync
+  verb: POST
+  path: /sync-runs
+  scope: tenant
+  permission: WORKFORCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.sync_run
+  writes: []
 - operation: updateRotaAssignment
   verb: PATCH
   path: /rota-assignments/{assignmentId}

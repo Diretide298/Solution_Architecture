@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 48 operations
+title: wallet — 50 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -30,6 +30,7 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.wallet
   writes:
   - cache:idempotency
   - games.card
@@ -98,8 +99,10 @@ operations:
   offline: false
   reads:
   - wallet.shared_wallet
+  - wallet.shared_wallet_member
   writes:
   - wallet.shared_wallet
+  - wallet.shared_wallet_member
 - operation: createVoucherType
   verb: POST
   path: /voucher-types
@@ -168,6 +171,17 @@ operations:
   offline: false
   reads:
   - wallet.wallet
+  writes: []
+- operation: getWalletBalance
+  verb: GET
+  path: /wallets/{walletId}/balance
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.balance
   writes: []
 - operation: getWalletFundingRules
   verb: GET
@@ -258,6 +272,7 @@ operations:
   offline: false
   reads:
   - wallet.shared_wallet
+  - wallet.shared_wallet_member
   writes: []
 - operation: listVoucherTypes
   verb: GET
@@ -280,6 +295,17 @@ operations:
   offline: false
   reads:
   - wallet.dispute
+  writes: []
+- operation: listWalletHolds
+  verb: GET
+  path: /wallets/{walletId}/holds
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.hold
   writes: []
 - operation: listWalletTransactions
   verb: GET
@@ -315,6 +341,7 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.wallet
   writes:
   - cache:idempotency
   - games.card

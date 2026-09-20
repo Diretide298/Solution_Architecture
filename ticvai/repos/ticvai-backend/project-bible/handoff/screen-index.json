@@ -22,6 +22,7 @@
   "reads": [
    "cache:resolution",
    "catalogue.product",
+   "control.footer_config",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
@@ -634,8 +635,11 @@
    "catalogue.product",
    "catalogue.published_bundle",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.allocation_component",
    "promotions.bundle",
+   "promotions.bundle_choice_group",
    "promotions.bundle_component",
    "promotions.upsell_rule"
   ],
@@ -820,6 +824,9 @@
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "pii.subject",
    "platform.scope",
    "promotions.coupon_code",
@@ -952,6 +959,7 @@
    "marketing.consent_purpose",
    "marketing.consent_record",
    "marketing.guest_device",
+   "marketing.guest_document",
    "marketing.guest_profile",
    "marketing.loyalty_position",
    "marketing.wishlist_item",
@@ -1400,6 +1408,7 @@
    "identity.session",
    "identity.sso_provider",
    "orders.cart",
+   "orders.cart_line",
    "orders.sales_order",
    "pii.subject",
    "pii.subject_contact"
@@ -1532,7 +1541,8 @@
    "marketing.guest_profile",
    "marketing.invitation",
    "marketing.invitation_campaign",
-   "marketing.wishlist_item"
+   "marketing.wishlist_item",
+   "orders.invitation"
   ],
   "writes": [
    "cache:idempotency",
@@ -1645,7 +1655,8 @@
    "catalogue.product",
    "identity.delegated_access",
    "orders.ticket_template",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "orders.wallet_pass"
   ],
   "writes": [
    "access.entitlement",
@@ -2638,6 +2649,7 @@
    "cache:idempotency",
    "catalogue.entitlement_template",
    "orders.order_line",
+   "orders.resale_listing",
    "orders.sales_order",
    "orders.ticket_transfer"
   ],
@@ -2714,6 +2726,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "maintenance.work_order",
    "orders.group_booking",
@@ -2725,6 +2738,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "orders.reservation"
   ],
@@ -2845,8 +2859,11 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "retail.merchandise",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -3047,9 +3064,12 @@
    "fnb.menu",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.modifier_option",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
+   "fnb.waitlist_entry",
    "inventory.stock_level",
    "platform.outlet"
   ],
@@ -3057,6 +3077,7 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.reservation_table",
    "fnb.service_order",
    "fnb.table_reservation",
    "fnb.table_session",
@@ -3103,7 +3124,8 @@
    "postgres"
   ],
   "reads": [
-   "fnb.modifier_group"
+   "fnb.modifier_group",
+   "fnb.modifier_option"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -3375,7 +3397,9 @@
    "cache:idempotency",
    "retail.merchandise",
    "retail.reservation",
-   "retail.shop_and_drop"
+   "retail.reservation_line",
+   "retail.shop_and_drop",
+   "retail.shop_and_drop_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -3433,6 +3457,8 @@
    "marketing.guest_profile",
    "marketing.loyalty_position",
    "marketing.loyalty_programme",
+   "marketing.points_earning_rule",
+   "marketing.referral",
    "promotions.promotion"
   ],
   "writes": [
@@ -3503,8 +3529,10 @@
    "cache:answer",
    "cache:idempotency",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "marketing.agent_availability",
    "marketing.conversation",
+   "marketing.conversation_message",
    "qdrant:knowledge"
   ],
   "writes": [
@@ -3562,7 +3590,8 @@
   ],
   "reads": [
    "whitelabel.content_page",
-   "whitelabel.faq_category"
+   "whitelabel.faq_category",
+   "whitelabel.faq_entry"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -3666,6 +3695,7 @@
    "catalogue.event",
    "catalogue.product",
    "catalogue.variant",
+   "control.footer_config",
    "identity.delegated_access",
    "marketing.consent_record",
    "marketing.guest_profile",
@@ -4976,7 +5006,8 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "orders.ticket_template"
+   "orders.ticket_template",
+   "orders.wallet_pass"
   ],
   "writes": [
    "cache:idempotency",
@@ -5463,6 +5494,7 @@
    "fnb.menu",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "fnb.service_order",
    "fnb.table_session",
    "inventory.stock_level",
@@ -5645,7 +5677,8 @@
    "games.card",
    "games.credit_ledger",
    "retail.merchandise",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -5806,6 +5839,7 @@
    "redis"
   ],
   "reads": [
+   "access.parking_entitlement",
    "access.parking_facility",
    "cache:idempotency",
    "orders.sales_order"
@@ -6043,8 +6077,10 @@
    "cache:answer",
    "cache:idempotency",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "marketing.agent_availability",
    "marketing.conversation",
+   "marketing.conversation_message",
    "qdrant:knowledge"
   ],
   "writes": [
@@ -6164,8 +6200,12 @@
    "inventory.stock_level",
    "marketing.agent_availability",
    "marketing.conversation",
+   "marketing.conversation_message",
    "orders.cart",
    "orders.cart_line",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "promotions.promotion",
    "qdrant:knowledge"
   ],
@@ -6483,6 +6523,7 @@
    "cache:idempotency",
    "catalogue.price_list",
    "marketing.loyalty_programme",
+   "marketing.points_earning_rule",
    "promotions.promotion"
   ],
   "writes": [
@@ -6786,7 +6827,8 @@
    "marketing.case",
    "pii.subject",
    "whitelabel.content_page",
-   "whitelabel.faq_category"
+   "whitelabel.faq_category",
+   "whitelabel.faq_entry"
   ],
   "writes": [
    "cache:idempotency",
@@ -6874,6 +6916,9 @@
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "pii.subject",
    "promotions.promotion"
   ],
@@ -7417,6 +7462,8 @@
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.upsell_rule"
   ],
   "writes": [
@@ -7565,7 +7612,9 @@
    "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
-   "catalogue.variant"
+   "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -8068,8 +8117,11 @@
    "catalogue.product",
    "catalogue.published_bundle",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.allocation_component",
    "promotions.bundle",
+   "promotions.bundle_choice_group",
    "promotions.bundle_component"
   ],
   "writes": [
@@ -8352,7 +8404,8 @@
    "postgres"
   ],
   "reads": [
-   "fnb.modifier_group"
+   "fnb.modifier_group",
+   "fnb.modifier_option"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -8405,7 +8458,8 @@
    "postgres"
   ],
   "reads": [
-   "retail.shop_and_drop"
+   "retail.shop_and_drop",
+   "retail.shop_and_drop_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -8683,6 +8737,7 @@
    "marketing.form_definition",
    "marketing.form_submission",
    "orders.refund_policy",
+   "orders.resale_listing",
    "orders.sales_order"
   ],
   "writes": [
@@ -8884,7 +8939,9 @@
    "catalogue.performance",
    "catalogue.waitlist_entry",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation",
+   "fnb.waitlist_entry",
    "maintenance.work_order",
    "platform.outlet",
    "resources.booking",
@@ -8893,6 +8950,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.waitlist_entry",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "fnb.waitlist_entry"
   ],
@@ -9035,7 +9093,9 @@
    "marketing.guest_profile",
    "marketing.invitation",
    "marketing.invitation_campaign",
+   "marketing.referral",
    "orders.group_booking",
+   "orders.invitation",
    "orders.sales_order",
    "pii.subject",
    "promotions.promotion"
@@ -9508,8 +9568,10 @@
   "reads": [
    "access.blacklist",
    "access.entitlement",
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.alternative_code",
@@ -9528,6 +9590,8 @@
    "marketing.guest_profile",
    "marketing.loyalty_position",
    "marketing.loyalty_programme",
+   "orders.cart",
+   "orders.cart_line",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -9538,7 +9602,10 @@
    "promotions.promotion",
    "retail.merchandise",
    "retail.return",
-   "retail.sale"
+   "retail.return_line",
+   "retail.sale",
+   "retail.sale_line",
+   "wallet.wallet"
   ],
   "writes": [
    "approvals.request",
@@ -10225,7 +10292,8 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "retail.sale"
+   "retail.sale",
+   "retail.sale_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11253,8 +11321,10 @@
    "platform.outlet",
    "platform.region_settings",
    "retail.return",
+   "retail.return_line",
    "retail.return_policy",
-   "retail.sale"
+   "retail.sale",
+   "retail.sale_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11388,7 +11458,8 @@
    "platform.region_settings",
    "platform.venue_settings",
    "platform.workstation",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11778,6 +11849,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "orders.deposit_box",
    "platform.device",
    "platform.workstation"
   ],
@@ -12082,6 +12154,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
    "approvals.request",
@@ -12181,6 +12254,9 @@
    "fnb.menu_item",
    "fnb.menu_section",
    "fnb.modifier_group",
+   "fnb.modifier_option",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.promotion"
   ],
   "writes": [
@@ -12271,7 +12347,9 @@
   "reads": [
    "cache:idempotency",
    "fnb.kitchen_ticket",
-   "fnb.service_order"
+   "fnb.kitchen_ticket_line",
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -12368,9 +12446,12 @@
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "promotions.promotion",
    "retail.merchandise",
-   "retail.sale"
+   "retail.sale",
+   "retail.sale_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -12808,7 +12889,9 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
+   "fnb.reservation_table",
    "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_reservation",
    "fnb.table_visit"
   ],
@@ -12896,6 +12979,7 @@
   ],
   "reads": [
    "fnb.service_order",
+   "fnb.service_order_line",
    "queue.entry",
    "queue.feed",
    "queue.queue"
@@ -13015,6 +13099,7 @@
   ],
   "reads": [
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
@@ -13262,6 +13347,9 @@
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "promotions.promotion"
   ],
   "writes": [
@@ -13572,7 +13660,8 @@
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "retail.shop_and_drop"
+   "retail.shop_and_drop",
+   "retail.shop_and_drop_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -13777,6 +13866,7 @@
    "catalogue.product",
    "marketing.agent_availability",
    "marketing.conversation",
+   "marketing.conversation_message",
    "qdrant:knowledge"
   ],
   "writes": [
@@ -13844,6 +13934,7 @@
    "fnb.location_session",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "inventory.stock_level"
   ],
   "writes": [
@@ -13909,8 +14000,11 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
    "retail.merchandise",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -14468,12 +14562,16 @@
   "reads": [
    "cache:idempotency",
    "maintenance.inspection",
-   "maintenance.inspection_template"
+   "maintenance.inspection_item",
+   "maintenance.inspection_template",
+   "maintenance.inspection_template_item"
   ],
   "writes": [
    "cache:idempotency",
    "maintenance.inspection",
-   "maintenance.inspection_template"
+   "maintenance.inspection_item",
+   "maintenance.inspection_template",
+   "maintenance.inspection_template_item"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -15191,7 +15289,8 @@
    "assets.media_asset",
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.work_order"
+   "maintenance.work_order",
+   "maintenance.work_order_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -15314,7 +15413,8 @@
    "assets.media_asset",
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.work_order"
+   "maintenance.work_order",
+   "maintenance.work_order_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -15452,7 +15552,8 @@
    "assets.media_asset",
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.work_order"
+   "maintenance.work_order",
+   "maintenance.work_order_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -16875,7 +16976,8 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
-   "workforce.rota_assignment"
+   "workforce.rota_assignment",
+   "workforce.shift_swap"
   ],
   "writes": [
    "approvals.request",
@@ -16964,7 +17066,8 @@
    "cache:idempotency",
    "identity.principal",
    "orders.pos_shift",
-   "workforce.rota_assignment"
+   "workforce.rota_assignment",
+   "workforce.shift_swap"
   ],
   "writes": [
    "approvals.request",
@@ -18458,7 +18561,9 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18629,6 +18734,7 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -18687,12 +18793,14 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation",
    "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "storedProcedures": [],
@@ -18747,6 +18855,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.waitlist_entry",
    "platform.outlet"
   ],
   "writes": [
@@ -18891,9 +19000,13 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
+   "fnb.reservation_table",
    "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_reservation",
    "fnb.table_visit",
+   "fnb.waitlist_entry",
    "identity.principal",
    "pii.subject",
    "platform.outlet"
@@ -18988,6 +19101,8 @@
    "cache:idempotency",
    "fnb.bill_split",
    "fnb.service_order",
+   "fnb.service_order_line",
+   "fnb.sub_bill",
    "fnb.table_session",
    "fnb.table_visit",
    "ledger.fx_rate",
@@ -19071,6 +19186,7 @@
   ],
   "reads": [
    "fnb.dining_table",
+   "fnb.reservation_table",
    "fnb.table_reservation"
   ],
   "writes": [],
@@ -19262,7 +19378,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -19322,7 +19439,8 @@
   "reads": [
    "cache:idempotency",
    "inventory.location",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -19386,6 +19504,7 @@
    "cache:idempotency",
    "fnb.cold_chain_event",
    "inventory.goods_receipt",
+   "inventory.goods_receipt_line",
    "inventory.item"
   ],
   "writes": [
@@ -19469,6 +19588,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.count",
+   "inventory.count_line",
    "inventory.item",
    "inventory.movement"
   ],
@@ -19621,7 +19741,8 @@
    "inventory.item",
    "inventory.location",
    "inventory.stock_level",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -19742,6 +19863,7 @@
    "cache:idempotency",
    "identity.principal",
    "inventory.requisition",
+   "inventory.requisition_line",
    "reporting.alert",
    "reporting.alert_rule"
   ],
@@ -19800,7 +19922,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -19913,7 +20036,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -19963,7 +20087,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20173,7 +20298,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20223,7 +20349,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20325,7 +20452,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20376,7 +20504,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20489,7 +20618,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20588,7 +20718,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20638,7 +20769,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20740,7 +20872,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20795,7 +20928,8 @@
   "reads": [
    "cache:idempotency",
    "marketing.message_dispatch",
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [
    "cache:idempotency",
@@ -20848,7 +20982,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20898,7 +21033,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -20948,7 +21084,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -21061,7 +21198,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -21113,7 +21251,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21319,7 +21460,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21369,7 +21513,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21419,7 +21566,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": true,
@@ -21475,7 +21625,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "maintenance.asset",
+   "rental.damage_assessment",
+   "rental.inspection"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -23246,6 +23398,7 @@
    "catalogue.variant",
    "catalogue.variant_dimension",
    "fnb.menu",
+   "fnb.menu_item",
    "fnb.menu_section",
    "inventory.item",
    "retail.merchandise"
@@ -23697,6 +23850,7 @@
    "catalogue.published_bundle",
    "promotions.allocation_component",
    "promotions.bundle",
+   "promotions.bundle_choice_group",
    "promotions.bundle_component"
   ],
   "writes": [
@@ -23704,6 +23858,7 @@
    "catalogue.published_bundle",
    "promotions.allocation_component",
    "promotions.bundle",
+   "promotions.bundle_choice_group",
    "promotions.bundle_component"
   ],
   "storedProcedures": [],
@@ -24663,7 +24818,9 @@
    "cache:idempotency",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
-   "fnb.service_order"
+   "fnb.kitchen_ticket_line",
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -25684,7 +25841,8 @@
    "assets.media_asset",
    "cache:idempotency",
    "maintenance.asset",
-   "maintenance.work_order"
+   "maintenance.work_order",
+   "maintenance.work_order_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -26321,6 +26479,7 @@
    "marketing.consent_record",
    "marketing.guest_device",
    "marketing.guest_profile",
+   "marketing.loyalty_points",
    "marketing.loyalty_position",
    "marketing.wishlist_item",
    "pii.subject",
@@ -26329,6 +26488,7 @@
    "platform.configuration_profile",
    "platform.device",
    "platform.device_heartbeat",
+   "platform.profile_deployment",
    "platform.scope",
    "platform.workstation",
    "reporting.alert",
@@ -26337,6 +26497,7 @@
   "writes": [
    "cache:idempotency",
    "marketing.guest_profile",
+   "marketing.loyalty_points",
    "marketing.loyalty_position",
    "platform.audit_read",
    "platform.device",
@@ -27280,12 +27441,15 @@
    "fnb.dining_table",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.modifier_option",
    "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.temperature_log",
    "identity.principal",
    "platform.outlet",
    "retail.merchandise",
    "retail.reservation",
+   "retail.reservation_line",
    "retail.return_policy"
   ],
   "writes": [
@@ -27481,7 +27645,8 @@
   "reads": [
    "cache:idempotency",
    "fnb.kitchen_station",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -27762,6 +27927,7 @@
    "inventory.movement",
    "inventory.stock_level",
    "inventory.transfer",
+   "inventory.transfer_line",
    "ledger.account"
   ],
   "writes": [
@@ -28097,8 +28263,10 @@
    "cache:idempotency",
    "fnb.cold_chain_event",
    "inventory.goods_receipt",
+   "inventory.goods_receipt_line",
    "inventory.item",
    "inventory.purchase_order",
+   "inventory.purchase_order_line",
    "inventory.transfer"
   ],
   "writes": [
@@ -28410,7 +28578,8 @@
    "identity.delegated_access",
    "identity.principal",
    "platform.workstation",
-   "workforce.rota_assignment"
+   "workforce.rota_assignment",
+   "workforce.shift_swap"
   ],
   "writes": [
    "approvals.request",
@@ -30741,7 +30910,9 @@
    "inventory.item",
    "inventory.location",
    "inventory.quotation",
-   "inventory.requisition"
+   "inventory.quotation_line",
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -30854,6 +31025,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.count",
+   "inventory.count_line",
    "inventory.item",
    "inventory.movement"
   ],
@@ -30978,8 +31150,10 @@
    "cache:idempotency",
    "fnb.cold_chain_event",
    "inventory.goods_receipt",
+   "inventory.goods_receipt_line",
    "inventory.item",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -31177,6 +31351,7 @@
    "cache:idempotency",
    "inventory.movement",
    "inventory.transfer",
+   "inventory.transfer_line",
    "orders.order_line",
    "orders.sales_order"
   ],
@@ -31270,6 +31445,7 @@
    "inventory.movement",
    "inventory.purchase_order",
    "inventory.quotation",
+   "inventory.quotation_line",
    "inventory.supplier"
   ],
   "writes": [
@@ -31808,7 +31984,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.journal_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -32475,6 +32652,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "resources.qualification",
    "resources.resource"
   ],
   "writes": [
@@ -34293,6 +34471,7 @@
    "cache:resolution",
    "inventory.item",
    "inventory.purchase_order",
+   "inventory.purchase_order_line",
    "platform.venue_settings"
   ],
   "writes": [
@@ -34896,11 +35075,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.recipe"
+   "fnb.recipe",
+   "fnb.recipe_ingredient"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.recipe"
+   "fnb.recipe",
+   "fnb.recipe_ingredient"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -34960,6 +35141,7 @@
    "fnb.menu_section",
    "fnb.modifier_group",
    "fnb.recipe",
+   "fnb.recipe_ingredient",
    "fnb.substitution_rule"
   ],
   "writes": [
@@ -34969,6 +35151,7 @@
    "fnb.menu_item",
    "fnb.menu_section",
    "fnb.recipe",
+   "fnb.recipe_ingredient",
    "fnb.substitution_rule"
   ],
   "storedProcedures": [],
@@ -35027,6 +35210,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.production_run",
    "fnb.recipe",
    "inventory.stock_level",
    "platform.outlet"
@@ -35389,6 +35573,7 @@
    "catalogue.channel_capacity",
    "catalogue.entitlement_template",
    "catalogue.event",
+   "catalogue.import_job",
    "catalogue.performance",
    "catalogue.price",
    "catalogue.price_list",
@@ -35856,6 +36041,7 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
+   "platform.profile_deployment",
    "platform.sale_board",
    "platform.scope",
    "platform.workstation"
@@ -36012,6 +36198,7 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
+   "platform.profile_deployment",
    "platform.sale_board",
    "platform.scope",
    "platform.workstation",
@@ -36222,6 +36409,7 @@
    "platform.connectivity_policy",
    "platform.device",
    "platform.device_heartbeat",
+   "platform.profile_deployment",
    "platform.workstation"
   ],
   "writes": [
@@ -36476,6 +36664,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -36756,6 +36945,7 @@
   "reads": [
    "fnb.production_run",
    "fnb.recipe",
+   "fnb.recipe_ingredient",
    "inventory.count",
    "inventory.movement"
   ],
@@ -37005,6 +37195,7 @@
    "cache:idempotency",
    "identity.principal",
    "inventory.requisition",
+   "inventory.requisition_line",
    "reporting.alert",
    "reporting.alert_rule"
   ],
@@ -49452,6 +49643,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -49811,7 +50003,8 @@
    "redis"
   ],
   "reads": [
-   "approvals.decision_record"
+   "approvals.decision_record",
+   "approvals.signature"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -49863,6 +50056,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "approvals.rule",
    "approvals.signature",
@@ -49923,6 +50117,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -49981,6 +50176,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -50035,6 +50231,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -50187,7 +50384,8 @@
    "redis"
   ],
   "reads": [
-   "approvals.decision_record"
+   "approvals.decision_record",
+   "approvals.signature"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -54054,7 +54252,8 @@
   "reads": [
    "cache:idempotency",
    "games.prize",
-   "games.redemption"
+   "games.redemption",
+   "games.redemption_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -57530,7 +57729,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -58799,7 +58999,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -58903,9 +59104,12 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.participant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -58999,7 +59203,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59048,9 +59253,12 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
-  "writes": [],
+  "writes": [
+   "rental.participant"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -59195,7 +59403,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59244,7 +59453,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59293,7 +59503,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59342,7 +59553,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59445,7 +59657,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59494,7 +59707,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59700,7 +59914,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59749,7 +59964,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59849,7 +60065,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -59899,7 +60116,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60002,7 +60220,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60099,7 +60318,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60148,7 +60368,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60248,7 +60469,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60302,7 +60524,8 @@
   "reads": [
    "cache:idempotency",
    "marketing.message_dispatch",
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [
    "cache:idempotency",
@@ -60354,7 +60577,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60403,7 +60627,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60452,7 +60677,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60555,7 +60781,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -60606,7 +60833,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -60808,7 +61038,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -60857,7 +61090,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -60906,7 +61142,10 @@
   "reads": [
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -60961,7 +61200,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "maintenance.asset",
+   "rental.damage_assessment",
+   "rental.inspection"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -61235,7 +61476,8 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "maintenance.work_order"
+   "maintenance.work_order",
+   "maintenance.work_order_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -61452,11 +61694,13 @@
   "reads": [
    "cache:idempotency",
    "maintenance.inspection",
+   "maintenance.inspection_item",
    "maintenance.work_order"
   ],
   "writes": [
    "cache:idempotency",
    "maintenance.inspection",
+   "maintenance.inspection_item",
    "maintenance.work_order",
    "platform.outbox"
   ],
@@ -61611,7 +61855,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -61861,7 +62106,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -61910,7 +62156,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -62546,6 +62793,7 @@
   ],
   "reads": [
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -62663,7 +62911,8 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.price_list",
-   "catalogue.product"
+   "catalogue.product",
+   "control.channel_listing"
   ],
   "writes": [
    "cache:idempotency",
@@ -64812,6 +65061,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -64915,6 +65165,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -68858,7 +69109,8 @@
    "catalogue.event_resource_plan",
    "identity.delegated_access",
    "identity.principal",
-   "platform.workstation"
+   "platform.workstation",
+   "workforce.rota_assignment"
   ],
   "writes": [
    "cache:idempotency",
@@ -69189,8 +69441,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -69818,6 +70072,7 @@
   ],
   "reads": [
    "fnb.menu",
+   "fnb.menu_item",
    "fnb.menu_section"
   ],
   "writes": [],
@@ -69868,6 +70123,7 @@
   ],
   "reads": [
    "fnb.menu",
+   "fnb.menu_item",
    "fnb.menu_section"
   ],
   "writes": [],
@@ -69917,7 +70173,8 @@
    "postgres"
   ],
   "reads": [
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -70067,7 +70324,8 @@
   ],
   "reads": [
    "marketing.guest_profile",
-   "marketing.segment"
+   "marketing.segment",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -70600,6 +70858,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.consent_record",
+   "marketing.guest_document",
    "pii.subject"
   ],
   "writes": [
@@ -71140,6 +71399,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "marketing.privacy_incident",
    "pii.subject"
   ],
   "writes": [
@@ -71242,7 +71502,8 @@
    "redis"
   ],
   "reads": [
-   "marketing.segment"
+   "marketing.segment",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -71837,7 +72098,8 @@
    "postgres"
   ],
   "reads": [
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -71988,7 +72250,8 @@
    "postgres"
   ],
   "reads": [
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -72261,12 +72524,15 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.segment_criterion"
   ],
   "writes": [
    "approvals.request",
@@ -73570,7 +73836,8 @@
   ],
   "reads": [
    "identity.principal",
-   "marketing.conversation"
+   "marketing.conversation",
+   "marketing.conversation_message"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -73678,7 +73945,8 @@
    "cache:idempotency",
    "identity.principal",
    "marketing.agent_availability",
-   "marketing.conversation"
+   "marketing.conversation",
+   "marketing.conversation_message"
   ],
   "writes": [
    "cache:idempotency",
@@ -73883,7 +74151,8 @@
   "reads": [
    "cache:idempotency",
    "marketing.agent_availability",
-   "marketing.conversation"
+   "marketing.conversation",
+   "marketing.conversation_message"
   ],
   "writes": [
    "cache:idempotency",
@@ -75369,6 +75638,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.event",
+   "marketing.challenge",
    "marketing.loyalty_programme"
   ],
   "writes": [
@@ -75424,6 +75694,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.event",
+   "marketing.challenge",
    "marketing.loyalty_programme"
   ],
   "writes": [
@@ -75478,11 +75749,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "marketing.loyalty_programme"
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.loyalty_programme"
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -75532,11 +75805,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "marketing.loyalty_programme"
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.loyalty_programme"
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -75587,6 +75862,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.event",
+   "marketing.challenge",
    "marketing.loyalty_programme"
   ],
   "writes": [
@@ -75642,6 +75918,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.guest_profile",
+   "marketing.referral",
    "promotions.promotion"
   ],
   "writes": [
@@ -75791,7 +76068,8 @@
    "postgres"
   ],
   "reads": [
-   "marketing.loyalty_programme"
+   "marketing.loyalty_programme",
+   "marketing.points_earning_rule"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -75842,6 +76120,7 @@
   ],
   "reads": [
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -76175,6 +76454,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.content_block",
    "marketing.segment"
   ],
   "writes": [
@@ -76333,6 +76613,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
+   "control.seo_metadata",
    "control.url_redirect"
   ],
   "writes": [
@@ -77312,8 +77593,12 @@
    "postgres",
    "redis"
   ],
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "resources.resource_relation"
+  ],
+  "writes": [
+   "resources.resource_relation"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -77416,10 +77701,12 @@
    "redis"
   ],
   "reads": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "writes": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -78266,6 +78553,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "resources.qualification",
    "resources.resource"
   ],
   "writes": [
@@ -78323,6 +78611,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "resources.qualification",
    "resources.resource"
   ],
   "writes": [
@@ -78379,6 +78668,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "resources.qualification",
    "resources.resource"
   ],
   "writes": [
@@ -78802,7 +79092,8 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
-   "platform.workstation"
+   "platform.workstation",
+   "workforce.rota_assignment"
   ],
   "writes": [
    "cache:idempotency",
@@ -79367,6 +79658,7 @@
   "reads": [
    "cache:idempotency",
    "identity.principal",
+   "resources.qualification",
    "resources.resource"
   ],
   "writes": [
@@ -79421,10 +79713,12 @@
    "redis"
   ],
   "reads": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "writes": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -80040,7 +80334,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.booking"
+   "rental.booking",
+   "rental.participant"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -80152,9 +80447,13 @@
   ],
   "reads": [
    "rental.booking",
+   "rental.participant",
    "rental.settlement"
   ],
-  "writes": [],
+  "writes": [
+   "rental.damage_assessment",
+   "rental.inspection"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -80320,11 +80619,13 @@
   "reads": [
    "cache:idempotency",
    "maintenance.inspection",
+   "maintenance.inspection_item",
    "rental.inspection"
   ],
   "writes": [
    "cache:idempotency",
    "maintenance.inspection",
+   "maintenance.inspection_item",
    "rental.inspection"
   ],
   "storedProcedures": [],
@@ -80695,7 +80996,8 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
-   "platform.workstation"
+   "platform.workstation",
+   "workforce.rota_assignment"
   ],
   "writes": [
    "cache:idempotency",
@@ -80749,10 +81051,12 @@
    "redis"
   ],
   "reads": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "writes": [
-   "resources.resource_package"
+   "resources.resource_package",
+   "resources.resource_requirement"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -80942,8 +81246,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.event_resource_plan",
@@ -81678,6 +81984,7 @@
   "reads": [
    "access.access_point",
    "cache:idempotency",
+   "workforce.attendance",
    "workforce.rota_assignment"
   ],
   "writes": [
@@ -82776,7 +83083,8 @@
    "cache:idempotency",
    "seating.seat",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -82887,7 +83195,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -82942,7 +83251,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -82997,7 +83307,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -83052,7 +83363,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -83107,7 +83419,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -83605,7 +83918,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat",
-   "seating.seat_map"
+   "seating.seat_map",
+   "seating.zone"
   ],
   "writes": [
    "cache:idempotency",
@@ -85972,8 +86286,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -87059,6 +87375,7 @@
   "reads": [
    "cache:idempotency",
    "ledger.account",
+   "ledger.deposit",
    "orders.sales_order",
    "seating.group_request"
   ],
@@ -87166,8 +87483,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -89284,6 +89603,7 @@
   "reads": [
    "cache:idempotency",
    "platform.configuration_profile",
+   "platform.profile_deployment",
    "platform.workstation"
   ],
   "writes": [
@@ -89959,8 +90279,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -91821,7 +92143,8 @@
    "postgres"
   ],
   "reads": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -91932,10 +92255,12 @@
    "postgres"
   ],
   "reads": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "writes": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -92196,10 +92521,12 @@
    "postgres"
   ],
   "reads": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "writes": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -92355,7 +92682,8 @@
    "postgres"
   ],
   "reads": [
-   "wallet.shared_wallet"
+   "wallet.shared_wallet",
+   "wallet.shared_wallet_member"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -95717,8 +96045,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -96811,6 +97141,7 @@
    "cache:idempotency",
    "control.cell",
    "control.invoice",
+   "control.invoice_line",
    "control.licence_add_on",
    "control.partner_agreement",
    "control.tenant",
@@ -96918,6 +97249,7 @@
    "cache:idempotency",
    "control.cell",
    "control.invoice",
+   "control.invoice_line",
    "control.licence_add_on",
    "control.tenant",
    "control.usage_record",
@@ -97510,6 +97842,7 @@
    "access.entitlement",
    "cache:idempotency",
    "control.api_client",
+   "control.api_limit",
    "control.cell",
    "control.licence_add_on",
    "control.tenant",
@@ -97610,6 +97943,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
@@ -97788,12 +98122,14 @@
   "reads": [
    "cache:idempotency",
    "whitelabel.faq_category",
+   "whitelabel.faq_entry",
    "whitelabel.policy",
    "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
    "whitelabel.faq_category",
+   "whitelabel.faq_entry",
    "whitelabel.policy",
    "whitelabel.tenant_config"
   ],
@@ -98552,7 +98888,10 @@
    "control.migration",
    "control.migration_plan",
    "control.migration_run",
-   "control.rollout_cell"
+   "control.migration_run_cell",
+   "control.migration_run_tenant",
+   "control.rollout_cell",
+   "control.rollout_tenant"
   ],
   "writes": [
    "cache:idempotency",
@@ -115366,6 +115705,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -115420,6 +115760,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -115475,6 +115816,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -115529,6 +115871,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -115584,6 +115927,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -115639,6 +115983,7 @@
   ],
   "reads": [
    "approvals.matrix",
+   "approvals.rule",
    "cache:idempotency"
   ],
   "writes": [
@@ -116224,7 +116569,8 @@
    "redis"
   ],
   "reads": [
-   "approvals.decision_record"
+   "approvals.decision_record",
+   "approvals.signature"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -116674,7 +117020,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.api_client"
+   "control.api_client",
+   "control.webhook_subscription"
   ],
   "writes": [
    "cache:idempotency",
@@ -118188,6 +118535,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.onboarding_application",
    "control.venue_type_template",
    "subscription.plan"
   ],
@@ -121472,7 +121820,8 @@
    "postgres"
   ],
   "reads": [
-   "control.invoice"
+   "control.invoice",
+   "control.invoice_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -121577,7 +121926,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.invoice"
+   "control.invoice",
+   "control.invoice_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -121682,6 +122032,7 @@
   "reads": [
    "cache:idempotency",
    "control.invoice",
+   "control.invoice_line",
    "ledger.fx_rate"
   ],
   "writes": [
@@ -126713,8 +127064,10 @@
    "redis"
   ],
   "reads": [
+   "approvals.decision",
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.request",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -135147,6 +135500,9 @@
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
    "promotions.promotion"
   ],
   "writes": [
@@ -138469,7 +138825,8 @@
    "identity.principal",
    "marketing.case",
    "marketing.case_message",
-   "marketing.conversation"
+   "marketing.conversation",
+   "marketing.conversation_message"
   ],
   "writes": [
    "cache:idempotency",
@@ -138625,7 +138982,8 @@
    "marketing.agent_availability",
    "marketing.case",
    "marketing.case_message",
-   "marketing.conversation"
+   "marketing.conversation",
+   "marketing.conversation_message"
   ],
   "writes": [
    "cache:idempotency",
@@ -138797,7 +139155,8 @@
    "ai.chunk_ref",
    "ai.knowledge_collection",
    "qdrant:knowledge",
-   "whitelabel.faq_category"
+   "whitelabel.faq_category",
+   "whitelabel.faq_entry"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -138957,6 +139316,7 @@
    "ledger.fiscal_period",
    "ledger.posting",
    "marketing.conversation",
+   "marketing.conversation_message",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -140137,6 +140497,7 @@
    "cache:idempotency",
    "control.cell",
    "control.invoice",
+   "control.invoice_line",
    "control.licence_add_on",
    "control.tenant",
    "control.usage_record",
@@ -140603,6 +140964,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.footer_config",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
@@ -141055,7 +141417,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "control.seo_metadata"
   ],
   "writes": [
    "cache:idempotency",
@@ -141210,6 +141573,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -141385,6 +141749,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.footer_config",
    "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
@@ -141470,6 +141835,7 @@
   ],
   "reads": [
    "cache:resolution",
+   "control.footer_config",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -141645,6 +142011,7 @@
    "marketing.consent_record",
    "marketing.guest_device",
    "marketing.guest_profile",
+   "marketing.loyalty_points",
    "marketing.loyalty_position",
    "marketing.wishlist_item",
    "pii.subject",
@@ -141653,6 +142020,7 @@
   "writes": [
    "cache:idempotency",
    "marketing.guest_profile",
+   "marketing.loyalty_points",
    "marketing.loyalty_position"
   ],
   "storedProcedures": [],
@@ -146782,6 +147150,7 @@
    "cache:idempotency",
    "control.api_client",
    "control.api_licence",
+   "control.api_limit",
    "control.api_version",
    "control.integration_listing"
   ],
@@ -146836,7 +147205,9 @@
   "reads": [
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
-   "fnb.service_order"
+   "fnb.kitchen_ticket_line",
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -147038,7 +147409,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -147104,7 +147476,9 @@
   ],
   "reads": [
    "fnb.kitchen_ticket",
-   "fnb.service_order"
+   "fnb.kitchen_ticket_line",
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -147227,6 +147601,7 @@
    "cache:idempotency",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order"
   ],
   "writes": [
@@ -147297,6 +147672,7 @@
    "cache:idempotency",
    "fnb.delivery_location",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order"
   ],
   "writes": [
@@ -147363,6 +147739,7 @@
    "fnb.corrective_action",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.menu_item",
    "fnb.sold_out_item",
    "fnb.temperature_log"
@@ -147431,6 +147808,7 @@
    "access.access_point",
    "cache:idempotency",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "platform.venue_settings"
   ],
   "writes": [
@@ -148369,6 +148747,7 @@
    "ai.policy",
    "ai.provider",
    "ai.suggestion",
+   "ai.suggestion_outcome",
    "cache:idempotency"
   ],
   "writes": [
@@ -149657,7 +150036,10 @@
    "postgres"
   ],
   "reads": [
-   "reporting.report_definition"
+   "reporting.report_column",
+   "reporting.report_definition",
+   "reporting.report_filter",
+   "reporting.report_parameter"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -150283,7 +150665,8 @@
   ],
   "reads": [
    "reporting.delivery",
-   "reporting.schedule"
+   "reporting.schedule",
+   "reporting.schedule_recipient"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -152088,6 +152471,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.onboarding_application",
    "control.venue_type_template",
    "subscription.plan"
   ],

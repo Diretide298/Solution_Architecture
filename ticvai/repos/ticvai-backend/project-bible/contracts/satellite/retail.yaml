@@ -1086,193 +1086,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StoreRule'
+  /product-recommendations:
+    get:
+      operationId: listRetailRecommendations
+      summary: Upsell and pairing suggestions for retail
+      description: >
+        The retail half of the same table F&B keeps. **Separate because the merchandising is
+        separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
+        serving both would be filtered on every read.
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Upsell and pairing suggestions for retail
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetailProductRecommendation'
 components:
   schemas:
-    RetailPrice:
-      type: object
-      x-ticvai-persistence: retail.price
-      description: '**Taken from the backend workbook, 20 September.** Stores the selling price of a Retail product or variant within a Retail price list.'
-      required:
-      - listId
-      - productId
-      - amount
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        listId:
-          type: string
-          format: uuid
-        productId:
-          type: string
-          format: uuid
-        variantId:
-          type: string
-          format: uuid
-          nullable: true
-        amount:
-          type: number
-        taxCode:
-          type: string
-          maxLength: 50
-          nullable: true
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    RetailPriceList:
-      type: object
-      x-ticvai-persistence: retail.price_list
-      description: '**Taken from the backend workbook, 20 September.** Defines Retail prices for a currency, scope, channel and validity period.'
-      required:
-      - code
-      - name
-      - currencyCode
-      - priority
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        currencyCode:
-          type: string
-          maxLength: 10
-          x-ticvai-persisted: false
-          description: '**Resolved from the region, not stored** (ADR-0018). The same rule
-            catalogue.price_list already follows: a price list in a UAE region is AED and
-            cannot be anything else, so the column would hold millions of copies of one
-            region-owned answer and would let a price list disagree with its own region.
-            **Kept on the wire, removed from the table.** Taken from the backend workbook,
-            which stored it.'
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        channelsJson:
-          type: string
-          nullable: true
-        priority:
-          type: integer
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    RetailProduct:
-      type: object
-      x-ticvai-persistence: retail.product
-      description: '**Taken from the backend workbook, 20 September.** Stores the independent master record for each sellable Retail merchandise item. It does not depend on Ticketing Catalogue.'
-      required:
-      - categoryId
-      - code
-      - name
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        categoryId:
-          type: string
-          format: uuid
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 200
-        description:
-          type: string
-          maxLength: 1000
-          nullable: true
-        brand:
-          type: string
-          maxLength: 150
-          nullable: true
-        taxCode:
-          type: string
-          maxLength: 50
-          nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    RetailProductCategory:
-      type: object
-      x-ticvai-persistence: retail.product_category
-      description: '**Taken from the backend workbook, 20 September.** Groups Retail products into business categories such as Apparel, Souvenir, Toy or Accessory.'
-      required:
-      - code
-      - name
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        scopePath:
-          type: string
-          nullable: true
-        code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
     RetailProductRecommendation:
       type: object
       x-ticvai-persistence: retail.product_recommendation
@@ -1332,48 +1174,6 @@ components:
           type: string
           format: date-time
           nullable: true
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-    RetailVariant:
-      type: object
-      x-ticvai-persistence: retail.variant
-      description: '**Taken from the backend workbook, 20 September.** Stores sellable Retail SKUs such as Size/Colour combinations.'
-      required:
-      - productId
-      - sku
-      - name
-      - isDefault
-      - isActive
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        productId:
-          type: string
-          format: uuid
-        sku:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 150
-        barcode:
-          type: string
-          maxLength: 100
-          nullable: true
-        attributesJson:
-          type: string
-          nullable: true
-        isDefault:
-          type: boolean
         isActive:
           type: boolean
         createdAt:

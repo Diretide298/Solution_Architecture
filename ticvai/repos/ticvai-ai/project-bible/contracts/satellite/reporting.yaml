@@ -1195,6 +1195,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+    delete:
+      operationId: deleteDashboard
+      summary: Archive a dashboard
+      description: 'CF-169. **Archives rather than removes, and refuses while `isShared` is true.**
+
+        A shared dashboard is on other people''s screens. Deleting one makes their saved view vanish
+        with no way to say what it was, and a confirmation dialog cannot help because nothing in it
+        reaches the people who are using it — **un-sharing first is one extra call and it puts the
+        owner in front of that fact.**
+
+        The tiles go with it and come back with it. `reporting.dashboard_tile` carries
+        `visualisation`, `parameters` and `refresh_seconds` per tile, which is the configuration
+        work rather than the dashboard.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          description: Archived
+        '409':
+          description: The dashboard is shared. Un-share it first.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /reports/ask:
     post:
       operationId: askReportingQuestion
@@ -3308,6 +3340,18 @@ components:
             - medium
             - high
             description: Combined refresh load of every tile.
+          archivedAt:
+            type: string
+            format: date-time
+            nullable: true
+            readOnly: true
+            description: >
+              **Set by `deleteDashboard`, which archives rather than removes.** A dashboard's
+              tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody
+              configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an
+              afternoon's work with it and leaves nothing to say what was there.
+
+              Archived dashboards are excluded from `listDashboards` unless asked for.
           createdAt:
             type: string
             format: date-time

@@ -69,8 +69,8 @@ CRITERIA = [
 DECISIONS = [
     (1, "Rental domain", "Keep rental.*, take their agreement", 5,
      "ours", "ours", "ours", "ours",
-     "catalogue.rental_rate puts rental pricing inside the hottest table set in the system - the "
-     "flash-sale argument that gave F&B and Retail their own price tables. Their layout also "
+     "catalogue.rental_rate puts rental pricing inside the hottest table set in the system - "
+     "catalogue.product alone is read by twelve contracts across 40 operations. Their layout also "
      "splits rental across CatalogueService and VenueOpsService. But we hold agreement_rules and "
      "agreement_signature and NO agreement: the signature signs a version string, and "
      "rental.participant has no booking reference at all."),
@@ -139,6 +139,43 @@ DECISIONS = [
      "A subject-access request spans every service. Ours sits in TenancyService and walks "
      "guest_link; theirs would sit in MarketingService, which owns one of the dozen schemas a "
      "DSAR has to reach."),
+    (12, "Currency on nine accepted tables", "Seven genuinely differ, two are copies", 9,
+     "ours", "tie", "tie", "ours",
+     "ADR-0018 resolves currency from the region and does not store it, so a generated schema "
+     "putting a currency column on anything holding money is supplying the conventional thing "
+     "and missing the specific one. Seven of the nine are exempt for a real reason; two are "
+     "copies of a fact that cannot differ and are marked not-persisted. It amended ADR-0018: a "
+     "venue may set its own currency and it freezes at the first trade."),
+    (13, "The F&B and Retail catalogue", "COLLAPSE into catalogue.* - keep six columns", 10,
+     "ours", "ours", "ours", "theirs",
+     "We took their ten product/category/variant/price/price_list tables on a DB-strain "
+     "argument and then measured it: catalogue.product has 40 operations across twelve "
+     "contracts and all ten of the new tables have zero. No retail operation reads "
+     "catalogue.product at all. A split that relieves contention needs the READS moved, not "
+     "the tables added - we paid the whole maintenance cost and got none of the isolation. "
+     "Three to one on the rubric, and the one criterion the split wins is unexercised; "
+     "x-ticvai-read-routing: analytical already exists for real contention. Six of their "
+     "columns stay, including product.categoryId - catalogue.product_category had two "
+     "operations since 20 August and nothing could be filed under it."),
+    (14, "The tier table decision 8 promised", "marketing.programme_tier - and keep the cache", 1,
+     "theirs", "theirs", "ours", "ours",
+     "Decision 8 said retire loyalty_tier and add a real tier table; the retire happened and the "
+     "add did not, so loyalty_position carried tierCode and tierName as denormalised strings and "
+     "pointsToNextTier was computed from a threshold that lived nowhere. The name was the part "
+     "that needed deciding: marketing.loyalty_tier is spent - schema-history declares it renamed "
+     "to points_earning_rule - and marketing.tier would repeat the subscription.plan collision. "
+     "The answer is BOTH the table and the cache: maintainability and readability want the "
+     "table, optimised access and cross-cell want the strings, because reading a definition to "
+     "render a badge would be a cross-cell call to print a word."),
+    (15, "Inspection answers", "maintenance.inspection_item", 1,
+     "theirs", "theirs", "ours", "ours",
+     "SubmitInspectionRequest.responses[] has always taken a key, a value, a pass flag, a note "
+     "and attachments, tagged 'none - request only', and the only persistence ever claimed was "
+     "maintenance.inspection_response, which does not exist. The template held the questions, "
+     "the inspection held failedItemCount, and which check failed was accepted over the wire and "
+     "dropped - on a record that takes an asset out of service. Items go on InspectionResult, "
+     "the detail response, not on Inspection, the list row, and the counts stay because "
+     "listInspections returns it in a list."),
 ]
 
 # area, what we change, why, kind

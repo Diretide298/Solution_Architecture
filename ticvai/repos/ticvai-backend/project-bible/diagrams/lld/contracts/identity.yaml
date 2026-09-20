@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 56 operations
+title: identity — 61 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -219,7 +219,8 @@ operations:
   audience:
   - staff
   offline: true
-  reads: []
+  reads:
+  - identity.access_policy
   writes: []
 - operation: getCurrentSession
   verb: GET
@@ -250,6 +251,19 @@ operations:
   reads:
   - identity.guest_session
   - pii.subject
+  writes: []
+- operation: getMembership
+  verb: GET
+  path: /memberships/{membershipId}
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.benefit_usage
+  - identity.customer_membership
+  - identity.membership_history
   writes: []
 - operation: getPrincipal
   verb: GET
@@ -381,6 +395,7 @@ operations:
   - staff
   offline: false
   reads:
+  - identity.access_policy
   - identity.access_policy_version
   writes: []
 - operation: listAccessPolicyTemplates
@@ -406,6 +421,18 @@ operations:
   reads:
   - identity.principal
   - identity.session
+  writes: []
+- operation: listCustomerMemberships
+  verb: GET
+  path: /customers/{customerId}/memberships
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - identity.customer_membership
   writes: []
 - operation: listDelegatedAccess
   verb: GET
@@ -445,6 +472,28 @@ operations:
   offline: false
   reads:
   - identity.mfa_method
+  writes: []
+- operation: listModules
+  verb: GET
+  path: /modules
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.module
+  writes: []
+- operation: listPermissions
+  verb: GET
+  path: /permissions
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.permission
   writes: []
 - operation: listPrincipals
   verb: GET
@@ -513,6 +562,19 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+- operation: recordBenefitUsage
+  verb: POST
+  path: /memberships/{membershipId}/benefit-usage
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  - service
+  offline: true
+  reads:
+  - identity.benefit_usage
+  writes:
+  - identity.benefit_usage
 - operation: refreshToken
   verb: POST
   path: /auth/refresh

@@ -9,7 +9,7 @@
    "contracts": 17,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 1
+   "operationsWithNoScreen": 8
   },
   "waves": {
    "wave1": 21,
@@ -27,7 +27,7 @@
    "contracts": 17,
    "modules": 16,
    "undrawn": 0,
-   "operationsWithNoScreen": 1
+   "operationsWithNoScreen": 8
   },
   "waves": {
    "wave1": 20,
@@ -45,7 +45,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 107
+   "operationsWithNoScreen": 178
   },
   "waves": {
    "wave1": 27,
@@ -62,7 +62,7 @@
    "contracts": 8,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 1
+   "operationsWithNoScreen": 7
   },
   "waves": {
    "wave2": 17
@@ -78,7 +78,7 @@
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 93
+   "operationsWithNoScreen": 165
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 26
+   "operationsWithNoScreen": 42
   },
   "waves": {
    "wave1": 11
@@ -112,7 +112,7 @@
    "contracts": 31,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 157
+   "operationsWithNoScreen": 237
   },
   "waves": {
    "wave1": 60,
@@ -130,7 +130,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 134
+   "operationsWithNoScreen": 205
   },
   "waves": {
    "wave1": 12,
@@ -181,7 +181,7 @@
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 60
+   "operationsWithNoScreen": 86
   },
   "waves": {
    "wave2": 2,
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 82
+   "operationsWithNoScreen": 118
   },
   "waves": {
    "wave2": 20,
@@ -232,7 +232,7 @@
    "contracts": 3,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 26
+   "operationsWithNoScreen": 31
   },
   "waves": {
    "wave2": 10
@@ -248,7 +248,7 @@
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 79
+   "operationsWithNoScreen": 125
   },
   "waves": {
    "wave3": 69

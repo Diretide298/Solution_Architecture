@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 127 operations
+title: subscription — 129 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -114,6 +114,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner_agreement
   - ledger.fx_rate
   - platform.tenant
   writes:
@@ -144,6 +145,7 @@ operations:
   reads:
   - cache:idempotency
   - control.partner_agreement
+  - control.partner_user
   - identity.principal
   - platform.scope
   writes:
@@ -199,7 +201,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - control.burst_environment
   writes:
   - cache:idempotency
   - platform.outbox
@@ -239,7 +242,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - control.burst_environment
   writes:
   - cache:idempotency
 - operation: executeTenantMigration
@@ -283,6 +287,7 @@ operations:
   reads:
   - cache:idempotency
   - control.invoice
+  - control.invoice_line
   writes:
   - cache:idempotency
   - control.invoice
@@ -390,6 +395,18 @@ operations:
   reads:
   - subscription.plan
   writes: []
+- operation: getPlanTiers
+  verb: GET
+  path: /plans/{planId}/tiers
+  scope: tenant
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.tier_allowance
+  - subscription.tier_module
+  writes: []
 - operation: getSubscription
   verb: GET
   path: /tenants/{tenantId}/subscription
@@ -474,6 +491,7 @@ operations:
   offline: false
   reads:
   - catalogue.performance
+  - control.burst_environment
   writes: []
 - operation: listCellClusters
   verb: GET
@@ -919,6 +937,7 @@ operations:
   offline: false
   reads:
   - control.invoice
+  - control.invoice_line
   writes: []
 - operation: listTenantCells
   verb: GET
@@ -1098,6 +1117,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.partner_agreement
   writes:
   - approvals.request
   - cache:idempotency
@@ -1127,6 +1147,7 @@ operations:
   offline: false
   reads:
   - catalogue.performance
+  - control.burst_environment
   - control.cell
   writes:
   - cache:idempotency
@@ -1204,6 +1225,7 @@ operations:
   - catalogue.channel_capacity
   - catalogue.price_list
   - catalogue.product
+  - control.channel_listing
   writes:
   - cache:idempotency
   - control.channel_listing
@@ -1333,6 +1355,20 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setPlanTiers
+  verb: PUT
+  path: /plans/{planId}/tiers
+  scope: tenant
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - subscription.tier_allowance
+  - subscription.tier_module
+  writes:
+  - subscription.tier_allowance
+  - subscription.tier_module
 - operation: setRenewalAutoMembership
   verb: PUT
   path: /renewal-auto-membership
@@ -1429,6 +1465,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.onboarding_application
   - control.venue_type_template
   - subscription.plan
   writes:

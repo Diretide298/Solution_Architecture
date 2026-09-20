@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 190 operations
+title: catalogue — 199 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -208,6 +208,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.donation_campaign
   - ledger.account
   writes:
   - cache:idempotency
@@ -348,6 +349,19 @@ operations:
   reads:
   - catalogue.channel_allocation
   writes: []
+- operation: getDynamicPriceRule
+  verb: GET
+  path: /pricing/dynamic-rules/{ruleId}
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - pricing.dynamic_price_action
+  - pricing.dynamic_price_condition
+  - pricing.dynamic_price_rule
+  writes: []
 - operation: getEvent
   verb: GET
   path: /events/{eventId}
@@ -407,6 +421,18 @@ operations:
   reads:
   - catalogue.performance
   writes: []
+- operation: getPlanBenefits
+  verb: GET
+  path: /entitlement-templates/{templateId}/benefits
+  scope: venue
+  permission: CATALOGUE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.plan_benefit
+  writes: []
 - operation: getPriceList
   verb: GET
   path: /price-lists/{priceListId}
@@ -442,6 +468,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.import_job
   - catalogue.product
   writes:
   - cache:idempotency
@@ -458,6 +485,7 @@ operations:
   - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.performance
+  - catalogue.waitlist_entry
   writes:
   - cache:idempotency
   - catalogue.waitlist_entry
@@ -773,6 +801,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listDynamicPriceRules
+  verb: GET
+  path: /pricing/dynamic-rules
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - pricing.dynamic_price_rule
+  writes: []
 - operation: listDynamicPricingAutomation
   verb: GET
   path: /dynamic-pricing-automation
@@ -971,6 +1010,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listMembershipBenefits
+  verb: GET
+  path: /membership-benefits
+  scope: venue
+  permission: CATALOGUE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.membership_benefit
+  writes: []
 - operation: listMembershipLoyaltyPricing
   verb: GET
   path: /membership-loyalty-pricing
@@ -980,6 +1031,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listMembershipProgrammes
+  verb: GET
+  path: /membership-programmes
+  scope: venue
+  permission: CATALOGUE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.membership_programme
   writes: []
 - operation: listNearbyEventExhibition
   verb: GET
@@ -1574,7 +1637,8 @@ operations:
   - staff
   - partner
   offline: false
-  reads: []
+  reads:
+  - catalogue.channel_allocation
   writes: []
 - operation: relinquishInventoryHold
   verb: DELETE
@@ -1748,6 +1812,22 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setDynamicPriceRule
+  verb: PUT
+  path: /pricing/dynamic-rules/{ruleId}
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - pricing.dynamic_price_action
+  - pricing.dynamic_price_condition
+  - pricing.dynamic_price_rule
+  writes:
+  - pricing.dynamic_price_action
+  - pricing.dynamic_price_condition
+  - pricing.dynamic_price_rule
 - operation: setDynamicPricingStrategy
   verb: PUT
   path: /dynamic-pricing-strategy
@@ -1848,6 +1928,42 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setMembershipBenefit
+  verb: PUT
+  path: /membership-benefits
+  scope: venue
+  permission: CATALOGUE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.membership_benefit
+  writes:
+  - catalogue.membership_benefit
+- operation: setMembershipProgramme
+  verb: PUT
+  path: /membership-programmes
+  scope: venue
+  permission: CATALOGUE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.membership_programme
+  writes:
+  - catalogue.membership_programme
+- operation: setPlanBenefits
+  verb: PUT
+  path: /entitlement-templates/{templateId}/benefits
+  scope: venue
+  permission: CATALOGUE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.plan_benefit
+  writes:
+  - catalogue.plan_benefit
 - operation: setPrepaidMinutePackage
   verb: PUT
   path: /prepaid-minute-packages

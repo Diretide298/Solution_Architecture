@@ -658,7 +658,9 @@
   "workforce.field_ownership": "2026-09-20",
   "workforce.integration_source": "2026-09-20",
   "workforce.sync_conflict": "2026-09-20",
-  "workforce.sync_run": "2026-09-20"
+  "workforce.sync_run": "2026-09-20",
+  "maintenance.inspection_item": "2026-09-20",
+  "marketing.programme_tier": "2026-09-20"
  },
  "renames": [
   {
@@ -781,7 +783,23 @@
   "orders.order_discount": "2026-09-20",
   "orders.payment_routing": "2026-09-20",
   "fnb.order": "2026-09-20",
-  "fnb.order_item": "2026-09-20"
+  "fnb.order_item": "2026-09-20",
+  "fnb.location_code": "2026-09-20",
+  "fnb.price": "2026-09-20",
+  "fnb.price_list": "2026-09-20",
+  "fnb.product": "2026-09-20",
+  "fnb.product_category": "2026-09-20",
+  "fnb.variant": "2026-09-20",
+  "identity.user_access": "2026-09-20",
+  "orders.donation_line": "2026-09-20",
+  "orders.order_media_link": "2026-09-20",
+  "retail.price": "2026-09-20",
+  "retail.price_list": "2026-09-20",
+  "retail.product": "2026-09-20",
+  "retail.product_category": "2026-09-20",
+  "retail.variant": "2026-09-20",
+  "whitelabel.redirect": "2026-09-20",
+  "whitelabel.seo_setting": "2026-09-20"
  },
  "baseline": "2026-09-19",
  "generated": "2026-09-20"
