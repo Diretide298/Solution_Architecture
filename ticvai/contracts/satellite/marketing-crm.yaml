@@ -2397,8 +2397,11 @@ paths:
           format: uuid
       - name: window
         in: query
-        description: '**Bounded on purpose.** An all-time board is won once and then stops being a
-          reason to come back.'
+        description: '**Monthly, confirmed 20 September.** `week` and `season` remain available and
+          the product runs on `month`.
+
+          **Bounded on purpose** — an all-time board is won once and then stops being a reason to
+          come back.'
         schema:
           type: string
           enum: [week, month, season]
@@ -13928,6 +13931,7 @@ components:
         identifier protects nothing.
       required:
       - rank
+      - nickname
       - points
       properties:
         rank:
@@ -13935,10 +13939,21 @@ components:
           minimum: 1
         nickname:
           type: string
-          nullable: true
           description: >
-            **Null where the guest has not chosen one, and never their real name.** The row still
-            appears, because standings that skip people are wrong about who is second.
+            **Always present, and never their real name.** The guest's chosen
+            `leaderboardNickname` where they have set one, and otherwise a generated
+            `Player-4821`.
+
+            **Not nullable, because a rank with no name is a hole on the board.** The first cut
+            of this returned null and left second place reading as a dash, which tells somebody
+            they do not count every time they look — and being on the board is the whole point of
+            the board.
+
+            **Generated from the loyalty position's own id**, not from the subject id and not
+            from a counter: it is stable across months, so the same guest is the same
+            `Player-N` and can be congratulated by it, and it carries nothing — no rank, no join
+            date, and no sequence anybody can count backwards from to learn how many guests a
+            programme has.
         points:
           type: integer
         isMe:
@@ -13967,9 +13982,14 @@ components:
             they reach the board and changeable afterwards; `setLeaderboardNickname` is the only
             thing that writes it.
 
-            **Null means no name on the board, not a fallback to a real one.** Displaying
-            `pii.subject.display_name` because a nickname was missing would disclose, silently,
-            on the day a guest first placed — which is the case this field exists to prevent.
+            **Null means the guest has not chosen one yet, and the board shows a generated
+            `Player-4821` in its place** — never `pii.subject.display_name`, which would
+            disclose silently on the day a guest first placed and is the case this field exists
+            to prevent.
+
+            **The generated name is computed at read time and not stored here.** Writing it would
+            make *"has this guest chosen a name"* unanswerable, and that flag is what the
+            prompt-on-reaching-the-board depends on.
         subjectId:
           type: string
           format: uuid
