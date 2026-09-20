@@ -1,0 +1,3761 @@
+{
+ "generated": "21 September 2026",
+ "note": "Per module, the capabilities a person can be granted. Derived from contracts/shared/permissions.yaml crossed with every contract's x-ticvai-permission. **The checklist a grant screen renders** — not a role taxonomy, because a role is a saved checklist rather than a prerequisite.",
+ "modules": {
+  "access": {
+   "title": "3 — Admission and Access",
+   "capabilityCount": 11,
+   "unguardedOperations": 3,
+   "capabilities": [
+    {
+     "key": "ACCESS_OVERRIDE",
+     "label": "admit against a failed validation, logged",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "overrideAccess"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCESS_POINT_CONFIGURE",
+     "label": null,
+     "group": "Access control",
+     "operationCount": 49,
+     "operations": [
+      "addBlacklistEntry",
+      "approveManualOverrideSupervisor",
+      "approveMultiMediaPreview",
+      "createAccessPoint",
+      "createAdmissionRules",
+      "listParkingFacilities"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCESS_VALIDATE",
+     "label": "scan and admit",
+     "group": "Access control",
+     "operationCount": 5,
+     "operations": [
+      "getOfflinePackage",
+      "syncScans",
+      "validateAccess",
+      "validateGroupAccess",
+      "verifyIdentity"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_MANAGE",
+     "label": "amend, merge, configure consent purposes",
+     "group": "Guest engagement",
+     "operationCount": 3,
+     "operations": [
+      "enrolFacePass",
+      "enrolFaceTag",
+      "revokeFacePass"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_VIEW",
+     "label": "profiles, behavioural attributes, consent state",
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "getFacePassEnrolment",
+      "listAccessChanges"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 4,
+     "operations": [
+      "getEntitlement",
+      "getEntitlementCredential",
+      "getEntitlementHistory",
+      "listMyEntitlements"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PARKING_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "setParkingFacility"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_VENUE",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 1,
+     "operations": [
+      "listScans"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SCOPE_VIEW",
+     "label": "read the hierarchy",
+     "group": "Organisation",
+     "operationCount": 111,
+     "operations": [
+      "getAccessPoint",
+      "listAccess",
+      "listAccessAttributeCatalog",
+      "listAccessExecutiveInsight",
+      "listAccessLocationGrouping",
+      "listAccessMonitoring"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TICKET_LOOKUP",
+     "label": "read-only validity check, no admission",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "lookupTicket"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TURNSTILE_MODE_SET",
+     "label": "entry, re-entry, crossover, exit, free, closed",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "setTurnstileMode"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "accreditation": {
+   "title": "12 — Accreditation & Credential Management",
+   "capabilityCount": 6,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ACCREDITATION_APPLY",
+     "label": "submit an application or a document",
+     "group": "Accreditation",
+     "operationCount": 2,
+     "operations": [
+      "createAccreditationApplication",
+      "submitAccreditationDocument"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCREDITATION_APPROVE",
+     "label": "decide an application, verify a document",
+     "group": "Accreditation",
+     "operationCount": 2,
+     "operations": [
+      "decideAccreditationApplication",
+      "verifyAccreditationDocument"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCREDITATION_CONFIGURE",
+     "label": "programmes, requirements, access profiles, badges",
+     "group": "Accreditation",
+     "operationCount": 8,
+     "operations": [
+      "createAccreditationProgramme",
+      "listBadgeTemplates",
+      "previewAccessImpact",
+      "setAccessProfile",
+      "setAccreditationNotificationRules",
+      "setAccreditationRequirements"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCREDITATION_ISSUE",
+     "label": "produce, encode and replace a credential",
+     "group": "Accreditation",
+     "operationCount": 4,
+     "operations": [
+      "createBadgePrintJob",
+      "issueAccreditationCredential",
+      "listBadgePrintJobs",
+      "replaceAccreditationCredential"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCREDITATION_MANAGE",
+     "label": "amend a holder, assign access, suspend, revoke",
+     "group": "Accreditation",
+     "operationCount": 5,
+     "operations": [
+      "importAccreditationHolders",
+      "listAccreditationIdentityConflicts",
+      "setAccreditationStatus",
+      "setHolderAccess",
+      "updateAccreditationHolder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ACCREDITATION_VIEW",
+     "label": null,
+     "group": "Accreditation",
+     "operationCount": 8,
+     "operations": [
+      "getAccreditationHolder",
+      "listAccessProfiles",
+      "listAccreditationAccessActivity",
+      "listAccreditationApplications",
+      "listAccreditationAudit",
+      "listAccreditationCredentials"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "ai": {
+   "title": "8 — Unified Operations Dashboard (AI)",
+   "capabilityCount": 7,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "AI_APPROVE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 2,
+     "operations": [
+      "decideProposedAction",
+      "listProposedActions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AI_AUDIT_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 2,
+     "operations": [
+      "getAiUsage",
+      "listAiInteractions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AI_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 16,
+     "operations": [
+      "createKnowledgeCollection",
+      "getAiPolicy",
+      "ingestKnowledgeDocument",
+      "listAiProviders",
+      "listIndexFailures",
+      "listIndexJobs"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AI_USE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 7,
+     "operations": [
+      "createAiConversation",
+      "generateConfiguration",
+      "listAiConversations",
+      "recordSuggestionOutcome",
+      "requestSuggestion",
+      "semanticSearch"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CAPACITY_CONFIGURE",
+     "label": "envelopes and allocation",
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "generateVenueLayout"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 1,
+     "operations": [
+      "proposeTranslations"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "VENUE_MAP_MANAGE",
+     "label": "place points, import geometry, accept proposals",
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "proposeVenueLabels",
+      "proposeWalkways"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "approvals": {
+   "title": "11 — Approval Workflows and Governance",
+   "capabilityCount": 5,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "APPROVAL_ACT",
+     "label": "approve, reject, return, request info",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "issueAccreditationBadge"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "APPROVAL_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 7,
+     "operations": [
+      "listApprovalMatrices",
+      "listStepUpPolicies",
+      "setApprovalControlPolicy",
+      "setApprovalMatrix",
+      "setApprovalRetentionPolicy",
+      "setApprovalSlaPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "APPROVAL_DECIDE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 5,
+     "operations": [
+      "createApprovalDelegation",
+      "decideApprovalRequest",
+      "revokeApprovalDelegation",
+      "setApproverAvailability",
+      "signApprovalDecision"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "APPROVAL_REQUEST",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 13,
+     "operations": [
+      "approveMatrixMultiLevel",
+      "approveRoleAuthorityDelegation",
+      "approveUnifiedDecision",
+      "approveVersioningGovernance",
+      "createApprovalRequest",
+      "createAutomationAutonomouAction"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "APPROVAL_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 19,
+     "operations": [
+      "createApprovalEvidencePackage",
+      "evaluateApprovalRequirement",
+      "getApprovalAnalytics",
+      "getApprovalRecord",
+      "listAccreditationBadges",
+      "listApprovalControlPolicies"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "assets": {
+   "title": "23 — Digital Asset Management",
+   "capabilityCount": 4,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ASSET_LIBRARY_APPROVE",
+     "label": "approve and publish an asset for use",
+     "group": "Digital assets",
+     "operationCount": 1,
+     "operations": [
+      "setMediaAssetApproval"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ASSET_LIBRARY_MANAGE",
+     "label": "upload, replace, delete, amend rights",
+     "group": "Digital assets",
+     "operationCount": 13,
+     "operations": [
+      "analyseMediaAsset",
+      "bulkUpdateMediaAssets",
+      "completeUpload",
+      "createCollection",
+      "createUpload",
+      "deleteMediaAsset"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ASSET_LIBRARY_SHARE",
+     "label": "issue an external share link",
+     "group": "Digital assets",
+     "operationCount": 1,
+     "operations": [
+      "createMediaShare"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ASSET_LIBRARY_VIEW",
+     "label": null,
+     "group": "Digital assets",
+     "operationCount": 11,
+     "operations": [
+      "findSimilarMediaAssets",
+      "getExpiringRights",
+      "getMediaAsset",
+      "getMediaDistribution",
+      "getMediaTaxonomy",
+      "getMediaUsageAnalytics"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "catalogue": {
+   "title": "1 — Ticketing Catalogue",
+   "capabilityCount": 9,
+   "unguardedOperations": 3,
+   "capabilities": [
+    {
+     "key": "CAPACITY_CONFIGURE",
+     "label": "envelopes and allocation",
+     "group": "Catalogue",
+     "operationCount": 6,
+     "operations": [
+      "createChannelCapacity",
+      "forceReleaseInventoryHold",
+      "relinquishChannelAllocation",
+      "setChannelAllocations",
+      "setEventCapacityProfile",
+      "updateChannelCapacity"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "EVENT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 12,
+     "operations": [
+      "assignSessionMedia",
+      "cloneEvent",
+      "createEvent",
+      "getEventResourcePlan",
+      "listEventTypes",
+      "listSpaces"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 3,
+     "operations": [
+      "acquireInventoryHold",
+      "relinquishInventoryHold",
+      "renewInventoryHold"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "suspendEntitlement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PERFORMANCE_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 7,
+     "operations": [
+      "cancelPerformance",
+      "createPerformances",
+      "listSessionTemplates",
+      "rescheduleEvent",
+      "setEventSchedule",
+      "setSessionTemplate"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 6,
+     "operations": [
+      "copyPriceList",
+      "createPriceList",
+      "setDynamicPriceRule",
+      "setPrepaidMinutePackage",
+      "setPrices",
+      "updatePriceList"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 5,
+     "operations": [
+      "getDynamicPriceRule",
+      "getPriceList",
+      "listDynamicPriceRules",
+      "listPriceLists",
+      "listPrices"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 52,
+     "operations": [
+      "approvePricingWorkflowAuthority",
+      "approveReviewDecision",
+      "approveWorkflow",
+      "assessProductChange",
+      "bulkChangePrices",
+      "cloneProduct"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 104,
+     "operations": [
+      "getAvailability",
+      "getChannelAllocations",
+      "getEvent",
+      "getLatestBundle",
+      "getMyMemberships",
+      "getPerformance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "cross-region": {
+   "title": "Cross-cutting — multi-region",
+   "capabilityCount": 5,
+   "unguardedOperations": 9,
+   "capabilities": [
+    {
+     "key": "ACCESS_VALIDATE",
+     "label": "scan and admit",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "consumeCrossRegionEntitlement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 3,
+     "operations": [
+      "authoriseWalletSpend",
+      "captureWalletAuthorisation",
+      "relinquishWalletAuthorisation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "getWalletAllocation",
+      "listCrossCellRequests"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REGION_CONFIGURE",
+     "label": "currency, decimals, time zone, fiscal year",
+     "group": "Organisation",
+     "operationCount": 2,
+     "operations": [
+      "listCellConnections",
+      "setWalletAllocationPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TICKET_LOOKUP",
+     "label": "read-only validity check, no admission",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "getCrossRegionEntitlement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "finance": {
+   "title": "5 — F&B & Guest Management (accounting and revenue recognition)",
+   "capabilityCount": 8,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ACCOUNT_CONFIGURE",
+     "label": "chart of accounts",
+     "group": "Finance",
+     "operationCount": 6,
+     "operations": [
+      "createAccount",
+      "createCostCenter",
+      "createLegalEntity",
+      "createRecognitionSchedule",
+      "setAccountMappings",
+      "updateAccount"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_APPROVE",
+     "label": "journal voucher approval",
+     "group": "Finance",
+     "operationCount": 12,
+     "operations": [
+      "abandonPeriodClose",
+      "approveJournalEntry",
+      "beginPeriodClose",
+      "closeFiscalPeriod",
+      "ingestFxRates",
+      "rejectJournal"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_POST",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 8,
+     "operations": [
+      "createJournalEntry",
+      "disputeObligation",
+      "recordDeposit",
+      "recordSettlement",
+      "recordWriteOff",
+      "resolveObligationDispute"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_VIEW",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 21,
+     "operations": [
+      "calculateTax",
+      "getAccount",
+      "getDeferredRevenue",
+      "getForeignTenderReport",
+      "getJournalEntry",
+      "getTrialBalance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_VENUE",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 1,
+     "operations": [
+      "getFinancialReport"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SETTLEMENT_RECONCILE",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 2,
+     "operations": [
+      "ingestSettlementFile",
+      "resolveSettlementException"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SETTLEMENT_VIEW",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 3,
+     "operations": [
+      "getSettlement",
+      "listSettlementExceptions",
+      "listSettlements"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TAX_CONFIGURE",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 3,
+     "operations": [
+      "createTaxCode",
+      "createTaxExemption",
+      "updateTaxCode"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "fnb": {
+   "title": "7 — F&B POS  ·  5 — F&B & Guest Management (service)",
+   "capabilityCount": 8,
+   "unguardedOperations": 10,
+   "capabilities": [
+    {
+     "key": "INCIDENT_MANAGE",
+     "label": "investigate, close, notify an authority",
+     "group": "Maintenance & safety",
+     "operationCount": 4,
+     "operations": [
+      "closeCorrectiveAction",
+      "escalateCorrectiveAction",
+      "recordCorrectiveAction",
+      "signCorrectiveAction"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_REPORT",
+     "label": "deliberately wide. An unreported near-miss recurs",
+     "group": "Maintenance & safety",
+     "operationCount": 3,
+     "operations": [
+      "logColdChain",
+      "logKitchenException",
+      "logTemperature"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_VIEW",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "getHaccpStatus"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 3,
+     "operations": [
+      "closeTableVisit",
+      "createFnbOrder",
+      "openTableVisit"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 32,
+     "operations": [
+      "acceptFnbOrder",
+      "amendFnbOrder",
+      "cancelFnbOrder",
+      "chaseStation",
+      "clearTable",
+      "compItem"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 8,
+     "operations": [
+      "getBill",
+      "getFnbOrder",
+      "getTableMap",
+      "getTableVisit",
+      "listFnbOrders",
+      "listKitchenTickets"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 30,
+     "operations": [
+      "applyMenuActions",
+      "attachModifierGroup",
+      "buildProductionPlan",
+      "completeProductionRun",
+      "createCombo",
+      "createMenu"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 11,
+     "operations": [
+      "getMenu",
+      "getProductionRun",
+      "list86Events",
+      "listFnbRecommendations",
+      "listIngredientSubstitutes",
+      "listKitchenStations"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "games": {
+   "title": "10 — Games & F&B Integration",
+   "capabilityCount": 10,
+   "unguardedOperations": 3,
+   "capabilities": [
+    {
+     "key": "ACCESS_VALIDATE",
+     "label": "scan and admit",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "authoriseGameplay"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 3,
+     "operations": [
+      "deployReaderConfiguration",
+      "setReaderConfiguration",
+      "testReader"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "listReaders"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "issueGameCard",
+      "redeemPrize"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "transferGameCard"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "setGamePricing"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "getGamePricing"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 13,
+     "operations": [
+      "createGame",
+      "createGameEntitlement",
+      "createPrize",
+      "setAttractionType",
+      "setGameCardExpiryRules",
+      "setGameCardLifecycle"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 8,
+     "operations": [
+      "getGameEligibility",
+      "getGameplaySyncStatus",
+      "getGameplayValidationRules",
+      "listAttractionTypes",
+      "listGameEntitlements",
+      "listGameplayTransactions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 1,
+     "operations": [
+      "setGameKioskConfiguration"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "identity": {
+   "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
+   "capabilityCount": 10,
+   "unguardedOperations": 23,
+   "capabilities": [
+    {
+     "key": "GUEST_MANAGE",
+     "label": "amend, merge, configure consent purposes",
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "grantDelegation",
+      "recordBenefitUsage"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_VIEW",
+     "label": "profiles, behavioural attributes, consent state",
+     "group": "Guest engagement",
+     "operationCount": 4,
+     "operations": [
+      "getMembership",
+      "listCustomerMemberships",
+      "listDelegations",
+      "verifyGuestEmail"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_VIEW_PII",
+     "label": "personal fields. Distinct from GUEST_VIEW by design",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "exportSubjectData"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PERMISSION_GRANT",
+     "label": "assign grants to a principal",
+     "group": "Session and identity",
+     "operationCount": 3,
+     "operations": [
+      "createDelegatedAccess",
+      "deleteDelegatedAccess",
+      "setPrincipalModuleAccess"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PERMISSION_MANAGE",
+     "label": "author, approve and retire access policies",
+     "group": "Session and identity",
+     "operationCount": 4,
+     "operations": [
+      "createAccessPolicy",
+      "createEmergencyAccessOverride",
+      "setAccessPolicyState",
+      "updateAccessPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PERMISSION_VIEW",
+     "label": "view the grant set of others",
+     "group": "Session and identity",
+     "operationCount": 17,
+     "operations": [
+      "evaluateAccess",
+      "getAccessPolicy",
+      "getAccessPolicyBundle",
+      "getPrincipalModuleAccess",
+      "listAccessDecisions",
+      "listAccessPolicies"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ROLE_MANAGE",
+     "label": "create roles and attach grants",
+     "group": "Session and identity",
+     "operationCount": 4,
+     "operations": [
+      "createRole",
+      "listRoles",
+      "setCapabilityTemplate",
+      "setSegregationRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SESSION_FORCE_LOGOUT",
+     "label": "terminate another principal's session",
+     "group": "Session and identity",
+     "operationCount": 3,
+     "operations": [
+      "forceLogout",
+      "listActiveSessions",
+      "revokeAllSessions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 1,
+     "operations": [
+      "setPasswordPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "USER_MANAGE",
+     "label": "create, edit, deactivate principals",
+     "group": "Session and identity",
+     "operationCount": 6,
+     "operations": [
+      "createPrincipal",
+      "getPrincipal",
+      "getSsoConfig",
+      "listPrincipals",
+      "setSsoConfig",
+      "updatePrincipal"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "inventory": {
+   "title": "15 — Inventory Management",
+   "capabilityCount": 8,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "APPROVAL_ACT",
+     "label": "approve, reject, return, request info",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "approveRequisition"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_APPROVE",
+     "label": "journal voucher approval",
+     "group": "Finance",
+     "operationCount": 5,
+     "operations": [
+      "closePurchaseOrderShort",
+      "closeTransferShort",
+      "recountStockCount",
+      "rejectRequisition",
+      "returnRequisition"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_POST",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 1,
+     "operations": [
+      "postStockCount"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_VIEW",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 1,
+     "operations": [
+      "getStockValuation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CANCEL",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "cancelPurchaseOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "createPurchaseOrder",
+      "createRequisition"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 20,
+     "operations": [
+      "acknowledgePurchaseOrder",
+      "bulkUpdateProducts",
+      "cancelRequisition",
+      "cancelStockCount",
+      "createGoodsReceipt",
+      "createInventoryItem"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 20,
+     "operations": [
+      "compareQuotations",
+      "getCountVariance",
+      "getInventoryItem",
+      "getPurchaseOrder",
+      "getStockPositions",
+      "getStockTransfer"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "maintenance": {
+   "title": "17 — Maintenance & Safety Management",
+   "capabilityCount": 13,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ASSET_MANAGE",
+     "label": "register, amend, take out of / return to service",
+     "group": "Maintenance & safety",
+     "operationCount": 5,
+     "operations": [
+      "createAsset",
+      "createMaintenancePlan",
+      "setAssetStatus",
+      "updateAsset",
+      "updateMaintenancePlan"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ASSET_VIEW",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 6,
+     "operations": [
+      "getAsset",
+      "getAssetHistory",
+      "getDueMaintenance",
+      "listAssets",
+      "listMaintenancePlans",
+      "lookupAsset"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_MANAGE",
+     "label": "investigate, close, notify an authority",
+     "group": "Maintenance & safety",
+     "operationCount": 2,
+     "operations": [
+      "recordAuthorityNotification",
+      "updateIncident"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_REPORT",
+     "label": "deliberately wide. An unreported near-miss recurs",
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "reportIncident"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_VIEW",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 2,
+     "operations": [
+      "getIncident",
+      "listIncidents"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INSPECTION_MANAGE",
+     "label": "author templates",
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "createInspectionTemplate"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INSPECTION_SUBMIT",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "submitInspection"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INSPECTION_VIEW",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 2,
+     "operations": [
+      "listInspectionTemplates",
+      "listInspections"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MAINTENANCE_APPROVE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "closeWorkOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MAINTENANCE_EXECUTE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 6,
+     "operations": [
+      "acceptWorkOrder",
+      "attachWorkOrderEvidence",
+      "pauseWorkOrder",
+      "rejectWorkOrder",
+      "resumeWorkOrder",
+      "startWorkOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORK_ORDER_MANAGE",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 6,
+     "operations": [
+      "cancelWorkOrder",
+      "completeWorkOrder",
+      "createWorkOrder",
+      "recordWorkOrderParts",
+      "recordWorkOrderTime",
+      "updateWorkOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORK_ORDER_VERIFY",
+     "label": "second pair of eyes. Never the completing technician",
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "verifyWorkOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORK_ORDER_VIEW",
+     "label": null,
+     "group": "Maintenance & safety",
+     "operationCount": 2,
+     "operations": [
+      "getWorkOrder",
+      "listWorkOrders"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "marketing-crm": {
+   "title": "22 — Marketing & CRM",
+   "capabilityCount": 11,
+   "unguardedOperations": 17,
+   "capabilities": [
+    {
+     "key": "CASE_MANAGE",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 15,
+     "operations": [
+      "addCaseMessage",
+      "claimConversation",
+      "closeConversation",
+      "createCase",
+      "escalateCase",
+      "matchLostItem"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CASE_VIEW",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 7,
+     "operations": [
+      "getCase",
+      "getConversation",
+      "getLostItemMatches",
+      "listCases",
+      "listConversations",
+      "listLostItems"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_MANAGE",
+     "label": "amend, merge, configure consent purposes",
+     "group": "Guest engagement",
+     "operationCount": 15,
+     "operations": [
+      "addGuestNote",
+      "addSuppression",
+      "decideDuplicateCandidate",
+      "listDuplicateCandidates",
+      "mergeGuestProfiles",
+      "mergeGuests"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_VIEW",
+     "label": "profiles, behavioural attributes, consent state",
+     "group": "Guest engagement",
+     "operationCount": 21,
+     "operations": [
+      "getConsentHistory",
+      "getGuestAttributeModel",
+      "getGuestConsents",
+      "getGuestExtraValues",
+      "getGuestIntelligence",
+      "getGuestLoyalty"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "GUEST_VIEW_PII",
+     "label": "personal fields. Distinct from GUEST_VIEW by design",
+     "group": "Guest engagement",
+     "operationCount": 3,
+     "operations": [
+      "listWaiverSignatures",
+      "setGuestExtraValues",
+      "uploadGuestDocument"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LEDGER_POST",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 1,
+     "operations": [
+      "adjustLoyaltyPoints"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LOYALTY_ACCRUE",
+     "label": "awarded by order completion, never by a person",
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "accrueLoyaltyPoints",
+      "listLoyaltyPointEntries"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "LOYALTY_REDEEM",
+     "label": "spending points. Two-phase, like every stored value",
+     "group": "Guest engagement",
+     "operationCount": 2,
+     "operations": [
+      "issueReward",
+      "redeemLoyaltyPoints"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MARKETING_MANAGE",
+     "label": "create and amend",
+     "group": "Guest engagement",
+     "operationCount": 45,
+     "operations": [
+      "activateAudience",
+      "approvePrivacyTesting",
+      "approveWaiverTesting",
+      "awardBadge",
+      "createCampaign",
+      "createCaseClassificationIntelligent"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MARKETING_SEND",
+     "label": "launch or stop a campaign. Separate from MANAGE",
+     "group": "Guest engagement",
+     "operationCount": 4,
+     "operations": [
+      "activateJourney",
+      "launchCampaign",
+      "retryMessageDispatch",
+      "stopCampaign"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MARKETING_VIEW",
+     "label": "segments, campaigns, loyalty, reviews",
+     "group": "Guest engagement",
+     "operationCount": 73,
+     "operations": [
+      "getAudienceOverlap",
+      "getCampaign",
+      "getCampaignPerformance",
+      "getJourneyPerformance",
+      "getLoyaltyRules",
+      "getMarketingSubscription"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "orders": {
+   "title": "2 — Ticketing Sales",
+   "capabilityCount": 18,
+   "unguardedOperations": 15,
+   "capabilities": [
+    {
+     "key": "CREDIT_MANAGE",
+     "label": "partner credit limits and terms",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "setB2bCreditLimit"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CREDIT_OVERRIDE",
+     "label": "authorise one order beyond the limit. 2.7.39",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "overrideCreditLimit"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MARKETING_MANAGE",
+     "label": "create and amend",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "listAbandonedCarts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CANCEL",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "cancelReservation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 41,
+     "operations": [
+      "appendEntitlementToMedia",
+      "approveExceptionServiceRecovery",
+      "approveGroupDiscountException",
+      "approveListingModeration",
+      "authoriseStoredValue",
+      "capturePayment"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_DISCOUNT",
+     "label": "manual discount. Threshold and approver are venue policy",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "applyManualDiscount"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_EXCHANGE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "exchangeOrderLines",
+      "reissueEntitlement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 12,
+     "operations": [
+      "addTip",
+      "convertToTermProduct",
+      "holdOrder",
+      "modifyOrder",
+      "pushWalletPassUpdate",
+      "quoteUpgrade"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REFUND",
+     "label": "initiate, subject to threshold",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createRefund"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REFUND_APPROVE",
+     "label": "authorise above threshold. See NOTE-1",
+     "group": "Selling",
+     "operationCount": 3,
+     "operations": [
+      "approveRefund",
+      "listChargebacks",
+      "respondToChargeback"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REFUND_BULK",
+     "label": "event- or date-level bulk refund",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createBulkRefund"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REPRINT",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "printTicketProof",
+      "reprintOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_RESCHEDULE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "rescheduleOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 88,
+     "operations": [
+      "getB2bCredit",
+      "getGroupBooking",
+      "getMediaEntitlements",
+      "getOrder",
+      "getOrderStatement",
+      "getPaymentLink"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VOID",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "voidOrder"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PAYMENT_VOID",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "voidPayment"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REGION_CONFIGURE",
+     "label": "currency, decimals, time zone, fiscal year",
+     "group": "Organisation",
+     "operationCount": 1,
+     "operations": [
+      "setRefundPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 1,
+     "operations": [
+      "setPaymentProvider"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "payments": {
+   "title": "4 — Bundles and Promotions",
+   "capabilityCount": 5,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "CREDIT_MANAGE",
+     "label": "partner credit limits and terms",
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "createB2bCreditAccount",
+      "setB2bPaymentTerms"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PAYMENT_CONFIGURE",
+     "label": "methods, routing, failover, terminals, tender rules",
+     "group": "Payment orchestration",
+     "operationCount": 19,
+     "operations": [
+      "createPaymentMethod",
+      "getDunningPolicy",
+      "listDunningCases",
+      "recordDepositActivity",
+      "resolveDunningCase",
+      "setDunningPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PAYMENT_DISPUTE",
+     "label": "assemble and submit chargeback evidence",
+     "group": "Payment orchestration",
+     "operationCount": 1,
+     "operations": [
+      "submitChargebackEvidence"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PAYMENT_PROVIDER_MANAGE",
+     "label": "connect a gateway and hold its credentials",
+     "group": "Payment orchestration",
+     "operationCount": 2,
+     "operations": [
+      "createPaymentProviderConnection",
+      "testPaymentProviderConnection"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PAYMENT_VIEW",
+     "label": "methods, providers, routing, health, economics",
+     "group": "Payment orchestration",
+     "operationCount": 15,
+     "operations": [
+      "getMixedTenderRules",
+      "getPaymentPerformance",
+      "getPaymentProviderEconomics",
+      "getPaymentProviderHealth",
+      "getPaymentRules",
+      "listB2bCreditAccounts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "platform-ops": {
+   "title": "Cross-cutting — Control Plane release and environment management",
+   "capabilityCount": 7,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "PLATFORM_CELL_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 4,
+     "operations": [
+      "replayDeadLetter",
+      "setScalingPolicy",
+      "setWafPolicy",
+      "skipRolloutCell"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_CELL_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 5,
+     "operations": [
+      "getScalingPolicy",
+      "listArchivalJobs",
+      "listBackupRuns",
+      "listDeadLetters",
+      "listWafRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_MIGRATION_APPLY",
+     "label": "apply a plan. Requires step-up",
+     "group": "Control Plane",
+     "operationCount": 2,
+     "operations": [
+      "applyMigration",
+      "rollbackMigrationRun"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_MIGRATION_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 4,
+     "operations": [
+      "getMigrationRun",
+      "getVersionSkew",
+      "listMigrations",
+      "planMigration"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_RELEASE_MANAGE",
+     "label": "cut releases, register environments, schedule upgrades",
+     "group": "Control Plane",
+     "operationCount": 5,
+     "operations": [
+      "createRelease",
+      "publishSupportNotice",
+      "registerEnvironment",
+      "scheduleTenantUpgrade",
+      "withdrawRelease"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_RELEASE_PROMOTE",
+     "label": "promote, pause, roll back. Separate from MANAGE",
+     "group": "Control Plane",
+     "operationCount": 5,
+     "operations": [
+      "pauseRollout",
+      "promoteRelease",
+      "rejectRelease",
+      "rollbackRollout",
+      "startRollout"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_RELEASE_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 8,
+     "operations": [
+      "getRelease",
+      "getReleaseReadiness",
+      "getRollout",
+      "listEnvironments",
+      "listReleases",
+      "listRollouts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "promotions": {
+   "title": "4 — Bundles and Promotions",
+   "capabilityCount": 6,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "LEDGER_VIEW",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 2,
+     "operations": [
+      "listAllocationSplits",
+      "previewAllocationSplit"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "redeemVoucher"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 30,
+     "operations": [
+      "approveCampaignWorkflow",
+      "approveDecision",
+      "assignCoupon",
+      "createCouponCampaign",
+      "createPromotion",
+      "createVoucherBatch"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRICE_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 89,
+     "operations": [
+      "analysePromotionConflicts",
+      "evaluatePromotions",
+      "getCouponCode",
+      "getPromotion",
+      "getPromotionUsage",
+      "listAdvancedOffer"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 11,
+     "operations": [
+      "concludeRecommendationExperiment",
+      "createBundle",
+      "createRecommendationExperiment",
+      "createRecommendationStrategy",
+      "createUpsellRule",
+      "deleteUpsellRule"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 12,
+     "operations": [
+      "explainRecommendation",
+      "getBundle",
+      "getProductAffinity",
+      "getRecommendationPerformance",
+      "getRecommendations",
+      "getUpsellSuggestions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "public-api": {
+   "title": "13 — Developer & API Management",
+   "capabilityCount": 3,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "DEVELOPER_ADMIN",
+     "label": "quotas, certification, licensing — TICVAI-side only",
+     "group": "Guest engagement",
+     "operationCount": 4,
+     "operations": [
+      "certifyIntegration",
+      "deprecateApiVersion",
+      "setApiLicensing",
+      "setApiQuota"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVELOPER_MANAGE",
+     "label": "own clients, credentials, sandboxes, subscriptions",
+     "group": "Guest engagement",
+     "operationCount": 9,
+     "operations": [
+      "createApiClient",
+      "createSandbox",
+      "createWebhookSubscription",
+      "replayEvents",
+      "resetSandbox",
+      "revokeApiCredential"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVELOPER_VIEW",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 9,
+     "operations": [
+      "getApiUsage",
+      "issueApiToken",
+      "listApiClients",
+      "listApiVersions",
+      "listIntegrationListings",
+      "listSandboxes"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "queue": {
+   "title": "5 — F&B & Guest Management (Virtual Queue)",
+   "capabilityCount": 4,
+   "unguardedOperations": 7,
+   "capabilities": [
+    {
+     "key": "QUEUE_MANAGE",
+     "label": "configure, open/pause/close, call next, set wait time",
+     "group": "Queue",
+     "operationCount": 9,
+     "operations": [
+      "callNextParties",
+      "configureQueueFeed",
+      "createQueue",
+      "getQueueFeedHealth",
+      "listQueueFeeds",
+      "setQueueStatus"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "QUEUE_OVERRIDE",
+     "label": "admit against a failed redemption. Audited",
+     "group": "Queue",
+     "operationCount": 1,
+     "operations": [
+      "overrideWaitingGuest"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "QUEUE_REDEEM",
+     "label": "admit a party at the ride",
+     "group": "Queue",
+     "operationCount": 1,
+     "operations": [
+      "redeemWaitingGuest"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "QUEUE_VIEW",
+     "label": null,
+     "group": "Queue",
+     "operationCount": 3,
+     "operations": [
+      "getQueue",
+      "listQueueEntries",
+      "listQueues"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "rental": {
+   "title": "1 — Ticketing Catalogue",
+   "capabilityCount": 8,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "RENTAL_APPROVE",
+     "label": "publish a product through maker/checker",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "publishRentalProduct"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_BOOK",
+     "label": "reserve a rental, sign the agreement",
+     "group": "Guest engagement",
+     "operationCount": 4,
+     "operations": [
+      "createRentalAgreement",
+      "createRentalBooking",
+      "signRentalAgreement",
+      "updateRentalBooking"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_CONFIGURE",
+     "label": "products, categories, rules, durations, agreements",
+     "group": "Guest engagement",
+     "operationCount": 11,
+     "operations": [
+      "createRentalCategory",
+      "createRentalProduct",
+      "importRentalCatalogue",
+      "setRentalAgreementRequirements",
+      "setRentalAvailabilityRules",
+      "setRentalDurationRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_MANAGE",
+     "label": "blackouts, closures, capacity blocking",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "createRentalBlackout"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_OPERATE",
+     "label": "check out, assign equipment, inspect, return",
+     "group": "Guest engagement",
+     "operationCount": 8,
+     "operations": [
+      "assessRentalDamage",
+      "assignRentalEquipment",
+      "checkOutRental",
+      "extendRental",
+      "recordRentalInspection",
+      "reportRentalIncident"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_OVERRIDE",
+     "label": "waive a deposit, a late fee or a damage charge",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "requestRentalCommercialOverride"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_PRICE",
+     "label": "pricing profiles, deposit and fee policies",
+     "group": "Guest engagement",
+     "operationCount": 5,
+     "operations": [
+      "createRentalPricingProfile",
+      "setRentalDepositPolicy",
+      "setRentalFeePolicy",
+      "simulateRentalPricing",
+      "updateRentalPricingProfile"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RENTAL_VIEW",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 12,
+     "operations": [
+      "explainRentalPrice",
+      "getRentalAgreement",
+      "getRentalAvailability",
+      "getRentalBooking",
+      "getRentalProduct",
+      "listOverdueRentals"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "reporting": {
+   "title": "8 — Unified Operations Dashboard  ·  cross-cutting",
+   "capabilityCount": 5,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "REPORT_EXPORT",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 2,
+     "operations": [
+      "exportReportResult",
+      "getReportExport"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_MANAGE",
+     "label": "create and amend report definitions and dashboards",
+     "group": "Reporting",
+     "operationCount": 11,
+     "operations": [
+      "createDashboard",
+      "createKpi",
+      "createReport",
+      "deleteDashboard",
+      "deleteReport",
+      "saveNaturalLanguageQuery"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_SCHEDULE",
+     "label": "schedules run under the owner's permissions",
+     "group": "Reporting",
+     "operationCount": 4,
+     "operations": [
+      "createReportSchedule",
+      "createReportSubscription",
+      "deleteReportSchedule",
+      "updateReportSchedule"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_TENANT",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 6,
+     "operations": [
+      "getAnalyticsBenchmark",
+      "getAnalyticsUsage",
+      "getSemanticModel",
+      "listAnalyticsPipelines",
+      "listKpis",
+      "listReportDeliveries"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_VENUE",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 20,
+     "operations": [
+      "acknowledgeAlert",
+      "askReportingQuestion",
+      "cancelReportExecution",
+      "getDashboard",
+      "getKpiValues",
+      "getReport"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "resources": {
+   "title": "1 — Ticketing Catalogue",
+   "capabilityCount": 4,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "RESOURCE_BOOK",
+     "label": "reserve, check out, check in",
+     "group": "Guest engagement",
+     "operationCount": 8,
+     "operations": [
+      "allocateResources",
+      "bookResource",
+      "cancelResourceBooking",
+      "checkInResource",
+      "checkOutResource",
+      "reorderSessionManifest"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RESOURCE_CONFIGURE",
+     "label": "types, categories, attributes, packages, policies",
+     "group": "Guest engagement",
+     "operationCount": 12,
+     "operations": [
+      "createResourceAttribute",
+      "createResourceCategory",
+      "createResourcePackage",
+      "createResourceType",
+      "setExperienceResourceRequirements",
+      "setResourceAllocationPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RESOURCE_MANAGE",
+     "label": "define resources, set qualifications",
+     "group": "Guest engagement",
+     "operationCount": 9,
+     "operations": [
+      "cloneResource",
+      "createResource",
+      "createResourceBlock",
+      "releaseResourceBlock",
+      "setResourceHierarchy",
+      "setResourceLifecycleState"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RESOURCE_VIEW",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 19,
+     "operations": [
+      "getExperienceResourceRequirements",
+      "getResource",
+      "getResourceAllocationPolicy",
+      "getResourceAuditTrail",
+      "getResourceAvailability",
+      "getResourceCalendar"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "retail": {
+   "title": "6 — Retail POS",
+   "capabilityCount": 9,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 5,
+     "operations": [
+      "cancelMerchandiseReservation",
+      "collectMerchandiseReservation",
+      "createRetailSale",
+      "createShopAndDrop",
+      "reserveMerchandise"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_EXCHANGE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createRetailExchange"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "collectShopAndDrop"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REFUND",
+     "label": "initiate, subject to threshold",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createRetailReturn"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REPRINT",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "reprintReceipt"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 6,
+     "operations": [
+      "getRetailSale",
+      "getReturnPolicy",
+      "listRetailReturns",
+      "listRetailSales",
+      "lookupRetailSale",
+      "lookupShopAndDrop"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 4,
+     "operations": [
+      "createMerchandise",
+      "disposeShopAndDrop",
+      "setStoreRules",
+      "updateMerchandise"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 5,
+     "operations": [
+      "getOutletStock",
+      "listMerchandise",
+      "listRetailRecommendations",
+      "listStoreRules",
+      "lookupMerchandise"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REGION_CONFIGURE",
+     "label": "currency, decimals, time zone, fiscal year",
+     "group": "Organisation",
+     "operationCount": 1,
+     "operations": [
+      "setReturnPolicy"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "seating": {
+   "title": "21 — Seat Management & Venue Mapping",
+   "capabilityCount": 5,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "CAPACITY_CONFIGURE",
+     "label": "envelopes and allocation",
+     "group": "Catalogue",
+     "operationCount": 30,
+     "operations": [
+      "cloneSeatMap",
+      "commitImportJob",
+      "copySeatMapSection",
+      "createSeatBlock",
+      "createSeatCategory",
+      "createSeatHoldPool"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 7,
+     "operations": [
+      "allocateBlockedSeats",
+      "allocateGroupSeats",
+      "assignSeats",
+      "createGroupSeatRequest",
+      "createSeatHold",
+      "extendSeatHold"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_MODIFY",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "reassignSeats",
+      "setGroupSeatRoster"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 2,
+     "operations": [
+      "getSeatHold",
+      "listGroupSeatRequests"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 13,
+     "operations": [
+      "diffSeatMapVersions",
+      "getImportJob",
+      "getSeatAvailability",
+      "getSeatMap",
+      "getSeatMapImport",
+      "getSeatingRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "shift": {
+   "title": "2 — Ticketing Sales (cash handling)",
+   "capabilityCount": 9,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "CASH_ADD",
+     "label": null,
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "adjustDepositBoxFloat"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CASH_LIFT",
+     "label": "traced mid-shift removal from an open float",
+     "group": "Shift and cash",
+     "operationCount": 2,
+     "operations": [
+      "createCashMovement",
+      "withdrawFromDepositBox"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "OVERSHORT_ACCEPT",
+     "label": "accept a variance beyond the configured threshold",
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "acceptShiftVariance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_WORKSTATION",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 3,
+     "operations": [
+      "getShift",
+      "listCashMovements",
+      "listShifts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_APPROVE_OPEN",
+     "label": "where supervisor approval on open is configured",
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "approveShiftOpen"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_CLOSE",
+     "label": null,
+     "group": "Shift and cash",
+     "operationCount": 2,
+     "operations": [
+      "closeDepositBoxes",
+      "closeShift"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_OPEN",
+     "label": null,
+     "group": "Shift and cash",
+     "operationCount": 6,
+     "operations": [
+      "allocateDepositBox",
+      "getCurrentShift",
+      "listDenominations",
+      "listDepositBoxes",
+      "openShift",
+      "resumeShift"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_REOPEN",
+     "label": "after final close",
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "reopenShift"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_SUSPEND",
+     "label": null,
+     "group": "Shift and cash",
+     "operationCount": 2,
+     "operations": [
+      "recordNoSale",
+      "suspendShift"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "subscription": {
+   "title": "20 — Subscription & Licensing Management",
+   "capabilityCount": 12,
+   "unguardedOperations": 2,
+   "capabilities": [
+    {
+     "key": "LEDGER_VIEW",
+     "label": null,
+     "group": "Finance",
+     "operationCount": 1,
+     "operations": [
+      "exportPartnerInvoice"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PARTNER_MANAGE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 6,
+     "operations": [
+      "createPartnerAgreement",
+      "createPartnerQuote",
+      "createPartnerUser",
+      "listPartnerAgreements",
+      "setChannelListing",
+      "updatePartnerAgreement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PARTNER_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 4,
+     "operations": [
+      "getCommissionStatement",
+      "listChannelListings",
+      "listPartnerQuotes",
+      "listPartnerUsers"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_BILLING_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 8,
+     "operations": [
+      "addCapacityPack",
+      "cancelInvoice",
+      "cancelSubscription",
+      "disputeInvoice",
+      "generateInvoice",
+      "recordInvoicePayment"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_BILLING_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 3,
+     "operations": [
+      "getBillingReconciliation",
+      "getLicenceEnforcement",
+      "listSubscriptionInvoices"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_CELL_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 26,
+     "operations": [
+      "approveBookingLimitCommercial",
+      "approveMembershipProductValidation",
+      "approvePartnerStatuLifecycle",
+      "cancelDecommission",
+      "decommissionBurstEnvironment",
+      "decommissionCell"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_CELL_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 9,
+     "operations": [
+      "getCell",
+      "getCellCapacity",
+      "getCellHealth",
+      "listBurstEnvironments",
+      "listCellClusters",
+      "listCellJobs"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_PLAN_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 14,
+     "operations": [
+      "createPlan",
+      "createPlanVersion",
+      "getPlanTiers",
+      "getVsiModel",
+      "listLicensingModels",
+      "listModuleCatalogue"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_TENANT_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 9,
+     "operations": [
+      "addLicenceAddOn",
+      "createTenant",
+      "getGoLiveReadiness",
+      "reactivateTenant",
+      "removeLicenceAddOn",
+      "runGoLiveValidation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_TENANT_TERMINATE",
+     "label": "deliberately separate from MANAGE",
+     "group": "Control Plane",
+     "operationCount": 1,
+     "operations": [
+      "terminateTenant"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_TENANT_VIEW",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 44,
+     "operations": [
+      "getEntitlementUsage",
+      "getPlan",
+      "getSubscription",
+      "getTenant",
+      "getTenantLicences",
+      "getUsageMetering"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 2,
+     "operations": [
+      "listVenueTypeTemplates",
+      "submitOnboardingApplication"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "tenancy": {
+   "title": "Cross-cutting — organisation hierarchy",
+   "capabilityCount": 10,
+   "unguardedOperations": 1,
+   "capabilities": [
+    {
+     "key": "AI_AUDIT_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "listAuditRecords"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "registerDevice"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_MANAGE",
+     "label": "enrol, assign, re-key, roll out firmware, retire",
+     "group": "Operations",
+     "operationCount": 6,
+     "operations": [
+      "enrolDevice",
+      "issueDeviceCredential",
+      "revokeDeviceCredential",
+      "rollbackDeviceFirmware",
+      "setDeviceAssignment",
+      "startDeviceFirmwareRollout"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 7,
+     "operations": [
+      "getDeviceTelemetry",
+      "getWorkstationHealth",
+      "listDeviceAuditRecords",
+      "listDeviceFirmware",
+      "listDeviceTamperEvents",
+      "listDevices"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REGION_CONFIGURE",
+     "label": "currency, decimals, time zone, fiscal year",
+     "group": "Organisation",
+     "operationCount": 3,
+     "operations": [
+      "createOutlet",
+      "updateOutlet",
+      "updateRegionSettings"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ROLE_MANAGE",
+     "label": "create roles and attach grants",
+     "group": "Session and identity",
+     "operationCount": 1,
+     "operations": [
+      "setRolePermissions"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SCOPE_MANAGE",
+     "label": "create, move, deactivate scope nodes",
+     "group": "Organisation",
+     "operationCount": 2,
+     "operations": [
+      "createOrgUnit",
+      "updateOrgUnit"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SCOPE_VIEW",
+     "label": "read the hierarchy",
+     "group": "Organisation",
+     "operationCount": 8,
+     "operations": [
+      "getOrgUnit",
+      "getRegionSettings",
+      "getWorkstation",
+      "listCellEndpoints",
+      "listOrgUnits",
+      "listOutlets"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 6,
+     "operations": [
+      "deployConfigurationProfile",
+      "getVenueSettings",
+      "setConfigurationProfile",
+      "setConnectivityThresholds",
+      "setOfflinePolicy",
+      "setVenueSettings"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORKSTATION_CONFIGURE",
+     "label": "sale board, device bindings, access point",
+     "group": "Organisation",
+     "operationCount": 3,
+     "operations": [
+      "configureWorkstation",
+      "createSaleBoard",
+      "updateSaleBoard"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "venue-map": {
+   "title": "21 — Seat Management & Venue Mapping",
+   "capabilityCount": 3,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "VENUE_MAP_MANAGE",
+     "label": "place points, import geometry, accept proposals",
+     "group": "Guest engagement",
+     "operationCount": 7,
+     "operations": [
+      "acceptVenueLabelProposals",
+      "acceptWalkwayProposals",
+      "createVenueMap",
+      "importVenueGeometry",
+      "setPathClosure",
+      "setVenuePoint"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "VENUE_MAP_PUBLISH",
+     "label": "make a draft the version guests see",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "publishVenueMap"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "VENUE_MAP_VIEW",
+     "label": null,
+     "group": "Guest engagement",
+     "operationCount": 4,
+     "operations": [
+      "getVenueMap",
+      "getVenueMapGraph",
+      "getVenueMapLive",
+      "listVenueMaps"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "wallet": {
+   "title": "4 — Bundles and Promotions",
+   "capabilityCount": 3,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "WALLET_CONFIGURE",
+     "label": "wallet types, credit types, funding and risk rules",
+     "group": "Wallet and stored value",
+     "operationCount": 15,
+     "operations": [
+      "createCreditType",
+      "createVoucherType",
+      "createWalletType",
+      "publishWalletConfiguration",
+      "setCreditConsumptionPolicy",
+      "setCreditEligibilityRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WALLET_OPERATE",
+     "label": "adjust, reverse, freeze, relink a credential",
+     "group": "Wallet and stored value",
+     "operationCount": 19,
+     "operations": [
+      "activateGiftCard",
+      "adjustGameCard",
+      "adjustWallet",
+      "blockGiftCard",
+      "closeWallet",
+      "createSharedWallet"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WALLET_VIEW",
+     "label": "balances, lots, liability, disputes",
+     "group": "Wallet and stored value",
+     "operationCount": 16,
+     "operations": [
+      "getCreditConsumptionPolicy",
+      "getGiftCard",
+      "getWallet",
+      "getWalletBalance",
+      "getWalletFundingRules",
+      "getWalletLiability"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "white-label": {
+   "title": "19 — Guest Mobile App & Branding (builder)",
+   "capabilityCount": 2,
+   "unguardedOperations": 1,
+   "capabilities": [
+    {
+     "key": "TENANT_CONFIGURE",
+     "label": "edit branding, content, navigation, modules",
+     "group": "Tenant experience",
+     "operationCount": 46,
+     "operations": [
+      "claimCustomDomain",
+      "createBanner",
+      "createContentBlock",
+      "createContentPage",
+      "createPreview",
+      "createPromoBlock"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_PUBLISH",
+     "label": "publish a configuration version, restore a prior one",
+     "group": "Tenant experience",
+     "operationCount": 3,
+     "operations": [
+      "publishContentBlock",
+      "publishTenantConfig",
+      "restoreConfigVersion"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
+  "workforce": {
+   "title": "18 — Employee Mobile App & AI Assistant (workforce)",
+   "capabilityCount": 4,
+   "unguardedOperations": 0,
+   "capabilities": [
+    {
+     "key": "ANNOUNCEMENT_PUBLISH",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 2,
+     "operations": [
+      "broadcastToGuests",
+      "publishAnnouncement"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ATTENDANCE_RECORD",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "recordAttendance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORKFORCE_MANAGE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 13,
+     "operations": [
+      "amendAttendance",
+      "createRotaAssignment",
+      "resolveSyncConflict",
+      "setFieldOwnership",
+      "setIntegrationSource",
+      "setJobTitle"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORKFORCE_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 27,
+     "operations": [
+      "acknowledgeAnnouncement",
+      "claimOpenShift",
+      "getAnnouncementReach",
+      "getEmployee",
+      "getFieldOwnership",
+      "getLabourCost"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  }
+ },
+ "unlabelled": {
+  "note": "Permission keys used by a contract with no description in contracts/shared/permissions.yaml. **A checklist item nobody can read gets ticked anyway**, so these are the blocker for shipping the grant screen -- not the contract, which is done. One line each, written next to the key in permissions.yaml.",
+  "count": 72,
+  "keys": {
+   "ACCESS_POINT_CONFIGURE": [
+    "addBlacklistEntry",
+    "approveManualOverrideSupervisor",
+    "approveMultiMediaPreview",
+    "createAccessPoint"
+   ],
+   "ACCREDITATION_VIEW": [
+    "getAccreditationHolder",
+    "listAccessProfiles",
+    "listAccreditationAccessActivity",
+    "listAccreditationApplications"
+   ],
+   "AI_APPROVE": [
+    "decideProposedAction",
+    "listProposedActions"
+   ],
+   "AI_AUDIT_VIEW": [
+    "getAiUsage",
+    "listAiInteractions",
+    "listAuditRecords"
+   ],
+   "AI_CONFIGURE": [
+    "createKnowledgeCollection",
+    "getAiPolicy",
+    "ingestKnowledgeDocument",
+    "listAiProviders"
+   ],
+   "AI_USE": [
+    "createAiConversation",
+    "generateConfiguration",
+    "listAiConversations",
+    "recordSuggestionOutcome"
+   ],
+   "ANNOUNCEMENT_PUBLISH": [
+    "broadcastToGuests",
+    "publishAnnouncement"
+   ],
+   "APPROVAL_CONFIGURE": [
+    "listApprovalMatrices",
+    "listStepUpPolicies",
+    "setApprovalControlPolicy",
+    "setApprovalMatrix"
+   ],
+   "APPROVAL_DECIDE": [
+    "createApprovalDelegation",
+    "decideApprovalRequest",
+    "revokeApprovalDelegation",
+    "setApproverAvailability"
+   ],
+   "APPROVAL_REQUEST": [
+    "approveMatrixMultiLevel",
+    "approveRoleAuthorityDelegation",
+    "approveUnifiedDecision",
+    "approveVersioningGovernance"
+   ],
+   "APPROVAL_VIEW": [
+    "createApprovalEvidencePackage",
+    "evaluateApprovalRequirement",
+    "getApprovalAnalytics",
+    "getApprovalRecord"
+   ],
+   "ASSET_LIBRARY_VIEW": [
+    "findSimilarMediaAssets",
+    "getExpiringRights",
+    "getMediaAsset",
+    "getMediaDistribution"
+   ],
+   "ASSET_VIEW": [
+    "getAsset",
+    "getAssetHistory",
+    "getDueMaintenance",
+    "listAssets"
+   ],
+   "ATTENDANCE_RECORD": [
+    "recordAttendance"
+   ],
+   "CASE_MANAGE": [
+    "addCaseMessage",
+    "claimConversation",
+    "closeConversation",
+    "createCase"
+   ],
+   "CASE_VIEW": [
+    "getCase",
+    "getConversation",
+    "getLostItemMatches",
+    "listCases"
+   ],
+   "CASH_ADD": [
+    "adjustDepositBoxFloat"
+   ],
+   "DEVELOPER_VIEW": [
+    "getApiUsage",
+    "issueApiToken",
+    "listApiClients",
+    "listApiVersions"
+   ],
+   "DEVICE_CONFIGURE": [
+    "deployReaderConfiguration",
+    "registerDevice",
+    "setReaderConfiguration",
+    "testReader"
+   ],
+   "DEVICE_VIEW": [
+    "getDeviceTelemetry",
+    "getWorkstationHealth",
+    "listDeviceAuditRecords",
+    "listDeviceFirmware"
+   ],
+   "EVENT_CONFIGURE": [
+    "assignSessionMedia",
+    "cloneEvent",
+    "createEvent",
+    "getEventResourcePlan"
+   ],
+   "INCIDENT_VIEW": [
+    "getHaccpStatus",
+    "getIncident",
+    "listIncidents"
+   ],
+   "INSPECTION_SUBMIT": [
+    "submitInspection"
+   ],
+   "INSPECTION_VIEW": [
+    "listInspectionTemplates",
+    "listInspections"
+   ],
+   "LEDGER_POST": [
+    "adjustLoyaltyPoints",
+    "createJournalEntry",
+    "disputeObligation",
+    "postStockCount"
+   ],
+   "LEDGER_VIEW": [
+    "calculateTax",
+    "exportPartnerInvoice",
+    "getAccount",
+    "getDeferredRevenue"
+   ],
+   "MAINTENANCE_APPROVE": [
+    "closeWorkOrder"
+   ],
+   "MAINTENANCE_EXECUTE": [
+    "acceptWorkOrder",
+    "attachWorkOrderEvidence",
+    "pauseWorkOrder",
+    "rejectWorkOrder"
+   ],
+   "ORDER_CANCEL": [
+    "cancelPurchaseOrder",
+    "cancelReservation"
+   ],
+   "ORDER_CREATE": [
+    "acquireInventoryHold",
+    "allocateBlockedSeats",
+    "allocateGroupSeats",
+    "appendEntitlementToMedia"
+   ],
+   "ORDER_EXCHANGE": [
+    "createRetailExchange",
+    "exchangeOrderLines",
+    "reissueEntitlement"
+   ],
+   "ORDER_MODIFY": [
+    "acceptFnbOrder",
+    "addTip",
+    "amendFnbOrder",
+    "cancelFnbOrder"
+   ],
+   "ORDER_REPRINT": [
+    "printTicketProof",
+    "reprintOrder",
+    "reprintReceipt"
+   ],
+   "ORDER_RESCHEDULE": [
+    "rescheduleOrder"
+   ],
+   "ORDER_VIEW": [
+    "getB2bCredit",
+    "getBill",
+    "getEntitlement",
+    "getEntitlementCredential"
+   ],
+   "ORDER_VOID": [
+    "voidOrder"
+   ],
+   "PARKING_CONFIGURE": [
+    "setParkingFacility"
+   ],
+   "PARTNER_MANAGE": [
+    "createPartnerAgreement",
+    "createPartnerQuote",
+    "createPartnerUser",
+    "listPartnerAgreements"
+   ],
+   "PARTNER_VIEW": [
+    "getCommissionStatement",
+    "listChannelListings",
+    "listPartnerQuotes",
+    "listPartnerUsers"
+   ],
+   "PAYMENT_VOID": [
+    "voidPayment"
+   ],
+   "PERFORMANCE_CONFIGURE": [
+    "cancelPerformance",
+    "createPerformances",
+    "listSessionTemplates",
+    "rescheduleEvent"
+   ],
+   "PLATFORM_BILLING_MANAGE": [
+    "addCapacityPack",
+    "cancelInvoice",
+    "cancelSubscription",
+    "disputeInvoice"
+   ],
+   "PLATFORM_BILLING_VIEW": [
+    "getBillingReconciliation",
+    "getLicenceEnforcement",
+    "listSubscriptionInvoices"
+   ],
+   "PLATFORM_CELL_MANAGE": [
+    "approveBookingLimitCommercial",
+    "approveMembershipProductValidation",
+    "approvePartnerStatuLifecycle",
+    "cancelDecommission"
+   ],
+   "PLATFORM_CELL_VIEW": [
+    "getCell",
+    "getCellCapacity",
+    "getCellHealth",
+    "getScalingPolicy"
+   ],
+   "PLATFORM_MIGRATION_VIEW": [
+    "getMigrationRun",
+    "getVersionSkew",
+    "listMigrations",
+    "planMigration"
+   ],
+   "PLATFORM_PLAN_MANAGE": [
+    "createPlan",
+    "createPlanVersion",
+    "getPlanTiers",
+    "getVsiModel"
+   ],
+   "PLATFORM_RELEASE_VIEW": [
+    "getRelease",
+    "getReleaseReadiness",
+    "getRollout",
+    "listEnvironments"
+   ],
+   "PLATFORM_TENANT_MANAGE": [
+    "addLicenceAddOn",
+    "createTenant",
+    "getGoLiveReadiness",
+    "reactivateTenant"
+   ],
+   "PLATFORM_TENANT_VIEW": [
+    "getEntitlementUsage",
+    "getPlan",
+    "getSubscription",
+    "getTenant"
+   ],
+   "PRICE_CONFIGURE": [
+    "approveCampaignWorkflow",
+    "approveDecision",
+    "assignCoupon",
+    "copyPriceList"
+   ],
+   "PRICE_VIEW": [
+    "analysePromotionConflicts",
+    "evaluatePromotions",
+    "getCouponCode",
+    "getDynamicPriceRule"
+   ],
+   "PRODUCT_CONFIGURE": [
+    "acknowledgePurchaseOrder",
+    "applyMenuActions",
+    "approvePricingWorkflowAuthority",
+    "approveReviewDecision"
+   ],
+   "PRODUCT_VIEW": [
+    "compareQuotations",
+    "diffSeatMapVersions",
+    "explainRecommendation",
+    "getAvailability"
+   ],
+   "QUEUE_VIEW": [
+    "getQueue",
+    "listQueueEntries",
+    "listQueues"
+   ],
+   "RENTAL_VIEW": [
+    "explainRentalPrice",
+    "getRentalAgreement",
+    "getRentalAvailability",
+    "getRentalBooking"
+   ],
+   "REPORT_EXPORT": [
+    "exportReportResult",
+    "getReportExport"
+   ],
+   "REPORT_VIEW_TENANT": [
+    "getAnalyticsBenchmark",
+    "getAnalyticsUsage",
+    "getSemanticModel",
+    "listAnalyticsPipelines"
+   ],
+   "REPORT_VIEW_VENUE": [
+    "acknowledgeAlert",
+    "askReportingQuestion",
+    "cancelReportExecution",
+    "getDashboard"
+   ],
+   "REPORT_VIEW_WORKSTATION": [
+    "getShift",
+    "listCashMovements",
+    "listShifts"
+   ],
+   "RESOURCE_VIEW": [
+    "getExperienceResourceRequirements",
+    "getResource",
+    "getResourceAllocationPolicy",
+    "getResourceAuditTrail"
+   ],
+   "SETTLEMENT_RECONCILE": [
+    "ingestSettlementFile",
+    "resolveSettlementException"
+   ],
+   "SETTLEMENT_VIEW": [
+    "getSettlement",
+    "listSettlementExceptions",
+    "listSettlements"
+   ],
+   "SHIFT_CLOSE": [
+    "closeDepositBoxes",
+    "closeShift"
+   ],
+   "SHIFT_OPEN": [
+    "allocateDepositBox",
+    "getCurrentShift",
+    "listDenominations",
+    "listDepositBoxes"
+   ],
+   "SHIFT_SUSPEND": [
+    "recordNoSale",
+    "suspendShift"
+   ],
+   "TAX_CONFIGURE": [
+    "createTaxCode",
+    "createTaxExemption",
+    "updateTaxCode"
+   ],
+   "VENUE_MAP_VIEW": [
+    "getVenueMap",
+    "getVenueMapGraph",
+    "getVenueMapLive",
+    "listVenueMaps"
+   ],
+   "WORKFORCE_MANAGE": [
+    "amendAttendance",
+    "createRotaAssignment",
+    "resolveSyncConflict",
+    "setFieldOwnership"
+   ],
+   "WORKFORCE_VIEW": [
+    "acknowledgeAnnouncement",
+    "claimOpenShift",
+    "getAnnouncementReach",
+    "getEmployee"
+   ],
+   "WORK_ORDER_MANAGE": [
+    "cancelWorkOrder",
+    "completeWorkOrder",
+    "createWorkOrder",
+    "recordWorkOrderParts"
+   ],
+   "WORK_ORDER_VIEW": [
+    "getWorkOrder",
+    "listWorkOrders"
+   ]
+  }
+ }
+}

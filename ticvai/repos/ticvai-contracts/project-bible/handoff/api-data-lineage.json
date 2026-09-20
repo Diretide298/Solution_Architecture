@@ -50434,5 +50434,122 @@
    "postgres",
    "redis"
   ]
+ },
+ "getPrincipalModuleAccess": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/principals/{principalId}/module-access",
+  "reads": [
+   "identity.module_access"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "What this person may do, as ticks",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCapabilityTemplates": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/capability-templates",
+  "reads": [
+   "identity.capability_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Saved tick-sets",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listModuleCapabilities": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/module-capabilities",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "What a person can be allowed to do, per module",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCapabilityTemplate": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/capability-templates",
+  "reads": [
+   "identity.capability_template"
+  ],
+  "writes": [
+   "identity.capability_template"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "ROLE_MANAGE",
+  "offline": false,
+  "summary": "Save a tick-set under a name",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrincipalModuleAccess": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/principals/{principalId}/module-access",
+  "reads": [
+   "identity.module_access"
+  ],
+  "writes": [
+   "identity.module_access"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERMISSION_GRANT",
+  "offline": false,
+  "summary": "Tick what they may do",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 615 of 657 declared references. The ones that reach the
+-- 616 of 658 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -413,6 +413,7 @@ ALTER TABLE orders.ticket_transfer ADD CONSTRAINT fk_ticket_transfer_to_subject_
 ALTER TABLE orders.upgrade ADD CONSTRAINT fk_upgrade_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.wallet_pass ADD CONSTRAINT fk_wallet_pass_entitlement_id FOREIGN KEY (entitlement_id) REFERENCES access.entitlement(id);
 ALTER TABLE payments.deposit_activity ADD CONSTRAINT fk_deposit_activity_payment_id FOREIGN KEY (payment_id) REFERENCES orders.payment(id);
+ALTER TABLE payments.dunning_case ADD CONSTRAINT fk_dunning_case_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE payments.routing_rule ADD CONSTRAINT fk_routing_rule_provider_id FOREIGN KEY (provider_id) REFERENCES ai.provider(id);
 ALTER TABLE payments.token ADD CONSTRAINT fk_token_consent_purpose_id FOREIGN KEY (consent_purpose_id) REFERENCES marketing.consent_purpose(id);
 ALTER TABLE payments.token ADD CONSTRAINT fk_token_provider_id FOREIGN KEY (provider_id) REFERENCES ai.provider(id);

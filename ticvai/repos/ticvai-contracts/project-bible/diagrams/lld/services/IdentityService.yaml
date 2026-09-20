@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 63 operations, 30 tables
+title: IdentityService — 68 operations, 32 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,14 +9,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 63
+  operations: 68
   inAFlow: 21
   percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 26
+  tables: 28
   stores:
   - postgres
   - redis
@@ -28,7 +28,7 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 63
+  count: 68
   operations:
   - operation: completeSsoAuthorization
     verb: POST
@@ -182,6 +182,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getPrincipalModuleAccess
+    verb: GET
+    path: /principals/{principalId}/module-access
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getSsoConfig
     verb: GET
     path: /tenants/sso-config
@@ -270,6 +278,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listCapabilityTemplates
+    verb: GET
+    path: /capability-templates
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listCustomerMemberships
     verb: GET
     path: /customers/{customerId}/memberships
@@ -301,6 +317,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
+    writes: 0
+  - operation: listModuleCapabilities
+    verb: GET
+    path: /module-capabilities
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listModules
     verb: GET
@@ -446,6 +470,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: setCapabilityTemplate
+    verb: PUT
+    path: /capability-templates
+    scope: tenant
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPasswordPolicy
     verb: PUT
     path: /password-policy
@@ -454,6 +486,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setPrincipalModuleAccess
+    verb: PUT
+    path: /principals/{principalId}/module-access
+    scope: venue
+    permission: PERMISSION_GRANT
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setSegregationRules
     verb: PUT
     path: /segregation-rules
@@ -587,6 +627,13 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.capability_template
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.customer_membership
   columns: 12
   store: postgres
@@ -643,6 +690,13 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: identity.module_access
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.otp_challenge
   columns: 2

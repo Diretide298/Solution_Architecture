@@ -15255,7 +15255,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createApprovalRequest · listPaymentMethods</div>
+          <div><b>OPERATIONS</b> &middot; createApprovalRequest · listPaymentMethods · getPaymentRules · setPaymentRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-559">ADM-559</a>  &mdash; <i>Back to Payment Command Center\t7</i></div>
@@ -16425,9 +16425,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMixedTenderRules</div>
+          <div><b>OPERATIONS</b> &middot; setMixedTenderRules · getDunningPolicy · setDunningPolicy · listDunningCases +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-599">ADM-599</a>  &mdash; <i>Back to Mixed Tender &amp; Credit Command Center</i></div>
           
           

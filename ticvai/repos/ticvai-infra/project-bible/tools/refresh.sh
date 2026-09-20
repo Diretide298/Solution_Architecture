@@ -135,6 +135,11 @@ python3 tools/index-boards.py
 # Both are derived from the screens and both go stale the moment a screen changes.
 python3 tools/derive-design-manifest.py
 python3 tools/derive-app-roles.py
+# **The grant checklist, derived rather than authored** (21 September). Per module, what a person
+# can be allowed to do: the 167-key vocabulary crossed with every contract's
+# `x-ticvai-permission`. Runs here because adding one operation with a permission changes a
+# checklist, and a checklist that lags the contracts grants access to operations that moved.
+python3 tools/derive-capabilities.py --apply
 # **Retired 10 September.** `derive-pack-boards.py` drew every pack screen a second time on
 # its own `WS##` board — 728 screens rendered twice, and a reviewer looking at two drawings
 # of one screen cannot tell it is one screen. The workshop grouping is now a badge and a
@@ -243,6 +248,19 @@ python3 tools/audit-guest-parity.py
 python3 tools/derive-overview.py
 python3 tools/build-status.py --domain ai
 python3 tools/sync-counts.py
+# **The whole package measured in one pass** (21 September). Every other report answers one
+# question; this one does the joins between them — the chain from requirement to operation to
+# screen to service to table, counted link by link, and the references that cross a service
+# boundary. It runs here because it reads what every tool above it wrote, and before the mirrors
+# so the repos carry this run's report rather than the last one's.
+python3 tools/build-package-report.py --apply
+# **The same measurement as rows somebody can filter** (21 September). The report says what the
+# numbers are; this is what a backend engineer opens to work from — 2,073 operations on one sheet
+# with an `Agreed?` column, 627 tables with the RLS mode each actually gets, and the 591
+# references that cross a service. Reads `package-report.json`, so it runs after it.
+# Called bare rather than with `2>/dev/null || true` like the two workbook builders above it.
+# Discarding an exit code is the habit the gate was restored to break, and openpyxl is present.
+python3 tools/build-readiness-workbook.py
 python3 tools/derive-mirrors.py
 
 echo

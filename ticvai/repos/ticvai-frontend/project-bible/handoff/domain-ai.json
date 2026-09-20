@@ -1220,6 +1220,12 @@
    "mentions": 2
   },
   {
+   "file": "docs\\active\\deep-audit-21-september.md",
+   "title": "Deep audit \u2014 module-wise build clearance",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\deep-audit-24-august.md",
    "title": "Deep audit \u2014 ten invariants, run adversarially",
    "status": "",
@@ -1579,7 +1585,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 36,
+  "documents": 37,
   "openConflicts": 1
  }
 }

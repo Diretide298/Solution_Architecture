@@ -9,12 +9,12 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 171 |
+| Operations with no screen | 176 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 171 operations with no screen here
+### 176 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| … | | | 131 more |
+| … | | | 136 more |
 
 ### 1 modules split across waves
 

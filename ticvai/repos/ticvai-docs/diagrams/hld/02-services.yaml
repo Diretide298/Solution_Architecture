@@ -34,8 +34,8 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 63
-    tables: 30
+    operations: 68
+    tables: 32
     schemas:
     - identity
     - pii

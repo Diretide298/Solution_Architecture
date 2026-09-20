@@ -65081,6 +65081,9 @@ screens:
     preloaded:
     - AED 200 ✓
     - AED 800 ✕
+    params:
+    - name: caseId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-606

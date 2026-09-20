@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 184 |
+| Operations with no screen | 189 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 184 operations with no screen here
+### 189 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
-| … | | | 144 more |
+| … | | | 149 more |
 
 ### 2 modules split across waves
 

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 676 |
-| Operations | 522 |
+| Operations | 528 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 213 |
+| Operations with no screen | 210 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 213 operations with no screen here
+### 210 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
-| … | | | 173 more |
+| … | | | 170 more |
 
 ### 4 modules split across waves
 
@@ -638,7 +638,7 @@
 | `ADM-564` | Currency & Payment Currency Configuration\t12 | Commercial | 3 | 1 | yes |
 | `ADM-565` | Payment Eligibility & Availability Rule Builder\t13 | Commercial | 3 | 1 | yes |
 | `ADM-566` | Payment Fees, Surcharges & Commercial Rules\t14 | Commercial | 3 | 1 | yes |
-| `ADM-567` | Payment Policy, Governance & Approval Manager\t15 | Commercial | 3 | 2 | yes |
+| `ADM-567` | Payment Policy, Governance & Approval Manager\t15 | Commercial | 3 | 4 | yes |
 | `ADM-568` | Payment Configuration Simulator & Validation Center\t16 | Commercial | 3 | 1 | yes |
 | `ADM-569` | Payment Orchestration Command Center\t27 | Commercial | 3 | 2 | yes |
 | `ADM-570` | Gateway, PSP & Acquirer Directory\t28 | Commercial | 3 | 2 | yes |
@@ -677,7 +677,7 @@
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration\t96 | Commercial | 3 | 1 | yes |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls\t97 | Commercial | 3 | 2 | yes |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules\t98 | Commercial | 3 | 1 | yes |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager\t100 | Commercial | 3 | 1 | yes |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager\t100 | Commercial | 3 | 5 | yes |
 | `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit\t100 | Commercial | 3 | 1 | yes |
 | `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor\t102 | Commercial | 3 | 2 | yes |
 | `ADM-609` | Refund & Payment Adjustment Command Center\t116 | Commercial | 3 | 1 | yes |

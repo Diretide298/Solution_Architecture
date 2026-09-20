@@ -100,7 +100,7 @@ BEGIN
 END
 $$;
 
--- **242 tables carry `scope_path` and 58 carry `venue_id` instead, out of 572.**
+-- **244 tables carry `scope_path` and 58 carry `venue_id` instead, out of 574.**
 -- Both are protected. A table with neither is not scoped -- it is reference data, a
 -- registry, or the migration log itself, and a policy on it would deny every row to
 -- everybody.
@@ -191,7 +191,9 @@ SELECT platform.apply_scope_rls('identity.access_decision'::regclass);
 SELECT platform.apply_scope_rls('identity.access_override'::regclass);
 SELECT platform.apply_scope_rls('identity.access_policy'::regclass);
 SELECT platform.apply_scope_rls('identity.access_policy_version'::regclass);
+SELECT platform.apply_scope_rls('identity.capability_template'::regclass);
 SELECT platform.apply_scope_rls('identity.delegated_access'::regclass);
+SELECT platform.apply_scope_rls('identity.module_access'::regclass);
 SELECT platform.apply_scope_rls('identity.password_policy'::regclass);
 SELECT platform.apply_scope_rls('identity.segregation_rule'::regclass);
 SELECT platform.apply_scope_rls('identity.sso_group_mapping'::regclass);

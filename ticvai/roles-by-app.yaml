@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 154
   inRolesYaml: 35
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 154 permission keys across 1974 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 154 permission keys across 1979 operations; `roles.yaml`
     grants 35, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -111,7 +111,7 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 646
+    operations: 652
     permissions: 77
     tiers:
       read:
@@ -217,8 +217,8 @@ apps:
     - P13
     - P16
     screens: 1379
-    operations: 1208
-    permissions: 136
+    operations: 1210
+    permissions: 137
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -333,6 +333,7 @@ apps:
       - MARKETING_MANAGE
       - PARKING_CONFIGURE
       - PARTNER_MANAGE
+      - PAYMENT_CONFIGURE
       - PERFORMANCE_CONFIGURE
       - PERMISSION_MANAGE
       - PLATFORM_BILLING_MANAGE

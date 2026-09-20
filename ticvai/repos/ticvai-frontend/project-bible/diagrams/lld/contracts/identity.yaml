@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 63 operations
+title: identity — 68 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -277,6 +277,17 @@ operations:
   reads:
   - identity.principal
   writes: []
+- operation: getPrincipalModuleAccess
+  verb: GET
+  path: /principals/{principalId}/module-access
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.module_access
+  writes: []
 - operation: getSsoConfig
   verb: GET
   path: /tenants/sso-config
@@ -422,6 +433,17 @@ operations:
   - identity.principal
   - identity.session
   writes: []
+- operation: listCapabilityTemplates
+  verb: GET
+  path: /capability-templates
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.capability_template
+  writes: []
 - operation: listCustomerMemberships
   verb: GET
   path: /customers/{customerId}/memberships
@@ -472,6 +494,16 @@ operations:
   offline: false
   reads:
   - identity.mfa_method
+  writes: []
+- operation: listModuleCapabilities
+  verb: GET
+  path: /module-capabilities
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listModules
   verb: GET
@@ -719,6 +751,18 @@ operations:
   reads:
   - identity.access_policy
   writes: []
+- operation: setCapabilityTemplate
+  verb: PUT
+  path: /capability-templates
+  scope: tenant
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.capability_template
+  writes:
+  - identity.capability_template
 - operation: setPasswordPolicy
   verb: PUT
   path: /password-policy
@@ -733,6 +777,18 @@ operations:
   writes:
   - cache:idempotency
   - identity.password_policy
+- operation: setPrincipalModuleAccess
+  verb: PUT
+  path: /principals/{principalId}/module-access
+  scope: venue
+  permission: PERMISSION_GRANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.module_access
+  writes:
+  - identity.module_access
 - operation: setSegregationRules
   verb: PUT
   path: /segregation-rules

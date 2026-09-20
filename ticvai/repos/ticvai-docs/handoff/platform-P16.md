@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 131 |
+| Operations with no screen | 136 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 131 operations with no screen here
+### 136 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
-| … | | | 91 more |
+| … | | | 96 more |
 
 ## Modules
 

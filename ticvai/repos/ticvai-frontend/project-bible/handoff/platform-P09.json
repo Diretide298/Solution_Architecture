@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
-  "operations": 522,
+  "operations": 528,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 213
+  "operationsWithNoScreen": 210
  },
  "waves": {
   "wave1": 12,
@@ -146,16 +146,16 @@
    "operations": 57
   },
   {
+   "contract": "payments",
+   "operations": 37
+  },
+  {
    "contract": "approvals",
    "operations": 35
   },
   {
    "contract": "platform-ops",
    "operations": 32
-  },
-  {
-   "contract": "payments",
-   "operations": 31
   },
   {
    "contract": "white-label",
@@ -178,11 +178,11 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "public-api",
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "ai",
    "operations": 5
   },
   {
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {
@@ -5109,7 +5109,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-policy-governance-approval-manager-t15-adm-567",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -5460,7 +5460,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -6607,6 +6607,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What this person may do, as ticks"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -6625,10 +6631,22 @@
     "summary": "Reusable policy shapes"
    },
    {
+    "operation": "listCapabilityTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Saved tick-sets"
+   },
+   {
     "operation": "listCustomerMemberships",
     "contract": "identity",
     "verb": "GET",
     "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listModuleCapabilities",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What a person can be allowed to do, per module"
    },
    {
     "operation": "listModules",
@@ -6665,6 +6683,18 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "setCapabilityTemplate",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Save a tick-set under a name"
+   },
+   {
+    "operation": "setPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Tick what they may do"
    },
    {
     "operation": "updateAccessPolicy",
@@ -6971,54 +7001,6 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "getDunningPolicy",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "How a failed recurring charge is chased"
-   },
-   {
-    "operation": "getPaymentRules",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Currency, eligibility and fee rules as one set"
-   },
-   {
-    "operation": "listDepositActivity",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Movements on a deposit"
-   },
-   {
-    "operation": "listDunningCases",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Recurring charges currently being chased"
-   },
-   {
-    "operation": "recordDepositActivity",
-    "contract": "payments",
-    "verb": "POST",
-    "summary": "Record a movement on a deposit"
-   },
-   {
-    "operation": "resolveDunningCase",
-    "contract": "payments",
-    "verb": "POST",
-    "summary": "Stop chasing, with a reason"
-   },
-   {
-    "operation": "setDunningPolicy",
-    "contract": "payments",
-    "verb": "PUT",
-    "summary": "Set the retry schedule and what happens when it runs out"
-   },
-   {
-    "operation": "setPaymentRules",
-    "contract": "payments",
-    "verb": "PUT",
-    "summary": "Replace the payment rule set"
    },
    {
     "operation": "skipRolloutCell",

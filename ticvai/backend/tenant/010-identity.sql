@@ -1,4 +1,4 @@
--- identity — 24 tables
+-- identity — 26 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -88,6 +88,15 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
     used_at                           timestamptz NOT NULL,
     remaining_quantity                numeric(18,4),
     notes                             text
+);
+
+CREATE TABLE IF NOT EXISTS identity.capability_template (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    description                       text,
+    capabilities                      text[] NOT NULL,
+    scope_path                        text
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -187,6 +196,17 @@ CREATE TABLE IF NOT EXISTS identity.module (
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS identity.module_access (
+    principal_id                      uuid,
+    module                            text NOT NULL,
+    scope_path                        text NOT NULL,
+    capabilities                      text[] NOT NULL,
+    applied_template                  text,
+    granted_by_principal_id           uuid,
+    granted_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- a one-time code sent to a guest contact point Hangs off: reaches identity.principal through its

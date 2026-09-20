@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 88 |
+| Operations with no screen | 93 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 88 operations with no screen here
+### 93 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -43,24 +43,24 @@
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `recordBenefitUsage` | identity | POST | Consume a benefit |
 | `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
+| `setCapabilityTemplate` | identity | PUT | Save a tick-set under a name |
+| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
-| `addSuppression` | marketing-crm | POST | Suppress an address |
-| `awardBadge` | marketing-crm | POST | Award a badge |
-| `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
-| `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
-| `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
-| … | | | 48 more |
+| … | | | 53 more |
 
 ## Modules
 

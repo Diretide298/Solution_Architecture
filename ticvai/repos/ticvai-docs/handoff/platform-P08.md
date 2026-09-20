@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1182 |
-| Operations | 1081 |
+| Operations | 1083 |
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 247 |
+| Operations with no screen | 244 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 247 operations with no screen here
+### 244 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| … | | | 207 more |
+| … | | | 204 more |
 
 ### 8 modules split across waves
 
@@ -606,7 +606,7 @@
 | `BO-324` | Payment & Order Financial Command Center | Orders & Money | 3 | 1 | yes |
 | `BO-325` | Order Payment Detail & Transaction Ledger | Orders & Money | 3 | 1 | yes |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | Orders & Money | 3 | 1 | yes |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | Orders & Money | 3 | 1 | yes |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | Orders & Money | 3 | 3 | yes |
 | `BO-328` | Order Split, Merge & Transaction Relationship Management | Orders & Money | 3 | 1 | yes |
 | `BO-329` | Related Order & Transaction Relationship Explorer | Orders & Money | 3 | 1 | yes |
 | `BO-330` | External Payment, Partner & Settlement Reference Mapping | Orders & Money | 3 | 1 | yes |

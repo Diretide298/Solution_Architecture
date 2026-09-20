@@ -47315,7 +47315,9 @@
   "app": "venue-management-web",
   "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
   "operations": [
-   "listDepositPartialPayment"
+   "listDepositPartialPayment",
+   "listDepositActivity",
+   "recordDepositActivity"
   ],
   "services": [
    "OrderService"
@@ -47324,8 +47326,12 @@
    "postgres",
    "redis"
   ],
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "payments.deposit_activity"
+  ],
+  "writes": [
+   "payments.deposit_activity"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -127054,7 +127060,9 @@
   "route": "/commercial/payment-policy-governance-approval-manager-t15-adm-567",
   "operations": [
    "createApprovalRequest",
-   "listPaymentMethods"
+   "listPaymentMethods",
+   "getPaymentRules",
+   "setPaymentRules"
   ],
   "services": [
    "OrderService",
@@ -127072,11 +127080,17 @@
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
+   "payments.currency_rule",
+   "payments.eligibility_rule",
+   "payments.fee_rule",
    "payments.method"
   ],
   "writes": [
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "payments.currency_rule",
+   "payments.eligibility_rule",
+   "payments.fee_rule"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -129282,7 +129296,11 @@
   "app": "ticvai-web",
   "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
   "operations": [
-   "setMixedTenderRules"
+   "setMixedTenderRules",
+   "getDunningPolicy",
+   "setDunningPolicy",
+   "listDunningCases",
+   "resolveDunningCase"
   ],
   "services": [
    "OrderService"
@@ -129291,9 +129309,12 @@
    "postgres"
   ],
   "reads": [
+   "payments.dunning_case",
+   "payments.dunning_policy",
    "payments.mixed_tender_rules"
   ],
   "writes": [
+   "payments.dunning_policy",
    "payments.mixed_tender_rules"
   ],
   "storedProcedures": [],

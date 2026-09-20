@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 122
+  "operationsWithNoScreen": 127
  },
  "waves": {
   "wave2": 20,
@@ -1121,6 +1121,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What this person may do, as ticks"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -1139,10 +1145,22 @@
     "summary": "Reusable policy shapes"
    },
    {
+    "operation": "listCapabilityTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Saved tick-sets"
+   },
+   {
     "operation": "listCustomerMemberships",
     "contract": "identity",
     "verb": "GET",
     "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listModuleCapabilities",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What a person can be allowed to do, per module"
    },
    {
     "operation": "listModules",
@@ -1179,6 +1197,18 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "setCapabilityTemplate",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Save a tick-set under a name"
+   },
+   {
+    "operation": "setPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Tick what they may do"
    },
    {
     "operation": "updateAccessPolicy",

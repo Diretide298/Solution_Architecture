@@ -49,15 +49,15 @@
    "operations": 11
   },
   {
-   "contract": "catalogue",
-   "operations": 1
-  },
-  {
    "contract": "finance",
    "operations": 1
   },
   {
    "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "catalogue",
    "operations": 1
   }
  ],

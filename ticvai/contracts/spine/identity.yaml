@@ -260,6 +260,195 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PasswordPolicy'
+  /module-capabilities:
+    get:
+      operationId: listModuleCapabilities
+      summary: What a person can be allowed to do, per module
+      description: '3.3.5, BL-110. **The checklist a grant screen renders**, and the reason the
+        package does not need a role taxonomy first.
+
+        **Derived, not authored** (`handoff/module-capabilities.json`): the 167-key vocabulary in
+        `contracts/shared/permissions.yaml` crossed with every contract''s
+        `x-ticvai-permission`. 232 capability pairs across 32 modules, and adding an operation
+        with a permission adds it to the right checklist by existing.
+
+        **`label` may be null and the client must render the key when it is.** 72 permissions
+        carry no description yet; a generated sentence would read like a label and mean nothing,
+        and **a checklist item nobody understands gets ticked anyway.**
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: module
+        in: query
+        description: A contract name. Omitted returns every module.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Modules and their capabilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleCapabilitySet'
+  /principals/{principalId}/module-access:
+    parameters:
+    - name: principalId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPrincipalModuleAccess
+      summary: What this person may do, as ticks
+      description: 'BL-110. **The same shape the grant screen writes**, so what an administrator
+        sees when they open it is what they saved. A read that returns a different structure from
+        the write is how an interface grows a translation layer nobody maintains.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Access
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleAccess'
+    put:
+      operationId: setPrincipalModuleAccess
+      summary: Tick what they may do
+      description: 'BL-110, 3.3.5. **The whole grant, replaced.** A partial update would make
+        "everything else stays as it was" a claim the caller cannot verify, and access is the one
+        setting where a silent survivor is a breach.
+
+        **Segregation is checked here, while the person is deciding.** `SegregationRule` says
+        which permissions one principal may not hold at once; a tick that would create a conflict
+        is refused with 409 naming the rule and the other capability — rather than appearing in a
+        violation report a month later, which is the same finding arriving too late to act on.
+
+        **An `elevated` capability raises an approval rather than taking effect.** The response is
+        202 with the request id when any tick is elevated, 200 when none is. Routed through
+        `approvals` so that 11.1.24 — *a requester may never approve their own request* — applies
+        without being restated here.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_GRANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ModuleAccess'
+      responses:
+        '200':
+          description: Granted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleAccess'
+        '202':
+          description: '**Raised for approval**, because at least one capability is elevated.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                  elevatedCapabilities:
+                    type: array
+                    items:
+                      type: string
+        '409':
+          description: '**A tick would breach a segregation rule.** Names the rule and the
+            capability already held, so the person deciding can narrow one rather than guess.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /capability-templates:
+    get:
+      operationId: listCapabilityTemplates
+      summary: Saved tick-sets
+      description: '3.3.23, BL-110. **A role, without the taxonomy.** *Duty Manager* is a named
+        set of ticks somebody saved because they grant it often — useful, and **not a thing access
+        depends on.**
+
+        **Applying a template copies its ticks and does not bind to them.** Editing one never
+        widens access somebody already holds, which is what makes a role hierarchy frightening to
+        change and is why most of them are never changed.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CapabilityTemplate'
+    put:
+      operationId: setCapabilityTemplate
+      summary: Save a tick-set under a name
+      tags:
+      - administration
+      x-ticvai-permission: ROLE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityTemplate'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityTemplate'
   /segregation-rules:
     get:
       operationId: listSegregationRules
@@ -3915,6 +4104,154 @@ components:
         detectedAt:
           type: string
           format: date-time
+
+    ModuleCapability:
+      type: object
+      x-ticvai-persistence: none — derived from contracts/shared/permissions.yaml and every contract
+      description: >
+        BL-110. **One tickable thing a person can be allowed to do in a module.** Derived rather
+        than authored, so an operation added with a permission appears on the right checklist by
+        existing rather than by somebody remembering.
+      required:
+      - key
+      properties:
+        key:
+          type: string
+          description: >
+            **The permission string, and the only vocabulary there is.** `roles.yaml` holds 44
+            lowercase keys sharing none of these; that file is a saved tick-set for the POS
+            surface which was mistaken for the alphabet, and it becomes a `CapabilityTemplate`.
+        label:
+          type: string
+          nullable: true
+          description: >
+            **Null where the permission has no description yet, and the client renders the key.**
+            72 of them are in that state. **A generated sentence would read like a label and mean
+            nothing** — and a checklist item nobody understands is ticked anyway, which is worse
+            than one that visibly needs explaining.
+        group:
+          type: string
+          nullable: true
+          description: The heading it sits under in the vocabulary — Selling, Access control, Shift
+            and cash. **How a checklist of forty items stays readable.**
+        operationCount:
+          type: integer
+          description: >
+            **How much this tick actually grants.** A capability behind ninety operations and one
+            behind two are different decisions, and the number is the only honest way to say so on
+            a screen.
+        elevated:
+          type: boolean
+          default: false
+          description: >
+            **Derived: at least one operation behind it declares `x-ticvai-step-up`.** Not a rank
+            and not a judgement about the name — the operation already said it needs a second
+            factor. Ticking one raises an approval rather than taking effect.
+        segregationConstrained:
+          type: boolean
+          default: false
+          description: >
+            **Named in a `SegregationRule`.** Ticking it may conflict with something the principal
+            already holds, and `setPrincipalModuleAccess` answers 409 rather than letting it
+            through.
+
+    ModuleCapabilitySet:
+      type: object
+      description: BL-110. One module and everything a person could be allowed to do in it.
+      properties:
+        module:
+          type: string
+        title:
+          type: string
+        unguardedOperations:
+          type: integer
+          description: >
+            **Operations in this module that carry no permission, and so appear on no checklist.**
+            94 across the package — guest-facing, service-to-service or self-scoped. Stated
+            because a checklist that silently omits a third of a module reads as complete.
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModuleCapability'
+
+    ModuleAccess:
+      x-ticvai-persistence: identity.module_access
+      type: object
+      description: >
+        BL-110. **What one principal may do in one module, at one scope.** The unit the grant
+        screen writes and reads back unchanged.
+      required:
+      - module
+      - scopePath
+      - capabilities
+      properties:
+        principalId:
+          type: string
+          format: uuid
+          readOnly: true
+        module:
+          type: string
+        scopePath:
+          type: string
+          description: >
+            **Where, and it is half the grant** (ADR-0018). A capability means nothing until it is
+            held at a scope containing the thing it acts on — holding `ORDER_REFUND` at one venue
+            is not holding it at another, and the checklist is per scope for that reason.
+        capabilities:
+          type: array
+          items:
+            type: string
+          description: >
+            **Permission keys, ticked.** The complete set for this module and scope: what is
+            absent is not granted, which is what makes the write replaceable and the read
+            verifiable.
+        appliedTemplate:
+          type: string
+          nullable: true
+          description: >
+            **Which saved tick-set this was copied from, for the record only.** It is not a
+            binding: the ticks are the grant, and editing the template afterwards changes nothing
+            here. A grant that silently follows a template is a grant nobody can audit at a point
+            in time.
+        grantedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        grantedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CapabilityTemplate:
+      x-ticvai-persistence: identity.capability_template
+      type: object
+      description: >
+        3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**
+      required:
+      - code
+      - name
+      - capabilities
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+        capabilities:
+          type: array
+          items:
+            type: string
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Written at `tenant` scope.'
 
     SegregationRule:
       type: object

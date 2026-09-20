@@ -1,5 +1,5 @@
 {
- "note": "How 32 contracts and 625 tables become 17 deployable services. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own.",
+ "note": "How 32 contracts and 627 tables become 17 deployable services. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -18,8 +18,8 @@
     "identity",
     "pii"
    ],
-   "operations": 63,
-   "tables": 30,
+   "operations": 68,
+   "tables": 32,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
    "risk": "**A restart is an outage everywhere.** Deploys go out first and alone.",

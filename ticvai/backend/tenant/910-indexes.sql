@@ -513,8 +513,8 @@ CREATE INDEX IF NOT EXISTS ix_chargeback_evidence_chargeback_id ON payments.char
 CREATE INDEX IF NOT EXISTS ix_deposit_activity_created_by_principal_id ON payments.deposit_activity (created_by_principal_id);
 -- convention, not declared: payments.deposit_activity.deposit_id -> payments.deposit_activity
 CREATE INDEX IF NOT EXISTS ix_deposit_activity_deposit_id ON payments.deposit_activity (deposit_id);
--- convention, not declared: payments.dunning_case.order_id -> orders.sales_order
-CREATE INDEX IF NOT EXISTS ix_dunning_case_order_id ON payments.dunning_case (order_id);
+-- convention, not declared: payments.dunning_case.resolved_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS ix_dunning_case_resolved_by_principal_id ON payments.dunning_case (resolved_by_principal_id);
 -- convention, not declared: payments.dunning_case.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_dunning_case_subject_id ON payments.dunning_case (subject_id);
 -- convention, not declared: payments.eligibility_rule.payment_method_id -> payments.method
@@ -891,6 +891,7 @@ CREATE INDEX IF NOT EXISTS ix_badge_template_scope ON accreditation.badge_templa
 CREATE INDEX IF NOT EXISTS ix_blacklist_scope ON access.blacklist (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_blackout_scope ON rental.blackout (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_booking_scope ON rental.booking (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_capability_template_scope ON identity.capability_template (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_card_expiry_rules_scope ON games.card_expiry_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_challenge_scope ON marketing.challenge (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_channel_rules_scope ON wallet.channel_rules (scope_path text_pattern_ops);
@@ -990,6 +991,7 @@ CREATE INDEX IF NOT EXISTS ix_method_config_scope ON payments.method_config (sco
 CREATE INDEX IF NOT EXISTS ix_method_scope ON payments.method (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_mixed_tender_rules_scope ON payments.mixed_tender_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_modifier_group_scope ON fnb.modifier_group (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_module_access_scope ON identity.module_access (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_notification_rules_scope ON accreditation.notification_rules (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_offline_policy_scope ON platform.offline_policy (scope_path text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_open_shift_scope ON workforce.open_shift (scope_path text_pattern_ops);

@@ -662,7 +662,9 @@
   "maintenance.inspection_item": "2026-09-20",
   "marketing.programme_tier": "2026-09-20",
   "payments.dunning_case": "2026-09-21",
-  "payments.dunning_policy": "2026-09-21"
+  "payments.dunning_policy": "2026-09-21",
+  "identity.capability_template": "2026-09-21",
+  "identity.module_access": "2026-09-21"
  },
  "renames": [
   {

@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1182,
-  "operations": 1081,
+  "operations": 1083,
   "contracts": 31,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 247
+  "operationsWithNoScreen": 244
  },
  "waves": {
   "wave1": 60,
@@ -247,7 +247,7 @@
   },
   {
    "contract": "payments",
-   "operations": 1
+   "operations": 3
   },
   {
    "contract": "platform-ops",
@@ -4842,7 +4842,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -11311,6 +11311,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What this person may do, as ticks"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -11329,10 +11335,22 @@
     "summary": "Reusable policy shapes"
    },
    {
+    "operation": "listCapabilityTemplates",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Saved tick-sets"
+   },
+   {
     "operation": "listCustomerMemberships",
     "contract": "identity",
     "verb": "GET",
     "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "listModuleCapabilities",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "What a person can be allowed to do, per module"
    },
    {
     "operation": "listModules",
@@ -11369,6 +11387,18 @@
     "contract": "identity",
     "verb": "POST",
     "summary": "Submit, approve, activate or retire a policy"
+   },
+   {
+    "operation": "setCapabilityTemplate",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Save a tick-set under a name"
+   },
+   {
+    "operation": "setPrincipalModuleAccess",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Tick what they may do"
    },
    {
     "operation": "updateAccessPolicy",
@@ -11687,54 +11717,6 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "getDunningPolicy",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "How a failed recurring charge is chased"
-   },
-   {
-    "operation": "getPaymentRules",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Currency, eligibility and fee rules as one set"
-   },
-   {
-    "operation": "listDepositActivity",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Movements on a deposit"
-   },
-   {
-    "operation": "listDunningCases",
-    "contract": "payments",
-    "verb": "GET",
-    "summary": "Recurring charges currently being chased"
-   },
-   {
-    "operation": "recordDepositActivity",
-    "contract": "payments",
-    "verb": "POST",
-    "summary": "Record a movement on a deposit"
-   },
-   {
-    "operation": "resolveDunningCase",
-    "contract": "payments",
-    "verb": "POST",
-    "summary": "Stop chasing, with a reason"
-   },
-   {
-    "operation": "setDunningPolicy",
-    "contract": "payments",
-    "verb": "PUT",
-    "summary": "Set the retry schedule and what happens when it runs out"
-   },
-   {
-    "operation": "setPaymentRules",
-    "contract": "payments",
-    "verb": "PUT",
-    "summary": "Replace the payment rule set"
    },
    {
     "operation": "skipRolloutCell",

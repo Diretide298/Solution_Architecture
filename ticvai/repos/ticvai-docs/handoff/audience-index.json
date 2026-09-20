@@ -108,7 +108,7 @@
   }
  },
  "totals": {
-  "operations": 2068,
+  "operations": 2073,
   "screens": 2427,
   "flows": 288
  },
@@ -1731,6 +1731,7 @@
     "getPlanTiers",
     "getPriceList",
     "getPrincipal",
+    "getPrincipalModuleAccess",
     "getProduct",
     "getProductAffinity",
     "getProductionRun",
@@ -1947,6 +1948,7 @@
     "listCampaignGovernanceBudget",
     "listCampaignPromotionPerformance",
     "listCampaigns",
+    "listCapabilityTemplates",
     "listCapacityInventoryReconciliation",
     "listCapacityPoolReservation",
     "listCapacityReservationInventory",
@@ -2227,6 +2229,7 @@
     "listMinorGuardianGroup",
     "listMissingExpiredInvalid",
     "listModifierGroups",
+    "listModuleCapabilities",
     "listModuleCatalogue",
     "listModules",
     "listMultiBuyQuantity",
@@ -2806,6 +2809,7 @@
     "setCallDisposition",
     "setCampaignBudgetFinancial",
     "setCancellationPartialPolicy",
+    "setCapabilityTemplate",
     "setCaseInvestigationResolution",
     "setCatalogueReview",
     "setChannelAllocations",
@@ -2960,6 +2964,7 @@
     "setPricing",
     "setPricingChangeRequest",
     "setPricingExperiment",
+    "setPrincipalModuleAccess",
     "setPrivacyComplianceException",
     "setPrizeCost",
     "setProRataResidual",
@@ -5675,6 +5680,7 @@
     "identity.access_policy",
     "identity.access_policy_version",
     "identity.benefit_usage",
+    "identity.capability_template",
     "identity.customer_membership",
     "identity.delegated_access",
     "identity.membership_history",
@@ -5682,6 +5688,7 @@
     "identity.mfa_method",
     "identity.mfa_recovery_code",
     "identity.module",
+    "identity.module_access",
     "identity.password_policy",
     "identity.permission",
     "identity.principal",
@@ -6070,11 +6077,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 1939,
+    "operations": 1944,
     "screens": 2087,
     "flows": 135,
     "contracts": 32,
-    "tables": 592
+    "tables": 594
    }
   }
  }

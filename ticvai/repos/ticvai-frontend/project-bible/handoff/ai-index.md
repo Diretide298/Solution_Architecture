@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 40 |
 | **Flows** | 11 |
-| **Documents** | 36 |
+| **Documents** | 37 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -237,6 +237,7 @@
 | [Contract audit — every contract against the four things that must agree with it](..\docs\active\contract-audit-19-september.md) |  | 7 |
 | [The contract run — plan](..\docs\active\contract-run-plan-19-september.md) |  | 1 |
 | [Current work](..\docs\active\current-work.md) |  | 2 |
+| [Deep audit — module-wise build clearance](..\docs\active\deep-audit-21-september.md) |  | 1 |
 | [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 3 |
 | [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |
 | [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |

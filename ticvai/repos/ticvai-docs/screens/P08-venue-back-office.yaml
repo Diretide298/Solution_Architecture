@@ -48851,6 +48851,9 @@ screens:
     - DepositPartialPaymentOutstandingBalanceManagementView.remainingBalance
     - DepositPartialPaymentOutstandingBalanceManagementView.dueDate
     - DepositPartialPaymentOutstandingBalanceManagementView.daysRemaining
+    params:
+    - name: depositId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated

@@ -465,6 +465,8 @@ identity.mfa_method,principal_id,identity.principal,reference,declared,,yes
 identity.mfa_method,via enrolMfaMethod,identity.mfa_recovery_code,ambient,lineage,,
 identity.mfa_recovery_code,principal_id,identity.principal,reference,declared,,yes
 identity.module,parent_module_id,identity.module,reference,convention,,yes
+identity.module_access,granted_by_principal_id,identity.principal,reference,convention,,
+identity.module_access,principal_id,identity.principal,reference,convention,,
 identity.otp_challenge,subject_id,pii.subject,reference,declared,yes,yes
 identity.otp_challenge,via verifyGuestEmail,marketing.message_dispatch,ambient,lineage,yes,
 identity.otp_challenge,via verifyGuestEmail,pii.subject,ambient,lineage,yes,
@@ -926,7 +928,7 @@ payments.deposit_activity,created_by_principal_id,identity.principal,reference,c
 payments.deposit_activity,deposit_id,payments.deposit_activity,reference,convention,,yes
 payments.deposit_activity,payment_id,orders.payment,reference,declared,yes,yes
 payments.dunning_case,order_id,orders.sales_order,reference,declared,yes,yes
-payments.dunning_case,resolved_by_principal_id,identity.principal,reference,convention,yes,
+payments.dunning_case,resolved_by_principal_id,identity.principal,reference,convention,yes,yes
 payments.dunning_case,subject_id,pii.subject,reference,convention,yes,yes
 payments.eligibility_rule,payment_method_id,payments.method,reference,convention,,yes
 payments.fee_rule,payment_method_id,payments.method,reference,convention,,yes

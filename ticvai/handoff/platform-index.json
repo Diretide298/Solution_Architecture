@@ -45,7 +45,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 184
+   "operationsWithNoScreen": 189
   },
   "waves": {
    "wave1": 27,
@@ -78,7 +78,7 @@
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 171
+   "operationsWithNoScreen": 176
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 48
+   "operationsWithNoScreen": 53
   },
   "waves": {
    "wave1": 11
@@ -108,11 +108,11 @@
   "operator": "venue",
   "counts": {
    "screens": 1182,
-   "operations": 1081,
+   "operations": 1083,
    "contracts": 31,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 247
+   "operationsWithNoScreen": 244
   },
   "waves": {
    "wave1": 60,
@@ -126,11 +126,11 @@
   "operator": "ticvai",
   "counts": {
    "screens": 676,
-   "operations": 522,
+   "operations": 528,
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 213
+   "operationsWithNoScreen": 210
   },
   "waves": {
    "wave1": 12,
@@ -181,7 +181,7 @@
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 88
+   "operationsWithNoScreen": 93
   },
   "waves": {
    "wave2": 2,
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 122
+   "operationsWithNoScreen": 127
   },
   "waves": {
    "wave2": 20,
@@ -248,7 +248,7 @@
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 131
+   "operationsWithNoScreen": 136
   },
   "waves": {
    "wave3": 69

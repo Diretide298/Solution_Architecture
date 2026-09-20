@@ -132,14 +132,14 @@ contracts:
   ref: diagrams/lld/contracts/fnb.yaml
 - contract: identity
   tier: spine
-  operations: 63
+  operations: 68
   holds: null
   service: IdentityService
   verbs:
     POST: 30
-    GET: 24
+    GET: 27
+    PUT: 6
     DELETE: 4
-    PUT: 4
     PATCH: 1
   guestCallable: 16
   offlineCapable: 6

@@ -59,7 +59,7 @@ servicesCalled:
 - service: TenancyService
   operationCalls: 272
 - service: OrderService
-  operationCalls: 222
+  operationCalls: 224
 - service: AccessService
   operationCalls: 203
 - service: MarketingService
@@ -8942,7 +8942,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDepositActivity
   - listDepositPartialPayment
+  - recordDepositActivity
   states:
   - emptyFirstRun
   - emptyNoAccess

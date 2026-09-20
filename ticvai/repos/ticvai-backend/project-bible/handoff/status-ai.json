@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 36,
+  "documents": 37,
   "openConflicts": 1
  },
  "metrics": {
@@ -209,6 +209,11 @@
   {
    "file": "docs\\active\\current-work.md",
    "title": "Current work",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\deep-audit-21-september.md",
+   "title": "Deep audit \u2014 module-wise build clearance",
    "status": ""
   },
   {

@@ -37,7 +37,7 @@ servicesCalled:
 - service: PlatformService
   operationCalls: 288
 - service: OrderService
-  operationCalls: 139
+  operationCalls: 145
 - service: TenancyService
   operationCalls: 85
 - service: IdentityService
@@ -12795,7 +12795,9 @@ screens:
   density: compact
   operations:
   - createApprovalRequest
+  - getPaymentRules
   - listPaymentMethods
+  - setPaymentRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13717,6 +13719,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getDunningPolicy
+  - listDunningCases
+  - resolveDunningCase
+  - setDunningPolicy
   - setMixedTenderRules
   states:
   - emptyFirstRun
