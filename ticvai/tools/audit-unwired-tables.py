@@ -156,7 +156,11 @@ def main():
         print("\n  PASS — every unreached table is explained")
         return 0
 
-    print("\n  %d need a decision, by schema:" % len(work))
+    # **"Needs an operation" is not "needs a verdict".** The 223 schema-merge verdicts are closed
+    # and stay closed — whether to accept a table was settled on 20 September. What is open here
+    # is how to reach one, which is contract work, and saying "decision" for both invited the
+    # reasonable question of which decisions had come untied. None had.
+    print("\n  %d still need an operation written, by schema:" % len(work))
     for sch, n in collections.Counter(r["table"].split(".")[0] for r in work).most_common():
         names = [r["table"].split(".", 1)[1] for r in work if r["table"].startswith(sch + ".")]
         print("    %-14s %3d   %s" % (sch, n, ", ".join(sorted(names)[:6])

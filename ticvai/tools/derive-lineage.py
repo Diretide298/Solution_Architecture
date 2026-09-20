@@ -56,7 +56,7 @@ def schema_defs() -> dict:
 
 
 def persistence_map() -> dict:
-    """Schema name -> the table it persists to, across every contract."""
+    """Schema name -> the table(s) it persists to, across every contract."""
     out = {}
     for c in sorted((ROOT / "contracts").rglob("*.yaml")):
         try:
@@ -75,7 +75,19 @@ def persistence_map() -> dict:
             # to refuse a table the schema reference has never heard of.
             if t.lower().startswith("none"):
                 continue
-            out[n] = t
+            # **A schema may persist to more than one table and twenty-four of them do.**
+            # `x-ticvai-persistence: orders.sales_order + orders.order_line` is an order and its
+            # lines returned as one object. Taken whole it is a table name with a plus sign in
+            # it, which is in no schema reference and which `derive-schema` would then rebuild
+            # as a real table from these very entries.
+            #
+            # This was invisible while `tables_in` looked one level deep: the stored entries were
+            # hand-mapped with the tables split correctly, and nothing re-derived them. Following
+            # refs reached the composed schemas and put the unsplit string into six operations
+            # before `check-lineage` caught it.
+            parts = [x.strip() for x in t.split("+") if x.strip() and "." in x]
+            if parts:
+                out[n] = parts
     return out
 
 
@@ -110,7 +122,7 @@ def tables_in(node, persist: dict, defs: dict = None, depth: int = 6) -> list:
             seen |= nxt
             frontier = nxt
         refs = seen
-    return sorted({persist[r] for r in refs if r in persist})
+    return sorted({t for r in refs if r in persist for t in persist[r]})
 
 
 # **A contract with no stored entry needs a person, and on 19 September five arrived at once.**

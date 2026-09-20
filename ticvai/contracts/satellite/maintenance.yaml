@@ -2115,7 +2115,17 @@ components:
         recordedAt: { type: string, format: date-time }
 
     Inspection:
-      x-ticvai-persistence: "maintenance.inspection + maintenance.inspection_response"
+      x-ticvai-persistence: maintenance.inspection
+      # **`+ maintenance.inspection_response` was removed on 20 September: no such table
+      # exists and this schema never described one.** It returns `failedItemCount` and
+      # `failedSafetyCriticalCount` — counts, not answers. The claim was invisible while
+      # the lineage read a dual tag as one table name with a plus sign in it.
+      #
+      # **The gap it was pointing at is real.** `maintenance.inspection_template_item`
+      # holds the questions and nothing holds the answers, so a failed inspection can say
+      # how many items failed and not which. `rental.inspection_item` is the shape that
+      # would fill it. Recorded rather than invented, because which items an inspection
+      # must retain is a retention decision.
       type: object
       required: [id, templateId, venueId, outcome, performedByPrincipalId, performedAt]
       properties:

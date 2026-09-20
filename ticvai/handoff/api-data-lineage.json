@@ -1696,8 +1696,7 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order",
-   "orders.sales_order + orders.order_line"
+   "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
@@ -2186,8 +2185,7 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order",
-   "orders.sales_order + orders.order_line"
+   "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
@@ -2246,8 +2244,7 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order",
-   "orders.sales_order + orders.order_line"
+   "orders.sales_order"
   ],
   "writes": [
    "access.entitlement",
@@ -7243,10 +7240,12 @@
   "path": "/guests/{subjectId}/loyalty/adjust",
   "reads": [
    "cache:idempotency",
+   "marketing.loyalty_points",
    "marketing.loyalty_position"
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.loyalty_points",
    "marketing.loyalty_position"
   ],
   "routing": "",
@@ -8414,7 +8413,7 @@
   "path": "/outlets/{outletId}/guest-menu",
   "reads": [
    "fnb.modifier_group",
-   "fnb.modifier_group + fnb.modifier_option"
+   "fnb.modifier_option"
   ],
   "writes": [],
   "routing": "replica",
@@ -9040,7 +9039,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.service_order",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -9069,7 +9068,7 @@
   "path": "/table-visits/{visitId}",
   "reads": [
    "fnb.service_order",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [],
@@ -9094,7 +9093,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.service_order",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -9124,7 +9123,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.service_order",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -9205,7 +9204,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.service_order",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -10964,7 +10963,7 @@
   "path": "/requisitions/{requisitionId}/quotations",
   "reads": [
    "inventory.quotation",
-   "inventory.quotation + inventory.quotation_line"
+   "inventory.quotation_line"
   ],
   "writes": [],
   "routing": "replica",
@@ -12476,8 +12475,7 @@
   "path": "/inspections",
   "reads": [
    "cache:idempotency",
-   "maintenance.inspection",
-   "maintenance.inspection + maintenance.inspection_response"
+   "maintenance.inspection"
   ],
   "writes": [
    "cache:idempotency",
@@ -13382,7 +13380,6 @@
   "path": "/dashboards/{dashboardId}",
   "reads": [
    "reporting.dashboard",
-   "reporting.dashboard + reporting.dashboard_tile",
    "reporting.dashboard_tile"
   ],
   "writes": [],
@@ -19408,7 +19405,8 @@
   "path": "/table-visits/{visitId}/request-bill",
   "reads": [
    "cache:idempotency",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -25018,7 +25016,8 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -25047,7 +25046,8 @@
   "path": "/table-visits/{visitId}/server",
   "reads": [
    "cache:idempotency",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit",
    "identity.principal"
   ],
@@ -25076,7 +25076,8 @@
   "path": "/table-visits/{visitId}/comp",
   "reads": [
    "cache:idempotency",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit",
    "orders.order_line"
   ],
@@ -25459,7 +25460,8 @@
   "path": "/table-visits/{visitId}/stage",
   "reads": [
    "cache:idempotency",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit"
   ],
   "writes": [
@@ -25515,7 +25517,8 @@
   "path": "/table-visits/{visitId}/transfer-items",
   "reads": [
    "cache:idempotency",
-   "fnb.service_order + fnb.service_order_line",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit",
    "orders.order_line"
   ],
@@ -48386,31 +48389,6 @@
    "redis"
   ]
  },
- "setShift": {
-  "contract": "workforce",
-  "verb": "PUT",
-  "path": "/shifts",
-  "reads": [
-   "workforce.shift"
-  ],
-  "writes": [
-   "workforce.shift"
-  ],
-  "routing": null,
-  "scope": "venue",
-  "perm": "WORKFORCE_MANAGE",
-  "offline": false,
-  "summary": "Define a shift pattern and its break",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "TenancyService",
-  "stores": [
-   "postgres",
-   "redis"
-  ]
- },
  "setWorkAssignment": {
   "contract": "workforce",
   "verb": "PUT",
@@ -48449,6 +48427,372 @@
   "perm": "WORKFORCE_MANAGE",
   "offline": false,
   "summary": "Run a synchronisation now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "awardBadge": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/customers/{customerId}/badges",
+  "reads": [
+   "marketing.customer_badge"
+  ],
+  "writes": [
+   "marketing.customer_badge"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Award a badge",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getLoyaltyRules": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/programmes/{programmeId}/rules",
+  "reads": [
+   "marketing.loyalty_rule",
+   "marketing.points_redemption_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Every rule a loyalty programme runs on",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "issueReward": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/loyalty/reward-assignments",
+  "reads": [
+   "marketing.reward_assignment"
+  ],
+  "writes": [
+   "marketing.reward_assignment"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "LOYALTY_REDEEM",
+  "offline": false,
+  "summary": "Issue a reward to a guest",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listBadges": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/badges",
+  "reads": [
+   "marketing.badge"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Badges a guest can be awarded",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCustomerBadges": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/customers/{customerId}/badges",
+  "reads": [
+   "marketing.customer_badge"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Badges a guest holds",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listLoyaltyCampaigns": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/campaigns",
+  "reads": [
+   "marketing.loyalty_campaign"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Time-boxed campaigns inside a programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listLoyaltyPointEntries": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/points",
+  "reads": [
+   "marketing.loyalty_points"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "LOYALTY_ACCRUE",
+  "offline": false,
+  "summary": "The ledger behind a points balance",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listRewardAssignments": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/reward-assignments",
+  "reads": [
+   "marketing.reward_assignment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Rewards issued to guests, and whether they were used",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listRewards": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/loyalty/rewards",
+  "reads": [
+   "marketing.reward"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "What points can be turned into",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setBadge": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/badges",
+  "reads": [
+   "marketing.badge"
+  ],
+  "writes": [
+   "marketing.badge"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Define a badge",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setLoyaltyCampaign": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/loyalty/campaigns",
+  "reads": [
+   "marketing.loyalty_campaign"
+  ],
+  "writes": [
+   "marketing.loyalty_campaign"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Define a loyalty campaign and its window",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setLoyaltyRules": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/loyalty/programmes/{programmeId}/rules",
+  "reads": [
+   "marketing.loyalty_rule",
+   "marketing.points_redemption_rule"
+  ],
+  "writes": [
+   "marketing.loyalty_rule",
+   "marketing.points_redemption_rule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Replace a programme's rules as one set",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setReward": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/loyalty/rewards",
+  "reads": [
+   "marketing.reward"
+  ],
+  "writes": [
+   "marketing.reward"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Define a reward and its points cost",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listShiftPatterns": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/shift-patterns",
+  "reads": [
+   "workforce.shift"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Named shift patterns",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setShiftPattern": {
+  "contract": "workforce",
+  "verb": "PUT",
+  "path": "/shift-patterns",
+  "reads": [
+   "workforce.shift"
+  ],
+  "writes": [
+   "workforce.shift"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_MANAGE",
+  "offline": false,
+  "summary": "Define a shift pattern and its break",
   "source": "derived",
   "audience": [
    "staff"

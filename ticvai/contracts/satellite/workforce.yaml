@@ -1218,9 +1218,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkforceLeaveBalance'
-  /shifts:
+  /shift-patterns:
     get:
-      operationId: listShifts
+      operationId: listShiftPatterns
       summary: Named shift patterns
       description: '**Distinct from `/shift-templates`, and the distinguishing column is
         `crossesMidnight`.** A pattern says that 22:00 to 06:00 is one shift; a template carries two
@@ -1244,7 +1244,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/WorkforceShift'
     put:
-      operationId: setShift
+      operationId: setShiftPattern
       summary: Define a shift pattern and its break
       tags:
       - workforce
