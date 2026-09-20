@@ -65,6 +65,24 @@ BOILERPLATE = {"id", "created_at", "updated_at", "is_active", "scope_path", "ven
 
 FLOOR = 0.34
 
+# **How much of the SUSPECT the original covers, which is not the same question as overlap.**
+# `identity.user_access` is `identity.delegated_access` with six columns missing, and Jaccard
+# scored it 0.26 — under the floor — because the rich original is punished for being rich. The
+# shape being hunted is containment: a poor table wholly inside a well-used one.
+CONTAINED = 0.6
+
+
+def stem(col):
+    """Compare `permission_id` with `permission`, and `granted_by_principal_id` with `granted_by`.
+
+    **Three of the strongest signals scored zero for being spelled differently.** A foreign key
+    and the thing it names are the same column to a reader, and `_principal` is this package's
+    way of saying which kind of id — `granted_by_principal_id` against `granted_by` is one
+    column, not two.
+    """
+    c = col[:-3] if col.endswith("_id") else col
+    return c.replace("_principal", "")
+
 
 def main():
     S = json.load(io.open(os.path.join(H, "schema-reference.json"), encoding="utf-8"))
@@ -85,7 +103,7 @@ def main():
 
     real = [t for t in cols if "." in t and ":" not in t]
     names = {t: {c["column"] for c in cols[t]} for t in real}
-    sig = {t: names[t] - BOILERPLATE for t in real}
+    sig = {t: {stem(c) for c in names[t]} - {stem(b) for b in BOILERPLATE} for t in real}
     short = {t: t.split(".", 1)[1] for t in real}
 
     # A child read through its parent is reached; it is not a candidate for being a copy.
@@ -95,7 +113,25 @@ def main():
         p = (lineage.get(t) or {}).get("parent")
         return bool(p and ops.get(p))
 
-    suspects = [t for t in real if not reached(t)]
+    # **A storage-only table is answered, not a suspect.** `schema-storage-only.md` says why
+    # `identity.authz_audit` has no API; pairing it with a table that does have one asks a
+    # question that document already closed.
+    import re as _re
+    storage = set()
+    _p = os.path.join(H, "schema-storage-only.md")
+    if os.path.exists(_p):
+        for line in io.open(_p, encoding="utf-8"):
+            if line.startswith("|") and line.count("|") >= 3:
+                c = [x.strip() for x in line.strip().strip("|").split("|")]
+                if len(c) >= 2 and not c[0].startswith("---") and c[0] != "Table":
+                    storage.update(_re.findall(r"`([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)`", c[0]))
+
+    # **A two-column table is contained in everything.** `platform.sale_board_tile` is `id` and
+    # `page_id`; once the boilerplate goes it has one column left, and one column inside a
+    # fifteen-column table scores a perfect containment while meaning nothing.
+    MIN_SIGNATURE = 3
+    suspects = [t for t in real
+                if not reached(t) and t not in storage and len(sig[t]) >= MIN_SIGNATURE]
     originals = [t for t in real if ops.get(t)]
 
     def domain_reads(schema, table):
@@ -114,22 +150,26 @@ def main():
             inter = sig[a] & sig[b]
             union = sig[a] | sig[b]
             j = (len(inter) / len(union)) if union else 0.0
-            if not same_name and j < FLOOR:
+            # **Containment is the second test and it catches what Jaccard cannot.**
+            covered = (len(inter) / len(sig[a])) if sig[a] else 0.0
+            if not same_name and j < FLOOR and covered < CONTAINED:
                 continue
             already = domain_reads(a_schema, b)
-            best.append((same_name, already, len(ops[b]), round(j, 3), b, sorted(inter)))
+            best.append((same_name, already, len(ops[b]), round(max(j, covered), 3), b,
+                         sorted(inter), round(covered, 3)))
         if not best:
             continue
         # **Name, then whether the domain already reads it, then operation count.** Overlap is
         # last and never decides: a richer twin shares proportionally less.
         best.sort(key=lambda x: (-int(x[0]), -int(x[1]), -x[2], -x[3]))
-        same_name, already, n, j, b, inter = best[0]
+        same_name, already, n, j, b, inter, covered = best[0]
         rows.append({
             "suspect": a, "suspect_columns": len(names[a]),
             "original": b, "original_columns": len(names[b]), "original_operations": n,
             "same_short_name": "yes" if same_name else "",
             "domain_already_reads_it": "yes" if already else "",
-            "column_overlap": j, "shared": " ".join(inter[:8]),
+            "column_overlap": j, "suspect_covered": covered,
+            "shared": " ".join(inter[:8]),
             "other_candidates": " ".join(x[4] for x in best[1:4]),
         })
 

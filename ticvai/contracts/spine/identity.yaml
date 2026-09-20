@@ -2938,98 +2938,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityPermission'
-  /principals/{principalId}/access:
-    get:
-      operationId: listPrincipalAccess
-      summary: What a principal is granted, and where
-      description: '**`identity.principal.primaryRoleId` is one role.** Between that and
-        `role_permission` there was no way to say *Duty Manager at Venue 3 until March, and denied
-        refunds anywhere*.
-
-        Grants are returned including expired ones by default filter, because **the question asked
-        of this endpoint is usually why somebody could do something last Tuesday**, and a view that
-        silently drops lapsed grants cannot answer it.
-
-        '
-      tags:
-      - identity
-      x-ticvai-permission: PERMISSION_VIEW
-      x-ticvai-audience:
-      - staff
-      x-ticvai-scope-level: tenant
-      x-ticvai-read-routing: replica
-      parameters:
-      - name: principalId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: activeOn
-        in: query
-        description: Grants in force at this instant. Omit for all, including lapsed and revoked.
-        schema:
-          type: string
-          format: date-time
-      responses:
-        '200':
-          description: Grants
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/IdentityUserAccess'
-    put:
-      operationId: setPrincipalAccess
-      summary: Replace a principal's grants
-      description: '**Set whole, because a deny only means something against the allows it sits
-        beside.** Applying grants one at a time opens a window in which a revoked allow is gone and
-        its replacing deny is not yet there, or the reverse — and for an access table that window is
-        the whole problem.
-
-        Revoking is expressed by omitting a grant, which records `revokedAt` and
-        `revokedByPrincipalId` rather than deleting the row. **A grant that is deleted cannot answer
-        why somebody had it.**
-
-        '
-      tags:
-      - identity
-      x-ticvai-permission: PERMISSION_GRANT
-      x-ticvai-audience:
-      - staff
-      x-ticvai-scope-level: tenant
-      parameters:
-      - name: principalId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/IdentityUserAccess'
-      responses:
-        '200':
-          description: Granted
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/IdentityUserAccess'
-        '409':
-          description: A grant breaches a segregation-of-duties rule
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
 components:
   schemas:
     MembershipDetail:
@@ -3328,58 +3236,6 @@ components:
           type: string
           format: uuid
           nullable: true
-    IdentityUserAccess:
-      type: object
-      x-ticvai-persistence: identity.user_access
-      description: '**Taken from the backend workbook, 20 September.** Assigns a role or direct permission to a principal within a specific scope and validity period.'
-      required:
-      - principalId
-      - effect
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        principalId:
-          type: string
-          format: uuid
-        roleId:
-          type: string
-          format: uuid
-          nullable: true
-        permissionId:
-          type: string
-          format: uuid
-          nullable: true
-        scopePath:
-          type: string
-          nullable: true
-        effect:
-          type: string
-          maxLength: 10
-        validFrom:
-          type: string
-          format: date-time
-          nullable: true
-        validTo:
-          type: string
-          format: date-time
-          nullable: true
-        grantedByPrincipalId:
-          type: string
-          format: uuid
-          nullable: true
-        revokedAt:
-          type: string
-          format: date-time
-          nullable: true
-        revokedByPrincipalId:
-          type: string
-          format: uuid
-          nullable: true
-        createdAt:
-          type: string
-          format: date-time
     AccessPolicy:
       type: object
       x-ticvai-persistence: identity.access_policy
@@ -4550,6 +4406,28 @@ components:
           enum:
           - ALLOW
           - DENY
+        permissionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Taken from `identity.user_access`, 20 September, when that table was collapsed into
+            this one.** `permission` above is free text; this names a row in
+            `identity.permission`, the catalogue wired the same day. A grant that names a
+            catalogue row can be checked against the keys the contracts actually enforce — which
+            is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml,
+            0 shared*.
+
+            Nullable because a role grant carries no permission at all.
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >
+            Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so
+            it could say who revoked a grant and not whether it was before or after the thing
+            somebody is asking about.
         validFrom:
           type: string
           format: date-time

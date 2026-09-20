@@ -1,6 +1,6 @@
 {
  "generated": "2026-08-18",
- "note": "Derived by tools/derive-relationships.py from schema-reference.json and api-data-lineage.json. **Not hand-maintained** \u2014 the previous graph described 540 relationships across 192 tables while the package held 352, because it had not been touched since the schema grew past it.",
+ "note": "Derived by tools/derive-relationships.py from schema-reference.json and api-data-lineage.json. **Not hand-maintained** — the previous graph described 540 relationships across 192 tables while the package held 352, because it had not been touched since the schema grew past it.",
  "rels": [
   {
    "frm": "assets.media_asset",
@@ -9093,51 +9093,6 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "identity.user_access",
-   "col": "principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "identity.user_access",
-   "col": "role_id",
-   "to": "identity.role",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "identity.user_access",
-   "col": "permission_id",
-   "to": "identity.permission",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "identity.user_access",
-   "col": "granted_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "identity.user_access",
-   "col": "revoked_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "inventory.stock_reservation",
    "col": "item_id",
    "to": "inventory.item",
@@ -15552,10 +15507,6 @@
   ],
   "identity.permission": [
    "listPermissions"
-  ],
-  "identity.user_access": [
-   "listPrincipalAccess",
-   "setPrincipalAccess"
   ]
  },
  "tab_screens": {

@@ -49267,54 +49267,6 @@
    "redis"
   ]
  },
- "listPrincipalAccess": {
-  "contract": "identity",
-  "verb": "GET",
-  "path": "/principals/{principalId}/access",
-  "reads": [
-   "identity.user_access"
-  ],
-  "writes": [],
-  "routing": "replica",
-  "scope": "tenant",
-  "perm": "PERMISSION_VIEW",
-  "offline": false,
-  "summary": "What a principal is granted, and where",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "IdentityService",
-  "stores": [
-   "postgres",
-   "redis"
-  ]
- },
- "setPrincipalAccess": {
-  "contract": "identity",
-  "verb": "PUT",
-  "path": "/principals/{principalId}/access",
-  "reads": [
-   "identity.user_access"
-  ],
-  "writes": [
-   "identity.user_access"
-  ],
-  "routing": null,
-  "scope": "tenant",
-  "perm": "PERMISSION_GRANT",
-  "offline": false,
-  "summary": "Replace a principal's grants",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "IdentityService",
-  "stores": [
-   "postgres",
-   "redis"
-  ]
- },
  "createRentalAgreement": {
   "contract": "rental",
   "verb": "POST",
