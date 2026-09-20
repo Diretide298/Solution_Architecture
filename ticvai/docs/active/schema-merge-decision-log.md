@@ -36,7 +36,7 @@ cost again.
 | 9 | Membership hierarchy | **take it** | 20 Sep |
 | 10 | Cross-cell guest link | **reversed — keep it in `platform`** | 20 Sep |
 | 11 | The DSAR duplicate | **drop theirs** | 20 Sep |
-| 12 | Currency on nine accepted tables | **seven genuinely differ, two are copies** — found by the checker | 20 Sep |
+| 12 | Currency on nine accepted tables | **seven genuinely differ, two are copies** — confirmed, and it amended ADR-0018 | 20 Sep |
 
 ---
 
@@ -521,6 +521,34 @@ says so: mark the property `x-ticvai-persisted: false`, or say why the table gen
 
 Seven exemptions are in `CURRENCY_OK` in `tools/check-package.py`, each with its reason on the
 line. `check-package` is PASS.
+
+### Confirmed, and it was closer than it looked
+
+**The question that settles it: can a venue's currency change after it has traded?** If it can,
+every dated artefact that resolves its currency renders retrospectively wrong — a price list is
+a dated range, `valid_from` to `valid_to`, so one valid in January and read in July resolves the
+currency *now*. On that reading their stored column would have been right and ours wrong,
+including `catalogue.price_list`, which is ours and has carried `x-ticvai-persisted: false`
+since 24 August.
+
+**Answered 20 September: once a venue has traded, its currency cannot change.** So resolution
+always returns what it was, and the call above stands on all three price lists.
+
+**With one consequence that is not obvious, and that amends ADR-0018.** A venue resolving purely
+from its region has nowhere to hold the frozen answer — change the region's currency and a venue
+that traded last year silently follows it. **The frozen value has to be written down**, which
+means `platform.venue_settings` gains `currency_code` and `currency_scale`, set at creation from
+the region, overridable until first trade, immutable after.
+
+That column also settles a second thing the ADR had wrong: it put currency in the same row as
+tax rates, *"a venue cannot choose its VAT"*. **True of tax, over-applied to currency** — a
+free-zone unit or a duty-free shop genuinely trades in a currency its region does not. The
+override is free once the frozen column exists, and it does not let a venue choose its VAT,
+which was the conflation. See the 20 September amendment to ADR-0018.
+
+**The one real piece of work it leaves:** `ledger.fx_rate` is keyed `region_id`. A venue trading
+outside its legal entity's currency needs FX from **its** currency to the books, and there is no
+venue granularity today.
 
 ### Why it is worth telling them
 
