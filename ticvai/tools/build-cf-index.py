@@ -24,8 +24,15 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTER = ROOT / "registers/conflicts.md"
 INDEX = ROOT / "registers/conflict-status.md"
 if not REGISTER.exists():
+    # **The index has to move with the register.** This redirected REGISTER into
+    # `docs/registers/` and left INDEX at the root, so every run in the flat layout wrote
+    # `conflict-status.md` beside the tools while everybody read
+    # `docs/registers/conflict-status.md` — last correct on 25 August, and 51 conflicts behind
+    # by 20 September. **The tool reported 175 and the file people opened said 124**, which is
+    # the failure mode the register's own header describes: a register that loses its most
+    # expensive open item is worse than no register, because it is trusted.
     REGISTER = ROOT / "docs/registers/conflicts.md"
-    INDEX = ROOT / "conflict-status.md"
+    INDEX = ROOT / "docs/registers/conflict-status.md"
 
 STATE = {
     "Open — needs a client decision": "OPEN — client",
