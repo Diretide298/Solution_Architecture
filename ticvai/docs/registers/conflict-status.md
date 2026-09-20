@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **12** |
+| OPEN — client | **10** |
 | OPEN — Softlabs | **0** |
-| CLOSED | **157** |
+| CLOSED | **159** |
 | WITHDRAWN | **6** |
 | **Total** | **175** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**12 open, 157 closed.**
+**10 open, 159 closed.**
 
 
-## Open — needs a client decision — 12
+## Open — needs a client decision — 10
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -29,13 +29,11 @@ register.
 | **CF-140** | The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found. `sources/planning/TAIS_Product_Planning_ | Chinmay + Qossai |
 | **CF-162** | Three deployment scenarios were requested and the package models one. The 24 August session asks Softlabs to document (a) independent tenant deploymen | Dinesh |
 | **CF-165** | Consent, retention and archival were walked in the 20 August CRM session and the package has consent only. `recordConsent` exists, CF-160 settled that | Allam |
-| **CF-166** | Seat map reuse and comparison — three of four gaps closed, and the fourth was never a gap. The 21 August decision reads: *"full and partial (section-l |  |
-| **CF-168** | A region may now hold more than one Postgres instance, and nothing decides which one a new tenant lands on. ADR-0040 removed the ceiling by letting a  | Chinmay + Dinesh |
 | **CF-169** | Three places where the data model was built and no screen was ever written, and one where the reverse is true. ADR-0041 turns 57 command centres into  | Chinmay + Dinesh |
 | **CF-170** | Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.  | Chinmay + Dinesh |
-| **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 | Chinmay + Qossai |
+| **CF-171** | A third of the API surface is a provisional draft named after a screen title, and the count is exact. Measured 8 September: 577 of the package's 1,626 |  |
 
-## Closed — 157
+## Closed — 159
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -193,7 +191,9 @@ register.
 | **CF-161** | Database segregation per service was decided in a workshop and the package had already decided the opposite |  |
 | **CF-163** | `openDated` was missing from `ProductKind` and it is one of six main ticket types the client draws. The *Create Ticket Flow* board names Open Dated, G | Chinmay |
 | **CF-164** | The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered n | Chinmay + Allam |
+| **CF-166** | Seat map reuse and comparison — the 21 August decision asked for full and partial section-level copy-paste between seat maps, a layout version-compari |  |
 | **CF-167** | The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region. Two sources want it in two places | Chinmay + Dinesh |
+| **CF-168** | A region may hold more than one Postgres instance, and nothing decided when to add one or which instance a new tenant lands on |  |
 | **CF-172** | The identity contract said both that an unverified guest buys and that it cannot. `verifyGuestEmail`: *"Unverified accounts still buy. Blocking purcha | Chinmay |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
