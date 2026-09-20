@@ -34,7 +34,7 @@ and eleven venues has settings belonging at four different heights.** Flattening
 of two failures: every venue configures everything from scratch, or one change at the top breaks a
 venue that needed to differ.
 
-`platform.org_unit` is the answer, and **it is reached by 304 of 379 tables** — the tenancy spine.
+`platform.scope` is the answer, and **it is reached by 304 of 379 tables** — the tenancy spine.
 A node has a `level`, a `parent_id` and a materialised `path`; configuration resolves by walking
 that path upward until something answers.
 
@@ -169,7 +169,7 @@ That left 28, one per contract, which is a mapping rather than a decision.
 
 The reasoning was that a shift owns no tables of its own. **That is true, and the conclusion was
 wrong.** A service with no data belongs where its data is — and a shift's data is entirely in
-`orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
+`orders`: `orders.pos_shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
 
 **A shift is venue-scoped, which is what made it look like a tenancy concern.** But **venue scope
 is the platform's default rather than a service boundary** — 675 of 1,014 operations are
@@ -210,9 +210,9 @@ is unwalked rather than under-documented**: its defects are still in it.
 The other eight are what they look like — a domain with its own schema, its own scaling profile and
 its own licence. **These eight are not.**
 
-**Tenancy** — **`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.
+**Tenancy** — **`platform.scope` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.
 
-**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
+**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.pos_shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
 
 **The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract — 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.
 
@@ -261,7 +261,7 @@ It moves a pseudonymous guest link rather than a guest, which is the whole desig
 ## 5. Consequences
 
 **Deploy order is the tier order.** Foundation first and alone — twelve contracts read Identity, and
-289 tables anchor on `platform.org_unit`.
+289 tables anchor on `platform.scope`.
 
 **Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossRegion. **A
 deliberate property that should be tested rather than assumed.**

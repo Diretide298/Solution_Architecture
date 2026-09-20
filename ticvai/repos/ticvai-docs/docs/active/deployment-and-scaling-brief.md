@@ -141,7 +141,7 @@ Not produced.
 
 | Tier | Services | What it means for deployment |
 |---|---|---|
-| **Foundation** | Identity, Tenancy | **First and alone.** 304 of 379 tables anchor on `platform.org_unit`; twelve contracts read Identity. A restart here is an outage everywhere |
+| **Foundation** | Identity, Tenancy | **First and alone.** 304 of 379 tables anchor on `platform.scope`; twelve contracts read Identity. A restart here is an outage everywhere |
 | **Commerce** | Catalogue, Order, Access, Ledger | The sale path. **Order autoscales; nothing else needs to** |
 | **Operations** | Inventory, F&B, Retail, VenueOps | **Licensed per module** — a venue that bought none runs none |
 | **Engagement** | Marketing, AI | **Nothing that takes money depends on these** |

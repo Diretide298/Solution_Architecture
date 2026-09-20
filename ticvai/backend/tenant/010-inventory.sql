@@ -265,6 +265,8 @@ CREATE TABLE IF NOT EXISTS inventory.stock_batch (
     status                            text
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 tables reference it.
 CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
     id                                uuid PRIMARY KEY,
     item_id                           uuid NOT NULL,
@@ -295,6 +297,8 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
     scope_path                        text
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
     id                                uuid PRIMARY KEY,
     supplier_id                       uuid NOT NULL,

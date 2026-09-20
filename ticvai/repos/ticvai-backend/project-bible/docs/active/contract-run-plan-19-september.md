@@ -146,10 +146,10 @@ The misses are concentrated in exactly the hubs the schema-viewer notes are abou
 
 | column | missed | should resolve to |
 |---|---:|---|
-| `venue_id` | 16 | `platform.org_unit` |
+| `venue_id` | 16 | `platform.scope` |
 | `order_id` | 14 | `orders.sales_order` |
-| `organisation_id` | 6 | `platform.org_unit` |
-| `partner_id` | 4 | `platform.org_unit` |
+| `organisation_id` | 6 | `platform.scope` |
+| `partner_id` | 4 | `platform.scope` |
 | `parent_id` | 5 | the table itself |
 | `*_ids` (`venue_ids`, `seat_ids`, `entitlement_ids`, `allowed_venue_ids`, `cell_ids`, …) | 19 | one-to-many — **a model change, not a lookup** |
 | `*_ref` (`image_asset_ref`, `icon_asset_ref`, `credential_ref`, `signature_ref`) | 12 | soft reference by convention |

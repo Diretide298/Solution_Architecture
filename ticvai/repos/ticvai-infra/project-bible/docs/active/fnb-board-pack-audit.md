@@ -87,7 +87,7 @@ clusters overlap and several boards name the same act twice. **Food safety first
 one where the absence is a regulatory exposure rather than a feature gap.
 
 **3 — Pages and tables.** `fnb.temperature_log`, `fnb.cold_chain_event`, `fnb.corrective_action`
-are new. Table service needs `fnb.table` as a first-class row — the package models a *visit* and
+are new. Table service needs `fnb.dining_table` as a first-class row — the package models a *visit* and
 infers the table. Counting needs `inventory.count_line`.
 
 **4 — Workflows and journeys.** Three flows the boards make obvious and the package does not have:

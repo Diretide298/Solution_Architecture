@@ -75,7 +75,7 @@ fnb.waitlist_entry             joinRestaurantWaitlist writes it
 fnb.combo_slot                 createCombo, setComboSlots write it
 maintenance.work_order_attachment  attachWorkOrderEvidence writes it
 marketing.privacy_incident     recordPrivacyIncident writes it
-control.api_quota              setApiQuota writes it
+control.api_limit              setApiQuota writes it
 ai.suggestion_outcome          recordSuggestionOutcome writes it
 ```
 

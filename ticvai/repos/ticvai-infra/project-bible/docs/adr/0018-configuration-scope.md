@@ -60,7 +60,7 @@ thing the rule said could not configure, which is how the gap announced itself.
       └── outlet                                            commercial
 
 **Department could not do this job.** `inventory.requisition.department_id` and
-`platform.workstation.department_id` both resolve to `platform.org_unit`: a department has
+`platform.workstation.department_id` both resolve to `platform.scope`: a department has
 requisitions, rotas and workstations. **Modelling a restaurant as a department would put it in
 the staffing tree and give every rota a restaurant to schedule against.**
 
@@ -117,8 +117,8 @@ last year silently follows it. The frozen value has to be written down, which is
 |---|---|
 | `venue_settings` gains `currency_code` and `currency_scale` | written at creation from the region, frozen at first trade |
 | the freeze needs a guard | an operation that changes a traded venue's currency must fail, the way `check-package` already fails an operation declaring a scope it is not entitled to |
-| `ledger.posting` and `journal_line` carry one amount and no currency | **this is the real work.** Currency is inherited from `account.currency`, so a venue trading in USD posts into an AED entity with the USD figure gone. Multi-currency accounting keeps both, and `platform.wallet_authorisation` already does exactly that — `allocation_currency`, `home_currency`, `consuming_currency`, `amount_in_consuming_currency` |
-| `ledger.settlement` has no currency | `provider_gross`, `ledger_gross` and `difference` are bare numbers, so a provider file in one currency against a ledger in another computes a meaningless difference |
+| `ledger.settlement` has no currency | **this is the one real gap, and it is now closed.** A posting resolves its currency from `ledger.account.currency` and a payment from its own `tenderCurrency`; a settlement is a provider file for a period and belongs to no account, so `provider_gross`, `ledger_gross` and `difference` were bare amounts that a cross-currency file makes meaningless. `ledger.settlement` gained `currencyCode` |
+| `ledger.posting` and `journal_line` | **not a gap.** They store the amount alone by design (`Money` declares `x-ticvai-persistence-column`), and `accountId` is required, so the currency is the account's. Accounts are already denominated |
 | `runFxRevaluation` is narrower than its name | it reads `ledger.inter_entity_obligation` only. It cannot revalue a venue's foreign balance because nothing records one |
 | `ledger.fx_rate` is keyed `region_id` | **not a blocker.** It scopes which rate *set* applies, not which pairs exist — a USD venue looks up USD→AED in its region's set. Load the pairs |
 | `region_settings` is a bundle | currency sits beside date format, number format and fiscal year. A venue overrides currency and scale only; the rest still resolves from the region |

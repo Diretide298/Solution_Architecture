@@ -228,6 +228,7 @@ CREATE TABLE IF NOT EXISTS ledger.recognition_schedule (
 -- Money actually arriving from a provider, matched against what was taken
 CREATE TABLE IF NOT EXISTS ledger.settlement (
     id                                uuid PRIMARY KEY NOT NULL,
+    currency_code                     text,
     provider_name                     text NOT NULL,
     period_start                      date NOT NULL,
     period_end                        date NOT NULL,

@@ -102,9 +102,19 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
             # one question.
             #
             # `x-ticvai-persistence-column` is how a shared object says what it stores as. For
-            # `Money` that is the amount alone: **currency and scale are region-scoped
-            # (ADR-0018) and resolve from the scope walk**, so storing AED against nine million
-            # rows in a UAE region is nine million copies of a fact that cannot differ.
+            # `Money` that is the amount alone: **currency and scale resolve rather than being
+            # stored**, so holding AED against nine million rows in one region is nine million
+            # copies of a fact that cannot differ.
+            #
+            # **Amended 20 September, and the rule survives the amendment.** ADR-0018 now lets a
+            # venue set its own trading currency, frozen once it has traded — so "cannot differ"
+            # is no longer true *between* venues. It is still true for any row, because every
+            # amount resolves from something that denominates it and none of those moved:
+            # a posting from `ledger.account.currency`, a payment from its own `tenderCurrency`,
+            # a wallet from `wallet.wallet.currency`, everything else from the venue's frozen
+            # value. **The one amount with nothing to resolve from was `ledger.settlement`** —
+            # a provider file for a period, belonging to no account — and that gained a currency
+            # of its own rather than a hole in this rule.
             col = target.get("x-ticvai-persistence-column")
             if col:
                 return col, None

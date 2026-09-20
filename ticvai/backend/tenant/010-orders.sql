@@ -124,6 +124,8 @@ CREATE TABLE IF NOT EXISTS orders.credit_override (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS orders.deposit (
     id                                uuid PRIMARY KEY,
     order_id                          uuid NOT NULL,
@@ -164,6 +166,8 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
     closed_at                         timestamptz
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS orders.discount (
     id                                uuid PRIMARY KEY,
     order_id                          uuid NOT NULL,
@@ -245,6 +249,8 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
     requires_approval_above           integer
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS orders.membership_renewal (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
@@ -273,6 +279,8 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
     count_this_shift                  integer
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS orders.order_fee (
     id                                uuid PRIMARY KEY,
     order_id                          uuid NOT NULL,
@@ -523,6 +531,8 @@ CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
     expires_at                        timestamptz NOT NULL
 );
 
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.upgrade (
     id                                uuid PRIMARY KEY,
     number                            text NOT NULL,

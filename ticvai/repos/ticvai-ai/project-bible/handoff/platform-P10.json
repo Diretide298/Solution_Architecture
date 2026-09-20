@@ -122,11 +122,11 @@
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "public-api",
    "operations": 4
   }
  ],

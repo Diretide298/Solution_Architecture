@@ -128,7 +128,7 @@ row pointing at it means nothing.
 
 ### 83 of 374 tables have no primary key
 
-22% of the schema. `access.blacklist`, `control.subscription`, `fnb.recipe`, `identity.session`,
+22% of the schema. `access.blacklist`, `subscription.contract`, `fnb.recipe`, `identity.session`,
 `orders.order_discount`, `ledger.journal_line`, `marketing.loyalty_position` and 76 others.
 
 **`derive-ddl.py` already knows.** It reports *"14 declared reference(s) point at a table with no

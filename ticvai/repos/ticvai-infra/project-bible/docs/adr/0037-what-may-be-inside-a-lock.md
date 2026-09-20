@@ -76,7 +76,7 @@ captureStoredValue      two-table write, one of them not contended
 ```
 
 **`captureStoredValue` is the interesting one**: it writes `orders.stored_value_authorisation` and
-`retail.wallet_transaction` in one transaction. **The second is an append to an uncontended table
+`wallet.wallet_transaction` in one transaction. **The second is an append to an uncontended table
 and does not need the lock** — it needs the same transaction, which is not the same requirement.
 
 ### What this does not decide

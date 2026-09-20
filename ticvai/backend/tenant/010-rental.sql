@@ -1,6 +1,8 @@
 -- rental — 23 tables
 -- **Derived. Do not hand-edit.**
 
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 tables reference it.
 CREATE TABLE IF NOT EXISTS rental.agreement (
     id                                uuid PRIMARY KEY,
     rental_number                     text NOT NULL,
@@ -17,6 +19,8 @@ CREATE TABLE IF NOT EXISTS rental.agreement (
     updated_at                        timestamptz
 );
 
+-- Holds 19 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 tables reference it.
 CREATE TABLE IF NOT EXISTS rental.agreement_item (
     id                                uuid PRIMARY KEY,
     rental_agreement_id               uuid NOT NULL,
@@ -227,6 +231,8 @@ CREATE TABLE IF NOT EXISTS rental.inspection (
     scope_path                        text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS rental.inspection_item (
     id                                uuid PRIMARY KEY,
     rental_inspection_id              uuid NOT NULL,

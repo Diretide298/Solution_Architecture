@@ -77,12 +77,12 @@ it.**
 
 ### `shift` is not a service
 
-**It owns no tables.** Its rows live in `orders.shift`, `orders.cash_movement`,
+**It owns no tables.** Its rows live in `orders.pos_shift`, `orders.cash_movement`,
 `orders.deposit_box` and `orders.no_sale_event` — 19 operations, zero schemas.
 
 **A service with no data is not a service; it is a set of operations**, and they belong with the
 scope they resolve against. Folded into TenancyService alongside `workforce` and `approvals`, all
-three of which read `platform.org_unit` constantly and write it rarely — **splitting them means
+three of which read `platform.scope` constantly and write it rarely — **splitting them means
 four services doing the same joins.**
 
 ### Subscription, platform-ops and public-api are one service

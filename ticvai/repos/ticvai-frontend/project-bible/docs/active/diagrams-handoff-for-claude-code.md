@@ -104,7 +104,7 @@ question you ask before writing DDL.
 
 ## Figures worth not restating from memory
 
-**304 of 379 tables anchor on `platform.org_unit`**, and 71 reference it directly. I reported
+**304 of 379 tables anchor on `platform.scope`**, and 71 reference it directly. I reported
 "289 of 378" for several days from an earlier count. **The hierarchy diagram now derives it**, so it
 cannot drift again.
 

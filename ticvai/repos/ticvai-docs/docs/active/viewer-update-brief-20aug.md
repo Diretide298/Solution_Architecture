@@ -43,7 +43,7 @@ New top-level key, one entry per table:
 "orders.order_line": {
   "schemaRoot": "orders.sales_order",
   "isSchemaRoot": false,
-  "anchors": ["access.admission_rules", "identity.role", "pii.subject", "platform.org_unit"],
+  "anchors": ["access.admission_rules", "identity.role", "pii.subject", "platform.scope"],
   "isAnchor": false,
   "parent": "orders.sales_order",
   "depth": 1,
@@ -52,7 +52,7 @@ New top-level key, one entry per table:
 ```
 
 **`anchors` is where a table's own outbound keys stop**, following them across schemas. The
-distribution is the honest shape of the package: **`platform.org_unit` is reached by 289 of 353
+distribution is the honest shape of the package: **`platform.scope` is reached by 289 of 353
 tables** — the tenancy spine — and `identity.role` by 207.
 
 **Worth surfacing as a filter**: *show me everything anchored only on `org_unit`* is *show me

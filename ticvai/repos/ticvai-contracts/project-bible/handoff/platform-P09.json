@@ -178,11 +178,11 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "public-api",
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "ai",
    "operations": 5
   },
   {
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {

@@ -76,11 +76,11 @@
    "operations": 15
   },
   {
-   "contract": "shift",
+   "contract": "rental",
    "operations": 13
   },
   {
-   "contract": "rental",
+   "contract": "shift",
    "operations": 13
   },
   {
@@ -92,6 +92,10 @@
    "operations": 11
   },
   {
+   "contract": "access",
+   "operations": 7
+  },
+  {
    "contract": "queue",
    "operations": 7
   },
@@ -100,27 +104,23 @@
    "operations": 7
   },
   {
-   "contract": "access",
-   "operations": 7
-  },
-  {
    "contract": "ai",
    "operations": 4
-  },
-  {
-   "contract": "reporting",
-   "operations": 2
   },
   {
    "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "reporting",
+   "operations": 2
+  },
+  {
+   "contract": "retail",
    "operations": 2
   },
   {

@@ -1,3 +1,11 @@
+> **SUPERSEDED, 20 September.** Written when 151 of 223 were reviewed and the review was
+> argued on change points. All 223 now carry a verdict and 38 rows moved when re-scored on
+> maintainability, readability, optimised access and strain on the database. Current state:
+> [schema-merge-decision-log.md](schema-merge-decision-log.md) for the twelve decisions,
+> [schema-merge-final-report-20-september.md](schema-merge-final-report-20-september.md)
+> for the report. **This file is kept for the banding method**, which is still how the
+> candidates were found, and for the Jaccard-against-containment finding.
+
 # Their workbook, every change in it, and what it means for us — 20 September
 
 > **Owner:** Chinmay · Supersedes the rename bullets in [current-work.md](current-work.md) and the

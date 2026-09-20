@@ -22,12 +22,12 @@ a table nothing references is not an error.
 | theirs | ours | note |
 |---|---|---|
 | `orders.order` | `orders.sales_order` | keep ours — `ORDER` is a reserved word |
-| `orders.pos_shift` | `orders.shift` | take theirs |
-| `orders.payment_gateway` | `orders.payment_provider` | take theirs — industry term |
+| `orders.pos_shift` | `orders.pos_shift` | take theirs |
+| `orders.payment_gateway` | `payments.provider` | take theirs — industry term |
 | `orders.payment_route` | `orders.payment_routing` | take theirs — a row is one route |
 | `orders.discount` | `orders.order_discount` | **take theirs wholesale, ours is a stub** |
 | `catalogue.product_variant` | `catalogue.variant` | keep ours — pairs with `variant_dimension` |
-| `marketing.journey_enrollment` | `marketing.journey_entrant` | take theirs |
+| `marketing.journey_enrollment` | `marketing.journey_enrollment` | take theirs |
 | `reporting.report_execution` | `reporting.execution` | take theirs — their change log declares it |
 | `reporting.report_input` | `reporting.report_parameter` | keep ours — "parameter" is the domain word |
 | `whitelabel.brand_version` | `whitelabel.config_version` | either |

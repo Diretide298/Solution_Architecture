@@ -114,8 +114,8 @@
   {
    "document": "Access Control Module_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -125,8 +125,8 @@
   {
    "document": "Approval_Workflows_and_Governance_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -136,8 +136,8 @@
   {
    "document": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -147,8 +147,8 @@
   {
    "document": "Communication & Notification Platform Services_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -158,8 +158,8 @@
   {
    "document": "Customer Service_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -202,8 +202,8 @@
   {
    "document": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -213,8 +213,8 @@
   {
    "document": "Membership___Annual_Pass_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -224,8 +224,8 @@
   {
    "document": "Order___Reservation_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -235,8 +235,8 @@
   {
    "document": "Pricing___Revenue_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -246,8 +246,8 @@
   {
    "document": "Privacy__Consent___Preference_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -257,8 +257,8 @@
   {
    "document": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -268,8 +268,8 @@
   {
    "document": "Promotions___Bundles_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -301,8 +301,8 @@
   {
    "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -312,8 +312,8 @@
   {
    "document": "Sales_Channel_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -345,8 +345,8 @@
   {
    "document": "Ticket Resale Marketplace_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -356,8 +356,8 @@
   {
    "document": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -367,8 +367,8 @@
   {
    "document": "Ticket_Media___Credential_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -444,8 +444,8 @@
   {
    "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -455,8 +455,8 @@
   {
    "document": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "heldIn": [
     "packs",
@@ -502,8 +502,8 @@
    "pages": 183,
    "canonical": "sources/packs/Access Control Module_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -799,8 +799,8 @@
    "pages": 81,
    "canonical": "sources/packs/Approval_Workflows_and_Governance_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -839,8 +839,8 @@
    "pages": 63,
    "canonical": "sources/packs/B2B, Reseller & OTA Partner Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1166,8 +1166,8 @@
    "pages": 22,
    "canonical": "sources/packs/Communication & Notification Platform Services_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1218,8 +1218,8 @@
    "pages": 43,
    "canonical": "sources/packs/Customer Service_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1624,8 +1624,8 @@
    "pages": 37,
    "canonical": "sources/packs/Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1772,8 +1772,8 @@
    "pages": 38,
    "canonical": "sources/packs/Membership___Annual_Pass_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1890,8 +1890,8 @@
    "pages": 55,
    "canonical": "sources/packs/Order___Reservation_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1995,8 +1995,8 @@
    "pages": 132,
    "canonical": "sources/packs/Pricing___Revenue_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2107,8 +2107,8 @@
    "pages": 38,
    "canonical": "sources/packs/Privacy__Consent___Preference_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2168,8 +2168,8 @@
    "pages": 27,
    "canonical": "sources/packs/Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2228,8 +2228,8 @@
    "pages": 158,
    "canonical": "sources/packs/Promotions___Bundles_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2505,8 +2505,8 @@
    "pages": 41,
    "canonical": "sources/packs/Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2567,8 +2567,8 @@
    "pages": 36,
    "canonical": "sources/packs/Sales_Channel_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2913,8 +2913,8 @@
    "pages": 59,
    "canonical": "sources/packs/Ticket Resale Marketplace_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2981,8 +2981,8 @@
    "pages": 23,
    "canonical": "sources/packs/Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -3029,8 +3029,8 @@
    "pages": 59,
    "canonical": "sources/packs/Ticket_Media___Credential_Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -4409,8 +4409,8 @@
    "pages": 136,
    "canonical": "sources/packs/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -4511,8 +4511,8 @@
    "pages": 44,
    "canonical": "sources/packs/Waiver, Consent & Digital Form Management_Reference.pdf",
    "authority": [
-    "workshop",
-    "reference"
+    "reference",
+    "workshop"
    ],
    "authorityConflict": true,
    "heldIn": [

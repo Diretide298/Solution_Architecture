@@ -54,7 +54,7 @@ it. You size four services for it and leave twelve alone.**
 
 **`IdentityService` carries 81 inbound cross-service touches, more than any other service.** Per
 venue, a guest who signed in at one venue is unknown at the next. A staff member's role is granted
-at a scope in a tree that spans venues, and 304 of 380 tables anchor on `platform.org_unit` — **the
+at a scope in a tree that spans venues, and 304 of 380 tables anchor on `platform.scope` — **the
 hierarchy itself is not venue-scoped, so the service that resolves it cannot be.**
 
 **`CrossRegionService` is incoherent per venue.** Its job is moving a pseudonymous guest link

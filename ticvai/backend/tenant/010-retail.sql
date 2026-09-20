@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
     is_active                         boolean NOT NULL
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.price (
     id                                uuid PRIMARY KEY,
     list_id                           uuid NOT NULL,
@@ -47,12 +49,13 @@ CREATE TABLE IF NOT EXISTS retail.price (
     updated_at                        timestamptz
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.price_list (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
     code                              text NOT NULL,
     name                              text NOT NULL,
-    currency_code                     text NOT NULL,
     valid_from                        timestamptz,
     valid_to                          timestamptz,
     channels_json                     text,
@@ -62,6 +65,8 @@ CREATE TABLE IF NOT EXISTS retail.price_list (
     updated_at                        timestamptz
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.product (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -76,6 +81,8 @@ CREATE TABLE IF NOT EXISTS retail.product (
     updated_at                        timestamptz
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.product_category (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -87,6 +94,8 @@ CREATE TABLE IF NOT EXISTS retail.product_category (
     updated_at                        timestamptz
 );
 
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
     id                                uuid PRIMARY KEY,
     scope_path                        text,
@@ -108,7 +117,7 @@ CREATE TABLE IF NOT EXISTS retail.product_recommendation (
 );
 
 -- Merchandise held for collection. Hangs off: reaches retail.sale through its keys; references
--- pii.subject, platform.outlet. Reached by: 1 operations read it and 1 write it; 2 tables
+-- pii.subject, platform.outlet. Reached by: 1 operations read it and 1 write it; 3 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS retail.reservation (
     id                                text PRIMARY KEY NOT NULL,
@@ -252,6 +261,8 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     updated_at                        timestamptz
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS retail.variant (
     id                                uuid PRIMARY KEY,
     product_id                        uuid NOT NULL,

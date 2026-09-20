@@ -1,6 +1,8 @@
 -- access — 9 tables
 -- **Derived. Do not hand-edit.**
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS access.access_change (
     id                                uuid PRIMARY KEY,
     old_access_id                     uuid NOT NULL,
@@ -88,6 +90,8 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     wallet_value_id                   uuid
 );
 
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS access.entry_rule_point (
     admission_profile_id              uuid NOT NULL,
     access_point_id                   uuid NOT NULL,

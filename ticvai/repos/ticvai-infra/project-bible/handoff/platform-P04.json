@@ -111,15 +111,15 @@
    "operations": 3
   },
   {
-   "contract": "games",
-   "operations": 2
-  },
-  {
    "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "games",
+   "operations": 2
+  },
+  {
+   "contract": "assets",
    "operations": 1
   },
   {
@@ -131,7 +131,7 @@
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "finance",
    "operations": 1
   }
  ],

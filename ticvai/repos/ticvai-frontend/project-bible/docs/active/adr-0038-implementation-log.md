@@ -110,7 +110,7 @@ was committing the defect it exists to catch.** It now reads a window of one lin
 python tools/check-package.py 2>&1 | grep -c "reasons from ADR"   # 0
 ```
 
-**4. Four tables were never marked written** — `fnb.table`, `identity.session`, `marketing.case`,
+**4. Four tables were never marked written** — `fnb.dining_table`, `identity.session`, `marketing.case`,
 `retail.return`. The regex stopped at the double quote, and those four are quoted precisely because
 they are Postgres reserved words.
 

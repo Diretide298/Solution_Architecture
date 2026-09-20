@@ -117,7 +117,7 @@ Worklist and method: [rename-worklist-20-september.md](rename-worklist-20-septem
 
 - [ ] **Settle the rental / payments / subscription collision first.** Their 28 new tables are
       11 payment, 10 rental and 4 subscription-tier — **and we built all three the same week**,
-      in `payments` (16 tables), `rental` (21) and `control.subscription*`. Theirs went into
+      in `payments` (16 tables), `rental` (21) and `subscription.contract*`. Theirs went into
       `orders`, `catalogue`, `resources`, `maintenance` and `platform`. **Two schemas for one
       domain, days apart. More expensive than every rename in the file put together**
 - [ ] **Take the 3 declared and the 24 certain.** No judgement needed on either
@@ -126,11 +126,11 @@ Worklist and method: [rename-worklist-20-september.md](rename-worklist-20-septem
 - [ ] **Work the 69 undeclared additives one at a time.** Several are plainly ours under another
       name — `identity.customer*` against our `pii.subject*`, `access.accreditation*` against our
       13-table `accreditation` schema — and the `Purpose` line settles them where columns cannot
-- [ ] **The 44 ambiguous need a person.** `fnb.table` matches both `dining_table` and
+- [ ] **The 44 ambiguous need a person.** `fnb.dining_table` matches both `dining_table` and
       `reservation_table`: either they split one or collapsed two, and guessing produces a table
       nobody owns
 - [ ] **Three renames are expensive** — `approvals.request` (16 inbound FKs), `catalogue.variant`
-      (11, and the table F&B and Retail both point at), `orders.shift` (11 reads, 16 screens)
+      (11, and the table F&B and Retail both point at), `orders.pos_shift` (11 reads, 16 screens)
 
 
 ### Now — renames first, then Phase 1
@@ -170,7 +170,7 @@ The Change Log states some renames before the prefix change and some after — `
 | their internal churn | 5 | neither name is ours |
 
 **`orders.till_shift -> orders.pos_shift` is in the churn group**, and that matters: the standing
-to-do lists `orders.shift -> orders.pos_shift` as the one expensive rename we owe. **Their
+to-do lists `orders.pos_shift -> orders.pos_shift` as the one expensive rename we owe. **Their
 Change Log says the rename was from `till_shift`, a name we have never had.** That item came from
 column matching, not from their declaration. Measured today it is 11 reads, 7 writes, two services
 and 16 screens across P04/P06/P07/P08 — **confirm it with them before paying for it.**
@@ -300,7 +300,7 @@ and both failure directions were observed:
   Change Log **declares** it as `identity.otp_challenge` → `identity.otp`
 
 **This is the lesson already in the phase-0 doc, confirmed from a third direction: step 3 must be
-human.** The ~23 surviving mid-confidence candidates (`fnb.sold_out_item` ↔ `fnb.eighty_six_event`
+human.** The ~23 surviving mid-confidence candidates (`fnb.sold_out_item` ↔ `fnb.sold_out_item`
 at 88%, `platform.cash_denomination` ↔ `platform.denomination`, `inventory.stock_movement` ↔
 `inventory.movement`) are a worklist for a person, not a result.
 
@@ -316,13 +316,13 @@ at 88%, `platform.cash_denomination` ↔ `platform.denomination`, `inventory.sto
 
       | ours → theirs | inbound FK | contract files | note |
       |---|---|---|---|
-      | `orders.shift` → `orders.pos_shift` | **6** | 3 | The only expensive one. `retail.sale`, `orders.sales_order`, `cash_movement`, `deposit_box` and two more point at it |
+      | `orders.pos_shift` → `orders.pos_shift` | **6** | 3 | The only expensive one. `retail.sale`, `orders.sales_order`, `cash_movement`, `deposit_box` and two more point at it |
       | `reporting.execution` → `reporting.report_execution` | 1 | 1 | `reporting.export.execution_id` |
       | `orders.payment_provider` → `orders.payment_gateway` | 0 | 1 | free |
       | `orders.payment_routing` → `orders.payment_route` | 0 | 1 | free |
       | `marketing.journey_entrant` → `marketing.journey_enrollment` | 0 | 1 | free |
 
-      **Four of the five are free.** Do those, then `orders.shift` on its own with its six FKs.
+      **Four of the five are free.** Do those, then `orders.pos_shift` on its own with its six FKs.
 
 - [ ] **Four renames to decline, in writing** — `orders.sales_order` (`ORDER` is reserved),
       `catalogue.variant` (pairs with `variant_dimension`), `reporting.report_parameter`
@@ -404,7 +404,7 @@ Writing `membership_renewal` exposed it. **No `customer_membership`, no `members
 **13 membership operations** and ~30 `Membership*View` schemas each declaring itself *"a projection
 over subscription state, assembled at read time from tables that already exist."* They do not exist.
 
-The three name matches are false friends: `control.subscription` is the tenant's SaaS plan,
+The three name matches are false friends: `subscription.contract` is the tenant's SaaS plan,
 `marketing.subscription` is a mailing list, `orders.wallet_pass` is an Apple/Google pass.
 
 **`orders.membership_renewal` cannot be migrated until `orders.customer_membership` lands.**

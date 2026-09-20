@@ -132,7 +132,7 @@ three times before that was visible.
 
 Above both sat the real source: **`derive-lineage` adds and never updates, and that applies
 to `reads` and `writes`, not only to `contract` and `service`.** Twenty-six operations still
-listed `retail.wallet`, so every refresh re-derived the tables from the lineage and
+listed `wallet.wallet`, so every refresh re-derived the tables from the lineage and
 `backend/` emitted `CREATE TABLE` for both.
 
 Repointed at source: 26 lineage operations, 27 names in `links.json`, 13 graph endpoints,

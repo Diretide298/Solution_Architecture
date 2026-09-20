@@ -152,6 +152,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.promo_block (
     scope_path                        text
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS whitelabel.redirect (
     id                                uuid PRIMARY KEY,
     tenant_config_id                  uuid NOT NULL,
@@ -165,6 +167,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.redirect (
     updated_at                        timestamptz
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS whitelabel.seo_setting (
     id                                uuid PRIMARY KEY,
     tenant_config_id                  uuid NOT NULL,

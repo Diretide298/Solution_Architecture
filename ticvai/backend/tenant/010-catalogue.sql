@@ -234,6 +234,8 @@ CREATE TABLE IF NOT EXISTS catalogue.inventory_hold (
     envelope_id                       uuid NOT NULL
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 tables reference it.
 CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -247,15 +249,17 @@ CREATE TABLE IF NOT EXISTS catalogue.membership_benefit (
     created_at                        timestamptz NOT NULL
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS catalogue.membership_programme (
-    id                                uuid PRIMARY KEY NOT NULL,
     program_id                        uuid NOT NULL,
     program_code                      text NOT NULL,
     program_name                      text NOT NULL,
     description                       text,
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
-    updated_at                        timestamptz
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- When a product happens — a session, a showing, a timed entry slot. Capacity lives here and in
@@ -273,15 +277,17 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
     admission_profile_id              uuid NOT NULL
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS catalogue.plan_benefit (
-    id                                uuid PRIMARY KEY NOT NULL,
     membership_plan_id                uuid NOT NULL,
     membership_benefit_id             uuid NOT NULL,
     usage_limit                       numeric(18,4),
     usage_period                      text,
     priority                          integer NOT NULL,
     is_active                         boolean NOT NULL,
-    created_at                        timestamptz NOT NULL
+    created_at                        timestamptz NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing

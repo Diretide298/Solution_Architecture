@@ -2405,6 +2405,32 @@ components:
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
         venueId: { type: string, format: uuid }
+        currencyCode:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          description: >
+            **The venue's trading currency, defaulted from its region and frozen once the venue
+            has traded** (ADR-0018, amended 20 September). Currency was a region-only fact,
+            grouped with tax rates on the reasoning that *"a venue cannot choose its VAT"* --
+            true of tax and over-applied to currency, because a free-zone unit, a duty-free shop
+            and a cruise terminal genuinely trade in a currency their region does not.
+
+            **This column exists because the freeze needs somewhere to live.** A venue that
+            resolved purely from its region would silently follow a region currency change after
+            it had already traded, and every dated artefact beneath it -- a price list is a
+            `validFrom`/`validTo` range -- would render retrospectively wrong. Null means
+            "resolve from the region", which is the answer for every venue that has not
+            overridden.
+        currencyScale:
+          type: integer
+          minimum: 0
+          maximum: 4
+          nullable: true
+          description: >
+            **Scale travels with currency** (ADR-0008). OMR is three decimal places because Oman
+            says so; overriding the currency without the scale gets rounding wrong. Set together
+            or not at all.
         supportHours:
           type: object
           description: >

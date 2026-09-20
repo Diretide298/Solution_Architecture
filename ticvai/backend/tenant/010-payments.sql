@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
     scope_path                        text
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS payments.currency_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -57,6 +59,8 @@ CREATE TABLE IF NOT EXISTS payments.currency_rule (
     updated_at                        timestamptz
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     id                                uuid PRIMARY KEY,
     deposit_id                        uuid NOT NULL,
@@ -69,6 +73,8 @@ CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     created_at                        timestamptz NOT NULL
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS payments.eligibility_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -98,6 +104,8 @@ CREATE TABLE IF NOT EXISTS payments.failover_policy (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS payments.fee_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
@@ -178,6 +186,8 @@ CREATE TABLE IF NOT EXISTS payments.method (
     is_active                         boolean
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS payments.method_config (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,

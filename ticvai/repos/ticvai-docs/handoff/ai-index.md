@@ -243,7 +243,7 @@
 | [Optimisation assessment — RAG, caching, backend, frontend](..\docs\active\optimisation-assessment.md) |  | 4 |
 | [Optimisation adoption plan](..\docs\active\optimisation-plan.md) |  | 3 |
 | [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |
-| [Their workbook, every change in it, and what it means for us — 20 September](..\docs\active\rename-worklist-20-september.md) |  | 2 |
+| [> **SUPERSEDED, 20 September.** Written when 151 of 223 were reviewed and the review was](..\docs\active\rename-worklist-20-september.md) |  | 2 |
 | [Schema merge — the decision log](..\docs\active\schema-merge-decision-log.md) |  | 2 |
 | [Identical operation sets — what each cluster actually is](..\docs\active\screen-duplicate-triage.md) |  | 5 |
 | [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |

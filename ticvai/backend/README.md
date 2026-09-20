@@ -54,7 +54,7 @@ the parser is reading something the generator did not write.
 sorted so that every reference precedes its use — `orders` reaches `catalogue`, `catalogue` reaches
 `platform`, and something reaches back.
 
-**`enforced: no` becomes an index and a comment, never a constraint.** 157 of the 1357 relationships
+**`enforced: no` becomes an index and a comment, never a constraint.** 157 of the 1348 relationships
 are naming conventions the contracts never asserted (ADR-0011), and **enforcing one fails on the
 first row that legitimately points nowhere.**
 

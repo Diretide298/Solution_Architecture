@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
     exception                         text
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.employee (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -68,6 +70,8 @@ CREATE TABLE IF NOT EXISTS workforce.employee (
     updated_at                        timestamptz
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS workforce.employment (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,
@@ -80,6 +84,8 @@ CREATE TABLE IF NOT EXISTS workforce.employment (
     created_at                        timestamptz NOT NULL
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.job_title (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -91,6 +97,8 @@ CREATE TABLE IF NOT EXISTS workforce.job_title (
     updated_at                        timestamptz
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS workforce.leave_balance (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,
@@ -118,6 +126,8 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
     scope_path                        text
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS workforce.leave_type (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -174,6 +184,8 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     note                              text
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS workforce.shift (
     id                                uuid PRIMARY KEY,
     tenant_id                         uuid NOT NULL,
@@ -244,6 +256,8 @@ CREATE TABLE IF NOT EXISTS workforce.training_record (
     evidence_ref                      text
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS workforce.work_assignment (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,

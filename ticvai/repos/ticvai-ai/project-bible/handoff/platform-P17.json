@@ -49,11 +49,11 @@
    "operations": 11
   },
   {
-   "contract": "finance",
+   "contract": "catalogue",
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "finance",
    "operations": 1
   },
   {

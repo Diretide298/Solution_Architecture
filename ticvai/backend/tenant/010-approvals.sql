@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 5
--- operations read it and 1 write it; 1 tables reference it.
+-- operations read it and 1 write it; 5 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,
     "order"                           integer NOT NULL,

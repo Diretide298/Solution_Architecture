@@ -72,15 +72,15 @@
    "operations": 7
   },
   {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "white-label",
    "operations": 1
   },
   {
    "contract": "queue",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   },
   {

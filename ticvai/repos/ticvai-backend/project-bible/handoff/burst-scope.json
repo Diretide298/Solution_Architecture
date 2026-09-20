@@ -489,7 +489,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.org_unit` through its keys. **Reached by**: 2 operations "
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 2 operations rea"
   },
   {
    "table": "seating.seat",

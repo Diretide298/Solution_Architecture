@@ -38,8 +38,8 @@ human, and it has to happen before any contract is written.
 | theirs | ours | evidence | recommendation |
 |---|---|---|---|
 | `orders.order` | `orders.sales_order` | both carry channel, status, gross_amount, refunded_amount, workstation_id, tax, order number | **Merge. Keep our name.** `order` is a reserved word in SQL and would need quoting at every use site — worth pushing back on rather than conceding. |
-| `orders.pos_shift` | `orders.shift` | both: workstation_id, status, opening_float, sales_total, refunds_total, opened_at, closed_at | **Merge, take their name.** `pos_shift` is clearer, and their change log already declares `till_shift → pos_shift`. |
-| `orders.payment_gateway` | `orders.payment_provider` | both: name, kind, supported_methods, supported_currencies, credential reference, is_active, supports_* flags | **Merge.** Name is a coin-toss; `gateway` is the more common industry term. |
+| `orders.pos_shift` | `orders.pos_shift` | both: workstation_id, status, opening_float, sales_total, refunds_total, opened_at, closed_at | **Merge, take their name.** `pos_shift` is clearer, and their change log already declares `till_shift → pos_shift`. |
+| `orders.payment_gateway` | `payments.provider` | both: name, kind, supported_methods, supported_currencies, credential reference, is_active, supports_* flags | **Merge.** Name is a coin-toss; `gateway` is the more common industry term. |
 | `orders.payment_route` | `orders.payment_routing` | both: priority, conditions, fallback provider | **Merge, take their name.** A row is one route. |
 | `orders.discount` | `orders.order_discount` | ours holds `id` and `order_id` **and nothing else** | **Merge, take theirs wholesale.** Ours is a stub that was never filled in. Theirs has applied_amount, coupon_code, promotion_id, reason, type, value. |
 | `orders.cash_count_line` | `orders.cash_count_line` | same name | **Merge.** They add denomination_id, denomination_value, line_total. |
@@ -126,7 +126,7 @@ domain it came from. **Take all three.**
 
 ### 3.3  `cash_count` belongs in `shift.yaml` — and the precedent already exists
 
-`shift.yaml` already declares persistence into `orders.cash_count_line`, `orders.shift`,
+`shift.yaml` already declares persistence into `orders.cash_count_line`, `orders.pos_shift`,
 `orders.cash_movement`, `orders.deposit_box` and `orders.no_sale_event`. **A contract file already
 owns `orders.*` tables**, so schema ownership and contract ownership diverging is the established
 pattern, not a new problem.

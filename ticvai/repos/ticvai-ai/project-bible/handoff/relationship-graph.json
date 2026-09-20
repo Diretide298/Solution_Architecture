@@ -1381,6 +1381,15 @@
   },
   {
    "frm": "control.rollout",
+   "col": "reinventory_hold_id",
+   "to": "wallet.hold",
+   "how": "convention",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.rollout",
    "col": "started_by_principal_id",
    "to": "identity.principal",
    "how": "declared",
@@ -5682,6 +5691,24 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "marketing.referral",
+   "col": "referrer_reward_id",
+   "to": "marketing.reward",
+   "how": "convention",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.referral",
+   "col": "referee_reward_id",
+   "to": "marketing.reward",
+   "how": "convention",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "marketing.touch_point",
    "col": "subject_id",
    "to": "pii.subject",
@@ -6641,6 +6668,15 @@
    "to": "platform.outbox",
    "how": "convention",
    "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "ai.index_failure",
+   "col": "job_id",
+   "to": "workforce.job_title",
+   "how": "convention",
+   "cross": "yes",
    "required": "yes",
    "edgeKind": "foreignKey"
   },
@@ -8859,48 +8895,12 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.rollout",
-   "col": "reinventory_hold_id",
-   "to": "wallet.hold",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "marketing.referral",
-   "col": "referrer_reward_id",
-   "to": "marketing.reward",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "marketing.referral",
-   "col": "referee_reward_id",
-   "to": "marketing.reward",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "ai.index_failure",
-   "col": "job_id",
-   "to": "workforce.job_title",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "access.access_change",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
+   "to": "orders.sales_order",
+   "how": "declared",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8909,7 +8909,7 @@
    "to": "orders.upgrade",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8918,16 +8918,16 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "access.entry_rule_point",
    "col": "admission_profile_id",
-   "to": "platform.profile_deployment",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "access.admission_rules",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8936,7 +8936,7 @@
    "to": "access.access_point",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8945,7 +8945,7 @@
    "to": "catalogue.entitlement_template",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8954,7 +8954,7 @@
    "to": "subscription.plan",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8963,7 +8963,7 @@
    "to": "catalogue.membership_benefit",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8972,7 +8972,7 @@
    "to": "inventory.item",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8981,7 +8981,7 @@
    "to": "inventory.item",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8990,7 +8990,7 @@
    "to": "inventory.item",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -8999,7 +8999,7 @@
    "to": "fnb.modifier_group",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9008,7 +9008,7 @@
    "to": "fnb.order",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9017,7 +9017,7 @@
    "to": "fnb.menu_item",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9026,7 +9026,7 @@
    "to": "orders.sales_order",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9035,7 +9035,7 @@
    "to": "platform.outlet",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9044,7 +9044,7 @@
    "to": "fnb.table_visit",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9053,7 +9053,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9062,7 +9062,16 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.product",
+   "col": "category_id",
+   "to": "maintenance.asset_category",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9071,7 +9080,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9080,7 +9089,7 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9089,7 +9098,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9098,7 +9107,7 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9107,7 +9116,16 @@
    "to": "retail.reservation",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.reservation_table",
+   "col": "table_id",
+   "to": "fnb.dining_table",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9116,7 +9134,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9125,7 +9143,7 @@
    "to": "identity.customer_membership",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9134,7 +9152,7 @@
    "to": "catalogue.membership_benefit",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9143,7 +9161,7 @@
    "to": "fnb.order",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9152,7 +9170,7 @@
    "to": "subscription.plan",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9161,7 +9179,7 @@
    "to": "fnb.order",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9170,7 +9188,7 @@
    "to": "identity.customer_membership",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9179,7 +9197,7 @@
    "to": "ledger.account",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9188,7 +9206,7 @@
    "to": "identity.module",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9197,7 +9215,7 @@
    "to": "identity.module",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9206,7 +9224,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9215,7 +9233,7 @@
    "to": "payments.token",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9224,7 +9242,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9233,7 +9251,7 @@
    "to": "identity.role",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9242,7 +9260,7 @@
    "to": "identity.permission",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9251,7 +9269,7 @@
    "to": "ledger.account",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9260,7 +9278,7 @@
    "to": "ledger.account",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9269,7 +9287,7 @@
    "to": "inventory.item",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9278,7 +9296,16 @@
    "to": "inventory.location",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "inventory.stock_reservation",
+   "col": "source_id",
+   "to": "ai.index_source",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9287,7 +9314,7 @@
    "to": "inventory.supplier",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9296,7 +9323,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9305,7 +9332,7 @@
    "to": "marketing.campaign",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9314,7 +9341,7 @@
    "to": "marketing.badge",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9323,7 +9350,7 @@
    "to": "marketing.challenge",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9332,7 +9359,7 @@
    "to": "platform.tenant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9341,7 +9368,7 @@
    "to": "reporting.report_field",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9350,7 +9377,7 @@
    "to": "reporting.report_field",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9359,7 +9386,7 @@
    "to": "marketing.journey",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9368,7 +9395,7 @@
    "to": "marketing.message_template",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9377,7 +9404,7 @@
    "to": "marketing.campaign",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9386,7 +9413,7 @@
    "to": "marketing.journey_step",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9395,7 +9422,7 @@
    "to": "marketing.journey_step",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9404,7 +9431,7 @@
    "to": "marketing.campaign",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9413,7 +9440,7 @@
    "to": "marketing.loyalty_points",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9422,7 +9449,7 @@
    "to": "marketing.campaign",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9431,7 +9458,7 @@
    "to": "marketing.points_earning_rule",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9440,7 +9467,7 @@
    "to": "marketing.reward",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9449,7 +9476,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9458,7 +9485,7 @@
    "to": "marketing.review",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9467,7 +9494,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9476,7 +9503,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9485,7 +9512,7 @@
    "to": "marketing.reward",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9494,16 +9521,16 @@
    "to": "fnb.order",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "orders.deposit",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "orders.sales_order",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9512,16 +9539,16 @@
    "to": "rental.agreement",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "orders.discount",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "orders.sales_order",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9530,7 +9557,7 @@
    "to": "promotions.promotion",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9539,7 +9566,7 @@
    "to": "identity.customer_membership",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9548,25 +9575,25 @@
    "to": "subscription.plan",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "orders.membership_renewal",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "orders.sales_order",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "orders.order_fee",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "orders.sales_order",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9575,7 +9602,7 @@
    "to": "approvals.rule",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9584,16 +9611,16 @@
    "to": "payments.method",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "orders.upgrade",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
+   "to": "orders.sales_order",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9602,7 +9629,7 @@
    "to": "orders.order_line",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9611,7 +9638,7 @@
    "to": "orders.order_line",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9620,7 +9647,7 @@
    "to": "approvals.rule",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9629,7 +9656,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9638,7 +9665,7 @@
    "to": "whitelabel.policy",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9647,7 +9674,7 @@
    "to": "assets.distribution_channel",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9656,7 +9683,7 @@
    "to": "ledger.deposit",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9665,7 +9692,7 @@
    "to": "orders.payment",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9674,7 +9701,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9683,7 +9710,7 @@
    "to": "whitelabel.policy",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9692,7 +9719,7 @@
    "to": "payments.method",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9701,7 +9728,7 @@
    "to": "assets.distribution_channel",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9710,7 +9737,7 @@
    "to": "whitelabel.policy",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9719,7 +9746,7 @@
    "to": "payments.method",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9728,7 +9755,7 @@
    "to": "ai.provider",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9737,7 +9764,7 @@
    "to": "assets.distribution_channel",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9746,7 +9773,7 @@
    "to": "whitelabel.policy",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9755,7 +9782,7 @@
    "to": "payments.method",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9764,7 +9791,7 @@
    "to": "assets.distribution_channel",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9773,7 +9800,7 @@
    "to": "control.cell",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9782,7 +9809,7 @@
    "to": "approvals.rule",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9791,7 +9818,7 @@
    "to": "approvals.rule",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9800,7 +9827,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9809,7 +9836,7 @@
    "to": "catalogue.price_list",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9818,16 +9845,25 @@
    "to": "assets.distribution_channel",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "rental.agreement",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
+   "to": "orders.sales_order",
+   "how": "declared",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "rental.agreement",
+   "col": "venue_id",
+   "to": "platform.scope",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9836,7 +9872,7 @@
    "to": "rental.agreement",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9845,7 +9881,7 @@
    "to": "orders.order_line",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9854,7 +9890,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9863,7 +9899,7 @@
    "to": "resources.booking",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9872,7 +9908,7 @@
    "to": "resources.resource",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9881,7 +9917,7 @@
    "to": "maintenance.asset",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9890,7 +9926,7 @@
    "to": "inventory.item",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9899,7 +9935,7 @@
    "to": "inventory.stock_reservation",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9908,7 +9944,7 @@
    "to": "rental.inspection",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9917,7 +9953,7 @@
    "to": "rental.agreement_item",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9926,7 +9962,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9935,7 +9971,16 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "retail.product",
+   "col": "category_id",
+   "to": "maintenance.asset_category",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9944,7 +9989,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9953,7 +9998,7 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9962,7 +10007,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9971,7 +10016,7 @@
    "to": "catalogue.variant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9980,7 +10025,7 @@
    "to": "rental.product",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9989,7 +10034,7 @@
    "to": "seating.seat",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -9998,7 +10043,7 @@
    "to": "wallet.hold",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10007,7 +10052,7 @@
    "to": "seating.seat",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10016,7 +10061,7 @@
    "to": "control.cell",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10025,7 +10070,7 @@
    "to": "control.cell",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10034,7 +10079,7 @@
    "to": "platform.guest_link",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10043,7 +10088,7 @@
    "to": "control.cell",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10052,7 +10097,7 @@
    "to": "control.cell",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10061,7 +10106,7 @@
    "to": "wallet.balance",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10070,7 +10115,7 @@
    "to": "wallet.wallet",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10079,7 +10124,7 @@
    "to": "wallet.hold",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10088,16 +10133,16 @@
    "to": "wallet.wallet",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
    "frm": "wallet.hold",
    "col": "order_id",
-   "to": "fnb.order",
-   "how": "convention",
+   "to": "orders.sales_order",
+   "how": "declared",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10106,7 +10151,7 @@
    "to": "orders.payment",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10115,7 +10160,7 @@
    "to": "whitelabel.tenant_config",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10124,7 +10169,7 @@
    "to": "whitelabel.tenant_config",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10133,7 +10178,7 @@
    "to": "ledger.legal_entity",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10142,7 +10187,7 @@
    "to": "platform.tenant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10151,7 +10196,7 @@
    "to": "identity.user_access",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10160,7 +10205,7 @@
    "to": "workforce.employee",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10169,7 +10214,7 @@
    "to": "workforce.employee",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10178,7 +10223,7 @@
    "to": "platform.tenant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10187,7 +10232,7 @@
    "to": "workforce.employee",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10196,7 +10241,7 @@
    "to": "platform.tenant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10205,7 +10250,7 @@
    "to": "platform.tenant",
    "how": "convention",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10214,7 +10259,7 @@
    "to": "workforce.employee",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10223,7 +10268,25 @@
    "to": "workforce.job_title",
    "how": "convention",
    "cross": "",
-   "required": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.work_assignment",
+   "col": "venue_id",
+   "to": "platform.scope",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.work_assignment",
+   "col": "department_id",
+   "to": "platform.scope",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -10232,151 +10295,7 @@
    "to": "platform.outlet",
    "how": "convention",
    "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "access.access_change",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "access.entry_rule_point",
-   "col": "admission_profile_id",
-   "to": "access.admission_rules",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "fnb.product",
-   "col": "category_id",
-   "to": "maintenance.asset_category",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "fnb.reservation_table",
-   "col": "table_id",
-   "to": "fnb.dining_table",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "inventory.stock_reservation",
-   "col": "source_id",
-   "to": "ai.index_source",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.deposit",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.discount",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.membership_renewal",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.order_fee",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "orders.upgrade",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "rental.agreement",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "rental.agreement",
-   "col": "venue_id",
-   "to": "platform.scope",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "retail.product",
-   "col": "category_id",
-   "to": "maintenance.asset_category",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "wallet.hold",
-   "col": "order_id",
-   "to": "orders.sales_order",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "workforce.work_assignment",
-   "col": "venue_id",
-   "to": "platform.scope",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "workforce.work_assignment",
-   "col": "department_id",
-   "to": "platform.scope",
-   "how": "precedent",
-   "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -12605,6 +12524,19 @@
    "getOrderStatement",
    "getCommissionStatement"
   ],
+  "ledger.journal_entry": [
+   "createRefund",
+   "createPayment",
+   "closeShift",
+   "runRecognition",
+   "listJournalEntries",
+   "createJournalEntry",
+   "getJournalEntry",
+   "approveJournalEntry",
+   "rejectJournal",
+   "reverseJournalEntry",
+   "runFxRevaluation"
+  ],
   "ledger.posting": [
    "createRefund",
    "createPayment",
@@ -12623,19 +12555,6 @@
    "respondToChargeback",
    "exportPartnerInvoice",
    "recordWriteOff"
-  ],
-  "ledger.journal_entry": [
-   "createRefund",
-   "createPayment",
-   "closeShift",
-   "runRecognition",
-   "listJournalEntries",
-   "createJournalEntry",
-   "getJournalEntry",
-   "approveJournalEntry",
-   "rejectJournal",
-   "reverseJournalEntry",
-   "runFxRevaluation"
   ],
   "orders.refund_policy": [
    "createRefundRequest",
@@ -12737,6 +12656,15 @@
   "orders.credit_override": [
    "overrideCreditLimit"
   ],
+  "access.admission_rules": [
+   "validateAccess",
+   "getOfflinePackage",
+   "listAdmissionRules",
+   "createAdmissionRules",
+   "updateAdmissionRules",
+   "validateGroupAccess",
+   "listEntitlements"
+  ],
   "access.access_point": [
    "validateAccess",
    "overrideAccess",
@@ -12752,15 +12680,6 @@
    "recordAttendance",
    "setVenuePoint",
    "setVenueSettings"
-  ],
-  "access.admission_rules": [
-   "validateAccess",
-   "getOfflinePackage",
-   "listAdmissionRules",
-   "createAdmissionRules",
-   "updateAdmissionRules",
-   "validateGroupAccess",
-   "listEntitlements"
   ],
   "access.blacklist": [
    "validateAccess",
@@ -12815,14 +12734,20 @@
    "escalateCorrectiveAction",
    "closeCorrectiveAction"
   ],
-  "venuemap.path": [
+  "venuemap.map": [
    "getOfflinePackage",
+   "listVenueMaps",
+   "createVenueMap",
    "getVenueMap",
    "importVenueGeometry",
+   "setVenuePoint",
    "publishVenueMap",
+   "getVenueMapLive",
+   "acceptVenueLabelProposals",
    "getVenueMapGraph",
    "validateVenueMapGraph",
    "setPathClosure",
+   "proposeWalkways",
    "acceptWalkwayProposals"
   ],
   "venuemap.point": [
@@ -12842,20 +12767,14 @@
    "recordLostItem",
    "broadcastToGuests"
   ],
-  "venuemap.map": [
+  "venuemap.path": [
    "getOfflinePackage",
-   "listVenueMaps",
-   "createVenueMap",
    "getVenueMap",
    "importVenueGeometry",
-   "setVenuePoint",
    "publishVenueMap",
-   "getVenueMapLive",
-   "acceptVenueLabelProposals",
    "getVenueMapGraph",
    "validateVenueMapGraph",
    "setPathClosure",
-   "proposeWalkways",
    "acceptWalkwayProposals"
   ],
   "orders.pos_shift": [
@@ -12871,18 +12790,18 @@
    "acceptShiftVariance",
    "getForeignTenderReport"
   ],
-  "platform.venue_settings": [
-   "openShift",
-   "closeShift",
-   "getVenueSettings",
-   "setVenueSettings"
-  ],
   "orders.cash_count_line": [
    "openShift",
    "closeShift",
    "listCashMovements",
    "createCashMovement",
    "closeDepositBoxes"
+  ],
+  "platform.venue_settings": [
+   "openShift",
+   "closeShift",
+   "getVenueSettings",
+   "setVenueSettings"
   ],
   "orders.cash_movement": [
    "closeShift",
@@ -12920,6 +12839,21 @@
    "getDsarRequest",
    "deleteGuestAccount"
   ],
+  "identity.session": [
+   "login",
+   "selectRole",
+   "refreshToken",
+   "logout",
+   "forceLogout",
+   "getCurrentSession",
+   "completeSsoAuthorization",
+   "verifyMfaChallenge",
+   "listActiveSessions",
+   "revokeAllSessions"
+  ],
+  "identity.principal_credential": [
+   "login"
+  ],
   "identity.delegated_access": [
    "login",
    "selectRole",
@@ -12939,18 +12873,6 @@
    "listMyEntitlements",
    "getEntitlement"
   ],
-  "identity.session": [
-   "login",
-   "selectRole",
-   "refreshToken",
-   "logout",
-   "forceLogout",
-   "getCurrentSession",
-   "completeSsoAuthorization",
-   "verifyMfaChallenge",
-   "listActiveSessions",
-   "revokeAllSessions"
-  ],
   "identity.role": [
    "login",
    "selectRole",
@@ -12961,9 +12883,6 @@
    "publishAnnouncement",
    "setAlertRule",
    "setRolePermissions"
-  ],
-  "identity.principal_credential": [
-   "login"
   ],
   "identity.role_permission": [
    "resolvePermissions",
@@ -13122,6 +13041,16 @@
    "addGuestNote",
    "updateGuestPreferences"
   ],
+  "marketing.loyalty_position": [
+   "getGuestProfile",
+   "updateGuestProfile",
+   "getGuestLoyalty",
+   "adjustLoyaltyPoints",
+   "getMyMemberships",
+   "identifyGuest",
+   "accrueLoyaltyPoints",
+   "redeemLoyaltyPoints"
+  ],
   "marketing.consent_record": [
    "getGuestProfile",
    "getGuestConsents",
@@ -13133,16 +13062,6 @@
    "uploadGuestDocument",
    "exportSubjectData",
    "mergeGuests"
-  ],
-  "marketing.loyalty_position": [
-   "getGuestProfile",
-   "updateGuestProfile",
-   "getGuestLoyalty",
-   "adjustLoyaltyPoints",
-   "getMyMemberships",
-   "identifyGuest",
-   "accrueLoyaltyPoints",
-   "redeemLoyaltyPoints"
   ],
   "marketing.consent_purpose": [
    "getGuestConsents",
@@ -13187,12 +13106,12 @@
    "getCampaignPerformance",
    "recordTouchPoint"
   ],
+  "marketing.message_delivery": [
+   "getCampaignPerformance"
+  ],
   "marketing.attribution_touch": [
    "getCampaignPerformance",
    "getJourneyPerformance"
-  ],
-  "marketing.message_delivery": [
-   "getCampaignPerformance"
   ],
   "marketing.message_template": [
    "listMessageTemplates",
@@ -13352,18 +13271,6 @@
    "listSubscriptionInvoices",
    "generateInvoice"
   ],
-  "fnb.menu": [
-   "listDiningOutlets",
-   "listMenus",
-   "createMenu",
-   "getMenu",
-   "updateMenu",
-   "setMenuSections",
-   "publishMenu",
-   "rollbackMenu",
-   "scheduleMenuPublish",
-   "applyMenuActions"
-  ],
   "fnb.service_order": [
    "listDiningOutlets",
    "recordOrderHandover",
@@ -13384,6 +13291,18 @@
    "closeTableVisit",
    "markOrderCollected",
    "sendOrderNotification"
+  ],
+  "fnb.menu": [
+   "listDiningOutlets",
+   "listMenus",
+   "createMenu",
+   "getMenu",
+   "updateMenu",
+   "setMenuSections",
+   "publishMenu",
+   "rollbackMenu",
+   "scheduleMenuPublish",
+   "applyMenuActions"
   ],
   "fnb.modifier_group": [
    "getGuestMenu",
@@ -13735,14 +13654,6 @@
    "getDueMaintenance",
    "closeWorkOrder"
   ],
-  "maintenance.preventive_plan": [
-   "getAsset",
-   "lookupAsset",
-   "listMaintenancePlans",
-   "createMaintenancePlan",
-   "updateMaintenancePlan",
-   "getDueMaintenance"
-  ],
   "maintenance.work_order": [
    "getAsset",
    "lookupAsset",
@@ -13763,6 +13674,14 @@
    "closeWorkOrder",
    "attachWorkOrderEvidence",
    "getResourceAvailability"
+  ],
+  "maintenance.preventive_plan": [
+   "getAsset",
+   "lookupAsset",
+   "listMaintenancePlans",
+   "createMaintenancePlan",
+   "updateMaintenancePlan",
+   "getDueMaintenance"
   ],
   "maintenance.inspection_template": [
    "listInspectionTemplates",
@@ -13818,7 +13737,7 @@
    "reindexSource",
    "listSeededReports"
   ],
-  "reporting.report_filter": [
+  "reporting.report_column": [
    "createReport",
    "getReport",
    "updateReport",
@@ -13832,7 +13751,7 @@
    "runReport",
    "saveNaturalLanguageQuery"
   ],
-  "reporting.report_column": [
+  "reporting.report_filter": [
    "createReport",
    "getReport",
    "updateReport",
@@ -13875,20 +13794,6 @@
    "getDashboard",
    "updateDashboard"
   ],
-  "ai.policy": [
-   "askReportingQuestion",
-   "saveNaturalLanguageQuery",
-   "sendAiMessage",
-   "generateConfiguration",
-   "getAiPolicy",
-   "setAiPolicy",
-   "settleAiUsage",
-   "proposeVenueLabels",
-   "proposeWalkways",
-   "proposeTranslations",
-   "requestSuggestion",
-   "setSuggestionProvider"
-  ],
   "ai.provider": [
    "askReportingQuestion",
    "saveNaturalLanguageQuery",
@@ -13899,6 +13804,20 @@
    "setAiProvider",
    "setAiCredential",
    "testAiProvider",
+   "proposeVenueLabels",
+   "proposeWalkways",
+   "proposeTranslations",
+   "requestSuggestion",
+   "setSuggestionProvider"
+  ],
+  "ai.policy": [
+   "askReportingQuestion",
+   "saveNaturalLanguageQuery",
+   "sendAiMessage",
+   "generateConfiguration",
+   "getAiPolicy",
+   "setAiPolicy",
+   "settleAiUsage",
    "proposeVenueLabels",
    "proposeWalkways",
    "proposeTranslations",
@@ -14000,17 +13919,17 @@
    "getBundle",
    "updateBundle"
   ],
+  "promotions.bundle_component": [
+   "createBundle",
+   "getBundle",
+   "updateBundle"
+  ],
   "promotions.allocation_component": [
    "createBundle",
    "getBundle",
    "updateBundle",
    "listAllocationSplits",
    "previewAllocationSplit"
-  ],
-  "promotions.bundle_component": [
-   "createBundle",
-   "getBundle",
-   "updateBundle"
   ],
   "promotions.allocation_split": [
    "listAllocationSplits"
@@ -14042,9 +13961,6 @@
    "semanticSearch",
    "ingestKnowledgeDocument"
   ],
-  "ai.message": [
-   "sendAiMessage"
-  ],
   "ai.chunk_ref": [
    "sendAiMessage",
    "semanticSearch",
@@ -14052,6 +13968,9 @@
    "createKnowledgeCollection",
    "ingestKnowledgeDocument",
    "generateConfiguration"
+  ],
+  "ai.message": [
+   "sendAiMessage"
   ],
   "ai.knowledge_collection": [
    "semanticSearch",
@@ -14125,16 +14044,28 @@
   "games.redemption": [
    "redeemPrize"
   ],
-  "whitelabel.homepage_section": [
+  "whitelabel.feature_toggle": [
    "getTenantConfig",
-   "getHomepageLayout",
-   "setHomepageLayout",
+   "getFeatureToggles",
+   "setFeatureToggles",
    "restoreConfigVersion"
   ],
   "whitelabel.navigation_item": [
    "getTenantConfig",
    "getNavigation",
    "setNavigation",
+   "restoreConfigVersion"
+  ],
+  "whitelabel.module_enablement": [
+   "getTenantConfig",
+   "getModuleEnablement",
+   "setModuleEnablement",
+   "restoreConfigVersion"
+  ],
+  "whitelabel.homepage_section": [
+   "getTenantConfig",
+   "getHomepageLayout",
+   "setHomepageLayout",
    "restoreConfigVersion"
   ],
   "whitelabel.tenant_config": [
@@ -14157,18 +14088,6 @@
    "validateTenantConfig",
    "restoreConfigVersion",
    "diffConfigVersion"
-  ],
-  "whitelabel.module_enablement": [
-   "getTenantConfig",
-   "getModuleEnablement",
-   "setModuleEnablement",
-   "restoreConfigVersion"
-  ],
-  "whitelabel.feature_toggle": [
-   "getTenantConfig",
-   "getFeatureToggles",
-   "setFeatureToggles",
-   "restoreConfigVersion"
   ],
   "whitelabel.config_version": [
    "getTenantAppStatus",
@@ -14211,17 +14130,12 @@
    "setIndexSource",
    "reindexSource"
   ],
-  "whitelabel.faq_entry": [
-   "reindexSource"
-  ],
   "ai.index_entry": [
    "reindexSource",
    "removeIndexEntry"
   ],
-  "approvals.decision": [
-   "listApprovalRequests",
-   "decideApprovalRequest",
-   "getApprovalAnalytics"
+  "whitelabel.faq_entry": [
+   "reindexSource"
   ],
   "approvals.request": [
    "listApprovalRequests",
@@ -14234,6 +14148,11 @@
    "requestShiftSwap",
    "createPartnerAgreement",
    "registerPartner"
+  ],
+  "approvals.decision": [
+   "listApprovalRequests",
+   "decideApprovalRequest",
+   "getApprovalAnalytics"
   ],
   "approvals.rule": [
    "createApprovalRequest",
@@ -14468,18 +14387,18 @@
    "recordDeposit",
    "settleDeposit"
   ],
-  "payments.routing_rule": [
-   "listPaymentProviders",
-   "setPaymentProvider",
-   "listPaymentRoutingRules",
-   "setPaymentRoutingRules"
-  ],
   "payments.provider": [
    "listPaymentProviders",
    "setPaymentProvider",
    "storePaymentToken",
    "createPaymentLink",
    "payByLink"
+  ],
+  "payments.routing_rule": [
+   "listPaymentProviders",
+   "setPaymentProvider",
+   "listPaymentRoutingRules",
+   "setPaymentRoutingRules"
   ],
   "payments.token": [
    "listPaymentTokens",
@@ -14546,12 +14465,12 @@
    "publishContentBlock",
    "proposeTranslations"
   ],
+  "control.onboarding_application": [
+   "submitOnboardingApplication"
+  ],
   "control.venue_type_template": [
    "submitOnboardingApplication",
    "listVenueTypeTemplates"
-  ],
-  "control.onboarding_application": [
-   "submitOnboardingApplication"
   ],
   "inventory.stock_batch": [
    "listExpiringBatches",
@@ -14748,13 +14667,13 @@
    "buildProductionPlan",
    "releaseProductionPlan"
   ],
+  "platform.audit_read": [
+   "listAuditRecords"
+  ],
   "platform.audit_record": [
    "listAuditRecords",
    "setRolePermissions",
    "updateSupplier"
-  ],
-  "platform.audit_read": [
-   "listAuditRecords"
   ],
   "whitelabel.custom_domain": [
    "listCustomDomains",
@@ -15411,21 +15330,23 @@
   ]
  },
  "tab_screens": {
-  "whitelabel.homepage_section": [
+  "whitelabel.config_version": [
    "WEB-001",
+   "WEB-025",
+   "WEB-028",
+   "WEB-029",
    "GST-001",
+   "GST-038",
+   "GST-047",
    "KSK-002",
-   "BO-599",
-   "BO-834",
-   "BO-840",
+   "BO-843",
    "ADM-016",
    "CMS-006",
-   "CMS-007",
-   "CMS-012",
+   "CMS-014",
    "CMS-015",
-   "CMS-016"
+   "CMS-020"
   ],
-  "whitelabel.navigation_item": [
+  "whitelabel.feature_toggle": [
    "WEB-001",
    "GST-001",
    "KSK-002",
@@ -15449,31 +15370,7 @@
    "CMS-015",
    "CMS-016"
   ],
-  "whitelabel.tenant_config": [
-   "WEB-001",
-   "WEB-025",
-   "WEB-028",
-   "WEB-029",
-   "GST-001",
-   "GST-038",
-   "GST-047",
-   "KSK-002",
-   "BO-599",
-   "BO-834",
-   "BO-836",
-   "ADM-016",
-   "ADM-018",
-   "CMS-002",
-   "CMS-003",
-   "CMS-005",
-   "CMS-006",
-   "CMS-011",
-   "CMS-012",
-   "CMS-014",
-   "CMS-015",
-   "CMS-016"
-  ],
-  "whitelabel.feature_toggle": [
+  "whitelabel.navigation_item": [
    "WEB-001",
    "GST-001",
    "KSK-002",
@@ -15484,22 +15381,6 @@
    "CMS-012",
    "CMS-015",
    "CMS-016"
-  ],
-  "whitelabel.config_version": [
-   "WEB-001",
-   "WEB-025",
-   "WEB-028",
-   "WEB-029",
-   "GST-001",
-   "GST-038",
-   "GST-047",
-   "KSK-002",
-   "BO-843",
-   "ADM-016",
-   "CMS-006",
-   "CMS-014",
-   "CMS-015",
-   "CMS-020"
   ],
   "catalogue.product": [
    "WEB-001",
@@ -15579,6 +15460,70 @@
    "CMS-013",
    "ANL-004"
   ],
+  "whitelabel.homepage_section": [
+   "WEB-001",
+   "GST-001",
+   "KSK-002",
+   "BO-599",
+   "BO-834",
+   "BO-840",
+   "ADM-016",
+   "CMS-006",
+   "CMS-007",
+   "CMS-012",
+   "CMS-015",
+   "CMS-016"
+  ],
+  "whitelabel.tenant_config": [
+   "WEB-001",
+   "WEB-025",
+   "WEB-028",
+   "WEB-029",
+   "GST-001",
+   "GST-038",
+   "GST-047",
+   "KSK-002",
+   "BO-599",
+   "BO-834",
+   "BO-836",
+   "ADM-016",
+   "ADM-018",
+   "CMS-002",
+   "CMS-003",
+   "CMS-005",
+   "CMS-006",
+   "CMS-011",
+   "CMS-012",
+   "CMS-014",
+   "CMS-015",
+   "CMS-016"
+  ],
+  "queue.reading": [
+   "WEB-002",
+   "WEB-004",
+   "WEB-015",
+   "WEB-039",
+   "WEB-040",
+   "GST-003",
+   "GST-004",
+   "GST-021",
+   "GST-022",
+   "GST-023",
+   "GST-038",
+   "GST-046",
+   "GST-051",
+   "GST-053",
+   "GST-054",
+   "GST-059",
+   "EMP-031",
+   "EMP-032",
+   "BO-001",
+   "BO-002",
+   "BO-003",
+   "BO-004",
+   "BO-005",
+   "BO-038"
+  ],
   "queue.queue": [
    "WEB-002",
    "WEB-004",
@@ -15605,6 +15550,33 @@
    "BO-005",
    "BO-038",
    "SUP-020"
+  ],
+  "queue.entry": [
+   "WEB-002",
+   "WEB-004",
+   "WEB-015",
+   "WEB-039",
+   "WEB-040",
+   "GST-003",
+   "GST-004",
+   "GST-021",
+   "GST-022",
+   "GST-023",
+   "GST-038",
+   "GST-046",
+   "GST-051",
+   "GST-053",
+   "GST-054",
+   "GST-059",
+   "POS-029",
+   "EMP-031",
+   "EMP-032",
+   "EMP-030",
+   "BO-001",
+   "BO-002",
+   "BO-004",
+   "BO-005",
+   "BO-038"
   ],
   "catalogue.performance": [
    "WEB-002",
@@ -15652,32 +15624,6 @@
    "BO-1039",
    "PTR-007",
    "PTR-010"
-  ],
-  "queue.reading": [
-   "WEB-002",
-   "WEB-004",
-   "WEB-015",
-   "WEB-039",
-   "WEB-040",
-   "GST-003",
-   "GST-004",
-   "GST-021",
-   "GST-022",
-   "GST-023",
-   "GST-038",
-   "GST-046",
-   "GST-051",
-   "GST-053",
-   "GST-054",
-   "GST-059",
-   "EMP-031",
-   "EMP-032",
-   "BO-001",
-   "BO-002",
-   "BO-003",
-   "BO-004",
-   "BO-005",
-   "BO-038"
   ],
   "catalogue.event": [
    "WEB-002",
@@ -15728,33 +15674,6 @@
    "BO-014",
    "PTR-006",
    "PTR-010"
-  ],
-  "queue.entry": [
-   "WEB-002",
-   "WEB-004",
-   "WEB-015",
-   "WEB-039",
-   "WEB-040",
-   "GST-003",
-   "GST-004",
-   "GST-021",
-   "GST-022",
-   "GST-023",
-   "GST-038",
-   "GST-046",
-   "GST-051",
-   "GST-053",
-   "GST-054",
-   "GST-059",
-   "POS-029",
-   "EMP-031",
-   "EMP-032",
-   "EMP-030",
-   "BO-001",
-   "BO-002",
-   "BO-004",
-   "BO-005",
-   "BO-038"
   ],
   "catalogue.inventory_hold": [
    "WEB-004",
@@ -15829,27 +15748,6 @@
    "PTR-007",
    "PTR-010"
   ],
-  "catalogue.price_list": [
-   "WEB-005",
-   "WEB-010",
-   "WEB-032",
-   "WEB-043",
-   "GST-036",
-   "GST-037",
-   "POS-002",
-   "POS-021",
-   "POS-023",
-   "KSK-006",
-   "BO-009",
-   "BO-010",
-   "BO-013",
-   "BO-117",
-   "BO-597",
-   "BO-598",
-   "BO-601",
-   "PTR-006",
-   "PTR-010"
-  ],
   "promotions.promotion": [
    "WEB-005",
    "WEB-010",
@@ -15877,6 +15775,27 @@
    "ADM-138",
    "ADM-140",
    "ADM-145",
+   "PTR-010"
+  ],
+  "catalogue.price_list": [
+   "WEB-005",
+   "WEB-010",
+   "WEB-032",
+   "WEB-043",
+   "GST-036",
+   "GST-037",
+   "POS-002",
+   "POS-021",
+   "POS-023",
+   "KSK-006",
+   "BO-009",
+   "BO-010",
+   "BO-013",
+   "BO-117",
+   "BO-597",
+   "BO-598",
+   "BO-601",
+   "PTR-006",
    "PTR-010"
   ],
   "platform.workstation": [
@@ -15915,45 +15834,6 @@
    "BO-1068",
    "BO-1069"
   ],
-  "seating.seat_hold": [
-   "WEB-007",
-   "GST-049",
-   "POS-004",
-   "BO-002",
-   "BO-015",
-   "BO-016",
-   "BO-019",
-   "BO-063",
-   "BO-986",
-   "BO-987",
-   "BO-994",
-   "BO-995",
-   "BO-996",
-   "BO-998",
-   "BO-999",
-   "BO-1000",
-   "PTR-009"
-  ],
-  "seating.seat_category": [
-   "WEB-007",
-   "GST-049",
-   "POS-004",
-   "BO-002",
-   "BO-015",
-   "BO-016",
-   "BO-019",
-   "BO-063",
-   "BO-117",
-   "BO-597",
-   "BO-598",
-   "BO-985",
-   "BO-986",
-   "BO-994",
-   "BO-996",
-   "BO-1000",
-   "BO-1045",
-   "BO-1055"
-  ],
   "seating.seat": [
    "WEB-007",
    "GST-049",
@@ -15982,26 +15862,71 @@
    "BO-1000",
    "BO-1051"
   ],
-  "orders.cart_line": [
+  "seating.seat_category": [
+   "WEB-007",
+   "GST-049",
+   "POS-004",
+   "BO-002",
+   "BO-015",
+   "BO-016",
+   "BO-019",
+   "BO-063",
+   "BO-117",
+   "BO-597",
+   "BO-598",
+   "BO-985",
+   "BO-986",
+   "BO-994",
+   "BO-996",
+   "BO-1000",
+   "BO-1045",
+   "BO-1055"
+  ],
+  "seating.seat_hold": [
+   "WEB-007",
+   "GST-049",
+   "POS-004",
+   "BO-002",
+   "BO-015",
+   "BO-016",
+   "BO-019",
+   "BO-063",
+   "BO-986",
+   "BO-987",
+   "BO-994",
+   "BO-995",
+   "BO-996",
+   "BO-998",
+   "BO-999",
+   "BO-1000",
+   "PTR-009"
+  ],
+  "promotions.bundle_component": [
    "WEB-008",
-   "WEB-010",
-   "WEB-016",
-   "WEB-033",
-   "GST-009",
-   "GST-032",
-   "GST-041",
+   "GST-056",
+   "BO-011"
+  ],
+  "promotions.upsell_rule": [
+   "WEB-008",
    "GST-048",
-   "GST-050",
-   "GST-053",
+   "BO-102",
+   "BO-119"
+  ],
+  "promotions.allocation_component": [
+   "WEB-008",
+   "GST-056",
+   "BO-011"
+  ],
+  "catalogue.published_bundle": [
+   "WEB-008",
+   "GST-052",
    "GST-056",
    "POS-002",
-   "POS-010",
-   "POS-021",
-   "POS-023",
-   "KSK-006",
-   "KSK-017",
-   "BO-778",
-   "PTR-010"
+   "EMP-018",
+   "BO-011",
+   "BO-013",
+   "BO-014",
+   "BO-037"
   ],
   "orders.cart": [
    "WEB-008",
@@ -16031,32 +15956,26 @@
    "GST-056",
    "BO-011"
   ],
-  "catalogue.published_bundle": [
+  "orders.cart_line": [
    "WEB-008",
-   "GST-052",
+   "WEB-010",
+   "WEB-016",
+   "WEB-033",
+   "GST-009",
+   "GST-032",
+   "GST-041",
+   "GST-048",
+   "GST-050",
+   "GST-053",
    "GST-056",
    "POS-002",
-   "EMP-018",
-   "BO-011",
-   "BO-013",
-   "BO-014",
-   "BO-037"
-  ],
-  "promotions.allocation_component": [
-   "WEB-008",
-   "GST-056",
-   "BO-011"
-  ],
-  "promotions.upsell_rule": [
-   "WEB-008",
-   "GST-048",
-   "BO-102",
-   "BO-119"
-  ],
-  "promotions.bundle_component": [
-   "WEB-008",
-   "GST-056",
-   "BO-011"
+   "POS-010",
+   "POS-021",
+   "POS-023",
+   "KSK-006",
+   "KSK-017",
+   "BO-778",
+   "PTR-010"
   ],
   "marketing.guest_profile": [
    "WEB-009",
@@ -16101,6 +16020,74 @@
    "WEB-027",
    "GST-020",
    "BO-036",
+   "CMS-018"
+  ],
+  "pii.subject": [
+   "WEB-010",
+   "WEB-011",
+   "WEB-016",
+   "WEB-019",
+   "WEB-020",
+   "WEB-021",
+   "WEB-024",
+   "WEB-031",
+   "WEB-034",
+   "GST-001",
+   "GST-015",
+   "GST-019",
+   "GST-034",
+   "GST-039",
+   "GST-040",
+   "GST-041",
+   "GST-042",
+   "GST-066",
+   "GST-069",
+   "GST-071",
+   "GST-072",
+   "GST-073",
+   "POS-002",
+   "POS-010",
+   "POS-027",
+   "EMP-010",
+   "EMP-015",
+   "EMP-017",
+   "EMP-036",
+   "EMP-055",
+   "EMP-057",
+   "EMP-058",
+   "SCN-003",
+   "SCN-007",
+   "SCN-008",
+   "SCN-009",
+   "SCN-013",
+   "SCN-014",
+   "SCN-015",
+   "BO-027",
+   "BO-034",
+   "BO-035",
+   "BO-036",
+   "BO-060",
+   "BO-097",
+   "BO-099",
+   "BO-385",
+   "BO-735",
+   "BO-738",
+   "BO-740",
+   "BO-743",
+   "BO-746",
+   "BO-749",
+   "BO-752",
+   "BO-796",
+   "BO-804",
+   "BO-813",
+   "BO-907",
+   "BO-937",
+   "BO-1116",
+   "BO-1121",
+   "ADM-593",
+   "ADM-680",
+   "SUP-005",
+   "CMS-010",
    "CMS-018"
   ],
   "orders.sales_order": [
@@ -16296,73 +16283,37 @@
    "ADM-420",
    "ADM-593"
   ],
-  "pii.subject": [
-   "WEB-010",
+  "marketing.loyalty_position": [
    "WEB-011",
-   "WEB-016",
-   "WEB-019",
    "WEB-020",
-   "WEB-021",
-   "WEB-024",
-   "WEB-031",
-   "WEB-034",
+   "WEB-022",
+   "WEB-023",
+   "WEB-043",
    "GST-001",
    "GST-015",
-   "GST-019",
-   "GST-034",
-   "GST-039",
-   "GST-040",
-   "GST-041",
-   "GST-042",
-   "GST-066",
-   "GST-069",
    "GST-071",
-   "GST-072",
-   "GST-073",
    "POS-002",
-   "POS-010",
+   "POS-005",
    "POS-027",
-   "EMP-010",
-   "EMP-015",
-   "EMP-017",
-   "EMP-036",
-   "EMP-055",
    "EMP-057",
-   "EMP-058",
-   "SCN-003",
-   "SCN-007",
-   "SCN-008",
-   "SCN-009",
-   "SCN-013",
-   "SCN-014",
-   "SCN-015",
-   "BO-027",
-   "BO-034",
-   "BO-035",
    "BO-036",
-   "BO-060",
-   "BO-097",
-   "BO-099",
-   "BO-385",
    "BO-735",
    "BO-738",
    "BO-740",
-   "BO-743",
-   "BO-746",
-   "BO-749",
-   "BO-752",
-   "BO-796",
-   "BO-804",
-   "BO-813",
-   "BO-907",
-   "BO-937",
-   "BO-1116",
-   "BO-1121",
-   "ADM-593",
    "ADM-680",
-   "SUP-005",
-   "CMS-010",
    "CMS-018"
+  ],
+  "marketing.consent_purpose": [
+   "WEB-011",
+   "WEB-020",
+   "WEB-024",
+   "GST-065",
+   "GST-066",
+   "BO-036",
+   "BO-747",
+   "BO-749",
+   "CMS-018",
+   "CMS-023"
   ],
   "pii.subject_contact": [
    "WEB-011",
@@ -16379,23 +16330,20 @@
    "ADM-680",
    "CMS-018"
   ],
-  "marketing.consent_purpose": [
-   "WEB-011",
-   "WEB-020",
-   "WEB-024",
-   "GST-065",
-   "GST-066",
-   "BO-036",
-   "BO-747",
-   "BO-749",
-   "CMS-018",
-   "CMS-023"
-  ],
   "marketing.guest_document": [
    "WEB-011",
    "WEB-024",
    "GST-066",
    "BO-743"
+  ],
+  "marketing.guest_device": [
+   "WEB-011",
+   "WEB-017",
+   "WEB-024",
+   "WEB-027",
+   "GST-073",
+   "BO-036",
+   "CMS-018"
   ],
   "marketing.consent_record": [
    "WEB-011",
@@ -16418,46 +16366,20 @@
    "ADM-680",
    "CMS-018"
   ],
-  "marketing.loyalty_position": [
-   "WEB-011",
-   "WEB-020",
-   "WEB-022",
-   "WEB-023",
-   "WEB-043",
-   "GST-001",
-   "GST-015",
-   "GST-071",
-   "POS-002",
-   "POS-005",
-   "POS-027",
-   "EMP-057",
-   "BO-036",
-   "BO-735",
-   "BO-738",
-   "BO-740",
-   "ADM-680",
-   "CMS-018"
-  ],
-  "marketing.guest_device": [
-   "WEB-011",
-   "WEB-017",
-   "WEB-024",
-   "WEB-027",
-   "GST-073",
-   "BO-036",
-   "CMS-018"
-  ],
-  "ledger.posting": [
+  "ledger.journal_entry": [
    "WEB-012",
    "GST-009",
+   "POS-001",
    "POS-002",
    "POS-004",
    "POS-005",
    "POS-006",
    "POS-007",
-   "POS-008",
+   "POS-009",
    "POS-011",
    "KSK-007",
+   "EMP-003",
+   "EMP-009",
    "EMP-014",
    "EMP-034",
    "EMP-035",
@@ -16466,24 +16388,75 @@
    "BO-023",
    "BO-024",
    "BO-026",
-   "BO-029",
-   "BO-043",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
    "BO-047",
-   "BO-051",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-070",
    "BO-076",
-   "BO-090",
-   "BO-1029",
-   "BO-1081",
+   "BO-089",
    "BO-1147",
    "ADM-616",
-   "ADM-626",
+   "PTR-008",
+   "PTR-012",
+   "PTR-015"
+  ],
+  "orders.payment": [
+   "WEB-012",
+   "WEB-013",
+   "WEB-014",
+   "WEB-019",
+   "WEB-038",
+   "GST-009",
+   "GST-010",
+   "GST-018",
+   "GST-019",
+   "GST-025",
+   "POS-001",
+   "POS-002",
+   "POS-004",
+   "POS-005",
+   "POS-006",
+   "POS-007",
+   "POS-009",
+   "POS-010",
+   "POS-011",
+   "POS-013",
+   "POS-014",
+   "KSK-007",
+   "KSK-008",
+   "KSK-009",
+   "KSK-011",
+   "EMP-003",
+   "EMP-009",
+   "EMP-014",
+   "EMP-034",
+   "EMP-035",
+   "EMP-036",
+   "EMP-059",
+   "BO-022",
+   "BO-023",
+   "BO-024",
+   "BO-026",
+   "BO-027",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-047",
+   "BO-051",
+   "BO-070",
+   "BO-130",
+   "BO-1081",
+   "BO-1147",
+   "ADM-595",
+   "ADM-597",
+   "ADM-613",
+   "ADM-615",
+   "ADM-616",
    "ADM-627",
    "ADM-628",
+   "ADM-633",
    "ADM-634",
    "PTR-002",
    "PTR-005",
@@ -16491,37 +16464,7 @@
    "PTR-012",
    "PTR-015",
    "PTR-016",
-   "PTR-018",
-   "SUP-008"
-  ],
-  "ledger.fx_rate": [
-   "WEB-012",
-   "WEB-035",
-   "GST-009",
-   "GST-044",
-   "POS-001",
-   "POS-002",
-   "POS-004",
-   "POS-005",
-   "POS-007",
-   "POS-009",
-   "KSK-007",
-   "EMP-003",
-   "EMP-009",
-   "EMP-035",
-   "EMP-059",
-   "BO-024",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-077",
-   "ADM-008",
-   "ADM-462",
-   "ADM-626",
-   "PTR-011",
-   "PTR-012",
-   "PTR-017"
+   "CMS-010"
   ],
   "platform.outbox": [
    "WEB-012",
@@ -16625,6 +16568,82 @@
    "KIT-006",
    "KIT-008"
   ],
+  "ledger.fx_rate": [
+   "WEB-012",
+   "WEB-035",
+   "GST-009",
+   "GST-044",
+   "POS-001",
+   "POS-002",
+   "POS-004",
+   "POS-005",
+   "POS-007",
+   "POS-009",
+   "KSK-007",
+   "EMP-003",
+   "EMP-009",
+   "EMP-035",
+   "EMP-059",
+   "BO-024",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-077",
+   "ADM-008",
+   "ADM-462",
+   "ADM-626",
+   "PTR-011",
+   "PTR-012",
+   "PTR-017"
+  ],
+  "ledger.posting": [
+   "WEB-012",
+   "GST-009",
+   "POS-002",
+   "POS-004",
+   "POS-005",
+   "POS-006",
+   "POS-007",
+   "POS-008",
+   "POS-011",
+   "KSK-007",
+   "EMP-014",
+   "EMP-034",
+   "EMP-035",
+   "EMP-059",
+   "BO-022",
+   "BO-023",
+   "BO-024",
+   "BO-026",
+   "BO-029",
+   "BO-043",
+   "BO-047",
+   "BO-051",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-070",
+   "BO-076",
+   "BO-090",
+   "BO-1029",
+   "BO-1081",
+   "BO-1147",
+   "ADM-616",
+   "ADM-626",
+   "ADM-627",
+   "ADM-628",
+   "ADM-634",
+   "PTR-002",
+   "PTR-005",
+   "PTR-008",
+   "PTR-012",
+   "PTR-015",
+   "PTR-016",
+   "PTR-018",
+   "SUP-008"
+  ],
   "orders.ticket_transfer": [
    "WEB-012",
    "WEB-013",
@@ -16644,106 +16663,6 @@
    "KSK-009",
    "KSK-010",
    "KSK-012"
-  ],
-  "ledger.journal_entry": [
-   "WEB-012",
-   "GST-009",
-   "POS-001",
-   "POS-002",
-   "POS-004",
-   "POS-005",
-   "POS-006",
-   "POS-007",
-   "POS-009",
-   "POS-011",
-   "KSK-007",
-   "EMP-003",
-   "EMP-009",
-   "EMP-014",
-   "EMP-034",
-   "EMP-035",
-   "EMP-059",
-   "BO-022",
-   "BO-023",
-   "BO-024",
-   "BO-026",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-047",
-   "BO-076",
-   "BO-089",
-   "BO-1147",
-   "ADM-616",
-   "PTR-008",
-   "PTR-012",
-   "PTR-015"
-  ],
-  "orders.payment": [
-   "WEB-012",
-   "WEB-013",
-   "WEB-014",
-   "WEB-019",
-   "WEB-038",
-   "GST-009",
-   "GST-010",
-   "GST-018",
-   "GST-019",
-   "GST-025",
-   "POS-001",
-   "POS-002",
-   "POS-004",
-   "POS-005",
-   "POS-006",
-   "POS-007",
-   "POS-009",
-   "POS-010",
-   "POS-011",
-   "POS-013",
-   "POS-014",
-   "KSK-007",
-   "KSK-008",
-   "KSK-009",
-   "KSK-011",
-   "EMP-003",
-   "EMP-009",
-   "EMP-014",
-   "EMP-034",
-   "EMP-035",
-   "EMP-036",
-   "EMP-059",
-   "BO-022",
-   "BO-023",
-   "BO-024",
-   "BO-026",
-   "BO-027",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-047",
-   "BO-051",
-   "BO-070",
-   "BO-130",
-   "BO-1081",
-   "BO-1147",
-   "ADM-595",
-   "ADM-597",
-   "ADM-613",
-   "ADM-615",
-   "ADM-616",
-   "ADM-627",
-   "ADM-628",
-   "ADM-633",
-   "ADM-634",
-   "PTR-002",
-   "PTR-005",
-   "PTR-008",
-   "PTR-012",
-   "PTR-015",
-   "PTR-016",
-   "CMS-010"
   ],
   "access.entitlement": [
    "WEB-012",
@@ -16818,6 +16737,14 @@
    "GST-009",
    "ADM-593"
   ],
+  "orders.reservation": [
+   "WEB-014",
+   "WEB-031",
+   "GST-009",
+   "GST-016",
+   "GST-017",
+   "ADM-593"
+  ],
   "payments.provider": [
    "WEB-014",
    "WEB-021",
@@ -16827,13 +16754,36 @@
    "ADM-592",
    "SGN-021"
   ],
-  "orders.reservation": [
-   "WEB-014",
-   "WEB-031",
-   "GST-009",
-   "GST-016",
-   "GST-017",
-   "ADM-593"
+  "identity.guest_session": [
+   "WEB-016",
+   "GST-042"
+  ],
+  "identity.mfa_method": [
+   "WEB-016",
+   "GST-042",
+   "GST-073",
+   "EMP-001",
+   "EMP-002",
+   "EMP-042",
+   "SCN-001",
+   "ADM-001",
+   "ADM-342",
+   "PTR-001",
+   "SUP-001"
+  ],
+  "identity.session": [
+   "WEB-016",
+   "GST-042",
+   "POS-000",
+   "POS-001",
+   "EMP-001",
+   "EMP-002",
+   "EMP-042",
+   "EMP-046",
+   "SCN-001",
+   "ADM-001",
+   "PTR-001",
+   "SUP-001"
   ],
   "identity.delegated_access": [
    "WEB-016",
@@ -16871,21 +16821,6 @@
    "PTR-020",
    "SUP-001",
    "DEV-002"
-  ],
-  "identity.principal_credential": [
-   "WEB-016",
-   "GST-042",
-   "POS-000",
-   "EMP-001",
-   "SCN-001",
-   "ADM-001",
-   "PTR-001",
-   "SUP-001"
-  ],
-  "identity.mfa_challenge": [
-   "WEB-016",
-   "GST-042",
-   "GST-073"
   ],
   "identity.principal": [
    "WEB-016",
@@ -17004,27 +16939,46 @@
    "GST-042",
    "GST-073"
   ],
-  "identity.mfa_recovery_code": [
+  "identity.mfa_challenge": [
    "WEB-016",
-   "GST-042"
+   "GST-042",
+   "GST-073"
   ],
-  "identity.guest_session": [
-   "WEB-016",
-   "GST-042"
-  ],
-  "identity.session": [
+  "identity.principal_credential": [
    "WEB-016",
    "GST-042",
    "POS-000",
-   "POS-001",
    "EMP-001",
-   "EMP-002",
-   "EMP-042",
-   "EMP-046",
    "SCN-001",
    "ADM-001",
    "PTR-001",
    "SUP-001"
+  ],
+  "pii.subject_document": [
+   "WEB-016",
+   "GST-042"
+  ],
+  "identity.sso_provider": [
+   "WEB-016",
+   "GST-042",
+   "EMP-001",
+   "EMP-002",
+   "EMP-042",
+   "SCN-001",
+   "ADM-001",
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "PTR-001",
+   "SUP-001",
+   "CMS-001"
   ],
   "identity.role": [
    "WEB-016",
@@ -17056,44 +17010,9 @@
    "CMS-019",
    "ANL-009"
   ],
-  "pii.subject_document": [
+  "identity.mfa_recovery_code": [
    "WEB-016",
    "GST-042"
-  ],
-  "identity.mfa_method": [
-   "WEB-016",
-   "GST-042",
-   "GST-073",
-   "EMP-001",
-   "EMP-002",
-   "EMP-042",
-   "SCN-001",
-   "ADM-001",
-   "ADM-342",
-   "PTR-001",
-   "SUP-001"
-  ],
-  "identity.sso_provider": [
-   "WEB-016",
-   "GST-042",
-   "EMP-001",
-   "EMP-002",
-   "EMP-042",
-   "SCN-001",
-   "ADM-001",
-   "ADM-002",
-   "ADM-005",
-   "ADM-006",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-010",
-   "ADM-011",
-   "ADM-012",
-   "ADM-015",
-   "PTR-001",
-   "SUP-001",
-   "CMS-001"
   ],
   "marketing.challenge": [
    "WEB-017",
@@ -17103,7 +17022,7 @@
    "BO-826",
    "BO-829"
   ],
-  "marketing.invitation": [
+  "marketing.invitation_campaign": [
    "WEB-017",
    "GST-072"
   ],
@@ -17112,13 +17031,9 @@
    "GST-072",
    "BO-824"
   ],
-  "marketing.invitation_campaign": [
+  "marketing.invitation": [
    "WEB-017",
    "GST-072"
-  ],
-  "orders.wallet_pass": [
-   "WEB-018",
-   "GST-018"
   ],
   "access.scan_event": [
    "WEB-018",
@@ -17207,6 +17122,10 @@
    "WEB-018",
    "GST-018"
   ],
+  "orders.wallet_pass": [
+   "WEB-018",
+   "GST-018"
+  ],
   "orders.refund_policy": [
    "WEB-019",
    "GST-067",
@@ -17264,6 +17183,23 @@
    "DEV-008",
    "KIT-002"
   ],
+  "wallet.gift_card": [
+   "WEB-021",
+   "GST-071",
+   "BO-097",
+   "BO-1125"
+  ],
+  "games.credit_ledger": [
+   "WEB-021",
+   "GST-026",
+   "BO-069",
+   "BO-396",
+   "BO-454",
+   "BO-455",
+   "BO-457",
+   "BO-462",
+   "BO-486"
+  ],
   "wallet.wallet": [
    "WEB-021",
    "GST-011",
@@ -17281,40 +17217,9 @@
    "BO-1149",
    "BO-1167"
   ],
-  "wallet.gift_card": [
-   "WEB-021",
-   "GST-071",
-   "BO-097",
-   "BO-1125"
-  ],
   "payments.token": [
    "WEB-021",
    "GST-071"
-  ],
-  "games.card": [
-   "WEB-021",
-   "GST-026",
-   "POS-002",
-   "BO-069",
-   "BO-396",
-   "BO-454",
-   "BO-455",
-   "BO-457",
-   "BO-460",
-   "BO-461",
-   "BO-462",
-   "BO-486"
-  ],
-  "games.credit_ledger": [
-   "WEB-021",
-   "GST-026",
-   "BO-069",
-   "BO-396",
-   "BO-454",
-   "BO-455",
-   "BO-457",
-   "BO-462",
-   "BO-486"
   ],
   "wallet.wallet_transaction": [
    "WEB-021",
@@ -17335,19 +17240,19 @@
    "ADM-627",
    "ADM-628"
   ],
-  "marketing.form_submission": [
-   "WEB-024",
-   "GST-066",
-   "GST-067",
-   "BO-852"
-  ],
-  "platform.dsar_request": [
-   "WEB-024",
-   "GST-066"
-  ],
-  "pii.subject_biometric": [
-   "WEB-024",
-   "GST-069"
+  "games.card": [
+   "WEB-021",
+   "GST-026",
+   "POS-002",
+   "BO-069",
+   "BO-396",
+   "BO-454",
+   "BO-455",
+   "BO-457",
+   "BO-460",
+   "BO-461",
+   "BO-462",
+   "BO-486"
   ],
   "marketing.form_definition": [
    "WEB-024",
@@ -17356,6 +17261,20 @@
    "BO-815",
    "BO-817",
    "BO-838",
+   "BO-852"
+  ],
+  "pii.subject_biometric": [
+   "WEB-024",
+   "GST-069"
+  ],
+  "platform.dsar_request": [
+   "WEB-024",
+   "GST-066"
+  ],
+  "marketing.form_submission": [
+   "WEB-024",
+   "GST-066",
+   "GST-067",
    "BO-852"
   ],
   "marketing.case": [
@@ -17395,6 +17314,33 @@
    "WEB-030",
    "GST-067"
   ],
+  "maintenance.work_order": [
+   "WEB-031",
+   "GST-070",
+   "EMP-004",
+   "EMP-005",
+   "EMP-006",
+   "EMP-075",
+   "BO-030",
+   "BO-031",
+   "BO-069",
+   "BO-096",
+   "BO-108",
+   "BO-506",
+   "BO-508",
+   "BO-509",
+   "BO-548",
+   "BO-574",
+   "BO-576",
+   "BO-577",
+   "BO-578",
+   "BO-579",
+   "BO-581",
+   "BO-910",
+   "BO-990",
+   "ADM-587",
+   "CMS-004"
+  ],
   "resources.booking": [
    "WEB-031",
    "GST-070",
@@ -17414,6 +17360,17 @@
    "BO-933",
    "BO-935",
    "BO-937"
+  ],
+  "fnb.table_reservation": [
+   "WEB-031",
+   "WEB-036",
+   "GST-070",
+   "POS-028",
+   "EMP-051",
+   "EMP-054",
+   "EMP-055",
+   "EMP-058",
+   "EMP-060"
   ],
   "orders.group_booking": [
    "WEB-031",
@@ -17450,43 +17407,14 @@
    "BO-937",
    "BO-943"
   ],
-  "fnb.table_reservation": [
-   "WEB-031",
-   "WEB-036",
-   "GST-070",
-   "POS-028",
-   "EMP-051",
-   "EMP-054",
-   "EMP-055",
-   "EMP-058",
-   "EMP-060"
-  ],
-  "maintenance.work_order": [
-   "WEB-031",
-   "GST-070",
-   "EMP-004",
-   "EMP-005",
-   "EMP-006",
-   "EMP-075",
-   "BO-030",
-   "BO-031",
-   "BO-069",
-   "BO-096",
-   "BO-108",
-   "BO-506",
-   "BO-508",
-   "BO-509",
-   "BO-548",
-   "BO-574",
-   "BO-576",
-   "BO-577",
-   "BO-578",
-   "BO-579",
-   "BO-581",
-   "BO-910",
-   "BO-990",
-   "ADM-587",
-   "CMS-004"
+  "retail.reservation": [
+   "WEB-033",
+   "WEB-042",
+   "GST-026",
+   "POS-012",
+   "KSK-017",
+   "EMP-068",
+   "BO-044"
   ],
   "retail.merchandise": [
    "WEB-033",
@@ -17502,15 +17430,6 @@
    "BO-114",
    "BO-116"
   ],
-  "retail.reservation": [
-   "WEB-033",
-   "WEB-042",
-   "GST-026",
-   "POS-012",
-   "KSK-017",
-   "EMP-068",
-   "BO-044"
-  ],
   "marketing.case_message": [
    "WEB-034",
    "GST-034",
@@ -17522,171 +17441,6 @@
    "SUP-002",
    "SUP-004",
    "SUP-005"
-  ],
-  "fnb.delivery_location": [
-   "WEB-036",
-   "WEB-038",
-   "GST-024",
-   "GST-025",
-   "GST-029",
-   "GST-032",
-   "POS-012",
-   "EMP-030",
-   "BO-021",
-   "BO-062",
-   "BO-065",
-   "KIT-007"
-  ],
-  "platform.outlet": [
-   "WEB-036",
-   "GST-024",
-   "GST-029",
-   "GST-070",
-   "POS-011",
-   "POS-024",
-   "EMP-030",
-   "EMP-056",
-   "EMP-058",
-   "EMP-067",
-   "BO-044",
-   "BO-062",
-   "BO-063",
-   "BO-065",
-   "BO-094",
-   "BO-112",
-   "BO-113",
-   "BO-138",
-   "BO-139",
-   "BO-727",
-   "BO-728",
-   "BO-732"
-  ],
-  "fnb.dining_table": [
-   "WEB-036",
-   "GST-070",
-   "POS-024",
-   "POS-028",
-   "EMP-051",
-   "EMP-052",
-   "EMP-053",
-   "EMP-054",
-   "EMP-055",
-   "EMP-056",
-   "EMP-058",
-   "EMP-060",
-   "BO-044"
-  ],
-  "fnb.menu_item": [
-   "WEB-036",
-   "GST-024",
-   "GST-032",
-   "POS-021",
-   "POS-024",
-   "KSK-016",
-   "EMP-062",
-   "EMP-067",
-   "BO-014",
-   "BO-044",
-   "BO-045",
-   "BO-049",
-   "BO-104",
-   "BO-109",
-   "BO-111",
-   "BO-136",
-   "BO-139",
-   "BO-140",
-   "CMS-009",
-   "KIT-008"
-  ],
-  "fnb.menu": [
-   "WEB-036",
-   "GST-024",
-   "GST-029",
-   "POS-021",
-   "POS-024",
-   "EMP-030",
-   "BO-007",
-   "BO-045",
-   "BO-062",
-   "BO-065",
-   "BO-104",
-   "BO-109",
-   "BO-111",
-   "BO-729",
-   "BO-730",
-   "CMS-009"
-  ],
-  "inventory.stock_level": [
-   "WEB-036",
-   "GST-024",
-   "GST-032",
-   "KSK-016",
-   "EMP-061",
-   "EMP-062",
-   "EMP-068",
-   "BO-049",
-   "BO-050",
-   "BO-112",
-   "BO-113",
-   "BO-138",
-   "BO-452",
-   "BO-504",
-   "BO-507",
-   "BO-513",
-   "ANL-005"
-  ],
-  "fnb.modifier_group": [
-   "WEB-036",
-   "WEB-037",
-   "WEB-044",
-   "GST-024",
-   "GST-031",
-   "GST-061",
-   "POS-021",
-   "KSK-016",
-   "BO-044",
-   "BO-045",
-   "BO-111"
-  ],
-  "fnb.location_session": [
-   "WEB-036",
-   "WEB-046",
-   "GST-024",
-   "GST-030",
-   "GST-032",
-   "KSK-016"
-  ],
-  "fnb.kitchen_ticket": [
-   "WEB-036",
-   "WEB-038",
-   "GST-024",
-   "GST-025",
-   "GST-032",
-   "POS-022",
-   "POS-028",
-   "KSK-016",
-   "EMP-058",
-   "BO-020",
-   "BO-021",
-   "BO-046",
-   "BO-731",
-   "KIT-001",
-   "KIT-002",
-   "KIT-003",
-   "KIT-004",
-   "KIT-006",
-   "KIT-007",
-   "KIT-008",
-   "KIT-009"
-  ],
-  "fnb.table_session": [
-   "WEB-036",
-   "WEB-038",
-   "GST-024",
-   "GST-025",
-   "POS-028",
-   "EMP-058",
-   "EMP-059"
   ],
   "fnb.service_order": [
    "WEB-036",
@@ -17714,13 +17468,178 @@
    "KIT-006",
    "KIT-007"
   ],
+  "fnb.menu_item": [
+   "WEB-036",
+   "GST-024",
+   "GST-032",
+   "POS-021",
+   "POS-024",
+   "KSK-016",
+   "EMP-062",
+   "EMP-067",
+   "BO-014",
+   "BO-044",
+   "BO-045",
+   "BO-049",
+   "BO-104",
+   "BO-109",
+   "BO-111",
+   "BO-136",
+   "BO-139",
+   "BO-140",
+   "CMS-009",
+   "KIT-008"
+  ],
+  "fnb.table_session": [
+   "WEB-036",
+   "WEB-038",
+   "GST-024",
+   "GST-025",
+   "POS-028",
+   "EMP-058",
+   "EMP-059"
+  ],
+  "fnb.menu": [
+   "WEB-036",
+   "GST-024",
+   "GST-029",
+   "POS-021",
+   "POS-024",
+   "EMP-030",
+   "BO-007",
+   "BO-045",
+   "BO-062",
+   "BO-065",
+   "BO-104",
+   "BO-109",
+   "BO-111",
+   "BO-729",
+   "BO-730",
+   "CMS-009"
+  ],
+  "fnb.delivery_location": [
+   "WEB-036",
+   "WEB-038",
+   "GST-024",
+   "GST-025",
+   "GST-029",
+   "GST-032",
+   "POS-012",
+   "EMP-030",
+   "BO-021",
+   "BO-062",
+   "BO-065",
+   "KIT-007"
+  ],
+  "inventory.stock_level": [
+   "WEB-036",
+   "GST-024",
+   "GST-032",
+   "KSK-016",
+   "EMP-061",
+   "EMP-062",
+   "EMP-068",
+   "BO-049",
+   "BO-050",
+   "BO-112",
+   "BO-113",
+   "BO-138",
+   "BO-452",
+   "BO-504",
+   "BO-507",
+   "BO-513",
+   "ANL-005"
+  ],
+  "fnb.location_session": [
+   "WEB-036",
+   "WEB-046",
+   "GST-024",
+   "GST-030",
+   "GST-032",
+   "KSK-016"
+  ],
+  "fnb.dining_table": [
+   "WEB-036",
+   "GST-070",
+   "POS-024",
+   "POS-028",
+   "EMP-051",
+   "EMP-052",
+   "EMP-053",
+   "EMP-054",
+   "EMP-055",
+   "EMP-056",
+   "EMP-058",
+   "EMP-060",
+   "BO-044"
+  ],
+  "fnb.kitchen_ticket": [
+   "WEB-036",
+   "WEB-038",
+   "GST-024",
+   "GST-025",
+   "GST-032",
+   "POS-022",
+   "POS-028",
+   "KSK-016",
+   "EMP-058",
+   "BO-020",
+   "BO-021",
+   "BO-046",
+   "BO-731",
+   "KIT-001",
+   "KIT-002",
+   "KIT-003",
+   "KIT-004",
+   "KIT-006",
+   "KIT-007",
+   "KIT-008",
+   "KIT-009"
+  ],
+  "fnb.modifier_group": [
+   "WEB-036",
+   "WEB-037",
+   "WEB-044",
+   "GST-024",
+   "GST-031",
+   "GST-061",
+   "POS-021",
+   "KSK-016",
+   "BO-044",
+   "BO-045",
+   "BO-111"
+  ],
+  "platform.outlet": [
+   "WEB-036",
+   "GST-024",
+   "GST-029",
+   "GST-070",
+   "POS-011",
+   "POS-024",
+   "EMP-030",
+   "EMP-056",
+   "EMP-058",
+   "EMP-067",
+   "BO-044",
+   "BO-062",
+   "BO-063",
+   "BO-065",
+   "BO-094",
+   "BO-112",
+   "BO-113",
+   "BO-138",
+   "BO-139",
+   "BO-727",
+   "BO-728",
+   "BO-732"
+  ],
   "fnb.waitlist_entry": [
    "WEB-036",
    "GST-070",
    "EMP-056",
    "EMP-058"
   ],
-  "venuemap.path": [
+  "venuemap.map": [
    "WEB-039",
    "GST-021",
    "POS-013",
@@ -17740,6 +17659,32 @@
    "BO-035",
    "BO-037",
    "BO-060",
+   "BO-092",
+   "BO-093",
+   "BO-094",
+   "BO-1061"
+  ],
+  "venuemap.point": [
+   "WEB-039",
+   "GST-021",
+   "POS-013",
+   "EMP-010",
+   "EMP-015",
+   "EMP-017",
+   "EMP-030",
+   "SCN-003",
+   "SCN-007",
+   "SCN-008",
+   "SCN-009",
+   "SCN-013",
+   "SCN-014",
+   "SCN-015",
+   "BO-019",
+   "BO-034",
+   "BO-035",
+   "BO-037",
+   "BO-060",
+   "BO-073",
    "BO-093",
    "BO-094"
   ],
@@ -17774,7 +17719,7 @@
    "CMS-090",
    "CMS-095"
   ],
-  "venuemap.point": [
+  "venuemap.path": [
    "WEB-039",
    "GST-021",
    "POS-013",
@@ -17794,43 +17739,12 @@
    "BO-035",
    "BO-037",
    "BO-060",
-   "BO-073",
    "BO-093",
    "BO-094"
-  ],
-  "venuemap.map": [
-   "WEB-039",
-   "GST-021",
-   "POS-013",
-   "EMP-010",
-   "EMP-015",
-   "EMP-017",
-   "EMP-030",
-   "SCN-003",
-   "SCN-007",
-   "SCN-008",
-   "SCN-009",
-   "SCN-013",
-   "SCN-014",
-   "SCN-015",
-   "BO-019",
-   "BO-034",
-   "BO-035",
-   "BO-037",
-   "BO-060",
-   "BO-092",
-   "BO-093",
-   "BO-094",
-   "BO-1061"
   ],
   "catalogue.waitlist_entry": [
    "WEB-040",
    "GST-070"
-  ],
-  "access.parking_entitlement": [
-   "WEB-041",
-   "GST-027",
-   "GST-028"
   ],
   "access.parking_facility": [
    "WEB-041",
@@ -17838,15 +17752,15 @@
    "GST-028",
    "BO-006"
   ],
+  "access.parking_entitlement": [
+   "WEB-041",
+   "GST-027",
+   "GST-028"
+  ],
   "retail.shop_and_drop": [
    "WEB-042",
    "GST-062",
    "KSK-011"
-  ],
-  "marketing.referral": [
-   "WEB-043",
-   "GST-072",
-   "BO-830"
   ],
   "marketing.loyalty_programme": [
    "WEB-043",
@@ -17865,6 +17779,11 @@
    "BO-831",
    "BO-833"
   ],
+  "marketing.referral": [
+   "WEB-043",
+   "GST-072",
+   "BO-830"
+  ],
   "orders.stored_value_authorisation": [
    "WEB-043",
    "GST-071",
@@ -17874,19 +17793,21 @@
    "BO-907",
    "BO-937"
   ],
-  "ai.suggestion": [
+  "marketing.conversation": [
    "WEB-044",
    "GST-031",
-   "GST-052",
-   "GST-054",
-   "GST-059",
-   "BO-115",
-   "BO-117",
-   "BO-136",
-   "ANL-001",
-   "ANL-010"
+   "GST-032",
+   "KSK-015",
+   "BO-794",
+   "BO-795",
+   "BO-796",
+   "BO-799",
+   "SUP-002",
+   "SUP-004",
+   "SUP-005",
+   "SUP-008"
   ],
-  "ai.message": [
+  "ai.knowledge_document": [
    "WEB-044",
    "GST-031",
    "GST-032",
@@ -17894,14 +17815,79 @@
    "GST-054",
    "KSK-015",
    "EMP-019",
-   "EMP-020"
+   "EMP-020",
+   "EMP-040",
+   "EMP-041"
   ],
-  "marketing.conversation_message": [
+  "ai.provider": [
    "WEB-044",
+   "GST-031",
    "GST-032",
-   "BO-796",
-   "BO-799",
-   "SUP-005"
+   "GST-033",
+   "GST-052",
+   "GST-054",
+   "GST-059",
+   "POS-008",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020",
+   "BO-029",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-093",
+   "BO-115",
+   "BO-117",
+   "BO-593",
+   "BO-597",
+   "BO-598",
+   "ADM-037",
+   "PTR-018",
+   "SUP-008",
+   "KIT-010",
+   "ANL-001",
+   "ANL-008",
+   "ANL-009",
+   "ANL-010",
+   "ANL-019",
+   "ANL-052",
+   "ANL-056"
+  ],
+  "ai.policy": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "GST-033",
+   "GST-052",
+   "GST-054",
+   "GST-059",
+   "POS-008",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020",
+   "BO-029",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-091",
+   "BO-093",
+   "BO-115",
+   "BO-117",
+   "BO-593",
+   "BO-597",
+   "BO-598",
+   "PTR-018",
+   "SUP-008",
+   "KIT-010",
+   "ANL-001",
+   "ANL-008",
+   "ANL-009",
+   "ANL-010",
+   "ANL-019",
+   "ANL-052",
+   "ANL-056"
   ],
   "ai.chunk_ref": [
    "WEB-044",
@@ -17918,6 +17904,72 @@
    "BO-597",
    "BO-598",
    "SUP-006"
+  ],
+  "ai.conversation": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "GST-033",
+   "GST-054",
+   "GST-068",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020"
+  ],
+  "marketing.agent_availability": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "KSK-015",
+   "BO-795",
+   "BO-799",
+   "SUP-002",
+   "SUP-003",
+   "SUP-004"
+  ],
+  "ai.message": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "GST-033",
+   "GST-054",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020"
+  ],
+  "ai.proposed_action": [
+   "WEB-044",
+   "GST-031",
+   "GST-032",
+   "GST-033",
+   "GST-054",
+   "KSK-015",
+   "EMP-019",
+   "EMP-020",
+   "BO-093",
+   "BO-117",
+   "BO-597",
+   "BO-598",
+   "ANL-009"
+  ],
+  "ai.suggestion": [
+   "WEB-044",
+   "GST-031",
+   "GST-052",
+   "GST-054",
+   "GST-059",
+   "BO-115",
+   "BO-117",
+   "BO-136",
+   "ANL-001",
+   "ANL-010"
+  ],
+  "marketing.conversation_message": [
+   "WEB-044",
+   "GST-032",
+   "BO-796",
+   "BO-799",
+   "SUP-005"
   ],
   "ai.activity": [
    "WEB-044",
@@ -17958,138 +18010,11 @@
    "ANL-052",
    "ANL-056"
   ],
-  "marketing.agent_availability": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "KSK-015",
-   "BO-795",
-   "BO-799",
-   "SUP-002",
-   "SUP-003",
-   "SUP-004"
-  ],
-  "ai.policy": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-052",
-   "GST-054",
-   "GST-059",
-   "POS-008",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020",
-   "BO-029",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-091",
-   "BO-093",
-   "BO-115",
-   "BO-117",
-   "BO-593",
-   "BO-597",
-   "BO-598",
-   "PTR-018",
-   "SUP-008",
-   "KIT-010",
-   "ANL-001",
-   "ANL-008",
-   "ANL-009",
-   "ANL-010",
-   "ANL-019",
-   "ANL-052",
-   "ANL-056"
-  ],
-  "ai.proposed_action": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-054",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020",
-   "BO-093",
-   "BO-117",
-   "BO-597",
-   "BO-598",
-   "ANL-009"
-  ],
-  "ai.knowledge_document": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-054",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020",
-   "EMP-040",
-   "EMP-041"
-  ],
-  "ai.conversation": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-054",
-   "GST-068",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020"
-  ],
-  "marketing.conversation": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "KSK-015",
-   "BO-794",
-   "BO-795",
-   "BO-796",
-   "BO-799",
-   "SUP-002",
-   "SUP-004",
-   "SUP-005",
-   "SUP-008"
-  ],
-  "ai.provider": [
-   "WEB-044",
-   "GST-031",
-   "GST-032",
-   "GST-033",
-   "GST-052",
-   "GST-054",
-   "GST-059",
-   "POS-008",
-   "KSK-015",
-   "EMP-019",
-   "EMP-020",
-   "BO-029",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-093",
-   "BO-115",
-   "BO-117",
-   "BO-593",
-   "BO-597",
-   "BO-598",
-   "ADM-037",
-   "PTR-018",
-   "SUP-008",
-   "KIT-010",
-   "ANL-001",
-   "ANL-008",
-   "ANL-009",
-   "ANL-010",
-   "ANL-019",
-   "ANL-052",
-   "ANL-056"
+  "whitelabel.content_page": [
+   "WEB-045",
+   "GST-040",
+   "GST-057",
+   "BO-837"
   ],
   "whitelabel.faq_category": [
    "WEB-045",
@@ -18097,11 +18022,56 @@
    "ADM-018",
    "SUP-006"
   ],
-  "whitelabel.content_page": [
-   "WEB-045",
-   "GST-040",
-   "GST-057",
-   "BO-837"
+  "orders.deposit_box": [
+   "POS-001",
+   "POS-007",
+   "POS-011",
+   "POS-012",
+   "POS-013",
+   "POS-015",
+   "POS-016",
+   "POS-018",
+   "BO-024"
+  ],
+  "platform.denomination": [
+   "POS-001",
+   "POS-007",
+   "POS-011",
+   "POS-012",
+   "POS-013"
+  ],
+  "platform.region_settings": [
+   "POS-001",
+   "POS-007",
+   "POS-011",
+   "POS-012",
+   "POS-013",
+   "BO-077",
+   "BO-117",
+   "BO-597",
+   "BO-598",
+   "BO-1064",
+   "BO-1065",
+   "ADM-425"
+  ],
+  "orders.cash_movement": [
+   "POS-001",
+   "POS-007",
+   "POS-009",
+   "POS-011",
+   "POS-012",
+   "POS-013",
+   "POS-015",
+   "POS-016",
+   "POS-017",
+   "POS-018",
+   "EMP-003",
+   "EMP-009",
+   "EMP-008",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042"
   ],
   "platform.device": [
    "POS-001",
@@ -18125,106 +18095,6 @@
    "ADM-580",
    "ADM-581",
    "ANL-003"
-  ],
-  "platform.denomination": [
-   "POS-001",
-   "POS-007",
-   "POS-011",
-   "POS-012",
-   "POS-013"
-  ],
-  "platform.venue_settings": [
-   "POS-001",
-   "POS-007",
-   "POS-009",
-   "POS-012",
-   "POS-019",
-   "EMP-003",
-   "EMP-009",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-063",
-   "BO-065",
-   "BO-100",
-   "BO-101",
-   "BO-102",
-   "BO-103",
-   "BO-104",
-   "BO-105",
-   "BO-106",
-   "BO-107",
-   "BO-108",
-   "BO-116",
-   "BO-136",
-   "BO-142",
-   "BO-143",
-   "BO-600",
-   "BO-1063",
-   "KIT-009"
-  ],
-  "orders.cash_movement": [
-   "POS-001",
-   "POS-007",
-   "POS-009",
-   "POS-011",
-   "POS-012",
-   "POS-013",
-   "POS-015",
-   "POS-016",
-   "POS-017",
-   "POS-018",
-   "EMP-003",
-   "EMP-009",
-   "EMP-008",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042"
-  ],
-  "orders.deposit_box": [
-   "POS-001",
-   "POS-007",
-   "POS-011",
-   "POS-012",
-   "POS-013",
-   "POS-015",
-   "POS-016",
-   "POS-018",
-   "BO-024"
-  ],
-  "orders.pos_shift": [
-   "POS-001",
-   "POS-007",
-   "POS-009",
-   "POS-012",
-   "POS-019",
-   "POS-025",
-   "EMP-003",
-   "EMP-009",
-   "EMP-008",
-   "EMP-022",
-   "SCN-001",
-   "BO-039",
-   "BO-040",
-   "BO-041",
-   "BO-042",
-   "BO-100"
-  ],
-  "platform.region_settings": [
-   "POS-001",
-   "POS-007",
-   "POS-011",
-   "POS-012",
-   "POS-013",
-   "BO-077",
-   "BO-117",
-   "BO-597",
-   "BO-598",
-   "BO-1064",
-   "BO-1065",
-   "ADM-425"
   ],
   "orders.no_sale_event": [
    "POS-001",
@@ -18266,50 +18136,54 @@
    "BO-129",
    "BO-1069"
   ],
-  "catalogue.alternative_code": [
-   "POS-002",
-   "POS-003",
-   "EMP-034",
-   "BO-007",
-   "BO-012",
-   "BO-014",
-   "PTR-006"
+  "orders.pos_shift": [
+   "POS-001",
+   "POS-007",
+   "POS-009",
+   "POS-012",
+   "POS-019",
+   "POS-025",
+   "EMP-003",
+   "EMP-009",
+   "EMP-008",
+   "EMP-022",
+   "SCN-001",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-100"
   ],
-  "approvals.rule": [
-   "POS-002",
-   "POS-004",
-   "POS-020",
-   "BO-084",
-   "BO-085",
-   "BO-086",
-   "BO-133",
-   "BO-367",
-   "BO-368",
-   "BO-370",
-   "BO-377",
-   "BO-378",
-   "BO-639",
-   "BO-641",
-   "BO-718",
-   "BO-771",
-   "BO-922",
-   "BO-940",
-   "BO-1010",
-   "BO-1031",
-   "BO-1080",
-   "BO-1181",
-   "ADM-145",
-   "ADM-329",
-   "ADM-330",
-   "ADM-331",
-   "ADM-332",
-   "ADM-333",
-   "ADM-334",
-   "ADM-335",
-   "ADM-337",
-   "ADM-338",
-   "ADM-567",
-   "ACC-007"
+  "platform.venue_settings": [
+   "POS-001",
+   "POS-007",
+   "POS-009",
+   "POS-012",
+   "POS-019",
+   "EMP-003",
+   "EMP-009",
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "BO-063",
+   "BO-065",
+   "BO-100",
+   "BO-101",
+   "BO-102",
+   "BO-103",
+   "BO-104",
+   "BO-105",
+   "BO-106",
+   "BO-107",
+   "BO-108",
+   "BO-116",
+   "BO-136",
+   "BO-142",
+   "BO-143",
+   "BO-600",
+   "BO-1063",
+   "KIT-009"
   ],
   "approvals.request": [
    "POS-002",
@@ -18363,13 +18237,9 @@
    "ACC-006",
    "ACC-007"
   ],
-  "retail.sale": [
+  "retail.return": [
    "POS-002",
-   "POS-005",
-   "POS-007",
-   "POS-011",
-   "POS-023",
-   "POS-026"
+   "POS-011"
   ],
   "approvals.delegation": [
    "POS-002",
@@ -18389,6 +18259,20 @@
    "BO-1181",
    "ADM-337",
    "ADM-567"
+  ],
+  "platform.sale_board": [
+   "POS-002",
+   "POS-025",
+   "BO-109",
+   "BO-115",
+   "BO-116",
+   "BO-117",
+   "BO-118",
+   "BO-122",
+   "BO-123",
+   "BO-124",
+   "BO-125",
+   "BO-126"
   ],
   "access.blacklist": [
    "POS-002",
@@ -18410,23 +18294,50 @@
    "BO-037",
    "BO-060"
   ],
-  "retail.return": [
+  "approvals.rule": [
    "POS-002",
-   "POS-011"
+   "POS-004",
+   "POS-020",
+   "BO-084",
+   "BO-085",
+   "BO-086",
+   "BO-133",
+   "BO-367",
+   "BO-368",
+   "BO-370",
+   "BO-377",
+   "BO-378",
+   "BO-639",
+   "BO-641",
+   "BO-718",
+   "BO-771",
+   "BO-922",
+   "BO-940",
+   "BO-1010",
+   "BO-1031",
+   "BO-1080",
+   "BO-1181",
+   "ADM-145",
+   "ADM-329",
+   "ADM-330",
+   "ADM-331",
+   "ADM-332",
+   "ADM-333",
+   "ADM-334",
+   "ADM-335",
+   "ADM-337",
+   "ADM-338",
+   "ADM-567",
+   "ACC-007"
   ],
-  "platform.sale_board": [
+  "catalogue.alternative_code": [
    "POS-002",
-   "POS-025",
-   "BO-109",
-   "BO-115",
-   "BO-116",
-   "BO-117",
-   "BO-118",
-   "BO-122",
-   "BO-123",
-   "BO-124",
-   "BO-125",
-   "BO-126"
+   "POS-003",
+   "EMP-034",
+   "BO-007",
+   "BO-012",
+   "BO-014",
+   "PTR-006"
   ],
   "approvals.matrix": [
    "POS-002",
@@ -18454,19 +18365,13 @@
    "ADM-338",
    "ADM-567"
   ],
-  "ledger.fiscal_period": [
-   "POS-008",
-   "BO-029",
-   "BO-043",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-076",
-   "BO-090",
-   "BO-1170",
-   "PTR-018",
-   "SUP-008"
+  "retail.sale": [
+   "POS-002",
+   "POS-005",
+   "POS-007",
+   "POS-011",
+   "POS-023",
+   "POS-026"
   ],
   "reporting.report_column": [
    "POS-008",
@@ -18516,6 +18421,67 @@
    "ANL-054",
    "ANL-056"
   ],
+  "ledger.fiscal_period": [
+   "POS-008",
+   "BO-029",
+   "BO-043",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-076",
+   "BO-090",
+   "BO-1170",
+   "PTR-018",
+   "SUP-008"
+  ],
+  "reporting.execution": [
+   "POS-008",
+   "POS-020",
+   "BO-010",
+   "BO-029",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-115",
+   "BO-118",
+   "BO-126",
+   "BO-133",
+   "BO-1059",
+   "BO-1082",
+   "PTR-018",
+   "SUP-008",
+   "ANL-001",
+   "ANL-002",
+   "ANL-003",
+   "ANL-004",
+   "ANL-005",
+   "ANL-006",
+   "ANL-007",
+   "ANL-009",
+   "ANL-039",
+   "ANL-040"
+  ],
+  "ledger.account": [
+   "POS-008",
+   "BO-024",
+   "BO-029",
+   "BO-043",
+   "BO-049",
+   "BO-050",
+   "BO-058",
+   "BO-059",
+   "BO-060",
+   "BO-061",
+   "BO-074",
+   "BO-076",
+   "BO-090",
+   "BO-1029",
+   "PTR-018",
+   "SUP-008",
+   "ANL-005"
+  ],
   "ledger.event_budget": [
    "POS-008",
    "BO-029",
@@ -18564,34 +18530,6 @@
    "ANL-052",
    "ANL-054"
   ],
-  "reporting.execution": [
-   "POS-008",
-   "POS-020",
-   "BO-010",
-   "BO-029",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-115",
-   "BO-118",
-   "BO-126",
-   "BO-133",
-   "BO-1059",
-   "BO-1082",
-   "PTR-018",
-   "SUP-008",
-   "ANL-001",
-   "ANL-002",
-   "ANL-003",
-   "ANL-004",
-   "ANL-005",
-   "ANL-006",
-   "ANL-007",
-   "ANL-009",
-   "ANL-039",
-   "ANL-040"
-  ],
   "reporting.report_definition": [
    "POS-008",
    "POS-020",
@@ -18629,24 +18567,20 @@
    "ANL-052",
    "ANL-054"
   ],
-  "ledger.account": [
-   "POS-008",
-   "BO-024",
-   "BO-029",
-   "BO-043",
-   "BO-049",
-   "BO-050",
-   "BO-058",
-   "BO-059",
-   "BO-060",
-   "BO-061",
-   "BO-074",
-   "BO-076",
-   "BO-090",
-   "BO-1029",
-   "PTR-018",
-   "SUP-008",
-   "ANL-005"
+  "reporting.alert": [
+   "POS-009",
+   "POS-020",
+   "POS-025",
+   "EMP-070",
+   "BO-036",
+   "BO-125",
+   "BO-133",
+   "BO-141",
+   "BO-472",
+   "ANL-001",
+   "ANL-003",
+   "ANL-009",
+   "ANL-012"
   ],
   "workforce.rota_assignment": [
    "POS-009",
@@ -18689,21 +18623,6 @@
    "ANL-009",
    "ANL-012"
   ],
-  "reporting.alert": [
-   "POS-009",
-   "POS-020",
-   "POS-025",
-   "EMP-070",
-   "BO-036",
-   "BO-125",
-   "BO-133",
-   "BO-141",
-   "BO-472",
-   "ANL-001",
-   "ANL-003",
-   "ANL-009",
-   "ANL-012"
-  ],
   "assets.media_usage": [
    "POS-010",
    "EMP-036",
@@ -18712,6 +18631,12 @@
    "CMS-068",
    "CMS-075",
    "CMS-082"
+  ],
+  "inventory.serialised_item": [
+   "POS-011",
+   "EMP-069",
+   "BO-114",
+   "BO-505"
   ],
   "inventory.stock_batch": [
    "POS-011",
@@ -18749,12 +18674,6 @@
    "BO-513",
    "ANL-005",
    "ANL-006"
-  ],
-  "inventory.serialised_item": [
-   "POS-011",
-   "EMP-069",
-   "BO-114",
-   "BO-505"
   ],
   "retail.return_policy": [
    "POS-011",
@@ -18896,16 +18815,6 @@
    "BO-132",
    "BO-133"
   ],
-  "inventory.requisition": [
-   "EMP-004",
-   "EMP-005",
-   "EMP-006",
-   "EMP-063",
-   "EMP-070",
-   "BO-078",
-   "BO-141",
-   "BO-513"
-  ],
   "maintenance.asset": [
    "EMP-004",
    "EMP-005",
@@ -18941,6 +18850,16 @@
    "EMP-006",
    "BO-030",
    "BO-577"
+  ],
+  "inventory.requisition": [
+   "EMP-004",
+   "EMP-005",
+   "EMP-006",
+   "EMP-063",
+   "EMP-070",
+   "BO-078",
+   "BO-141",
+   "BO-513"
   ],
   "workforce.announcement": [
    "EMP-007",
@@ -19038,6 +18957,13 @@
    "BO-510",
    "BO-513"
   ],
+  "fnb.corrective_action": [
+   "EMP-062",
+   "EMP-065",
+   "EMP-067",
+   "BO-044",
+   "KIT-008"
+  ],
   "fnb.cold_chain_event": [
    "EMP-062",
    "EMP-065",
@@ -19048,13 +18974,6 @@
   ],
   "fnb.temperature_log": [
    "EMP-062",
-   "EMP-067",
-   "BO-044",
-   "KIT-008"
-  ],
-  "fnb.corrective_action": [
-   "EMP-062",
-   "EMP-065",
    "EMP-067",
    "BO-044",
    "KIT-008"
@@ -19191,26 +19110,6 @@
    "SCN-011",
    "ADM-003"
   ],
-  "marketing.campaign": [
-   "BO-005",
-   "BO-107",
-   "BO-118",
-   "BO-121",
-   "BO-764",
-   "BO-766",
-   "BO-767",
-   "BO-768",
-   "BO-769",
-   "BO-771",
-   "BO-772",
-   "BO-773"
-  ],
-  "marketing.attribution_touch": [
-   "BO-005",
-   "BO-772",
-   "BO-773",
-   "BO-781"
-  ],
   "marketing.segment_criterion": [
    "BO-005",
    "BO-107",
@@ -19227,10 +19126,30 @@
    "BO-769",
    "ANL-007"
   ],
+  "marketing.campaign": [
+   "BO-005",
+   "BO-107",
+   "BO-118",
+   "BO-121",
+   "BO-764",
+   "BO-766",
+   "BO-767",
+   "BO-768",
+   "BO-769",
+   "BO-771",
+   "BO-772",
+   "BO-773"
+  ],
   "marketing.message_delivery": [
    "BO-005",
    "BO-772",
    "BO-773"
+  ],
+  "marketing.attribution_touch": [
+   "BO-005",
+   "BO-772",
+   "BO-773",
+   "BO-781"
   ],
   "catalogue.price": [
    "BO-007",
@@ -19350,6 +19269,13 @@
    "BO-126",
    "BO-133"
   ],
+  "platform.profile_deployment": [
+   "BO-036",
+   "BO-124",
+   "BO-126",
+   "BO-129",
+   "BO-1068"
+  ],
   "platform.configuration_profile": [
    "BO-036",
    "BO-123",
@@ -19359,18 +19285,15 @@
    "BO-1068",
    "BO-1070"
   ],
-  "platform.profile_deployment": [
-   "BO-036",
-   "BO-124",
-   "BO-126",
-   "BO-129",
-   "BO-1068"
-  ],
   "platform.offline_policy": [
    "BO-037",
    "BO-128",
    "BO-130",
    "BO-206"
+  ],
+  "catalogue.product_version": [
+   "BO-045",
+   "ADM-131"
   ],
   "fnb.substitution_rule": [
    "BO-045",
@@ -19386,28 +19309,19 @@
    "BO-137",
    "BO-138"
   ],
-  "catalogue.product_version": [
-   "BO-045",
-   "ADM-131"
-  ],
   "inventory.purchase_order": [
    "BO-052",
    "BO-083",
    "BO-105"
-  ],
-  "reporting.schedule_recipient": [
-   "BO-058",
-   "ANL-042"
   ],
   "reporting.schedule": [
    "BO-058",
    "ANL-041",
    "ANL-042"
   ],
-  "control.webhook_delivery": [
-   "BO-067",
-   "BO-1078",
-   "DEV-005"
+  "reporting.schedule_recipient": [
+   "BO-058",
+   "ANL-042"
   ],
   "control.developer_account": [
    "BO-067",
@@ -19417,13 +19331,6 @@
    "DEV-003",
    "DEV-004",
    "DEV-007"
-  ],
-  "control.api_licence": [
-   "BO-067",
-   "BO-1073",
-   "PTR-019",
-   "DEV-003",
-   "DEV-008"
   ],
   "control.api_client": [
    "BO-067",
@@ -19442,6 +19349,11 @@
    "DEV-006",
    "DEV-008"
   ],
+  "control.webhook_delivery": [
+   "BO-067",
+   "BO-1078",
+   "DEV-005"
+  ],
   "control.webhook_subscription": [
    "BO-067",
    "BO-692",
@@ -19449,6 +19361,13 @@
    "BO-1077",
    "ADM-353",
    "DEV-005"
+  ],
+  "control.api_licence": [
+   "BO-067",
+   "BO-1073",
+   "PTR-019",
+   "DEV-003",
+   "DEV-008"
   ],
   "games.game": [
    "BO-069",
@@ -19478,10 +19397,10 @@
   "ledger.tax_exemption": [
    "BO-075"
   ],
-  "ledger.tax_code": [
+  "ledger.account_mapping": [
    "BO-075"
   ],
-  "ledger.account_mapping": [
+  "ledger.tax_code": [
    "BO-075"
   ],
   "ledger.recognition_schedule": [
@@ -19548,16 +19467,6 @@
   "catalogue.product_category": [
    "BO-115"
   ],
-  "catalogue.import_job": [
-   "BO-117"
-  ],
-  "seating.seating_rules": [
-   "BO-117",
-   "BO-597",
-   "BO-598",
-   "BO-993",
-   "BO-995"
-  ],
   "seating.seat_map": [
    "BO-117",
    "BO-597",
@@ -19606,6 +19515,16 @@
    "BO-978",
    "BO-982",
    "BO-1070"
+  ],
+  "catalogue.import_job": [
+   "BO-117"
+  ],
+  "seating.seating_rules": [
+   "BO-117",
+   "BO-597",
+   "BO-598",
+   "BO-993",
+   "BO-995"
   ],
   "marketing.segment": [
    "BO-118",
@@ -19673,14 +19592,14 @@
    "BO-383",
    "ADM-345"
   ],
+  "approvals.signature": [
+   "BO-377",
+   "ADM-344"
+  ],
   "approvals.step_up_policy": [
    "BO-377",
    "ADM-342",
    "ADM-343"
-  ],
-  "approvals.signature": [
-   "BO-377",
-   "ADM-344"
   ],
   "approvals.control_policy": [
    "BO-381",
@@ -19950,6 +19869,15 @@
    "ADM-426",
    "ADM-427"
   ],
+  "accreditation.application": [
+   "BO-615",
+   "BO-616",
+   "BO-617",
+   "BO-623",
+   "BO-635",
+   "BO-636",
+   "BO-640"
+  ],
   "accreditation.holder": [
    "BO-615",
    "BO-625",
@@ -19967,15 +19895,6 @@
    "BO-682",
    "BO-684",
    "BO-685"
-  ],
-  "accreditation.application": [
-   "BO-615",
-   "BO-616",
-   "BO-617",
-   "BO-623",
-   "BO-635",
-   "BO-636",
-   "BO-640"
   ],
   "accreditation.programme": [
    "BO-619",
@@ -20406,24 +20325,6 @@
    "BO-1164",
    "BO-1169"
   ],
-  "control.usage_record": [
-   "ADM-002",
-   "ADM-005",
-   "ADM-006",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-010",
-   "ADM-011",
-   "ADM-012",
-   "ADM-015",
-   "ADM-371",
-   "ADM-449",
-   "ADM-451",
-   "ADM-457",
-   "ADM-458",
-   "CMS-001"
-  ],
   "subscription.contract": [
    "ADM-002",
    "ADM-005",
@@ -20469,19 +20370,6 @@
    "ADM-457",
    "CMS-001"
   ],
-  "identity.sso_group_mapping": [
-   "ADM-002",
-   "ADM-005",
-   "ADM-006",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-010",
-   "ADM-011",
-   "ADM-012",
-   "ADM-015",
-   "CMS-001"
-  ],
   "subscription.plan": [
    "ADM-002",
    "ADM-005",
@@ -20507,6 +20395,24 @@
    "SGN-012",
    "SGN-022"
   ],
+  "control.usage_record": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "ADM-371",
+   "ADM-449",
+   "ADM-451",
+   "ADM-457",
+   "ADM-458",
+   "CMS-001"
+  ],
   "control.cell": [
    "ADM-002",
    "ADM-003",
@@ -20528,6 +20434,19 @@
    "ADM-034",
    "CMS-001"
   ],
+  "identity.sso_group_mapping": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "CMS-001"
+  ],
   "control.cell_job": [
    "ADM-003",
    "ADM-013",
@@ -20537,6 +20456,14 @@
    "ADM-032",
    "ADM-033",
    "ADM-034"
+  ],
+  "platform.tenant": [
+   "ADM-008",
+   "ADM-011",
+   "ADM-414",
+   "ADM-463",
+   "CMS-001",
+   "SGN-022"
   ],
   "control.partner_agreement": [
    "ADM-008",
@@ -20552,14 +20479,6 @@
    "ADM-462",
    "ADM-467",
    "CMS-001"
-  ],
-  "platform.tenant": [
-   "ADM-008",
-   "ADM-011",
-   "ADM-414",
-   "ADM-463",
-   "CMS-001",
-   "SGN-022"
   ],
   "control.scaling_policy": [
    "ADM-014",
@@ -20583,10 +20502,10 @@
   "control.upgrade_schedule": [
    "ADM-025"
   ],
-  "control.migration_plan": [
+  "control.migration": [
    "ADM-027"
   ],
-  "control.migration": [
+  "control.migration_plan": [
    "ADM-027"
   ],
   "control.rollout_cell": [
@@ -20645,13 +20564,13 @@
    "ADM-413",
    "SGN-018"
   ],
+  "control.onboarding_application": [
+   "ADM-380",
+   "SGN-002"
+  ],
   "control.venue_type_template": [
    "ADM-380",
    "ADM-424",
-   "SGN-002"
-  ],
-  "control.onboarding_application": [
-   "ADM-380",
    "SGN-002"
   ],
   "subscription.module_listing": [
@@ -20688,6 +20607,12 @@
    "ADM-408",
    "PTR-011"
   ],
+  "payments.routing_rule": [
+   "ADM-412",
+   "ADM-573",
+   "ADM-574",
+   "SGN-021"
+  ],
   "identity.password_policy": [
    "ADM-421"
   ],
@@ -20712,10 +20637,6 @@
    "ADM-570",
    "ADM-571",
    "ADM-572"
-  ],
-  "payments.routing_rule": [
-   "ADM-573",
-   "ADM-574"
   ],
   "payments.failover_policy": [
    "ADM-575"
@@ -20821,12 +20742,12 @@
    "ADM-691",
    "ADM-692"
   ],
-  "orders.credit_override": [
+  "orders.b2b_credit": [
    "PTR-001",
    "PTR-002",
    "PTR-013"
   ],
-  "orders.b2b_credit": [
+  "orders.credit_override": [
    "PTR-001",
    "PTR-002",
    "PTR-013"

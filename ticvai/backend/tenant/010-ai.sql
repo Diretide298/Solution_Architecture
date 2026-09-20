@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
 
 -- Configured providers, models and failover order. Credentials are a vault reference, never a key
 -- Hangs off: reaches ai.index_source through its keys; references ai.provider, control.tenant,
--- platform.scope. Reached by: 14 operations read it and 3 write it; 6 tables reference it.
+-- platform.scope. Reached by: 14 operations read it and 3 write it; 7 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.provider (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL,

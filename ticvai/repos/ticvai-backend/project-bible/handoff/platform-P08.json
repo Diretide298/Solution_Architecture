@@ -150,11 +150,11 @@
    "operations": 52
   },
   {
-   "contract": "resources",
+   "contract": "inventory",
    "operations": 48
   },
   {
-   "contract": "inventory",
+   "contract": "resources",
    "operations": 48
   },
   {
@@ -246,11 +246,11 @@
    "operations": 3
   },
   {
-   "contract": "payments",
+   "contract": "platform-ops",
    "operations": 1
   },
   {
-   "contract": "platform-ops",
+   "contract": "payments",
    "operations": 1
   }
  ],

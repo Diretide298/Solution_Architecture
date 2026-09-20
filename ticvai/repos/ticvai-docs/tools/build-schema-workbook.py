@@ -525,10 +525,12 @@ for t_ in ['Blue rows are the eight stored procedures. Amber were hand-mapped be
 # one place nothing pointed at. It read as 520 warnings that the DDL had invented columns the
 # workbook did not list; the DDL was right in every case.
 #
-# Writing both here is what keeps them from drifting: they cannot disagree if there is no moment
-# at which only one of them has been written.
-for _dest in (_ROOT / 'TICVAI_Schema_Reference.xlsx',
-              _H / 'TICVAI_Schema_Reference.xlsx'):
-    wb.save(_dest)
+# Writing both was the fix for that, and it was the wrong one: **two copies that cannot drift are
+# still two copies, and every reader had to know which.** Settled 20 September - `handoff/` is
+# canonical and the root copy is gone. Everything already pointed at `handoff/`:
+# `check-package` reads it there, `derive-overview` documents it there, `derive-mirrors` copies
+# only that one into the six repos, and the viewer's lineage cites that path. The root copy was
+# left over from the bare-filename bug and nothing read it.
+wb.save(_H / 'TICVAI_Schema_Reference.xlsx')
 print(f"{tot} tables | {len(written)} written | {len(PII)} PII | {len(NEW)} new")
-print("  written to TICVAI_Schema_Reference.xlsx and handoff/TICVAI_Schema_Reference.xlsx")
+print("  written to handoff/TICVAI_Schema_Reference.xlsx")

@@ -55,6 +55,8 @@ CREATE INDEX IF NOT EXISTS ix_partner_agreement_accepted_by_principal_id ON cont
 CREATE INDEX IF NOT EXISTS ix_partner_agreement_branding_asset_id ON control.partner_agreement (branding_asset_id);
 -- convention, not declared: control.release.created_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS ix_release_created_by_principal_id ON control.release (created_by_principal_id);
+-- convention, not declared: control.rollout.reinventory_hold_id -> wallet.hold
+CREATE INDEX IF NOT EXISTS ix_rollout_reinventory_hold_id ON control.rollout (reinventory_hold_id);
 -- convention, not declared: control.rollout_tenant.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_rollout_tenant_cell_id ON control.rollout_tenant (cell_id);
 -- convention, not declared: control.rollout_tenant.tenant_id -> platform.tenant

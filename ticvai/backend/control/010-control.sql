@@ -448,8 +448,8 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
 
 -- Net rate or commission, credit terms, validity. Versioned — an order placed last week used last
 -- week’s rate Hangs off: reaches control.cell through its keys; references approvals.request,
--- identity.principal, maintenance.asset. Reached by: 6 operations read it and 3 write it; 1 tables
--- reference it.
+-- assets.media_asset, identity.principal. Reached by: 6 operations read it and 3 write it; 1
+-- tables reference it.
 CREATE TABLE IF NOT EXISTS control.partner_agreement (
     id                                uuid PRIMARY KEY,
     partner_id                        uuid NOT NULL,

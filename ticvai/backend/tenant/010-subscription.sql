@@ -117,6 +117,8 @@ CREATE TABLE IF NOT EXISTS subscription.plan (
     published_at                      timestamptz
 );
 
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS subscription.tier_allowance (
     id                                uuid PRIMARY KEY,
     tier_id                           uuid NOT NULL,
@@ -130,6 +132,8 @@ CREATE TABLE IF NOT EXISTS subscription.tier_allowance (
     updated_at                        timestamptz
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is.
 CREATE TABLE IF NOT EXISTS subscription.tier_module (
     id                                uuid PRIMARY KEY,
     tier_id                           uuid NOT NULL,

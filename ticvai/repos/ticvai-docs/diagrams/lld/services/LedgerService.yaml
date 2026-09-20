@@ -586,7 +586,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.settlement
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:

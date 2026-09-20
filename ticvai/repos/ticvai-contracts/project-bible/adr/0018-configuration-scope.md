@@ -1,6 +1,6 @@
 # ADR-0018 — Configuration scope
 
-**Status:** Accepted · amended 18 August 2026 (CF-138)
+**Status:** Accepted · amended 18 August 2026 (CF-138) · **amended 20 September 2026 (currency)**
 **Date:** 14 August 2026
 **Relates to:** [ADR-0008](0008-money-carries-per-region-scale.md) money scale ·
 [ADR-0011](0011-hierarchy-is-binding.md) hierarchy — **amended 18 August to add `outlet`, by this ADR** · [ADR-0006](0006-tiered-guest-app-distribution.md) app distribution
@@ -60,7 +60,7 @@ thing the rule said could not configure, which is how the gap announced itself.
       └── outlet                                            commercial
 
 **Department could not do this job.** `inventory.requisition.department_id` and
-`platform.workstation.department_id` both resolve to `platform.org_unit`: a department has
+`platform.workstation.department_id` both resolve to `platform.scope`: a department has
 requisitions, rotas and workstations. **Modelling a restaurant as a department would put it in
 the staffing tree and give every rota a restaurant to schedule against.**
 
@@ -86,6 +86,51 @@ not forty configurations. Forty configurations is forty things to keep in step, 
 not stay in step.
 
 ## The levels
+
+### Currency is a region default a venue may set, and is frozen once the venue trades
+
+**Amended 20 September 2026.** The original rule put currency in the same row as tax rates —
+*"a venue cannot choose its VAT"*. **That is true of tax and was over-applied to currency.** A
+free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region
+does not, and the package already carries currency at two levels: `platform.region_settings` for
+the trading currency and `ledger.legal_entity` for the book currency. A third is not a new idea.
+
+    region_settings.currency_code     the default
+    venue_settings.currency_code      set at venue creation, overridable until first trade
+    (after first trade)               immutable
+
+**The freeze is what makes resolution safe, and it is the reason the column has to exist.**
+Configuration resolves at read time. A price list is a dated range — `valid_from`, `valid_to` —
+so a list valid in January and read in July resolves its currency *now*, not as it was. If a
+currency could change, every dated artefact below it would render retrospectively wrong, and the
+only fix would be to store a currency on every priced row.
+
+It cannot change, so resolution stays correct. **But a venue that resolves purely from its region
+has nowhere to hold the frozen answer**: change the region's currency and a venue that traded
+last year silently follows it. The frozen value has to be written down, which is
+`venue_settings.currency_code` and `currency_scale` together — scale travels with currency
+(ADR-0008) and overriding one without the other gets rounding wrong.
+
+**Consequences.**
+
+| | |
+|---|---|
+| `venue_settings` gains `currency_code` and `currency_scale` | written at creation from the region, frozen at first trade |
+| the freeze needs a guard | an operation that changes a traded venue's currency must fail, the way `check-package` already fails an operation declaring a scope it is not entitled to |
+| `ledger.settlement` has no currency | **this is the one real gap, and it is now closed.** A posting resolves its currency from `ledger.account.currency` and a payment from its own `tenderCurrency`; a settlement is a provider file for a period and belongs to no account, so `provider_gross`, `ledger_gross` and `difference` were bare amounts that a cross-currency file makes meaningless. `ledger.settlement` gained `currencyCode` |
+| `ledger.posting` and `journal_line` | **not a gap.** They store the amount alone by design (`Money` declares `x-ticvai-persistence-column`), and `accountId` is required, so the currency is the account's. Accounts are already denominated |
+| `runFxRevaluation` is narrower than its name | it reads `ledger.inter_entity_obligation` only. It cannot revalue a venue's foreign balance because nothing records one |
+| `ledger.fx_rate` is keyed `region_id` | **not a blocker.** It scopes which rate *set* applies, not which pairs exist — a USD venue looks up USD→AED in its region's set. Load the pairs |
+| `region_settings` is a bundle | currency sits beside date format, number format and fiscal year. A venue overrides currency and scale only; the rest still resolves from the region |
+
+**What did not move.** Tax rates, cash denominations, chart of accounts, settlement and acquirer
+files stay at region. **A venue choosing its trading currency does not let it choose its VAT** —
+that was the conflation this amendment removes.
+
+**Rejected: inferring the default from an IP trace.** A venue is a fixed physical place with an
+address, a region and a legal entity. Its currency is a commercial fact we already hold, and
+geolocation guesses at it — wrongly, under a VPN, a corporate egress or a cloud-hosted till. IP
+inference belongs to **guest-facing display currency**, which is a different feature.
 
 ### Region — law and money
 

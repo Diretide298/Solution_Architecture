@@ -955,7 +955,7 @@ tables:
 - table: fnb.menu_item_modifier
   columns: 5
   store: postgres
-  parent: null
+  parent: inventory.item
   writtenBy: []
   foreignWriters: null
 - table: fnb.menu_section
@@ -1050,7 +1050,7 @@ tables:
 - table: fnb.reservation_table
   columns: 4
   store: postgres
-  parent: null
+  parent: retail.reservation
   writtenBy: []
   foreignWriters: null
 - table: fnb.service_order

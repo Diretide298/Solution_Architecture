@@ -39,11 +39,11 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
+   "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "inventory",
+   "contract": "marketing-crm",
    "operations": 3
   },
   {
@@ -59,7 +59,7 @@
    "operations": 1
   },
   {
-   "contract": "approvals",
+   "contract": "tenancy",
    "operations": 1
   },
   {
@@ -67,11 +67,11 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "approvals",
    "operations": 1
   },
   {
-   "contract": "tenancy",
+   "contract": "orders",
    "operations": 1
   }
  ],

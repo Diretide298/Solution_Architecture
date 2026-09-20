@@ -24,8 +24,9 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
     scope_path                        text
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 tables reference it.
 CREATE TABLE IF NOT EXISTS wallet.balance (
-    id                                uuid PRIMARY KEY NOT NULL,
     wallet_balance_id                 uuid NOT NULL,
     wallet_id                         uuid NOT NULL,
     available_balance                 numeric(18,4) NOT NULL,
@@ -33,7 +34,8 @@ CREATE TABLE IF NOT EXISTS wallet.balance (
     total_balance                     numeric(18,4) NOT NULL,
     currency_code                     text NOT NULL,
     version                           integer NOT NULL,
-    updated_at                        timestamptz NOT NULL
+    updated_at                        timestamptz NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -206,8 +208,9 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
     scope_path                        text
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 3 tables reference it.
 CREATE TABLE IF NOT EXISTS wallet.hold (
-    id                                uuid PRIMARY KEY NOT NULL,
     wallet_hold_id                    uuid NOT NULL,
     wallet_id                         uuid NOT NULL,
     order_id                          uuid,
@@ -218,7 +221,8 @@ CREATE TABLE IF NOT EXISTS wallet.hold (
     expires_at                        timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL,
     captured_at                       timestamptz,
-    released_at                       timestamptz
+    released_at                       timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing

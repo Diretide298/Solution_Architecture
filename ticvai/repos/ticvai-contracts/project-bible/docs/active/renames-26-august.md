@@ -39,16 +39,16 @@ wins, every service crosses databases and the name means nothing.
 
 | Was | Now | Cols | Ops | FKs in |
 |---|---|---:|---:|---:|
-| `platform.scope_node` | **`platform.org_unit`** | 8 | 17 | **76** |
+| `platform.scope_node` | **`platform.scope`** | 8 | 17 | **76** |
 | `catalogue.envelope` | **`catalogue.channel_capacity`** | 12 | 13 | 2 |
 | `catalogue.attribute_axis` | **`catalogue.variant_dimension`** | 3 | 2 | 0 |
 | `catalogue.inventory_lease` | **`catalogue.inventory_hold`** | 14 | 14 | 3 |
 | `identity.grant` | **`identity.delegated_access`** | 19 | 17 | 0 |
 | `ledger.entry` | **`ledger.posting`** | 12 | 17 | 3 |
-| `queue.entry` | **`queue.waiting_guest`** | 18 | 9 | 1 |
+| `queue.entry` | **`queue.entry`** | 18 | 9 | 1 |
 | `access.admission_profile` | **`access.admission_rules`** | 9 | 7 | 3 |
 | `platform.redemption_right` | **`platform.cross_region_entitlement`** | 16 | 5 | 1 |
-| `control.plan` | **`control.subscription_plan`** | 15 | 8 | 7 |
+| `control.plan` | **`subscription.plan`** | 15 | 8 | 7 |
 
 ### The reasoning, one line each
 
@@ -104,7 +104,7 @@ subscription.Plan             -> subscription.SubscriptionPlan
 ## Operations and paths — 24 renamed
 
 **A table renamed while its API keeps the old word is worse than neither.** A developer reading
-`createScopeNode` and finding `platform.org_unit` has two vocabularies for one thing.
+`createScopeNode` and finding `platform.scope` has two vocabularies for one thing.
 
 **Six of the ten tables had operations named after them**, and the first draft of this document
 caught only one of the six.
@@ -168,7 +168,7 @@ operations. **"Scope" appears 1,426 times across the contracts and it is the rig
 
 **The org unit is the thing; a scope is what you get when you use one for authorisation.** Same row,
 two roles. `identity.delegated_access` carries a `scope_path` because a grant is *scoped*;
-`platform.org_unit` is the structure being scoped against.
+`platform.scope` is the structure being scoped against.
 
 **Renaming `scope_path` to `org_path` would have traded one confusion for a much larger one.**
 

@@ -4007,6 +4007,16 @@ components:
         id:
           type: string
           format: uuid
+        currencyCode:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: >
+            **A settlement has no account, so nothing else denominates it.** A posting takes its
+            currency from `ledger.account.currency` and a payment from `tenderCurrency`, but a
+            settlement is a provider file for a period: `providerGross`, `ledgerGross` and
+            `difference` are bare amounts, and a provider file in one currency against a ledger
+            in another computes a difference that means nothing. Added 20 September, when a venue
+            became able to trade outside its region's currency.
         providerName:
           type: string
         periodStart:

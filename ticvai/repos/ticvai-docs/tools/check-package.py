@@ -615,6 +615,14 @@ def main() -> int:
         "orders.deposit",                    # money actually taken, like orders.payment.tender_currency beside it
         "wallet.balance",                    # a stored-value balance is denominated, the same reason wallet.wallet is exempt
         "wallet.hold",                       # a hold on a denominated balance carries the balance's denomination
+        # **The two the 20 September amendment created, and they are the point of it.**
+        # `platform.venue_settings` holds the venue's trading currency *because* it is frozen at
+        # first trade and the frozen answer needs somewhere to live — a venue resolving purely
+        # from its region would silently follow a region currency change it had already traded
+        # under. `ledger.settlement` is a provider file for a period and belongs to no account,
+        # so unlike a posting it has nothing to resolve a currency from.
+        "platform.venue_settings",
+        "ledger.settlement",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():
