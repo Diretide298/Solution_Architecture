@@ -306,6 +306,7 @@ draft-pack-operations specify-pack-operations scope-pack-to-contracts
 splice-contract apply-p04-transitions
 retire-answered-questions                                          # never run: the answers are the reasoning
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
+build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "
