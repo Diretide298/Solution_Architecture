@@ -16,9 +16,23 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
-    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
+    <!-- 1.9.0 across all three until 21 September. The exporter at 1.9.0 is
+         CVE-2026-42191 / GHSA-4625-4j76-fww9: the OTLP disk-retry feature fell
+         back to the system temp directory when no retry directory was set, so
+         on a shared machine another user could read the *.blob files holding
+         telemetry between failed exports, or drop their own in for this
+         application to forward under its identity. Affected 1.8.0-1.15.2;
+         first patched 1.15.3.
+
+         All three move together rather than the exporter alone. They share the
+         OpenTelemetry core package, and 1.15.3 does not exist for
+         Instrumentation.AspNetCore at all - its line goes 1.15.2 to 1.16.0 - so
+         a minimum-bump set would have been three different versions resolving
+         one core between them. 1.18.0 is the newest release all three share
+         that has a month of use behind it; 1.19.0 is three days old. -->
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
   </ItemGroup>
 </Project>
