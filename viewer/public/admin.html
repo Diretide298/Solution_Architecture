@@ -320,6 +320,9 @@
     </div>
 
     <script type="module">
+      // The viewer's top bar on a page that is not the viewer: the layer tabs,
+      // the bell and the account drawer. Eight pages had none of it.
+      import '/page-chrome.js';
       import {
         authState, listAccounts, setAccountActive, setAccountRole,
         createInvite, listInvites, revokeInvite, logoutAccount,

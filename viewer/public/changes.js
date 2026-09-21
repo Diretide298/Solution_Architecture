@@ -6,6 +6,9 @@
  * The list is the project's own; switching project is a reload with ?project=.
  * Everything shown can be exported as CSV, filters applied.
  */
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { hideLoader } from '/loader.js';
 

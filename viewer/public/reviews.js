@@ -11,6 +11,9 @@
  * ER boxes, the state machines — and a charting library would be the first
  * dependency in the frontend, for four charts.
  */
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { attachSubSearch } from '/subsearch.js';
 import { hue } from '/core.js';

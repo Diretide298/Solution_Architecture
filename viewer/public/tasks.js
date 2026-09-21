@@ -21,6 +21,9 @@
  * Claude Code, as it does everywhere else; a page that can move somebody else's
  * ticket is a page that moves it by accident.
  */
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { hideLoader, loaderSays } from '/loader.js';
 import { followSections } from '/sections.js';

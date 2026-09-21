@@ -676,7 +676,22 @@ function sendCachedJson(res, req, cache, key, value) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+  // **A request line this cannot parse used to take the process down.**
+  // `new URL('//', base)` throws `ERR_INVALID_URL` — `//` is a protocol-relative
+  // reference with an empty host — and the throw happened before any handler,
+  // outside every try in the file, so it reached the top of the event loop and
+  // node exited. One malformed request from anything at all, a link with a
+  // doubled slash included, stopped the viewer for everybody on it.
+  //
+  // A 400 is the whole fix. This is a read-only local server, but "the process
+  // dies if you ask it the wrong way" is not a property any server should have.
+  let url;
+  try {
+    url = new URL(req.url, `http://${req.headers.host}`);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('bad request line');
+  }
 
   // The deployment gives the browser one API host and sends the thirteen paths
   // this process owns on to it, so requests for the package now arrive from the

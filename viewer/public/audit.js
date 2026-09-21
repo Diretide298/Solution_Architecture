@@ -23,6 +23,9 @@
  * product, and a client opening it would learn nothing they wanted to know.
  */
 
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import '/theme.js';
 import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';

@@ -38,6 +38,9 @@
  * The prose is typed and says only things that stay true when the counts move.
  */
 
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import '/theme.js';   // the saved day/night choice, before anything paints
 import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';

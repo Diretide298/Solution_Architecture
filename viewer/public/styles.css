@@ -505,7 +505,7 @@ body {
   scrollbar-width: none;
 }
 .layer-tray::-webkit-scrollbar, .view-tabs::-webkit-scrollbar { display: none; }
-.layer-tray button, .mode { flex: none; white-space: nowrap; }
+.layer-tray button, .layer-tray a, .mode { flex: none; white-space: nowrap; }
 
 /* ── brand ─────────────────────────────────────────────────────────
    The client's mark, rendered white rather than served white — a filter is
@@ -689,7 +689,10 @@ body {
   border-radius: 11px;
   background: color-mix(in srgb, #000 22%, var(--chrome-1));
 }
-.layer-tray button {
+/* `a` as well as `button`: the standalone pages' chrome draws these tabs as
+   real links, because they go to another document and a middle-click should
+   open one. Same rule, so the two bars cannot drift apart visually. */
+.layer-tray button, .layer-tray a {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -704,8 +707,8 @@ body {
   cursor: pointer;
   white-space: nowrap;
 }
-.layer-tray button:hover { color: var(--chrome-text); }
-.layer-tray button.active {
+.layer-tray button:hover, .layer-tray a:hover { color: var(--chrome-text); text-decoration: none; }
+.layer-tray button.active, .layer-tray a.active {
   background: linear-gradient(135deg, var(--accent), var(--accent-bright));
   color: #ffffff;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-bright) 34%, transparent);

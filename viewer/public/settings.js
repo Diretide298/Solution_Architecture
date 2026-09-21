@@ -18,6 +18,9 @@
  * a password box somebody walks away from.
  */
 
+// The viewer's top bar on a page that is not the viewer: the layer tabs, the
+// bell and the account drawer. Eight pages had none of it.
+import '/page-chrome.js';
 import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,

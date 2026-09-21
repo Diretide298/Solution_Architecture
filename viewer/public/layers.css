@@ -3028,3 +3028,49 @@ textarea.rt-sendback-note {
   .set-nav a { flex: none; border-left: 0; border: 1px solid var(--border); border-radius: 999px; }
   .set-nav-group { display: none; }
 }
+
+/* ── the shared chrome on the standalone pages ──────────────────────────────
+   `page-chrome.js` upgrades the `.admin-bar` on settings, admin, tasks,
+   validation, reviews, changes, domains and audit: the layer tabs go in the
+   middle, the viewer's icon buttons on the right. The bar itself was already
+   the right surface — same `--chrome-*` tokens, dark in both themes — so what
+   is here is placement, not a second skin.
+
+   Eight pages had no way to reach the account drawer, the bell or another
+   layer without going back to the viewer first. A section of a product that
+   has to be left before it can be navigated is a second application. */
+.admin-bar[data-chrome="full"] {
+  /* `space-between` put the tabs against the brand and the controls against the
+     far edge with the gap in the middle. The tabs belong beside the brand and
+     the controls belong at the end, so the spacer is the tray's own margin. */
+  justify-content: flex-start;
+  gap: 12px;
+}
+.admin-bar[data-chrome="full"] .admin-bar-right { margin-left: auto; }
+.admin-bar[data-chrome="full"] .chrome-layers { padding: 3px; }
+.admin-bar[data-chrome="full"] .chrome-layers a { padding: 6px 11px; font-size: 12.5px; }
+
+/* The divider the tray sits after. `.chrome-divider` is defined for the
+   viewer's own bar; this is the same hairline at the height this bar runs at. */
+.admin-bar[data-chrome="full"] .chrome-divider {
+  width: 1px;
+  height: 20px;
+  flex: none;
+  background: color-mix(in srgb, var(--chrome-text) 20%, transparent);
+}
+
+/* Below the tabs' natural width the bar would push the page sideways. The tray
+   already scrolls rather than wraps (`.layer-tray` sets `overflow-x: auto`),
+   so this only has to stop it claiming space it does not have. */
+@media (max-width: 1100px) {
+  .admin-bar[data-chrome="full"] .chrome-layers { min-width: 0; }
+  .admin-bar[data-chrome="full"] .brand-sub { display: none; }
+}
+
+/* On a phone the tabs are the first thing to go, not the last: the page you are
+   on is the one you asked for, and nine tabs above it is a menu you did not.
+   The account drawer stays — it is how you get anywhere else from here. */
+@media (max-width: 720px) {
+  .admin-bar[data-chrome="full"] .chrome-layers,
+  .admin-bar[data-chrome="full"] .chrome-divider { display: none; }
+}
