@@ -18,13 +18,21 @@ import { apiBase } from '/validation.js';
 
 /** What may be taken, in the order the control offers it.
  *
- *  Review activity leads because it is the register the product is for — one
- *  row per thing somebody said at a time, growing with the work. The other two
- *  grow with the payroll, and are here because an admin panel is where somebody
- *  asks who was invited in July. `label` is what the option says; the value is
- *  the dataset name the service knows. */
+ *  The two that grow with the work lead. Review activity is first because it is
+ *  the register the product is for — one row per thing somebody said at a time
+ *  — and change requests follow because they are the other record of the work
+ *  itself. **They are also the two that come back**: both files have a column
+ *  somebody fills in and re-uploads, into the two panels below.
+ *
+ *  The last two grow with the payroll rather than with the work, and are here
+ *  because an admin panel is where somebody asks who was invited in July. They
+ *  are read-only registers; nothing reads them back.
+ *
+ *  `label` is what the option says; the value is the dataset name the service
+ *  knows. */
 const SETS = [
   ['verdicts', 'Review activity — every verdict recorded'],
+  ['changes', 'Change requests — every one raised'],
   ['invites', 'Invites — every link made'],
   ['accounts', 'Accounts — everyone who has one'],
 ];

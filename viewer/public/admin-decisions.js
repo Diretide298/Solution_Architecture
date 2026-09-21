@@ -1,15 +1,25 @@
 /**
- * Closing review items from the spreadsheet they were decided on.
+ * Settling work from the spreadsheet it was decided on.
  *
- * The other end of the export panel above it. A range of the register goes out
- * as a CSV, somebody works down the "Our verdict" column in Excel saying how
- * each thing was answered, and this sends the file back to be applied.
+ * Two panels, one machine. The export above hands out a range of a register as
+ * a CSV; somebody works down a single column in Excel saying how each thing was
+ * answered; this sends the file back to be applied. That is true of review
+ * items, where the column is "our verdict" and the act is closing them, and it
+ * is true of change requests, where the column is "our decision" and the act is
+ * settling them.
  *
- * Two presses, never one, and the first press writes nothing. A bulk close is
+ * The two differ in what the service does with the file, and the page shows
+ * that difference — different buckets, different words, different button. They
+ * do not differ in how the page behaves, and that is deliberate: an admin who
+ * has learned one panel has learned the other, and a second copy of this file
+ * would be the place the two quietly drifted apart. Everything that is the same
+ * lives in `mountSheetPanel`; everything that is not lives in a spec beside it.
+ *
+ * Two presses, never one, and the first press writes nothing. A bulk settle is
  * the one action on this page that cannot be undone by doing it again with the
- * right file: closing an item overwrites who closed it and when, so a file
- * applied by accident does not leave the previous answer behind to be restored.
- * So the first press asks the service what the file *would* do and shows it —
+ * right file: it overwrites who settled an item and when, so a file applied by
+ * accident does not leave the previous answer behind to be restored. So the
+ * first press asks the service what the file *would* do and shows it —
  * including the rows it disagrees with and the rows it cannot use — and only
  * the second one applies it.
  *
@@ -27,20 +37,25 @@ import { apiBase } from '/validation.js';
  *  is always the true one; this only caps what is drawn. */
 const SHOWN = 150;
 
-/** Wires the panel. Called once, by the admin branch of admin.html, after the
- *  page has established the reader is an admin.
+/**
+ * Wires one of the two panels.
  *
- *  Nothing here is the access rule — the service refuses both routes to anyone
- *  else whatever the page draws, and it has to, because a hidden control is
- *  still a POST away for anybody who opens devtools. */
-export function mountDecisions() {
-  const $ = (id) => document.getElementById(id);
-  const picker = $('decide-file');
-  const check = $('decide-check');
-  const apply = $('decide-apply');
-  const error = $('decide-error');
-  const ok = $('decide-ok');
-  const plan = $('decide-plan');
+ * `spec` says which register this is — which elements, which routes, which
+ * column the service reads, which buckets it writes, and what to call the act.
+ * Everything else here is the same for both.
+ *
+ * Nothing here is the access rule — the service refuses both routes to anyone
+ * else whatever the page draws, and it has to, because a hidden control is
+ * still a POST away for anybody who opens devtools.
+ */
+function mountSheetPanel(spec) {
+  const $ = (suffix) => document.getElementById(`${spec.prefix}-${suffix}`);
+  const picker = $('file');
+  const check = $('check');
+  const apply = $('apply');
+  const error = $('error');
+  const ok = $('ok');
+  const plan = $('plan');
   if (!picker || !check) return;
 
   const el = (tag, cls, text) => {
@@ -70,14 +85,16 @@ export function mountDecisions() {
   // has to hold for a caller that never ran it.
   picker.onchange = () => { quiet(); forget(); };
 
-  /** One row of the plan, as a sentence. `#812` is there because it is what
-   *  every message from the service names, and a reader who has the file open
-   *  beside this wants to find the same row in it. */
+  /** One row of the plan, as a sentence. The reference is there because it is
+   *  what every message from the service names, and a reader who has the file
+   *  open beside this wants to find the same row in it. A change request has a
+   *  name people say out loud — CR-007 — and a review item has only its id. */
   const line = (item, tail) => {
     const row = el('div', 'decide-line');
     row.append(el('span', 'decide-row', `Row ${item.row}`));
-    row.append(el('span', 'decide-id', `#${item.id}`));
-    row.append(el('span', 'decide-what', `${item.kind} · ${item.artefact}`));
+    row.append(el('span', 'decide-id', item.ref ?? `#${item.id}`));
+    row.append(el('span', 'decide-what',
+      `${item.kind} · ${item.artefact}${item.title ? ` · ${item.title}` : ''}`));
     row.append(el('span', 'decide-tail', tail));
     return row;
   };
@@ -85,8 +102,8 @@ export function mountDecisions() {
   /** A named group of them, with its own count and its own reason for being
    *  shown separately. Empty groups are not drawn: a panel listing four
    *  headings with nothing under three of them buries the one that matters. */
-  const group = (title, why, items, tail, tone) => {
-    if (!items.length) return;
+  const group = ({ title, why, items, tail, tone }) => {
+    if (!items?.length) return;
     const box = el('section', `decide-group ${tone}`);
     box.append(el('h3', 'decide-group-title', `${title} — ${items.length}`));
     box.append(el('p', 'auth-note auth-fine decide-why', why));
@@ -109,55 +126,16 @@ export function mountDecisions() {
       ? `Excel workbook${result.tab ? ` · sheet "${result.tab}"` : ''}` : 'CSV';
     head.textContent =
       `${result.file} — ${format}, ${result.rows} row${result.rows === 1 ? '' : 's'}. `
-      + `${result.blank} of them have no decision in the "our verdict" column and `
+      + `${result.blank} of them have no decision in the ${spec.column} column and `
       + 'are left exactly as they are.';
     plan.append(head);
 
-    // The heading is in a different tense before and after, because the same
-    // list means two different things either side of the press and a panel
-    // still headed "would be closed" over rows that have been is the one place
-    // a reader could reasonably think nothing happened.
-    group(result.applied ? 'Closed' : 'Would be closed', result.applied
-      ? 'Closed, with you recorded as who closed them and when.'
-      : 'Not closed yet — nothing has been written. The button below is what '
-        + 'writes them.',
-      result.close,
-      (item) => line(item, `${item.verdict} → ${item.response_label}`
-        + (item.was === 'sent back' ? ' · was sent back, this closes it again' : '')),
-      'good');
+    for (const box of spec.groups(result, line)) group(box);
 
-    group('Already closed the same way', 'Left alone. Closing them again would '
-      + 'move the date and the name to you and today, and lose who actually did '
-      + 'it, in exchange for no change of meaning.',
-      result.already,
-      (item) => line(item, `already ${item.current_label} on ${item.done_on}`
-        + (item.done_by ? ` by ${item.done_by}` : '')),
-      'quiet');
-
-    group('Closed, but differently', 'Not touched, and worth a look: the file '
-      + 'and the register disagree about how these were answered. Changing one '
-      + 'of them is a decision about that item, so it is made on the item — on '
-      + 'the reviews page — rather than by a file that happens to name it.',
-      result.differs,
-      (item) => line(item,
-        `file says ${item.response_label}, closed as `
-        + `${item.current_label || 'nothing recorded'} on ${item.done_on}`),
-      'warn');
-
-    group('Could not be used', 'These rows named something this cannot act on. '
-      + 'Everything else in the file still applies.',
-      result.problems,
-      (item) => {
-        const row = el('div', 'decide-line');
-        row.append(el('span', 'decide-tail', item.message));
-        return row;
-      },
-      'bad');
-
-    if (!result.applied && result.close.length) {
+    const written = spec.written(result);
+    if (!result.applied && written.length) {
       apply.hidden = false;
-      apply.textContent = `Close ${result.close.length} item`
-        + `${result.close.length === 1 ? '' : 's'}`;
+      apply.textContent = spec.button(written.length);
     } else {
       apply.hidden = true;
     }
@@ -202,13 +180,10 @@ export function mountDecisions() {
     }
     check.disabled = true;
     try {
-      const result = await post('/api/decisions/preview');
+      const result = await post(spec.preview);
       confirm = result.digest;
       draw(result);
-      if (!result.close.length) {
-        say(ok, 'Nothing in that file would close anything. Everything it names '
-          + 'is already closed, disagrees with the register, or could not be used.');
-      }
+      if (!spec.written(result).length) say(ok, spec.nothing);
     } catch (failure) {
       say(error, failure.message);
     } finally {
@@ -225,16 +200,13 @@ export function mountDecisions() {
     apply.disabled = true;
     check.disabled = true;
     try {
-      const result = await post('/api/decisions/apply', { confirm });
+      const result = await post(spec.apply, { confirm });
       draw(result);
-      say(ok, `Closed ${result.close.length} item`
-        + `${result.close.length === 1 ? '' : 's'}, recorded against you at `
-        + `${result.closed_at}.`);
+      say(ok, spec.done(result));
       // Applying it once is the whole of it. The plan on screen is now a record
       // of what happened rather than an offer, and pressing again would ask the
-      // service to close rows it has just closed — which it would answer by
-      // moving every one of them into "already closed the same way", correctly
-      // and confusingly.
+      // service to settle rows it has just settled — which it would answer by
+      // moving every one of them into "already", correctly and confusingly.
       confirm = '';
       picker.value = '';
     } catch (failure) {
@@ -245,4 +217,170 @@ export function mountDecisions() {
       apply.hidden = true;
     }
   };
+}
+
+/** The review register: one column, one act, three buckets. */
+const VERDICTS = {
+  prefix: 'decide',
+  preview: '/api/decisions/preview',
+  apply: '/api/decisions/apply',
+  column: '"our verdict"',
+  written: (result) => result.close,
+  button: (n) => `Close ${n} item${n === 1 ? '' : 's'}`,
+  done: (result) => `Closed ${result.close.length} item`
+    + `${result.close.length === 1 ? '' : 's'}, recorded against you at `
+    + `${result.closed_at}.`,
+  nothing: 'Nothing in that file would close anything. Everything it names '
+    + 'is already closed, disagrees with the register, or could not be used.',
+  groups: (result, line) => [
+    // The heading is in a different tense before and after, because the same
+    // list means two different things either side of the press and a panel
+    // still headed "would be closed" over rows that have been is the one place
+    // a reader could reasonably think nothing happened.
+    {
+      title: result.applied ? 'Closed' : 'Would be closed',
+      why: result.applied
+        ? 'Closed, with you recorded as who closed them and when.'
+        : 'Not closed yet — nothing has been written. The button below is what '
+          + 'writes them.',
+      items: result.close,
+      tail: (item) => line(item, `${item.verdict} → ${item.response_label}`
+        + (item.was === 'sent back' ? ' · was sent back, this closes it again' : '')),
+      tone: 'good',
+    },
+    {
+      title: 'Already closed the same way',
+      why: 'Left alone. Closing them again would move the date and the name to '
+        + 'you and today, and lose who actually did it, in exchange for no '
+        + 'change of meaning.',
+      items: result.already,
+      tail: (item) => line(item, `already ${item.current_label} on ${item.done_on}`
+        + (item.done_by ? ` by ${item.done_by}` : '')),
+      tone: 'quiet',
+    },
+    {
+      title: 'Closed, but differently',
+      why: 'Not touched, and worth a look: the file and the register disagree '
+        + 'about how these were answered. Changing one of them is a decision '
+        + 'about that item, so it is made on the item — on the reviews page — '
+        + 'rather than by a file that happens to name it.',
+      items: result.differs,
+      tail: (item) => line(item,
+        `file says ${item.response_label}, closed as `
+        + `${item.current_label || 'nothing recorded'} on ${item.done_on}`),
+      tone: 'warn',
+    },
+    {
+      title: 'Could not be used',
+      why: 'These rows named something this cannot act on. Everything else in '
+        + 'the file still applies.',
+      items: result.problems,
+      tail: (item) => {
+        const row = document.createElement('div');
+        row.className = 'decide-line';
+        const span = document.createElement('span');
+        span.className = 'decide-tail';
+        span.textContent = item.message;
+        row.append(span);
+        return row;
+      },
+      tone: 'bad',
+    },
+  ],
+};
+
+/** The change request register. Four buckets rather than three, because a
+ *  request has a lifecycle where a review item has a switch: accepting a change
+ *  and then completing it is two steps forward, not a disagreement, so `Done`
+ *  on an accepted request is written and gets a heading of its own. */
+const CHANGES = {
+  prefix: 'settle',
+  preview: '/api/changes/import/preview',
+  apply: '/api/changes/import/apply',
+  column: '"our decision"',
+  written: (result) => [...result.settle, ...result.advance],
+  button: (n) => `Settle ${n} change request${n === 1 ? '' : 's'}`,
+  done: (result) => {
+    const n = result.settle.length + result.advance.length;
+    return `Settled ${n} change request${n === 1 ? '' : 's'}, recorded against `
+      + `you at ${result.settled_at}.`;
+  },
+  nothing: 'Nothing in that file would settle anything. Everything it names is '
+    + 'already settled the same way, would move a settled request, or could not '
+    + 'be used.',
+  groups: (result, line) => [
+    {
+      title: result.applied ? 'Settled' : 'Would be settled',
+      why: result.applied
+        ? 'Settled, with you recorded as who settled them and when.'
+        : 'Not settled yet — nothing has been written. The button below is what '
+          + 'writes them.',
+      items: result.settle,
+      tail: (item) => line(item, `open → ${item.decision_label}`
+        + (item.reference ? ` · ${item.reference}` : '')),
+      tone: 'good',
+    },
+    {
+      title: result.applied ? 'Completed' : 'Would be completed',
+      why: 'Already accepted, and this marks them done. The one move onto an '
+        + 'already-settled request a file may make, because accepting a change '
+        + 'and then completing it is the lifecycle rather than a disagreement.',
+      items: result.advance,
+      tail: (item) => line(item, `${item.from} → ${item.decision_label}`
+        + (item.reference ? ` · ${item.reference}` : '')),
+      tone: 'good',
+    },
+    {
+      title: 'Already settled the same way',
+      why: 'Left alone, including where the "because" column differs from what '
+        + 'is stored. Writing them again would move the date and the name to '
+        + 'you and today and lose who actually settled them. Rewording a '
+        + 'settled request is done on the changes page.',
+      items: result.already,
+      tail: (item) => line(item, `already ${item.decision_label}`
+        + (item.settled_on ? ` on ${item.settled_on}` : '')
+        + (item.settled_by ? ` by ${item.settled_by}` : '')),
+      tone: 'quiet',
+    },
+    {
+      title: 'Would move a settled request',
+      why: 'Not touched. These name a request that is already settled and ask '
+        + 'for a different answer — including reopening one, which clears who '
+        + 'settled it, when, and against what. That is a decision about the '
+        + 'request, so it is made on the request, on the changes page, rather '
+        + 'than by a file that happens to name it.',
+      items: result.differs,
+      tail: (item) => line(item,
+        `file says ${item.decision_label}, settled as ${item.current_label}`
+        + (item.settled_on ? ` on ${item.settled_on}` : '')),
+      tone: 'warn',
+    },
+    {
+      title: 'Could not be used',
+      why: 'These rows named something this cannot act on. Everything else in '
+        + 'the file still applies.',
+      items: result.problems,
+      tail: (item) => {
+        const row = document.createElement('div');
+        row.className = 'decide-line';
+        const span = document.createElement('span');
+        span.className = 'decide-tail';
+        span.textContent = item.message;
+        row.append(span);
+        return row;
+      },
+      tone: 'bad',
+    },
+  ],
+};
+
+/** Wires the review panel. Called once, by the admin branch of admin.html,
+ *  after the page has established the reader is an admin. */
+export function mountDecisions() {
+  mountSheetPanel(VERDICTS);
+}
+
+/** Wires the change request panel, on the same terms. */
+export function mountChangeImport() {
+  mountSheetPanel(CHANGES);
 }

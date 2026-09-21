@@ -11,6 +11,11 @@
 import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { hideLoader } from '/loader.js';
+// The file this page hands out, and the labels on it. Shared with the
+// service's own export of the same register rather than spelled again here:
+// either file can be filled in and uploaded back, which only holds while the
+// two are the same file. See change-csv.js.
+import { CHANGE_KIND_LABEL, toChangeCsv } from '/change-csv.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -23,11 +28,11 @@ const el = (tag, className, text) => {
 };
 
 const STATUS = { open: 'Open', accepted: 'Accepted', rejected: 'Rejected', done: 'Done' };
-const KINDS = {
-  operation: 'Operation', schema: 'Schema', contract: 'Contract', table: 'Table',
-  screen: 'Screen', flow: 'Journey', module: 'Module', service: 'Service', adr: 'Decision',
-  platform: 'Platform', state: 'State model', event: 'Event', other: 'Other',
-};
+// The thirteen kinds a change request may be about, with what each is called.
+// From change-csv.js, because the export writes these words and the service
+// reads them back; two copies is how the dropdown and the file come to
+// disagree about what a `flow` is called.
+const KINDS = CHANGE_KIND_LABEL;
 
 const state = {
   project: null,
@@ -215,21 +220,13 @@ function draw() {
 // ── export ───────────────────────────────────────────────────────────
 
 function exportCsv() {
-  const esc = (s) => `"${String(s ?? '').replace(/"/g, '""')}"`;
+  // Exactly the rows on screen, which is what makes "every filter above
+  // applies" true. The columns, the labels and the quoting are not this page's
+  // to decide: they are the file the service also writes and reads back, and
+  // they live in change-csv.js so the two cannot drift apart.
   const rows = shown();
-  const lines = [
-    ['id', 'status', 'blocking', 'title', 'kind', 'artefact', 'ticket', 'raised by', 'raised via',
-      'raised at', 'problem', 'evidence', 'options', 'recommendation', 'settled by', 'settled at',
-      'resolution', 'fixed by'].join(','),
-    ...rows.map((c) => [
-      c.id, STATUS[c.status] ?? c.status, c.blocking ? 'yes' : 'no', c.title,
-      KINDS[c.target.kind] ?? c.target.kind, c.target.id, c.ticket, c.raisedBy, c.raisedVia,
-      c.raisedAt, c.problem, c.evidence, (c.options ?? []).join(' | '), c.recommendation,
-      c.resolvedBy ?? '', c.resolvedAt ?? '', c.resolution, c.resolvedRef,
-    ].map(esc).join(',')),
-  ].join('\r\n');
-  // A BOM, so Excel on Windows reads the dashes and quotes as written.
-  const url = URL.createObjectURL(new Blob(['﻿' + lines], { type: 'text/csv;charset=utf-8' }));
+  const url = URL.createObjectURL(
+    new Blob([toChangeCsv(rows)], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
   const narrowed = state.filter.status || state.filter.blocking || state.filter.text.trim();
@@ -309,6 +306,10 @@ function wireForm() {
   $('cr-blocking').onchange = (e) => { state.filter.blocking = e.target.checked; draw(); };
   $('cr-text').oninput = (e) => { state.filter.text = e.target.value; draw(); };
   $('cr-export').onclick = exportCsv;
+  // Admin only, because /api/changes/import/* is. Hiding it is presentation —
+  // the service refuses the upload to anybody else whatever this page draws —
+  // and it is here so nobody is shown a link that will only tell them no.
+  $('cr-settle-link').hidden = state.me?.role !== 'admin';
   wireForm();
   await load();
   hideLoader();

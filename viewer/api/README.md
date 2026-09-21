@@ -84,9 +84,27 @@ verdict on an artefact is simply its newest row.
 | `POST /api/validation` | records a verdict on an artefact |
 | `GET /api/validation/{kind}/{id}` | current verdict and how it got there |
 | `GET /api/validation` | one row per judged artefact, plus counts |
+| `GET /api/export/{dataset}` | admin only. A date range as a CSV. `verdicts`, `changes`, `invites`, `accounts`. |
+| `POST /api/decisions/preview` | admin only. What an edited review file would close. Writes nothing. |
+| `POST /api/decisions/apply` | admin only. Closes it, on the preview's checksum. |
+| `POST /api/changes/import/preview` | admin only. What an edited change request file would settle. Writes nothing. |
+| `POST /api/changes/import/apply` | admin only. Settles it, on the preview's checksum. |
 
 A target is `operation`, `table`, `screen` or `board`. A verdict is `approved`,
 `rejected` or `needs-work`.
+
+Two of the four exports come back. The review file is filled in down its
+**our verdict** column and closes items; the change request file is filled in
+down **our decision**, **because** and **reference**, and settles them. Both
+take the CSV or the same sheet saved as .xlsx, both match rows on the **id**
+column, and neither applies without the checksum its own preview answered with
+— so a file cannot be applied that nobody read the consequences of.
+
+A change request file may answer an open request and may complete an accepted
+one. It may not reopen a settled request or overrule how one was already
+answered: both throw away who settled it and when, which re-uploading the right
+file afterwards cannot restore. Those rows are listed by the preview and left
+alone.
 
 ## Configuration
 
@@ -139,3 +157,18 @@ used to tidy away an inconvenient opinion.
 should not work: forged cookies, a reviewer minting invites, redeeming an
 invite twice, claiming an address the invite was not for, and telling an
 unknown account apart from a wrong password.
+
+`changes-import-check.mjs` — 52 assertions over the change request round trip,
+most of them about the half that does not write: a rejection with no reason, a
+decision outside the four, an id no request has, a reopen, a stale checksum,
+and the same file applied twice. It also asserts that the file the changes page
+writes and the file this service writes are **the same file**, row for row —
+they share their column list in `public/change-csv.js`, and either one can be
+filled in and uploaded back.
+
+It wants an empty store, so give it one of its own:
+
+```bash
+TICVAI_DB=/tmp/check.db python -m uvicorn api.main:app --port 8799
+API=http://localhost:8799 node api/changes-import-check.mjs
+```

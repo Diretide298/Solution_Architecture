@@ -97,6 +97,12 @@
                  placeholder="search titles, artefacts, tickets, people" autocomplete="off" />
           <button class="chip" id="cr-export" type="button"
                   title="Exports exactly the rows shown - every filter applies">Export CSV</button>
+          <!-- The other half of that button. Shown to admins only, because the
+               route behind it is admin-only and a link that answers 403 is
+               worse than no link. The same pair the reviews page has. -->
+          <a class="chip chip-link" id="cr-settle-link" href="/admin.html#settle-from-sheet"
+             title="Fill in the 'our decision' column and upload it there - admin only"
+             hidden>Settle from a spreadsheet &rarr;</a>
           <button class="chip cr-new-toggle" id="cr-new-toggle" type="button">Raise a change request</button>
         </div>
         <p class="auth-error" id="cr-error" hidden></p>

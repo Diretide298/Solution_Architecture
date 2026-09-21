@@ -115,6 +115,7 @@
           <div class="set-nav-group">The register</div>
           <a href="#export">Download a range</a>
           <a href="#close-from-sheet">Close from a spreadsheet</a>
+          <a href="#settle-from-sheet">Settle change requests</a>
           <div class="set-nav-group">You</div>
           <a href="#password">Your password</a>
         </div>
@@ -305,6 +306,55 @@
         <button id="decide-apply" class="chip decide-apply" type="button" hidden></button>
       </section>
 
+      <!-- ── change requests, out and back ─────────────────────────── -->
+      <!-- Named, because the changes page links straight at it, exactly as the
+           reviews page links at the panel above. -->
+      <section class="admin-panel set-section" id="settle-from-sheet">
+        <h2 class="admin-heading">Settle change requests from a spreadsheet</h2>
+        <p class="auth-note">
+          The same round trip over the other register. Take the range with
+          <b>Change requests</b> selected, fill in the <b>our decision</b>
+          column against the ones that have been settled — <b>Accepted</b>,
+          <b>Rejected</b> or <b>Done</b> — and upload it here. Put the reason in
+          <b>because</b> and the commit, ADR or contract version that settled it
+          in <b>reference</b>. The CSV as it came, or the same sheet saved as
+          .xlsx.
+        </p>
+        <p class="auth-note auth-fine">
+          <b>Nothing is written until the second press.</b> Checking the file
+          reports what it would do and settles nothing. The column is
+          <b>blank for every open request</b> when the file is downloaded, and a
+          blank cell is <b>no decision</b> — so a sheet you have not touched does
+          nothing at all. A <b>rejection needs a reason</b>, here or already
+          stored, because that is what the person who raised it reads. Rows are
+          matched by the <b>id</b> column, not by <b>CR-007</b>: that number is
+          counted per project, and two projects both have one.
+        </p>
+        <!-- The one thing a reader has to know before pressing anything, and it
+             is the difference from the panel above rather than a repeat of it.
+             A file may answer an open request and may complete an accepted one.
+             It may not reopen anything, and it may not overrule an answer
+             somebody already recorded — both of those throw away who settled it
+             and when, which re-uploading the right file afterwards cannot
+             restore. They are listed, not applied. -->
+        <p class="auth-note auth-fine">
+          A file can <b>answer an open request</b> and <b>complete an accepted
+          one</b>. It cannot reopen a settled request or overrule how one was
+          already answered — those are listed for you to look at and left
+          untouched, because they are decisions about a single request and are
+          made on it, on the changes page.
+        </p>
+        <div class="invite-row decide-row">
+          <input id="settle-file" class="auth-input decide-file" type="file"
+                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <button id="settle-check" class="chip" type="button">Check the file</button>
+        </div>
+        <p class="auth-error" id="settle-error" hidden></p>
+        <p class="auth-ok" id="settle-ok" hidden></p>
+        <div id="settle-plan" class="decide-plan" hidden></div>
+        <button id="settle-apply" class="chip decide-apply" type="button" hidden></button>
+      </section>
+
       <!-- ── your own password ────────────────────────────────────── -->
       <!-- Moved to the settings page, which everybody can open. Here it was
            behind the admin gate, so a reviewer had no way to change their own
@@ -343,8 +393,10 @@
       import { mountExport } from '/admin-export.js';
       // And its other end, for the same reason: it posts a file rather than
       // JSON, and the two presses that stand between an upload and two hundred
-      // closed items are worth explaining where they happen.
-      import { mountDecisions } from '/admin-decisions.js';
+      // settled items are worth explaining where they happen. Two panels out of
+      // one module, because the machinery is the same and only the register and
+      // the words differ.
+      import { mountDecisions, mountChangeImport } from '/admin-decisions.js';
 
       const $ = (id) => document.getElementById(id);
       const el = (tag, cls, text) => {
@@ -391,6 +443,10 @@
         // what it changed is on the reviews page, and the panel says what it
         // did rather than sending anybody there to check.
         mountDecisions();
+        // The same panel over the other register. Change requests are settled
+        // rather than closed and have one more bucket, which is a difference in
+        // the spec it is handed rather than in anything here.
+        mountChangeImport();
         // Both lists, because the page is not drawn until it has both — and
         // allSettled rather than all, so one failing still shows the page it
         // failed on rather than leaving the curtain up over it.

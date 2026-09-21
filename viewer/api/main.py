@@ -156,6 +156,18 @@ RESPONSE_LABEL = {
     "built": "Built", "wired": "Wired", "answered": "Answered",
     "accepted": "Accepted", "approved-no-action": "Approved — no action",
 }
+# Where a change request stands, as a file opened in Excel spells it. Here with
+# the other label maps rather than beside CHANGE_STATUSES, because this is the
+# same kind of thing they are — the export's spelling of a stored value — and
+# the import reads both spellings of each, exactly as _RESPONSE_OF does.
+#
+# "Accepted" is also a RESPONSE_LABEL. The two never meet: one is what a
+# reviewer's verdict was answered with, the other is where a change request got
+# to, and they are in different files with different columns.
+CHANGE_STATUS_LABEL = {
+    "open": "Open", "accepted": "Accepted",
+    "rejected": "Rejected", "done": "Done",
+}
 
 
 @app.on_event("startup")
@@ -1677,6 +1689,18 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
 
 CHANGE_KINDS = ("contract", "operation", "schema", "table", "screen", "flow", "module",
                 "service", "adr", "platform", "state", "event", "other")
+# What each of those is called in a file somebody opens in Excel, and on the
+# changes page. **Not KIND_LABEL**, which is the verdict vocabulary: that one has
+# seven kinds to this one's thirteen and calls an operation "APIs", so using it
+# here would label six of these blank and rename the rest. The same words as
+# `KINDS` in changes.js and in public/change-csv.js, which is what makes the
+# page's export and this one the same file.
+CHANGE_KIND_LABEL = {
+    "contract": "Contract", "operation": "Operation", "schema": "Schema",
+    "table": "Table", "screen": "Screen", "flow": "Journey", "module": "Module",
+    "service": "Service", "adr": "Decision", "platform": "Platform",
+    "state": "State model", "event": "Event", "other": "Other",
+}
 CHANGE_STATUSES = ("open", "accepted", "rejected", "done")
 DRAFT_MINUTES = 30
 
@@ -1746,6 +1770,12 @@ _CHANGE_SELECT = (
 def _change_row(row) -> dict:
     return {
         "id": f"CR-{row['number']:03d}",
+        # The store's own id for this row, which is what the CSV round trip
+        # matches on. `id` above is the name people say — CR-007 — and it is
+        # **counted per project**, so two projects both have one; it cannot
+        # identify a row on its own. Carried so the page's export can write the
+        # same `id` column the service's does and be applied the same way.
+        "rowId": row["id"],
         "number": row["number"],
         "project": row["project_id"],
         "target": {"kind": row["target_kind"], "id": row["target_id"]},
@@ -1758,6 +1788,10 @@ def _change_row(row) -> dict:
         "ticket": row["external_key"],
         "status": row["status"],
         "raisedBy": row["raised_by_name"] or row["raised_by_email"],
+        # Separately from the fallback above, because the CSV has a column for
+        # each: a roster of who raised what is read by name, and the address is
+        # what somebody searches when two people share one.
+        "raisedByEmail": row["raised_by_email"],
         "raisedAt": row["raised_at"],
         "raisedVia": row["raised_via"],
         "resolution": row["resolution"],
@@ -2539,12 +2573,112 @@ def _export_accounts(clause: str, args: tuple):
     return header, body
 
 
-# What may be exported, and what the file is called. Three, because three tables
+def _export_changes(clause: str, args: tuple):
+    """Every change request raised, with the three columns that settle one
+    blank for somebody to fill in and send back. See /api/changes/import.
+
+    Ordered by project then number, so the file reads the way CR-001, CR-002
+    does on the page. Not by `c.id`, which is the matching key and interleaves
+    two projects by whoever happened to file first.
+    """
+    rows = db.all_rows(
+        f"""SELECT c.id, c.number, c.project_id, c.target_kind, c.target_id,
+                   c.title, c.problem, c.evidence, c.options, c.recommendation,
+                   c.blocking, c.external_key, c.status, c.raised_at,
+                   c.raised_via, c.resolution, c.resolved_ref, c.resolved_at,
+                   r.name AS raised_by_name, r.email AS raised_by_email,
+                   s.name AS resolved_by_name
+              FROM change_request c
+              JOIN account r ON r.id = c.raised_by
+              LEFT JOIN account s ON s.id = c.resolved_by
+             WHERE 1 = 1{clause}
+             ORDER BY c.project_id, c.number""",
+        args,
+    )
+    # `id` first and `ref` second, and the pair is the whole of why this file
+    # can be applied. `id` is the key — the database's own, unique across every
+    # project — and it is what the import matches on. `ref` is CR-007, which is
+    # what a person says out loud and what the page shows, and it is **counted
+    # per project**: two projects both have a CR-007. Matching on it would settle
+    # the wrong request about the wrong package, so it is carried for reading and
+    # never read back.
+    #
+    # The three editable columns sit in the middle, ahead of `problem`. That is
+    # deliberate and it is the one layout decision here: `problem` runs to eight
+    # thousand characters, and a reader who has to scroll past it to reach the
+    # cell they came to fill in is a reader who fills in the wrong row.
+    header = [
+        "id", "ref", "raised", "date", "project", "status", "blocking",
+        "kind", "artefact", "title", "raised by", "email", "via", "ticket",
+        "our decision", "because", "reference", "settled on", "settled by",
+        "problem", "evidence", "options", "recommendation",
+    ]
+    body = [
+        [
+            r["id"],
+            f"CR-{r['number']:03d}",
+            r["raised_at"], _day(r["raised_at"]),
+            r["project_id"],
+            CHANGE_STATUS_LABEL.get(r["status"], r["status"]),
+            "yes" if r["blocking"] else "",
+            CHANGE_KIND_LABEL.get(r["target_kind"], r["target_kind"]),
+            r["target_id"],
+            r["title"],
+            # Name or address, the same fallback _change_row makes, because an
+            # account that never set a name would otherwise leave this column
+            # blank here and filled on the page's own export of the same row.
+            r["raised_by_name"] or r["raised_by_email"], r["raised_by_email"],
+            r["raised_via"],
+            r["external_key"],
+            # The three the import reads, and the first of them is **blank
+            # while the request is open**. That is the same rule the verdict
+            # file follows for "our verdict": the column holds the answer, and
+            # an open request has not been answered, so there is nothing to put
+            # there. It is what makes a blank cell mean "leave this one alone"
+            # on the way back — and since most of any range is open, most of the
+            # column is blank and the reader fills in only what they settled.
+            #
+            # `status` above carries the current state for every row including
+            # the open ones, so nothing is hidden by this being empty.
+            "" if r["status"] == "open"
+            else CHANGE_STATUS_LABEL.get(r["status"], r["status"]),
+            r["resolution"],
+            r["resolved_ref"],
+            _day(r["resolved_at"]),
+            r["resolved_by_name"] or "",
+            r["problem"], r["evidence"],
+            # A JSON list on the way out. Pipes rather than commas because this
+            # is one cell in a comma-separated file, and a reader who opens it
+            # in a text editor should not have to count quotation marks to see
+            # where the options end.
+            " | ".join(_options_of(r["options"])),
+            r["recommendation"],
+        ]
+        for r in rows
+    ]
+    return header, body
+
+
+def _options_of(value) -> list:
+    """The ways a change request could be settled, as stored. `[]` for anything
+    that will not parse: a malformed cell in one row of an export is not worth
+    failing the other four hundred over, and it shows as an empty cell."""
+    try:
+        parsed = json.loads(value or "[]")
+    except ValueError:
+        return []
+    return [str(item) for item in parsed] if isinstance(parsed, list) else []
+
+
+# What may be exported, and what the file is called. Four, because four tables
 # hold a record that accumulates and that somebody would sensibly ask a month of.
 #
 # `verdicts` is the default and the reason this exists: it is the register the
-# whole product is for, one row per thing somebody said at a time, and it is the
-# only one of the three that grows with the work rather than with the payroll.
+# whole product is for, one row per thing somebody said at a time.
+#
+# `changes` is the other one that grows with the work rather than with the
+# payroll, and it is the other one that comes back: both files have columns a
+# person fills in and re-uploads. The other two are read-only registers.
 #
 # `session` is deliberately absent although it is the fastest-growing table here.
 # A session is deleted on sign-out, on a password change and on an account being
@@ -2561,6 +2695,7 @@ def _export_accounts(clause: str, args: tuple):
 # here keeps the range one piece of code across three different shapes of query.
 EXPORTS = {
     "verdicts": ("review-activity", "v.created_at", _export_verdicts),
+    "changes": ("change-requests", "c.raised_at", _export_changes),
     "invites": ("invites", "i.created_at", _export_invites),
     "accounts": ("accounts", "a.created_at", _export_accounts),
 }
@@ -2978,6 +3113,343 @@ def apply_decisions(
     plan["applied"] = True
     plan["closed_at"] = at
     plan["closed_by"] = admin["name"] or admin["email"]
+    return plan
+
+
+# ── change requests, out and back ────────────────────────────────────
+#
+# The same round trip as the verdict file above, over the other register that
+# grows with the work. A range of change requests goes out as a CSV, somebody
+# works down the "our decision" column saying how each was settled, and this
+# reads it back and settles them in one go.
+#
+# **Every rule /api/changes/{number}/resolve enforces is enforced here, per
+# row**, because a bulk path that settles differently from the single path is
+# two behaviours wearing one name, and the difference would only ever be found
+# in a report six weeks later. Where that route refuses outright, this one
+# reports the row and carries on with the rest of the file.
+#
+# One of those rules is satisfied by where this route sits rather than by any
+# code below: "somebody other than the person who raised it has to accept or
+# reject it" holds because **this is admin only, and an admin is that route's
+# own stated exception**. If this is ever opened to a reviewer, that check has
+# to be written in here, because nothing else would then be making it.
+
+# What a decision cell may say, and what it means. Both spellings of each of the
+# four: the key the store holds and the label the export writes. Folded on both
+# sides so case, spacing and the shape of a dash stop mattering — the same trick
+# _RESPONSE_OF plays for the verdict file.
+_DECISION_OF = {
+    decisions.fold(spelling): key
+    for key in CHANGE_STATUSES
+    for spelling in (key, CHANGE_STATUS_LABEL[key])
+}
+
+# The columns this reads, folded the way the parser folds a heading. `id` and
+# `our decision` are required; the other two are optional, because a reader who
+# is only moving things to Done has no reason to keep them and the file still
+# applies without them. Every other column in the export is there to be read.
+_CHANGE_ID_COLUMN = "id"
+_CHANGE_DECISION_COLUMN = "our-decision"
+_CHANGE_BECAUSE_COLUMN = "because"
+_CHANGE_REFERENCE_COLUMN = "reference"
+
+
+def _change_current(ids: List[int]) -> dict:
+    """Where each of those change requests stands right now, by database id."""
+    found = {}
+    for start in range(0, len(ids), _CHUNK):
+        batch = ids[start:start + _CHUNK]
+        holes = ",".join("?" * len(batch))
+        for row in db.all_rows(
+            f"""SELECT c.id, c.number, c.project_id, c.target_kind, c.target_id,
+                       c.title, c.status, c.resolution, c.resolved_ref,
+                       c.resolved_at, s.name AS resolved_by_name
+                  FROM change_request c
+                  LEFT JOIN account s ON s.id = c.resolved_by
+                 WHERE c.id IN ({holes})""",
+            tuple(batch),
+        ):
+            found[row["id"]] = row
+    return found
+
+
+def _change_describe(row) -> dict:
+    """The bit of a change request a message about it has to say out loud."""
+    return {
+        "id": row["id"],
+        "ref": f"CR-{row['number']:03d}",
+        "project": row["project_id"],
+        "kind": CHANGE_KIND_LABEL.get(row["target_kind"], row["target_kind"]),
+        "artefact": row["target_id"],
+        "title": row["title"],
+    }
+
+
+def _change_plan(payload: bytes, filename: str) -> dict:
+    """What this spreadsheet would settle, without settling any of it.
+
+    Every row lands in exactly one bucket, and the buckets are the reasoning:
+
+    `settle`   — a decision on a request that is open. Written. The ordinary
+                 case, and most of any file that does anything.
+
+    `advance`  — `Done` on a request that is already `accepted`. Written, and it
+                 is the only move onto an already-settled row this will make:
+                 accepting a change and then completing it is the lifecycle
+                 rather than a disagreement, and it is exactly what the control
+                 on the changes page does. `from` says what it was, so the
+                 preview shows it as a move rather than a fresh settlement.
+
+    `already`  — a decision that agrees with where the request already is. **Not
+                 written**, including when the file's `because` differs from the
+                 stored one: writing it would move resolved_by and resolved_at to
+                 whoever uploaded the file, throwing away who actually settled it
+                 and when, in exchange for a changed note. Rewording a settled
+                 request is a single deliberate act, and the changes page is
+                 where it is made.
+
+    `differs`  — any other move off a settled request, **including reopening**.
+                 Not written, and listed rather than counted. Reopening clears
+                 resolved_by, resolved_at and resolved_ref, so a file applied by
+                 accident would not leave the previous answer behind to be
+                 restored — the same irreversibility that stops the verdict file
+                 re-closing a closed row.
+
+    `blank`    — no decision on that row. Counted, never listed. The export
+                 leaves this column empty for every open request, so most of a
+                 file is blank cells, and a blank one is the absence of an answer
+                 rather than an instruction.
+
+    `problems` — a row naming something this cannot act on: an id that is not a
+                 number, an id no request has, a decision outside the four, a
+                 decision with no id beside it, or a rejection with nothing
+                 saying why. Reported one by one with the row number the person
+                 sees in Excel, because "400 Bad Request" about a file of four
+                 hundred rows is not an answer.
+    """
+    try:
+        sheet = decisions.read(payload)
+    except decisions.FileError as bad:
+        raise HTTPException(400, str(bad))
+
+    # First wins, so a sheet with two columns called the same thing reads the
+    # left one rather than raising about a case nobody meant to create.
+    where: dict = {}
+    for index, name in enumerate(sheet.header):
+        where.setdefault(name, index)
+
+    if _CHANGE_ID_COLUMN not in where:
+        raise HTTPException(400, (
+            "That file has no id column, so there is no way to tell which "
+            "change request each row is about. Upload a file taken from "
+            "Download a date range with Change requests selected."))
+    if _CHANGE_DECISION_COLUMN not in where:
+        # Worth telling apart from the verdict file, which is the other thing an
+        # admin has on disk with an id column and a very similar shape. Applying
+        # one as the other cannot happen — the ids would name unrelated rows —
+        # so the message names the mistake rather than listing the headings.
+        looks_like_verdicts = _DECISION_COLUMN in where
+        raise HTTPException(400, (
+            "That file has no 'our decision' column, which is the one this "
+            "reads. " + (
+                "It looks like the review activity file, which has 'our "
+                "verdict' and belongs in Close items from a spreadsheet above."
+                if looks_like_verdicts else
+                "The headings found were: "
+                + (", ".join(sheet.header) or "none") + ".")))
+
+    wanted: List[int] = []
+    parsed = []
+    problems = []
+    blank = 0
+
+    for number, cells in sheet.rows:
+        said = decisions.cell(cells, where[_CHANGE_DECISION_COLUMN])
+        raw_id = decisions.cell(cells, where[_CHANGE_ID_COLUMN])
+        if not said:
+            blank += 1
+            continue
+        if not raw_id:
+            problems.append({"row": number, "message": (
+                f"Row {number}: {said!r} with no id beside it, so there is "
+                f"nothing to settle.")})
+            continue
+        try:
+            # int(float(...)) as well, because Excel is entirely capable of
+            # handing an integer column back as 812.0 once somebody has sorted
+            # the sheet.
+            change_id = int(float(raw_id))
+        except ValueError:
+            problems.append({"row": number, "message": (
+                f"Row {number}: {raw_id!r} is not a change request id.")})
+            continue
+        status = _DECISION_OF.get(decisions.fold(said))
+        if status is None:
+            problems.append({"row": number, "message": (
+                f"Row {number}: {said!r} is not one of "
+                f"{', '.join(CHANGE_STATUS_LABEL[k] for k in CHANGE_STATUSES)}."
+            )})
+            continue
+        parsed.append((
+            number, change_id, status,
+            decisions.cell(cells, where.get(_CHANGE_BECAUSE_COLUMN)),
+            decisions.cell(cells, where.get(_CHANGE_REFERENCE_COLUMN)),
+        ))
+        wanted.append(change_id)
+
+    live = _change_current(wanted)
+    settle, advance, already, differs = [], [], [], []
+
+    for number, change_id, status, because, reference in parsed:
+        row = live.get(change_id)
+        if row is None:
+            problems.append({"row": number, "message": (
+                f"Row {number}: no change request with id {change_id}.")})
+            continue
+
+        # A blank cell leaves what is stored, exactly as the single-row route
+        # does with `body.resolution or row["resolution"]`. So the reason a
+        # rejection needs is either one typed into this file or one already
+        # there from a previous answer.
+        note = because or row["resolution"]
+        if status == "rejected" and not note.strip():
+            problems.append({"row": number, "message": (
+                f"Row {number}: CR-{row['number']:03d} is rejected with nothing "
+                f"in the 'because' column. Say why it is rejected - that is "
+                f"what the person who raised it reads.")})
+            continue
+
+        entry = {
+            "row": number, **_change_describe(row),
+            "decision": status,
+            "decision_label": CHANGE_STATUS_LABEL[status],
+            "because": note,
+            "reference": reference or row["resolved_ref"],
+        }
+        current = row["status"]
+
+        if current == status:
+            entry["settled_on"] = _day(row["resolved_at"])
+            entry["settled_by"] = row["resolved_by_name"] or ""
+            already.append(entry)
+        elif current == "open":
+            settle.append(entry)
+        elif current == "accepted" and status == "done":
+            entry["from"] = CHANGE_STATUS_LABEL[current]
+            advance.append(entry)
+        else:
+            entry["current"] = current
+            entry["current_label"] = CHANGE_STATUS_LABEL.get(current, current)
+            entry["settled_on"] = _day(row["resolved_at"])
+            entry["settled_by"] = row["resolved_by_name"] or ""
+            differs.append(entry)
+
+    # Back into file order. Several passes produce them, and a list that runs
+    # 18, 19, 17 reads as a second mistake to somebody checking it against the
+    # sheet.
+    problems.sort(key=lambda p: p["row"])
+
+    return {
+        "file": filename or "the upload",
+        "format": sheet.kind,
+        "tab": sheet.tab,
+        "digest": decisions.digest(payload),
+        "applied": False,
+        "rows": len(sheet.rows),
+        "blank": blank,
+        "counts": {
+            "settle": len(settle), "advance": len(advance),
+            "already": len(already), "differs": len(differs),
+            "problems": len(problems), "blank": blank,
+        },
+        "settle": settle,
+        "advance": advance,
+        "already": already,
+        "differs": differs,
+        "problems": problems,
+    }
+
+
+def _written_rows(plan: dict) -> list:
+    """The rows an apply writes: the ones that answer an open request, and the
+    ones that complete an accepted one.
+
+    Two buckets in the preview because they read differently to a person; one
+    list here because the statement is identical, and writing it twice would be
+    two places for the next change to have to find. Nothing else in the plan is
+    written — that is what `already`, `differs` and `problems` mean.
+    """
+    return plan["settle"] + plan["advance"]
+
+
+@app.post("/api/changes/import/preview")
+def preview_changes(
+    file: UploadFile = File(...),
+    admin: dict = Depends(require_admin),
+):
+    """What this spreadsheet would settle, and what it would not. Writes nothing.
+
+    The default, and the only way to reach the apply below, which will not act
+    on a file it has not been told the checksum of. Same ordering and the same
+    reason as the verdict importer: settling a request overwrites who settled it
+    and when, so a file applied by accident does not leave the previous answer
+    behind to be restored by uploading the right one afterwards.
+    """
+    return _change_plan(_uploaded(file), file.filename or "")
+
+
+@app.post("/api/changes/import/apply")
+def apply_changes(
+    file: UploadFile = File(...),
+    # The digest the preview answered with, sent back. A plain `confirm=true`
+    # would confirm the *press*, which is not the thing in doubt: what has to be
+    # established is that the file about to be applied is the file whose
+    # consequences were read.
+    confirm: str = Form(default=""),
+    admin: dict = Depends(require_admin),
+):
+    """Settle everything the preview said would settle. Admin only.
+
+    The plan is built again from the file rather than carried over from the
+    preview, so what is written is derived from the bytes in hand and from the
+    store as it is now — not from a summary made a minute ago, during which
+    somebody may have settled one of these on the changes page.
+
+    One timestamp for the whole file, because it is one act. All of it in one
+    transaction, because a bulk settle that half happened is the worst answer
+    available: the counts in the response would be right and the store would not.
+    """
+    payload = _uploaded(file)
+    plan = _change_plan(payload, file.filename or "")
+
+    if not confirm:
+        raise HTTPException(400, (
+            "Nothing was applied: this needs the checksum the preview answered "
+            "with, so that what is settled is what was read."))
+    if confirm.strip() != plan["digest"]:
+        raise HTTPException(400, (
+            "That confirmation belongs to a different file than the one just "
+            "uploaded. Preview this file and apply the result of that."))
+
+    at = security.stamp()
+    with db.cursor(commit=True) as cur:
+        for item in _written_rows(plan):
+            # Character for character the update /api/changes/{number}/resolve
+            # makes for a settled status. `because` and `reference` have already
+            # fallen back to what is stored, in _change_plan, so a blank cell
+            # leaves the stored note and ref exactly as that route does.
+            cur.execute(
+                "UPDATE change_request SET status = ?, resolution = ?, "
+                "resolved_ref = ?, resolved_by = ?, resolved_at = ? "
+                "WHERE id = ?",
+                (item["decision"], item["because"], item["reference"],
+                 admin["id"], at, item["id"]),
+            )
+
+    plan["applied"] = True
+    plan["settled_at"] = at
+    plan["settled_by"] = admin["name"] or admin["email"]
     return plan
 
 
