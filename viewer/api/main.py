@@ -1912,6 +1912,11 @@ class ChangeIn(BaseModel):
     recommendation: str = Field(default="", max_length=2000)
     blocking: bool = False
     ticket: str = Field(default="", max_length=20)
+    # Whose queue. Both optional: `tag` falls back to the kind's usual side and
+    # `platform` to the whole of it, which is what a filer who does not know
+    # means. See _clean_change.
+    tag: str = Field(default="", max_length=20)
+    platform: str = Field(default="", max_length=20)
 
 
 class FileIn(BaseModel):
@@ -1940,6 +1945,10 @@ def _change_project(account: dict, project_id: str) -> dict:
     # make it. An administrator settles anything; everybody else needs the
     # account role to permit it *and* a reviewer's standing on this project.
     return {"project": project,
+            # Carried out so the per-request check does not have to look it up
+            # again — and so the two can never disagree about which project role
+            # they are reasoning from.
+            "role": role,
             "may_resolve": security.is_admin(account["role"])
                            or (security.may_settle(account["role"]) and role == "reviewer")}
 
@@ -1954,19 +1963,44 @@ def _clean_change(body: ChangeIn) -> dict:
     ticket = body.ticket.strip().lstrip("#")
     if ticket and not ticket.isdigit():
         raise HTTPException(400, "ticket is an OpenProject work package number.")
+
+    # The side of the house, chosen if the filer said and defaulted from the
+    # kind if not — the same starting position a verdict gets, from the same
+    # map, for the same reason: a screen blocked on an endpoint is backend work
+    # and only the person who found it knows that.
+    #
+    # An empty tag survives. `adr` and `other` have no honest default, so those
+    # arrive unrouted, which is a state the page shows rather than a hole.
+    tag = body.tag.strip().lower() or db.TAG_OF.get(kind, "")
+    if tag and tag not in TAGS:
+        raise HTTPException(400, f"tag is one of {', '.join(TAGS)}, or left out.")
+    platform = body.platform.strip().upper()
+    if platform and not _PLATFORM.match(platform):
+        raise HTTPException(
+            400, f"A platform is written P01, P04 and so on, not {body.platform!r}.")
+    if platform and not tag:
+        # A platform belongs to a side. Accepting one without the other would
+        # make a request that matches a scope on neither half of the pair.
+        raise HTTPException(
+            400, "A platform needs a side with it — say tag as well.")
+
     return {
         "target_kind": kind, "target_id": body.target_id.strip(),
         "title": body.title.strip(), "problem": body.problem.strip(),
         "evidence": body.evidence.strip(), "options": options,
         "recommendation": body.recommendation.strip(),
         "blocking": bool(body.blocking), "ticket": ticket,
+        "tag": tag, "platform": platform,
     }
 
 
 _CHANGE_SELECT = (
     "SELECT c.*, r.name AS raised_by_name, r.email AS raised_by_email, "
-    "s.name AS resolved_by_name FROM change_request c "
-    "JOIN account r ON r.id = c.raised_by LEFT JOIN account s ON s.id = c.resolved_by"
+    "s.name AS resolved_by_name, p.name AS picked_by_name "
+    "FROM change_request c "
+    "JOIN account r ON r.id = c.raised_by "
+    "LEFT JOIN account s ON s.id = c.resolved_by "
+    "LEFT JOIN account p ON p.id = c.picked_by"
 )
 
 
@@ -1997,6 +2031,15 @@ def _change_row(row) -> dict:
         "raisedByEmail": row["raised_by_email"],
         "raisedAt": row["raised_at"],
         "raisedVia": row["raised_via"],
+        "tag": row["tag"],
+        "platform": row["platform"],
+        # What the pair says out loud, built here so the page, the file and any
+        # report agree on the words.
+        "slice": (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
+                  + (f" · {row['platform']}" if row["platform"] else " · all platforms"))
+                 if row["tag"] else "",
+        "pickedBy": row["picked_by_name"],
+        "pickedAt": row["picked_at"],
         "resolution": row["resolution"],
         "resolvedRef": row["resolved_ref"],
         "resolvedBy": row["resolved_by_name"],
@@ -2020,16 +2063,212 @@ def _file_change(project: str, fields: dict, account: dict, via: str) -> dict:
         cur.execute(
             "INSERT INTO change_request (project_id, number, target_kind, target_id, title, "
             "problem, evidence, options, recommendation, blocking, external_key, status, "
-            "raised_by, raised_at, raised_via) "
-            "SELECT ?, COALESCE(MAX(number), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ? "
+            "raised_by, raised_at, raised_via, tag, platform) "
+            "SELECT ?, COALESCE(MAX(number), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ? "
             "FROM change_request WHERE project_id = ?",
             (project, fields["target_kind"], fields["target_id"], fields["title"],
              fields["problem"], fields["evidence"], json.dumps(fields["options"]),
              fields["recommendation"], int(fields["blocking"]), fields["ticket"],
-             account["id"], security.stamp(), via, project),
+             account["id"], security.stamp(), via,
+             fields.get("tag", ""), fields.get("platform", ""), project),
         )
         new_id = cur.lastrowid
     return _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (new_id,)))
+
+
+# ── whose change request is it ───────────────────────────────────────
+#
+# A request carries a slice — a side of the house and a platform within it —
+# and `scope` says who owns which slice. Putting the two together is how a
+# request finds the lead whose queue it belongs in.
+#
+# **Seeing is not acting, and the split is the whole point of the role.** A team
+# lead reads every request on the project, because a lead who cannot see what is
+# happening outside their platform cannot spot the thing that is about to land
+# on it. What the slice decides is narrower: which ones they may pick up, which
+# ones they may settle, and which ones will be counted against them.
+
+# How long a request may sit with nobody having taken it on. Two days, and the
+# escalation is a query rather than a job: "open, unpicked, older than this" is
+# answerable at any moment from the rows themselves, so there is no scheduler to
+# install, no tick to miss, and no stored notification to go stale when somebody
+# picks the request up a minute after it fired.
+PICK_SLA_DAYS = 2
+
+
+def _scopes_of(account_id: int, project: str) -> list:
+    return db.all_rows(
+        "SELECT tag, platform FROM scope WHERE account_id = ? AND project_id = ?",
+        (account_id, project))
+
+
+def _in_scope(scopes: list, tag: str, platform: str) -> bool:
+    """Whether a slice falls inside any of these grants.
+
+    A grant with no platform is the whole of that side, and it covers a platform
+    that did not exist when the grant was made — which is the reason the column
+    is nullable rather than a row per platform.
+
+    An untagged request is in nobody's scope, and that is correct rather than
+    unfortunate: nobody has said whose it is, so nobody is quietly on the hook
+    for it. It shows up in the unrouted list instead.
+    """
+    if not tag:
+        return False
+    for row in scopes:
+        if row["tag"] != tag:
+            continue
+        if row["platform"] is None or row["platform"] == platform:
+            return True
+    return False
+
+
+def _may_pick(account: dict, scopes: list, row) -> bool:
+    """Whether this account may take this request on.
+
+    An administrator may pick anything, because somebody has to be able to when
+    the lead is away and because they are whole rather than scoped. A lead may
+    pick what is theirs. Nobody else picks at all: taking a request on is a
+    statement that you are going to deal with it.
+    """
+    if security.is_admin(account["role"]):
+        return True
+    if account["role"] != "lead":
+        return False
+    return _in_scope(scopes, row["tag"], row["platform"])
+
+
+def _may_settle_change(account: dict, project_role: str, scopes: list, row) -> bool:
+    """Whether this account may accept, reject or complete this request.
+
+    An administrator settles anything. A lead settles their own slice — that is
+    what "approvals, per platform" means. A reviewer settles anything on the
+    project, as they always could: narrowing that would take a capability away
+    from the people doing the reviewing today, which is a different decision
+    from giving leads one.
+    """
+    if security.is_admin(account["role"]):
+        return True
+    if not security.may_settle(account["role"]) or project_role != "reviewer":
+        return False
+    if account["role"] == "lead":
+        return _in_scope(scopes, row["tag"], row["platform"])
+    return True
+
+
+def _overdue_before() -> str:
+    """The stamp a request must have been raised before to count as overdue.
+
+    Compared as text, which is exact rather than a shortcut: security.stamp()
+    writes one fixed-width ISO 8601 form in UTC, and for that form text order is
+    time order.
+    """
+    return security.stamp(security.now() - timedelta(days=PICK_SLA_DAYS))
+
+
+@app.post("/api/changes/{number}/pick")
+def pick_change(number: str, body: FileIn, account: dict = Depends(require_account)):
+    """Take a change request on. Says whose it is; says nothing about the answer.
+
+    Picking and settling are separate acts on purpose, and a request can sit
+    picked and unsettled for a fortnight without that being a contradiction —
+    that is what being worked on looks like. What picking stops is the two-day
+    escalation, because the thing being escalated is that nobody has looked.
+    """
+    scope = _change_project(account, body.project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    if row["status"] != "open":
+        raise HTTPException(
+            409, f"{number} is {row['status']}, not open. There is nothing left to take on.")
+
+    scopes = _scopes_of(account["id"], scope["project"])
+    if not _may_pick(account, scopes, row):
+        raise HTTPException(403, (
+            f"{number} is not in your platforms."
+            if account["role"] == "lead" else
+            "Only a team lead on that platform, or an admin, takes a change request on."))
+
+    if row["picked_by"] and row["picked_by"] != account["id"]:
+        holder = db.one("SELECT name, email FROM account WHERE id = ?", (row["picked_by"],))
+        raise HTTPException(409, (
+            f"{number} was taken on by {holder['name'] or holder['email']}. "
+            f"They can hand it back, or an admin can."))
+
+    db.write("UPDATE change_request SET picked_by = ?, picked_at = ? WHERE id = ?",
+             (account["id"], security.stamp(), row["id"]))
+    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+
+
+@app.post("/api/changes/{number}/unpick")
+def unpick_change(number: str, body: FileIn, account: dict = Depends(require_account)):
+    """Hand one back. The person holding it, or an administrator.
+
+    The clock starts again from where it was — `raised_at` is what the
+    escalation measures from and it does not move, so a request handed back
+    after three days is overdue the moment it is handed back rather than getting
+    another two days of quiet.
+    """
+    scope = _change_project(account, body.project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    if not row["picked_at"]:
+        raise HTTPException(409, f"Nobody has taken {number} on.")
+    if row["picked_by"] != account["id"] and not security.is_admin(account["role"]):
+        raise HTTPException(403, "Only whoever took it on can hand it back, or an admin.")
+
+    db.write("UPDATE change_request SET picked_by = NULL, picked_at = NULL WHERE id = ?",
+             (row["id"],))
+    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+
+
+@app.get("/api/changes/overdue")
+def overdue_changes(project_id: str = Query(default=""),
+                    admin: dict = Depends(require_admin)):
+    """Every open request nobody has taken on within two days.
+
+    **This is the escalation.** There is no notification to send and none
+    stored: the question is answered from the rows every time it is asked, so a
+    request picked up a minute after it tipped over stops being on this list
+    immediately, and a service that was down for a day does not miss anything.
+
+    An administrator's, which is where "the super admin must be told" lands —
+    an owner is an administrator, and an admin seeing it too is right rather
+    than a leak: they are the ones who can reassign a platform.
+    """
+    project = _readable_project(admin, project_id)
+    rows = db.all_rows(
+        _CHANGE_SELECT + " WHERE c.project_id = ? AND c.status = 'open' "
+        "AND c.picked_at IS NULL AND c.raised_at < ? ORDER BY c.raised_at",
+        (project, _overdue_before()))
+
+    # Who should have taken each one, so the list is actionable rather than a
+    # complaint. An unrouted request names nobody, and that is the answer: it is
+    # waiting on somebody saying whose it is.
+    out = []
+    for row in rows:
+        holders = db.all_rows(
+            "SELECT a.id, a.name, a.email FROM scope s JOIN account a ON a.id = s.account_id "
+            "WHERE s.project_id = ? AND s.tag = ? AND (s.platform IS NULL OR s.platform = ?) "
+            "AND a.active = 1 AND a.role = 'lead'",
+            (project, row["tag"], row["platform"]))
+        out.append({
+            **_change_row(row),
+            "waitingDays": _days_since(row["raised_at"]),
+            "shouldBe": [{"id": h["id"], "name": h["name"] or h["email"]} for h in holders],
+        })
+    return {"project": project, "afterDays": PICK_SLA_DAYS, "total": len(out), "items": out}
+
+
+def _days_since(stamp: str) -> int:
+    try:
+        return max(0, (security.now() - security.parse(stamp)).days)
+    except (ValueError, TypeError):
+        return 0
 
 
 @app.get("/api/changes")
@@ -2053,13 +2292,42 @@ def list_changes(project_id: str = Query(default=""), status: str = Query(defaul
         where.append("c.external_key = ?"); args.append(ticket.strip().lstrip("#"))
     rows = db.all_rows(_CHANGE_SELECT + " WHERE " + " AND ".join(where) + " ORDER BY c.number DESC",
                        tuple(args))
-    items = [_change_row(r) for r in rows]
+
+    # Every request, for everybody who may read them — a lead sees the whole
+    # project, which is the point of the role. What the slice decides is marked
+    # per row rather than filtered out, so "mine" is a lens and never a wall.
+    scopes = _scopes_of(account["id"], scope["project"])
+    items = []
+    for row in rows:
+        item = _change_row(row)
+        item["mine"] = _in_scope(scopes, row["tag"], row["platform"])
+        item["mayPick"] = row["status"] == "open" and _may_pick(account, scopes, row)
+        item["maySettle"] = _may_settle_change(account, scope["role"], scopes, row)
+        items.append(item)
+
     counts = {s: 0 for s in CHANGE_STATUSES}
     for row in db.all_rows("SELECT status, COUNT(*) AS n FROM change_request WHERE project_id = ? "
                            "GROUP BY status", (scope["project"],)):
         counts[row["status"]] = row["n"]
+
+    # The two figures the escalation is about, counted over the whole project
+    # rather than over what the filters left — a filtered-away overdue request
+    # is still overdue.
+    waiting = db.one(
+        "SELECT COUNT(*) AS n FROM change_request WHERE project_id = ? "
+        "AND status = 'open' AND picked_at IS NULL", (scope["project"],))["n"]
+    overdue = db.one(
+        "SELECT COUNT(*) AS n FROM change_request WHERE project_id = ? "
+        "AND status = 'open' AND picked_at IS NULL AND raised_at < ?",
+        (scope["project"], _overdue_before()))["n"]
+    unrouted = db.one(
+        "SELECT COUNT(*) AS n FROM change_request WHERE project_id = ? "
+        "AND status = 'open' AND tag = ''", (scope["project"],))["n"]
+
     return {"project": scope["project"], "mayResolve": scope["may_resolve"],
-            "total": len(items), "counts": counts, "items": items}
+            "total": len(items), "counts": counts,
+            "unpicked": waiting, "overdue": overdue, "unrouted": unrouted,
+            "afterDays": PICK_SLA_DAYS, "items": items}
 
 
 def _change_number(value: str) -> int:
@@ -2137,8 +2405,16 @@ def file_draft(code: str, body: FileIn, account: dict = Depends(require_account)
 def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require_account)):
     """
     Accept, reject, mark done, or reopen. An admin or a reviewer on the
-    project; not the person who raised it, unless they are an admin - somebody
-    else has to agree the package is wrong.
+    project, or the team lead whose platform it is; not the person who raised
+    it, unless they are an admin - somebody else has to agree the package is
+    wrong.
+
+    **Two checks, and they answer different questions.** `may_resolve` on the
+    project says whether this account settles anything here at all, and it is
+    what the page draws its controls from. `_may_settle_change` says whether
+    they settle *this one*, which for a lead depends on the slice it carries —
+    and only the second can be the rule, because the first cannot see the
+    request.
     """
     scope = _change_project(account, body.project_id)
     if not scope["may_resolve"]:
@@ -2150,6 +2426,13 @@ def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require
                  (scope["project"], _change_number(number)))
     if not row:
         raise HTTPException(404, f"No {number} in this project.")
+    scopes = _scopes_of(account["id"], scope["project"])
+    if not _may_settle_change(account, scope["role"], scopes, row):
+        where = (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
+                 + (f" · {row['platform']}" if row["platform"] else "")) if row["tag"]             else "not routed to a platform yet"
+        raise HTTPException(403, (
+            f"{number} is {where}, which is not one of yours. A team lead "
+            f"settles their own platforms; an admin settles anything."))
     if (row["raised_by"] == account["id"] and not security.is_admin(account["role"])
             and status in ("accepted", "rejected")):
         raise HTTPException(403, "Somebody other than the person who raised it has to accept or reject it.")
@@ -2790,11 +3073,13 @@ def _export_changes(clause: str, args: tuple):
                    c.title, c.problem, c.evidence, c.options, c.recommendation,
                    c.blocking, c.external_key, c.status, c.raised_at,
                    c.raised_via, c.resolution, c.resolved_ref, c.resolved_at,
+                   c.tag, c.platform, c.picked_at,
                    r.name AS raised_by_name, r.email AS raised_by_email,
-                   s.name AS resolved_by_name
+                   s.name AS resolved_by_name, p.name AS picked_by_name
               FROM change_request c
               JOIN account r ON r.id = c.raised_by
               LEFT JOIN account s ON s.id = c.resolved_by
+              LEFT JOIN account p ON p.id = c.picked_by
              WHERE 1 = 1{clause}
              ORDER BY c.project_id, c.number""",
         args,
@@ -2813,7 +3098,9 @@ def _export_changes(clause: str, args: tuple):
     # cell they came to fill in is a reader who fills in the wrong row.
     header = [
         "id", "ref", "raised", "date", "project", "status", "blocking",
+        "side", "platform",
         "kind", "artefact", "title", "raised by", "email", "via", "ticket",
+        "picked by", "picked on",
         "our decision", "because", "reference", "settled on", "settled by",
         "problem", "evidence", "options", "recommendation",
     ]
@@ -2825,6 +3112,10 @@ def _export_changes(clause: str, args: tuple):
             r["project_id"],
             CHANGE_STATUS_LABEL.get(r["status"], r["status"]),
             "yes" if r["blocking"] else "",
+            # Whose queue it is in. Blank means nobody has said, which the
+            # changes page shows as a bucket of its own rather than hiding.
+            TAG_LABEL.get(r["tag"], r["tag"]),
+            r["platform"],
             CHANGE_KIND_LABEL.get(r["target_kind"], r["target_kind"]),
             r["target_id"],
             r["title"],
@@ -2834,6 +3125,10 @@ def _export_changes(clause: str, args: tuple):
             r["raised_by_name"] or r["raised_by_email"], r["raised_by_email"],
             r["raised_via"],
             r["external_key"],
+            # Taken on, which is not settled. A blank here on an open request
+            # older than two days is what the escalation is counting.
+            r["picked_by_name"] or "",
+            _day(r["picked_at"]),
             # The three the import reads, and the first of them is **blank
             # while the request is open**. That is the same rule the verdict
             # file follows for "our verdict": the column holds the answer, and

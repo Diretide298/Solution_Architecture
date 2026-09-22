@@ -48,6 +48,19 @@
 .cr-badge-rejected { color: var(--error); }
 .cr-badge-blocking { color: var(--error); background: color-mix(in srgb, var(--error) 12%, transparent); }
 
+/* Whose queue a request is in. The two sides are the same two colours the rest
+   of the viewer gives frontend and backend work, so a reader who has seen one
+   board recognises them here. */
+.cr-badge-side { color: var(--text-faint); }
+.cr-side-frontend { color: var(--accent); }
+.cr-side-backend { color: var(--ok); }
+.cr-badge-platform { color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.cr-badge-picked { color: var(--text-faint); border-style: dashed; }
+/* Nobody has said which side this is, so no lead owns it. Worth spotting. */
+.cr-badge-unrouted { color: var(--warning); border-style: dashed; }
+/* A count that is not zero and should be. */
+.cr-stat-late .stat-value { color: var(--error); }
+
 .cr-body { padding: 0 14px 12px; display: grid; gap: 10px; }
 .cr-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-bottom: 2px; }
 .cr-text { margin: 0; color: var(--text); line-height: 1.55; white-space: pre-wrap; }

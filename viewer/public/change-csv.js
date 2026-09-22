@@ -40,10 +40,16 @@
  */
 export const CHANGE_CSV_HEADER = [
   'id', 'ref', 'raised', 'date', 'project', 'status', 'blocking',
+  'side', 'platform',
   'kind', 'artefact', 'title', 'raised by', 'email', 'via', 'ticket',
+  'picked by', 'picked on',
   'our decision', 'because', 'reference', 'settled on', 'settled by',
   'problem', 'evidence', 'options', 'recommendation',
 ];
+
+/** Which side of the house a request is in the queue of. The same two words
+ *  the service writes, and the same two `verdict.tag` has always carried. */
+export const CHANGE_SIDE_LABEL = { frontend: 'Frontend', backend: 'Backend' };
 
 /** Where a change request stands, as the file spells it. The same four words
  *  the service writes and reads, and the importer takes either spelling. */
@@ -88,12 +94,20 @@ export function changeCsvRow(c) {
     c.project,
     CHANGE_STATUS_LABEL[c.status] ?? c.status,
     c.blocking ? 'yes' : '',
+    // Whose queue. Blank means nobody has said yet, which the page shows as a
+    // bucket of its own rather than hiding.
+    CHANGE_SIDE_LABEL[c.tag] ?? c.tag ?? '',
+    c.platform ?? '',
     CHANGE_KIND_LABEL[c.target?.kind] ?? c.target?.kind ?? '',
     c.target?.id ?? '',
     c.title,
     c.raisedBy ?? '', c.raisedByEmail ?? '',
     c.raisedVia ?? '',
     c.ticket ?? '',
+    // Taken on, which is not settled. Blank on an open request older than two
+    // days is what the escalation counts.
+    c.pickedBy ?? '',
+    day(c.pickedAt),
     settled ? (CHANGE_STATUS_LABEL[c.status] ?? c.status) : '',
     c.resolution ?? '',
     c.resolvedRef ?? '',

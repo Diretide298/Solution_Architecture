@@ -434,6 +434,19 @@ export const resolveChange = (projectId, id, status, resolution = '', ref = '') 
   call(`/api/changes/${encodeURIComponent(id)}/resolve`,
     { method: 'POST', body: { project_id: projectId ?? '', status, resolution, ref } });
 
+// Taking a change request on, and handing it back. Separate from resolving it
+// on purpose: picking says whose it is and settling says what was decided, and
+// a request sits picked and unsettled for as long as the work takes.
+export const pickChange = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/pick`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+export const unpickChange = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/unpick`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+/** Open requests nobody has taken on inside the window. Administrators only. */
+export const overdueChanges = (projectId) =>
+  call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+
 export const listPmsProjects = () => call('/api/pms/projects');
 export const availablePmsProjects = () => call('/api/pms/available');
 export const setPmsProject = (projectId, pmsProjectId) =>

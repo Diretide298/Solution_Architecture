@@ -15,7 +15,7 @@ import { hideLoader } from '/loader.js';
 // service's own export of the same register rather than spelled again here:
 // either file can be filled in and uploaded back, which only holds while the
 // two are the same file. See change-csv.js.
-import { CHANGE_KIND_LABEL, toChangeCsv } from '/change-csv.js';
+import { CHANGE_KIND_LABEL, CHANGE_SIDE_LABEL, toChangeCsv } from '/change-csv.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -40,7 +40,14 @@ const state = {
   counts: {},
   mayResolve: false,
   me: null,
-  filter: { status: 'open,accepted', blocking: false, text: '' },
+  // What nobody has taken on, and what has waited too long. Counted over the
+  // whole project by the service rather than over what the filters left — a
+  // request filtered off the screen is still unanswered.
+  unpicked: 0,
+  overdue: 0,
+  unrouted: 0,
+  afterDays: 2,
+  filter: { status: 'open,accepted', blocking: false, text: '', mine: false },
 };
 
 const fmt = (iso) => (iso ? new Date(iso).toLocaleString(undefined,
@@ -59,6 +66,10 @@ async function load() {
     state.items = data.items ?? [];
     state.counts = data.counts ?? {};
     state.mayResolve = Boolean(data.mayResolve);
+    state.unpicked = data.unpicked ?? 0;
+    state.overdue = data.overdue ?? 0;
+    state.unrouted = data.unrouted ?? 0;
+    state.afterDays = data.afterDays ?? 2;
     showError('');
   } catch (error) {
     state.items = [];
@@ -76,6 +87,9 @@ function shown() {
   return state.items.filter((c) => {
     if (wanted && !wanted.includes(c.status)) return false;
     if (f.blocking && !c.blocking) return false;
+    // A lens, never a wall: a lead reads the whole project and this narrows
+    // what is on screen. The service sends every request either way.
+    if (f.mine && !c.mine) return false;
     if (needle) {
       const hay = [c.id, c.title, c.target.kind, c.target.id, c.ticket, c.raisedBy, c.problem,
         c.resolution].join(' ').toLowerCase();
@@ -103,6 +117,20 @@ function drawHeadline() {
   box.append(stat(blocking, 'blocking work', blocking ? 'tickets are waiting on these' : 'nothing is held up'));
   box.append(stat(state.counts.done ?? 0, 'done', 'fixed in the package'));
   box.append(stat(state.counts.rejected ?? 0, 'rejected', 'the package was right'));
+  // The two the escalation is about. "Overdue" is derived on every read rather
+  // than stored, so picking one up clears it here on the next load with nothing
+  // to retract.
+  box.append(stat(state.unpicked, 'not taken on', state.unpicked
+    ? 'nobody has said they are dealing with these'
+    : 'everything open has somebody'));
+  const late = stat(state.overdue, 'overdue',
+    `open, untaken, more than ${state.afterDays} days`);
+  if (state.overdue) late.classList.add('cr-stat-late');
+  box.append(late);
+  if (state.unrouted) {
+    box.append(stat(state.unrouted, 'unrouted',
+      'no side of the house, so no lead — somebody has to say'));
+  }
 }
 
 function drawStatusSeg() {
@@ -131,9 +159,45 @@ function block(label, text, pre = false) {
 
 function actions(c) {
   const bar = el('div', 'cr-actions');
-  if (!state.mayResolve) return bar;
   const mine = state.me && c.raisedBy && [state.me.name, state.me.email].includes(c.raisedBy);
   const admin = auth.isAdmin(state.me);
+  const holder = state.me && c.pickedBy
+    && [state.me.name, state.me.email].includes(c.pickedBy);
+
+  // Taking it on, which is not settling it. A request can sit taken and
+  // unsettled for as long as the work takes; what picking stops is the clock
+  // that tells the super admin nobody has looked.
+  const pick = async (fn) => {
+    try {
+      await fn(state.project, c.id);
+      await load();
+    } catch (error) {
+      showError(`${c.id}: ${error.message}`);
+    }
+  };
+  if (c.mayPick) {
+    const take = el('button', 'chip cr-pick', 'Take this on');
+    take.type = 'button';
+    take.onclick = () => pick(auth.pickChange);
+    bar.append(take);
+  }
+  if (c.pickedBy && (holder || admin)) {
+    const back = el('button', 'chip', 'Hand back');
+    back.type = 'button';
+    back.onclick = () => pick(auth.unpickChange);
+    bar.append(back);
+  }
+
+  // Settling is decided per request, not per project: a lead settles their own
+  // platforms. `maySettle` is the service's answer about this one.
+  if (!c.maySettle) {
+    if (!bar.children.length && state.mayResolve) {
+      bar.append(el('span', 'cr-hint',
+        c.tag ? 'Another team lead owns this platform.'
+              : 'Nobody has said which side of the house this is.'));
+    }
+    return bar;
+  }
   const note = el('input', 'auth-input cr-note');
   note.placeholder = 'Why, or what was decided';
   const ref = el('input', 'auth-input cr-ref');
@@ -173,6 +237,16 @@ function card(c) {
   summary.append(el('span', 'cr-id', c.id));
   summary.append(el('span', `cr-badge cr-badge-${c.status}`, STATUS[c.status] ?? c.status));
   if (c.blocking && ['open', 'accepted'].includes(c.status)) summary.append(el('span', 'cr-badge cr-badge-blocking', 'Blocking'));
+  // Whose queue, and whether anybody has taken it. An open request with no
+  // side is the one worth spotting, so it says so rather than showing nothing.
+  if (c.tag) {
+    summary.append(el('span', `cr-badge cr-badge-side cr-side-${c.tag}`,
+      CHANGE_SIDE_LABEL[c.tag] ?? c.tag));
+    if (c.platform) summary.append(el('span', 'cr-badge cr-badge-platform', c.platform));
+  } else if (c.status === 'open') {
+    summary.append(el('span', 'cr-badge cr-badge-unrouted', 'Unrouted'));
+  }
+  if (c.pickedBy) summary.append(el('span', 'cr-badge cr-badge-picked', `Taken: ${c.pickedBy}`));
   summary.append(el('span', 'cr-title', c.title));
   const meta = el('span', 'cr-meta');
   meta.append(el('code', null, `${KINDS[c.target.kind] ?? c.target.kind} ${c.target.id}`));
@@ -215,6 +289,10 @@ function draw() {
     return;
   }
   for (const c of rows) list.append(card(c));
+  // Offered only where it would do something. Somebody who owns no platform
+  // has no "mine", and a filter that empties the page is worse than no filter.
+  const wrap = $('cr-mine-wrap');
+  if (wrap) wrap.hidden = !state.items.some((c) => c.mine);
 }
 
 // ── export ───────────────────────────────────────────────────────────
@@ -304,6 +382,7 @@ function wireForm() {
 
   drawStatusSeg();
   $('cr-blocking').onchange = (e) => { state.filter.blocking = e.target.checked; draw(); };
+  $('cr-mine').onchange = (e) => { state.filter.mine = e.target.checked; draw(); };
   $('cr-text').oninput = (e) => { state.filter.text = e.target.value; draw(); };
   $('cr-export').onclick = exportCsv;
   // Admin only, because /api/changes/import/* is. Hiding it is presentation —

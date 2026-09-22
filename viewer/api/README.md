@@ -80,6 +80,48 @@ python -m api.cli owner chinmay.parab@softlabsgroup.com --revoke --to admin
 carry it, so becoming or unmaking the super admin takes a shell here. The CLI
 refuses to leave nobody able to administer.
 
+## Where a change request goes
+
+A request carries a **slice**: a side of the house (`frontend` or `backend`) and
+a platform within it (`P01`…), or no platform meaning the whole side. `scope`
+says who owns which slice, and putting the two together is how a request finds
+the lead whose queue it is in.
+
+The side is chosen at filing and defaults from the kind — the same `TAG_OF` map
+a verdict uses, and for the same reason: a screen blocked on an endpoint is
+backend work, and only the person who found it knows. `adr` and `other` have no
+honest default, so those arrive **unrouted**, which the page shows as a bucket
+rather than hiding.
+
+A grant of one platform does not cover a request that names none. *Frontend,
+unspecified* is wider than *Frontend · P01*, so it belongs to whoever owns the
+whole side, or to nobody until somebody says.
+
+**Seeing and acting are separate.** A team lead reads every request on the
+project — a lead who cannot see what is coming cannot prepare for it. The slice
+decides which they may take on, which they may settle, and which are counted
+against them. A reviewer still settles anything on the project, as they always
+could.
+
+### Taking one on, and the two-day clock
+
+`picked_by` and `picked_at` are columns, **not a status**. Picking says whose a
+request is; settling says what was decided; a request sits picked and unsettled
+for as long as the work takes, and that is not a contradiction. Keeping it off
+`status` also leaves the spreadsheet round trip's four words exactly as they
+were.
+
+An open request nobody has taken on within `PICK_SLA_DAYS` (two) is **overdue**.
+There is no notification stored and none sent: `GET /api/changes/overdue`
+answers it from the rows every time it is asked. So a request picked up a minute
+after it tipped over stops being overdue immediately with nothing to retract,
+and a service that was down for a day misses nothing. The overdue list names the
+leads who should have taken each one — or nobody, for an unrouted request, which
+is itself the answer.
+
+Handing one back does not restart the clock: the escalation measures from
+`raised_at`, which does not move.
+
 ## Why invites rather than signup
 
 Restricting signup to `@softlabsgroup.com` only checks the address a stranger
@@ -131,6 +173,9 @@ verdict on an artefact is simply its newest row.
 | `GET /api/export/{dataset}` | admin only. A date range as a CSV. `verdicts`, `changes`, `invites`, `accounts`. |
 | `POST /api/decisions/preview` | admin only. What an edited review file would close. Writes nothing. |
 | `POST /api/decisions/apply` | admin only. Closes it, on the preview's checksum. |
+| `POST /api/changes/{n}/pick` | take a request on. A lead on that platform, or an admin. |
+| `POST /api/changes/{n}/unpick` | hand it back. Whoever holds it, or an admin. |
+| `GET /api/changes/overdue` | admin only. Open, untaken, older than two days. |
 | `POST /api/changes/import/preview` | admin only. What an edited change request file would settle. Writes nothing. |
 | `POST /api/changes/import/apply` | admin only. Settles it, on the preview's checksum. |
 
@@ -215,6 +260,14 @@ because making an owner is deliberately not something the API can do:
 TICVAI_DB=/tmp/roles.db python -m uvicorn api.main:app --port 8799
 TICVAI_DB=/tmp/roles.db API=http://localhost:8799 node api/roles-check.mjs
 ```
+
+`cr-routing-check.mjs` — 42 assertions over where a request belongs and who
+takes it on. Most of them are a team lead being *shown* a request they may not
+touch and then refused when they touch it: a check that only tested the refusal
+would pass equally against a lead who could not see it at all, which is the
+wrong product. It needs `TICVAI_DB` as well as `API`, because making a request
+older than it is takes the store directly — the alternative is a check that
+sleeps for two days.
 
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a

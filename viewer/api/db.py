@@ -305,6 +305,23 @@ CREATE TABLE IF NOT EXISTS change_request (
   raised_at      TEXT    NOT NULL,
   -- 'claude' when filed through the connector, 'viewer' from the page.
   raised_via     TEXT    NOT NULL DEFAULT 'viewer',
+  -- Whose queue this is in: a side of the house, and a platform within it.
+  -- The pair `scope` grants, so a request finds the lead who owns that slice.
+  -- Either may be blank, and blank is not an error — it means nobody has said,
+  -- and a request nobody has routed is one for the super admin to triage
+  -- rather than one quietly belonging to everybody.
+  tag            TEXT    NOT NULL DEFAULT '',
+  platform       TEXT    NOT NULL DEFAULT '',
+  -- Who has taken it on, and when. **Not a status.** Picking a request up and
+  -- settling it are different acts — the first says whose it is, the second
+  -- says what was decided — and a request can sit picked and unsettled for a
+  -- fortnight without that being a contradiction. Keeping it off `status` also
+  -- leaves the spreadsheet round trip's four words exactly as they were.
+  --
+  -- `picked_at` being null on an open request older than two days is the whole
+  -- of the escalation: it is a query, not a job, so there is no tick to miss.
+  picked_by      INTEGER REFERENCES account(id),
+  picked_at      TEXT,
   resolution     TEXT    NOT NULL DEFAULT '',
   -- What closed it: a commit, an ADR, a contract version.
   resolved_ref   TEXT    NOT NULL DEFAULT '',
@@ -314,6 +331,12 @@ CREATE TABLE IF NOT EXISTS change_request (
 );
 CREATE INDEX IF NOT EXISTS change_request_by_target
   ON change_request(project_id, target_kind, target_id, status);
+-- The two questions the changes page asks that are not about one artefact:
+-- "what is in my slice" and "what has nobody taken".
+CREATE INDEX IF NOT EXISTS change_request_by_slice
+  ON change_request(project_id, tag, platform, status);
+CREATE INDEX IF NOT EXISTS change_request_unpicked
+  ON change_request(project_id, status, picked_at);
 
 -- A change request drafted by Claude and waiting for the person to agree.
 -- Filing takes the one-use code; the draft expires like a work package
@@ -490,6 +513,19 @@ TAG_OF = {
     # of tables. Both are somebody's build before they are anybody's screen.
     "state": "backend",
     "schema": "backend",
+    # The six below are change request kinds only — a verdict is never given on
+    # one. They are here rather than in a second map because "which side of the
+    # house is this" is one question, and two maps answering it is how a flow
+    # comes to be frontend in one place and backend in another.
+    "flow": "frontend",
+    "platform": "frontend",
+    "contract": "backend",
+    "service": "backend",
+    "event": "backend",
+    # `adr` and `other` are deliberately absent. A decision is not a side of the
+    # house and neither is "other", so guessing would route them somewhere on no
+    # evidence. They arrive untagged, which is a state the page shows and
+    # somebody answers — a worse default is worse than none.
 }
 
 
@@ -621,6 +657,34 @@ def init() -> None:
             cur.execute(
                 "INSERT OR IGNORE INTO project (id, name, active, created_at) VALUES (?, ?, 1, ?)",
                 (project_id, name, _stamp()),
+            )
+
+        # Where a change request belongs, and who has taken it on. Added to
+        # stores made before the columns existed; the fresh schema above already
+        # has them.
+        change_columns = {row[1] for row in cur.execute("PRAGMA table_info(change_request)")}
+        for column, ddl in (
+            ("tag", "TEXT NOT NULL DEFAULT ''"),
+            ("platform", "TEXT NOT NULL DEFAULT ''"),
+            ("picked_by", "INTEGER"),
+            ("picked_at", "TEXT"),
+        ):
+            if column not in change_columns:
+                cur.execute(f"ALTER TABLE change_request ADD COLUMN {column} {ddl}")
+        # Backfilled from the kind, the same starting position a new one gets,
+        # and only where nobody has said otherwise. Leaving them blank would put
+        # every request that predates routing into the "nobody has said" bucket
+        # the page asks the super admin to clear — which would be true of the
+        # column and false of the work.
+        #
+        # `platform` is not backfilled and cannot be: this service does not read
+        # the packages, so it has no way to know that POS-002 is P04. They arrive
+        # as "the whole of that side", which is the honest reading of a request
+        # filed before anybody was asked.
+        for kind, tag in TAG_OF.items():
+            cur.execute(
+                "UPDATE change_request SET tag = ? WHERE target_kind = ? AND tag = ''",
+                (tag, kind),
             )
 
         # Which OpenProject project each package reads. Added to stores made

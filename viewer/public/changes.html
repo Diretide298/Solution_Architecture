@@ -93,6 +93,13 @@
         <div class="signoff-controls cr-filters">
           <div class="seg" id="cr-status"></div>
           <label class="cr-check"><input type="checkbox" id="cr-blocking" /> Blocking only</label>
+          <!-- A lens, not a wall. A team lead reads every request on the
+               project — that is the point of the role — and this narrows what
+               is on screen to the platforms they own. Hidden for anybody who
+               owns no platform, where it would filter everything away. -->
+          <label class="cr-check" id="cr-mine-wrap" hidden>
+            <input type="checkbox" id="cr-mine" /> My platforms
+          </label>
           <input id="cr-text" class="auth-input signoff-filter" type="search"
                  placeholder="search titles, artefacts, tickets, people" autocomplete="off" />
           <button class="chip" id="cr-export" type="button"
