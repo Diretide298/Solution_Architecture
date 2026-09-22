@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — ask</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/chat.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">ask</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/changes.html">Change requests</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main id="chat" class="admin-main chat-main">
+      <div class="admin-panel chat-panel">
+        <h1 class="admin-heading">Ask about the package</h1>
+        <p class="auth-note set-lede">
+          Answers come from the package and nothing else. ADAM searches it for
+          what you asked about, sends those excerpts with your question, and is
+          told to say which part of the package <em>would</em> have the answer
+          rather than inventing one.
+          <strong>If the package looks wrong, you can raise a change request
+          straight from the answer.</strong>
+        </p>
+
+        <!-- The picker lives here rather than in the top bar: which model
+             answers is part of asking, not a setting you configure once. A
+             cheaper model on a long question should be one dropdown away. -->
+        <div class="chat-picker">
+          <label class="chat-pick">
+            <span class="auth-label">Provider</span>
+            <select class="scope-select" id="ch-provider"></select>
+          </label>
+          <label class="chat-pick chat-pick-wide">
+            <span class="auth-label">Model</span>
+            <input class="auth-input" id="ch-model" list="ch-models" autocomplete="off"
+                   placeholder="pick one, or type a name" />
+            <datalist id="ch-models"></datalist>
+          </label>
+          <p class="chat-keynote" id="ch-keynote"></p>
+        </div>
+
+        <p class="auth-error" id="ch-error" hidden></p>
+
+        <!-- No key for the chosen provider. Its own panel rather than an error,
+             because this is a setup step and not a failure. -->
+        <div class="chat-nokey" id="ch-nokey" hidden>
+          <p class="auth-note">
+            <strong id="ch-nokey-who">This provider</strong> needs a key before
+            it can answer. ADAM asks <strong>on your own key</strong>, never on a
+            shared one, so your questions are on your bill and under your rate
+            limit and nobody else&rsquo;s. It is encrypted before it is stored
+            and never sent back to this page.
+          </p>
+          <form class="chat-keyform" id="ch-keyform">
+            <input class="auth-input" id="ch-key" type="password" autocomplete="off"
+                   placeholder="Paste the key" required />
+            <input class="auth-input" id="ch-endpoint" type="text" autocomplete="off"
+                   placeholder="https://… endpoint" hidden />
+            <button class="chip" type="submit">Check and save</button>
+            <a class="chip" id="ch-keys-at" href="#" target="_blank" rel="noreferrer" hidden>Get a key</a>
+          </form>
+          <p class="set-state" id="ch-key-says" role="status"></p>
+        </div>
+
+        <div class="chat-log" id="ch-log"></div>
+
+        <form class="chat-ask" id="ch-ask">
+          <textarea id="ch-question" class="auth-input" rows="2" required
+            placeholder="Which operations write to orders.sales_order?"></textarea>
+          <div class="set-actions">
+            <button class="auth-button" type="submit" id="ch-send">Ask</button>
+            <button class="chip" type="button" id="ch-clear">Clear</button>
+            <p class="set-state" id="ch-says" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/chat.js"></script>
+  </body>
+</html>

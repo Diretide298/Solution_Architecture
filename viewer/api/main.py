@@ -32,7 +32,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import db, decisions, netaddr, openproject, secrets, security
+from . import db, decisions, llm, netaddr, openproject, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
@@ -1573,6 +1573,10 @@ def my_settings(account: dict = Depends(require_account)):
     stored = _secret_row(account["id"], OPENPROJECT)
     return {
         "email": account["email"],
+        # Model keys are not here. There is one per provider and a person may
+        # hold several, so they are their own route — /api/chat/providers, which
+        # also says which models each key can actually reach. Repeating a subset
+        # of that here would be a second answer to the same question.
         "name": account["name"],
         "gitEmail": (row["git_email"] if row else "") or "",
         "openproject": {
@@ -2502,6 +2506,269 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
         "workPackage": {k: updated.get(k) for k in ("key", "subject", "status", "percentDone", "url")},
         **({"testing": batch} if batch else {}),
         **({"commit": nudge} if nudge else {}),
+    }
+
+
+# ── asking ADAM ──────────────────────────────────────────────────────
+#
+# **Everybody brings their own key, from whichever provider they like.** The
+# same rule as OpenProject and for the same reason: a shared credential would
+# put every question anybody asks on one bill, under one rate limit, with no way
+# to tell whose was whose. A key is stored encrypted, verified before it is
+# kept, and never sent back to a page.
+#
+# Which providers there are, and why this is a table of wire shapes rather than
+# a pile of SDKs, is in `llm.py`. What matters here: a person can hold a key for
+# each of them at once and choose per question, so trying a cheaper model on a
+# long question is a dropdown rather than a settings change.
+#
+# **The service holds the key; the page holds the context.** ADAM's accounts
+# service cannot read a delivery package — that is the viewer's job, and giving
+# it a second reader of the same files is the thing this codebase has avoided
+# everywhere else. So the page gathers what it already has on screen and sends
+# it with the question, and this composes the call. Neither half has both.
+#
+# What comes back is an answer and, when the package looks wrong, the makings of
+# a change request — filed through the draft-then-confirm flow that already
+# exists, never from here.
+
+CHAT_MAX_TOKENS = 4000
+
+# How much of the package one question may carry. Sized so a long answer still
+# fits comfortably inside a single request, and so a page that got carried away
+# gathering context is trimmed here rather than producing a bill somebody did
+# not expect.
+CHAT_CONTEXT_CHARS = 60_000
+CHAT_HISTORY_TURNS = 8
+
+CHAT_SYSTEM = """You are ADAM, answering questions about one delivery package.
+
+A delivery package is a specification: contracts, screens, a data model, state
+machines, services, and the decisions behind them. The person asking is on the
+team building against it, or a client reading what was built for them.
+
+**Answer only from the excerpts you are given.** They are what the reader has on
+screen. If they do not contain the answer, say which part of the package would
+have it and stop — do not fill the gap from general knowledge about software. An
+invented operation name or table column is worse than no answer, because it will
+be believed and built against.
+
+Be specific and brief. Name the contract, the screen id, the table. Quote the
+package's own words where they answer the question. Do not pad.
+
+If the excerpts contradict each other, or something the reader would plainly
+need is missing, say so — that is a change request, and the page will offer to
+raise one. Do not raise it yourself and do not pretend to have."""
+
+
+def _key_kind(provider: str) -> str:
+    """One `account_secret` row per provider per person.
+
+    `kind` was built as a column rather than a second table, and this is what it
+    was for: holding keys for four providers at once needed no migration and no
+    new table, just four rows with different kinds.
+    """
+    llm.known(provider)
+    return "llm:" + provider.strip().lower()
+
+
+class KeyIn(BaseModel):
+    provider: str
+    key: str
+    # Only the OpenAI-compatible escape hatch needs one, and there it is
+    # required. Stored in the plaintext `endpoint` column beside the encrypted
+    # key, which is why llm.base_for refuses one carrying userinfo.
+    endpoint: str = Field(default="", max_length=300)
+
+
+class ChatBit(BaseModel):
+    title: str = Field(default="", max_length=200)
+    text: str = Field(default="", max_length=CHAT_CONTEXT_CHARS)
+
+
+class ChatTurn(BaseModel):
+    role: str
+    text: str = Field(max_length=20_000)
+
+
+class ChatIn(BaseModel):
+    project_id: str = ""
+    question: str = Field(max_length=4000)
+    provider: str
+    model: str = Field(max_length=120)
+    context: List[ChatBit] = Field(default_factory=list)
+    history: List[ChatTurn] = Field(default_factory=list)
+
+
+def _llm_key(account_id: int, provider: str):
+    """This person's key and endpoint for one provider, or the sentence to show."""
+    row = db.one(
+        "SELECT ciphertext, endpoint FROM account_secret WHERE account_id = ? AND kind = ?",
+        (account_id, _key_kind(provider)))
+    if not row:
+        raise HTTPException(428, (
+            "Add your " + llm.known(provider)["label"] + " key first — Settings, "
+            "then paste one. ADAM asks on your key, never on a shared one."))
+    try:
+        return secrets.open_(row["ciphertext"]), row["endpoint"] or ""
+    except secrets.Unreadable as exc:
+        raise HTTPException(409, str(exc))
+
+
+@app.get("/api/chat/providers")
+def chat_providers(account: dict = Depends(require_account)):
+    """Who there is, which of them this person has a key for, and what to pick.
+
+    The model list comes from the provider itself wherever a key is stored, so a
+    model released this morning is selectable without a deploy here. The table's
+    own list is the fallback, and what the picker shows before anybody has a key.
+    """
+    out = []
+    for name, spec in llm.PROVIDERS.items():
+        row = _secret_row(account["id"], "llm:" + name)
+        models = list(spec["models"])
+        if row:
+            try:
+                models = llm.catalogue(name, secrets.open_(row["ciphertext"]),
+                                       row["endpoint"] or "")
+            except secrets.Unreadable:
+                pass
+        out.append({
+            "id": name,
+            "label": spec["label"],
+            "configured": bool(row),
+            "hint": row["hint"] if row else "",
+            "needsEndpoint": bool(spec.get("needsBase")),
+            "endpoint": (row["endpoint"] if row else "") or spec["base"],
+            "keysAt": spec["keysAt"],
+            "models": models,
+        })
+    return {"providers": out}
+
+
+@app.put("/api/settings/llm")
+def set_llm_key(body: KeyIn, account: dict = Depends(require_account)):
+    """Store a key for one provider, encrypted, after checking that it works.
+
+    The check is a model listing — a read, so verifying a key never puts a token
+    on anybody's bill. A key that does not work is worse than none: it is kept,
+    it looks configured, and it fails later somewhere that reads as a different
+    bug.
+    """
+    key = body.key.strip()
+    if not key:
+        raise HTTPException(400, "Paste a key.")
+    if not secrets.available():
+        raise HTTPException(503, secrets.describe_key())
+    try:
+        kind = _key_kind(body.provider)
+        said = llm.verify(body.provider, key, body.endpoint)
+    except llm.Refused as exc:
+        raise HTTPException(_llm_status(exc), str(exc))
+
+    endpoint = (body.endpoint or "").strip().rstrip("/")
+    now = security.stamp()
+    if _secret_row(account["id"], kind):
+        db.write("UPDATE account_secret SET ciphertext = ?, hint = ?, endpoint = ?, "
+                 "updated_at = ? WHERE account_id = ? AND kind = ?",
+                 (secrets.seal(key), secrets.hint(key), endpoint, now, account["id"], kind))
+    else:
+        db.write("INSERT INTO account_secret (account_id, kind, ciphertext, hint, endpoint, "
+                 "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                 (account["id"], kind, secrets.seal(key), secrets.hint(key),
+                  endpoint, now, now))
+    return {"ok": True, "hint": secrets.hint(key), "checked": said}
+
+
+@app.delete("/api/settings/llm/{provider}")
+def forget_llm_key(provider: str, account: dict = Depends(require_account)):
+    try:
+        kind = _key_kind(provider)
+    except llm.Refused as exc:
+        raise HTTPException(400, str(exc))
+    db.write("DELETE FROM account_secret WHERE account_id = ? AND kind = ?",
+             (account["id"], kind))
+    return {"ok": True}
+
+
+def _llm_status(exc) -> int:
+    """What to answer when a provider refuses.
+
+    A credential problem is 401 whatever the provider called it, a quota is 429,
+    and anything else in the 4xx range is the caller's to fix and is passed
+    through. A 5xx from them is a 502 from here: their outage, not ours.
+    """
+    if exc.status in (401, 403):
+        return 401
+    if exc.status == 429:
+        return 429
+    return exc.status if 400 <= exc.status < 500 else 502
+
+
+@app.post("/api/chat")
+def chat(body: ChatIn, account: dict = Depends(require_account)):
+    """One question about the package, on the caller's own key and chosen model."""
+    _readable_project(account, body.project_id)
+    question = body.question.strip()
+    if not question:
+        raise HTTPException(400, "Ask something.")
+    model = body.model.strip()
+    if not model:
+        raise HTTPException(400, "Choose a model.")
+    try:
+        llm.known(body.provider)
+    except llm.Refused as exc:
+        raise HTTPException(400, str(exc))
+
+    key, endpoint = _llm_key(account["id"], body.provider)
+
+    # Trimmed here rather than trusted from the page. The page decides what is
+    # relevant; this decides how much of it is sent, because the cost lands on
+    # somebody's card and a page with a loop in it should not be able to spend
+    # their money.
+    excerpts = []
+    spent = 0
+    dropped = 0
+    for bit in body.context:
+        text = bit.text.strip()
+        if not text:
+            continue
+        if spent + len(text) > CHAT_CONTEXT_CHARS:
+            dropped += 1
+            continue
+        spent += len(text)
+        excerpts.append("## " + (bit.title.strip() or "From the package") + "\n\n" + text)
+
+    turns = []
+    for turn in body.history[-CHAT_HISTORY_TURNS:]:
+        if turn.role in ("user", "assistant") and turn.text.strip():
+            turns.append({"role": turn.role, "content": turn.text})
+    asked = (
+        ("Excerpts from the package:\n\n" + "\n\n".join(excerpts) + "\n\n---\n\n")
+        if excerpts else
+        "You have been given no excerpts from the package for this question.\n\n"
+    ) + "Question: " + question
+    turns.append({"role": "user", "content": asked})
+
+    try:
+        said = llm.ask(body.provider, key, model, CHAT_SYSTEM, turns,
+                       max_tokens=CHAT_MAX_TOKENS, endpoint=endpoint)
+    except llm.Refused as exc:
+        # The provider's own sentence, carried through. "You exceeded your
+        # current quota" is the answer somebody needs; "the provider answered
+        # 429" is not, and this is the one place that knows both.
+        raise HTTPException(_llm_status(exc), str(exc))
+
+    return {
+        "answer": said["text"],
+        "provider": body.provider,
+        "model": model,
+        # Reported because it is the person's own money. A chat that never says
+        # what it spent is one somebody stops trusting the first time they look
+        # at a bill. Zero where the provider does not report it.
+        "usage": {"in": said["in"], "out": said["out"]},
+        "excerpts": len(excerpts),
+        "droppedExcerpts": dropped,
     }
 
 

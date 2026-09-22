@@ -440,6 +440,30 @@ export const listChanges = (projectId, filters = {}) =>
   call(`/api/changes?${new URLSearchParams({ project_id: projectId ?? '', ...filters })}`);
 export const raiseChange = (projectId, change) =>
   call('/api/changes', { method: 'POST', body: { project_id: projectId ?? '', ...change } });
+// Draft, then file. The two-step the Claude connector uses, exposed to the page
+// as well now that the chat can propose one: a change request is a claim that
+// somebody else's work is wrong, and it goes out under the name of whoever
+// pressed the button, so somebody reads it before it is filed.
+export const draftChange = (projectId, change) =>
+  call('/api/changes/drafts', { method: 'POST', body: { project_id: projectId ?? '', ...change } });
+export const fileDraft = (projectId, code) =>
+  call(`/api/changes/drafts/${encodeURIComponent(code)}/file`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+
+// Asking a model about the package, on this person's own key. Which providers
+// there are, which of them they hold a key for, and what each key can actually
+// reach — the model list comes from the provider itself, so one released this
+// morning is selectable without a deploy.
+export const chatProviders = () => call('/api/chat/providers');
+export const setLlmKey = (provider, key, endpoint = '') =>
+  call('/api/settings/llm', { method: 'PUT', body: { provider, key, endpoint } });
+export const forgetLlmKey = (provider) =>
+  call(`/api/settings/llm/${encodeURIComponent(provider)}`, { method: 'DELETE' });
+export const askAdam = ({ question, provider, model, context = [], history = [], projectId = '' }) =>
+  call('/api/chat', { method: 'POST', body: {
+    project_id: projectId || project() || '', question, provider, model, context,
+    history: history.map((t) => ({ role: t.role, text: t.text })),
+  } });
 export const resolveChange = (projectId, id, status, resolution = '', ref = '') =>
   call(`/api/changes/${encodeURIComponent(id)}/resolve`,
     { method: 'POST', body: { project_id: projectId ?? '', status, resolution, ref } });
