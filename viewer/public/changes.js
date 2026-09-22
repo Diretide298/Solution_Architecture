@@ -133,7 +133,7 @@ function actions(c) {
   const bar = el('div', 'cr-actions');
   if (!state.mayResolve) return bar;
   const mine = state.me && c.raisedBy && [state.me.name, state.me.email].includes(c.raisedBy);
-  const admin = state.me?.role === 'admin';
+  const admin = auth.isAdmin(state.me);
   const note = el('input', 'auth-input cr-note');
   note.placeholder = 'Why, or what was decided';
   const ref = el('input', 'auth-input cr-ref');
@@ -309,7 +309,7 @@ function wireForm() {
   // Admin only, because /api/changes/import/* is. Hiding it is presentation —
   // the service refuses the upload to anybody else whatever this page draws —
   // and it is here so nobody is shown a link that will only tell them no.
-  $('cr-settle-link').hidden = state.me?.role !== 'admin';
+  $('cr-settle-link').hidden = !auth.isAdmin(state.me);
   wireForm();
   await load();
   hideLoader();

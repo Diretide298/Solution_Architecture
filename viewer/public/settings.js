@@ -24,7 +24,7 @@ import '/page-chrome.js';
 import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,
-  changePassword, signOut, logoutAll, project,
+  changePassword, signOut, logoutAll, project, isAdmin,
 } from '/validation.js';
 import { followSections } from '/sections.js';
 
@@ -44,8 +44,12 @@ const because = (error) => error?.message || 'That did not work. Try again.';
 const MIN_PASSWORD = 12;   // the server's rule, said here so the answer is instant
 
 const ROLE_SAYS = {
-  reviewer: 'Read everything, and record reviews.',
+  owner: 'Everything an admin can, plus the Build layer, the IP allowlist and granting roles. Set on the machine, not from here.',
   admin: 'Everything a reviewer can, plus invite people, manage accounts and make password-reset links.',
+  pm: 'Read everything an admin can read. Records nothing — not a review, not a change request decision.',
+  lead: 'See all activity and every change request. Notified about, and settle, the platforms you own.',
+  dev: 'Your own tasks and backlog, and the package behind them.',
+  reviewer: 'Read everything, and record reviews.',
   client: 'Read everything except Decisions. Your reviews are kept separately, as the client review.',
 };
 
@@ -68,7 +72,9 @@ function drawAccount(state, who) {
   $('me-role').dataset.role = role;
   $('me-role-says').textContent = ROLE_SAYS[role] ?? '—';
 
-  const admin = role === 'admin';
+  // The owner administers too, so this is the shared predicate rather than a
+  // comparison — see isAdmin in validation.js.
+  const admin = isAdmin({ role });
   $('admin').hidden = !admin;
   $('nav-admin').hidden = !admin;
   $('nav-admin-group').hidden = !admin;

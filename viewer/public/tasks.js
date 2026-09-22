@@ -510,7 +510,7 @@ function exportCsv() {
   if (!(await auth.requireSignIn())) return hideLoader();
   state.me = auth.account();
   $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${state.me.role}` : '';
-  if (state.me?.role !== 'admin') { denied(); return hideLoader(); }
+  if (!auth.isAdmin(state.me)) { denied(); return hideLoader(); }
 
   state.project = await auth.ensureProject();
   $('tasks').hidden = false;

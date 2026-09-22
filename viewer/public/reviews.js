@@ -632,7 +632,7 @@ function tableRow(v) {
 function doneCell(v) {
   const cell = el('td', 'rt-done');
   const me = auth.account();
-  const mayWrite = me && me.role !== 'client';
+  const mayWrite = me && !auth.isClient(me);
 
   const stamp = el('span', 'rt-done-stamp');
   const paint = () => {
@@ -749,7 +749,7 @@ function sendBackControl(v, repaint) {
   const me = auth.account();
   // Only on a row that is actually claiming to be finished — there is nothing
   // to reject on one nobody has marked done.
-  if (me?.role !== 'admin' || !auth.isSettled(v)) return el('span');
+  if (!auth.isAdmin(me) || !auth.isSettled(v)) return el('span');
 
   const wrap = el('span', 'rt-sendback');
   const open = el('button', 'chip rt-sendback-open', 'Send back');
@@ -1021,7 +1021,7 @@ function redraw() {
   $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
   // The return path for the file the button beside it produces. Admin only, the
   // same as the route it leads to.
-  $('f-close-link').hidden = me?.role !== 'admin';
+  $('f-close-link').hidden = !auth.isAdmin(me);
   try {
     const data = await auth.allVerdicts();
     state.all = data.verdicts ?? [];

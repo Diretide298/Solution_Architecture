@@ -34,16 +34,94 @@ ALLOWED_DOMAIN = os.environ.get("TICVAI_DOMAIN", "softlabsgroup.com").lower()
 SESSION_DAYS = 14
 INVITE_DAYS = 7
 
-# The three roles. A client is outside the company: it reads everything except
-# the decisions and writes nothing. Kept here rather than in main.py because two
-# places held the list and the second was always the one that got missed.
+# The roles. Kept here rather than in main.py because two places held the list
+# and the second was always the one that got missed.
 #
 # Named `client` and not `guest` because this codebase already has a guest: the
 # package's own word for a venue visitor, in `x-ticvai-audience` on 96
 # operations. Two meanings for one word in one repository is a bug waiting for
 # somebody to read the wrong one.
-ROLES = ("admin", "reviewer", "client")
-WRITERS = ("admin", "reviewer")
+#
+# **This is not a ladder, and the sets below are not ranges of one.** It was
+# three roles and it reads like a ladder — client, reviewer, admin — but a
+# project manager reads everything and administers nothing while an admin does
+# the opposite, and neither is "above" the other. So what a role may do is
+# stated as membership of a named set, and every check asks a predicate rather
+# than comparing to a string.
+#
+#   owner     the super admin. Everything an admin may do, plus the things that
+#             are deliberately one person's: granting roles, the IP allowlist,
+#             and the Build layer. Granted from the CLI only — see api/cli.py —
+#             so there is no dropdown anywhere that can produce one.
+#   admin     invites, resets, the registers, the bulk settles. As it was.
+#   pm        delivery oversight. Reads everything an admin can read and writes
+#             nothing: not a verdict, not a change request settlement.
+#   lead      a team lead. Sees all activity and every change request; is
+#             notified about, and acts on, the platforms in `scope`.
+#   dev       a developer. Their own work.
+#   reviewer  records verdicts on the package. As it was.
+#   client    outside the company: reads everything except the decisions, and
+#             writes nothing. As it was.
+ROLES = ("owner", "admin", "pm", "lead", "dev", "reviewer", "client")
+
+# Who may manage accounts, invites, resets, the exports and the bulk settles.
+#
+# **Every `role == "admin"` in this codebase meant this set**, back when the set
+# had one member. An owner that is not in here is a super admin who can see less
+# than an admin, which is the one way this change could go quietly wrong.
+ADMINS = ("owner", "admin")
+
+# Who may change the shape of the review itself: close an item, send one back,
+# say that work has happened. **Not who may record a verdict** — that is
+# `require_voice` in main.py and it is open to everybody including a client, on
+# the argument that a reader who finds a fault and cannot say so will say it
+# somewhere nobody is reading. Saying what you think is not the same act as
+# declaring it dealt with, and only the second one is in here.
+#
+# A pm is absent because declaring work done is the thing they are overseeing. A
+# client is absent because they are outside the company.
+WRITERS = ("owner", "admin", "lead", "dev", "reviewer")
+
+# Who may settle a change request — accept it, reject it, mark it done.
+#
+# Narrower than WRITERS by one: a dev may close a review item that names their
+# own work, and does not decide whether the package itself was wrong. That is
+# the lead's, and above.
+#
+# A pm is absent here for the reason they are absent from WRITERS, and it has to
+# be said in a set rather than left to the project role: everybody internal gets
+# `reviewer` on a project by default, so a check that asked only the project
+# role would hand a pm the decision it is their job to watch.
+SETTLERS = ("owner", "admin", "lead", "reviewer")
+
+# Who a platform can be handed to. A scope row for anybody else is meaningless
+# rather than harmful, and refusing it early is how it stays that way.
+SCOPED = ("lead", "dev")
+
+# The one role the API will not grant. It is CLI-only, so that becoming the
+# super admin takes a shell on the machine rather than a session on the site.
+CLI_ONLY = ("owner",)
+
+
+def is_owner(role: str) -> bool:
+    return role == "owner"
+
+
+def is_admin(role: str) -> bool:
+    """Whether this role administers. True for an owner, which is the point."""
+    return role in ADMINS
+
+
+def may_write(role: str) -> bool:
+    return role in WRITERS
+
+
+def may_be_scoped(role: str) -> bool:
+    return role in SCOPED
+
+
+def may_settle(role: str) -> bool:
+    return role in SETTLERS
 
 # A client invite is a link to an address we do not control, handed to somebody
 # outside the company. A shorter window is the cheapest thing that limits what

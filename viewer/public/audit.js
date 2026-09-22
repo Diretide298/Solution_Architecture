@@ -89,7 +89,7 @@ const code = (text) => el('code', 'au-code', text);
   const me = auth.account();
   $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
 
-  if (me?.role !== 'admin') {
+  if (!auth.isAdmin(me)) {
     // Said, not blanked. A page that renders an empty shell to a reviewer looks
     // broken; this one tells them what it is and that it is not for them.
     $('audit-body').replaceChildren(

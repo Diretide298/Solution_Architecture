@@ -54,6 +54,57 @@ def add_admin(args) -> None:
     print(f"admin {email} created. Sign in at the viewer and invite the rest.")
 
 
+def set_owner(args) -> None:
+    """Make an existing account the super admin, or stop it being one.
+
+    **The only way in or out of the role.** `/api/accounts/{id}/role` refuses
+    `owner` in both directions and an invite cannot carry it, so becoming the
+    super admin takes a shell on this machine — which is the whole point. A
+    stolen session, a mistake on the accounts page and a forwarded invite link
+    are all, between them, not enough.
+
+    It does not create the account. Whoever is getting this already signs in,
+    and pairing "make a person" with "give them everything" in one command is
+    how the wrong address ends up holding it.
+    """
+    db.init()
+    folded = db.fold(args.email)
+    row = db.one(
+        "SELECT id, email, name, role, active FROM account WHERE email_folded = ?",
+        (folded,))
+    if not row:
+        sys.exit(f"No account for {args.email}. They sign in first, then this.")
+
+    wanted = "owner" if not args.revoke else args.to
+    if wanted not in security.ROLES or wanted in security.CLI_ONLY and args.revoke:
+        sys.exit(f"--to is one of {', '.join(r for r in security.ROLES if r not in security.CLI_ONLY)}.")
+
+    if row["role"] == wanted:
+        print(f"{row['email']} is already {wanted}. Nothing to do.")
+        return
+    if not row["active"]:
+        sys.exit(f"{row['email']} is disabled. Enable the account first.")
+
+    # Leaving nobody able to administer is the one outcome worth refusing here,
+    # and this command is the only one that can cause it — the API's own guard
+    # cannot see a change made behind its back.
+    if args.revoke and not security.is_admin(wanted):
+        others = db.one(
+            "SELECT COUNT(*) AS n FROM account WHERE active = 1 AND id != ? "
+            f"AND role IN ({','.join('?' * len(security.ADMINS))})",
+            (row["id"], *security.ADMINS))["n"]
+        if not others:
+            sys.exit(
+                f"{row['email']} is the last account that can administer. "
+                f"Make another an admin first, or nobody can invite anyone.")
+
+    db.write("UPDATE account SET role = ? WHERE id = ?", (wanted, row["id"]))
+    # Their sessions are left alone on purpose: the role is read fresh on every
+    # request, so the change is live on their next click without signing them
+    # out of a page they are in the middle of.
+    print(f"{row['email']} ({row['name'] or 'no name'}) is now {wanted}.")
+
+
 def add_invite(args) -> None:
     db.init()
     try:
@@ -219,11 +270,23 @@ def main() -> None:
 
     p = subs.add_parser("invite", help="make an invite link for one address")
     p.add_argument("email")
-    p.add_argument("--role", default="reviewer", choices=list(security.ROLES),
+    # Every role but the super admin. An invite is a link handed to somebody,
+    # and a link that makes a super admin is a super admin left in whatever chat
+    # it was pasted into. The API refuses the same thing at its own door.
+    p.add_argument("--role", default="reviewer",
+                   choices=[r for r in security.ROLES if r not in security.CLI_ONLY],
                    help="client is outside the company: reads everything but the decisions, records nothing")
     p.add_argument("--days", type=int, default=security.INVITE_DAYS)
     p.add_argument("--base", default="http://localhost:4173")
     p.set_defaults(func=add_invite)
+
+    p = subs.add_parser("owner", help="make an existing account the super admin")
+    p.add_argument("email")
+    p.add_argument("--revoke", action="store_true",
+                   help="take it away instead, leaving them as --to")
+    p.add_argument("--to", default="admin",
+                   help="what they become when revoked (default: admin)")
+    p.set_defaults(func=set_owner)
 
     p = subs.add_parser("list", help="show accounts and open invites")
     p.set_defaults(func=show)

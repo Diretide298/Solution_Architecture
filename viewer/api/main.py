@@ -293,8 +293,29 @@ def require_account(account: Optional[dict] = Depends(current_account)) -> dict:
 
 
 def require_admin(account: dict = Depends(require_account)) -> dict:
-    if account["role"] != "admin":
+    """Anyone who administers: an admin, or the owner above them.
+
+    `security.is_admin` rather than `role == "admin"`, and that is the whole of
+    why the predicate exists. Every one of these checks was a string comparison
+    while "administers" had exactly one spelling; the moment it had two, each
+    one left over would have refused the super admin something an admin can do.
+    """
+    if not security.is_admin(account["role"]):
         raise HTTPException(403, "Only an admin can do that.")
+    return account
+
+
+def require_owner(account: dict = Depends(require_account)) -> dict:
+    """The super admin, and nobody else — not even an admin.
+
+    For the things that are deliberately one person's rather than the
+    administrators': granting roles, the IP allowlist, and the Build layer. The
+    role cannot be reached through this API at all (see set_role below), so what
+    this gates is reachable only by somebody who has had a shell on the machine.
+    """
+    if not security.is_owner(account["role"]):
+        raise HTTPException(
+            403, "Only the super admin can do that.")
     return account
 
 
@@ -349,13 +370,13 @@ def projects_for(account: dict) -> list:
     `account_project` is for \u2014 and reading `account.role` for a package would
     make the table decorative.
 
-    An admin gets every active project. They register projects and they issue
-    grants, so refusing them a package they added a minute ago would be a lockout
-    with the key in the same pocket. Everybody else needs a row, and a missing
-    row is no access: there is no default that has to be remembered and turned
-    off.
+    An administrator gets every active project. They register projects and they
+    issue grants, so refusing them a package they added a minute ago would be a
+    lockout with the key in the same pocket. Everybody else needs a row, and a
+    missing row is no access: there is no default that has to be remembered and
+    turned off.
     """
-    if account["role"] == "admin":
+    if security.is_admin(account["role"]):
         return [
             {"id": row["id"], "role": "reviewer"}
             for row in db.all_rows(
@@ -571,7 +592,13 @@ def set_active(account_id: int, active: bool, admin: dict = Depends(require_admi
         raise HTTPException(404, "No such account.")
     if account_id == admin["id"]:
         raise HTTPException(409, "You cannot disable your own account.")
-    if not active and row["role"] == "admin" and _live_admin_count() <= 1:
+    if security.is_owner(row["role"]):
+        # The owner is not disableable from here for the same reason the role is
+        # not grantable from here: the super admin is arranged on the machine, so
+        # that a session on the site is never enough to remove one.
+        raise HTTPException(
+            409, "The super admin cannot be disabled from here. Use the CLI.")
+    if not active and security.is_admin(row["role"]) and _live_admin_count() <= 1:
         raise HTTPException(409, "That is the last active admin. Make another first.")
 
     db.write("UPDATE account SET active = ? WHERE id = ?", (1 if active else 0, account_id))
@@ -584,22 +611,184 @@ def set_active(account_id: int, active: bool, admin: dict = Depends(require_admi
 
 @app.post("/api/accounts/{account_id}/role")
 def set_role(account_id: int, role: str, admin: dict = Depends(require_admin)):
+    """Move an account between roles. Every role but one.
+
+    `owner` is refused in both directions — it cannot be granted here and it
+    cannot be taken away here — and that is the point of it: becoming or
+    unmaking the super admin takes a shell on the machine, so no session, no
+    stolen cookie and no mistake on this page can produce one.
+    """
     if role not in security.ROLES:
         raise HTTPException(400, f"A role is one of {', '.join(security.ROLES)}.")
+    if role in security.CLI_ONLY:
+        raise HTTPException(
+            403, f"{role!r} is not granted from here. It is set on the machine, "
+                 f"with `python -m api.cli owner <address>`.")
     row = db.one("SELECT id, role FROM account WHERE id = ?", (account_id,))
     if not row:
         raise HTTPException(404, "No such account.")
-    if account_id == admin["id"] and role != "admin":
-        raise HTTPException(409, "You cannot take admin away from yourself.")
-    if row["role"] == "admin" and role != "admin" and _live_admin_count() <= 1:
+    if row["role"] in security.CLI_ONLY:
+        raise HTTPException(
+            403, "The super admin's role is not changed from here. Use the CLI.")
+    # "Your own administration" rather than "your own admin role": an owner
+    # demoting themselves to reviewer is the same lockout by another name, and
+    # the check that named one role would have missed it.
+    if account_id == admin["id"] and not security.is_admin(role):
+        raise HTTPException(409, "You cannot take administration away from yourself.")
+    if (security.is_admin(row["role"]) and not security.is_admin(role)
+            and _live_admin_count() <= 1):
         raise HTTPException(409, "That is the last admin.")
     db.write("UPDATE account SET role = ? WHERE id = ?", (role, account_id))
     return {"ok": True, "role": role}
 
 
 def _live_admin_count() -> int:
+    """How many accounts can still administer. **Owners included** — they can do
+    everything an admin can, so a store with one owner and one admin does not
+    become adminless when the admin is demoted, and saying it did would block a
+    change that is perfectly safe."""
+    holes = ",".join("?" * len(security.ADMINS))
     return db.one(
-        "SELECT COUNT(*) AS n FROM account WHERE role = 'admin' AND active = 1")["n"]
+        f"SELECT COUNT(*) AS n FROM account WHERE role IN ({holes}) AND active = 1",
+        security.ADMINS)["n"]
+
+
+# ── who owns which slice ─────────────────────────────────────────────
+#
+# "Super admin assigns team lead a platform", as routes. The table is `scope` in
+# db.py, and the reasoning about what it is for — and what it is deliberately
+# not for — is there rather than repeated here.
+#
+# **Reading is an administrator's; writing is the owner's alone.** An admin
+# needs to see who owns what to do their job; changing it is how work gets
+# routed and who gets paged, so it is arranged by one person on purpose.
+
+
+class ScopeIn(BaseModel):
+    project_id: str = ""
+    tag: str
+    # Absent or empty means the whole of that side. Kept tellable from a named
+    # platform all the way down to the column, because "owns frontend" and "owns
+    # P01" are different grants and a lead may hold both.
+    platform: str = Field(default="", max_length=20)
+
+
+# A platform code as the package writes it: P01, P04. **This service cannot
+# check that the platform exists** — the packages live on the node side, which
+# is the half that reads them, and teaching this one to open them would be a
+# second reader of the same files. So the shape is checked and the existence is
+# not, and a typo shows up as a scope that matches nothing rather than as a
+# refusal. The page offers a list, which is where the real answer comes from.
+_PLATFORM = re.compile(r"^P\d{2,3}$")
+
+
+def _scope_row(row) -> dict:
+    return {
+        "id": row["id"],
+        "project": row["project_id"],
+        "tag": row["tag"],
+        "platform": row["platform"],
+        # What it says out loud, built here so the page and any report agree.
+        "says": f"{TAG_LABEL.get(row['tag'], row['tag'])}"
+                + (f" · {row['platform']}" if row["platform"] else " · all platforms"),
+        "grantedAt": row["granted_at"],
+        "grantedBy": row["granted_by_name"] or row["granted_by_email"],
+    }
+
+
+_SCOPE_SELECT = (
+    "SELECT s.*, g.name AS granted_by_name, g.email AS granted_by_email "
+    "FROM scope s JOIN account g ON g.id = s.granted_by"
+)
+
+
+@app.get("/api/accounts/{account_id}/scopes")
+def list_scopes(account_id: int, admin: dict = Depends(require_admin)):
+    """Which slices this account owns. An administrator may read it."""
+    if not db.one("SELECT id FROM account WHERE id = ?", (account_id,)):
+        raise HTTPException(404, "No such account.")
+    rows = db.all_rows(
+        _SCOPE_SELECT + " WHERE s.account_id = ? ORDER BY s.project_id, s.tag, s.platform",
+        (account_id,))
+    return {"scopes": [_scope_row(r) for r in rows]}
+
+
+@app.get("/api/scopes")
+def every_scope(project_id: str = Query(default=""),
+                admin: dict = Depends(require_admin)):
+    """Every grant on a project, so "who owns P04" is one call rather than one
+    per account. An administrator may read it."""
+    project = _readable_project(admin, project_id)
+    rows = db.all_rows(
+        _SCOPE_SELECT + " WHERE s.project_id = ? ORDER BY s.tag, s.platform, s.id",
+        (project,))
+    out = []
+    for row in rows:
+        who = db.one("SELECT name, email, role FROM account WHERE id = ?",
+                     (row["account_id"],))
+        out.append({**_scope_row(row), "account": {
+            "id": row["account_id"],
+            "name": who["name"] if who else "",
+            "email": who["email"] if who else "",
+            "role": who["role"] if who else "",
+        }})
+    return {"project": project, "scopes": out}
+
+
+@app.post("/api/accounts/{account_id}/scopes")
+def grant_scope(account_id: int, body: ScopeIn, owner: dict = Depends(require_owner)):
+    """Hand somebody a slice of a project. The super admin, and nobody else.
+
+    Refused for a role that cannot hold one. A scope row on an admin is not
+    dangerous — nothing reads it for them, because they are whole rather than
+    scoped — but it is a second, narrower answer to a question already answered,
+    and the person who wrote it would reasonably expect it to mean something.
+    """
+    row = db.one("SELECT id, role, active FROM account WHERE id = ?", (account_id,))
+    if not row:
+        raise HTTPException(404, "No such account.")
+    if not security.may_be_scoped(row["role"]):
+        raise HTTPException(
+            409, f"{'An' if row['role'][0] in 'aeiou' else 'A'} {row['role']} "
+                 f"is not scoped to a platform. "
+                 f"{' or a '.join(security.SCOPED)} can hold one; an owner, an admin "
+                 f"and a pm already see the whole project.")
+
+    project = _readable_project(owner, body.project_id)
+    tag = body.tag.strip().lower()
+    if tag not in TAGS:
+        raise HTTPException(400, f"tag is one of {', '.join(TAGS)}.")
+    platform = body.platform.strip().upper()
+    if platform and not _PLATFORM.match(platform):
+        raise HTTPException(
+            400, f"A platform is written P01, P04 and so on, not {body.platform!r}. "
+                 f"Leave it out to mean the whole of {TAG_LABEL.get(tag, tag)}.")
+
+    # NULL rather than '' for "the whole side", because the unique index has to
+    # tell it from a named platform and SQLite compares '' as a value.
+    stored = platform or None
+    existing = db.one(
+        "SELECT id FROM scope WHERE account_id = ? AND project_id = ? AND tag = ? "
+        "AND platform IS ?", (account_id, project, tag, stored))
+    if existing:
+        raise HTTPException(409, "They already hold that one.")
+
+    db.write(
+        "INSERT INTO scope (account_id, project_id, tag, platform, granted_by, granted_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (account_id, project, tag, stored, owner["id"], security.stamp()))
+    row = db.one(_SCOPE_SELECT + " WHERE s.account_id = ? AND s.project_id = ? "
+                 "AND s.tag = ? AND s.platform IS ?",
+                 (account_id, project, tag, stored))
+    return {"ok": True, "scope": _scope_row(row)}
+
+
+@app.delete("/api/scopes/{scope_id}")
+def revoke_scope(scope_id: int, owner: dict = Depends(require_owner)):
+    """Take one back. The super admin, and nobody else."""
+    if not db.change("DELETE FROM scope WHERE id = ?", (scope_id,)):
+        raise HTTPException(404, "No such grant.")
+    return {"ok": True}
 
 
 @app.post("/api/auth/password")
@@ -639,6 +828,13 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     # is expected to be on another domain; a reviewer is not.
     if body.role not in security.ROLES:
         raise HTTPException(400, f"A role is one of {', '.join(security.ROLES)}.")
+    if body.role in security.CLI_ONLY:
+        # The same rule as set_role, stated again because this is the other door
+        # into a role. An invite is a link handed to somebody; a link that makes
+        # a super admin is a super admin left in whatever chat it was pasted in.
+        raise HTTPException(
+            403, f"An invite cannot make a {body.role}. That role is set on the "
+                 f"machine, with `python -m api.cli owner <address>`.")
 
     try:
         email = security.check_email(body.email, body.role)
@@ -1738,7 +1934,14 @@ def _change_project(account: dict, project_id: str) -> dict:
     role = next((p["role"] for p in projects_for(account) if p["id"] == project), "")
     if role == "client":
         raise HTTPException(403, "Change requests are for the delivery team.")
-    return {"project": project, "may_resolve": account["role"] == "admin" or role == "reviewer"}
+    # Both halves, and the account role is the half that was missing. Everybody
+    # internal is `reviewer` on a project by default, so the project role alone
+    # would let a pm — whose whole job is to watch this decision being made —
+    # make it. An administrator settles anything; everybody else needs the
+    # account role to permit it *and* a reviewer's standing on this project.
+    return {"project": project,
+            "may_resolve": security.is_admin(account["role"])
+                           or (security.may_settle(account["role"]) and role == "reviewer")}
 
 
 def _clean_change(body: ChangeIn) -> dict:
@@ -1947,7 +2150,8 @@ def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require
                  (scope["project"], _change_number(number)))
     if not row:
         raise HTTPException(404, f"No {number} in this project.")
-    if row["raised_by"] == account["id"] and account["role"] != "admin" and status in ("accepted", "rejected"):
+    if (row["raised_by"] == account["id"] and not security.is_admin(account["role"])
+            and status in ("accepted", "rejected")):
         raise HTTPException(403, "Somebody other than the person who raised it has to accept or reject it.")
     note = body.resolution.strip()
     if status == "rejected" and not note:

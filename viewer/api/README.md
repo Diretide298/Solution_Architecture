@@ -36,6 +36,50 @@ python -m api.cli invite asha@softlabsgroup.com --role reviewer
 python -m api.cli list
 ```
 
+## Roles
+
+Seven, on three axes that are deliberately not one.
+
+**What you may do anywhere** is `account.role`:
+
+| | |
+|---|---|
+| `owner` | the super admin. Everything an admin may, plus the Build layer, the IP allowlist and granting roles. |
+| `admin` | invites, resets, the registers, the bulk settles. |
+| `pm` | delivery oversight. Reads what an admin reads; settles nothing. |
+| `lead` | a team lead. Sees all activity and every change request; acts on the platforms they own. |
+| `dev` | a developer. Their own work. |
+| `reviewer` | records verdicts on the package. |
+| `client` | outside the company: reads everything but the decisions, records nothing. |
+
+**Which packages you may open** is `account_project`, and its role is only ever
+reviewer or client — the same person can be a reviewer on one package and a
+client on another.
+
+**Which slice of a package is yours** is `scope`: a side (frontend or backend)
+and a platform within it, or the whole side. Only a `lead` or a `dev` holds one;
+an owner, an admin and a pm are whole rather than scoped.
+
+Seeing and acting are separate. A team lead reads every change request on the
+project and is notified about, and may settle, the ones in their scope.
+
+Three predicates in `security.py` answer these rather than any string
+comparison — `is_admin`, `is_owner`, `may_settle` — and `isAdmin` / `isOwner` in
+`public/validation.js` answer the same question for drawing. **A `role == "admin"`
+left anywhere is a refusal of the super admin**, which is the one way this model
+goes quietly wrong.
+
+`owner` is granted from the machine and nowhere else:
+
+```
+python -m api.cli owner chinmay.parab@softlabsgroup.com
+python -m api.cli owner chinmay.parab@softlabsgroup.com --revoke --to admin
+```
+
+`/api/accounts/{id}/role` refuses it in both directions and an invite cannot
+carry it, so becoming or unmaking the super admin takes a shell here. The CLI
+refuses to leave nobody able to administer.
+
 ## Why invites rather than signup
 
 Restricting signup to `@softlabsgroup.com` only checks the address a stranger
@@ -132,6 +176,7 @@ into the temp file rather than the store. `adopt` below is what got it back.
 ```
 python -m api.cli list                          # accounts and open invites
 python -m api.cli admin you@softlabsgroup.com   # the first account, if there is none
+python -m api.cli owner you@softlabsgroup.com   # make an existing account the super admin
 python -m api.cli passwd you@softlabsgroup.com  # a new password, without the old one
 python -m api.cli adopt you@softlabsgroup.com --source other.db --yes
 python -m api.cli forget harness@softlabsgroup.com --yes
@@ -157,6 +202,19 @@ used to tidy away an inconvenient opinion.
 should not work: forged cookies, a reviewer minting invites, redeeming an
 invite twice, claiming an address the invite was not for, and telling an
 unknown account apart from a wrong password.
+
+`roles-check.mjs` — 43 assertions over the role model, most of them the super
+admin doing ordinary administrative things and being allowed to. That is the
+hazard: every guard here was `role == "admin"` while "administers" had one
+spelling, and each one left behind refuses the owner one route at a time. The
+rest is the other direction — what is the owner's alone, and the three doors the
+role must not be reachable through. It needs `TICVAI_DB` as well as `API`,
+because making an owner is deliberately not something the API can do:
+
+```bash
+TICVAI_DB=/tmp/roles.db python -m uvicorn api.main:app --port 8799
+TICVAI_DB=/tmp/roles.db API=http://localhost:8799 node api/roles-check.mjs
+```
 
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a

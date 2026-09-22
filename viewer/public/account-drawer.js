@@ -148,6 +148,7 @@ const DRAWER_HTML = `
         <nav class="drawer-group" aria-labelledby="drawer-explore">
           <h3 class="drawer-group-title" id="drawer-explore">Explore</h3>
           <a class="drawer-link" href="/domains.html">Domain lenses</a>
+          <a class="drawer-link" href="/avatar.html">The avatar, and what it can do</a>
         </nav>
 
         <nav class="drawer-group" id="account-admin" hidden aria-labelledby="drawer-admin">
@@ -232,7 +233,7 @@ function renderAccountPanel() {
     $('account-email').textContent = who.name ? who.email : '';
     $('account-role').textContent = who.role;
     $('account-role').dataset.role = who.role;
-    $('account-admin').hidden = who.role !== 'admin';
+    $('account-admin').hidden = !auth.isAdmin(who);
     // Never reopen already armed. This panel is opened and closed all day, and
     // a confirm left standing from a change of mind ten minutes ago would sit
     // one click from ending every session on the account.

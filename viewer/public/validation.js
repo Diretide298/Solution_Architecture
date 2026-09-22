@@ -269,6 +269,29 @@ let session = { signedIn: false, account: null, reachable: true };
 const listeners = new Set();
 
 export const account = () => (session.signedIn ? session.account : null);
+
+// ── what a role may do, asked once ───────────────────────────────────
+//
+// **Every page used to write `role !== 'admin'`, and there were eight of them.**
+// That was exact while "administers" had one spelling. The moment a super admin
+// existed above the admin, each one left as a string comparison would have
+// refused the owner something an admin can do — which is the opposite of what
+// the role is for, and it would have shown up eight times in eight different
+// bug reports.
+//
+// So the question is asked here. The service holds the same list in
+// `security.ADMINS` and enforces it; these are for drawing, and a control this
+// hides is still refused at the door if somebody finds it anyway.
+
+/** Who administers: an admin, and the owner above them. */
+export const isAdmin = (who) => who?.role === 'owner' || who?.role === 'admin';
+
+/** The super admin alone — not an admin. For the things that are deliberately
+ *  one person's: the Build layer, the IP allowlist, granting roles. */
+export const isOwner = (who) => who?.role === 'owner';
+
+/** Outside the company: reads the package, records nothing. */
+export const isClient = (who) => who?.role === 'client';
 export const reachable = () => session.reachable;
 export const onAuthChange = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 const announce = () => { for (const fn of listeners) fn(session); };

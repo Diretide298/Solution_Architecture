@@ -41,7 +41,7 @@ import { buildSearch } from './lib/search.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate } from './lib/session.mjs';
-import { clientMayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
+import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -747,11 +747,17 @@ const server = http.createServer(async (req, res) => {
     // Before anything is read from disk. The sign-in page and the two files it
     // needs are the only things a stranger is given; everything else — every
     // payload and every page — waits for a session.
+    // Two roles, kept apart. `accountRole` is what they are on this
+    // installation and never changes between packages; `role` is narrowed to
+    // this package's grant below and is the reviewer-or-client one. Collapsing
+    // them into one variable is how the super admin lost the Build layer.
+    let accountRole = null;
     let role = null;
     let grants = null;
     if (!NO_GATE) {
       const seen = await gate(req, res, url, AUTH_BASE);
       if (seen.answered) return;
+      accountRole = seen.role;
       role = seen.role;
       grants = seen.projects;
 
@@ -773,11 +779,16 @@ const server = http.createServer(async (req, res) => {
         role = grant.role ?? 'reviewer';
       }
 
-      // A client reads everything except the decisions, so the refusal is
-      // narrow and it happens here, at the door. The honest answer is 403 and
-      // not a hollowed-out payload: they either may read a thing or may not.
-      if (role === 'client' && route && !clientMayCall(route)) {
-        return send(res, 403, JSON.stringify({ error: 'not for a client account' }), MIME['.json']);
+      // A client reads everything except the decisions, and only the super
+      // admin reads the build. Both refusals happen here, at the door, and the
+      // honest answer is 403 rather than a hollowed-out payload: a reader
+      // either may read a thing or may not.
+      if (route && !mayCall(accountRole, role, route)) {
+        return send(res, 403, JSON.stringify({
+          // Phrased without an article, because "a admin" is what the
+          // obvious phrasing produces and this string is read by a person.
+          error: `${accountRole ?? role} accounts cannot read that`,
+        }), MIME['.json']);
       }
     }
 
@@ -824,7 +835,10 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, JSON.stringify({
         project: pkg.id,
         role: role ?? 'reviewer',
-        layers: layersFor(role ?? 'reviewer'),
+        // The account role too, because the tab strip has one entry that turns
+        // on it rather than on the project grant.
+        accountRole: accountRole ?? role ?? 'reviewer',
+        layers: layersFor(accountRole ?? 'reviewer', role ?? 'reviewer'),
         modes: modesFor(role ?? 'reviewer'),
       }), MIME['.json']);
     }

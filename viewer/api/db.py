@@ -207,6 +207,50 @@ CREATE TABLE IF NOT EXISTS account_project (
 );
 CREATE INDEX IF NOT EXISTS account_project_by_project ON account_project(project_id, role);
 
+-- Which slice of a project somebody owns.
+--
+-- **The third axis, and it is not the other two.** `account.role` says what a
+-- person may do anywhere; `account_project` says which packages they may open;
+-- this says which part of one is theirs. A team lead has one role and one
+-- project and four platforms, and none of the three facts implies another.
+--
+-- `tag` is frontend or backend — the same two values `verdict.tag` carries, and
+-- for the same stated reason: the question it answers is "whose queue is this
+-- in", and two values is what makes it answerable. `platform` is P01, P02 and
+-- so on, or NULL meaning the whole of that side.
+--
+-- The package already agrees that this is the unit: `lib/platforms.mjs` opens
+-- with "a platform is an application somebody signs into... it is the unit a
+-- delivery lead owns". This table is that sentence, stored.
+--
+-- **Owning a slice is about being notified and acting, never about reading.** A
+-- team lead sees every change request and all of the activity on the project;
+-- what `scope` decides is which ones reach their queue and which ones they may
+-- settle. Two separate questions that one table would happily confuse, so the
+-- comment is here rather than nowhere.
+--
+-- No row for an owner, an admin or a pm. They are not scoped, they are whole —
+-- and a scope row for one of them would be a second, narrower answer to a
+-- question that has already been answered.
+CREATE TABLE IF NOT EXISTS scope (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  tag        TEXT    NOT NULL,
+  -- NULL is "the whole of that side", which is a different statement from a
+  -- row per platform and has to stay tellable from it: platforms get added, and
+  -- a lead who owns the side should own the new one without anybody remembering.
+  platform   TEXT,
+  granted_by INTEGER NOT NULL REFERENCES account(id),
+  granted_at TEXT    NOT NULL
+);
+-- One row per person per slice. The NULL platform does not collide with a named
+-- one in SQLite's unique index -- NULLs are distinct -- which is correct here:
+-- "the whole side" and "P01" are different grants and a person may hold both.
+CREATE UNIQUE INDEX IF NOT EXISTS scope_once
+  ON scope(account_id, project_id, tag, platform);
+CREATE INDEX IF NOT EXISTS scope_by_slice ON scope(project_id, tag, platform);
+
 -- A change to an OpenProject work package that somebody has been shown and has
 -- not yet agreed to. Claude proposes; the person says yes; only then is it sent.
 --
