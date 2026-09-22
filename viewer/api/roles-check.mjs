@@ -223,6 +223,67 @@ const pmAdmin = await as('admin', 'GET', '/api/accounts');
 check('and a pm cannot read the roster, being no longer an admin', pmAdmin.status === 403,
   `${pmAdmin.status}`);
 
+// ── and a pm reads the delivery whole ────────────────────────────────
+//
+// The other half of the role, and the half that did not exist. Every one of
+// these paths asked require_admin, so "a pm reads everything an admin can read"
+// was true of nothing: what a pm actually had was a reviewer's view of one
+// package and no way to see how the delivery was going.
+//
+// The line is drawn between the **delivery** and the **installation**, and not
+// at the door. Both sides are asserted below, because opening the door would
+// have handed a pm every address and open invite in the store, and leaving it
+// shut would have kept the role decorative.
+
+const pmOverdue = await as('admin', 'GET', '/api/changes/overdue');
+check('a pm reads the list nobody has taken on', pmOverdue.status === 200,
+  `${pmOverdue.status} ${JSON.stringify(pmOverdue.data?.detail ?? '')}`);
+
+const pmActivity = await as('admin', 'GET', '/api/export/verdicts');
+check('and takes the review activity as a file', pmActivity.status === 200, `${pmActivity.status}`);
+const pmChanges = await as('admin', 'GET', '/api/export/changes');
+check('and the change requests', pmChanges.status === 200, `${pmChanges.status}`);
+
+// The installation, which is not theirs. Refused per dataset rather than by the
+// role at the door, so widening one of these later cannot quietly widen both.
+const pmRoster = await as('admin', 'GET', '/api/export/accounts');
+check('but not the account register', pmRoster.status === 403, `${pmRoster.status}`);
+const pmInvites = await as('admin', 'GET', '/api/export/invites');
+check('and not the invite log', pmInvites.status === 403, `${pmInvites.status}`);
+check('and is told which files are theirs rather than only refused',
+  /changes|verdicts/.test(String(pmRoster.data?.detail ?? '')),
+  String(pmRoster.data?.detail ?? ''));
+
+// The bell. Something has to be standing for this not to pass vacuously — the
+// mistake that let "a lead is told only about their own platforms" hold while
+// the lead was being told nothing at all — so one is raised first, with a kind
+// that routes to neither side of the house.
+const loose = await as('admin', 'POST', '/api/changes', {
+  target_kind: 'other', target_id: 'nothing-in-particular',
+  title: 'Raised so the bell has something true to say',
+  problem: 'Unrouted on purpose: `other` is deliberately absent from TAG_OF.',
+});
+check('a pm can raise a change request', loose.status === 200,
+  `${loose.status} ${JSON.stringify(loose.data?.detail ?? '')}`);
+
+const pmBell = await as('admin', 'GET', '/api/alerts');
+const pmKinds = (pmBell.data?.alerts ?? []).map((a) => a.kind);
+check('and is told when one has no side of the house',
+  pmKinds.includes('unrouted-change'), pmKinds.join(' ') || 'nothing');
+
+// The negative, against the same store in the same second: this widened one
+// named set by one role, and not everything that used to say admin.
+const leadBell = await as('harness.lead', 'GET', '/api/alerts');
+const leadKinds = (leadBell.data?.alerts ?? []).map((a) => a.kind);
+check('while a lead is still not told about the routing failures',
+  !leadKinds.includes('unrouted-change'), leadKinds.join(' ') || 'nothing');
+const leadOverdue = await as('harness.lead', 'GET', '/api/changes/overdue');
+check('and still cannot read the overdue list', leadOverdue.status === 403,
+  `${leadOverdue.status}`);
+const leadExport = await as('harness.lead', 'GET', '/api/export/verdicts');
+check('and still cannot take the register as a file', leadExport.status === 403,
+  `${leadExport.status}`);
+
 // ── the Build layer, which is the owner's ────────────────────────────
 //
 // Two halves and both matter: the tab strip is told what it may open, and the

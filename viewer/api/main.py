@@ -319,6 +319,25 @@ def require_owner(account: dict = Depends(require_account)) -> dict:
     return account
 
 
+def require_reader(account: dict = Depends(require_account)) -> dict:
+    """Anyone who reads the delivery whole: an administrator, or a pm.
+
+    **Distinct from require_admin, and the distinction is the pm's whole job.**
+    These are the paths that answer "how is the delivery going" rather than
+    "who has an account" — the overview of every ticket, the requests nobody has
+    taken on, the registers as a file. Asking require_admin on them meant a
+    project manager, whose role exists to watch exactly that, was refused all
+    four and left with a reviewer's view of one package.
+
+    It gates reading and nothing else. Every write on the same objects still
+    asks require_admin or narrower, so a pm sees the whole picture and changes
+    no part of it, which is the shape the role was described as having.
+    """
+    if not security.may_oversee(account["role"]):
+        raise HTTPException(403, "Only an admin or a project manager can do that.")
+    return account
+
+
 def require_writer(account: dict = Depends(require_account)) -> dict:
     """Anyone who may act on the team's behalf — admin or reviewer, never a
     client.
@@ -1689,9 +1708,15 @@ def _overview_payload(account: dict, scope: dict) -> dict:
 def delivery_overview(
     project_id: str = Query(default=""),
     refresh: int = Query(default=0),
-    account: dict = Depends(require_admin),
+    account: dict = Depends(require_reader),
 ):
-    """Every ticket in the project's OpenProject project, cached for five minutes."""
+    """Every ticket in the project's OpenProject project, cached for five minutes.
+
+    A reader's rather than an administrator's: this is the delivery, and a pm
+    who cannot see it is not overseeing anything. Note that it still runs on the
+    caller's own OpenProject token, so a pm sees what their own OpenProject
+    account can see — ADAM widens who may ask, and does not widen the answer.
+    """
     scope = _pms_scope(account, project_id)
     key = (scope["project"], scope["pmsId"])
     now = time.monotonic()
@@ -2228,7 +2253,7 @@ def unpick_change(number: str, body: FileIn, account: dict = Depends(require_acc
 
 @app.get("/api/changes/overdue")
 def overdue_changes(project_id: str = Query(default=""),
-                    admin: dict = Depends(require_admin)):
+                    reader: dict = Depends(require_reader)):
     """Every open request nobody has taken on within two days.
 
     **This is the escalation.** There is no notification to send and none
@@ -2236,11 +2261,13 @@ def overdue_changes(project_id: str = Query(default=""),
     request picked up a minute after it tipped over stops being on this list
     immediately, and a service that was down for a day does not miss anything.
 
-    An administrator's, which is where "the super admin must be told" lands —
-    an owner is an administrator, and an admin seeing it too is right rather
-    than a leak: they are the ones who can reassign a platform.
+    A reader's, which is where "the super admin must be told" lands — an owner
+    is an administrator, and an admin seeing it too is right rather than a leak:
+    they are the ones who can reassign a platform. A pm reads it and can
+    reassign nothing, which is oversight working as intended: the list is the
+    thing they are meant to be asking about in the stand-up.
     """
-    project = _readable_project(admin, project_id)
+    project = _readable_project(reader, project_id)
     rows = db.all_rows(
         _CHANGE_SELECT + " WHERE c.project_id = ? AND c.status = 'open' "
         "AND c.picked_at IS NULL AND c.raised_at < ? ORDER BY c.raised_at",
@@ -2633,13 +2660,15 @@ def alerts(account: dict = Depends(require_account)):
 
     Who is told what follows the role, and the two are different questions:
 
-      An **administrator** — which includes the owner — is told when a request
-      has waited more than the window with nobody taking it on, and when one has
-      no side of the house at all. Both are failures of routing rather than of
-      work, and they are fixed by reassigning a platform or saying whose a
-      request is, which is an administrator's to do. **This is where "the super
-      admin must be notified" lands.** An admin seeing it too is right rather
-      than a leak: they are the other people who can act on it.
+      An **administrator or a pm** — which includes the owner — is told when a
+      request has waited more than the window with nobody taking it on, and when
+      one has no side of the house at all. Both are failures of routing
+      rather than of work. **This is where "the super admin must be notified"
+      lands.** An admin seeing it too is right rather than a leak: they are the
+      other people who can reassign a platform. A pm is told and can reassign
+      nothing — being told is the point of the role, and a bell that rang only
+      for people who could fix it would never reach the person whose job is to
+      ask why it is still ringing.
 
       A **team lead** is told about their own platforms only — open requests in
       their slices that nobody has taken. They can read every request on the
@@ -2659,7 +2688,7 @@ def alerts(account: dict = Depends(require_account)):
     holes = ",".join("?" * len(projects))
     cutoff = _overdue_before()
 
-    if security.is_admin(account["role"]):
+    if security.may_oversee(account["role"]):
         late = db.all_rows(
             f"SELECT * FROM change_request WHERE project_id IN ({holes}) "
             f"AND status = 'open' AND picked_at IS NULL AND raised_at < ? "
@@ -3346,6 +3375,10 @@ EXPORTS = {
     "accounts": ("accounts", "a.created_at", _export_accounts),
 }
 
+# Of those, the ones about the installation rather than the delivery. A pm is
+# refused these two and allowed the rest; an administrator takes any of them.
+ADMIN_EXPORTS = {"invites", "accounts"}
+
 
 def _bound(value: Optional[str], which: str) -> Optional[date]:
     """One end of the range, or None for "no end that way"."""
@@ -3367,7 +3400,7 @@ def export_csv(
     # `frm` in a URL is a thing nobody guesses right twice.
     since: Optional[str] = Query(default=None, alias="from"),
     until: Optional[str] = Query(default=None, alias="to"),
-    admin: dict = Depends(require_admin),
+    reader: dict = Depends(require_reader),
 ) -> Response:
     """A date range of one register, as a CSV file.
 
@@ -3390,10 +3423,17 @@ def export_csv(
     tell "nothing happened that week" from "the export is broken", which are the
     two things they are actually choosing between.
 
-    Admin only. The account register and the invite log are plainly an admin's;
-    the review activity is signed-in reading on /api/verdicts and is admin here
-    anyway, because a whole-history file of who reviewed what and how fast is a
-    different object from the same rows on a screen behind a filter.
+    **Who may take which file is decided per dataset, not at the door.** The
+    review activity and the change requests are the delivery, and a pm reads the
+    delivery; the account register and the invite log are the installation, and
+    those stay an administrator's. One door for both would have meant either
+    refusing a pm the delivery or handing them every address and open invite in
+    the store, and neither is the role.
+
+    That the review activity is signed-in reading on /api/verdicts does not make
+    the file the same object: a whole-history CSV of who reviewed what and how
+    fast is a different thing from the same rows on a screen behind a filter,
+    which is why it is here at all rather than open to everybody.
     """
     if dataset not in EXPORTS:
         raise HTTPException(
@@ -3405,6 +3445,11 @@ def export_csv(
         raise HTTPException(
             400, f"The range runs backwards: {first.isoformat()} is after "
                  f"{last.isoformat()}. Swap them.")
+
+    if dataset in ADMIN_EXPORTS and not security.is_admin(reader["role"]):
+        raise HTTPException(
+            403, f"The {dataset} register is an administrator's. "
+                 f"The delivery ones are {', '.join(sorted(set(EXPORTS) - ADMIN_EXPORTS))}.")
 
     stem, column, build = EXPORTS[dataset]
     clause, args = "", []

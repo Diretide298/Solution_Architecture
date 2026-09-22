@@ -94,6 +94,22 @@ WRITERS = ("owner", "admin", "lead", "dev", "reviewer")
 # role would hand a pm the decision it is their job to watch.
 SETTLERS = ("owner", "admin", "lead", "reviewer")
 
+# Who may read the whole of the delivery rather than their own corner of it: the
+# overview of every ticket, the overdue list, the registers as files, and the
+# bell that says routing has failed.
+#
+# **This is the set a pm exists for, and it was the one the role did not have.**
+# The comment above says a pm "reads everything an admin can read"; every one of
+# those four paths asked `require_admin`, so what a pm actually was, in the
+# store, was a reviewer who could not settle — the oversight half of the role
+# was described and not wired. Separating "reads the whole thing" from
+# "administers it" is the only way to have one without the other.
+#
+# Deliberately not a superset of anything. A lead and a dev are absent because
+# their slice is the point of their role; a reviewer is absent because reading
+# every ticket in the project is not what reviewing the package is.
+READERS = ("owner", "admin", "pm")
+
 # Who a platform can be handed to. A scope row for anybody else is meaningless
 # rather than harmful, and refusing it early is how it stays that way.
 SCOPED = ("lead", "dev")
@@ -122,6 +138,11 @@ def may_be_scoped(role: str) -> bool:
 
 def may_settle(role: str) -> bool:
     return role in SETTLERS
+
+
+def may_oversee(role: str) -> bool:
+    """Whether this role reads the delivery whole. True for a pm, which is the point."""
+    return role in READERS
 
 # A client invite is a link to an address we do not control, handed to somebody
 # outside the company. A shorter window is the cheapest thing that limits what

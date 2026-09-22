@@ -290,6 +290,16 @@ export const isAdmin = (who) => who?.role === 'owner' || who?.role === 'admin';
  *  one person's: the Build layer, the IP allowlist, granting roles. */
 export const isOwner = (who) => who?.role === 'owner';
 
+/** Who reads the delivery whole: an administrator, or a project manager.
+ *
+ *  Not the same question as isAdmin, and the pages that confused the two were
+ *  the reason a pm could see no more of the delivery than a reviewer. This
+ *  draws the read-only oversight surfaces — the ticket overview, the requests
+ *  nobody has taken on. Anything that writes still asks isAdmin.
+ *
+ *  Mirrors `security.READERS`, which is what actually refuses the call. */
+export const isReader = (who) => isAdmin(who) || who?.role === 'pm';
+
 /** Outside the company: reads the package, records nothing. */
 export const isClient = (who) => who?.role === 'client';
 export const reachable = () => session.reachable;

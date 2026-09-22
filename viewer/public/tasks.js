@@ -510,7 +510,10 @@ function exportCsv() {
   if (!(await auth.requireSignIn())) return hideLoader();
   state.me = auth.account();
   $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${state.me.role}` : '';
-  if (!auth.isAdmin(state.me)) { denied(); return hideLoader(); }
+  // A reader's page, not an administrator's: it shows the delivery and changes
+  // nothing on it. A pm was refused here, which left the role with no view of
+  // the thing it exists to oversee.
+  if (!auth.isReader(state.me)) { denied(); return hideLoader(); }
 
   state.project = await auth.ensureProject();
   $('tasks').hidden = false;
