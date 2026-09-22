@@ -14,6 +14,14 @@ import { createServer } from 'node:http';
 const PORT = Number(process.env.PORT ?? 8798);
 const PROJECT = { id: 42, identifier: 'ticvai-test', name: 'TICVAI (harness)' };
 
+// Three, and only `isClosed` matters here: the testing gate counts a close
+// because OpenProject said the status closes, never because of its name.
+const STATUSES = [
+  { id: 1, name: 'New', isClosed: false },
+  { id: 7, name: 'In progress', isClosed: false },
+  { id: 12, name: 'Closed', isClosed: true },
+];
+
 const TYPES = [
   { id: 1, name: 'Task', isDefault: true, isMilestone: false },
   { id: 7, name: 'Bug', isDefault: false, isMilestone: false },
@@ -41,8 +49,35 @@ packages.set('991', {
   },
 });
 
+/** Any number is a work package in the harness project.
+ *
+ *  The gate test closes a few dozen tickets and cares about none of them
+ *  individually; writing them out would be a fixture nobody reads. 991 stays
+ *  explicit above because being in *another* project is the whole point of it.
+ */
+function ensure(id) {
+  if (packages.has(id)) return packages.get(id);
+  const made = {
+    id: Number(id), subject: `Harness ticket ${id}`, lockVersion: 1, percentageDone: 0,
+    createdAt: '2026-09-01T09:00:00Z', updatedAt: '2026-09-01T09:00:00Z',
+    _links: {
+      project: { href: `/api/v3/projects/${PROJECT.id}`, title: PROJECT.name },
+      type: { href: '/api/v3/types/1', title: 'Task' },
+      status: { href: '/api/v3/statuses/1', title: 'New' },
+    },
+  };
+  packages.set(id, made);
+  return made;
+}
+
 let nextId = 1200;
 const created = [];
+
+const read = (req) => new Promise((resolve) => {
+  const parts = [];
+  req.on('data', (c) => parts.push(c));
+  req.on('end', () => { try { resolve(JSON.parse(Buffer.concat(parts).toString())); } catch { resolve({}); } });
+});
 
 const json = (res, code, body) => {
   res.writeHead(code, { 'content-type': 'application/json' });
@@ -78,20 +113,40 @@ createServer(async (req, res) => {
     return json(res, 200, { total: TYPES.length, _embedded: { elements: TYPES } });
   }
 
+  if (path === '/api/v3/statuses') {
+    return json(res, 200, { total: STATUSES.length, _embedded: { elements: STATUSES } });
+  }
+
   const one = path.match(/^\/api\/v3\/work_packages\/(\d+)$/);
   if (one && req.method === 'GET') {
-    const found = packages.get(one[1]);
-    if (!found) return json(res, 404, { message: 'no such work package' });
+    return json(res, 200, ensure(one[1]));
+  }
+  if (one && req.method === 'PATCH') {
+    const found = ensure(one[1]);
+    const body = await read(req);
+    // OpenProject refuses a stale lockVersion with a 409, and the bridge relies
+    // on that being real — a stand-in that accepted anything would let the
+    // optimistic-locking path pass without ever being exercised.
+    if (body.lockVersion !== found.lockVersion) {
+      return json(res, 409, { message: 'Invalid lock version' });
+    }
+    if (body.percentageDone !== undefined) found.percentageDone = body.percentageDone;
+    const href = body?._links?.status?.href ?? '';
+    const status = STATUSES.find((st) => href.endsWith(`/${st.id}`));
+    if (status) found._links.status = { href, title: status.name };
+    found.lockVersion += 1;
+    found.updatedAt = new Date().toISOString();
     return json(res, 200, found);
+  }
+  const activity = path.match(/^\/api\/v3\/work_packages\/(\d+)\/activities$/);
+  if (activity && req.method === 'POST') {
+    await read(req);
+    return json(res, 201, { _type: 'Activity', id: nextId++ });
   }
 
   const make = path.match(/^\/api\/v3\/projects\/(\d+)\/work_packages$/);
   if (make && req.method === 'POST') {
-    const body = await new Promise((resolve) => {
-      const parts = [];
-      req.on('data', (c) => parts.push(c));
-      req.on('end', () => { try { resolve(JSON.parse(Buffer.concat(parts).toString())); } catch { resolve({}); } });
-    });
+    const body = await read(req);
     if (!String(body.subject ?? '').trim()) {
       return json(res, 422, { message: 'Subject cannot be blank' });
     }

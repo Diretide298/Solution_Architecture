@@ -278,6 +278,12 @@ CREATE TABLE IF NOT EXISTS wp_proposal (
   lock_version  INTEGER,
   status_id     INTEGER,
   status_name   TEXT    NOT NULL DEFAULT '',
+  -- Whether that status closes the work package, as OpenProject said when the
+  -- change was proposed. Recorded rather than re-asked at apply time, for the
+  -- same reason `lock_version` is: the answer is part of what the person was
+  -- shown. It is what the testing gate counts — a ticket is "closed" when
+  -- OpenProject's own isClosed says so, never by a name matched here.
+  status_closes INTEGER NOT NULL DEFAULT 0,
   percent_done  INTEGER,
   comment       TEXT    NOT NULL DEFAULT '',
   summary       TEXT    NOT NULL DEFAULT '',
@@ -543,6 +549,68 @@ CREATE TABLE IF NOT EXISTS ip_refusal (
   armed      INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS ip_refusal_recent ON ip_refusal(at DESC);
+
+-- ── tested in batches, and checked by somebody else ─────────────────
+--
+-- Every so many tickets a developer closes, they stop and test what they have
+-- built, and **a teammate confirms they did**. Two rules, and they are the same
+-- mechanism seen from either end:
+--
+--   The gate: closing the next ticket is refused once the open batch is full.
+--   Not a reminder — the service owns the write path that closes a ticket, so
+--   this is the one place the rule can be a rule rather than a convention.
+--
+--   The checker: the person who did the testing cannot be the person who says
+--   it was done. Otherwise the gate is a box somebody ticks on the way past,
+--   which is a slower way of not testing.
+--
+-- A batch is per person and per project. It opens on the first close after the
+-- last one passed, fills as tickets close, and is spent when a teammate passes
+-- it. Nothing here schedules or reminds: whether a batch is full is a count of
+-- its rows, asked at the moment somebody tries to close the next ticket.
+
+CREATE TABLE IF NOT EXISTS test_batch (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id   TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  -- Whose. The gate is personal: one developer closing ten tickets has to test,
+  -- and it is not held up by what anybody else has closed.
+  account_id   INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  opened_at    TEXT    NOT NULL,
+  -- The maker's half: what they tested and what it showed.
+  submitted_at TEXT,
+  notes        TEXT    NOT NULL DEFAULT '',
+  evidence     TEXT    NOT NULL DEFAULT '',
+  -- The checker's. `verdict` is '' until somebody has looked, then 'passed' or
+  -- 'failed'. A failed batch is not reopened for editing: it stays as it was
+  -- said, and the maker submits it again — so the record keeps the fact that it
+  -- was sent back, which is the part worth having.
+  checker_id   INTEGER REFERENCES account(id),
+  checked_at   TEXT,
+  verdict      TEXT    NOT NULL DEFAULT '',
+  checker_note TEXT    NOT NULL DEFAULT ''
+);
+-- "The open batch for this person on this project" is asked on every close, so
+-- it is an index rather than a scan. Open means no passing verdict yet.
+CREATE INDEX IF NOT EXISTS test_batch_open
+  ON test_batch(account_id, project_id, verdict, opened_at);
+
+CREATE TABLE IF NOT EXISTS test_batch_item (
+  batch_id     INTEGER NOT NULL REFERENCES test_batch(id) ON DELETE CASCADE,
+  external_key TEXT    NOT NULL,
+  subject      TEXT    NOT NULL DEFAULT '',
+  status_name  TEXT    NOT NULL DEFAULT '',
+  closed_at    TEXT    NOT NULL,
+  -- What the working tree was at, if the connector could tell us. Nothing here
+  -- is enforceable — ADAM cannot see anybody's repository, and a developer who
+  -- does not use the connector sends nothing — so this is evidence and a nudge,
+  -- never a gate. See the commit note in main.py.
+  head_sha     TEXT    NOT NULL DEFAULT '',
+  dirty        INTEGER NOT NULL DEFAULT 0,
+  -- One row per ticket per batch: closing the same ticket twice is one closure
+  -- as far as the gate is concerned, or reopening and reclosing would be a way
+  -- to fill a batch without doing any work.
+  PRIMARY KEY (batch_id, external_key)
+);
 """
 
 # The project every row that predates projects belongs to.
@@ -851,6 +919,12 @@ def init() -> None:
             cur.execute("ALTER TABLE change_request ADD COLUMN child_by INTEGER")
 
         have = {row[1] for row in cur.execute("PRAGMA table_info(wp_proposal)")}
+        if "status_closes" not in have:
+            # 0 is right for every row that already exists: whether a status
+            # closed was not asked when they were written, and a proposal older
+            # than this deploy has either been applied or lapsed.
+            cur.execute(
+                "ALTER TABLE wp_proposal ADD COLUMN status_closes INTEGER NOT NULL DEFAULT 0")
         if "kind" not in have:
             # 'change' is right for every row that already exists — creating was
             # not possible when they were written — so the default does the

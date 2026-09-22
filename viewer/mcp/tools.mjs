@@ -1,5 +1,5 @@
 /**
- * The nineteen tools, and where each gets its answer.
+ * The twenty-two tools, and where each gets its answer.
  *
  * **Nine read the package.** They are selectors over bulk payloads, not
  * proxies: there is no `/api/screen?id=BO-102`, so a layer is fetched whole,
@@ -38,6 +38,15 @@
  * files the draft after the person has said yes. Settling one is done by people
  * on ADAM's Changes page, never from here.
  *
+ * **Three are about testing, and one of them is not a tool at all.** Every ten
+ * tickets a person closes, the next close is refused until that batch has been
+ * tested and a *teammate* has said so. `adam_testing` reads where that stands,
+ * `adam_submit_batch` records what was run, `adam_check_batch` passes or fails
+ * somebody else's. **The gate itself is not here** — it is in the service, on
+ * the route that closes a ticket, which is the only place it can be a rule
+ * rather than an instruction an agent is free to reinterpret. These three help
+ * explain and clear it, and none of them can route around it.
+ *
  * Screens come from `journeys`, not from `uiux`. `/api/uiux` is about design
  * boards and frames — how much of the product is drawn — and holds no screen
  * records at all, so reading it for a screen returns nothing and presents as a
@@ -48,10 +57,46 @@
  * handed the candidates fixes it in the same turn instead of asking.
  */
 
+import { execFile } from 'node:child_process';
 import { appendFile, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { promisify } from 'node:util';
+
+const run = promisify(execFile);
 
 const MAX_HITS = 25;
+
+/**
+ * What the working tree is at, if this is a repository at all.
+ *
+ * **The one thing this process can see that the service cannot.** ADAM has no
+ * access to anybody's repository, so "you have closed five tickets without
+ * committing" is only answerable because the connector runs on the machine
+ * where the work happens and can ask git.
+ *
+ * Everything about it is best-effort. Not a repository, no git on the PATH, a
+ * repository with no commits yet — all of them answer with nothing, and the
+ * service simply says less. It must never be the reason an apply fails: the
+ * ticket is closed either way, and a tool that refused to record that because
+ * `git` was missing would be trading the important thing for the incidental one.
+ */
+async function treeState(dir) {
+  const cwd = path.resolve(String(dir || process.env.ADAM_WORKDIR || process.cwd()));
+  try {
+    const [head, status] = await Promise.all([
+      run('git', ['rev-parse', 'HEAD'], { cwd, timeout: 4000 }),
+      run('git', ['status', '--porcelain'], { cwd, timeout: 4000 }),
+    ]);
+    return {
+      head: head.stdout.trim(),
+      // Anything at all: staged, unstaged or untracked. The question is "is
+      // there work here that is not in a commit", and all three answer yes.
+      dirty: status.stdout.trim().length > 0,
+    };
+  } catch {
+    return { head: '', dirty: false };
+  }
+}
 
 /** Case- and separator-insensitive: BO-102, bo102 and bo_102 are one name. */
 const fold = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -1107,11 +1152,21 @@ export const TOOLS = [
     },
     async run(client, { key, proposal, dir }) {
       const number = String(key ?? '').replace(/^#/, '');
+      const tree = await treeState(dir);
       const answer = await client.service(
         `/api/work-packages/${encodeURIComponent(number)}/proposals/${encodeURIComponent(proposal ?? '')}/apply`,
-        { method: 'POST', body: { project_id: (await client.projectId()) ?? '' } },
+        { method: 'POST', body: { project_id: (await client.projectId()) ?? '', ...tree } },
       );
       if (answer.status === 428) return { ok: false, needsSetup: true, error: answer.data?.detail };
+      // A 409 on a closing change is usually the testing gate rather than a
+      // clash, and it is the one refusal an agent must not work around: it is
+      // handed back as prose for the person to read, with no retry and no
+      // alternative route suggested, because there is not one.
+      if (answer.status === 409) {
+        return { ok: false, changed: false, blocked: true, error: answer.data?.detail,
+                 next: 'Tell the person exactly this, and stop. Do not try another status '
+                     + 'or another ticket to get around it.' };
+      }
       if (!answer.ok) return { ok: false, changed: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
 
       // The local record, when this ticket was pulled here. A failure to write
@@ -1266,6 +1321,105 @@ export const TOOLS = [
           ? `Filed as ${change.id}. Offer to propose #${change.ticket} On hold with "Blocked by ${change.id}" as the comment.`
           : `Filed as ${change.id}. It shows on ADAM's Changes page for the team to settle.`,
       };
+    },
+  },
+
+  // ── testing, in batches, checked by somebody else ──────────────────
+  //
+  // The gate is in the service and not here — closing a ticket goes through
+  // /proposals/{code}/apply, and that is where it is refused. These three tools
+  // exist so the agent can *explain* the refusal and help with the part that
+  // clears it, never to route around it. `adam_check_batch` deliberately cannot
+  // be used on your own batch; the service refuses it and so does the text.
+
+  {
+    name: 'adam_testing',
+    description:
+      'Where the testing batch stands: how many tickets have been closed since the last '
+      + 'tested batch, whether it is waiting on a teammate, and any batches of other '
+      + 'people\'s that this person could check. Read this when a close is refused, and '
+      + 'when the person asks what is blocking them.',
+    inputSchema: { type: 'object', properties: {} },
+    async run(client) {
+      const answer = await client.service(`/api/test-batches?${await scoped(client)}`);
+      if (answer.status === 428) return { ok: false, needsSetup: true, error: answer.data?.detail };
+      if (!answer.ok) return { ok: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const { mine, waiting = [], every } = answer.data;
+      let next;
+      if (!mine) next = `Nothing closed yet in this batch. Testing is due every ${every}.`;
+      else if (mine.verdict === 'failed') {
+        next = `Sent back: ${mine.checkerNote || 'no reason given'}. Deal with it and `
+          + 'submit again with adam_submit_batch.';
+      } else if (mine.submittedAt) {
+        next = 'Submitted and waiting on a teammate. Closing is refused until they look — '
+          + 'that is deliberate, and not something to work around.';
+      } else if (mine.full) {
+        next = `${mine.closed} of ${every} closed. Run the tests, then record what you ran `
+          + 'with adam_submit_batch. Closing is refused until a teammate checks it.';
+      } else {
+        next = `${mine.closed} of ${every} closed. ${every - mine.closed} more before testing is due.`;
+      }
+      if (waiting.length) {
+        next += ` ${waiting.length} batch${waiting.length === 1 ? '' : 'es'} of somebody `
+          + 'else\'s is waiting to be checked — adam_check_batch.';
+      }
+      return { ok: true, ...answer.data, next };
+    },
+  },
+
+  {
+    name: 'adam_submit_batch',
+    description:
+      '**Records that this batch was tested.** Say what was actually run and what it showed — '
+      + 'a teammate has to be able to check it, so "tested" is not enough and the service '
+      + 'refuses it. Call this only after the tests have really been run and the person has '
+      + 'seen the result; never to clear a refusal. Submitting does not reopen closing: a '
+      + 'teammate still has to pass it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        batch: { type: 'number', description: 'Batch id, from adam_testing' },
+        notes: { type: 'string', description: 'What was run, and what it showed' },
+        evidence: { type: 'string', description: 'Output worth keeping: failures, counts, timings' },
+      },
+      required: ['batch', 'notes'],
+    },
+    async run(client, { batch, notes, evidence }) {
+      const answer = await client.service(`/api/test-batches/${encodeURIComponent(batch)}/submit`, {
+        method: 'POST', body: { notes: notes ?? '', evidence: evidence ?? '' },
+      });
+      if (!answer.ok) return { ok: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      return { ok: true, batch: answer.data.batch,
+               next: 'Recorded. Ask a teammate to check it — you cannot check your own, '
+                   + 'and closing stays refused until somebody does.' };
+    },
+  },
+
+  {
+    name: 'adam_check_batch',
+    description:
+      '**Passes or fails somebody else\'s tested batch.** Only after the person has read what '
+      + 'the other developer submitted and said what they think — this is them vouching for '
+      + 'a teammate\'s testing, not a formality. You cannot check your own batch and the '
+      + 'service refuses it. Failing needs a reason.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        batch: { type: 'number', description: 'Batch id, from adam_testing' },
+        verdict: { type: 'string', enum: ['passed', 'failed'] },
+        note: { type: 'string', description: 'Why. Required when failing.' },
+      },
+      required: ['batch', 'verdict'],
+    },
+    async run(client, { batch, verdict, note }) {
+      const answer = await client.service(`/api/test-batches/${encodeURIComponent(batch)}/check`, {
+        method: 'POST', body: { verdict: verdict ?? '', note: note ?? '' },
+      });
+      if (!answer.ok) return { ok: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      return { ok: true, batch: answer.data.batch,
+               next: verdict === 'passed'
+                 ? 'Passed. They can close tickets again.'
+                 : 'Sent back. They submit again once they have dealt with it.' };
     },
   },
 ];

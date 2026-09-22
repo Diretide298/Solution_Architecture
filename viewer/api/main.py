@@ -2161,6 +2161,146 @@ class ProposalIn(BaseModel):
 
 class ApplyIn(BaseModel):
     project_id: str = ""
+    # What the working tree was at, when the caller is the connector and could
+    # tell. Optional and unverifiable by design — see _commit_nudge. A browser
+    # sends neither and loses nothing but the nudge.
+    head: str = Field(default="", max_length=64)
+    dirty: bool = False
+
+
+# ── tested in batches, and checked by somebody else ──────────────────
+#
+# How many tickets one person may close before they stop and test what they
+# built. Ten, and it is a count rather than a schedule: a fortnight of closing
+# nothing needs no testing, and ten in an afternoon needs it that afternoon.
+#
+# **This is a rule and not a reminder, and it can be because of where it lives.**
+# A ticket is closed by sending OpenProject a closing status, and the only way
+# to send one through ADAM is `apply_change` below. Refusing there is refusing
+# the act itself — there is no connector setting, no flag and no "skip" that
+# reaches around it, because the gate is not in the connector.
+#
+# What it cannot reach is somebody closing a ticket in OpenProject's own web
+# interface, and nothing here pretends otherwise. That is a different door, and
+# it is one where the developer has stepped outside the tooling deliberately
+# rather than been let past by accident.
+TEST_EVERY = 10
+
+# And how many closes go by before the connector says something about
+# committing. See _commit_nudge: a sentence, never a refusal.
+COMMIT_EVERY = 5
+
+
+def _open_batch(account_id: int, project: str):
+    """This person's current batch on this project, or None.
+
+    Open means "not yet passed". A submitted batch waiting on a teammate is
+    still open, and a failed one is still open — being sent back does not
+    empty it, or a failing batch would be a way to clear the gate.
+    """
+    return db.one(
+        "SELECT * FROM test_batch WHERE account_id = ? AND project_id = ? "
+        "AND verdict != 'passed' ORDER BY id DESC LIMIT 1",
+        (account_id, project))
+
+
+def _batch_size(batch_id: int) -> int:
+    return db.one("SELECT COUNT(*) AS n FROM test_batch_item WHERE batch_id = ?",
+                  (batch_id,))["n"]
+
+
+def _gate(account: dict, project: str, number: str) -> None:
+    """Refuse the close if this person's batch is full and unpassed.
+
+    Asked before anything is sent, so a refusal leaves OpenProject untouched.
+    The message says the number, what to do, and — when it is waiting on
+    somebody — that it is not their own move to make.
+    """
+    batch = _open_batch(account["id"], project)
+    if not batch:
+        return
+    size = _batch_size(batch["id"])
+    if size < TEST_EVERY:
+        return
+    # Already closed in this very batch: closing it again is the same closure,
+    # and refusing a re-send of a change that is already counted would be
+    # refusing somebody for the thing they already did.
+    if db.one("SELECT 1 FROM test_batch_item WHERE batch_id = ? AND external_key = ?",
+              (batch["id"], number)):
+        return
+    if batch["verdict"] == "failed":
+        raise HTTPException(409, (
+            f"Your last batch of {size} was sent back: "
+            f"{batch['checker_note'] or 'no reason given'}. "
+            f"Deal with that and submit it again before closing anything else."))
+    if batch["submitted_at"]:
+        raise HTTPException(409, (
+            f"You have closed {size} tickets and submitted them for checking. "
+            f"A teammate has to look at that before you close another — it is "
+            f"deliberately not yours to wave through."))
+    raise HTTPException(409, (
+        f"You have closed {size} tickets since your last tested batch. "
+        f"Test them, then submit the batch with what you ran and what it showed. "
+        f"A teammate checks it, and closing carries on from there."))
+
+
+def _record_close(account: dict, project: str, number: str, updated: dict,
+                  head: str = "", dirty: bool = False) -> dict:
+    """Put this closure in the person's batch, opening one if there is none.
+
+    Returns what the caller should say about it, which is the only reason this
+    hands anything back: the batch is the developer's own business until it is
+    full, and then it is the thing standing in their way.
+    """
+    batch = _open_batch(account["id"], project)
+    if not batch:
+        db.write("INSERT INTO test_batch (project_id, account_id, opened_at) VALUES (?, ?, ?)",
+                 (project, account["id"], security.stamp()))
+        batch = _open_batch(account["id"], project)
+    db.write(
+        "INSERT OR IGNORE INTO test_batch_item (batch_id, external_key, subject, "
+        "status_name, closed_at, head_sha, dirty) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (batch["id"], number, (updated.get("subject") or "")[:200],
+         updated.get("status") or "", security.stamp(), head[:64], 1 if dirty else 0))
+    size = _batch_size(batch["id"])
+    return {
+        "id": batch["id"],
+        "closed": size,
+        "every": TEST_EVERY,
+        "remaining": max(0, TEST_EVERY - size),
+        "full": size >= TEST_EVERY,
+        "say": (f"That is {size} of {TEST_EVERY}. Test this batch and submit it — "
+                f"the next close is refused until a teammate has checked it."
+                if size >= TEST_EVERY else
+                f"{TEST_EVERY - size} more before this batch has to be tested."),
+    }
+
+
+def _commit_nudge(batch_id: int, head: str) -> Optional[str]:
+    """A sentence about committing, when the tree has not moved in a while.
+
+    **Item 13, and it is honest about what it is.** ADAM cannot see anybody's
+    repository and has no way to make a commit happen; a developer who does not
+    use the connector sends no `head` at all and this returns nothing. So this
+    is a prompt with an audit trail behind it, never a gate — saying otherwise
+    would be claiming an enforcement that a `--no-verify` equivalent does not
+    even need to exist to defeat.
+
+    What it *can* say is true and useful: these last several closes all happened
+    at the same commit, so the work behind them is sitting uncommitted.
+    """
+    if not head:
+        return None
+    recent = db.all_rows(
+        "SELECT head_sha FROM test_batch_item WHERE batch_id = ? AND head_sha != '' "
+        "ORDER BY closed_at DESC LIMIT ?", (batch_id, COMMIT_EVERY))
+    if len(recent) < COMMIT_EVERY:
+        return None
+    if any(row["head_sha"] != head for row in recent):
+        return None
+    return (f"The last {COMMIT_EVERY} tickets you closed were all at {head[:8]}. "
+            f"Commit what you have built before the next one — a batch that is "
+            f"one commit wide is a batch nobody can bisect.")
 
 
 def _pick_status(wanted: str, known: list) -> dict:
@@ -2227,17 +2367,34 @@ def propose_change(key: str, body: ProposalIn, account: dict = Depends(require_a
     now = security.now()
     db.write(
         "INSERT INTO wp_proposal (token_hash, account_id, project_id, external_key, "
-        "lock_version, status_id, status_name, percent_done, comment, summary, "
-        "created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "lock_version, status_id, status_name, status_closes, percent_done, comment, "
+        "summary, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (security.token_hash(proposal), account["id"], scope["project"], number,
          found.get("lockVersion"), status["id"] if status else None,
-         status["name"] if status else "", percent, note, "; ".join(changes),
+         status["name"] if status else "", 1 if (status and status["isClosed"]) else 0,
+         percent, note, "; ".join(changes),
          security.stamp(now), security.stamp(now + timedelta(minutes=PROPOSAL_MINUTES))),
     )
+    # Said at the proposal rather than only at the apply, because this is the
+    # point where somebody is being asked to agree to something. Being told the
+    # batch is full *after* saying yes, with nothing sent, reads as the tool
+    # having failed rather than as a rule.
+    standing = None
+    if status and status["isClosed"]:
+        batch = _open_batch(account["id"], scope["project"])
+        size = _batch_size(batch["id"]) if batch else 0
+        if size:
+            standing = {"closed": size, "every": TEST_EVERY,
+                        "remaining": max(0, TEST_EVERY - size),
+                        "full": size >= TEST_EVERY,
+                        "submitted": bool(batch["submitted_at"]),
+                        "verdict": batch["verdict"]}
     return {
         "proposal": proposal,
         "workPackage": {k: found[k] for k in ("key", "subject", "status", "percentDone", "url")},
         "changes": changes,
+        "closes": bool(status and status["isClosed"]),
+        **({"testing": standing} if standing else {}),
         "expiresInMinutes": PROPOSAL_MINUTES,
         "note": "Nothing has changed yet. Show these changes to the person and apply "
                 "only after they say yes.",
@@ -2261,6 +2418,11 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
     if scope["project"] != row["project_id"]:
         raise HTTPException(400, "That proposal was made for another ADAM project.")
     endpoint, token = _pms_for(account["id"])
+
+    # Before anything is sent, so a refusal leaves OpenProject untouched and the
+    # proposal unspent. This is the gate; everything else about it is bookkeeping.
+    if row["status_closes"]:
+        _gate(account, scope["project"], number)
 
     # Claimed before it is sent, so two quick presses cannot send it twice.
     if not db.change("UPDATE wp_proposal SET applied_at = ? WHERE id = ? AND applied_at IS NULL",
@@ -2301,11 +2463,188 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
         "WHERE external_system = 'openproject' AND external_key = ? AND project_id = ?",
         (updated.get("status", ""), security.stamp(), number, row["project_id"]),
     )
+
+    # Counted only once OpenProject has actually closed it. A close that was
+    # refused, or that half-landed, must not fill the batch — the gate is about
+    # work that is done, not about attempts.
+    batch = None
+    nudge = None
+    if row["status_closes"]:
+        batch = _record_close(account, row["project_id"], number, updated,
+                              head=(body.head or "").strip(), dirty=bool(body.dirty))
+        nudge = _commit_nudge(batch["id"], (body.head or "").strip())
+
     return {
         "ok": True,
         "applied": row["summary"],
         "workPackage": {k: updated.get(k) for k in ("key", "subject", "status", "percentDone", "url")},
+        **({"testing": batch} if batch else {}),
+        **({"commit": nudge} if nudge else {}),
     }
+
+
+# ── the batch, submitted and checked ─────────────────────────────────
+#
+# The gate above decides when somebody has to stop. These are the two acts that
+# let them start again, and they are deliberately two: the person who did the
+# testing says what they ran, and **somebody else** says it was enough.
+#
+# One person doing both is the failure this is against. A single "I tested it"
+# button is a box that gets ticked on the way past, which is a slower way of not
+# testing; a teammate who has to read what you ran is a small cost that makes
+# the claim mean something.
+
+
+class SubmitIn(BaseModel):
+    notes: str = Field(max_length=4000)
+    evidence: str = Field(default="", max_length=8000)
+
+
+class CheckIn(BaseModel):
+    verdict: str
+    note: str = Field(default="", max_length=2000)
+
+
+def _batch_row(row, items: bool = True) -> dict:
+    who = db.one("SELECT name, email FROM account WHERE id = ?", (row["account_id"],))
+    checker = db.one("SELECT name, email FROM account WHERE id = ?",
+                     (row["checker_id"],)) if row["checker_id"] else None
+    size = _batch_size(row["id"])
+    return {
+        "id": row["id"],
+        "project": row["project_id"],
+        "who": {"id": row["account_id"], "name": (who["name"] or who["email"]) if who else "?"},
+        "openedAt": row["opened_at"],
+        "closed": size,
+        "every": TEST_EVERY,
+        "full": size >= TEST_EVERY,
+        "submittedAt": row["submitted_at"],
+        "notes": row["notes"],
+        "evidence": row["evidence"],
+        "verdict": row["verdict"],
+        "checkedAt": row["checked_at"],
+        "checkedBy": (checker["name"] or checker["email"]) if checker else None,
+        "checkerNote": row["checker_note"],
+        "tickets": [
+            {"key": i["external_key"], "subject": i["subject"], "status": i["status_name"],
+             "closedAt": i["closed_at"], "head": i["head_sha"], "dirty": bool(i["dirty"])}
+            for i in db.all_rows(
+                "SELECT * FROM test_batch_item WHERE batch_id = ? ORDER BY closed_at",
+                (row["id"],))
+        ] if items else [],
+    }
+
+
+@app.get("/api/test-batches")
+def list_batches(project_id: str = Query(default=""),
+                 account: dict = Depends(require_account)):
+    """Your batch, your history, and the ones waiting on somebody to check them.
+
+    All three in one answer because they are one question asked from different
+    sides: what is standing in my way, what did I do about it last time, and
+    what is standing in a teammate's way that I could clear.
+    """
+    project = _readable_project(account, project_id)
+    mine = _open_batch(account["id"], project)
+
+    # Waiting on a checker, and not this person's own — the whole point is that
+    # they cannot be the one. Left out rather than shown and refused: a list of
+    # buttons that all say no is a worse explanation than not being on the list.
+    waiting = []
+    if security.may_write(account["role"]):
+        waiting = [
+            _batch_row(row, items=False) for row in db.all_rows(
+                "SELECT * FROM test_batch WHERE project_id = ? AND submitted_at IS NOT NULL "
+                "AND verdict = '' AND account_id != ? ORDER BY submitted_at",
+                (project, account["id"]))
+        ]
+
+    return {
+        "project": project,
+        "every": TEST_EVERY,
+        "mine": _batch_row(mine) if mine else None,
+        "waiting": waiting,
+        "past": [_batch_row(row, items=False) for row in db.all_rows(
+            "SELECT * FROM test_batch WHERE project_id = ? AND account_id = ? "
+            "AND verdict = 'passed' ORDER BY id DESC LIMIT 10",
+            (project, account["id"]))],
+    }
+
+
+@app.post("/api/test-batches/{batch_id}/submit")
+def submit_batch(batch_id: int, body: SubmitIn, account: dict = Depends(require_account)):
+    """Say what you tested. Yours alone, and it does not clear the gate.
+
+    Submitting is not passing. The gate stays shut until a teammate has looked,
+    which is the difference between a record and a check.
+    """
+    row = db.one("SELECT * FROM test_batch WHERE id = ?", (batch_id,))
+    if not row:
+        raise HTTPException(404, "No such batch.")
+    if row["account_id"] != account["id"]:
+        raise HTTPException(403, "That is somebody else's batch. You can check it, not submit it.")
+    if row["verdict"] == "passed":
+        raise HTTPException(409, "That batch has already passed.")
+    notes = body.notes.strip()
+    if len(notes) < 20:
+        # Not a length rule for its own sake: "tested" is what gets typed when
+        # the box is small and nobody will read it, and a checker handed that
+        # has nothing to check.
+        raise HTTPException(400, (
+            "Say what you actually ran and what it showed — a teammate has to be "
+            "able to check it, and 'tested' is not something anybody can check."))
+    if not _batch_size(row["id"]):
+        raise HTTPException(409, "There is nothing in that batch yet.")
+
+    # Resubmitting after a failure clears the old verdict, and the note with it.
+    # What is kept is that it happened: the check row is rewritten, and the log
+    # of it is the checker's note being replaced by the new one — which is the
+    # one thing this design does lose. Worth it for the simplicity of one row
+    # per batch, given a failed batch is meant to be dealt with and not argued
+    # over.
+    db.write(
+        "UPDATE test_batch SET submitted_at = ?, notes = ?, evidence = ?, "
+        "verdict = '', checker_id = NULL, checked_at = NULL, checker_note = '' WHERE id = ?",
+        (security.stamp(), notes, body.evidence.strip(), row["id"]))
+    return {"ok": True, "batch": _batch_row(db.one("SELECT * FROM test_batch WHERE id = ?", (row["id"],)))}
+
+
+@app.post("/api/test-batches/{batch_id}/check")
+def check_batch(batch_id: int, body: CheckIn, account: dict = Depends(require_account)):
+    """Somebody else says it was tested, or says it was not.
+
+    **Never the person who submitted it.** That refusal is the feature; without
+    it the maker–checker pair is one person agreeing with themselves, and an
+    admin override would be the same hole with a nicer name — so there is none.
+    """
+    row = db.one("SELECT * FROM test_batch WHERE id = ?", (batch_id,))
+    if not row:
+        raise HTTPException(404, "No such batch.")
+    if not row["submitted_at"]:
+        raise HTTPException(409, "That batch has not been submitted yet.")
+    if row["account_id"] == account["id"]:
+        raise HTTPException(403, (
+            "You cannot check your own testing. That is the whole of what this is "
+            "for — ask somebody else on the team to look."))
+    if not security.may_write(account["role"]):
+        raise HTTPException(403, "Only somebody who works on this project can check a batch.")
+    if not any(p["id"] == row["project_id"] for p in projects_for(account)):
+        raise HTTPException(403, "That batch is on a project you do not read.")
+    verdict = body.verdict.strip().lower()
+    if verdict not in ("passed", "failed"):
+        raise HTTPException(400, "A verdict is 'passed' or 'failed'.")
+    if verdict == "failed" and not body.note.strip():
+        # Sending work back without saying why is how it comes back the same —
+        # the same rule the review register has for sent_back_note.
+        raise HTTPException(400, "Say why you are sending it back.")
+
+    db.write("UPDATE test_batch SET verdict = ?, checker_id = ?, checked_at = ?, "
+             "checker_note = ? WHERE id = ?",
+             (verdict, account["id"], security.stamp(), body.note.strip(), row["id"]))
+    # Passing spends the batch. The next close opens a fresh one, which is why
+    # nothing here creates it: a batch with no closures in it would sit at zero
+    # and read as somebody being behind when they are not.
+    return {"ok": True, "batch": _batch_row(db.one("SELECT * FROM test_batch WHERE id = ?", (row["id"],)))}
 
 
 # ── change requests ──────────────────────────────────────────────────

@@ -153,10 +153,10 @@ console.log('\ntools');
 
 const list = await mcp.send('tools/list', {});
 const names = (list.result?.tools ?? []).map((t) => t.name).sort();
-const want = ['adam_apply', 'adam_board', 'adam_changes', 'adam_contract', 'adam_decisions',
-  'adam_draft_change', 'adam_file', 'adam_journey', 'adam_link', 'adam_links', 'adam_module',
-  'adam_propose', 'adam_pull', 'adam_raise_change', 'adam_screen', 'adam_search', 'adam_service',
-  'adam_table', 'adam_work'];
+const want = ['adam_apply', 'adam_board', 'adam_changes', 'adam_check_batch', 'adam_contract',
+  'adam_decisions', 'adam_draft_change', 'adam_file', 'adam_journey', 'adam_link', 'adam_links',
+  'adam_module', 'adam_propose', 'adam_pull', 'adam_raise_change', 'adam_screen', 'adam_search',
+  'adam_service', 'adam_submit_batch', 'adam_table', 'adam_testing', 'adam_work'];
 if (String(names) === String(want)) pass(`${want.length} tools listed: ${names.join(', ')}`);
 else fail(`${want.length} tools listed`, `got ${names.join(', ') || '(none)'}`);
 
