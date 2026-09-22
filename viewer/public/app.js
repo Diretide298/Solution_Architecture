@@ -2,6 +2,7 @@ import { Graph, colorForNode, colorForLink } from './graph.js';
 import { StructureTree, kindColor } from './structure.js';
 import { BoxDiagram } from './boxdiagram.js';
 import { StateMachine } from './statemachine.js';
+import { mountDiagramExport } from './diagram-export.js';
 import { Galaxy, galaxyLegend } from './galaxy.js';
 import { installTips, tip, tipFor } from './tips.js';
 import * as auth from './validation.js';
@@ -236,6 +237,45 @@ async function boot() {
     // a screen, table or board link followed while the app is already open
     else if (!state.nodesById.has(id)) openArtefactHash(id);
   });
+
+  // ── taking a diagram away ───────────────────────────────────────
+  //
+  // One button per canvas, added here rather than written into index.html six
+  // times: they are identical but for which view they save, and six copies of
+  // a control is five chances for one of them to drift.
+  //
+  // The name is a function wherever the view has a scope, so the file is named
+  // after what is on screen — `adam-data-model-orders-2026-09-23.png` rather
+  // than six files all called `adam-data-model`, which is what somebody ends up
+  // with after an afternoon of screenshots.
+  const bar = (id) => $(id)?.closest('.view')?.querySelector('.graph-toolbar');
+  // Two canvases share a toolbar wherever a view has both a laid-out diagram
+  // and a particle field — the contract graph is a force layout at some scopes
+  // and a galaxy at others, and so is the data model. Both are listed and the
+  // export picks whichever the layout has given a size to, so this stays right
+  // without a copy of the scope rules living in two places.
+  for (const [canvasId, targets, name] of [
+    ['graph-canvas', [['graph-canvas', graph], ['graph-galaxy', graphGalaxy]],
+      () => `contracts-${state.graphScope ?? 'graph'}`],
+    ['struct-canvas', [['struct-canvas', tree]],
+      () => `structure-${(state.structureFile ?? '').split('/').pop() ?? ''}`],
+    ['er-canvas', [['er-canvas', er]],
+      () => `schemas-${(state.erScope ?? '').split('/').pop() ?? ''}`],
+    ['er-services-canvas', [['er-services-canvas', serviceEr], ['services-galaxy', servicesGalaxy]],
+      'services'],
+    ['data-canvas', [['data-canvas', data], ['data-galaxy', dataGalaxy]],
+      () => `data-model-${$('data-scope')?.value || 'all'}`],
+    ['states-canvas', [['states-canvas', machine]],
+      () => `states-${state.machineId ?? ''}`],
+    ['events-canvas', [['events-canvas', eventGalaxy]], 'events'],
+    ['lineage-galaxy', [['lineage-galaxy', lineageGalaxy]], 'lineage'],
+    ['apps-galaxy', [['apps-galaxy', appsGalaxy]], 'apps'],
+  ]) {
+    mountDiagramExport({
+      toolbar: bar(canvasId), name,
+      targets: targets.map(([id, view]) => [$(id), view]),
+    });
+  }
 
   // handy for debugging layouts from the console
   window.__graph = graph;

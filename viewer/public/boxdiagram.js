@@ -447,7 +447,13 @@ export class BoxDiagram {
 
   // ── view ────────────────────────────────────────────────────────
   _resize() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = (window.devicePixelRatio || 1) * (this.exportScale || 1);
+    // `exportScale` multiplies it, and only while a PNG is being taken. The
+    // backing store grows; `this.width`/`this.height` stay in CSS pixels, so
+    // every coordinate, font size and hit test below is unchanged and the
+    // picture is the same picture with more pixels in it — which is the whole
+    // trick, and the reason an export is a redraw rather than an upscale of
+    // the bitmap that is already there. See diagram-export.js.
     const rect = this.canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     this.width = rect.width;

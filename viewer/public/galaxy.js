@@ -1154,7 +1154,9 @@ export class Galaxy {
 
     // devicePixelRatio capped at 2: at 3 the mote count starts costing real
     // milliseconds for no visible gain.
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Capped at 2 for the animation and multiplied for an export, which runs
+    // once and is allowed to cost milliseconds. See diagram-export.js.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2) * (this.exportScale || 1);
     const want = [Math.round(box.width * dpr), Math.round(box.height * dpr)];
     if (cv.width !== want[0] || cv.height !== want[1]) {
       cv.width = want[0];
