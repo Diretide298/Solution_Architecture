@@ -122,6 +122,32 @@ is itself the answer.
 Handing one back does not restart the clock: the escalation measures from
 `raised_at`, which does not move.
 
+### The bell: two kinds of thing
+
+`/api/mentions` and `/api/alerts` both feed the bell and behave nothing alike.
+
+A **mention** is an *event*. Somebody named you at a moment, it is stored, and
+marking it read is meaningful because the moment has passed.
+
+An **alert** is a *condition* — true of the store right now, computed on every
+read, never written down. That decides how it behaves:
+
+- nothing is sent, so nothing has to be retracted
+- nothing is scheduled, so nothing can be missed; a service down for a day comes
+  back knowing exactly what is overdue
+- **they cannot be marked read**, and that is the point rather than a gap. An
+  escalation you can dismiss is one that gets dismissed. The only way to clear
+  "nobody has taken this on" is for somebody to take it on.
+
+Who is told what follows the role, and being *told* is narrower than being able
+to *see*:
+
+| | |
+|---|---|
+| owner, admin | `overdue-change`, `unrouted-change` — failures of routing, fixed by reassigning a platform or saying whose a request is |
+| lead | `unpicked-in-scope` — their own platforms only. They can read every request; being told about all of them would make the bell useless in a week. |
+| everybody else | nothing. The changes page still shows all of it. |
+
 ## Why invites rather than signup
 
 Restricting signup to `@softlabsgroup.com` only checks the address a stranger
@@ -176,6 +202,10 @@ verdict on an artefact is simply its newest row.
 | `POST /api/changes/{n}/pick` | take a request on. A lead on that platform, or an admin. |
 | `POST /api/changes/{n}/unpick` | hand it back. Whoever holds it, or an admin. |
 | `GET /api/changes/overdue` | admin only. Open, untaken, older than two days. |
+| `GET /api/alerts` | conditions standing against you now. Derived; nothing stored. |
+| `GET /api/scopes` | admin only. Who owns which slice of a project. |
+| `POST /api/accounts/{id}/scopes` | **owner only.** Hand somebody a platform. |
+| `DELETE /api/scopes/{id}` | **owner only.** Take one back. |
 | `POST /api/changes/import/preview` | admin only. What an edited change request file would settle. Writes nothing. |
 | `POST /api/changes/import/apply` | admin only. Settles it, on the preview's checksum. |
 
@@ -261,13 +291,17 @@ TICVAI_DB=/tmp/roles.db python -m uvicorn api.main:app --port 8799
 TICVAI_DB=/tmp/roles.db API=http://localhost:8799 node api/roles-check.mjs
 ```
 
-`cr-routing-check.mjs` — 42 assertions over where a request belongs and who
+`cr-routing-check.mjs` — 56 assertions over where a request belongs and who
 takes it on. Most of them are a team lead being *shown* a request they may not
 touch and then refused when they touch it: a check that only tested the refusal
 would pass equally against a lead who could not see it at all, which is the
 wrong product. It needs `TICVAI_DB` as well as `API`, because making a request
 older than it is takes the store directly — the alternative is a check that
-sleeps for two days.
+sleeps for two days. The last section is the bell, and it files a fresh request
+on a lead's platform before asserting they are told about it — without that the
+assertion passes against a lead who is told nothing at all, which is the wrong
+product and the easiest way for a check like this to look green while the bell
+is broken.
 
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a

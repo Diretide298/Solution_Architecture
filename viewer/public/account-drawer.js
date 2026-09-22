@@ -142,7 +142,7 @@ const DRAWER_HTML = `
           <h3 class="drawer-group-title" id="drawer-reviews">Reviews</h3>
           <a class="drawer-link" href="/validation.html">What has been signed off</a>
           <a class="drawer-link" id="mentions-link" href="/reviews.html">Review activity</a>
-          <a class="drawer-link" href="/changes.html">Change requests</a>
+          <a class="drawer-link" id="changes-link" href="/changes.html">Change requests</a>
         </nav>
 
         <nav class="drawer-group" aria-labelledby="drawer-explore">
@@ -198,6 +198,10 @@ const DRAWER_HTML = `
 // sometimes — rather than dropping it on the page.
 let accountOpener = null;
 let mentionCache = [];
+// Conditions rather than events — see showMentionCount. Held beside the
+// mentions and never merged into them, because the two behave differently at
+// every point: one can be marked read and the other cannot.
+let alertCache = [];
 let onMentionTarget = null;
 
 export function openAccountPanel() {
@@ -268,12 +272,24 @@ async function showMentionCount() {
   // the control with it. Empty is a state a bell can say out loud. Gone is not.
   bell.hidden = false;
 
-  let payload = null;
-  try {
-    payload = await auth.myMentions();
-  } catch {
+  // Two fetches, two different kinds of thing. A mention is an *event* — it
+  // happened, it is stored, and marking it read is meaningful because the
+  // moment has passed. An alert is a *condition*: it is true of the store right
+  // now, it is computed on every read, and it cannot be marked read because the
+  // only way to clear it is to fix what it is about. Keeping them apart here is
+  // what stops the panel offering "mark all read" over an overdue request.
+  //
+  // allSettled, because the bell must draw whichever half answers: a reader
+  // with three unread mentions should not lose them to an alerts query that
+  // failed.
+  const [mentions, standing] = await Promise.allSettled([
+    auth.myMentions(), auth.myAlerts(),
+  ]);
+  if (mentions.status === 'rejected' && standing.status === 'rejected') {
     return;                       // the viewer is not about this
   }
+  const payload = mentions.status === 'fulfilled' ? mentions.value : {};
+  alertCache = (standing.status === 'fulfilled' ? standing.value.alerts : null) ?? [];
   mentionCache = payload.mentions ?? [];
   const unseen = payload.unseen ?? 0;
 
@@ -281,20 +297,37 @@ async function showMentionCount() {
   // keeps the history: "what did that say again" is a question people ask an
   // hour after reading something, and a control that empties itself on the
   // last read takes the answer with it.
-  bell.classList.toggle('has-mentions', unseen > 0);
-  bell.title = unseen
-    ? `${unseen} note${unseen === 1 ? '' : 's'} named you`
-    : mentionCache.length
-      ? 'Where you were named'
-      : 'No notifications';
+  // An alert counts as unread for as long as it is true. There is no seen
+  // state to set and setting one would be a way of turning an escalation off,
+  // which is the one thing it must not have.
+  const standingCount = alertCache.length;
+  const waiting = unseen + standingCount;
+  const loud = alertCache.some((a) => a.severity === 'high');
+
+  bell.classList.toggle('has-mentions', waiting > 0);
+  bell.classList.toggle('has-alert', loud);
+  bell.title = standingCount
+    ? alertCache.map((a) => a.title).join(' · ')
+    : unseen
+      ? `${unseen} note${unseen === 1 ? '' : 's'} named you`
+      : mentionCache.length
+        ? 'Where you were named'
+        : 'No notifications';
 
   const count = $('bell-count');
-  count.textContent = unseen > 9 ? '9+' : String(unseen);
-  count.hidden = unseen === 0;
+  count.textContent = waiting > 9 ? '9+' : String(waiting);
+  count.hidden = waiting === 0;
 
   if (link) {
     link.textContent = unseen ? `Review activity - ${unseen} named you` : 'Review activity';
     link.classList.toggle('auth-button-loud', unseen > 0);
+  }
+  const changes = $('changes-link');
+  if (changes) {
+    changes.textContent = standingCount
+      ? `Change requests - ${standingCount} waiting`
+      : 'Change requests';
+    changes.classList.toggle('auth-button-loud', loud);
   }
 }
 
@@ -316,15 +349,54 @@ function renderBellPanel() {
   const list = $('bell-list');
   list.innerHTML = '';
   const unseen = mentionCache.filter((m) => !m.seen_at).length;
+
+  // Standing first, and above the rule. A mention is something that happened;
+  // an alert is something that is still happening, and the thing still
+  // happening is the one to read first.
+  for (const alert of alertCache) {
+    const row = el('div', `bell-alert bell-alert-${alert.severity}`);
+    const head = el('div', 'bell-row-head');
+    head.append(el('span', 'bell-alert-title', alert.title));
+    row.append(head);
+    row.append(el('p', 'bell-alert-detail', alert.detail));
+    if (alert.items.length) {
+      const named = el('div', 'bell-alert-items');
+      for (const item of alert.items) {
+        const chip = el('button', 'bell-alert-chip',
+          `${item.id}${item.days ? ` · ${item.days}d` : ''}`);
+        chip.type = 'button';
+        chip.title = item.slice ? `${item.title} — ${item.slice}` : item.title;
+        chip.onclick = () => { closeBellPanel(); location.href = alert.href; };
+        named.append(chip);
+      }
+      if (alert.count > alert.items.length) {
+        named.append(el('span', 'bell-alert-more', `and ${alert.count - alert.items.length} more`));
+      }
+      row.append(named);
+    }
+    // No "mark read". There is nothing to mark: the alert is a reading of the
+    // store and it goes when the store changes, which is the only way it
+    // should go.
+    const go = el('button', 'chip bell-alert-go', 'Open the change requests');
+    go.type = 'button';
+    go.onclick = () => { closeBellPanel(); location.href = alert.href; };
+    row.append(go);
+    list.append(row);
+  }
+
   $('bell-note').textContent = mentionCache.length
     ? (unseen ? `${unseen} unread of ${mentionCache.length}` : `${mentionCache.length}, all read`)
-    : 'No notifications';
+    : alertCache.length ? 'Nobody has named you' : 'No notifications';
   $('bell-seen').hidden = unseen === 0;
 
   // Said in the list rather than only in the line above it, because the empty
   // list is the thing the eye lands on and a blank box is ambiguous between
   // "nothing here" and "did not load".
   if (!mentionCache.length) {
+    // Only when there is genuinely nothing. With an alert drawn above, "nobody
+    // has named you yet" is true and "no notifications" is not, so the sentence
+    // stays and the framing changes.
+    if (alertCache.length) return;
     const empty = el('p', 'bell-empty');
     empty.append('Nobody has named you yet. When someone writes ');
     empty.append(el('span', 'bell-empty-handle', `@${auth.account()?.email ?? 'your address'}`));

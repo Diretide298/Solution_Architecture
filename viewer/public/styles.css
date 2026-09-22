@@ -3143,3 +3143,32 @@ html[data-entry] .graph-legend {
   font-size: 12px;
   color: var(--text-faint);
 }
+
+
+/* ── standing alerts in the bell ──────────────────────────────────────
+   Not mentions. A mention is something that happened and can be marked read;
+   these are conditions that are true right now and go only when the thing they
+   are about is dealt with. Drawn above the rule, and never with a dismiss. */
+.bell-alert {
+  display: grid; gap: 8px; padding: 12px 14px; margin-bottom: 10px;
+  border-radius: 8px; border: 1px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
+}
+.bell-alert-high {
+  border-color: var(--error);
+  background: color-mix(in srgb, var(--error) 8%, transparent);
+}
+.bell-alert-title { font-weight: 650; color: var(--text); }
+.bell-alert-detail { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-dim); }
+.bell-alert-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.bell-alert-chip {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.bell-alert-chip:hover { border-color: var(--accent); color: var(--accent); }
+.bell-alert-more { font-size: 11px; color: var(--text-faint); align-self: center; }
+.bell-alert-go { justify-self: start; }
+/* The bell itself, when one of them is high. The unread dot is already there
+   for mentions; this changes its colour rather than adding a second mark. */
+.bell-toggle.has-alert .bell-count { background: var(--error); }

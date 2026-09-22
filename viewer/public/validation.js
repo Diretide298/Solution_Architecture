@@ -437,6 +437,22 @@ export const resolveChange = (projectId, id, status, resolution = '', ref = '') 
 // Taking a change request on, and handing it back. Separate from resolving it
 // on purpose: picking says whose it is and settling says what was decided, and
 // a request sits picked and unsettled for as long as the work takes.
+/** Conditions standing against you right now — an overdue change request,
+ *  one nobody has routed, work waiting on your platforms. Derived on every
+ *  read, so there is nothing to mark as read and nothing to retract. */
+export const myAlerts = () => call('/api/alerts');
+
+// Who owns which slice of a project. Reading is an administrator's; granting
+// and taking back are the owner's alone, and the service enforces that whatever
+// the page draws.
+export const listScopes = (projectId) =>
+  call(`/api/scopes?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+export const grantScope = (accountId, projectId, tag, platform = '') =>
+  call(`/api/accounts/${accountId}/scopes`,
+    { method: 'POST', body: { project_id: projectId ?? '', tag, platform } });
+export const revokeScope = (scopeId) =>
+  call(`/api/scopes/${scopeId}`, { method: 'DELETE' });
+
 export const pickChange = (projectId, id) =>
   call(`/api/changes/${encodeURIComponent(id)}/pick`,
     { method: 'POST', body: { project_id: projectId ?? '' } });

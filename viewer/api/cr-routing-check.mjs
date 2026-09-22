@@ -249,5 +249,72 @@ const pickSettled = await as('boss', 'POST', `/api/changes/${p01.id}/pick`, {});
 check('a settled request cannot be taken on', pickSettled.status === 409,
   pickSettled.data?.detail ?? `${pickSettled.status}`);
 
+// ── the bell ─────────────────────────────────────────────────────────
+//
+// Alerts are conditions, not events: computed on every read, never stored, and
+// with no seen state — because the only way to clear "nobody has taken this on"
+// should be for somebody to take it on. So the assertions below are about what
+// each role is *told*, and about an alert going away on its own when the thing
+// it is about is dealt with.
+
+const bossBell = await as('boss', 'GET', '/api/alerts');
+const kinds = (b) => (b.data?.alerts ?? []).map((a) => a.kind).sort();
+check('the super admin is told about requests nobody has taken',
+  kinds(bossBell).includes('overdue-change'), kinds(bossBell).join(' '));
+check('and about the ones with no side of the house',
+  kinds(bossBell).includes('unrouted-change'), kinds(bossBell).join(' '));
+
+const overdueAlert = (bossBell.data?.alerts ?? []).find((a) => a.kind === 'overdue-change');
+check('the overdue one is loud', overdueAlert?.severity === 'high', overdueAlert?.severity);
+check('it names which, not only how many',
+  (overdueAlert?.items ?? []).length > 0
+  && (overdueAlert?.items ?? []).every((i) => /^CR-\d{3}$/.test(i.id)),
+  (overdueAlert?.items ?? []).map((i) => i.id).join(' '));
+check('and nothing in it can be marked read',
+  (bossBell.data?.alerts ?? []).every((a) => !('seen_at' in a) && !('seen' in a)));
+
+// A fresh one on their platform first. Without it the assertion below passes
+// against a lead who is told nothing at all, which is the wrong product and the
+// easiest way for this check to look green while the bell is broken.
+const forThem = await file('boss', { platform: 'P01', title: 'The storefront filter forgets itself' });
+check('a request is filed on the front lead’s platform',
+  forThem.data?.change?.slice === 'Frontend · P01', forThem.data?.change?.slice ?? `${forThem.status}`);
+
+const frontBell = await as('harness.frontlead', 'GET', '/api/alerts');
+check('a lead is told about work waiting on their platforms',
+  kinds(frontBell).includes('unpicked-in-scope'), kinds(frontBell).join(' ') || 'nothing');
+check('and only about those',
+  kinds(frontBell).every((k) => k === 'unpicked-in-scope'),
+  kinds(frontBell).join(' ') || 'nothing');
+check('the one it names is theirs',
+  (frontBell.data?.alerts?.[0]?.items ?? []).some((i) => i.id === forThem.data.change.id),
+  (frontBell.data?.alerts?.[0]?.items ?? []).map((i) => i.id).join(' '));
+
+// And the other lead is not told about it, which is the half that makes the
+// first half mean something.
+const otherBell = await as('harness.backlead', 'GET', '/api/alerts');
+check('the lead who does not own that platform is not told',
+  !(otherBell.data?.alerts ?? []).flatMap((a) => a.items).some((i) => i.id === forThem.data.change.id),
+  (otherBell.data?.alerts ?? []).flatMap((a) => a.items).map((i) => i.id).join(' ') || 'nothing');
+check('and never about the routing failures, which are not theirs to fix',
+  !kinds(frontBell).includes('unrouted-change'), kinds(frontBell).join(' '));
+
+const revBell = await as('harness.rev', 'GET', '/api/alerts');
+check('a reviewer is told nothing here, having no platform to be told about',
+  (revBell.data?.alerts ?? []).length === 0, kinds(revBell).join(' '));
+
+// The whole argument for deriving them: dealing with the thing clears the
+// alert, with nothing to retract and nothing left behind.
+const wasOverdue = overdueAlert?.count ?? 0;
+for (const item of overdueAlert?.items ?? []) {
+  await as('boss', 'POST', `/api/changes/${item.id}/pick`, {});
+}
+const afterBell = await as('boss', 'GET', '/api/alerts');
+check('taking them on clears the alert, with nothing to retract',
+  !kinds(afterBell).includes('overdue-change'),
+  `${wasOverdue} were overdue; now ${kinds(afterBell).join(' ') || 'nothing'}`);
+check('and the unrouted one stays, because that is still true',
+  kinds(afterBell).includes('unrouted-change'), kinds(afterBell).join(' '));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

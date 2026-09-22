@@ -112,6 +112,7 @@
           <a href="#people">Accounts</a>
           <div class="set-nav-group">Delivery</div>
           <a href="#projects">Projects</a>
+          <a href="#platforms">Platforms</a>
           <div class="set-nav-group">The register</div>
           <a href="#export">Download a range</a>
           <a href="#close-from-sheet">Close from a spreadsheet</a>
@@ -235,6 +236,31 @@
       </section>
 
       <!-- ── a date range, as a file ──────────────────────────────── -->
+      <!-- ── who owns which platform ───────────────────────────────── -->
+      <section class="admin-panel set-section" id="platforms">
+        <h2 class="admin-heading">Platforms</h2>
+        <p class="auth-note">
+          Which slice of the delivery each team lead owns: a side of the house,
+          and a platform within it — or <b>all platforms</b> on that side, which
+          is the grant that covers one added next month without anybody coming
+          back here.
+        </p>
+        <!-- The thing people get wrong about a permission control, said before
+             they use it rather than after. -->
+        <p class="auth-note auth-fine">
+          <b>This is not about what they can see.</b> A team lead reads every
+          change request and all of the activity on the project either way — a
+          lead who cannot see what is coming cannot prepare for it. What a
+          platform decides is narrower: which requests reach their bell, which
+          they may take on, and which they may settle.
+        </p>
+        <p class="auth-note auth-fine" id="platforms-readonly" hidden>
+          Only the super admin hands these out. You can see who holds what.
+        </p>
+        <div id="platforms-list" class="platform-list"></div>
+        <p class="auth-error" id="platforms-error" hidden></p>
+      </section>
+
       <section class="admin-panel set-section" id="export">
         <h2 class="admin-heading">Download a date range</h2>
         <p class="auth-note">
@@ -398,6 +424,10 @@
       // one module, because the machinery is the same and only the register and
       // the words differ.
       import { mountDecisions, mountChangeImport } from '/admin-decisions.js';
+      // Who owns which platform. Its own module for the same reason as the two
+      // above: it reads the package for the platform list, which nothing else
+      // on this page does.
+      import { mountPlatforms } from '/admin-platforms.js';
 
       const $ = (id) => document.getElementById(id);
       const el = (tag, cls, text) => {
@@ -450,6 +480,10 @@
         // rather than closed and have one more bucket, which is a difference in
         // the spec it is handed rather than in anything here.
         mountChangeImport();
+        // Reads on its own, so it is not awaited with the lists below — and a
+        // failure in it leaves the rest of the page standing.
+        $('platforms-readonly').hidden = isOwner(me);
+        mountPlatforms();
         // Both lists, because the page is not drawn until it has both — and
         // allSettled rather than all, so one failing still shows the page it
         // failed on rather than leaving the curtain up over it.

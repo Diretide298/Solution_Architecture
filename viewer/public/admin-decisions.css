@@ -93,3 +93,29 @@
   .decide-line { grid-template-columns: auto auto; }
   .decide-what, .decide-tail { grid-column: 1 / -1; }
 }
+
+
+/* ── who owns which platform ──────────────────────────────────────────
+   One row per person who can hold one, their grants as chips, and the control
+   to give another. An owner sees the controls; an admin sees the chips. */
+.platform-list { display: grid; gap: 8px; }
+.platform-row {
+  display: grid; gap: 10px; align-items: center;
+  grid-template-columns: minmax(120px, 1fr) minmax(180px, 1.4fr) minmax(200px, 2fr) auto auto auto;
+}
+.platform-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.platform-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; padding: 2px 4px 2px 9px;
+  border-radius: 999px; border: 1px solid var(--accent); color: var(--accent);
+}
+.platform-drop {
+  border: 0; background: none; cursor: pointer; padding: 0 4px;
+  color: inherit; font-size: 13px; line-height: 1; opacity: .65;
+}
+.platform-drop:hover { opacity: 1; color: var(--error); }
+.platform-none { font-size: 12px; color: var(--text-faint); font-style: italic; }
+
+@media (max-width: 720px) {
+  .platform-row { grid-template-columns: 1fr; }
+}

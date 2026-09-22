@@ -2574,6 +2574,153 @@ def mentioned_in(note: str) -> list:
     return hit
 
 
+# ── what is standing against you right now ───────────────────────────
+#
+# The bell's other half. A mention is an **event**: somebody named you at a
+# moment, it is stored, and marking it read is meaningful because the moment has
+# passed. What is below is not that. These are **conditions** — things that are
+# true of the store as it is, this second — and they are computed on every read
+# rather than written down.
+#
+# That difference decides everything about how they behave, and it is worth
+# being explicit because a table would have been the obvious thing to build:
+#
+#   Nothing is sent, so nothing has to be retracted. A change request picked up
+#   a minute after it tipped over stops being overdue on the next read, and no
+#   row anywhere has to be found and cleared.
+#
+#   Nothing is scheduled, so nothing can be missed. A service that was down for
+#   a day comes back knowing exactly what is overdue; a job that should have run
+#   at midnight does not.
+#
+#   **They cannot be marked read**, and that is the point rather than a
+#   limitation. An escalation you can dismiss is one that gets dismissed. The
+#   only way to clear "nobody has taken this on" is for somebody to take it on.
+#
+# The cost is that there is no record of having been told, which matters for an
+# event and not for a condition: "you were notified on Tuesday" is not a thing
+# anybody needs to know about a request that is still sitting there today.
+
+
+def _alert(kind: str, severity: str, title: str, detail: str, href: str, items: list) -> dict:
+    return {
+        "kind": kind,
+        "severity": severity,
+        "title": title,
+        "detail": detail,
+        "href": href,
+        "count": len(items),
+        # A handful, named. The count above is always the true one; this is so
+        # the panel can say *which* rather than only how many, and a bell that
+        # lists two hundred rows is a bell nobody opens twice.
+        "items": items[:5],
+    }
+
+
+def _change_brief(row) -> dict:
+    return {
+        "id": f"CR-{row['number']:03d}",
+        "title": row["title"],
+        "days": _days_since(row["raised_at"]),
+        "slice": (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
+                  + (f" · {row['platform']}" if row["platform"] else "")) if row["tag"] else "",
+    }
+
+
+@app.get("/api/alerts")
+def alerts(account: dict = Depends(require_account)):
+    """Conditions standing against this account, across every project they read.
+
+    Who is told what follows the role, and the two are different questions:
+
+      An **administrator** — which includes the owner — is told when a request
+      has waited more than the window with nobody taking it on, and when one has
+      no side of the house at all. Both are failures of routing rather than of
+      work, and they are fixed by reassigning a platform or saying whose a
+      request is, which is an administrator's to do. **This is where "the super
+      admin must be notified" lands.** An admin seeing it too is right rather
+      than a leak: they are the other people who can act on it.
+
+      A **team lead** is told about their own platforms only — open requests in
+      their slices that nobody has taken. They can read every request on the
+      project, and being *told* about all of them would make the bell useless
+      inside a week. Seeing and being notified are separate, and this is the
+      half that is narrow.
+
+    Everybody else gets nothing here, which is not the same as being shut out:
+    the changes page shows all of this to anybody who may read it. A bell is for
+    what is yours to do something about.
+    """
+    out = []
+    projects = [p["id"] for p in projects_for(account)]
+    if not projects:
+        return {"alerts": [], "total": 0}
+
+    holes = ",".join("?" * len(projects))
+    cutoff = _overdue_before()
+
+    if security.is_admin(account["role"]):
+        late = db.all_rows(
+            f"SELECT * FROM change_request WHERE project_id IN ({holes}) "
+            f"AND status = 'open' AND picked_at IS NULL AND raised_at < ? "
+            f"ORDER BY raised_at",
+            (*projects, cutoff))
+        if late:
+            out.append(_alert(
+                "overdue-change", "high",
+                f"{len(late)} change request{'' if len(late) == 1 else 's'} "
+                f"nobody has taken on",
+                f"Open for more than {PICK_SLA_DAYS} days with no team lead on "
+                f"{'it' if len(late) == 1 else 'them'}. Reassign the platform, or "
+                f"take {'it' if len(late) == 1 else 'them'} on.",
+                "/changes.html?status=open",
+                [_change_brief(r) for r in late]))
+
+        loose = db.all_rows(
+            f"SELECT * FROM change_request WHERE project_id IN ({holes}) "
+            f"AND status = 'open' AND tag = '' ORDER BY raised_at",
+            tuple(projects))
+        if loose:
+            out.append(_alert(
+                "unrouted-change", "warn",
+                f"{len(loose)} change request{'' if len(loose) == 1 else 's'} "
+                f"with no side of the house",
+                "Nobody owns these, because nothing says whether they are "
+                "frontend or backend. They will never reach a team lead until "
+                "somebody says.",
+                "/changes.html?status=open",
+                [_change_brief(r) for r in loose]))
+
+    elif account["role"] == "lead":
+        # Their slices, in one pass per project, because `scope` is per project
+        # and a lead may hold platforms on more than one.
+        mine = []
+        for project in projects:
+            scopes = _scopes_of(account["id"], project)
+            if not scopes:
+                continue
+            for row in db.all_rows(
+                "SELECT * FROM change_request WHERE project_id = ? "
+                "AND status = 'open' AND picked_at IS NULL ORDER BY raised_at",
+                    (project,)):
+                if _in_scope(scopes, row["tag"], row["platform"]):
+                    mine.append(row)
+        if mine:
+            overdue = [r for r in mine if r["raised_at"] < cutoff]
+            out.append(_alert(
+                "unpicked-in-scope", "high" if overdue else "warn",
+                f"{len(mine)} change request{'' if len(mine) == 1 else 's'} "
+                f"on your platforms",
+                (f"{len(overdue)} of them {'has' if len(overdue) == 1 else 'have'} "
+                 f"waited more than {PICK_SLA_DAYS} days. "
+                 if overdue else "")
+                + "Nobody has taken them on yet.",
+                "/changes.html?status=open",
+                [_change_brief(r) for r in mine]))
+
+    return {"alerts": out, "total": sum(a["count"] for a in out)}
+
+
 @app.get("/api/mentions")
 def mentions(account: dict = Depends(require_account)):
     """Every time somebody named you, newest first.
