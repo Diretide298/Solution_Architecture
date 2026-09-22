@@ -2772,6 +2772,255 @@ def chat(body: ChatIn, account: dict = Depends(require_account)):
     }
 
 
+# ── a diagram somebody arranged by hand ──────────────────────────────
+#
+# **The package is never written to.** A saved arrangement lives in this store
+# and is laid over the generated diagram when the page draws it; the YAML on
+# disk stays exactly as the vendor shipped it. That is the same rule the whole
+# service runs on, and it is what keeps "edit the diagram" from meaning "edit
+# the specification".
+#
+# **What is saved is the arrangement, not the content.** Where each box was
+# dropped, what was hidden, what was annotated. The nodes and the edges come
+# from the package on every draw, so a diagram cannot quietly disagree with the
+# contracts about what *exists* — only about where it sits on the page. An
+# arrangement that refers to a node the package no longer has simply has a
+# position nobody uses.
+#
+# **The risk this cannot remove, it reports.** A picture arranged in March
+# against a package that changed in June is still a picture, and it looks
+# current. So the page sends a hash of what it drew, this stores it, and on the
+# next read the page compares — and says the arrangement is older than the
+# package rather than letting somebody present it as today's.
+#
+# Saving, restoring and retiring are an administrator's or a team lead's.
+# Everybody else reads whatever is current.
+
+# No slash, and that is load-bearing rather than tidiness: a `{diagram:path}`
+# route converter is greedy, so `graph:spine/restore/1` was swallowed whole and
+# matched the *save* route with a nonsense key instead of the restore one. Every
+# route below therefore takes a plain segment, and a scope with a path in it —
+# `contracts/spine/orders.yaml` — is named by its last part, which is what the
+# page was already doing.
+_DIAGRAM = re.compile(r"^[a-z]+:[A-Za-z0-9_.\- ]{1,120}$")
+
+
+class DiagramIn(BaseModel):
+    """Which project, for the routes that change an arrangement.
+
+    Its own model rather than reusing `FileIn`, which says the same thing and is
+    declared eight hundred lines further down. `from __future__ import
+    annotations` makes every annotation a string, so FastAPI resolves them at
+    decoration time — a name defined later does not raise, it quietly fails to
+    resolve and the parameter becomes a **query** parameter. The symptom is a
+    422 saying `body` is a missing query field, which names neither the cause
+    nor the file.
+    """
+    project_id: str = ""
+
+
+class LayoutIn(BaseModel):
+    project_id: str = ""
+    # {"nodes": {...}, "hidden": [...], "notes": [...]} — shape owned by the
+    # page, because the page is the only thing that draws it. Kept as text here
+    # and never interpreted, which is why a renderer can add a field to it
+    # without a migration.
+    layout: dict
+    source_hash: str = Field(default="", max_length=64)
+    note: str = Field(default="", max_length=300)
+
+
+def _diagram_key(raw: str) -> str:
+    key = (raw or "").strip()
+    if not _DIAGRAM.match(key):
+        raise HTTPException(400, (
+            "A diagram is named view:scope, with no slash — graph:spine, "
+            "data:orders, states:WorkOrder."))
+    return key
+
+
+def _may_publish_diagram(account: dict) -> bool:
+    """Who may save, restore or retire an arrangement.
+
+    An administrator or a team lead, which is what was asked for. Not a
+    reviewer: this is a picture the team presents to other people, and the two
+    roles that answer for it are the ones who can change it. Everybody else
+    still drags boxes around on their own screen — the arrangement is theirs
+    until somebody with the standing publishes one.
+    """
+    return security.is_admin(account["role"]) or account["role"] == "lead"
+
+
+def _version_row(row, mine: bool = False) -> dict:
+    who = db.one("SELECT name, email FROM account WHERE id = ?", (row["created_by"],))
+    ended = db.one("SELECT name, email FROM account WHERE id = ?",
+                   (row["retired_by"],)) if row["retired_by"] else None
+    try:
+        layout = json.loads(row["layout"])
+    except ValueError:
+        layout = {}
+    return {
+        "version": row["version"],
+        "status": row["status"],
+        "note": row["note"],
+        "sourceHash": row["source_hash"],
+        "savedBy": (who["name"] or who["email"]) if who else "?",
+        "savedAt": row["created_at"],
+        "retiredBy": (ended["name"] or ended["email"]) if ended else None,
+        "retiredAt": row["retired_at"],
+        # Counted so a listing can say how big an arrangement is without
+        # carrying every coordinate in it.
+        "nodes": len(layout.get("nodes") or {}),
+        "notes": len(layout.get("notes") or []),
+        **({"layout": layout} if mine else {}),
+    }
+
+
+@app.get("/api/diagram-versions/{diagram}/versions")
+def diagram_versions(diagram: str, project_id: str = Query(default=""),
+                     account: dict = Depends(require_account)):
+    """Every arrangement ever saved for one diagram, newest first.
+
+    Retired ones included, and that is the point of keeping them: "we just do
+    not show it" is a different thing from "it is gone", and the second is how
+    a rearrangement nobody liked becomes unrecoverable.
+    """
+    key = _diagram_key(diagram)
+    project = _readable_project(account, project_id)
+    rows = db.all_rows(
+        "SELECT * FROM diagram_version WHERE project_id = ? AND diagram = ? "
+        "ORDER BY version DESC", (project, key))
+    return {
+        "project": project, "diagram": key,
+        "mayPublish": _may_publish_diagram(account),
+        "versions": [_version_row(r) for r in rows],
+    }
+
+
+@app.get("/api/diagram-versions/{diagram}")
+def diagram_current(diagram: str, project_id: str = Query(default=""),
+                    source_hash: str = Query(default=""),
+                    account: dict = Depends(require_account)):
+    """The arrangement to draw, and whether it is older than the package.
+
+    `source_hash` is what the page just drew. Comparing it here rather than on
+    the page means one answer to "is this stale" instead of every renderer
+    having its own idea, and it is the only thing about this feature the service
+    knows about the package at all — a hash it never computes and never reads.
+    """
+    key = _diagram_key(diagram)
+    project = _readable_project(account, project_id)
+    row = db.one(
+        "SELECT * FROM diagram_version WHERE project_id = ? AND diagram = ? "
+        "AND status = 'current' ORDER BY version DESC LIMIT 1", (project, key))
+    retired = db.one(
+        "SELECT COUNT(*) AS n FROM diagram_version WHERE project_id = ? AND diagram = ? "
+        "AND status = 'retired'", (project, key))["n"]
+    if not row:
+        return {"project": project, "diagram": key, "current": None,
+                "retired": retired, "mayPublish": _may_publish_diagram(account)}
+    current = _version_row(row, mine=True)
+    return {
+        "project": project, "diagram": key,
+        "current": current,
+        "retired": retired,
+        "mayPublish": _may_publish_diagram(account),
+        # Three states, not two. Unknown is its own answer: a page that did not
+        # send a hash, or an arrangement saved before hashes were recorded, is
+        # not the same as one known to be current, and saying so is the whole
+        # reason the hash is here.
+        "stale": (None if not source_hash or not row["source_hash"]
+                  else source_hash != row["source_hash"]),
+    }
+
+
+@app.post("/api/diagram-versions/{diagram}")
+def save_diagram(diagram: str, body: LayoutIn, account: dict = Depends(require_account)):
+    """Save this arrangement as the next version, retiring the one before it.
+
+    Never an edit of an existing version. A version is a thing somebody
+    published at a moment, and rewriting one would lose the fact that the
+    picture used to be different — the same argument the verdict register is
+    append-only on.
+    """
+    key = _diagram_key(diagram)
+    project = _readable_project(account, body.project_id)
+    if not _may_publish_diagram(account):
+        raise HTTPException(403, (
+            "Saving an arrangement for everybody is an admin's or a team "
+            "lead's. Yours stays on your screen."))
+    nodes = (body.layout or {}).get("nodes")
+    if not isinstance(nodes, dict) or not nodes:
+        raise HTTPException(400, (
+            "There is nothing arranged to save — move at least one box first."))
+
+    highest = db.one(
+        "SELECT MAX(version) AS n FROM diagram_version WHERE project_id = ? AND diagram = ?",
+        (project, key))["n"] or 0
+    now = security.stamp()
+    # The old one goes first. If the insert then failed there would be no
+    # current version rather than two, and no current version is a diagram that
+    # draws from the package — which is the safe end to fail towards.
+    db.write("UPDATE diagram_version SET status = 'retired', retired_by = ?, retired_at = ? "
+             "WHERE project_id = ? AND diagram = ? AND status = 'current'",
+             (account["id"], now, project, key))
+    db.write(
+        "INSERT INTO diagram_version (project_id, diagram, version, layout, source_hash, "
+        "note, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, 'current', ?, ?)",
+        (project, key, highest + 1, json.dumps(body.layout), body.source_hash.strip(),
+         body.note.strip(), account["id"], now))
+    return {"ok": True, "version": highest + 1, "retired": highest or None}
+
+
+@app.post("/api/diagram-versions/{diagram}/restore/{version}")
+def restore_diagram(diagram: str, version: int, body: DiagramIn,
+                    account: dict = Depends(require_account)):
+    """Make an older arrangement the current one again.
+
+    A swap, not a rewind: the one being replaced is retired and kept, so
+    restoring v2 over v5 leaves v5 there to restore back to. Nothing is deleted
+    by any route in this file.
+    """
+    key = _diagram_key(diagram)
+    project = _readable_project(account, body.project_id)
+    if not _may_publish_diagram(account):
+        raise HTTPException(403, "Restoring an arrangement is an admin's or a team lead's.")
+    row = db.one(
+        "SELECT * FROM diagram_version WHERE project_id = ? AND diagram = ? AND version = ?",
+        (project, key, version))
+    if not row:
+        raise HTTPException(404, f"There is no version {version} of that diagram.")
+    if row["status"] == "current":
+        raise HTTPException(409, f"Version {version} is already the current one.")
+    now = security.stamp()
+    db.write("UPDATE diagram_version SET status = 'retired', retired_by = ?, retired_at = ? "
+             "WHERE project_id = ? AND diagram = ? AND status = 'current'",
+             (account["id"], now, project, key))
+    db.write("UPDATE diagram_version SET status = 'current', retired_by = NULL, "
+             "retired_at = NULL WHERE id = ?", (row["id"],))
+    return {"ok": True, "version": version}
+
+
+@app.post("/api/diagram-versions/{diagram}/retire")
+def retire_diagram(diagram: str, body: DiagramIn, account: dict = Depends(require_account)):
+    """Stop showing any saved arrangement — back to what the package generates.
+
+    The way out of a picture that has drifted. Nothing is destroyed: every
+    version stays listed and any of them can be restored.
+    """
+    key = _diagram_key(diagram)
+    project = _readable_project(account, body.project_id)
+    if not _may_publish_diagram(account):
+        raise HTTPException(403, "Retiring an arrangement is an admin's or a team lead's.")
+    changed = db.change(
+        "UPDATE diagram_version SET status = 'retired', retired_by = ?, retired_at = ? "
+        "WHERE project_id = ? AND diagram = ? AND status = 'current'",
+        (account["id"], security.stamp(), project, key))
+    if not changed:
+        raise HTTPException(409, "That diagram is already drawn from the package.")
+    return {"ok": True}
+
+
 # ── what it cost ─────────────────────────────────────────────────────
 #
 # **ADAM holds the rate; OpenProject holds the hours; the cost is a

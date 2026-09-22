@@ -1,0 +1,53 @@
+/* The version bar on a diagram toolbar, and the panel it opens. Colours from
+   the shared tokens; furniture from layers.css. */
+
+.dv-bar { display: inline-flex; gap: 6px; align-items: center; }
+.dv-says { font-size: 10.5px; color: var(--warning); white-space: nowrap; }
+
+/* Three states on one control, because "is this the generated diagram, a saved
+   one, or a saved one that has drifted" is the whole question somebody has
+   when they open a diagram somebody else arranged. */
+.dv-state.is-saved { color: var(--accent); border-color: var(--accent-line); }
+.dv-state.is-stale { color: var(--warning); border-color: var(--warning); }
+
+.dv-panel {
+  margin: 0 0 10px; padding: 12px 14px; display: grid; gap: 10px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
+}
+.dv-panel[hidden] { display: none; }
+.dv-head { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.dv-head strong { font-size: 13px; color: var(--text); }
+
+.dv-warn {
+  margin: 0; padding: 8px 10px; border-radius: 6px; font-size: 12px; color: var(--text);
+  border: 1px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+}
+
+.dv-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.dv-actions input { flex: 1 1 240px; min-width: 0; }
+.dv-said { font-size: 11.5px; color: var(--text-dim); }
+
+.dv-history { display: grid; gap: 2px; }
+.dv-label { font-size: 11px; color: var(--text-faint); margin-bottom: 4px; }
+.dv-row {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1.4fr) auto auto;
+  gap: 10px; align-items: center; padding: 5px 0; font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.dv-row:last-child { border-bottom: 0; }
+/* The one being shown reads differently from the ones being kept. */
+.dv-row.is-current { color: var(--text); }
+.dv-v { font-family: var(--mono); color: var(--text); }
+.dv-who { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dv-note { color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dv-count { color: var(--text-faint); font-family: var(--mono); white-space: nowrap; }
+.dv-badge {
+  padding: 1px 8px; border-radius: 999px; font-size: 10.5px;
+  background: var(--accent-soft); color: var(--accent-text); white-space: nowrap;
+}
+
+@media (max-width: 820px) {
+  .dv-row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .dv-note, .dv-count { display: none; }
+}

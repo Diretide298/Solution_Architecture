@@ -594,6 +594,53 @@ CREATE TABLE IF NOT EXISTS test_batch (
 CREATE INDEX IF NOT EXISTS test_batch_open
   ON test_batch(account_id, project_id, verdict, opened_at);
 
+-- ── a diagram somebody arranged by hand ────────────────────────────
+--
+-- The package is what the vendor shipped and stays as received — that rule is
+-- at the top of this file and this does not break it. A saved arrangement
+-- lives here and is laid over the generated diagram when it is drawn; the
+-- YAML on disk is never written to.
+--
+-- **What is saved is the arrangement, not the content.** Where each box was
+-- dropped, what was hidden, what was annotated. The nodes and the edges still
+-- come from the package every time, so a diagram cannot quietly disagree with
+-- the contracts about what exists — only about where it sits on the page.
+--
+-- Versions are kept and never deleted. Saving a new one retires the one before
+-- it; retired versions stay readable to whoever can publish, because "we just
+-- do not show it" is a different thing from "it is gone", and the second one is
+-- how a rearrangement nobody liked becomes unrecoverable.
+CREATE TABLE IF NOT EXISTS diagram_version (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  -- Which diagram: `graph:spine`, `data:orders`, `states:WorkOrder`. The view
+  -- and its scope, because the same view at two scopes is two pictures.
+  diagram     TEXT    NOT NULL,
+  -- Counted per diagram, from 1. Not a timestamp: people say "go back to v2".
+  version     INTEGER NOT NULL,
+  -- {"nodes": {id: {x, y}}, "hidden": [id], "notes": [{x, y, text}]}
+  layout      TEXT    NOT NULL,
+  -- What the generated diagram looked like when this was arranged, as a hash
+  -- the page computes from the node ids it drew. **This is the whole mitigation
+  -- for the thing that makes hand-editing dangerous**: the package moves on,
+  -- and an arrangement made against an older shape is still displayed as if it
+  -- were current. Comparing hashes lets the page say so instead.
+  source_hash TEXT    NOT NULL DEFAULT '',
+  note        TEXT    NOT NULL DEFAULT '',
+  -- 'current' or 'retired'. One current per diagram per project, enforced by
+  -- the route rather than by a constraint, because the swap is two writes and
+  -- a unique index would refuse the moment between them.
+  status      TEXT    NOT NULL DEFAULT 'current',
+  created_by  INTEGER NOT NULL REFERENCES account(id),
+  created_at  TEXT    NOT NULL,
+  retired_by  INTEGER REFERENCES account(id),
+  retired_at  TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS diagram_version_once
+  ON diagram_version(project_id, diagram, version);
+CREATE INDEX IF NOT EXISTS diagram_version_current
+  ON diagram_version(project_id, diagram, status);
+
 -- ── what an hour of somebody's time costs ──────────────────────────
 --
 -- **ADAM holds the rate and nothing else.** The hours come from the work

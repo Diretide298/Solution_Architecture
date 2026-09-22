@@ -450,6 +450,32 @@ export const fileDraft = (projectId, code) =>
   call(`/api/changes/drafts/${encodeURIComponent(code)}/file`,
     { method: 'POST', body: { project_id: projectId ?? '' } });
 
+// A saved arrangement of a diagram. Named `diagram-versions` and not
+// `diagrams` on purpose: `/api/diagrams` is the *package's* route, served by
+// the viewer, and an accounts-service route of the same name would not move it
+// — it would shadow it out of existence. The package is never written to: these
+// carry where each box was dropped, laid over the generated diagram when the
+// page draws it. `sourceHash` is what the page just drew, so the service can
+// say when an arrangement is older than the package it was arranged against.
+export const diagramVersion = (diagram, sourceHash = '', projectId = '') =>
+  call(`/api/diagram-versions/${encodeURIComponent(diagram)}?${new URLSearchParams({
+    project_id: projectId || project() || '', source_hash: sourceHash,
+  })}`);
+export const diagramVersions = (diagram, projectId = '') =>
+  call(`/api/diagram-versions/${encodeURIComponent(diagram)}/versions?${new URLSearchParams({
+    project_id: projectId || project() || '',
+  })}`);
+export const saveDiagram = (diagram, layout, sourceHash = '', note = '', projectId = '') =>
+  call(`/api/diagram-versions/${encodeURIComponent(diagram)}`, { method: 'POST', body: {
+    project_id: projectId || project() || '', layout, source_hash: sourceHash, note,
+  } });
+export const restoreDiagram = (diagram, version, projectId = '') =>
+  call(`/api/diagram-versions/${encodeURIComponent(diagram)}/restore/${version}`,
+    { method: 'POST', body: { project_id: projectId || project() || '' } });
+export const retireDiagram = (diagram, projectId = '') =>
+  call(`/api/diagram-versions/${encodeURIComponent(diagram)}/retire`,
+    { method: 'POST', body: { project_id: projectId || project() || '' } });
+
 // Asking a model about the package, on this person's own key. Which providers
 // there are, which of them they hold a key for, and what each key can actually
 // reach — the model list comes from the provider itself, so one released this

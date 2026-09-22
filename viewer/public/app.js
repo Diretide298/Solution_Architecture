@@ -3,6 +3,7 @@ import { StructureTree, kindColor } from './structure.js';
 import { BoxDiagram } from './boxdiagram.js';
 import { StateMachine } from './statemachine.js';
 import { mountDiagramExport } from './diagram-export.js';
+import { mountDiagramVersions } from './diagram-versions.js';
 import { Galaxy, galaxyLegend } from './galaxy.js';
 import { installTips, tip, tipFor } from './tips.js';
 import * as auth from './validation.js';
@@ -275,6 +276,33 @@ async function boot() {
       toolbar: bar(canvasId), name,
       targets: targets.map(([id, view]) => [$(id), view]),
     });
+  }
+
+  // ── and keeping an arrangement of one ───────────────────────────
+  //
+  // Only the three views whose boxes a person can actually drag. A particle
+  // field arranges itself and there is nothing to save; a structure tree is a
+  // nesting, and moving a node in it would say something untrue about the
+  // document it draws.
+  //
+  // The key is the view *and* its scope: the same view at two scopes is two
+  // pictures, and an arrangement of the orders module has nothing to do with
+  // the one for payments.
+  const versions = new Map();
+  for (const [canvasId, view, key] of [
+    ['graph-canvas', () => graph, () => `graph:${state.graphScope ?? 'spine'}`],
+    ['er-canvas', () => er, () => `er:${(state.erScope ?? 'all').split('/').pop()}`],
+    ['er-services-canvas', () => serviceEr, () => 'services:all'],
+    ['data-canvas', () => data, () => `data:${$('data-scope')?.value || 'all'}`],
+    ['states-canvas', () => machine, () => `states:${state.machineId ?? 'none'}`],
+  ]) {
+    const mounted = mountDiagramVersions({
+      toolbar: bar(canvasId), name: key, view,
+      onApplied: (placed) => {
+        if (placed) toast(`${placed} boxes placed where they were saved`);
+      },
+    });
+    if (mounted) versions.set(canvasId, mounted);
   }
 
   // handy for debugging layouts from the console
