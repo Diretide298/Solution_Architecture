@@ -83,10 +83,15 @@ function userOf(req) {
   return USERS[token] ?? 0;
 }
 
-function own(id, { subject, status = 7, done = 0, start, due, parent, version, user = 5, updated }) {
+function own(id, { subject, status = 7, done = 0, start, due, parent, version, user = 5, updated, spent, estimate }) {
   const wp = ensure(String(id));
   wp.subject = subject;
   wp.percentageDone = done;
+  // ISO 8601 durations, as OpenProject reports them. `spentTime` is absent
+  // rather than zero when the token may not read time entries, and the costing
+  // page counts those apart — so the fixture has one of each.
+  if (spent !== undefined) wp.spentTime = spent;
+  if (estimate !== undefined) wp.estimatedTime = estimate;
   wp.startDate = start ?? null;
   wp.dueDate = due ?? null;
   wp._links.status = { href: `/api/v3/statuses/${status}`, title: STATUSES.find((s) => s.id === status).name };
@@ -104,10 +109,12 @@ function own(id, { subject, status = 7, done = 0, start, due, parent, version, u
 // A board: one overdue, one due this week, one started, one in the backlog,
 // one closed. The dates are relative so the assertions do not rot.
 const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
-own(7001, { subject: 'Receipt totals are wrong', start: day(-20), due: day(-3), parent: 900, version: 'M1 Checkout' });
-own(7002, { subject: 'Tax rounding on the POS', start: day(-5), due: day(3), parent: 900, version: 'M1 Checkout' });
-own(7003, { subject: 'Refund flow', done: 40, start: day(-10), due: day(40), parent: 901, version: 'M2 Refunds' });
-own(7004, { subject: 'Nothing has started here', parent: 901, version: 'M2 Refunds' });
+own(7001, { subject: 'Receipt totals are wrong', start: day(-20), due: day(-3), parent: 900, version: 'M1 Checkout', spent: 'PT12H', estimate: 'PT8H' });
+own(7002, { subject: 'Tax rounding on the POS', start: day(-5), due: day(3), parent: 900, version: 'M1 Checkout', spent: 'PT4H30M', estimate: 'PT6H' });
+own(7003, { subject: 'Refund flow', done: 40, start: day(-10), due: day(40), parent: 901, version: 'M2 Refunds', spent: 'P1DT1H', estimate: 'PT20H' });
+// No time logged, and time that cannot be read, are different facts. 7004
+// has a zero; 7100 has no spentTime field at all.
+own(7004, { subject: 'Nothing has started here', parent: 901, version: 'M2 Refunds', spent: 'PT0S' });
 own(7005, { subject: 'Already shipped', status: 12, done: 100, start: day(-30), due: day(-10), updated: day(-2), parent: 900, version: 'M1 Checkout' });
 // A milestone with nothing left in it, so "hide what is finished" has
 // something to hide. Without one the switch redraws the same chart and the
@@ -115,7 +122,7 @@ own(7005, { subject: 'Already shipped', status: 12, done: 100, start: day(-30), 
 own(7006, { subject: 'Shipped and closed', status: 12, done: 100, start: day(-60), due: day(-40), updated: day(-40), parent: 902, version: 'M0 Groundwork' });
 
 // Somebody else's, to prove a board is only ever your own.
-own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6 });
+own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
 
 let nextId = 1200;
 const created = [];

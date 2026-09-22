@@ -2505,6 +2505,180 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
     }
 
 
+# ── what it cost ─────────────────────────────────────────────────────
+#
+# **ADAM holds the rate; OpenProject holds the hours; the cost is a
+# multiplication done on read.** Nothing is stored, so there is no total to go
+# stale when somebody logs time on a Friday, and nothing in this file that could
+# be mistaken for an invoice.
+#
+# The hours are `spentTime`, which is the time people actually logged — and
+# which OpenProject only shows to a token with permission to view time entries.
+# A `None` therefore means "this token cannot see it" as often as it means
+# "nobody logged any", and those are very different facts, so the reply counts
+# them separately rather than adding them up as zero. An estimate is reported
+# beside them and never silently substituted: a plan is not a cost.
+#
+# Rates are the delivery's, not a person's performance: read by whoever reads
+# the delivery, set by an administrator.
+
+
+class RateIn(BaseModel):
+    project_id: str = ""
+    person: str = Field(max_length=120)
+    # In the currency's smallest unit — see the table. A float here is a float
+    # in somebody's invoice.
+    hourly: int = Field(ge=0, le=100_000_00)
+    currency: str = Field(default="INR", max_length=8)
+    note: str = Field(default="", max_length=200)
+
+
+def _rate_row(row) -> dict:
+    return {
+        "id": row["id"], "person": row["person"],
+        "hourly": row["hourly"], "currency": row["currency"],
+        "note": row["note"], "setAt": row["set_at"],
+    }
+
+
+@app.get("/api/rates")
+def list_rates(project_id: str = Query(default=""),
+               reader: dict = Depends(require_reader)):
+    """Every rate on this project, and every name the tickets are assigned to.
+
+    Both together because setting one is choosing from the other: a rate typed
+    against a name OpenProject does not use matches nothing, and the only way
+    anybody notices is a cost of zero on a person who has been working.
+    """
+    project = _readable_project(reader, project_id)
+    rows = db.all_rows("SELECT * FROM rate WHERE project_id = ? ORDER BY person", (project,))
+    return {"project": project, "rates": [_rate_row(r) for r in rows]}
+
+
+@app.put("/api/rates")
+def set_rate(body: RateIn, admin: dict = Depends(require_admin)):
+    """Set or replace what an hour of somebody's time costs."""
+    project = _readable_project(admin, body.project_id)
+    person = body.person.strip()
+    if not person:
+        raise HTTPException(400, "Say whose rate this is.")
+    existing = db.one("SELECT id FROM rate WHERE project_id = ? AND person = ? COLLATE NOCASE",
+                      (project, person))
+    if existing:
+        db.write("UPDATE rate SET hourly = ?, currency = ?, note = ?, set_by = ?, set_at = ? "
+                 "WHERE id = ?",
+                 (body.hourly, body.currency.strip().upper(), body.note.strip(),
+                  admin["id"], security.stamp(), existing["id"]))
+        return {"ok": True, "id": existing["id"], "replaced": True}
+    # Linked when an ADAM account plainly is this person. Display only: the
+    # hours arrive against the OpenProject name, and the name is what matches,
+    # so a wrong guess here costs nothing and a right one saves a lookup.
+    same = db.one("SELECT id FROM account WHERE name = ? COLLATE NOCASE", (person,))
+    db.write(
+        "INSERT INTO rate (project_id, person, account_id, hourly, currency, note, set_by, set_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (project, person, same["id"] if same else None,
+         body.hourly, body.currency.strip().upper(), body.note.strip(),
+         admin["id"], security.stamp()))
+    return {"ok": True, "replaced": False}
+
+
+@app.delete("/api/rates/{rate_id}")
+def drop_rate(rate_id: int, admin: dict = Depends(require_admin)):
+    if not db.change("DELETE FROM rate WHERE id = ?", (rate_id,)):
+        raise HTTPException(404, "No such rate.")
+    return {"ok": True}
+
+
+@app.get("/api/costing")
+def costing(project_id: str = Query(default=""), refresh: int = Query(default=0),
+            reader: dict = Depends(require_reader)):
+    """Hours from the tickets, rates from here, cost multiplied on read.
+
+    Reuses the overview's cached read of the project — the same five minutes,
+    the same one call — because costing and the overview are the same question
+    about the same rows and reading OpenProject twice to ask both would double
+    the cost of a page somebody leaves open.
+    """
+    scope = _pms_scope(reader, project_id)
+    key = (scope["project"], scope["pmsId"])
+    now = time.monotonic()
+    held = _overview_cache.get(key)
+    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
+        payload = held["payload"]
+    else:
+        payload = _overview_payload(reader, scope)
+        _overview_cache[key] = {"at": now, "payload": payload}
+
+    rates = {r["person"].lower(): r for r in db.all_rows(
+        "SELECT * FROM rate WHERE project_id = ?", (scope["project"],))}
+
+    people: dict = {}
+    # Counted apart from the hours, because they are three different facts and
+    # adding them together is how a costing page comes to say a number nobody
+    # can defend: work with no time logged, work whose time this token may not
+    # read, and work by somebody with no rate set.
+    no_hours = 0
+    unreadable = 0
+    for item in payload["items"]:
+        name = item.get("assignee") or "Nobody"
+        spent = item.get("spentHours")
+        who = people.setdefault(name.lower(), {
+            "person": name, "tickets": 0, "hours": 0.0, "estimated": 0.0,
+            "withoutHours": 0, "rate": None})
+        who["tickets"] += 1
+        who["estimated"] += item.get("estimatedHours") or 0
+        if spent is None:
+            unreadable += 1
+            who["withoutHours"] += 1
+        elif spent == 0:
+            no_hours += 1
+            who["withoutHours"] += 1
+        else:
+            who["hours"] += spent
+
+    out = []
+    currencies = set()
+    unrated = []
+    for entry in people.values():
+        rate = rates.get(entry["person"].lower())
+        cost = None
+        if rate and entry["hours"]:
+            # Integer maths on the smallest unit, rounded once at the end. A
+            # float rate times a float hour count, summed, is a total that
+            # disagrees with itself between two readers.
+            cost = int(round(rate["hourly"] * entry["hours"]))
+            currencies.add(rate["currency"])
+        elif not rate and entry["hours"]:
+            unrated.append(entry["person"])
+        out.append({
+            **entry,
+            "hours": round(entry["hours"], 2),
+            "estimated": round(entry["estimated"], 2),
+            "hourly": rate["hourly"] if rate else None,
+            "currency": rate["currency"] if rate else None,
+            "cost": cost,
+        })
+    out.sort(key=lambda p: -(p["cost"] or 0) or -p["hours"])
+
+    return {
+        "project": scope["project"],
+        "asOf": security.stamp(),
+        "people": out,
+        "totalHours": round(sum(p["hours"] for p in out), 2),
+        # Only where a rate exists, and only when one currency is in play. Two
+        # currencies cannot be added, and a page that added them would be
+        # quietly wrong in the most expensive possible way.
+        "totalCost": (sum(p["cost"] or 0 for p in out) if len(currencies) == 1 else None),
+        "currency": next(iter(currencies)) if len(currencies) == 1 else None,
+        "currencies": sorted(currencies),
+        "ticketsWithoutHours": no_hours,
+        "ticketsHoursUnreadable": unreadable,
+        "peopleWithoutRate": sorted(set(unrated)),
+        "truncated": payload.get("truncated", False),
+    }
+
+
 # ── what the agent did ───────────────────────────────────────────────
 #
 # Claude Code runs on the developer's machine; ADAM does not. Hooks there write

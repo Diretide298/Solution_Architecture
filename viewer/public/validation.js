@@ -495,6 +495,21 @@ export const agentSession = (id) => call(`/api/agent/sessions/${id}`);
 export const overdueChanges = (projectId) =>
   call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);
 
+// What the delivery has cost. Hours come from the tickets, rates from ADAM,
+// and the multiplication happens on read — there is no stored total to ask
+// for. Read by whoever reads the delivery; rates are set by an administrator.
+export const costing = (days = 14, refresh = false, projectId = '') =>
+  call(`/api/costing?${new URLSearchParams({
+    project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}),
+  })}`);
+export const listRates = (projectId = '') =>
+  call(`/api/rates?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+/** `hourly` is in the currency's smallest unit — 450050 is 4,500.50. */
+export const setRate = (person, hourly, currency = 'INR', note = '', projectId = '') =>
+  call('/api/rates', { method: 'PUT',
+    body: { project_id: projectId ?? '', person, hourly, currency, note } });
+export const dropRate = (id) => call(`/api/rates/${id}`, { method: 'DELETE' });
+
 // A developer's own work, always. The service answers from the caller's own
 // OpenProject token with `assignee = me`, so there is no id to pass and no
 // wider version of this to ask for.

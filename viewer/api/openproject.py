@@ -162,6 +162,57 @@ def call(endpoint: str, token: str, path: str,
         raise Refused(f"Could not reach {endpoint}: {exc}") from exc
 
 
+def hours(duration: Optional[str]) -> Optional[float]:
+    """An ISO 8601 duration as hours, or None.
+
+    OpenProject reports time as `PT8H30M`, `P1DT4H`, `PT45M`. Parsed here rather
+    than on the page because two readers of the same format is one too many, and
+    because getting it wrong is invisible: a bad parse returns a plausible
+    number, not an error.
+
+    A day is **eight hours, not twenty-four.** OpenProject's own `P1D` on a time
+    entry means a working day, and treating it as elapsed time would triple
+    every cost that came from one. A week is five of those.
+    """
+    text = (duration or "").strip().upper()
+    if not text.startswith("P"):
+        return None
+    total = 0.0
+    number = ""
+    in_time = False
+    for ch in text[1:]:
+        if ch == "T":
+            in_time = True
+            number = ""
+            continue
+        if ch.isdigit() or ch == ".":
+            number += ch
+            continue
+        try:
+            value = float(number) if number else 0.0
+        except ValueError:
+            return None
+        number = ""
+        if ch == "W":
+            total += value * 5 * 8
+        elif ch == "D":
+            total += value * 8
+        elif ch == "H":
+            total += value
+        elif ch == "M":
+            # Ambiguous in ISO 8601 and unambiguous here: before the T it is
+            # months and after it is minutes. Months are not a time entry, so
+            # one before the T is a value this cannot use.
+            if not in_time:
+                return None
+            total += value / 60
+        elif ch == "S":
+            total += value / 3600
+        else:
+            return None
+    return round(total, 4)
+
+
 def _titled(link: Optional[dict]) -> str:
     """The human name off a HAL `_links` entry. HAL gives every association an
     href and a title, and the title is the only part worth showing."""
@@ -205,6 +256,13 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         "startDate": work_package.get("startDate"),
         "dueDate": work_package.get("dueDate"),
         "percentDone": work_package.get("percentageDone"),
+        # What a ticket cost and what it was expected to. Both are durations in
+        # OpenProject and hours here; `spentTime` needs permission to view time
+        # entries, so a None means "this token cannot see it" as often as it
+        # means "nobody logged any", and the costing page says so rather than
+        # showing a zero somebody would take for a fact.
+        "spentHours": hours(work_package.get("spentTime")),
+        "estimatedHours": hours(work_package.get("estimatedTime")),
         # Both ends of the ticket's life. `createdAt` is what "how long did this
         # take" is measured from; on a closed ticket `updatedAt` is the closest
         # thing to a closing date this API offers without reading activities.

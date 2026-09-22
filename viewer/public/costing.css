@@ -1,0 +1,35 @@
+/* Costing. Furniture from layers.css; only what a money page needs is here. */
+
+.ct-row.admin-row {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) auto auto auto auto;
+}
+.ct-rate-row.admin-row { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto auto; }
+.ct-gap.admin-row { grid-template-columns: 48px minmax(0, 1fr) minmax(0, 2fr); }
+
+/* Money and hours are tabular: a column of figures that does not line up is a
+   column nobody adds in their head, and adding in their head is exactly what
+   somebody does with a costing page. */
+.ct-num, .ct-cost {
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  white-space: nowrap; color: var(--text);
+}
+.ct-cost { justify-self: end; font-weight: 600; }
+.ct-dim { color: var(--text-faint); font-weight: 400; }
+/* Something that is absent rather than zero. The distinction is the whole
+   point of the page: a dash is "not priced", a zero would be "free". */
+.ct-missing { color: var(--warning); }
+
+.stat-card.ct-stat-warn .stat-value { color: var(--warning); }
+
+.ct-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 4px; }
+.ct-money { width: 9ch; font-family: var(--mono); text-align: right; }
+.ct-currency { width: 6ch; text-transform: uppercase; }
+.ct-add input:not(.ct-money):not(.ct-currency) { flex: 1 1 200px; min-width: 0; }
+
+.ct-gap-none { opacity: 0.55; }
+
+@media (max-width: 820px) {
+  .ct-row.admin-row,
+  .ct-rate-row.admin-row,
+  .ct-gap.admin-row { grid-template-columns: minmax(0, 1fr) auto; }
+}

@@ -594,6 +594,34 @@ CREATE TABLE IF NOT EXISTS test_batch (
 CREATE INDEX IF NOT EXISTS test_batch_open
   ON test_batch(account_id, project_id, verdict, opened_at);
 
+-- ── what an hour of somebody's time costs ──────────────────────────
+--
+-- **ADAM holds the rate and nothing else.** The hours come from the work
+-- packages, the cost is multiplied on read, and no total is ever stored — so
+-- there is no second number to go stale when somebody logs time on Friday, and
+-- no figure in this file that anybody could mistake for an invoice.
+--
+-- Keyed on the OpenProject assignee's display name rather than on an ADAM
+-- account, because that is what the hours actually arrive attached to. A join
+-- through an account would need a mapping nobody maintains, and a rate that
+-- silently matched nobody would read as somebody working for free. `account_id`
+-- is carried when the two are known to be the same person, for display only.
+CREATE TABLE IF NOT EXISTS rate (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  -- Exactly as OpenProject spells it. Compared case-insensitively on read.
+  person     TEXT    NOT NULL,
+  account_id INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  -- Stored in the smallest unit, so no total is ever the sum of floats: a rate
+  -- of 4,500.50 is 450050. Divided once, at the edge, for display.
+  hourly     INTEGER NOT NULL,
+  currency   TEXT    NOT NULL DEFAULT 'INR',
+  note       TEXT    NOT NULL DEFAULT '',
+  set_by     INTEGER NOT NULL REFERENCES account(id),
+  set_at     TEXT    NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS rate_once ON rate(project_id, person);
+
 -- ── what the agent did, and what went wrong ─────────────────────────
 --
 -- Claude Code runs on the developer's machine and ADAM does not, so the only

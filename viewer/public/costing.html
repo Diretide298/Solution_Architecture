@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — costing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/costing.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">costing</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <button id="ct-refresh" class="chip" type="button" title="Reads OpenProject again, now">Refresh</button>
+        <a class="chip" href="/tasks.html">Tasks</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          What the delivery is costing is read by an administrator or a project
+          manager. Your own work is on <a href="/board.html">your board</a>.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <main id="unconnected" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">OpenProject is not connected</h1>
+        <p class="auth-note" id="unconnected-why"></p>
+        <a class="auth-button" href="/settings.html#openproject">Go to settings</a>
+      </div>
+    </main>
+
+    <div id="costing" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Costing</h1>
+        <div class="set-nav-list">
+          <a href="#totals">What it has cost</a>
+          <a href="#people">Per person</a>
+          <div class="set-nav-group">What the numbers rest on</div>
+          <a href="#rates">Hourly rates</a>
+          <a href="#gaps">What is missing</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
+        <section class="admin-panel set-section" id="totals">
+          <h2 class="admin-heading">What it has cost</h2>
+          <p class="auth-note set-lede">
+            <strong>Hours come from the tickets; rates are set here; the cost is
+            a multiplication done when you open the page.</strong> No total is
+            stored, so nothing here can go stale &mdash; and nothing here is an
+            invoice. The hours are the time people logged in OpenProject, which
+            is not the same as the time they worked.
+          </p>
+          <p class="auth-error" id="ct-error" hidden></p>
+          <section class="stat-strip" id="ct-stats"></section>
+        </section>
+
+        <section class="admin-panel set-section" id="people">
+          <h2 class="admin-heading">Per person <span class="admin-count" id="ct-people-count"></span></h2>
+          <p class="auth-note set-lede">
+            Logged hours against the rate set for that name. Somebody with hours
+            and no rate shows a dash rather than a zero &mdash; a zero reads as
+            free.
+          </p>
+          <div class="admin-table" id="ct-people"></div>
+        </section>
+
+        <section class="admin-panel set-section" id="rates">
+          <h2 class="admin-heading">Hourly rates <span class="admin-count" id="ct-rates-count"></span></h2>
+          <p class="auth-note set-lede">
+            Set against the name OpenProject uses, because that is what the hours
+            arrive attached to. A rate typed against a name the tickets do not
+            use matches nothing, so pick from the list.
+          </p>
+          <p class="auth-error" id="ct-rate-error" hidden></p>
+          <form class="ct-add" id="ct-add" hidden>
+            <select id="ct-person" class="scope-select" aria-label="Who"></select>
+            <input id="ct-hourly" class="auth-input ct-money" type="number" min="0" step="0.01"
+                   placeholder="0.00" aria-label="Per hour" />
+            <input id="ct-currency" class="auth-input ct-currency" type="text" value="INR"
+                   maxlength="8" aria-label="Currency" />
+            <input id="ct-note" class="auth-input" type="text" placeholder="Note (optional)" />
+            <button class="chip" type="submit">Set</button>
+          </form>
+          <p class="auth-note auth-fine" id="ct-readonly" hidden>
+            Rates are set by an administrator. You can read them.
+          </p>
+          <div class="admin-table" id="ct-rates"></div>
+        </section>
+
+        <section class="admin-panel set-section" id="gaps">
+          <h2 class="admin-heading">What is missing</h2>
+          <p class="auth-note set-lede">
+            Counted rather than absorbed, because each of these makes the total
+            above an understatement and they are three different problems.
+          </p>
+          <div class="admin-table" id="ct-gaps"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/costing.js"></script>
+  </body>
+</html>
