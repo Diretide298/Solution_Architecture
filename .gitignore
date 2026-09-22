@@ -100,3 +100,16 @@ ticvai/_review-*/
 # --- screenshot captures for decks and presentations -------------------------
 # Regenerated on demand by viewer/checks/capture-assets.mjs; never part of the package.
 /assets/
+
+# --- the retired 3D avatar ---------------------------------------------------
+# `/avatar.html` was retired on 23 September 2026 and moved, whole, to
+# `_retired/avatar/`. It was never committed -- the page, its 48 KB of
+# JavaScript, the rigged GLBs and the vendored three.js build were all untracked
+# working-tree files -- so there is no history to recover it from and the copy
+# under `_retired/` is the only one. It stays ignored for the reason it always
+# was: the models are 7 MB, the three.js build another 1.4 MB, and one of the
+# remotes is a public GitHub repository.
+#
+# `tools/avatar/` is the toolchain that built it and is still tracked, so the
+# page can be rebuilt if it is ever wanted back.
+/_retired/

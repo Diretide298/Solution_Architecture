@@ -156,7 +156,6 @@ const DRAWER_HTML = `
           <a class="drawer-link" href="/chat.html">Ask about the package</a>
           <a class="drawer-link" href="/document.html">Generate documentation</a>
           <a class="drawer-link" href="/domains.html">Domain lenses</a>
-          <a class="drawer-link" href="/avatar.html">The avatar, and what it can do</a>
         </nav>
 
         <nav class="drawer-group" id="account-admin" hidden aria-labelledby="drawer-admin">
