@@ -483,6 +483,14 @@ export const createTicket = (projectId, id, proposal) =>
   call(`/api/changes/${encodeURIComponent(id)}/ticket/${encodeURIComponent(proposal)}/apply`,
     { method: 'POST', body: { project_id: projectId ?? '' } });
 
+// What Claude Code did on the machines it runs on. Narrow by design — tool
+// names, outcomes, durations, ticket ids, and nothing that was typed or
+// written. Everybody signed in may ask; a developer is answered with their own
+// and an administrator or a pm with the project's, and the reply says which.
+export const agentUsage = (days = 14, projectId = '') =>
+  call(`/api/agent/usage?${new URLSearchParams({ days, project_id: projectId ?? '' })}`);
+export const agentSession = (id) => call(`/api/agent/sessions/${id}`);
+
 /** Open requests nobody has taken on inside the window. Administrators only. */
 export const overdueChanges = (projectId) =>
   call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);

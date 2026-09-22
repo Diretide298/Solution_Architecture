@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — agents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/agents.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">agents</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <select class="scope-select" id="ag-days" aria-label="How far back">
+          <option value="7">Last 7 days</option>
+          <option value="14" selected>Last 14 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        <a class="chip" href="/tasks.html">Tasks</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <div id="agents" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Agents</h1>
+        <div class="set-nav-list">
+          <a href="#overview">Overview</a>
+          <a href="#people">Who is using it</a>
+          <div class="set-nav-group">What is going wrong</div>
+          <a href="#tools">Tools and failures</a>
+          <div class="set-nav-group">Session by session</div>
+          <a href="#sessions">Sessions</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
+        <section class="admin-panel set-section" id="overview">
+          <h2 class="admin-heading">Overview <span class="admin-count" id="ag-scope"></span></h2>
+          <p class="auth-note set-lede" id="ag-lede">
+            Claude Code runs on each developer&rsquo;s machine, so this is what
+            their hooks have sent: which tools ran, whether they worked, how long
+            they took, and which ticket was open.
+            <strong>Never the prompts, the arguments or the code</strong> &mdash;
+            so this can say that Edit failed eleven times on a ticket and not what
+            it was trying to edit.
+          </p>
+          <p class="auth-error" id="ag-error" hidden></p>
+          <section class="stat-strip" id="ag-stats"></section>
+          <p class="auth-note auth-fine" id="ag-nothing" hidden>
+            Nothing has arrived yet. The hooks are installed per machine &mdash;
+            see <code>viewer/mcp/hooks/README.md</code> &mdash; and a session is
+            sent when it ends, not while it runs.
+          </p>
+        </section>
+
+        <section class="admin-panel set-section" id="people">
+          <h2 class="admin-heading">Who is using it <span class="admin-count" id="ag-people-count"></span></h2>
+          <p class="auth-note set-lede">
+            Active time, not wall clock: a session left open over lunch is not an
+            hour of agent use, so gaps longer than five minutes are not counted.
+          </p>
+          <div class="admin-table" id="ag-people"></div>
+        </section>
+
+        <section class="admin-panel set-section" id="tools">
+          <h2 class="admin-heading">Tools and failures <span class="admin-count" id="ag-tools-count"></span></h2>
+          <p class="auth-note set-lede">
+            Sorted by what is failing rather than by what is used most. The error
+            words are classified on the machine &mdash; the messages themselves are
+            never sent, because they carry paths and snippets.
+          </p>
+          <div class="admin-table" id="ag-tools"></div>
+        </section>
+
+        <section class="admin-panel set-section" id="sessions">
+          <h2 class="admin-heading">Sessions <span class="admin-count" id="ag-sessions-count"></span></h2>
+          <p class="auth-note set-lede">Open one to see it event by event.</p>
+          <div class="admin-table" id="ag-sessions"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/agents.js"></script>
+  </body>
+</html>

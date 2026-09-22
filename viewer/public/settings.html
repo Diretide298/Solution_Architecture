@@ -91,6 +91,7 @@
           <a href="#openproject">OpenProject</a>
           <a href="#git">Git identity</a>
           <a href="#connector">Claude connector</a>
+          <a href="#agents">Agent activity</a>
           <div class="set-nav-group">Security</div>
           <a href="#sessions">Sessions</a>
           <div class="set-nav-group" id="nav-admin-group" hidden>Admin</div>
@@ -202,7 +203,7 @@
         <section class="admin-panel set-section" id="connector">
           <h2 class="admin-heading">Claude connector</h2>
           <p class="auth-note set-lede">
-            Nineteen tools that let Claude Code on your machine read this package — screens, journeys,
+            Twenty-two tools that let Claude Code on your machine read this package — screens, journeys,
             contracts, tables, services, modules and the decisions behind them — and, once OpenProject
             is connected above, work your tickets: pull one with everything it touches into
             <code>.adam/</code> in your folder, then propose its new status and apply it once you
@@ -230,6 +231,30 @@
             Everything it can read is what <em>you</em> can read — it signs in as your account and
             inherits the same refusals. There is no shared login, deliberately: one would hand every
             reader the widest role in the building.
+          </p>
+        </section>
+
+        <!-- ── what the agent did ───────────────────────────────────── -->
+        <section class="admin-panel set-section" id="agents">
+          <h2 class="admin-heading">Agent activity</h2>
+          <p class="auth-note set-lede">
+            Claude Code runs on your machine, so ADAM only knows what its hooks
+            send: which tools ran, whether they worked, how long they took, and
+            which ticket was open. <strong>Never the prompts, the arguments or
+            the code.</strong> That is the whole list, and the service drops
+            anything else it is sent.
+          </p>
+          <div class="set-links">
+            <a class="set-link" href="/agents.html">
+              <span><strong>Agents: where the time goes and what keeps failing</strong>
+                <small>Your own sessions; an admin or a project manager sees the team&rsquo;s</small></span>
+            </a>
+          </div>
+          <p class="auth-note auth-fine">
+            Installed per machine, alongside the connector &mdash; see
+            <code>viewer/mcp/hooks/README.md</code>. A session is sent when it
+            ends, not while it runs, so nothing here slows your work down.
+            Remove the hooks and everything else carries on exactly the same.
           </p>
         </section>
 

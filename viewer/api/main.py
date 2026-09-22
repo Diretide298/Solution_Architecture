@@ -2483,6 +2483,276 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
     }
 
 
+# ── what the agent did ───────────────────────────────────────────────
+#
+# Claude Code runs on the developer's machine; ADAM does not. Hooks there write
+# a line per event to a local file and flush the file here when the session
+# ends, so nothing is sent per tool call and a developer who is offline loses
+# nothing but a delay.
+#
+# **What is accepted is deliberately narrow**, and the service enforces the
+# narrowness rather than trusting the hook to have been careful: a tool name, a
+# verdict, a classified error word, a duration. Anything else in the payload is
+# dropped here. That matters because the hook is a file on somebody's laptop
+# that anybody could edit, and because a rule kept in one place is a rule.
+#
+# Everything in this table is about **utilisation and failure**: how much the
+# agent is used, on which tickets, which tools fail, and how often. It cannot
+# answer what the agent was asked or what it wrote, and that is the trade that
+# was chosen.
+
+# A gap longer than this is somebody having lunch, not the agent working.
+IDLE_GAP_MS = 5 * 60 * 1000
+
+# The only error words this service will store. A hook that sends anything else
+# gets 'error' — one place deciding the vocabulary is what keeps this a column
+# you can group by rather than a pile of free text.
+ERROR_KINDS = ("refused", "not-found", "timeout", "conflict", "cancelled", "error")
+
+EVENT_KINDS = ("tool", "prompt", "stop", "notify")
+
+
+def _stamp_in(value: str) -> str:
+    """An outside timestamp, in this store's one form — or now, if it is not one.
+
+    Two reasons, and the second is the one that bites much later.
+
+    `Date.toISOString()` ends in `Z`, which is what every hook will send and
+    which `datetime.fromisoformat` refuses on Python 3.9. Parsing it as a
+    failure meant every event was skipped and active time came out as zero on a
+    session full of work — a number that is wrong and looks plausible.
+
+    And ADAM writes `+00:00`, so a store holding both forms cannot be ordered
+    or ranged as text: for the same instant, `...00Z` sorts *after*
+    `...00+00:00`, because 'Z' is above '+'. Every comparison in this file is
+    lexicographic on the stored text. So nothing outside-supplied is stored as
+    it arrived.
+    """
+    text = (value or "").strip()
+    if text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
+    try:
+        return security.stamp(security.parse(text))
+    except (ValueError, TypeError):
+        return security.stamp()
+
+
+class AgentEventIn(BaseModel):
+    at: str
+    kind: str = "tool"
+    tool: str = Field(default="", max_length=60)
+    ok: bool = True
+    # Deliberately loose here and narrow below. A telemetry flush that 422s
+    # because one event carried an odd word would lose the whole session — and
+    # the word is not stored anyway: only membership of ERROR_KINDS is, so
+    # whatever arrives becomes one of six or becomes 'error'.
+    error_kind: str = Field(default="", max_length=200)
+    ms: int = Field(default=0, ge=0, le=86_400_000)
+
+
+class AgentFlushIn(BaseModel):
+    # The agent's own session id. Flushing twice updates one row.
+    key: str = Field(max_length=120)
+    project_id: str = ""
+    external_key: str = Field(default="", max_length=32)
+    repo: str = Field(default="", max_length=120)
+    host: str = Field(default="", max_length=120)
+    agent: str = Field(default="", max_length=60)
+    started_at: str
+    ended_at: str = ""
+    events: List[AgentEventIn] = Field(default_factory=list)
+
+
+def _active_ms(events: list) -> int:
+    """Time with something happening, from the gaps between events.
+
+    Wall clock would count a session left open overnight as fourteen hours of
+    agent use, which is the number somebody would then put in a report. Each
+    gap counts only up to the idle threshold, and a tool call's own duration
+    counts whole — a two-minute build is two minutes of work even though
+    nothing was logged in the middle of it.
+    """
+    if not events:
+        return 0
+    stamps = []
+    for event in events:
+        try:
+            stamps.append((security.parse(_stamp_in(event.at)), event.ms))
+        except (ValueError, TypeError):
+            continue
+    if not stamps:
+        return 0
+    stamps.sort(key=lambda pair: pair[0])
+    total = sum(ms for _, ms in stamps)
+    for (before, _), (after, _) in zip(stamps, stamps[1:]):
+        gap = int((after - before).total_seconds() * 1000)
+        if 0 < gap < IDLE_GAP_MS:
+            total += min(gap, IDLE_GAP_MS)
+    return total
+
+
+@app.post("/api/agent/flush")
+def flush_agent_session(body: AgentFlushIn, account: dict = Depends(require_account)):
+    """Take a finished agent session from the machine it ran on.
+
+    The account is the caller's own — the hook signs in as the developer, the
+    same way the connector does — so there is no way to file somebody else's
+    time against them.
+    """
+    project = _readable_project(account, body.project_id)
+    existing = db.one("SELECT id, account_id FROM agent_session WHERE key = ?", (body.key,))
+    if existing and existing["account_id"] != account["id"]:
+        # Two people cannot share an agent session id in practice; if they
+        # somehow do, the second is not allowed to overwrite the first.
+        raise HTTPException(409, "That session belongs to somebody else.")
+
+    active = _active_ms(body.events)
+    if existing:
+        db.write("UPDATE agent_session SET ended_at = ?, active_ms = ?, external_key = ?, "
+                 "repo = ?, host = ?, agent = ? WHERE id = ?",
+                 (_stamp_in(body.ended_at) if body.ended_at else security.stamp(),
+                  active, body.external_key,
+                  body.repo, body.host, body.agent, existing["id"]))
+        # Replaced rather than appended: a flush is the whole session, and a
+        # retry that appended would double every count on the page.
+        db.write("DELETE FROM agent_event WHERE session_id = ?", (existing["id"],))
+        session_id = existing["id"]
+    else:
+        db.write(
+            "INSERT INTO agent_session (key, account_id, project_id, external_key, repo, "
+            "host, agent, started_at, ended_at, active_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (body.key, account["id"], project, body.external_key, body.repo, body.host,
+             body.agent, _stamp_in(body.started_at),
+             _stamp_in(body.ended_at) if body.ended_at else security.stamp(), active))
+        session_id = db.one("SELECT id FROM agent_session WHERE key = ?", (body.key,))["id"]
+
+    kept = 0
+    for event in body.events:
+        kind = event.kind if event.kind in EVENT_KINDS else "tool"
+        # The vocabulary is decided here, not by the hook. Anything unrecognised
+        # becomes 'error', which is honest: something went wrong and this
+        # service does not know what kind of wrong.
+        word = event.error_kind if event.error_kind in ERROR_KINDS else ("error" if not event.ok else "")
+        db.write(
+            "INSERT INTO agent_event (session_id, at, kind, tool, ok, error_kind, ms) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (session_id, _stamp_in(event.at), kind, event.tool[:60],
+             1 if event.ok else 0, word, event.ms))
+        kept += 1
+    return {"ok": True, "session": session_id, "events": kept, "activeMs": active}
+
+
+def _may_read_agents(account: dict) -> bool:
+    """Who sees whose. A developer sees their own; oversight sees everybody's.
+
+    This is time-and-failure data about named people, which is the kind of thing
+    that is fine as a delivery measure and corrosive as a performance one. The
+    split follows the same line as everything else here: a lead and a dev read
+    their own corner, a pm and an administrator read the whole.
+    """
+    return security.may_oversee(account["role"])
+
+
+@app.get("/api/agent/usage")
+def agent_usage(project_id: str = Query(default=""), days: int = Query(default=14, ge=1, le=120),
+                account: dict = Depends(require_account)):
+    """How much the agent is being used, and where it keeps failing.
+
+    Grouped three ways because three different questions get asked of it: by
+    person (is this being used at all), by tool (what is broken), and by ticket
+    (what did this one actually cost). Everything is computed on read.
+    """
+    project = _readable_project(account, project_id)
+    since = security.stamp(security.now() - timedelta(days=days))
+    whole = _may_read_agents(account)
+    where = "s.project_id = ? AND s.started_at >= ?"
+    args: tuple = (project, since)
+    if not whole:
+        where += " AND s.account_id = ?"
+        args = (*args, account["id"])
+
+    sessions = db.all_rows(
+        f"SELECT s.*, a.name, a.email FROM agent_session s JOIN account a ON a.id = s.account_id "
+        f"WHERE {where} ORDER BY s.started_at DESC LIMIT 500", args)
+
+    by_person: dict = {}
+    for row in sessions:
+        who = by_person.setdefault(row["account_id"], {
+            "name": row["name"] or row["email"], "sessions": 0, "activeMs": 0,
+            "tickets": set(), "failures": 0, "calls": 0})
+        who["sessions"] += 1
+        who["activeMs"] += row["active_ms"]
+        if row["external_key"]:
+            who["tickets"].add(row["external_key"])
+
+    ids = [row["id"] for row in sessions]
+    tools: dict = {}
+    if ids:
+        holes = ",".join("?" * len(ids))
+        for row in db.all_rows(
+                f"SELECT tool, ok, error_kind, COUNT(*) AS n, SUM(ms) AS total, MAX(ms) AS worst "
+                f"FROM agent_event WHERE session_id IN ({holes}) AND kind = 'tool' AND tool != '' "
+                f"GROUP BY tool, ok, error_kind", tuple(ids)):
+            entry = tools.setdefault(row["tool"], {
+                "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
+                "why": {}})
+            entry["calls"] += row["n"]
+            entry["totalMs"] += row["total"] or 0
+            entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
+            if not row["ok"]:
+                entry["failed"] += row["n"]
+                entry["why"][row["error_kind"] or "error"] = row["n"]
+        # Back onto the people, so "is this working for them" and "is this
+        # working at all" come from one read rather than two that can disagree.
+        for row in db.all_rows(
+                f"SELECT s.account_id, COUNT(*) AS n, SUM(CASE WHEN e.ok = 0 THEN 1 ELSE 0 END) AS bad "
+                f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+                f"WHERE e.session_id IN ({holes}) AND e.kind = 'tool' GROUP BY s.account_id",
+                tuple(ids)):
+            if row["account_id"] in by_person:
+                by_person[row["account_id"]]["calls"] = row["n"]
+                by_person[row["account_id"]]["failures"] = row["bad"] or 0
+
+    return {
+        "project": project,
+        "days": days,
+        "whole": whole,
+        "people": sorted(
+            [{**who, "tickets": len(who["tickets"])} for who in by_person.values()],
+            key=lambda p: -p["activeMs"]),
+        # Sorted by what is going wrong rather than by what is used most: the
+        # page exists to find the thing that keeps failing.
+        "tools": sorted(tools.values(), key=lambda t: (-t["failed"], -t["calls"])),
+        "sessions": [{
+            "id": row["id"], "who": row["name"] or row["email"], "repo": row["repo"],
+            "ticket": row["external_key"], "startedAt": row["started_at"],
+            "endedAt": row["ended_at"], "activeMs": row["active_ms"], "agent": row["agent"],
+        } for row in sessions[:100]],
+    }
+
+
+@app.get("/api/agent/sessions/{session_id}")
+def agent_session(session_id: int, account: dict = Depends(require_account)):
+    """One session, event by event. Yours, or anybody's if you oversee."""
+    row = db.one("SELECT s.*, a.name, a.email FROM agent_session s "
+                 "JOIN account a ON a.id = s.account_id WHERE s.id = ?", (session_id,))
+    if not row:
+        raise HTTPException(404, "No such session.")
+    if row["account_id"] != account["id"] and not _may_read_agents(account):
+        raise HTTPException(403, "That is somebody else's session.")
+    return {
+        "id": row["id"], "who": row["name"] or row["email"], "repo": row["repo"],
+        "ticket": row["external_key"], "host": row["host"], "agent": row["agent"],
+        "startedAt": row["started_at"], "endedAt": row["ended_at"],
+        "activeMs": row["active_ms"],
+        "events": [{
+            "at": e["at"], "kind": e["kind"], "tool": e["tool"], "ok": bool(e["ok"]),
+            "why": e["error_kind"], "ms": e["ms"],
+        } for e in db.all_rows(
+            "SELECT * FROM agent_event WHERE session_id = ? ORDER BY at, id", (session_id,))],
+    }
+
+
 # ── the batch, submitted and checked ─────────────────────────────────
 #
 # The gate above decides when somebody has to stop. These are the two acts that

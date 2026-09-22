@@ -594,6 +594,72 @@ CREATE TABLE IF NOT EXISTS test_batch (
 CREATE INDEX IF NOT EXISTS test_batch_open
   ON test_batch(account_id, project_id, verdict, opened_at);
 
+-- ── what the agent did, and what went wrong ─────────────────────────
+--
+-- Claude Code runs on the developer's machine and ADAM does not, so the only
+-- way to see how much the agent is being used — and where it keeps failing —
+-- is for the machine to say. Hooks write locally and flush here in one post
+-- when a session ends.
+--
+-- **Narrow on purpose, and the narrowness is the design.** What is kept is
+-- which tool ran, whether it worked, how long it took, and which ticket was
+-- open. What is *not* kept is prompts, file contents, diffs, commands or tool
+-- arguments. Those would answer richer questions and would put every secret
+-- anybody ever pasted into a prompt into this file — which is exported as CSV,
+-- backed up, and read by more people than would ever be told. A log that is
+-- uncomfortable to keep is a log that gets turned off.
+--
+-- The cost is real and worth naming: you can see that Edit failed eleven times
+-- on one ticket and not what it was trying to edit. The answer to that is to
+-- open the ticket, not to widen this.
+
+CREATE TABLE IF NOT EXISTS agent_session (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- The agent's own session id, so a flush that arrives twice — a retry, a
+  -- second SessionEnd — updates one row instead of making a second.
+  key          TEXT    NOT NULL UNIQUE,
+  account_id   INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id   TEXT    NOT NULL,
+  -- The ticket that was open, when the folder said so. This is what turns
+  -- "the agent ran for three hours" into "the agent ran for three hours on
+  -- #6046", which is the only form of it anybody can act on.
+  external_key TEXT    NOT NULL DEFAULT '',
+  -- The repository's folder name, never its path. A path carries the person's
+  -- machine, their home directory and sometimes a client's name in it.
+  repo         TEXT    NOT NULL DEFAULT '',
+  host         TEXT    NOT NULL DEFAULT '',
+  agent        TEXT    NOT NULL DEFAULT '',
+  started_at   TEXT    NOT NULL,
+  ended_at     TEXT,
+  -- Time with something actually happening, as against wall clock. A session
+  -- left open over lunch is not two hours of agent use, so gaps longer than
+  -- the idle threshold are not counted. Computed where the events are, and
+  -- stored because it cannot be recovered once the events are trimmed.
+  active_ms    INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS agent_session_who
+  ON agent_session(account_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS agent_session_ticket
+  ON agent_session(project_id, external_key);
+
+CREATE TABLE IF NOT EXISTS agent_event (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id INTEGER NOT NULL REFERENCES agent_session(id) ON DELETE CASCADE,
+  at         TEXT    NOT NULL,
+  -- 'tool', 'prompt', 'stop', 'notify'. A prompt event records that there was
+  -- one and when — never a word of it.
+  kind       TEXT    NOT NULL,
+  tool       TEXT    NOT NULL DEFAULT '',
+  ok         INTEGER NOT NULL DEFAULT 1,
+  -- A classified word, not a message: 'refused', 'not-found', 'timeout',
+  -- 'conflict', 'error'. A message would carry paths and snippets, which is
+  -- exactly what this table is for not carrying.
+  error_kind TEXT    NOT NULL DEFAULT '',
+  ms         INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS agent_event_session ON agent_event(session_id, at);
+CREATE INDEX IF NOT EXISTS agent_event_tool ON agent_event(tool, ok);
+
 CREATE TABLE IF NOT EXISTS test_batch_item (
   batch_id     INTEGER NOT NULL REFERENCES test_batch(id) ON DELETE CASCADE,
   external_key TEXT    NOT NULL,
