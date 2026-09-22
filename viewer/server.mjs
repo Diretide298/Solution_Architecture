@@ -43,6 +43,7 @@ import { frameDocument } from './lib/wireframes.mjs';
 import { gate, callerIp } from './lib/session.mjs';
 import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
+import { buildDocument, SECTIONS } from './lib/document.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, 'public');
@@ -1069,6 +1070,43 @@ const server = http.createServer(async (req, res) => {
     if (route === 'search') {
       if (!pkg.search) await refreshIndex(pkg, 'on demand');
       return sendCachedJson(res, req, pkg.packed, 'search', pkg.search);
+    }
+
+    // The package as one document somebody can read end to end. Markdown,
+    // because the destination is always somebody else's tooling — Confluence,
+    // Word, GitHub, a printer — and a PDF would be none of those and would
+    // need a rendering dependency this server does not have.
+    //
+    // Which sections a reader may have is decided by the same rule that
+    // decides which tabs they get: a client has no Decisions here either, and
+    // the rule is read from audience.mjs rather than written a second time.
+    if (route === 'document') {
+      if (!pkg.index) await refreshIndex(pkg, 'on demand');
+      // The same two roles the tab strip is built from, and the same call:
+      // `seen` is scoped to the gate block above, and reaching for it here
+      // would have been a ReferenceError on every request.
+      const mine = layersFor(accountRole, role);
+      const allowed = SECTIONS.map((s) => s.id).filter((id) => {
+        if (id === 'overview') return true;
+        // The section ids line up with the layer keys except for the two the
+        // viewer spells differently, and a mismatch here would silently drop a
+        // section from everybody's document rather than from a client's.
+        const layer = { frontend: 'frontend', contracts: 'contracts', domain: 'domain',
+                        backend: 'backend', services: 'services', decisions: 'decisions' }[id];
+        return !layer || mine.includes(layer);
+      });
+      const asked = (url.searchParams.get('sections') ?? '').split(',').filter(Boolean);
+      const wanted = asked.length ? asked : allowed;
+      const meta = { id: pkg.id, name: pkg.name ?? pkg.id, on: new Date().toISOString().slice(0, 10) };
+      const built = buildDocument(pkg, meta, wanted, allowed);
+      // Not cached against `pkg.packed`: the document carries the date it was
+      // generated, so an ETag on the package alone would serve yesterday's
+      // date with today's content.
+      return send(res, 200, JSON.stringify({
+        project: pkg.id,
+        available: SECTIONS.filter((x) => allowed.includes(x.id)).map((x) => ({ id: x.id, title: x.title })),
+        ...built,
+      }), { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
     }
 
     if (route === 'file' || route === 'tree') {

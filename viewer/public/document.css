@@ -1,0 +1,31 @@
+/* The documentation generator. Furniture from layers.css. */
+
+.doc-main { max-width: 1080px; display: grid; gap: 18px; }
+.doc-main .admin-panel { margin: 0; }
+
+.doc-sections { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 14px 0 4px; }
+.doc-section {
+  display: inline-flex; gap: 6px; align-items: center;
+  font-size: 12.5px; color: var(--text-dim);
+}
+
+/* Monospace and preformatted, because it is Markdown and the reader is about
+   to paste it somewhere: showing it rendered would hide the thing they are
+   actually taking away. */
+.doc-preview {
+  margin: 10px 0 0; padding: 16px; max-height: 60vh; overflow: auto;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.6;
+  white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-dim);
+}
+
+/* Printing is the third way out, after download and copy. On paper the
+   furniture is noise: the document is the only thing anybody wants. */
+@media print {
+  .admin-bar, .doc-sections, .set-actions, #dc-skipped, .set-lede, .admin-heading { display: none; }
+  .doc-main, .admin-panel { max-width: none; margin: 0; padding: 0; border: 0; background: none; }
+  .doc-preview {
+    max-height: none; overflow: visible; border: 0; padding: 0; background: none;
+    color: #000; font-size: 10pt;
+  }
+}

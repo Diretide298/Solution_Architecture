@@ -153,6 +153,7 @@ const DRAWER_HTML = `
 
         <nav class="drawer-group" aria-labelledby="drawer-explore">
           <h3 class="drawer-group-title" id="drawer-explore">Explore</h3>
+          <a class="drawer-link" href="/document.html">Generate documentation</a>
           <a class="drawer-link" href="/domains.html">Domain lenses</a>
           <a class="drawer-link" href="/avatar.html">The avatar, and what it can do</a>
         </nav>

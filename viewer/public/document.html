@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/document.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">documentation</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main class="admin-main doc-main">
+      <div class="admin-panel">
+        <h1 class="admin-heading">Generate documentation</h1>
+        <p class="auth-note set-lede">
+          The package as one document you can hand to somebody: Markdown, so it
+          pastes into Confluence, opens in Word, renders on GitHub and prints
+          from a browser. <strong>Every figure and every line of prose in it
+          comes from the package</strong> &mdash; nothing is written for the
+          document, and nothing is padded where the package says nothing.
+        </p>
+        <p class="auth-error" id="dc-error" hidden></p>
+
+        <div class="doc-sections" id="dc-sections"></div>
+
+        <div class="set-actions">
+          <button id="dc-build" class="auth-button" type="button">Generate</button>
+          <button id="dc-download" class="chip" type="button" hidden>Download .md</button>
+          <button id="dc-copy" class="chip" type="button" hidden>Copy</button>
+          <button id="dc-print" class="chip" type="button" hidden>Print</button>
+          <p class="set-state" id="dc-says" role="status"></p>
+        </div>
+
+        <p class="auth-note auth-fine" id="dc-skipped" hidden></p>
+      </div>
+
+      <div class="admin-panel" id="dc-preview-panel" hidden>
+        <h2 class="admin-heading">Preview <span class="admin-count" id="dc-words"></span></h2>
+        <pre class="doc-preview" id="dc-preview"></pre>
+      </div>
+    </main>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/document.js"></script>
+  </body>
+</html>
