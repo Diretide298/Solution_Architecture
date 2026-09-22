@@ -140,7 +140,9 @@ CREATE TABLE IF NOT EXISTS verdict (
 -- Verdicts are append-only: a row is a thing someone said at a time, and
 -- rewriting it would lose the fact that they once thought otherwise. The
 -- current verdict is the newest row for that target.
-CREATE INDEX IF NOT EXISTS verdict_target ON verdict(target_kind, target_id, audience, id DESC);
+--
+-- Its index is in LATE_INDEXES below, not here: it names `audience`, which an
+-- old store does not have until the migration adds it.
 
 -- Somebody named in a note. A row per person per verdict, rather than parsing
 -- the note again on every read: the note is prose and people get renamed, and
@@ -364,12 +366,10 @@ CREATE TABLE IF NOT EXISTS change_request (
 );
 CREATE INDEX IF NOT EXISTS change_request_by_target
   ON change_request(project_id, target_kind, target_id, status);
--- The two questions the changes page asks that are not about one artefact:
--- "what is in my slice" and "what has nobody taken".
-CREATE INDEX IF NOT EXISTS change_request_by_slice
-  ON change_request(project_id, tag, platform, status);
-CREATE INDEX IF NOT EXISTS change_request_unpicked
-  ON change_request(project_id, status, picked_at);
+-- The two questions the changes page asks that are not about one artefact --
+-- "what is in my slice" and "what has nobody taken" -- are indexed in
+-- LATE_INDEXES below, not here: both name columns an old store does not have
+-- until the migration adds them.
 
 -- A change request drafted by Claude and waiting for the person to agree.
 -- Filing takes the one-use code; the draft expires like a work package
@@ -754,6 +754,34 @@ CREATE TABLE IF NOT EXISTS test_batch_item (
 );
 """
 
+# Indexes that cannot be created until the migration has run.
+#
+# `executescript(SCHEMA)` is the first thing init() does, and CREATE TABLE IF
+# NOT EXISTS is a no-op against a table that is already there -- so on a store
+# made before a column existed, the table keeps its old shape until the ALTER
+# statements further down add it. An index naming that column is therefore a
+# statement about a column that does not exist yet, and SQLite refuses the whole
+# script with `no such column`. The service then fails to start, on the one kind
+# of store that has real data in it, which is the only kind that can hit it.
+#
+# So these three live here and run at the end of init() instead. The rule for
+# anything added later: if the column is in a `for column, ddl in ...` migration
+# block, its index belongs in this string and not in SCHEMA.
+LATE_INDEXES = """
+-- The current verdict is the newest row for this artefact and this audience.
+-- A store that predates `audience` has this rebuilt by hand in the migration,
+-- so IF NOT EXISTS here correctly leaves the wider one alone.
+CREATE INDEX IF NOT EXISTS verdict_target
+  ON verdict(target_kind, target_id, audience, id DESC);
+
+-- The two questions the changes page asks that are not about one artefact:
+-- "what is in my slice" and "what has nobody taken".
+CREATE INDEX IF NOT EXISTS change_request_by_slice
+  ON change_request(project_id, tag, platform, status);
+CREATE INDEX IF NOT EXISTS change_request_unpicked
+  ON change_request(project_id, status, picked_at);
+"""
+
 # The project every row that predates projects belongs to.
 #
 # There was one package and it was this one, so every verdict, every mention and
@@ -1088,6 +1116,9 @@ def init() -> None:
         # makes on the page, never something a deploy does on their behalf.
         cur.execute(
             "INSERT OR IGNORE INTO ip_policy (id, armed) VALUES (1, 0)")
+
+        # Last, now that every column those indexes name exists.
+        cur.executescript(LATE_INDEXES)
 
 
 def fold(email: str) -> str:
