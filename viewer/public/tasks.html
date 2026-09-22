@@ -68,6 +68,7 @@
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/board.html">My work</a>
         <a class="chip" href="/admin.html">Admin</a>
         <a class="chip" href="/changes.html">Change requests</a>
         <a class="chip" href="/">Back to the viewer</a>
@@ -119,6 +120,7 @@
           <a href="#people">People</a>
           <a href="#dates">Overdue and due</a>
           <div class="set-nav-group">What is being delivered</div>
+          <a href="#timeline">Timeline</a>
           <a href="#deliverables">Deliverables</a>
           <a href="#parents">Epics</a>
           <div class="set-nav-group">Over time</div>
@@ -179,6 +181,29 @@
           <div class="admin-table" id="tk-overdue"></div>
           <h3 class="tk-sub" id="tk-soon-title">Due in the next seven days</h3>
           <div class="admin-table" id="tk-soon"></div>
+        </section>
+
+        <!-- ── timeline ──────────────────────────────────────────────── -->
+        <!-- Drawn from the dates OpenProject already holds. ADAM schedules
+             nothing and stores no dates of its own (CF-124): this is a view,
+             and moving a bar means moving it in OpenProject. -->
+        <section class="admin-panel set-section" id="timeline">
+          <h2 class="admin-heading">
+            Timeline <span class="admin-count" id="tk-timeline-count"></span>
+          </h2>
+          <p class="auth-note set-lede">
+            Every epic that has dates, under the milestone it is being delivered
+            for. A bar runs from the earliest start to the latest date among its
+            tickets; the solid part is how much of it is closed. Tickets with no
+            dates cannot be placed and are counted underneath rather than
+            quietly dropped.
+          </p>
+          <div class="set-actions">
+            <label class="tk-only"><input id="tk-gantt-open" type="checkbox" />
+              Hide milestones where everything is done</label>
+          </div>
+          <div class="tk-gantt" id="tk-gantt"></div>
+          <p class="auth-note auth-fine" id="tk-undated"></p>
         </section>
 
         <!-- ── deliverables ──────────────────────────────────────────── -->

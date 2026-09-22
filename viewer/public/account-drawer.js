@@ -138,6 +138,12 @@ const DRAWER_HTML = `
                stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
         </a>
 
+        <nav class="drawer-group" aria-labelledby="drawer-mine">
+          <h3 class="drawer-group-title" id="drawer-mine">Your work</h3>
+          <a class="drawer-link" href="/board.html">My work, and the testing gate</a>
+          <a class="drawer-link" href="/agents.html">Agent activity</a>
+        </nav>
+
         <nav class="drawer-group" aria-labelledby="drawer-reviews">
           <h3 class="drawer-group-title" id="drawer-reviews">Reviews</h3>
           <a class="drawer-link" href="/validation.html">What has been signed off</a>

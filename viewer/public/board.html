@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — my work</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/board.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">my work</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <button id="bd-refresh" class="chip" type="button" title="Reads OpenProject again, now">Refresh</button>
+        <a class="chip" href="/changes.html">Change requests</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <!-- The whole page needs OpenProject: no token, or no OpenProject project
+         chosen for this ADAM project, and there is nothing to show. Both say
+         which of the two it is, and where to fix it. -->
+    <main id="unconnected" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">OpenProject is not connected</h1>
+        <p class="auth-note" id="unconnected-why"></p>
+        <a class="auth-button" id="unconnected-go" href="/settings.html#openproject">Go to settings</a>
+      </div>
+    </main>
+
+    <main id="board" class="admin-main board-main" hidden>
+      <p class="auth-error" id="bd-error" hidden></p>
+
+      <!-- The gate, where somebody will meet it rather than at the moment it
+           refuses them. A developer who learns on their eleventh close that
+           they should have tested ten closes ago has been ambushed by a rule
+           that was always visible to the service and never to them. -->
+      <section class="bd-gate" id="bd-gate" hidden>
+        <div class="bd-gate-text">
+          <strong id="bd-gate-title"></strong>
+          <span id="bd-gate-detail"></span>
+        </div>
+        <a class="chip" href="#bd-testing" id="bd-gate-go">Go to testing</a>
+      </section>
+
+      <section class="stat-strip" id="bd-stats"></section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          Overdue <span class="admin-count" id="bd-overdue-count"></span>
+        </h2>
+        <p class="auth-note set-lede">Past the date on the ticket. First, because nothing else on this page is.</p>
+        <div class="admin-table" id="bd-overdue"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          This week <span class="admin-count" id="bd-week-count"></span>
+        </h2>
+        <p class="auth-note set-lede">Due in the next seven days.</p>
+        <div class="admin-table" id="bd-week"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          Started <span class="admin-count" id="bd-started-count"></span>
+        </h2>
+        <p class="auth-note set-lede">
+          Something has been done on these &mdash; OpenProject says they are part
+          finished &mdash; and nothing is pressing on the date.
+        </p>
+        <div class="admin-table" id="bd-started"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          Backlog <span class="admin-count" id="bd-backlog-count"></span>
+        </h2>
+        <p class="auth-note set-lede">
+          Assigned to you, not started, no date pressing. What comes after the
+          rest of this page.
+        </p>
+        <div class="admin-table" id="bd-backlog"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          Finished this week <span class="admin-count" id="bd-done-count"></span>
+        </h2>
+        <p class="auth-note set-lede">
+          The other half of the same board. A page of only what is left reads as
+          a list of things you have not done.
+        </p>
+        <div class="admin-table" id="bd-done"></div>
+      </section>
+
+      <!-- ── testing ──────────────────────────────────────────────────
+           Here rather than on a page of its own, because this is where a
+           developer already is. It also closes a hole: the gate and the
+           maker-checker shipped with the connector as their only interface,
+           so anybody not using Claude Code could be stopped by a rule they
+           had no way to satisfy. -->
+      <section class="admin-panel" id="bd-testing">
+        <h2 class="admin-heading">Testing <span class="admin-count" id="bd-batch-count"></span></h2>
+        <p class="auth-note set-lede">
+          Every ten tickets you close, the next close is refused until that batch
+          has been tested and <strong>somebody else</strong> has said so. You
+          cannot check your own &mdash; that is the whole of what it is for.
+        </p>
+        <p class="auth-error" id="bd-batch-error" hidden></p>
+
+        <div id="bd-batch"></div>
+
+        <form class="bd-submit" id="bd-submit" hidden>
+          <label class="auth-label" for="bd-notes">What you ran, and what it showed</label>
+          <textarea id="bd-notes" class="auth-input" rows="3"
+            placeholder="Ran the contract suite and the POS smoke pack against staging: 412 passed, 2 failed on the receipt total, both traced to CR-001."></textarea>
+          <label class="auth-label" for="bd-evidence">Output worth keeping (optional)</label>
+          <textarea id="bd-evidence" class="auth-input" rows="2"
+            placeholder="pytest -q tests/contracts: 412 passed, 2 failed in 96s"></textarea>
+          <div class="set-actions">
+            <button class="auth-button" type="submit" id="bd-submit-go">Submit for checking</button>
+            <p class="set-state" id="bd-submit-says" role="status"></p>
+          </div>
+        </form>
+      </section>
+
+      <section class="admin-panel" id="bd-checking" hidden>
+        <h2 class="admin-heading">
+          Waiting on you to check <span class="admin-count" id="bd-waiting-count"></span>
+        </h2>
+        <p class="auth-note set-lede">
+          A teammate has tested a batch and cannot clear their own gate. Read
+          what they ran; pass it, or send it back with a reason.
+        </p>
+        <div id="bd-waiting"></div>
+      </section>
+
+      <p class="auth-note auth-fine" id="bd-note"></p>
+    </main>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/board.js"></script>
+  </body>
+</html>

@@ -43,6 +43,9 @@ const state = {
   data: null,
   closedByName: new Map(),   // status name -> isClosed, from OpenProject
   filter: { text: '', status: '', person: '', openOnly: false },
+  // The timeline's own switch, kept out of `filter` because that one drives
+  // the ticket list at the bottom and these are different questions.
+  ganttOpenOnly: false,
 };
 
 // Open states that mean the work has stopped. A guess, and the only one on the
@@ -132,6 +135,7 @@ function draw() {
   drawStates(items);
   drawPeople(items);
   drawDates(items);
+  drawTimeline(items);
   drawDeliverables(items);
   drawParents(items);
   drawThroughput(items);
@@ -365,6 +369,162 @@ function drawDeliverables(items) {
     : 'Every ticket is linked to something in the package.';
 }
 
+// ── the timeline ────────────────────────────────────────────────────
+//
+// **A view over OpenProject's dates and nothing of ADAM's own.** There is no
+// schedule stored here, no bar to drag, and no way to move a date from this
+// page — CF-124, the same reason the board cannot reassign a ticket. Moving
+// work means moving it where the plan lives.
+//
+// Grouped by version, because that is where the delivery plan's milestones
+// land in OpenProject, then by epic. An epic's bar spans the earliest start to
+// the latest date among its own tickets: a parent usually carries no dates
+// itself, so taking its own would draw almost nothing.
+
+const MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** The window a ticket occupies. A ticket with only one of the two dates is a
+ *  point rather than a span — drawing it as "from the beginning of time" is the
+ *  version of this that makes every chart look like one long bar. */
+function span(t) {
+  const from = asDate(t.startDate);
+  const to = asDate(t.dueDate);
+  if (from && to) return [from, to < from ? from : to];
+  if (from) return [from, from];
+  if (to) return [to, to];
+  return null;
+}
+
+function drawTimeline(items) {
+  const box = $('tk-gantt');
+  box.replaceChildren();
+
+  // Milestone -> epic -> tickets, keeping only what can be placed.
+  const placed = [];
+  let undated = 0;
+  for (const t of items) {
+    const at = span(t);
+    if (!at) { undated += 1; continue; }
+    placed.push([t, at]);
+  }
+  $('tk-undated').textContent = undated
+    ? `${plural(undated, 'ticket has', 'tickets have')} no start or due date in OpenProject, so `
+      + `${undated === 1 ? 'it is' : 'they are'} not on the chart.`
+    : 'Every ticket has a date.';
+
+  if (!placed.length) {
+    box.append(el('p', 'tk-empty',
+      'No ticket in this project carries a start or a due date, so there is nothing '
+      + 'to place on a timeline. Dates are set in OpenProject.'));
+    $('tk-timeline-count').textContent = '';
+    return;
+  }
+
+  let first = placed[0][1][0];
+  let last = placed[0][1][1];
+  for (const [, [from, to]] of placed) {
+    if (from < first) first = from;
+    if (to > last) last = to;
+  }
+  // Whole months, so the gridlines are dates somebody recognises rather than
+  // wherever the first ticket happened to start.
+  const start = new Date(first.getFullYear(), first.getMonth(), 1);
+  const end = new Date(last.getFullYear(), last.getMonth() + 1, 0);
+  const width = Math.max(1, end - start);
+  const pct = (d) => `${Math.max(0, Math.min(100, ((d - start) / width) * 100))}%`;
+
+  const milestones = new Map();
+  for (const [t, at] of placed) {
+    const key = t.version || '';
+    const group = milestones.get(key) ?? { name: t.version || 'No milestone', epics: new Map() };
+    const epicKey = t.parent ? String(t.parent) : `loose:${t.key}`;
+    const epic = group.epics.get(epicKey) ?? {
+      key: t.parent ? String(t.parent) : '',
+      name: t.parentSubject || (t.parent ? `#${t.parent}` : t.subject || `#${t.key}`),
+      from: at[0], to: at[1], tickets: [],
+    };
+    if (at[0] < epic.from) epic.from = at[0];
+    if (at[1] > epic.to) epic.to = at[1];
+    epic.tickets.push(t);
+    group.epics.set(epicKey, epic);
+    milestones.set(key, group);
+  }
+
+  // The months, once, above everything.
+  const scale = el('div', 'tk-gantt-scale');
+  for (let d = new Date(start); d <= end; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) {
+    const tick = el('div', 'tk-gantt-month', `${MONTH[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`);
+    tick.style.left = pct(d);
+    scale.append(tick);
+  }
+  const now = today();
+  if (now >= start && now <= end) {
+    const line = el('div', 'tk-gantt-now');
+    line.style.left = pct(now);
+    line.title = 'today';
+    scale.append(line);
+  }
+  box.append(scale);
+
+  let shown = 0;
+  const groups = [...milestones.entries()].sort((a, b) => {
+    if (!a[0] !== !b[0]) return a[0] ? -1 : 1;          // "No milestone" last
+    const ea = Math.min(...[...a[1].epics.values()].map((e) => +e.from));
+    const eb = Math.min(...[...b[1].epics.values()].map((e) => +e.from));
+    return ea - eb;
+  });
+  for (const [, group] of groups) {
+    const epics = [...group.epics.values()].sort((a, b) => a.from - b.from);
+    const allDone = epics.every((e) => e.tickets.every(isDone));
+    if (state.ganttOpenOnly && allDone) continue;
+
+    const wrap = el('div', 'tk-gantt-group');
+    const total = epics.reduce((n, e) => n + e.tickets.length, 0);
+    const done = epics.reduce((n, e) => n + e.tickets.filter(isDone).length, 0);
+    wrap.append(el('h3', 'tk-sub', `${group.name} — ${done} of ${total} done`));
+
+    for (const epic of epics) {
+      shown += 1;
+      const row = el('div', 'tk-gantt-row');
+      const label = el('span', 'tk-gantt-label', epic.name);
+      label.title = epic.name;
+      row.append(label);
+
+      const track = el('div', 'tk-gantt-track');
+      const late = epic.tickets.some(isOverdue);
+      const finished = epic.tickets.every(isDone);
+      const bar = el('div', `tk-gantt-bar${finished ? ' is-done' : late ? ' is-late' : ''}`);
+      bar.style.left = pct(epic.from);
+      // A single-day epic would be zero wide and invisible, so it gets a floor.
+      bar.style.width = `max(3px, ${((epic.to - epic.from) / width) * 100}%)`;
+      const share = epic.tickets.length
+        ? epic.tickets.filter(isDone).length / epic.tickets.length : 0;
+      const fill = el('div', 'tk-gantt-fill');
+      fill.style.width = `${Math.round(share * 100)}%`;
+      bar.append(fill);
+      // Newlines as escapes, not as real line breaks: a tooltip built from a
+      // template literal spanning lines carries the source indentation into
+      // the tooltip.
+      bar.title = [
+        epic.name,
+        `${fmtDay(epic.from.toISOString())} – ${fmtDay(epic.to.toISOString())}`,
+        `${epic.tickets.filter(isDone).length} of ${epic.tickets.length} done`,
+        late ? 'something in it is overdue' : '',
+      ].filter(Boolean).join('\n');
+      track.append(bar);
+      row.append(track);
+      row.append(el('span', 'tk-gantt-count',
+        `${epic.tickets.filter(isDone).length}/${epic.tickets.length}`));
+      wrap.append(row);
+    }
+    box.append(wrap);
+  }
+  if (!shown) {
+    box.append(el('p', 'tk-empty', 'Everything with a date is finished.'));
+  }
+  $('tk-timeline-count').textContent = plural(shown, 'epic', 'epics');
+}
+
 function drawParents(items) {
   const groups = new Map();
   for (const t of items) {
@@ -533,6 +693,11 @@ function exportCsv() {
       location.search = `?project=${encodeURIComponent(picker.value)}`;
     };
   } catch { /* the page still works for the current project */ }
+
+  $('tk-gantt-open').onchange = (e) => {
+    state.ganttOpenOnly = e.target.checked;
+    drawTimeline(state.data?.items ?? []);
+  };
 
   $('tk-refresh').onclick = async () => {
     $('tk-refresh').disabled = true;

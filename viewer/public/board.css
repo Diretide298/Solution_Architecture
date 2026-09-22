@@ -1,0 +1,77 @@
+/* A developer's board. Furniture from layers.css; only the parts specific to
+   a personal work list are here. */
+
+.board-main { max-width: 1180px; display: grid; gap: 18px; }
+.board-main .admin-panel { margin: 0; }
+
+/* ── the gate ──────────────────────────────────────────────────────── */
+
+.bd-gate {
+  display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: 10px;
+  border: 1px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+}
+/* Full is a different thing from approaching full: one is a warning and the
+   other is the reason the next close will be refused. */
+.bd-gate.is-blocked { border-color: var(--error); background: color-mix(in srgb, var(--error) 10%, transparent); }
+.bd-gate[hidden] { display: none; }
+.bd-gate-text { display: grid; gap: 2px; flex: 1 1 320px; min-width: 0; }
+.bd-gate-text strong { color: var(--text); font-size: 13.5px; }
+.bd-gate-text span { color: var(--text-dim); font-size: 12.5px; line-height: 1.5; }
+
+.stat-card.bd-stat-bad .stat-value { color: var(--error); }
+
+/* ── a ticket ──────────────────────────────────────────────────────── */
+
+.bd-row.admin-row {
+  grid-template-columns: 66px minmax(0, 1.4fr) minmax(0, 1fr) auto auto;
+}
+.bd-key { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+.bd-subject { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bd-status { color: var(--text-dim); white-space: nowrap; }
+.bd-when { color: var(--text-faint); white-space: nowrap; justify-self: end; }
+
+.bd-touches { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
+.bd-touch {
+  padding: 1px 7px; border-radius: 999px; font-size: 10.5px;
+  background: var(--bg-hover); color: var(--text-dim); white-space: nowrap;
+}
+.bd-touch-more { color: var(--text-faint); }
+.bd-touch-none { font-size: 10.5px; color: var(--text-faint); font-style: italic; }
+
+/* ── testing ───────────────────────────────────────────────────────── */
+
+.bd-batch {
+  padding: 12px 14px; margin-top: 10px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
+  display: grid; gap: 8px;
+}
+.bd-batch-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 12.5px; }
+.bd-verdict {
+  margin-left: auto; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; background: var(--bg-hover); color: var(--text-dim);
+}
+.bd-verdict.passed { color: var(--ok); }
+.bd-verdict.failed { color: var(--error); }
+.bd-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.bd-label { font-size: 11px; color: var(--text-faint); }
+.bd-notes {
+  margin: 0; padding: 8px 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--bg-panel);
+  font-family: var(--mono); font-size: 11.5px; white-space: pre-wrap;
+  overflow-wrap: anywhere; color: var(--text-dim);
+}
+.bd-evidence { color: var(--text-faint); }
+
+.bd-submit { display: grid; gap: 6px; margin-top: 14px; }
+.bd-submit textarea { resize: vertical; font-family: inherit; }
+.bd-submit .set-actions .auth-button { width: auto; margin: 0; padding: 8px 18px; }
+.bd-pass { color: var(--ok); }
+.bd-fail { color: var(--error); }
+#bd-waiting { display: grid; gap: 10px; }
+
+@media (max-width: 820px) {
+  .bd-row.admin-row { grid-template-columns: 66px minmax(0, 1fr); }
+  .bd-when { justify-self: start; }
+}

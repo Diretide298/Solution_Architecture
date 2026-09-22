@@ -495,6 +495,22 @@ export const agentSession = (id) => call(`/api/agent/sessions/${id}`);
 export const overdueChanges = (projectId) =>
   call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);
 
+// A developer's own work, always. The service answers from the caller's own
+// OpenProject token with `assignee = me`, so there is no id to pass and no
+// wider version of this to ask for.
+export const myBoard = (projectId = '') =>
+  call(`/api/board/mine?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+
+// Testing in batches, and the teammate who signs it off. `checkBatch` is
+// refused on your own batch by the service; the page does not offer it either,
+// but the refusal is what makes it a rule.
+export const listBatches = (projectId = '') =>
+  call(`/api/test-batches?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+export const submitBatch = (id, notes, evidence = '') =>
+  call(`/api/test-batches/${id}/submit`, { method: 'POST', body: { notes, evidence } });
+export const checkBatch = (id, verdict, note = '') =>
+  call(`/api/test-batches/${id}/check`, { method: 'POST', body: { verdict, note } });
+
 // The allowlist. All of it is the owner's, reads included — the sightings are a
 // record of where every colleague has opened their laptop, which is a different
 // kind of object from a list of rules. See the note above the routes in main.py.

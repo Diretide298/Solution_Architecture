@@ -382,6 +382,34 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 2000) ->
     return list(found.values())[:limit]
 
 
+def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
+                  limit: int = 50) -> list:
+    """What this person has closed lately, newest first.
+
+    **Filtered by status and sorted by date, never filtered by date.** A date
+    operator would be the obvious way to ask for "the last week", and the
+    operators for it changed shape across OpenProject versions — this instance
+    is 10.0.2, from 2019. Asking for the newest closed ones and choosing the
+    window in Python is one more round of sorting and cannot be wrong.
+
+    A board that shows only what is left reads as a list of things you have not
+    done. What somebody finished this week is the other half of the same board.
+    """
+    wanted = [
+        {"assignee": {"operator": "=", "values": ["me"]}},
+        {"status": {"operator": "c", "values": [""]}},
+    ]
+    if project_id is not None:
+        wanted.append({"project": {"operator": "=", "values": [str(project_id)]}})
+    page = call(endpoint, token, "work_packages", {
+        "filters": json.dumps(wanted),
+        "pageSize": max(1, min(limit, 200)),
+        "sortBy": json.dumps([["updatedAt", "desc"]]),
+    })
+    return [summarise(wp, endpoint)
+            for wp in page.get("_embedded", {}).get("elements", [])]
+
+
 def mine(endpoint: str, token: str, limit: int = 100,
          project_id: Optional[int] = None) -> list:
     """

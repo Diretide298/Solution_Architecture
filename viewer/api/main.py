@@ -2008,11 +2008,16 @@ def my_board(
     endpoint, token = _pms_for(account["id"])
     try:
         items = openproject.mine(endpoint, token, project_id=scope["pmsId"])
+        # The other half of the same board. A list of only what is left reads
+        # as a list of things you have not done; what somebody closed this week
+        # is the part that says the week happened.
+        finished = openproject.mine_finished(endpoint, token, project_id=scope["pmsId"])
     except (openproject.Blocked, openproject.Refused) as exc:
         raise HTTPException(502, str(exc))
     # Checked again here, in case an instance ignores the filter: a board that
     # quietly shows other products' tickets is the thing this scope prevents.
     items = [item for item in items if item.get("projectId") == scope["pmsId"]]
+    finished = [item for item in finished if item.get("projectId") == scope["pmsId"]]
 
     # One query for every link, joined in memory. The alternative is a query per
     # work package, and this table is small.
@@ -2035,6 +2040,23 @@ def my_board(
             "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
         },
         "items": [{**item, "touches": touching.get(item["key"], [])} for item in items],
+        # The window is chosen here rather than asked of OpenProject: see
+        # openproject.mine_finished for why a date filter is the wrong thing to
+        # send to a 2019 instance.
+        "finished": [
+            {**item, "touches": touching.get(item["key"], [])}
+            for item in finished
+            if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))
+        ],
+        # What is standing against this person on the testing gate, so a board
+        # that is about to refuse the next close says so on the board rather
+        # than at the moment of closing.
+        "testing": (lambda batch: None if not batch else {
+            "id": batch["id"], "closed": _batch_size(batch["id"]), "every": TEST_EVERY,
+            "full": _batch_size(batch["id"]) >= TEST_EVERY,
+            "submitted": bool(batch["submitted_at"]), "verdict": batch["verdict"],
+            "checkerNote": batch["checker_note"],
+        })(_open_batch(account["id"], scope["project"])),
         # Said out loud when it is the answer. An empty board reads as "nothing
         # assigned to me", and the truth may be "nothing has been loaded yet".
         "note": None if items else

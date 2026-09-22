@@ -70,6 +70,53 @@ function ensure(id) {
   return made;
 }
 
+/** Assign a ticket to the harness user and give it the shape a board and a
+ *  timeline need: dates, an epic, a milestone, a percentage. */
+const USERS = { 'harness-key': 5, 'other-key': 6 };
+
+/** Which user a token belongs to. The whole point of `assignee = me` is that
+ *  the answer depends on who is asking, so a stand-in that ignored the
+ *  credential would make "a board is only ever your own" untestable. */
+function userOf(req) {
+  const header = (req.headers.authorization ?? '').replace(/^Basic /, '');
+  const token = Buffer.from(header, 'base64').toString().split(':')[1] ?? '';
+  return USERS[token] ?? 0;
+}
+
+function own(id, { subject, status = 7, done = 0, start, due, parent, version, user = 5, updated }) {
+  const wp = ensure(String(id));
+  wp.subject = subject;
+  wp.percentageDone = done;
+  wp.startDate = start ?? null;
+  wp.dueDate = due ?? null;
+  wp._links.status = { href: `/api/v3/statuses/${status}`, title: STATUSES.find((s) => s.id === status).name };
+  wp._links.assignee = { href: `/api/v3/users/${user}`, title: user === 5 ? 'Harness Person' : 'Somebody Else' };
+  if (parent) wp._links.parent = { href: `/api/v3/work_packages/${parent}`, title: `Epic ${parent}` };
+  if (version) wp._links.version = { href: '/api/v3/versions/1', title: version };
+  // When it last changed, which for a closed ticket is when it was closed —
+  // and that is what the board's "finished this week" window is measured on.
+  // Defaulting it to the due date made a ticket due a fortnight ago look like
+  // it was closed a fortnight ago, which is a different fact.
+  wp.updatedAt = `${updated ?? due ?? '2026-09-01'}T09:00:00Z`;
+  return wp;
+}
+
+// A board: one overdue, one due this week, one started, one in the backlog,
+// one closed. The dates are relative so the assertions do not rot.
+const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+own(7001, { subject: 'Receipt totals are wrong', start: day(-20), due: day(-3), parent: 900, version: 'M1 Checkout' });
+own(7002, { subject: 'Tax rounding on the POS', start: day(-5), due: day(3), parent: 900, version: 'M1 Checkout' });
+own(7003, { subject: 'Refund flow', done: 40, start: day(-10), due: day(40), parent: 901, version: 'M2 Refunds' });
+own(7004, { subject: 'Nothing has started here', parent: 901, version: 'M2 Refunds' });
+own(7005, { subject: 'Already shipped', status: 12, done: 100, start: day(-30), due: day(-10), updated: day(-2), parent: 900, version: 'M1 Checkout' });
+// A milestone with nothing left in it, so "hide what is finished" has
+// something to hide. Without one the switch redraws the same chart and the
+// assertion about it passes while proving nothing.
+own(7006, { subject: 'Shipped and closed', status: 12, done: 100, start: day(-60), due: day(-40), updated: day(-40), parent: 902, version: 'M0 Groundwork' });
+
+// Somebody else's, to prove a board is only ever your own.
+own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6 });
+
 let nextId = 1200;
 const created = [];
 
@@ -97,7 +144,9 @@ createServer(async (req, res) => {
   }
 
   if (path === '/api/v3/users/me') {
-    return json(res, 200, { _type: 'User', id: 5, name: 'Harness Person', login: 'harness' });
+    const me = userOf(req);
+    return json(res, 200, { _type: 'User', id: me || 5,
+                            name: me === 6 ? 'Somebody Else' : 'Harness Person', login: `u${me}` });
   }
 
   if (path === '/api/v3/projects') {
@@ -111,6 +160,40 @@ createServer(async (req, res) => {
   if (types) {
     if (types[1] !== String(PROJECT.id)) return json(res, 404, { message: 'no such project' });
     return json(res, 200, { total: TYPES.length, _embedded: { elements: TYPES } });
+  }
+
+  // The collection, filtered. Enough of OpenProject's filter language for the
+  // board and the overview to be exercised for real: assignee=me, the built-in
+  // open/closed status sets, and the project. Everything else is ignored rather
+  // than refused — a stand-in that argued about filters would fail tests about
+  // something other than what they test.
+  if (path === '/api/v3/work_packages' && req.method === 'GET') {
+    let want = [];
+    try { want = JSON.parse(url.searchParams.get('filters') ?? '[]'); } catch { want = []; }
+    const closedOf = (wp) => {
+      const href = wp._links?.status?.href ?? '';
+      return STATUSES.find((st) => href.endsWith(`/${st.id}`))?.isClosed ?? false;
+    };
+    let rows = [...packages.values()];
+    for (const f of want) {
+      const [field, spec] = Object.entries(f)[0] ?? [];
+      if (field === 'assignee' && spec.values?.includes('me')) {
+        const me = userOf(req);
+        rows = rows.filter((wp) => (wp._links?.assignee?.href ?? '') === `/api/v3/users/${me}`);
+      } else if (field === 'status' && spec.operator === 'o') {
+        rows = rows.filter((wp) => !closedOf(wp));
+      } else if (field === 'status' && spec.operator === 'c') {
+        rows = rows.filter((wp) => closedOf(wp));
+      } else if (field === 'project') {
+        rows = rows.filter((wp) => (wp._links?.project?.href ?? '').endsWith(`/${spec.values[0]}`));
+      }
+    }
+    rows.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+    const size = Number(url.searchParams.get('pageSize') ?? 100);
+    return json(res, 200, {
+      total: rows.length, count: Math.min(rows.length, size),
+      _embedded: { elements: rows.slice(0, size) },
+    });
   }
 
   if (path === '/api/v3/statuses') {
