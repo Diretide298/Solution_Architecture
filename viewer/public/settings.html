@@ -276,6 +276,13 @@
               <span><strong>Audit the delivery package</strong>
                 <small>What the package's own checks found</small></span>
             </a>
+            <!-- The super admin's, not an administrator's, so it is hidden
+                 inside a section admins can see. The service refuses every
+                 route behind it to anybody else regardless. -->
+            <a class="set-link" href="/ips.html" id="link-networks" hidden>
+              <span><strong>Networks: who may reach Adam</strong>
+                <small>Every address is allowed until you say otherwise — and a log of where each account signs in from</small></span>
+            </a>
           </div>
         </section>
       </main>

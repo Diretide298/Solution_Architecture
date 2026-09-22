@@ -1,0 +1,110 @@
+/* The networks page. Colours come from the shared tokens, so day and night
+   follow the viewer; the furniture (set-layout, admin-row, chips) is in
+   layers.css and only the parts specific to an allowlist are here. */
+
+/* ── status ────────────────────────────────────────────────────────── */
+
+.ip-state {
+  margin-top: 12px; padding: 14px;
+  border: 1px solid var(--border); border-left: 4px solid var(--text-faint);
+  border-radius: 8px; background: var(--bg-raised);
+}
+/* Armed is the state worth being able to see from across the room: it is the
+   one where somebody being unable to sign in is this page's doing. */
+.ip-state.is-armed { border-left-color: var(--ok); }
+
+.ip-headline { display: flex; gap: 10px; align-items: center; }
+.ip-headline-text { font-size: 15px; font-weight: 700; color: var(--text); }
+.ip-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--text-faint); flex: none;
+}
+.ip-dot.on { background: var(--ok); }
+.ip-dot.off { background: var(--warning); }
+
+.ip-state .set-facts { margin-top: 14px; }
+
+.ip-override {
+  margin: 12px 0 0; padding: 12px 14px;
+  border: 1px solid var(--warning); border-radius: 8px;
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  color: var(--text); font-size: 12.5px; line-height: 1.55;
+}
+.ip-override[hidden] { display: none; }
+.ip-override b { display: block; margin-bottom: 4px; }
+.ip-override code { font-family: var(--mono); }
+/* The loopback note is a thing to check, not a thing that is wrong — on a
+   workstation it is simply true — so it sits a step below the override. */
+.ip-caution {
+  border-color: var(--border);
+  background: var(--bg-raised);
+  color: var(--text-dim);
+}
+
+.ip-confirm {
+  display: inline-flex; gap: 8px; align-items: center;
+  font-size: 12.5px; color: var(--text-dim);
+}
+.ip-confirm[hidden] { display: none; }
+.ip-confirm b { font-family: var(--mono); color: var(--text); }
+.ip-confirm input { width: 7ch; }
+
+/* ── rules ─────────────────────────────────────────────────────────── */
+
+.ip-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 4px; }
+.ip-add input { min-width: 0; }
+#ip-cidr { flex: 0 1 200px; font-family: var(--mono); }
+#ip-label { flex: 1 1 220px; }
+
+.ip-row.admin-row { grid-template-columns: minmax(150px, auto) minmax(0, 1fr) auto auto; }
+#ip-rules .ip-row.admin-row { grid-template-columns: minmax(150px, auto) minmax(0, 1fr) auto auto; }
+#ip-seen .ip-row.admin-row,
+#ip-refused .ip-row.admin-row,
+#ip-dry .ip-row.admin-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) auto auto;
+}
+
+.ip-cidr { font-family: var(--mono); color: var(--text); overflow-wrap: anywhere; }
+.ip-label { color: var(--text-dim); overflow-wrap: anywhere; }
+.ip-where { color: var(--text-faint); overflow-wrap: anywhere; }
+.ip-when { color: var(--text-faint); white-space: nowrap; }
+
+.ip-here {
+  margin-left: 6px; padding: 1px 6px; border-radius: 999px;
+  font-family: var(--font); font-size: 10.5px; letter-spacing: 0.02em;
+  background: var(--bg-hover); color: var(--text-dim);
+}
+
+.ip-verdict {
+  justify-self: end; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; white-space: nowrap;
+  background: var(--bg-hover); color: var(--text-dim);
+}
+.ip-verdict.ok { color: var(--ok); }
+.ip-verdict.bad { color: var(--error); }
+
+/* A row the allowlist would act on. Kept to a left edge rather than a fill:
+   most of this table is uncovered addresses on a store nobody has configured
+   yet, and a page of red reads as broken rather than as a worklist. */
+.ip-row-uncovered { border-left: 3px solid var(--warning); padding-left: 8px; }
+.ip-row-bad { border-left: 3px solid var(--error); padding-left: 8px; }
+.ip-row-unknown { border-left: 3px solid var(--text-faint); padding-left: 8px; }
+
+/* ── the log's own controls ────────────────────────────────────────── */
+
+.ip-filter { flex: 1 1 260px; min-width: 0; }
+.ip-only {
+  display: inline-flex; gap: 6px; align-items: center;
+  font-size: 12.5px; color: var(--text-dim);
+}
+
+@media (max-width: 820px) {
+  .ip-row.admin-row,
+  #ip-rules .ip-row.admin-row,
+  #ip-seen .ip-row.admin-row,
+  #ip-refused .ip-row.admin-row,
+  #ip-dry .ip-row.admin-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ip-when { white-space: normal; }
+}

@@ -40,7 +40,7 @@ import { buildUiux } from './lib/uiux.mjs';
 import { buildSearch } from './lib/search.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
-import { gate } from './lib/session.mjs';
+import { gate, callerIp } from './lib/session.mjs';
 import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
 
@@ -106,7 +106,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|health)(\/|$)|docs|openapi\.json)/;
 
 /**
  * Hand a request to the accounts service and give its answer back unchanged.
@@ -131,6 +131,7 @@ async function proxyToApi(req, res, url) {
   for (const name of ['cookie', 'content-type', 'accept', 'user-agent']) {
     if (req.headers[name]) headers[name] = req.headers[name];
   }
+  headers['x-real-ip'] = callerIp(req);
 
   try {
     const answer = await fetch(`${AUTH_BASE}${url.pathname}${url.search}`, {

@@ -29,15 +29,171 @@ from fastapi import (
     Request, UploadFile,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import db, decisions, openproject, secrets, security
+from . import db, decisions, netaddr, openproject, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
     version="1.0.0",
     description=__doc__,
 )
+
+
+# ── the allowlist ────────────────────────────────────────────────────
+#
+# Every request passes through here, and almost every request is waved on: the
+# policy ships off, and off means allowed. What it does from the first boot is
+# **watch** — one row per account and address, rolled up — so that by the time
+# anybody wants to switch it on, the list of addresses to allow is a query
+# against traffic that really happened rather than a guess.
+#
+# Three ways out, and they exist because an allowlist's characteristic failure
+# is locking out the person who installed it:
+#
+#   The policy is off until somebody turns it on, on a page, deliberately.
+#   Arming is refused unless a rule already covers the address doing the arming.
+#   ADAM_IP_ALLOWLIST=off ignores the policy entirely, for a shell on the box.
+#
+# The last one is the real safety net and it is deliberately an environment
+# variable: recovering from a lockout must not require the thing you are locked
+# out of.
+
+# Answered whatever the policy says. Monitoring is the one caller that has no
+# person behind it and no way to be told it has been blocked — a health check
+# that starts failing because of an allowlist reads as an outage, and somebody
+# is paged for a rule change.
+IP_EXEMPT = ("/api/health",)
+
+# The break-glass. Read per request rather than at import, so a systemd drop-in
+# plus a restart is the whole recovery and nothing has to be edited.
+def _allowlist_off() -> bool:
+    return os.environ.get("ADAM_IP_ALLOWLIST", "").strip().lower() in ("off", "0", "false")
+
+
+def _who_is_calling(request: Request):
+    """The account behind the cookie, without the dependency machinery.
+
+    Middleware runs before any of that, and this needs the account for two
+    things the request itself cannot say: whose sighting this is, and whose
+    email to copy onto a refusal.
+    """
+    token = request.cookies.get(SESSION_COOKIE)
+    if not token:
+        return None
+    try:
+        return db.one(
+            "SELECT a.id, a.email, a.active FROM session s JOIN account a ON a.id = s.account_id "
+            "WHERE s.token_hash = ? AND s.expires_at > ?",
+            (security.token_hash(token), security.stamp()))
+    except Exception:
+        # A request must not 500 because the log could not be written. This is
+        # the observing half of the feature; the deciding half below has its own
+        # reasons to be careful and does not share this swallow.
+        return None
+
+
+def _note_sighting(account_id: int, ip: str, agent: str, path: str) -> None:
+    try:
+        db.write(
+            "INSERT INTO ip_sighting (account_id, ip, first_seen, last_seen, hits, "
+            "last_agent, last_path) VALUES (?, ?, ?, ?, 1, ?, ?) "
+            "ON CONFLICT(account_id, ip) DO UPDATE SET "
+            "last_seen = excluded.last_seen, hits = hits + 1, "
+            "last_agent = excluded.last_agent, last_path = excluded.last_path",
+            (account_id, ip, security.stamp(), security.stamp(), agent[:200], path[:200]))
+    except Exception:
+        pass
+
+
+# How long two refusals from the same address count as the same event. A
+# scanner hitting a closed door does it hundreds of times a minute, and a log
+# that records every one of them is a log nobody can read afterwards.
+REFUSAL_QUIET_SECONDS = 60
+
+
+def _note_refusal(account, ip: str, path: str, armed: bool) -> None:
+    try:
+        recent = db.one(
+            "SELECT id FROM ip_refusal WHERE ip = ? AND armed = ? AND at > ? "
+            "AND (account_id IS ? OR account_id = ?) ORDER BY id DESC LIMIT 1",
+            (ip, 1 if armed else 0,
+             security.stamp(security.now() - timedelta(seconds=REFUSAL_QUIET_SECONDS)),
+             account["id"] if account else None, account["id"] if account else -1))
+        if recent:
+            return
+        db.write(
+            "INSERT INTO ip_refusal (account_id, email, ip, path, at, armed) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (account["id"] if account else None,
+             (account["email"] if account else "")[:200],
+             ip, path[:200], security.stamp(), 1 if armed else 0))
+    except Exception:
+        pass
+
+
+@app.middleware("http")
+async def ip_allowlist(request: Request, call_next):
+    """Watch always; refuse only when armed and only from an address no rule covers.
+
+    **Registered before the CORS middleware on purpose.** Starlette wraps each
+    new middleware around the ones already added, so the one registered last is
+    the outermost — and a 403 raised outside CORS reaches the browser stripped
+    of Access-Control-Allow-Origin. The page would then report a CORS failure
+    for what is actually an allowlist refusal, which is the single most
+    misleading thing this feature could do. CORS is added below; this is here.
+    """
+    path = request.url.path
+    if path in IP_EXEMPT:
+        return await call_next(request)
+
+    peer = request.client.host if request.client else ""
+    ip = netaddr.client_ip(
+        peer,
+        request.headers.get("x-real-ip", ""),
+        request.headers.get("x-forwarded-for", ""))
+    # Resolved once and carried, so a route that needs to know where the caller
+    # is — arming, which refuses to strand you — reasons from exactly the value
+    # the gate reasoned from. Working it out a second time from the same headers
+    # would be a second implementation of the trust rule.
+    request.state.client_ip = ip
+    account = _who_is_calling(request)
+    if account and account["active"] and ip:
+        _note_sighting(account["id"], ip, request.headers.get("user-agent", ""), path)
+
+    try:
+        policy = db.one("SELECT armed FROM ip_policy WHERE id = 1")
+        armed = bool(policy and policy["armed"]) and not _allowlist_off()
+        rules = [r["cidr"] for r in db.all_rows("SELECT cidr FROM ip_rule")]
+    except Exception:
+        # The store is unreadable. Waving the request through is the right
+        # failure: the alternative is an allowlist that turns a database
+        # hiccup into a total outage nobody can sign in to fix.
+        return await call_next(request)
+
+    if not rules:
+        # Nothing has been allowed, which means nothing has been configured —
+        # not that everybody is barred. Recording a dry-run refusal for every
+        # request in that state would fill the log with the absence of a
+        # decision, and arming is refused in this state anyway.
+        return await call_next(request)
+
+    if netaddr.covers(rules, ip):
+        return await call_next(request)
+
+    _note_refusal(account, ip or peer, path, armed)
+    if not armed:
+        # The dry run. The row above is the whole point of this branch: it says
+        # who *would* have been turned away, written by real traffic, so that
+        # arming can be checked against evidence instead of intention.
+        return await call_next(request)
+
+    return JSONResponse(
+        status_code=403,
+        content={"detail":
+                 f"This ADAM is limited to approved networks, and {ip or 'your address'} "
+                 f"is not one of them. Ask the super admin to add it."})
 
 # On a workstation the viewer is served by the Node process on another port, so
 # the browser treats calls here as cross-origin. Credentials must be allowed for
@@ -692,6 +848,18 @@ class ScopeIn(BaseModel):
     platform: str = Field(default="", max_length=20)
 
 
+class RuleIn(BaseModel):
+    # An address or a network: 203.0.113.7, 203.0.113.0/24, 2001:db8::/32. A
+    # bare address is stored as a single-address network — see netaddr.
+    cidr: str = Field(max_length=60)
+    label: str = Field(default="", max_length=120)
+
+
+class ArmIn(BaseModel):
+    # Typed back by hand. See arm_allowlist for why a button was not enough.
+    confirm: str = ""
+
+
 # A platform code as the package writes it: P01, P04. **This service cannot
 # check that the platform exists** — the packages live on the node side, which
 # is the half that reads them, and teaching this one to open them would be a
@@ -808,6 +976,234 @@ def revoke_scope(scope_id: int, owner: dict = Depends(require_owner)):
     if not db.change("DELETE FROM scope WHERE id = ?", (scope_id,)):
         raise HTTPException(404, "No such grant.")
     return {"ok": True}
+
+
+# ── which networks, and who has been where ───────────────────────────
+#
+# The owner's alone, reads included, and that is a decision rather than caution
+# about the controls. The sightings table is a record of where every colleague
+# has opened their laptop for the last however many months — home, a hotel, a
+# client's office — and it is the kind of thing that is fine while one person
+# can read it and quietly corrosive when a team can. The controls being one
+# person's is what the feature was asked for; the log being one person's is the
+# part worth being deliberate about.
+
+
+def _policy() -> dict:
+    row = db.one("SELECT armed, changed_by, changed_at FROM ip_policy WHERE id = 1")
+    rules = db.all_rows(
+        "SELECT r.id, r.cidr, r.label, r.added_at, a.name, a.email "
+        "FROM ip_rule r JOIN account a ON a.id = r.added_by ORDER BY r.cidr")
+    by = db.one("SELECT name, email FROM account WHERE id = ?",
+                (row["changed_by"],)) if row and row["changed_by"] else None
+    return {
+        "armed": bool(row and row["armed"]),
+        # The break-glass, reported rather than hidden. A page that says "on"
+        # while an environment variable is quietly ignoring the policy is a page
+        # that will have somebody believing they are protected when they are not.
+        "overridden": _allowlist_off(),
+        "changedAt": row["changed_at"] if row else None,
+        "changedBy": (by["name"] or by["email"]) if by else None,
+        "rules": [{"id": r["id"], "cidr": r["cidr"], "label": r["label"],
+                   "addedAt": r["added_at"], "addedBy": r["name"] or r["email"]}
+                  for r in rules],
+    }
+
+
+@app.get("/api/ips")
+def read_allowlist(request: Request, owner: dict = Depends(require_owner)):
+    """The policy, the rules, and where this request is coming from.
+
+    `you` is on the reply because it is the number that decides whether arming
+    is safe, and the page should not have to ask a second endpoint — or worse,
+    guess from a public what-is-my-ip service — for the one value the refusal
+    would be about.
+    """
+    here = getattr(request.state, "client_ip", "") or ""
+    policy = _policy()
+    rules = [r["cidr"] for r in policy["rules"]]
+    return {
+        **policy,
+        "you": here,
+        "youAreCovered": netaddr.covers(rules, here) if here else False,
+        "sightings": db.one("SELECT COUNT(*) n FROM ip_sighting")["n"],
+        "addresses": db.one("SELECT COUNT(DISTINCT ip) n FROM ip_sighting")["n"],
+    }
+
+
+@app.post("/api/ips/rules")
+def add_rule(body: RuleIn, owner: dict = Depends(require_owner)):
+    """Allow an address or a network."""
+    network = netaddr.as_network(body.cidr)
+    if not network:
+        raise HTTPException(400, (
+            f"{body.cidr.strip()!r} is not an address or a network. "
+            f"Write one address as 203.0.113.7, or a range as 203.0.113.0/24."))
+    if db.one("SELECT id FROM ip_rule WHERE cidr = ?", (network,)):
+        raise HTTPException(409, f"{network} is already allowed.")
+    # Said out loud when the two spellings differ, because somebody who typed a
+    # host address with a prefix meant the range and should see which range they
+    # got rather than discover it from who can sign in tomorrow.
+    db.write("INSERT INTO ip_rule (cidr, label, added_by, added_at) VALUES (?, ?, ?, ?)",
+             (network, body.label.strip(), owner["id"], security.stamp()))
+    return {"ok": True, "cidr": network,
+            "note": (f"Stored as {network}." if network != body.cidr.strip() else "")}
+
+
+@app.delete("/api/ips/rules/{rule_id}")
+def drop_rule(rule_id: int, request: Request, owner: dict = Depends(require_owner)):
+    """Take a rule away.
+
+    Refused if the policy is armed and this is the rule covering the address
+    asking — the one deletion that locks the door behind you on the way out.
+    """
+    row = db.one("SELECT cidr FROM ip_rule WHERE id = ?", (rule_id,))
+    if not row:
+        raise HTTPException(404, "No such rule.")
+    policy = db.one("SELECT armed FROM ip_policy WHERE id = 1")
+    if policy and policy["armed"] and not _allowlist_off():
+        here = getattr(request.state, "client_ip", "") or ""
+        rest = [r["cidr"] for r in db.all_rows(
+            "SELECT cidr FROM ip_rule WHERE id != ?", (rule_id,))]
+        if here and not netaddr.covers(rest, here):
+            raise HTTPException(409, (
+                f"{row['cidr']} is the only rule covering {here}, which is where "
+                f"you are. Removing it would lock you out. Add the rule you mean "
+                f"to keep first, or switch the allowlist off."))
+    db.write("DELETE FROM ip_rule WHERE id = ?", (rule_id,))
+    return {"ok": True}
+
+
+@app.post("/api/ips/arm")
+def arm_allowlist(body: ArmIn, request: Request, owner: dict = Depends(require_owner)):
+    """Switch it on.
+
+    **Three things have to be true, and each one is a different way this goes
+    wrong.** There has to be at least one rule, or arming bars everybody
+    including whoever is arming it. A rule has to cover the address making this
+    request, because the request that turns the lock is the last one that gets
+    through otherwise. And the confirmation has to be typed rather than clicked,
+    because this is the control where "I did not realise that would do that" ends
+    with nobody able to sign in and a shell being the only way back.
+    """
+    rules = [r["cidr"] for r in db.all_rows("SELECT cidr FROM ip_rule")]
+    if not rules:
+        raise HTTPException(409, (
+            "There are no rules yet, so arming would refuse everybody including "
+            "you. Add the networks people work from first — the log below shows "
+            "where they have actually been signing in."))
+    here = getattr(request.state, "client_ip", "") or ""
+    if not here:
+        raise HTTPException(409, (
+            "This service cannot tell what address you are coming from, so it "
+            "cannot promise arming would not lock you out. Check that the proxy "
+            "is passing X-Real-IP before switching this on."))
+    if not netaddr.covers(rules, here):
+        raise HTTPException(409, (
+            f"No rule covers {here}, which is where you are asking from. "
+            f"Arming now would refuse this very request. Add {here} first."))
+    if body.confirm.strip().lower() != "arm":
+        raise HTTPException(400, "Type 'arm' to confirm.")
+
+    db.write("UPDATE ip_policy SET armed = 1, changed_by = ?, changed_at = ? WHERE id = 1",
+             (owner["id"], security.stamp()))
+    return {"ok": True, **_policy(), "you": here}
+
+
+@app.post("/api/ips/disarm")
+def disarm_allowlist(owner: dict = Depends(require_owner)):
+    """Switch it off. No confirmation and no conditions — this is the direction
+    that cannot strand anybody, and a control that undoes a lockout should never
+    be the one asking questions."""
+    db.write("UPDATE ip_policy SET armed = 0, changed_by = ?, changed_at = ? WHERE id = 1",
+             (owner["id"], security.stamp()))
+    return {"ok": True, **_policy()}
+
+
+@app.get("/api/ips/sightings")
+def list_sightings(limit: int = Query(default=500, le=2000),
+                   owner: dict = Depends(require_owner)):
+    """Every account against every address it has been seen at.
+
+    **This is the answer to "show me the log of account against IPs".** Rolled
+    up rather than one row per request: since when, how often, most recently
+    when, and whether a rule covers it today. That last column is the one that
+    turns the log into a worklist — it is the dry run, per address.
+    """
+    rules = [r["cidr"] for r in db.all_rows("SELECT cidr FROM ip_rule")]
+    rows = db.all_rows(
+        "SELECT s.*, a.name, a.email, a.role, a.active FROM ip_sighting s "
+        "JOIN account a ON a.id = s.account_id ORDER BY s.last_seen DESC LIMIT ?",
+        (limit,))
+    return {
+        "total": db.one("SELECT COUNT(*) n FROM ip_sighting")["n"],
+        "armed": bool(db.one("SELECT armed FROM ip_policy WHERE id = 1")["armed"]),
+        "items": [{
+            "account": {"id": r["account_id"], "name": r["name"] or r["email"],
+                        "email": r["email"], "role": r["role"], "active": bool(r["active"])},
+            "ip": r["ip"], "firstSeen": r["first_seen"], "lastSeen": r["last_seen"],
+            "hits": r["hits"], "agent": r["last_agent"], "path": r["last_path"],
+            "covered": netaddr.covers(rules, r["ip"]),
+        } for r in rows],
+    }
+
+
+@app.get("/api/ips/refusals")
+def list_refusals(limit: int = Query(default=200, le=1000),
+                  owner: dict = Depends(require_owner)):
+    """Who was turned away, and who would have been.
+
+    `armed: false` rows are the dry run — requests that a rule did not cover
+    while the policy was off. They are the evidence arming is checked against,
+    and they keep accumulating afterwards only for addresses that are genuinely
+    refused, because once armed there is no "would have".
+    """
+    rows = db.all_rows(
+        "SELECT r.*, a.name FROM ip_refusal r LEFT JOIN account a ON a.id = r.account_id "
+        "ORDER BY r.at DESC LIMIT ?", (limit,))
+    return {"items": [{
+        "id": r["id"], "ip": r["ip"], "path": r["path"], "at": r["at"],
+        "armed": bool(r["armed"]),
+        "who": r["name"] or r["email"] or "nobody signed in",
+    } for r in rows]}
+
+
+@app.get("/api/ips/dry-run")
+def allowlist_dry_run(owner: dict = Depends(require_owner)):
+    """Who arming would lock out, from where people have actually been.
+
+    Computed against the sightings rather than against the refusal log, because
+    the question is about **people**, not requests: an account whose every known
+    address is uncovered has nowhere to sign in from, and an account with one
+    covered address is fine however many uncovered ones it also has. Counting
+    refusals would have answered a different question and answered it loudly.
+    """
+    rules = [r["cidr"] for r in db.all_rows("SELECT cidr FROM ip_rule")]
+    rows = db.all_rows(
+        "SELECT s.account_id, s.ip, s.last_seen, a.name, a.email, a.role, a.active "
+        "FROM ip_sighting s JOIN account a ON a.id = s.account_id WHERE a.active = 1")
+    people: dict = {}
+    for r in rows:
+        who = people.setdefault(r["account_id"], {
+            "name": r["name"] or r["email"], "email": r["email"], "role": r["role"],
+            "covered": [], "stranded": []})
+        (who["covered"] if netaddr.covers(rules, r["ip"]) else who["stranded"]).append(
+            {"ip": r["ip"], "lastSeen": r["last_seen"]})
+
+    out = [p for p in people.values() if not p["covered"]]
+    return {
+        "rules": len(rules),
+        # Everybody active who has never been seen at all. They are not in the
+        # sightings table, so the loop above cannot find them — and "we have no
+        # idea where this person works" is exactly the case somebody should look
+        # at before arming, rather than the case that silently reads as fine.
+        "unseen": [{"name": r["name"] or r["email"], "email": r["email"], "role": r["role"]}
+                   for r in db.all_rows(
+                       "SELECT name, email, role FROM account WHERE active = 1 "
+                       "AND id NOT IN (SELECT account_id FROM ip_sighting)")],
+        "wouldBeLockedOut": out,
+        "wouldBeFine": [p for p in people.values() if p["covered"]],
+    }
 
 
 @app.post("/api/auth/password")

@@ -24,7 +24,7 @@ import '/page-chrome.js';
 import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,
-  changePassword, signOut, logoutAll, project, isAdmin,
+  changePassword, signOut, logoutAll, project, isAdmin, isOwner,
 } from '/validation.js';
 import { followSections } from '/sections.js';
 
@@ -78,6 +78,10 @@ function drawAccount(state, who) {
   $('admin').hidden = !admin;
   $('nav-admin').hidden = !admin;
   $('nav-admin-group').hidden = !admin;
+  // Inside the admin section and narrower than it: the allowlist and the log of
+  // where people sign in from are the super admin's, and an admin opening that
+  // page is told so rather than shown an empty one.
+  $('link-networks').hidden = !isOwner({ role });
 }
 
 function drawOpenProject(state) {

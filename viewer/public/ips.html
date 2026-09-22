@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — networks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <!-- The settings furniture — set-layout, admin-row, the chips — lives in
+         layers.css alongside the viewer's own, so a page that links only
+         styles.css draws unstyled rows. -->
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/ips.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">networks</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/settings.html">Settings</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main id="signed-out" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Sign in first</h1>
+        <p class="auth-note">This page is about who may reach Adam, so there has to be an account.</p>
+        <a class="auth-button" href="/login.html">Sign in</a>
+      </div>
+    </main>
+
+    <!-- Not an admin page. The rules are the super admin's, and so is the log:
+         where each colleague has been signing in from is a different kind of
+         record from a list of networks, and the service refuses both to
+         everybody else whatever this page draws. -->
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          Limiting Adam to particular networks &mdash; and the log of where each
+          account has signed in from &mdash; is the super admin&rsquo;s alone.
+          That includes admins.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <div id="ips" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Networks</h1>
+        <div class="set-nav-list">
+          <a href="#status">Status</a>
+          <a href="#rules">Allowed networks</a>
+          <div class="set-nav-group">Before switching on</div>
+          <a href="#dry-run">Who would be locked out</a>
+          <div class="set-nav-group">The log</div>
+          <a href="#sightings">Where people sign in from</a>
+          <a href="#refusals">Turned away</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
+        <!-- ── status ───────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="status">
+          <h2 class="admin-heading">Status</h2>
+          <p class="auth-note set-lede">
+            Adam starts with every address allowed and every sign-in logged. It
+            stays that way until you switch it on here &mdash; the point of the
+            log below is that by then you can choose the networks from where
+            people have actually been, rather than from memory.
+          </p>
+          <p class="auth-error" id="ip-error" hidden></p>
+
+          <div class="ip-state" id="ip-state"></div>
+
+          <!-- Normal on a workstation, and on a server the one thing that has
+               to be fixed before any of this means anything. Shown rather than
+               assumed either way, because the address looks like an answer. -->
+          <p class="ip-override ip-caution" id="ip-loopback" hidden>
+            <b>Adam thinks you are on the same machine as the server.</b>
+            That is right on a workstation. On a server it means the proxy in
+            front of Adam is not passing <code>X-Real-IP</code>, so everybody
+            resolves to this one address &mdash; the log below would be a single
+            row and these rules would mean nothing. Fix that before switching
+            anything on.
+          </p>
+
+          <!-- The override, when it is on. Loud on purpose: a page that says
+               "armed" while an environment variable quietly ignores the policy
+               is a page that has somebody believing they are protected. -->
+          <p class="ip-override" id="ip-override" hidden>
+            <b>ADAM_IP_ALLOWLIST is set to off on the server.</b>
+            The policy below is being ignored for every request, whatever it
+            says. Unset it and restart to put the rules back in force.
+          </p>
+
+          <div class="set-actions" id="ip-arm-box">
+            <label class="ip-confirm" id="ip-confirm-label">
+              Type <b>arm</b> to switch it on
+              <input id="ip-confirm" type="text" autocomplete="off" spellcheck="false" />
+            </label>
+            <button id="ip-arm" class="chip" type="button">Switch on</button>
+            <button id="ip-disarm" class="chip" type="button" hidden>Switch off</button>
+          </div>
+        </section>
+
+        <!-- ── rules ────────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="rules">
+          <h2 class="admin-heading">
+            Allowed networks <span class="admin-count" id="ip-rules-count"></span>
+          </h2>
+          <p class="auth-note set-lede">
+            One address, written <code>203.0.113.7</code>, or a range, written
+            <code>203.0.113.0/24</code>. A label is for you &mdash; a rule nobody
+            can attribute is a rule nobody dares delete.
+          </p>
+          <form class="ip-add" id="ip-add">
+            <input id="ip-cidr" type="text" placeholder="203.0.113.0/24"
+                   autocomplete="off" spellcheck="false" required />
+            <input id="ip-label" type="text" placeholder="The Bombay office" autocomplete="off" />
+            <button class="chip" type="submit">Allow</button>
+            <button class="chip" type="button" id="ip-use-mine">Allow where I am</button>
+          </form>
+          <div class="admin-table" id="ip-rules"></div>
+        </section>
+
+        <!-- ── dry run ──────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="dry-run">
+          <h2 class="admin-heading">
+            Who would be locked out <span class="admin-count" id="ip-dry-count"></span>
+          </h2>
+          <p class="auth-note set-lede">
+            Worked out from where people have actually signed in, not from a
+            list of rules. Somebody with one covered address is fine however many
+            other addresses they also use; somebody with none has nowhere to sign
+            in from. Accounts nobody has seen anywhere are listed separately,
+            because they read as fine and are not.
+          </p>
+          <div class="admin-table" id="ip-dry"></div>
+        </section>
+
+        <!-- ── sightings ────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="sightings">
+          <h2 class="admin-heading">
+            Where people sign in from <span class="admin-count" id="ip-seen-count"></span>
+          </h2>
+          <p class="auth-note set-lede">
+            One row per account and address: since when, how often, and most
+            recently when. Rolled up rather than one row per request &mdash; the
+            question is where somebody works, not what they clicked.
+          </p>
+          <div class="set-actions">
+            <input id="ip-seen-filter" class="ip-filter" type="search"
+                   placeholder="Filter by name, address or role" />
+            <label class="ip-only"><input id="ip-seen-uncovered" type="checkbox" />
+              Only addresses no rule covers</label>
+          </div>
+          <div class="admin-table" id="ip-seen"></div>
+        </section>
+
+        <!-- ── refusals ─────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="refusals">
+          <h2 class="admin-heading">
+            Turned away <span class="admin-count" id="ip-refused-count"></span>
+          </h2>
+          <p class="auth-note set-lede">
+            Requests no rule covered. While the allowlist is off these are
+            <em>would have been</em> &mdash; the dry run, written by real traffic.
+            Repeats from one address inside a minute count once, so a scanner
+            cannot bury the rest.
+          </p>
+          <div class="admin-table" id="ip-refused"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/ips.js"></script>
+  </body>
+</html>

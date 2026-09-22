@@ -24,7 +24,13 @@ const COOKIE = 'ticvai_session';
 const TTL_OK_MS = 60_000;
 const TTL_FAIL_MS = 5_000;
 
-const cache = new Map(); // token -> { account, until }
+// Keyed on the address as well as the token, and that is not a detail. The
+// accounts service can now refuse a request because of where it came from, so
+// "who is this token" has a different answer from a different address — and a
+// cache keyed on the token alone would hold the answer from the address that
+// asked first and hand it to every other one for the next minute. That is the
+// allowlist not applying, for exactly as long as somebody keeps browsing.
+const cache = new Map(); // `${ip}\n${token}` -> { account, until }
 
 /**
  * Only the pages a signed-out visitor must be able to reach to sign in — and
@@ -151,25 +157,73 @@ const CLEAR_STALE = `${COOKIE}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`;
  * Ordinary requests carry one cookie and cost one call, unchanged.
  */
 export async function whoIs(req, apiBase) {
+  const ip = callerIp(req);
   for (const token of readCookies(req.headers.cookie)) {
-    const account = await resolveToken(token, apiBase);
+    const account = await resolveToken(token, apiBase, ip);
     if (account) return account;
   }
   return null;
 }
 
 /**
+ * Who this request is actually from.
+ *
+ * **This server is a hop, and a hop that forwards nothing erases the caller.**
+ * Every page read reaches the accounts service through this process, so without
+ * this the allowlist there would see one address — this process's — for the
+ * whole company, the sightings log would be a single row, and arming it would
+ * either admit everybody or lock out everybody.
+ *
+ * `x-real-ip` is a header, so a client can send one. It is believed only when
+ * the socket on the other end belongs to a proxy we put there; otherwise the
+ * socket address is the answer and the claim is discarded. That is why callers
+ * assign the result unconditionally rather than passing an incoming header on.
+ *
+ * TICVAI_TRUSTED_PROXIES is the same variable the accounts service reads and
+ * defaults the same way, so a deployment configures the chain once.
+ */
+const TRUSTED_PROXIES = (process.env.TICVAI_TRUSTED_PROXIES ?? '127.0.0.1,::1')
+  .split(',').map((s) => s.trim()).filter(Boolean);
+
+/** ::ffff:127.0.0.1 is IPv4 wearing a hat, and Node reports it that way for a
+ *  v4 client on a dual-stack socket. Two spellings of one address would read as
+ *  two places somebody has been. */
+function plainIp(value) {
+  const text = String(value ?? '').trim().replace(/^\[|\]$/g, '');
+  return text.toLowerCase().startsWith('::ffff:') ? text.slice(7) : text;
+}
+
+export function callerIp(req) {
+  const peer = plainIp(req.socket?.remoteAddress);
+  // Deliberately exact addresses and not CIDR matching: this names one or two
+  // loopback proxies, and a second, subtly different implementation of network
+  // containment is a worse thing to own than a narrower rule. The accounts
+  // service does the real matching, against the rules.
+  if (!TRUSTED_PROXIES.some((t) => plainIp(t) === peer)) return peer;
+  const claimed = plainIp(req.headers['x-real-ip']);
+  if (claimed) return claimed;
+  const forwarded = plainIp(String(req.headers['x-forwarded-for'] ?? '').split(',')[0]);
+  return forwarded || peer;
+}
+
+/**
  * `apiBase` is where the accounts service lives — same host in every
  * deployment, so this is a loopback call and not a trip over the network.
  */
-async function resolveToken(token, apiBase) {
-  const hit = cache.get(token);
+async function resolveToken(token, apiBase, ip = '') {
+  const key = `${ip}\n${token}`;
+  const hit = cache.get(key);
   if (hit && hit.until > Date.now()) return hit.account;
 
   let account = null;
   try {
     const res = await fetch(`${apiBase}/api/auth/me`, {
-      headers: { cookie: `${COOKIE}=${encodeURIComponent(token)}` },
+      headers: {
+        cookie: `${COOKIE}=${encodeURIComponent(token)}`,
+        // Loopback, so the accounts service trusts what this says. That trust
+        // is the reason the value above is computed rather than forwarded.
+        ...(ip ? { 'x-real-ip': ip } : {}),
+      },
       signal: AbortSignal.timeout(4000),
     });
     if (res.ok) {
@@ -190,7 +244,7 @@ async function resolveToken(token, apiBase) {
     account = null;
   }
 
-  cache.set(token, { account, until: Date.now() + (account ? TTL_OK_MS : TTL_FAIL_MS) });
+  cache.set(key, { account, until: Date.now() + (account ? TTL_OK_MS : TTL_FAIL_MS) });
   if (cache.size > 4096) {
     for (const [k, v] of cache) if (v.until <= Date.now()) cache.delete(k);
   }

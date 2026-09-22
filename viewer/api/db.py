@@ -433,6 +433,89 @@ CREATE TABLE IF NOT EXISTS account_secret (
   updated_at TEXT    NOT NULL,
   PRIMARY KEY (account_id, kind)
 );
+
+-- ── where people sign in from ───────────────────────────────────────
+--
+-- Three tables and they answer three different questions, which is why this is
+-- not one table with a flag on it:
+--
+--   ip_policy    is the allowlist switched on at all
+--   ip_rule      which addresses it lets through
+--   ip_sighting  where each account has actually been seen
+--   ip_refusal   who was turned away, or would have been
+--
+-- **The whole thing ships off.** An allowlist installed armed is an allowlist
+-- that locks its owner out of the machine they installed it from, and the only
+-- honest way to choose the rules is to have watched the traffic first. So the
+-- policy row starts armed = 0, every address is allowed, and the sightings
+-- accumulate from the first request — the list of rules writes itself out of
+-- what is in this table by the time anybody wants to switch it on.
+
+CREATE TABLE IF NOT EXISTS ip_policy (
+  -- One row, forever. The CHECK is the whole mechanism: a second row would be a
+  -- second answer to "is this on", and the reader would have to pick.
+  id         INTEGER PRIMARY KEY CHECK (id = 1),
+  armed      INTEGER NOT NULL DEFAULT 0,
+  changed_by INTEGER REFERENCES account(id),
+  changed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ip_rule (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- Always stored as a network, never as a bare address: a single address is
+  -- written 203.0.113.7/32 on the way in. One shape to compare means the
+  -- matcher has one branch, and "is 203.0.113.7 already covered" is answerable
+  -- without knowing which of the two spellings somebody used last time.
+  cidr     TEXT    NOT NULL UNIQUE,
+  -- "The Bombay office", "Chinmay at home". A rule nobody can attribute is a
+  -- rule nobody dares delete, and an allowlist that only grows is one that
+  -- stops meaning anything.
+  label    TEXT    NOT NULL DEFAULT '',
+  added_by INTEGER NOT NULL REFERENCES account(id),
+  added_at TEXT    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ip_sighting (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  ip         TEXT    NOT NULL,
+  first_seen TEXT    NOT NULL,
+  last_seen  TEXT    NOT NULL,
+  hits       INTEGER NOT NULL DEFAULT 1,
+  last_agent TEXT    NOT NULL DEFAULT '',
+  last_path  TEXT    NOT NULL DEFAULT ''
+);
+-- Rolled up per account and address rather than a row per request, and that is
+-- the difference between a table somebody reads and a table somebody archives.
+-- A row per request would be tens of thousands a week to say the one thing
+-- anybody wants from it: this person, this address, since when, how often,
+-- most recently when. The cost is that you cannot reconstruct a session from
+-- it — which is what ip_refusal is for, and refusals are rare enough to keep
+-- whole.
+CREATE UNIQUE INDEX IF NOT EXISTS ip_sighting_once ON ip_sighting(account_id, ip);
+CREATE INDEX IF NOT EXISTS ip_sighting_recent ON ip_sighting(last_seen DESC);
+
+CREATE TABLE IF NOT EXISTS ip_refusal (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- Null when nobody was signed in: a refusal at the door is still worth
+  -- keeping, and it is the one that tells you somebody is knocking.
+  account_id INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  -- Copied rather than joined, so the row still says who it was after the
+  -- account is deleted. A security log that empties itself when an account
+  -- goes is a security log that is useful for everything except the case it
+  -- exists for.
+  email      TEXT    NOT NULL DEFAULT '',
+  ip         TEXT    NOT NULL,
+  path       TEXT    NOT NULL DEFAULT '',
+  at         TEXT    NOT NULL,
+  -- 1: turned away. 0: **would have been** turned away, recorded while the
+  -- policy is off. The second is the dry run, and it is the reason arming this
+  -- is not a leap of faith — the list of people it is about to lock out is a
+  -- query against rows that were written by real traffic, not a guess from a
+  -- list of rules.
+  armed      INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ip_refusal_recent ON ip_refusal(at DESC);
 """
 
 # The project every row that predates projects belongs to.
@@ -723,6 +806,16 @@ def init() -> None:
             "FROM account",
             (FIRST_PROJECT, _stamp()),
         )
+
+        # ---- the allowlist, off -------------------------------------------
+        #
+        # The row exists from the first boot so that reading the policy is a
+        # SELECT rather than a SELECT-or-default, and every reader agrees about
+        # what "not configured" means. `armed = 0` is the shipped state and the
+        # one an existing store lands in: turning it on is a decision somebody
+        # makes on the page, never something a deploy does on their behalf.
+        cur.execute(
+            "INSERT OR IGNORE INTO ip_policy (id, armed) VALUES (1, 0)")
 
 
 def fold(email: str) -> str:

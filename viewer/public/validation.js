@@ -473,6 +473,22 @@ export const unpickChange = (projectId, id) =>
 export const overdueChanges = (projectId) =>
   call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);
 
+// The allowlist. All of it is the owner's, reads included — the sightings are a
+// record of where every colleague has opened their laptop, which is a different
+// kind of object from a list of rules. See the note above the routes in main.py.
+export const allowlist = () => call('/api/ips');
+export const addIpRule = (cidr, label = '') =>
+  call('/api/ips/rules', { method: 'POST', body: { cidr, label } });
+export const dropIpRule = (id) => call(`/api/ips/rules/${id}`, { method: 'DELETE' });
+/** `confirm` is the word "arm", typed. The service refuses anything else — see
+ *  arm_allowlist for why a button on its own was not enough. */
+export const armAllowlist = (confirm) =>
+  call('/api/ips/arm', { method: 'POST', body: { confirm } });
+export const disarmAllowlist = () => call('/api/ips/disarm', { method: 'POST', body: {} });
+export const ipSightings = () => call('/api/ips/sightings');
+export const ipRefusals = () => call('/api/ips/refusals');
+export const ipDryRun = () => call('/api/ips/dry-run');
+
 export const listPmsProjects = () => call('/api/pms/projects');
 export const availablePmsProjects = () => call('/api/pms/available');
 export const setPmsProject = (projectId, pmsProjectId) =>
