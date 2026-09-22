@@ -469,6 +469,20 @@ export const pickChange = (projectId, id) =>
 export const unpickChange = (projectId, id) =>
   call(`/api/changes/${encodeURIComponent(id)}/unpick`,
     { method: 'POST', body: { project_id: projectId ?? '' } });
+// Turning a change request into a ticket. Two calls and never one: the first
+// works out what would be created and sends nothing, the second creates what
+// the person agreed to. The token from the first is single-use and lapses, so
+// a page that held one for an hour is refused rather than creating something
+// out of a preview nobody is looking at any more.
+export const previewTicket = (projectId, id, subject = '', typeId = null) =>
+  call(`/api/changes/${encodeURIComponent(id)}/ticket/preview`, {
+    method: 'POST',
+    body: { project_id: projectId ?? '', subject, ...(typeId ? { type_id: typeId } : {}) },
+  });
+export const createTicket = (projectId, id, proposal) =>
+  call(`/api/changes/${encodeURIComponent(id)}/ticket/${encodeURIComponent(proposal)}/apply`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+
 /** Open requests nobody has taken on inside the window. Administrators only. */
 export const overdueChanges = (projectId) =>
   call(`/api/changes/overdue?${new URLSearchParams({ project_id: projectId ?? '' })}`);

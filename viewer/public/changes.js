@@ -271,9 +271,147 @@ function card(c) {
     c.resolvedAt ? block(`${STATUS[c.status] ?? 'Settled'} by ${c.resolvedBy ?? '?'} · ${fmt(c.resolvedAt)}`,
       [c.resolution, c.resolvedRef && `Fixed by: ${c.resolvedRef}`].filter(Boolean).join('\n') || '-') : null,
   ]) if (part) body.append(part);
+  body.append(ticketing(c));
   body.append(actions(c));
   box.append(body);
   return box;
+}
+
+/**
+ * Turning the request into a ticket, under the ticket it came out of.
+ *
+ * **Preview then confirm, and the preview is the whole control.** Nothing is
+ * sent when the button is pressed; the service works out exactly what it would
+ * create and hands it back, and this draws it — the parent, the type, the
+ * subject, the description in full. The second button is the one that writes.
+ *
+ * That is not ceremony. A ticket filed into the wrong project, or under no
+ * parent, or with a subject somebody has to decode later, cannot be taken back
+ * from here: OpenProject owns it the moment it exists. The cheapest place to
+ * catch all three is a paragraph the person reads before saying yes.
+ */
+function ticketing(c) {
+  const wrap = el('div', 'cr-ticketing');
+
+  // Already done. Shown rather than hidden, because "has this been scheduled"
+  // is the question somebody opens the request to answer.
+  if (c.childTicket) {
+    const done = el('div', 'cr-scheduled');
+    done.append(el('span', 'cr-label', 'Scheduled as'));
+    const link = el('a', 'cr-ticket-link', `#${c.childTicket}`);
+    link.href = c.childUrl;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    done.append(link);
+    if (c.childAt) done.append(el('span', 'cr-hint', fmt(c.childAt)));
+    wrap.append(done);
+    return wrap;
+  }
+  if (!c.mayFileTicket) return wrap;
+
+  const open = el('button', 'chip cr-schedule', 'Schedule a ticket…');
+  open.type = 'button';
+  const panel = el('div', 'cr-preview');
+  panel.hidden = true;
+  wrap.append(open, panel);
+
+  open.onclick = async () => {
+    open.disabled = true;
+    panel.hidden = false;
+    panel.innerHTML = '';
+    panel.append(el('p', 'cr-hint', 'Working out what this would create…'));
+    let plan;
+    try {
+      plan = await auth.previewTicket(state.project, c.id);
+    } catch (error) {
+      panel.innerHTML = '';
+      panel.append(el('p', 'auth-error', error.message));
+      open.disabled = false;
+      return;
+    }
+    panel.innerHTML = '';
+
+    const facts = el('dl', 'cr-preview-facts');
+    const fact = (term, value) => {
+      facts.append(el('dt', null, term));
+      facts.append(value instanceof Node ? (() => { const d = el('dd'); d.append(value); return d; })()
+        : el('dd', null, value));
+    };
+    fact('Project', plan.willCreate.project);
+    fact('Under', plan.willCreate.parent
+      ? `#${plan.willCreate.parent.key} · ${plan.willCreate.parent.subject}`
+      : 'nothing — this would be a top-level ticket');
+    panel.append(facts);
+
+    // The one case worth interrupting for. A top-level ticket is not what
+    // "file it under the original" means, and it happens quietly whenever the
+    // request was raised from the viewer rather than from a ticket.
+    if (plan.topLevel) {
+      panel.append(el('p', 'cr-warn',
+        `${c.id} did not come from a ticket, so there is nothing to hang this `
+        + 'under. It will sit at the top level of the project.'));
+    }
+
+    const subject = el('input', 'auth-input cr-subject');
+    subject.value = plan.willCreate.subject;
+    subject.maxLength = 255;
+    const subjectLabel = el('label', 'cr-field');
+    subjectLabel.append(el('span', 'cr-label', 'Subject'), subject);
+
+    const type = el('select', 'scope-select');
+    for (const kind of plan.types ?? []) {
+      const option = el('option', null, kind.name);
+      option.value = kind.id;
+      option.selected = kind.name === plan.willCreate.type;
+      type.append(option);
+    }
+    const typeLabel = el('label', 'cr-field');
+    typeLabel.append(el('span', 'cr-label', 'Type'), type);
+    panel.append(subjectLabel, typeLabel);
+
+    const text = el('details', 'cr-preview-text');
+    text.append(el('summary', null, 'What the ticket will say'));
+    text.append(el('pre', 'cr-preview-body', plan.willCreate.description));
+    panel.append(text);
+
+    const bar = el('div', 'cr-actions');
+    const go = el('button', 'chip cr-accept', 'Create it');
+    go.type = 'button';
+    const stop = el('button', 'chip', 'Cancel');
+    stop.type = 'button';
+    stop.onclick = () => { panel.hidden = true; open.disabled = false; };
+    const said = el('p', 'cr-hint', `Nothing has been created yet. This preview `
+      + `lapses in ${plan.expiresInMinutes} minutes.`);
+
+    go.onclick = async () => {
+      go.disabled = true;
+      stop.disabled = true;
+      try {
+        // Re-previewed when either field was touched, so what is created is
+        // what the person last saw rather than what the first preview held.
+        // The service is the one that decides either way — this only spares
+        // them a refusal they would not understand.
+        let token = plan.proposal;
+        if (subject.value.trim() !== plan.willCreate.subject
+            || Number(type.value) !== (plan.types ?? []).find(
+              (k) => k.name === plan.willCreate.type)?.id) {
+          const redone = await auth.previewTicket(
+            state.project, c.id, subject.value.trim(), Number(type.value));
+          token = redone.proposal;
+        }
+        await auth.createTicket(state.project, c.id, token);
+        await load();
+      } catch (error) {
+        showError(`${c.id}: ${error.message}`);
+        go.disabled = false;
+        stop.disabled = false;
+      }
+    };
+    bar.append(go, stop);
+    panel.append(bar, said);
+  };
+
+  return wrap;
 }
 
 function draw() {

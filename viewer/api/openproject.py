@@ -6,14 +6,25 @@ account.** That is the whole reason the settings page exists: a shared
 credential would attribute every read — and later every write — to one robot,
 and the audit trail is most of what a PMS is for.
 
-Mostly read-through. The bridge does not mint work package ids and does not
-create work packages. It can change three things on one, **only after the person
-has seen the change and said yes** (see the proposals in main.py): the status,
-the % done, and a comment. OpenProject still owns all three; the change is made
-as the person, with their token, so its history says who did it. OpenProject holds
-the schedule — 23 epics, 444 features, 2,173 tasks in the delivery plan — and
-this service holds the one thing OpenProject cannot express: which artefact a
-work package is about. See `artefact_link` in db.py.
+Mostly read-through. The bridge still does not mint work package ids — every id
+is OpenProject's, always — and it writes exactly four things, **each only after
+the person has seen it and said yes** (see the proposals in main.py): the status,
+the % done, a comment, and one new work package under an existing one.
+
+**That last one is a reversal, and it is worth saying so.** This file used to
+state plainly that the bridge does not create work packages, on the argument
+that a second thing minting tickets is a second plan. The argument still holds
+and the exception is narrow enough to live beside it: a change request that has
+been accepted *is* work, it has to be scheduled somewhere, and the somewhere is
+OpenProject. So one CR creates at most one ticket, as a child of the ticket the
+CR came out of, once — `change_request.child_key` records which, and a second
+attempt is refused rather than making a second ticket. What is not being built
+is a way for this service to plan: there is no create that is not anchored to a
+change request, and the caller cannot choose the project.
+
+OpenProject holds the schedule — 23 epics, 444 features, 2,173 tasks in the
+delivery plan — and this service holds the one thing OpenProject cannot express:
+which artefact a work package is about. See `artefact_link` in db.py.
 
 Two things bitten into this file, both from a real afternoon:
 
@@ -94,8 +105,8 @@ def call(endpoint: str, token: str, path: str,
 
     `path` is relative to `/api/v3`. The answer is parsed JSON; anything else
     raises rather than being handed on as a string that a caller will index into
-    and get a character from. A GET is the normal case; `update` and `comment`
-    below are the only callers that send anything else.
+    and get a character from. A GET is the normal case; `update`, `comment` and
+    `create` below are the only callers that send anything else.
     """
     url = f"{endpoint.rstrip('/')}/api/v3/{path.lstrip('/')}"
     if params:
@@ -250,6 +261,51 @@ def update(endpoint: str, token: str, key: str, lock_version: int,
     if status_id is not None:
         body["_links"] = {"status": {"href": f"/api/v3/statuses/{status_id}"}}
     raw = call(endpoint, token, f"work_packages/{key}", method="PATCH", body=body)
+    return summarise(raw, endpoint)
+
+
+def types(endpoint: str, token: str, project_id: int) -> list:
+    """The work package types this project offers, as `{id, name, isDefault}`.
+
+    Per project rather than instance-wide: OpenProject lets a project enable a
+    subset, and offering a type the project has turned off produces a 422 at
+    the moment of creation — after the person has already said yes, which is
+    the worst possible time to find out.
+    """
+    page = call(endpoint, token, f"projects/{project_id}/types")
+    return [
+        {"id": t.get("id"), "name": t.get("name", ""),
+         "isDefault": bool(t.get("isDefault")), "isMilestone": bool(t.get("isMilestone"))}
+        for t in page.get("_embedded", {}).get("elements", [])
+    ]
+
+
+def create(endpoint: str, token: str, project_id: int, subject: str,
+           description: str = "", type_id: Optional[int] = None,
+           parent_key: Optional[str] = None) -> dict:
+    """Create one work package, as the owner of `token`.
+
+    The only create in this file, and the caller does not choose the project:
+    `project_id` comes from the ADAM project's mapping, so a ticket cannot be
+    filed into somebody else's plan by naming a different number.
+
+    `parent_key` is the ticket this one hangs under. Sent as a link rather than
+    set afterwards, so the ticket is never briefly parentless — a top-level
+    ticket that acquires a parent a second later still shows up in whatever
+    read the project between the two.
+    """
+    body: dict = {"subject": subject.strip()[:255]}
+    if description:
+        body["description"] = {"raw": description}
+    links: dict = {}
+    if type_id is not None:
+        links["type"] = {"href": f"/api/v3/types/{type_id}"}
+    if parent_key:
+        links["parent"] = {"href": f"/api/v3/work_packages/{parent_key}"}
+    if links:
+        body["_links"] = links
+    raw = call(endpoint, token, f"projects/{project_id}/work_packages",
+               method="POST", body=body)
     return summarise(raw, endpoint)
 
 

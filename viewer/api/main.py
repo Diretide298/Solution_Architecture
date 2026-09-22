@@ -1831,8 +1831,19 @@ def _pms_scope(account: dict, project_id: str) -> dict:
     }
 
 
-def _in_scope(found: dict, scope: dict, number: str) -> None:
-    """A work package from another OpenProject project is not this one's."""
+def _same_pms_project(found: dict, scope: dict, number: str) -> None:
+    """A work package from another OpenProject project is not this one's.
+
+    **Renamed from `_in_scope`, which is why this note exists.** A second
+    function of that name was added further down for a different question —
+    whether a change request's slice falls inside a team lead's platforms — and
+    Python kept the later one. Every call here silently became a call to that,
+    which iterated a dict of work package fields as if it were a list of scope
+    rows: `TypeError: string indices must be integers`, raised from the guard
+    that was supposed to refuse a cross-project write, on the only path where
+    being refused mattered. Two plausible functions can share a question; they
+    cannot share a name.
+    """
     if found.get("projectId") != scope["pmsId"]:
         raise HTTPException(
             404,
@@ -1910,7 +1921,7 @@ def make_link(body: LinkIn, account: dict = Depends(require_account)):
     except openproject.Refused as exc:
         raise HTTPException(400 if exc.status == 404 else 502, str(exc))
     try:
-        _in_scope(found, scope, key)
+        _same_pms_project(found, scope, key)
     except HTTPException as exc:
         # A link is a claim about this package; one to another product's
         # ticket is refused like a number that does not exist.
@@ -1970,7 +1981,7 @@ def read_work_package(
         raise HTTPException(502, str(exc))
     except openproject.Refused as exc:
         raise HTTPException(404 if exc.status == 404 else 502, str(exc))
-    _in_scope(found, scope, number)
+    _same_pms_project(found, scope, number)
 
     rows = db.all_rows(
         "SELECT * FROM artefact_link WHERE external_key = ? "
@@ -2195,7 +2206,7 @@ def propose_change(key: str, body: ProposalIn, account: dict = Depends(require_a
         raise HTTPException(502, str(exc))
     except openproject.Refused as exc:
         raise HTTPException(404 if exc.status == 404 else 502, str(exc))
-    _in_scope(found, scope, number)
+    _same_pms_project(found, scope, number)
 
     changes = []
     if status and status["name"] != found["status"]:
@@ -2257,7 +2268,7 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
         raise HTTPException(409, "That change has already been applied.")
     try:
         current = openproject.work_package(endpoint, token, number)
-        _in_scope(current, scope, number)
+        _same_pms_project(current, scope, number)
         if row["lock_version"] is not None and current.get("lockVersion") != row["lock_version"]:
             raise HTTPException(
                 409, f"#{number} was changed in OpenProject after this was proposed. "
@@ -2444,6 +2455,16 @@ def _change_row(row) -> dict:
         "recommendation": row["recommendation"],
         "blocking": bool(row["blocking"]),
         "ticket": row["external_key"],
+        # The ticket filed *from* this request, as against `ticket` above which
+        # is the one it came out of. Two different work packages and the page
+        # says so: one is where the problem was found, the other is where the
+        # fix is scheduled.
+        "childTicket": row["child_key"],
+        # Built here rather than in the page. The page would have to be told
+        # the instance address to build one, and a page that guesses it gets a
+        # link that 404s for everybody on a different deployment.
+        "childUrl": f"{DEFAULT_PMS}/work_packages/{row['child_key']}" if row["child_key"] else "",
+        "childAt": row["child_at"],
         "status": row["status"],
         "raisedBy": row["raised_by_name"] or row["raised_by_email"],
         # Separately from the fallback above, because the CSV has a column for
@@ -2726,6 +2747,13 @@ def list_changes(project_id: str = Query(default=""), status: str = Query(defaul
         item["mine"] = _in_scope(scopes, row["tag"], row["platform"])
         item["mayPick"] = row["status"] == "open" and _may_pick(account, scopes, row)
         item["maySettle"] = _may_settle_change(account, scope["role"], scopes, row)
+        # Whether the control is worth drawing at all. It says nothing about
+        # whether OpenProject is connected — that is answered by the preview,
+        # with a sentence about which of the two things is missing, rather than
+        # by a button that is absent for a reason nobody can see.
+        item["mayFileTicket"] = (
+            not row["child_key"] and row["status"] in ("open", "accepted")
+            and _may_file_ticket(account, scope["role"], scopes, row))
         items.append(item)
 
     counts = {s: 0 for s in CHANGE_STATUSES}
@@ -2871,6 +2899,251 @@ def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require
                  (status, note or row["resolution"], body.ref.strip() or row["resolved_ref"],
                   account["id"], security.stamp(), row["id"]))
     return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+
+
+# ── a change request becomes a ticket ────────────────────────────────
+#
+# An accepted change request is work, and work is scheduled in OpenProject. This
+# is the one place in the service that creates a work package, and every
+# constraint on it exists to keep it from becoming a second way to plan:
+#
+#   It is always **anchored to a change request** — there is no route here that
+#   creates a ticket from nothing.
+#
+#   It is a **child of the ticket the request came out of**, which is what makes
+#   it findable by somebody reading the original rather than a loose task with a
+#   cryptic subject.
+#
+#   It happens **at most once per request**. `change_request.child_key` is the
+#   guard, and a second attempt is answered with the key that is already there.
+#
+#   Nothing is sent until the person has seen exactly what will be created. Same
+#   propose-then-confirm as every other write across this bridge, on the same
+#   single-use token.
+
+
+class TicketIn(BaseModel):
+    project_id: str = ""
+    # Both optional. Left alone, the subject is the request's title and the type
+    # is whatever OpenProject says is the project's default — the point of the
+    # preview is that they can see that and change it before anything is sent.
+    subject: str = Field(default="", max_length=255)
+    type_id: Optional[int] = None
+
+
+def _may_file_ticket(account: dict, project_role: str, scopes: list, row) -> bool:
+    """Whether this account may turn this request into a ticket.
+
+    Whoever may settle it, or whoever took it on. The second half matters: a
+    lead picks a request up precisely to deal with it, and the person doing that
+    is the one who knows what the ticket should say. An administrator qualifies
+    through the first half, as everywhere else.
+    """
+    if _may_settle_change(account, project_role, scopes, row):
+        return True
+    return bool(row["picked_by"]) and row["picked_by"] == account["id"]
+
+
+def _ticket_text(row) -> str:
+    """What the ticket will say, built from the request rather than retyped.
+
+    Everything a developer needs to start is already written down in the change
+    request — the problem, what was seen, what was suggested — and asking
+    somebody to summarise it again produces a ticket that says "see CR-007".
+    The reference goes at the end so the ticket points back rather than starting
+    with an id nobody can resolve from OpenProject.
+    """
+    parts = [row["problem"].strip()]
+    if row["evidence"].strip():
+        parts.append(f"**What was seen**\n\n{row['evidence'].strip()}")
+    try:
+        options = json.loads(row["options"] or "[]")
+    except ValueError:
+        options = []
+    if options:
+        parts.append("**Options considered**\n\n"
+                     + "\n".join(f"- {str(o).strip()}" for o in options if str(o).strip()))
+    if row["recommendation"].strip():
+        parts.append(f"**Recommended**\n\n{row['recommendation'].strip()}")
+    where = (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
+             + (f" · {row['platform']}" if row["platform"] else "")) if row["tag"] else ""
+    tail = f"Raised in ADAM as CR-{row['number']:03d}"
+    if where:
+        tail += f" ({where})"
+    parts.append(f"---\n\n{tail}.")
+    return "\n\n".join(p for p in parts if p)
+
+
+def _ticket_guard(number: str, account: dict, project_id: str):
+    """The checks both halves share, so the preview and the apply cannot drift.
+
+    A preview that permits what the apply refuses is a page that offers a button
+    and then explains itself, and the version where they drift the other way is
+    worse.
+    """
+    scope = _change_project(account, project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    scopes = _scopes_of(account["id"], scope["project"])
+    if not _may_file_ticket(account, scope["role"], scopes, row):
+        raise HTTPException(403, (
+            f"{number} is not yours to schedule. Whoever can settle it, or "
+            f"whoever took it on, files the ticket."))
+    if row["status"] == "rejected":
+        raise HTTPException(409, f"{number} was rejected. There is nothing to build.")
+    if row["status"] == "done":
+        raise HTTPException(409, f"{number} is already done. A ticket now would be for work that happened.")
+    if row["child_key"]:
+        raise HTTPException(409, (
+            f"{number} already has a ticket: #{row['child_key']}. One request, "
+            f"one ticket — add to that one rather than opening another."))
+    return scope, row
+
+
+@app.post("/api/changes/{number}/ticket/preview")
+def preview_ticket(number: str, body: TicketIn, account: dict = Depends(require_account)):
+    """Work out the ticket and keep it for the person to agree to. **Sends nothing.**"""
+    scope, row = _ticket_guard(number, account, body.project_id)
+    pms = _pms_scope(account, scope["project"])
+    endpoint, token = _pms_for(account["id"])
+
+    parent = None
+    try:
+        # The parent is read rather than assumed, for two answers at once: that
+        # it still exists, and that it is in this ADAM project's OpenProject
+        # project. Filing a child into somebody else's plan is the mistake this
+        # catches, and it is invisible afterwards.
+        if row["external_key"]:
+            parent = openproject.work_package(endpoint, token, row["external_key"])
+            _same_pms_project(parent, pms, row["external_key"])
+        kinds = openproject.types(endpoint, token, pms["pmsId"])
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+
+    chosen = None
+    if body.type_id is not None:
+        chosen = next((k for k in kinds if k["id"] == body.type_id), None)
+        if not chosen:
+            raise HTTPException(400, (
+                f"This project has no type {body.type_id}. It offers "
+                f"{', '.join(k['name'] for k in kinds) or 'none'}."))
+    else:
+        # OpenProject's own default, then a Task, then whatever is first. Not a
+        # hardcoded name: a project that has renamed or disabled Task would get
+        # a 422 at the moment of creation, after the person had said yes.
+        chosen = (next((k for k in kinds if k["isDefault"]), None)
+                  or next((k for k in kinds if k["name"].lower() == "task"), None)
+                  or (kinds[0] if kinds else None))
+    if not chosen:
+        raise HTTPException(502, "OpenProject offers this project no work package types.")
+
+    subject = body.subject.strip() or row["title"].strip()
+    text = _ticket_text(row)
+    proposal = security.new_token()
+    now = security.now()
+    db.write(
+        "INSERT INTO wp_proposal (token_hash, account_id, project_id, kind, external_key, "
+        "change_number, subject, description, type_id, type_name, summary, "
+        "created_at, expires_at) VALUES (?, ?, ?, 'child', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (security.token_hash(proposal), account["id"], scope["project"],
+         row["external_key"] or "", row["number"], subject, text,
+         chosen["id"], chosen["name"],
+         f"new {chosen['name']} under #{row['external_key'] or '(nothing)'}: {subject[:120]}",
+         security.stamp(now), security.stamp(now + timedelta(minutes=PROPOSAL_MINUTES))),
+    )
+    return {
+        "proposal": proposal,
+        "change": f"CR-{row['number']:03d}",
+        "willCreate": {
+            "subject": subject,
+            "type": chosen["name"],
+            "description": text,
+            "project": pms["pmsName"] or pms["pmsIdentifier"],
+            "parent": None if not parent else {
+                "key": parent["key"], "subject": parent["subject"], "url": parent["url"]},
+        },
+        "types": kinds,
+        # Said plainly, because a top-level ticket is not what anybody asking for
+        # this had in mind — it happens only when the request came from no
+        # ticket at all, and they should decide rather than discover.
+        "topLevel": not row["external_key"],
+        "expiresInMinutes": PROPOSAL_MINUTES,
+        "note": "Nothing has been created yet. Show this to the person and apply "
+                "only after they say yes.",
+    }
+
+
+@app.post("/api/changes/{number}/ticket/{proposal}/apply")
+def apply_ticket(number: str, proposal: str, body: FileIn,
+                 account: dict = Depends(require_account)):
+    """Create the ticket the person has agreed to. One use; their own token."""
+    scope, row = _ticket_guard(number, account, body.project_id)
+    held = db.one("SELECT * FROM wp_proposal WHERE token_hash = ? AND kind = 'child'",
+                  (security.token_hash(proposal),))
+    if (not held or held["account_id"] != account["id"]
+            or held["project_id"] != scope["project"]
+            or held["change_number"] != row["number"]):
+        raise HTTPException(404, f"No such proposal for {number}. Preview it first.")
+    if held["applied_at"]:
+        raise HTTPException(409, f"That ticket has already been created: #{held['result_key']}.")
+    if security.expired(held["expires_at"]):
+        raise HTTPException(410, (
+            f"That preview is more than {PROPOSAL_MINUTES} minutes old. "
+            f"Look at it again and preview it again."))
+
+    pms = _pms_scope(account, scope["project"])
+    endpoint, token = _pms_for(account["id"])
+
+    # Claimed before anything is sent, so two quick presses cannot make two
+    # tickets. The same mechanism apply_change uses, which is most of the reason
+    # both kinds live in one table.
+    if not db.change("UPDATE wp_proposal SET applied_at = ? WHERE id = ? AND applied_at IS NULL",
+                     (security.stamp(), held["id"])):
+        raise HTTPException(409, "That ticket has already been created.")
+    try:
+        made = openproject.create(
+            endpoint, token, pms["pmsId"], held["subject"], held["description"],
+            type_id=held["type_id"], parent_key=held["external_key"] or None)
+    except openproject.Blocked as exc:
+        # The claim is released on every failure: nothing was created, so the
+        # person should be able to press it again rather than having to preview
+        # from the start because OpenProject was briefly unreachable.
+        db.write("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (held["id"],))
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        db.write("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (held["id"],))
+        raise HTTPException(422 if exc.status == 422 else 502, str(exc))
+
+    db.write("UPDATE wp_proposal SET result_key = ? WHERE id = ?", (made["key"], held["id"]))
+    # Written last and guarded, so that two applies racing past the claim above
+    # still leave one ticket recorded rather than the second overwriting the
+    # first. A CR whose child_key is already set is refused by _ticket_guard.
+    db.change("UPDATE change_request SET child_key = ?, child_at = ?, child_by = ? "
+              "WHERE id = ? AND child_key = ''",
+              (made["key"], security.stamp(), account["id"], row["id"]))
+
+    # Linked as well as recorded. `child_key` answers "does this request have a
+    # ticket"; the link answers "what work is scheduled against this artefact",
+    # which is the question the boards ask and which the column cannot reach.
+    db.write(
+        "INSERT OR IGNORE INTO artefact_link (project_id, target_kind, target_id, "
+        "external_system, external_key, url, cached_subject, cached_status, "
+        "cached_type, cached_assignee, synced_at, created_at, created_by) "
+        "VALUES (?, ?, ?, 'openproject', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (scope["project"], row["target_kind"], row["target_id"], made["key"],
+         made.get("url", ""), made.get("subject", ""), made.get("status", ""),
+         made.get("type", ""), made.get("assignee", ""),
+         security.stamp(), security.stamp(), account["id"]))
+
+    return {
+        "ok": True,
+        "ticket": {k: made.get(k) for k in ("key", "subject", "status", "type", "url")},
+        "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
+    }
 
 
 # ── which OpenProject project each ADAM project reads ────────────────

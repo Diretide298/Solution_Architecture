@@ -263,6 +263,17 @@ CREATE TABLE IF NOT EXISTS wp_proposal (
   token_hash    TEXT    NOT NULL UNIQUE,
   account_id    INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
   project_id    TEXT    NOT NULL,
+  -- 'change' alters an existing work package; 'child' creates one under it.
+  --
+  -- One table for both, and the reason is the column nobody thinks about:
+  -- `applied_at`, claimed with `UPDATE ... WHERE applied_at IS NULL`, is what
+  -- makes a proposal single-use. A second table would need that mechanism
+  -- written a second time, and the failure of the copy is silent — two quick
+  -- presses making two tickets, which nobody notices until somebody wonders
+  -- why a change request has two.
+  kind          TEXT    NOT NULL DEFAULT 'change',
+  -- For 'change', the work package being changed. For 'child', the parent it
+  -- will hang under — empty when the change request came from no ticket.
   external_key  TEXT    NOT NULL,
   lock_version  INTEGER,
   status_id     INTEGER,
@@ -270,6 +281,14 @@ CREATE TABLE IF NOT EXISTS wp_proposal (
   percent_done  INTEGER,
   comment       TEXT    NOT NULL DEFAULT '',
   summary       TEXT    NOT NULL DEFAULT '',
+  -- 'child' only. The change request this is for, what the ticket will say,
+  -- which type it will be, and the id OpenProject gave it once it existed.
+  change_number INTEGER,
+  subject       TEXT    NOT NULL DEFAULT '',
+  description   TEXT    NOT NULL DEFAULT '',
+  type_id       INTEGER,
+  type_name     TEXT    NOT NULL DEFAULT '',
+  result_key    TEXT    NOT NULL DEFAULT '',
   created_at    TEXT    NOT NULL,
   expires_at    TEXT    NOT NULL,
   applied_at    TEXT
@@ -298,8 +317,16 @@ CREATE TABLE IF NOT EXISTS change_request (
   recommendation TEXT    NOT NULL DEFAULT '',
   -- Work cannot go on until it is settled.
   blocking       INTEGER NOT NULL DEFAULT 0,
-  -- The OpenProject work package it came up in, when there was one.
+  -- The OpenProject work package it came up in, when there was one. The
+  -- *parent* of anything filed from this request.
   external_key   TEXT    NOT NULL DEFAULT '',
+  -- The ticket filed for this request, once one has been. At most one, ever:
+  -- this column is the guard, and a second attempt is answered with the key
+  -- already here rather than with a second ticket. Set only through the
+  -- propose-then-confirm flow, never by an import or a CSV.
+  child_key      TEXT    NOT NULL DEFAULT '',
+  child_at       TEXT,
+  child_by       INTEGER REFERENCES account(id),
   status         TEXT    NOT NULL DEFAULT 'open',
   raised_by      INTEGER NOT NULL REFERENCES account(id),
   raised_at      TEXT    NOT NULL,
@@ -806,6 +833,36 @@ def init() -> None:
             "FROM account",
             (FIRST_PROJECT, _stamp()),
         )
+
+        # ---- a change request can become a ticket --------------------------
+        #
+        # Two tables and the same reason: the columns are new, the stores are
+        # not. `child_key` is the guard that stops one request making two
+        # tickets, so a store where it silently did not exist would answer
+        # "already filed" never and file forever.
+        have = {row[1] for row in cur.execute("PRAGMA table_info(change_request)")}
+        if "child_key" not in have:
+            cur.execute(
+                "ALTER TABLE change_request ADD COLUMN child_key TEXT NOT NULL DEFAULT ''")
+            cur.execute("ALTER TABLE change_request ADD COLUMN child_at TEXT")
+            # No REFERENCES: SQLite cannot add a column with a foreign key to an
+            # existing table. The constraint on the fresh schema above is the
+            # one that matters from here on.
+            cur.execute("ALTER TABLE change_request ADD COLUMN child_by INTEGER")
+
+        have = {row[1] for row in cur.execute("PRAGMA table_info(wp_proposal)")}
+        if "kind" not in have:
+            # 'change' is right for every row that already exists — creating was
+            # not possible when they were written — so the default does the
+            # backfill and there is nothing to update.
+            cur.execute(
+                "ALTER TABLE wp_proposal ADD COLUMN kind TEXT NOT NULL DEFAULT 'change'")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN change_number INTEGER")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN subject TEXT NOT NULL DEFAULT ''")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN description TEXT NOT NULL DEFAULT ''")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN type_id INTEGER")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN type_name TEXT NOT NULL DEFAULT ''")
+            cur.execute("ALTER TABLE wp_proposal ADD COLUMN result_key TEXT NOT NULL DEFAULT ''")
 
         # ---- the allowlist, off -------------------------------------------
         #
