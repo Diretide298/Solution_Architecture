@@ -102,7 +102,10 @@ def set_owner(args) -> None:
     # Their sessions are left alone on purpose: the role is read fresh on every
     # request, so the change is live on their next click without signing them
     # out of a page they are in the middle of.
-    print(f"{row['email']} ({row['name'] or 'no name'}) is now {wanted}.")
+    # The name, not the stored value: `owner` is what the column holds and
+    # "System Architect" is what the role is called. security.label is the one
+    # place that knows both.
+    print(f"{row['email']} ({row['name'] or 'no name'}) is now {security.label(wanted)}.")
 
 
 def add_invite(args) -> None:
@@ -280,7 +283,10 @@ def main() -> None:
     p.add_argument("--base", default="http://localhost:4173")
     p.set_defaults(func=add_invite)
 
-    p = subs.add_parser("owner", help="make an existing account the super admin")
+    # The subcommand keeps its old spelling. It is typed by one person on one
+    # machine, it matches the stored value, and renaming it would break every
+    # runbook and harness that already calls it.
+    p = subs.add_parser("owner", help="make an existing account the System Architect")
     p.add_argument("email")
     p.add_argument("--revoke", action="store_true",
                    help="take it away instead, leaving them as --to")

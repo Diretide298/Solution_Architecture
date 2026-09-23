@@ -121,6 +121,17 @@ own(7005, { subject: 'Already shipped', status: 12, done: 100, start: day(-30), 
 // assertion about it passes while proving nothing.
 own(7006, { subject: 'Shipped and closed', status: 12, done: 100, start: day(-60), due: day(-40), updated: day(-40), parent: 902, version: 'M0 Groundwork' });
 
+// The three epics the tickets above hang off. They exist as work packages in
+// their own right, with no parent, which is what makes them modules on the
+// plan — and until now they were only ever hrefs, so the plan had nothing to
+// draw. 900 and 901 are scheduled automatically, the way OpenProject leaves a
+// parent by default; 902 has been taken off it by hand, so the chart has one
+// of each and "this bar will switch to manual scheduling" is testable.
+own(900, { subject: 'M1 Checkout', done: 30, start: day(-20), due: day(3) });
+own(901, { subject: 'M2 Refunds', done: 20, start: day(-10), due: day(40) });
+own(902, { subject: 'M0 Groundwork', status: 12, done: 100, start: day(-60), due: day(-40) });
+packages.get('902').scheduleManually = true;
+
 // Somebody else's, to prove a board is only ever your own.
 own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
 
@@ -221,6 +232,21 @@ createServer(async (req, res) => {
       return json(res, 409, { message: 'Invalid lock version' });
     }
     if (body.percentageDone !== undefined) found.percentageDone = body.percentageDone;
+    // Dates, and the rule that makes them interesting. OpenProject derives a
+    // parent's dates from its children while `scheduleManually` is false, and
+    // refuses a PATCH that sets them with a 422 naming the field. The plan page
+    // sends the flag in the same request for exactly this reason, so the
+    // stand-in has to refuse the request that does not — otherwise the bridge
+    // could stop sending it and every test would still pass.
+    const setsDates = body.startDate !== undefined || body.dueDate !== undefined;
+    if (setsDates && !found.scheduleManually && body.scheduleManually !== true) {
+      return json(res, 422, {
+        message: 'Start date cannot be set on an automatically scheduled parent.',
+      });
+    }
+    if (body.scheduleManually !== undefined) found.scheduleManually = body.scheduleManually;
+    if (body.startDate !== undefined) found.startDate = body.startDate;
+    if (body.dueDate !== undefined) found.dueDate = body.dueDate;
     const href = body?._links?.status?.href ?? '';
     const status = STATUSES.find((st) => href.endsWith(`/${st.id}`));
     if (status) found._links.status = { href, title: status.name };

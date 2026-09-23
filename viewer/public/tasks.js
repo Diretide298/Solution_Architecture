@@ -669,7 +669,7 @@ function exportCsv() {
 (async () => {
   if (!(await auth.requireSignIn())) return hideLoader();
   state.me = auth.account();
-  $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${state.me.role}` : '';
+  $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${auth.roleLabel(state.me.role)}` : '';
   // A reader's page, not an administrator's: it shows the delivery and changes
   // nothing on it. A pm was refused here, which left the role with no view of
   // the thing it exists to oversee.

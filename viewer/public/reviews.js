@@ -1018,7 +1018,7 @@ function redraw() {
 (async () => {
   if (!(await auth.requireSignIn())) return hideLoader();
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
   // The return path for the file the button beside it produces. Admin only, the
   // same as the route it leads to.
   $('f-close-link').hidden = !auth.isAdmin(me);

@@ -136,9 +136,9 @@
           <input id="invite-email" class="auth-input" type="email"
                  placeholder="them@softlabsgroup.com" />
           <select id="invite-role" class="scope-select">
-            <option value="reviewer">reviewer</option>
-            <option value="admin">admin</option>
-            <option value="client">client</option>
+            <option value="reviewer">Reviewer</option>
+            <option value="admin">Admin</option>
+            <option value="client">Client</option>
           </select>
           <select id="invite-project" class="scope-select" aria-label="Project they get access to"></select>
           <select id="invite-days" class="scope-select">
@@ -404,7 +404,7 @@
         createInvite, listInvites, revokeInvite, logoutAccount,
         makeReset,
         listPmsProjects, availablePmsProjects, setPmsProject, clearPmsProject,
-        isAdmin, isOwner,
+        isAdmin, isOwner, roleLabel,
       } from '/validation.js';
       import { attachSubSearch } from '/subsearch.js';
       // The list on the left, following what is on screen. Shared with the
@@ -460,7 +460,7 @@
         me = state.account;
         // The role, not the word "admin": an owner reading this page is not
         // an admin and should not be told they are.
-        $('whoami').textContent = `${me.email} · ${me.role}`;
+        $('whoami').textContent = `${me.email} · ${roleLabel(me.role)}`;
         $('admin').hidden = false;
         followSections('invite');
         // A link straight at a section - the reviews page sends people to
@@ -512,7 +512,7 @@
           row.append(el('span', 'invite-state', invite.state));
           row.append(el('span', 'invite-who', invite.email));
           row.append(el('span', 'invite-role',
-            `${invite.role} · ${invite.project_name || invite.project_id || '—'}`));
+            `${roleLabel(invite.role)} · ${invite.project_name || invite.project_id || '—'}`));
           row.append(el('span', 'admin-when',
             invite.state === 'open' ? `expires ${when(invite.expires_at)}`
               : invite.redeemed_at ? `used ${when(invite.redeemed_at)}`
@@ -701,20 +701,21 @@
           row.append(el('span', 'invite-who', person.email + (person.id === me.id ? ' (you)' : '')));
 
           const role = el('select', 'scope-select admin-role');
-          // Every role the service will accept here. `owner` is deliberately
-          // absent: /api/accounts/{id}/role refuses it in both directions, so
-          // offering it would be offering a refusal. It is set on the machine,
-          // with `python -m api.cli owner <address>`.
+          // Every role the service will accept here. The System Architect is
+          // deliberately absent: /api/accounts/{id}/role refuses that role in
+          // both directions, so offering it would be offering a refusal. It is
+          // set on the machine, with `python -m api.cli owner <address>` — the
+          // CLI still spells it `owner`, which is the stored value everywhere.
           for (const value of ['reviewer', 'dev', 'lead', 'pm', 'admin', 'client']) {
-            const option = el('option', null, value);
+            const option = el('option', null, roleLabel(value));
             option.value = value;
             if (person.role === value) option.selected = true;
             role.append(option);
           }
-          // An owner's row shows `owner` and offers nothing, rather than showing
-          // a picker whose every option is a 403.
+          // The System Architect's row shows the role and offers nothing, rather
+          // than a picker whose every option is a 403.
           if (isOwner(person)) {
-            const only = el('option', null, 'owner');
+            const only = el('option', null, roleLabel('owner'));
             only.value = 'owner';
             only.selected = true;
             role.replaceChildren(only);

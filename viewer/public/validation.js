@@ -284,6 +284,30 @@ export const account = () => (session.signedIn ? session.account : null);
 // hides is still refused at the door if somebody finds it anyway.
 
 /** Who administers: an admin, and the owner above them. */
+// ── what a role is called ────────────────────────────────────────────
+//
+// **The stored value and the name people read are two different things, and
+// this is the only place they are joined.** `owner` is what the database, the
+// CLI, `security.ROLES` and every predicate in the service say; "System
+// Architect" is what it is called. Renaming the stored value instead would mean
+// migrating live rows, the CLI, `audience.mjs` and nine checks, for a change
+// that alters no permission — the System Architect has exactly the powers the
+// owner had, which is all of them.
+//
+// A role with no entry falls back to itself, so a role added to the service
+// and not to this map appears under its own name rather than as "undefined".
+export const ROLE_LABELS = {
+  owner: 'System Architect',
+  admin: 'Admin',
+  pm: 'Project Manager',
+  lead: 'Team Lead',
+  dev: 'Developer',
+  reviewer: 'Reviewer',
+  client: 'Client',
+};
+
+export const roleLabel = (role) => ROLE_LABELS[role] ?? role ?? '';
+
 export const isAdmin = (who) => who?.role === 'owner' || who?.role === 'admin';
 
 /** The super admin alone — not an admin. For the things that are deliberately
@@ -605,6 +629,34 @@ export const clearPmsProject = (projectId) =>
 export const boardOverview = (projectId, { refresh = false } = {}) =>
   call(`/api/board/overview?${new URLSearchParams({
     project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}) })}`);
+
+// ── the plan: modules on a chart, the System Architect's only ────────
+//
+// Every one of these is refused with a 403 for anybody else, including an
+// admin. The page hides itself as well, but that is presentation: the rule is
+// at the door, the same way `mayCall` treats the Build layer.
+export const readPlan = (projectId = '', { refresh = false } = {}) =>
+  call(`/api/plan?${new URLSearchParams({
+    project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}) })}`);
+
+// Where the bars are now. Sends nothing to OpenProject; a bar dragged back to
+// where it started is returned rather than stored.
+export const savePlanDraft = (projectId, bars) =>
+  call('/api/plan/draft', { method: 'PUT', body: { project_id: projectId ?? '', bars } });
+
+export const clearPlanDraft = (projectId = '') =>
+  call(`/api/plan/draft?${new URLSearchParams({ project_id: projectId ?? '' })}`,
+    { method: 'DELETE' });
+
+// The two halves of the confirm. `previewPlan` re-reads every ticket and hands
+// back a one-use token; `shipPlan` is the only call in this file that changes
+// the delivery plan.
+export const previewPlan = (projectId = '') =>
+  call('/api/plan/preview', { method: 'POST', body: { project_id: projectId ?? '' } });
+
+export const shipPlan = (projectId, proposal) =>
+  call(`/api/plan/${encodeURIComponent(proposal)}/apply`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
 
 export const logoutAccount = (id) =>
   call(`/api/accounts/${id}/logout-all`, { method: 'POST' });

@@ -87,7 +87,7 @@ const code = (text) => el('code', 'au-code', text);
 (async function start() {
   await auth.requireSignIn();
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
   if (!auth.isAdmin(me)) {
     // Said, not blanked. A page that renders an empty shell to a reviewer looks

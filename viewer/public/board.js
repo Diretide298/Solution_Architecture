@@ -284,7 +284,7 @@ async function load() {
 (async () => {
   if (!(await auth.requireSignIn())) return;
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
   $('bd-refresh').onclick = async () => {
     $('bd-refresh').disabled = true;

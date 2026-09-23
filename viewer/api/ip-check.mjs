@@ -95,7 +95,7 @@ const boot = await as('boss', 'POST', '/api/auth/bootstrap', {
 check('the first account is made with no allowlist in the way', boot.status === 200,
   `${boot.status}`);
 check('the CLI makes them the super admin',
-  /is now owner/.test(STORE ? cli('owner', 'harness.boss@softlabsgroup.com') : ''),
+  /is now System Architect/.test(STORE ? cli('owner', 'harness.boss@softlabsgroup.com') : ''),
   STORE ? '' : 'no TICVAI_DB given');
 
 const first = await as('boss', 'GET', '/api/ips');

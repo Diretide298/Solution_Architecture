@@ -327,7 +327,7 @@ async function loadProviders() {
 (async () => {
   if (!(await auth.requireSignIn())) return;
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
   try { await loadProviders(); }
   catch (error) { say('ch-error', error.message); return; }

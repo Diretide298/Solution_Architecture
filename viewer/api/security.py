@@ -64,6 +64,33 @@ INVITE_DAYS = 7
 #             writes nothing. As it was.
 ROLES = ("owner", "admin", "pm", "lead", "dev", "reviewer", "client")
 
+# What each role is *called*, which is not what it is stored as.
+#
+# `owner` is the System Architect. The stored value stays `owner` in the
+# database, in `ROLES`, in every predicate above, in `audience.mjs` and in the
+# CLI subcommand, because renaming it would mean migrating live account rows
+# and nine checks to change a name while changing no permission — the System
+# Architect has exactly the powers the owner had, which is all of them.
+#
+# `viewer/public/validation.js` holds the same map for the pages. Two copies
+# of seven words, rather than an endpoint whose only job is to serve them.
+LABELS = {
+    "owner": "System Architect",
+    "admin": "Admin",
+    "pm": "Project Manager",
+    "lead": "Team Lead",
+    "dev": "Developer",
+    "reviewer": "Reviewer",
+    "client": "Client",
+}
+
+
+def label(role: str) -> str:
+    """The name a person reads. Falls back to the stored value, so a role
+    added to ROLES and not to LABELS appears under its own name."""
+    return LABELS.get(role, role)
+
+
 # Who may manage accounts, invites, resets, the exports and the bulk settles.
 #
 # **Every `role == "admin"` in this codebase meant this set**, back when the set

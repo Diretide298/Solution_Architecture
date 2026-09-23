@@ -202,7 +202,7 @@ async function load() {
 (async () => {
   if (!(await auth.requireSignIn())) return;
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
   $('agents').hidden = false;
   $('ag-days').onchange = (e) => { state.days = Number(e.target.value); load(); };
   await load();

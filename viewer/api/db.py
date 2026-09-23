@@ -752,6 +752,71 @@ CREATE TABLE IF NOT EXISTS test_batch_item (
   -- to fill a batch without doing any work.
   PRIMARY KEY (batch_id, external_key)
 );
+
+-- Where the System Architect has dragged a module to, before anybody is told.
+--
+-- **This is a sketch, not a plan.** OpenProject holds the plan; this holds one
+-- person's unsent rearrangement of it, and the two are allowed to disagree for
+-- as long as it takes to think. Nothing here is ever read by the board, the
+-- costing page or anybody else's screen: the rows are keyed by account, and the
+-- only way anything in here reaches the delivery is the propose-then-confirm
+-- pair on `/api/plan`, which writes the dates to the work packages themselves
+-- and then deletes the row it sent.
+--
+-- So this table does not become a second delivery plan sitting beside the
+-- first, which is the thing `artefact_link`'s CF-124 comment warns against. It
+-- is a drawing board that empties itself when the drawing is agreed.
+--
+-- `start_date` and `due_date` are ISO dates, blank for "not stated". Both are
+-- kept even when only one was dragged, so that what is shipped is the whole
+-- bar the person was looking at rather than half of it.
+CREATE TABLE IF NOT EXISTS plan_draft (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id   INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id   TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  -- The OpenProject work package this bar is. Not a foreign key: the ticket
+  -- lives in another system, and a draft that outlives a deleted ticket is a
+  -- stale row rather than a broken one -- `/api/plan` simply stops finding it.
+  external_key TEXT    NOT NULL,
+  start_date   TEXT    NOT NULL DEFAULT '',
+  due_date     TEXT    NOT NULL DEFAULT '',
+  -- What the bar read before it was dragged, so the confirm screen can say
+  -- "12 March -> 19 March" rather than only where it ended up, and so a bar
+  -- dragged back to where it started can be recognised and dropped.
+  was_start    TEXT    NOT NULL DEFAULT '',
+  was_due      TEXT    NOT NULL DEFAULT '',
+  moved_at     TEXT    NOT NULL,
+  -- One row per person per ticket. Dragging the same bar twice is one
+  -- unsent intention, not two.
+  UNIQUE (account_id, project_id, external_key)
+);
+
+-- A whole rearrangement, frozen at the moment somebody was shown it.
+--
+-- The plan ships several bars at once, so the single-use token cannot hang off
+-- one work package the way `wp_proposal` does. What is kept is the payload
+-- itself: every ticket, the dates it will be given, the dates it had, and the
+-- lockVersion each was read at. The apply sends *this*, never the draft table.
+--
+-- That difference is the entire point of a confirm step. Re-deriving from
+-- `plan_draft` at apply time would ship whatever the chart looks like now,
+-- including bars dragged in the seconds after the summary was read -- which is
+-- to say it would ship things nobody agreed to, while looking like it had
+-- asked.
+CREATE TABLE IF NOT EXISTS plan_proposal (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  token_hash  TEXT    NOT NULL UNIQUE,
+  account_id  INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  -- JSON: [{key, subject, start, due, wasStart, wasDue, lockVersion}, ...]
+  payload     TEXT    NOT NULL,
+  summary     TEXT    NOT NULL DEFAULT '',
+  created_at  TEXT    NOT NULL,
+  expires_at  TEXT    NOT NULL,
+  -- Claimed with UPDATE ... WHERE applied_at IS NULL, so two clicks on one
+  -- token race for the row and exactly one of them wins.
+  applied_at  TEXT
+);
 """
 
 # Indexes that cannot be created until the migration has run.

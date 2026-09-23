@@ -165,6 +165,15 @@ const DRAWER_HTML = `
           <a class="drawer-link" href="/costing.html">Costing: hours and what they cost</a>
           <a class="drawer-link" href="/audit.html">Audit the delivery package</a>
         </nav>
+
+        <!-- Its own group rather than a line in Administration, because it is
+             not administration: it is the one screen that belongs to a single
+             person. Hidden for everybody else, and refused by the service for
+             everybody else, which are two different guarantees. -->
+        <nav class="drawer-group" id="account-architect" hidden aria-labelledby="drawer-architect">
+          <h3 class="drawer-group-title" id="drawer-architect">System Architect</h3>
+          <a class="drawer-link" href="/plan.html">The plan: modules on a chart</a>
+        </nav>
       </div>
 
       <p class="auth-note auth-fine" id="account-offline" hidden>
@@ -243,9 +252,10 @@ function renderAccountPanel() {
     // what signs in; the name is only what people call you.
     $('account-name').textContent = who.name || who.email;
     $('account-email').textContent = who.name ? who.email : '';
-    $('account-role').textContent = who.role;
+    $('account-role').textContent = auth.roleLabel(who.role);
     $('account-role').dataset.role = who.role;
     $('account-admin').hidden = !auth.isAdmin(who);
+    $('account-architect').hidden = !auth.isOwner(who);
     // Never reopen already armed. This panel is opened and closed all day, and
     // a confirm left standing from a change of mind ten minutes ago would sit
     // one click from ending every session on the account.
@@ -465,7 +475,7 @@ export function renderAccountButton() {
   }
   badge.textContent = initialsOf(who);
   button.classList.add('signed-in');
-  button.title = `${who.email} — ${who.role}`;
+  button.title = `${who.email} — ${auth.roleLabel(who.role)}`;
 }
 
 /**

@@ -89,7 +89,7 @@ async function build() {
 (async () => {
   if (!(await auth.requireSignIn())) return;
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
   try {
     // An empty build, to learn which sections this reader may have without

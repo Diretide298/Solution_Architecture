@@ -497,7 +497,7 @@ function wireForm() {
 (async () => {
   if (!(await auth.requireSignIn())) return hideLoader();
   state.me = auth.account();
-  $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${state.me.role}` : '';
+  $('whoami').textContent = state.me ? `${state.me.name || state.me.email} · ${auth.roleLabel(state.me.role)}` : '';
   state.project = await auth.ensureProject();
 
   // The projects this account may open, by name, for the switcher.

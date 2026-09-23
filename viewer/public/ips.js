@@ -173,7 +173,7 @@ function drawDryRun(dry) {
   for (const person of out) {
     const row = el('div', 'admin-row ip-row ip-row-bad');
     row.append(el('span', 'account-name', person.name));
-    row.append(el('span', 'invite-who', `${person.email} · ${person.role}`));
+    row.append(el('span', 'invite-who', `${person.email} · ${auth.roleLabel(person.role)}`));
     row.append(el('span', 'ip-where',
       person.stranded.map((s) => s.ip).join(', ')));
     row.append(el('span', 'ip-verdict', 'no covered address'));
@@ -182,7 +182,7 @@ function drawDryRun(dry) {
   for (const person of unseen) {
     const row = el('div', 'admin-row ip-row ip-row-unknown');
     row.append(el('span', 'account-name', person.name));
-    row.append(el('span', 'invite-who', `${person.email} · ${person.role}`));
+    row.append(el('span', 'invite-who', `${person.email} · ${auth.roleLabel(person.role)}`));
     row.append(el('span', 'ip-where', '—'));
     row.append(el('span', 'ip-verdict', 'never seen anywhere'));
     host.append(row);
@@ -219,7 +219,7 @@ function drawSightings() {
   for (const item of rows) {
     const row = el('div', `admin-row ip-row${item.covered ? '' : ' ip-row-uncovered'}`);
     row.append(el('span', 'account-name', item.account.name));
-    row.append(el('span', 'invite-who', `${item.account.email} · ${item.account.role}`));
+    row.append(el('span', 'invite-who', `${item.account.email} · ${auth.roleLabel(item.account.role)}`));
     row.append(el('span', 'ip-cidr', item.ip));
     const when = el('span', 'ip-when', `${ago(item.lastSeen)} · ${item.hits} request${item.hits === 1 ? '' : 's'}`);
     when.title = `First seen ${item.firstSeen}\nLast seen ${item.lastSeen}`
@@ -278,7 +278,7 @@ async function load() {
 (async () => {
   if (!(await auth.requireSignIn())) return;
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
   if (!auth.isOwner(me)) { $('denied').hidden = false; return; }
   $('ips').hidden = false;
 

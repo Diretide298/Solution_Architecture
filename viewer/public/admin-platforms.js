@@ -20,6 +20,7 @@
 
 import {
   listScopes, listAccounts, grantScope, revokeScope, project, isOwner, account,
+  roleLabel,
 } from '/validation.js';
 
 /** Which platforms exist, from the package rather than from a list kept here.
@@ -116,7 +117,7 @@ export async function mountPlatforms() {
     for (const person of scopable) {
       const row = el('div', 'admin-row platform-row');
       row.append(el('span', 'account-name', person.name || '—'));
-      row.append(el('span', 'invite-who', `${person.email} · ${person.role}`));
+      row.append(el('span', 'invite-who', `${person.email} · ${roleLabel(person.role)}`));
 
       const chips = el('div', 'platform-chips');
       const mine = held.get(person.id) ?? [];

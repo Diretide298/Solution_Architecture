@@ -58,6 +58,12 @@ const PAGES = [
   // an orphan without anyone noticing, and that is the failure this list exists
   // to prevent.
   '/settings.html',
+  // The plan. The System Architect's, so whoever the harness account is it
+  // will most likely see the refusal panel rather than the chart -- which is
+  // still the assertion this list makes: the document loads and nothing in it
+  // throws. What the chart *does* is in api/plan-check.mjs, where there is an
+  // account with the role to see it.
+  '/plan.html',
 ];
 
 let pass = 0, fail = 0;

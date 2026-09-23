@@ -255,6 +255,13 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         "parentSubject": _titled(links.get("parent")),
         "startDate": work_package.get("startDate"),
         "dueDate": work_package.get("dueDate"),
+        # Whether this ticket's dates are its own. OpenProject schedules a
+        # parent automatically by default: its dates are derived from its
+        # children and a PATCH that sets them is refused with a 422. The plan
+        # page has to know which bars are draggable before somebody drags one,
+        # so this comes back on every summary rather than being discovered at
+        # the moment of writing.
+        "scheduleManually": bool(work_package.get("scheduleManually", False)),
         "percentDone": work_package.get("percentageDone"),
         # What a ticket cost and what it was expected to. Both are durations in
         # OpenProject and hours here; `spentTime` needs permission to view time
@@ -305,17 +312,33 @@ def statuses(endpoint: str, token: str) -> list:
 
 
 def update(endpoint: str, token: str, key: str, lock_version: int,
-           status_id: Optional[int] = None, percent_done: Optional[int] = None) -> dict:
+           status_id: Optional[int] = None, percent_done: Optional[int] = None,
+           start_date: Optional[str] = None, due_date: Optional[str] = None) -> dict:
     """
-    Change the status and/or % done, as the owner of `token`.
+    Change the status, % done and/or the dates, as the owner of `token`.
 
     `lockVersion` is the version that was read when the change was proposed. If
     anybody has touched the work package since, OpenProject answers 409 and
     nothing changes — the person agreed to a change against what they saw.
+
+    **Dates carry `scheduleManually` with them, and they have to.** OpenProject
+    schedules a parent automatically unless told otherwise: its start and finish
+    are derived from its children, and a PATCH that sets them on an
+    automatically scheduled ticket is refused with a 422 naming a field the
+    person never touched. Sending the flag in the same PATCH is what converts
+    "these dates are computed" into "these dates are stated", which is exactly
+    what moving a bar on a chart means. It is sent only when a date is being
+    written, so a status-only change leaves the scheduling mode alone.
     """
     body: dict = {"lockVersion": lock_version}
     if percent_done is not None:
         body["percentageDone"] = percent_done
+    if start_date is not None:
+        body["startDate"] = start_date or None
+    if due_date is not None:
+        body["dueDate"] = due_date or None
+    if start_date is not None or due_date is not None:
+        body["scheduleManually"] = True
     if status_id is not None:
         body["_links"] = {"status": {"href": f"/api/v3/statuses/{status_id}"}}
     raw = call(endpoint, token, f"work_packages/{key}", method="PATCH", body=body)

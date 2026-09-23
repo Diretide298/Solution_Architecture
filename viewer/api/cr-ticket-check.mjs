@@ -78,7 +78,7 @@ const boot = await as('boss', 'POST', '/api/auth/bootstrap', {
 });
 check('an admin exists', boot.status === 200, `${boot.status}`);
 check('and is made the super admin, because granting a platform is theirs',
-  /is now owner/.test(STORE ? cli('owner', 'harness.boss@softlabsgroup.com') : ''),
+  /is now System Architect/.test(STORE ? cli('owner', 'harness.boss@softlabsgroup.com') : ''),
   STORE ? '' : 'no TICVAI_DB given');
 check('and connects to the stand-in OpenProject',
   (await connect('boss')).status === 200);

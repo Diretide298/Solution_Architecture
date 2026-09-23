@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — the plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/plan.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">the plan</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <button id="pl-refresh" class="chip" type="button" title="Reads OpenProject again, now">Refresh</button>
+        <a class="chip" href="/board.html">Board</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          Rearranging the delivery is the System Architect&rsquo;s, and only
+          theirs &mdash; not an administrator&rsquo;s. What is planned is on
+          <a href="/board.html">the board</a>, and what it costs is on
+          <a href="/costing.html">the costing page</a>.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <main id="unconnected" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">OpenProject is not connected</h1>
+        <p class="auth-note" id="unconnected-why"></p>
+        <a class="auth-button" href="/settings.html#openproject">Go to settings</a>
+      </div>
+    </main>
+
+    <main id="plan" class="admin-main pl-main" hidden>
+      <p class="auth-error" id="pl-error" hidden></p>
+
+      <section class="admin-panel pl-intro">
+        <h1 class="admin-heading">Modules, and when they happen</h1>
+        <p class="auth-note set-lede">
+          <strong>Every bar is a top-level ticket in OpenProject, spanning
+          everything underneath it.</strong> Drag a bar to move it, drag either
+          end to stretch it. Nothing leaves this screen until you press
+          <em>Ship to OpenProject</em> and confirm &mdash; until then the
+          arrangement is yours alone, and nobody else&rsquo;s board changes.
+        </p>
+      </section>
+
+      <section class="pl-toolbar" id="pl-toolbar">
+        <div class="pl-zoom" role="group" aria-label="Zoom">
+          <button class="chip" type="button" data-zoom="quarter">Quarter</button>
+          <button class="chip" type="button" data-zoom="month">Month</button>
+          <button class="chip" type="button" data-zoom="week">Week</button>
+        </div>
+        <label class="pl-switch">
+          <input type="checkbox" id="pl-hide-done" />
+          <span>Hide finished modules</span>
+        </label>
+        <span class="pl-spacer"></span>
+        <span class="pl-dirty" id="pl-dirty" hidden></span>
+        <button class="chip" id="pl-discard" type="button" hidden>Discard the sketch</button>
+        <button class="chip chip-go" id="pl-ship" type="button" hidden>Ship to OpenProject</button>
+      </section>
+
+      <section class="admin-panel pl-chart-panel">
+        <div class="pl-chart" id="pl-chart">
+          <!-- The names do not scroll sideways with the bars: a chart three
+               months wide is one you read by scrolling, and a row whose label
+               has gone off the left is a row about nothing. -->
+          <div class="pl-names" id="pl-names"></div>
+          <div class="pl-scroll" id="pl-scroll">
+            <div class="pl-axis" id="pl-axis" aria-hidden="true"></div>
+            <div class="pl-rows" id="pl-rows"></div>
+          </div>
+        </div>
+        <p class="auth-note auth-fine" id="pl-empty" hidden></p>
+      </section>
+
+      <section class="admin-panel" id="pl-undated-panel" hidden>
+        <h2 class="admin-heading">
+          No dates yet <span class="admin-count" id="pl-undated-count"></span>
+        </h2>
+        <p class="auth-note set-lede">
+          These modules have no start and no finish, and nothing underneath them
+          has one either &mdash; so there is nowhere on a time axis to draw them.
+          Putting one on the chart gives it a fortnight from today, which you
+          can then drag like any other.
+        </p>
+        <div class="admin-table" id="pl-undated"></div>
+      </section>
+
+      <p class="auth-note auth-fine pl-asof" id="pl-asof"></p>
+    </main>
+
+    <!-- The confirm. Nothing reaches OpenProject without passing through here,
+         and it lists every ticket by name rather than saying "12 changes". -->
+    <div class="pl-veil" id="pl-veil" hidden>
+      <div class="admin-panel pl-dialog" role="dialog" aria-modal="true" aria-labelledby="pl-dialog-title">
+        <h2 class="admin-heading" id="pl-dialog-title">Ship this to OpenProject</h2>
+        <p class="auth-note set-lede" id="pl-dialog-lede"></p>
+        <p class="auth-error" id="pl-dialog-error" hidden></p>
+        <div class="admin-table pl-dialog-list" id="pl-dialog-list"></div>
+        <p class="auth-note auth-fine" id="pl-dialog-manual" hidden></p>
+        <p class="auth-note auth-fine" id="pl-dialog-skipped" hidden></p>
+        <div class="pl-dialog-actions">
+          <button class="chip" id="pl-cancel" type="button">Cancel</button>
+          <button class="chip chip-go" id="pl-confirm" type="button">Yes, send these</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/plan.js"></script>
+  </body>
+</html>

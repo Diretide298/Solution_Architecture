@@ -928,7 +928,7 @@ function setView(view) {
   const me = auth.account();
   // Optional: inside the viewer these views are sections of a page that already
   // says who you are, so there is no `#whoami` to fill.
-  $('whoami')?.replaceChildren(me ? `${me.name || me.email} · ${me.role}` : '');
+  $('whoami')?.replaceChildren(me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '');
 
   let uiux;
   try {

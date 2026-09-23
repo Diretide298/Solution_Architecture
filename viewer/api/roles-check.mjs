@@ -80,7 +80,7 @@ check('a second admin is invited', chief.ok, chief.why ?? '');
 
 // The CLI is the only door. Everything below leans on this having worked.
 const said = STORE ? cli('owner', 'harness.chief@softlabsgroup.com') : '';
-check('the CLI makes them the super admin', /is now owner/.test(said), said.trim() || 'no TICVAI_DB given');
+check('the CLI makes them the System Architect', /is now System Architect/.test(said), said.trim() || 'no TICVAI_DB given');
 
 const me = await as('harness.chief', 'GET', '/api/auth/me');
 check('and they are an owner on their next request', me.data?.account?.role === 'owner',

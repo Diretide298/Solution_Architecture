@@ -193,7 +193,7 @@ async def ip_allowlist(request: Request, call_next):
         status_code=403,
         content={"detail":
                  f"This ADAM is limited to approved networks, and {ip or 'your address'} "
-                 f"is not one of them. Ask the super admin to add it."})
+                 f"is not one of them. Ask the System Architect to add it."})
 
 # On a workstation the viewer is served by the Node process on another port, so
 # the browser treats calls here as cross-origin. Credentials must be allowed for
@@ -471,7 +471,7 @@ def require_owner(account: dict = Depends(require_account)) -> dict:
     """
     if not security.is_owner(account["role"]):
         raise HTTPException(
-            403, "Only the super admin can do that.")
+            403, "Only the System Architect can do that.")
     return account
 
 
@@ -772,7 +772,7 @@ def set_active(account_id: int, active: bool, admin: dict = Depends(require_admi
         # not grantable from here: the super admin is arranged on the machine, so
         # that a session on the site is never enough to remove one.
         raise HTTPException(
-            409, "The super admin cannot be disabled from here. Use the CLI.")
+            409, "The System Architect cannot be disabled from here. Use the CLI.")
     if not active and security.is_admin(row["role"]) and _live_admin_count() <= 1:
         raise HTTPException(409, "That is the last active admin. Make another first.")
 
@@ -804,7 +804,7 @@ def set_role(account_id: int, role: str, admin: dict = Depends(require_admin)):
         raise HTTPException(404, "No such account.")
     if row["role"] in security.CLI_ONLY:
         raise HTTPException(
-            403, "The super admin's role is not changed from here. Use the CLI.")
+            403, "The System Architect's role is not changed from here. Use the CLI.")
     # "Your own administration" rather than "your own admin role": an owner
     # demoting themselves to reviewer is the same lockout by another name, and
     # the check that named one role would have missed it.
@@ -4465,6 +4465,405 @@ def apply_ticket(number: str, proposal: str, body: FileIn,
         "ticket": {k: made.get(k) for k in ("key", "subject", "status", "type", "url")},
         "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
     }
+
+
+# ── the plan: modules on a chart, dragged, then shipped ──────────────
+#
+# **The one page in ADAM that is one person's.** Every other screen is gated by
+# what a role may do; this one is gated by `require_owner`, which is to say the
+# System Architect and nobody else — not an admin, not a pm. That is not a
+# security boundary so much as a statement about whose job this is: moving the
+# shape of the delivery around to see what it would look like is thinking out
+# loud, and thinking out loud in front of the whole company is not thinking.
+#
+# **A module is a top-level ticket.** Not a platform, not an ADAM concept: a
+# work package in OpenProject with no parent inside this project. Its bar spans
+# everything underneath it, so dragging the bar is a statement about the module
+# and not about any one ticket in it.
+#
+# **Nothing here is a second plan.** The drag lands in `plan_draft`, which is
+# private and temporary; the only way out of it is the propose-then-confirm pair
+# below, which writes the dates onto the work packages themselves and deletes
+# what it sent. `artefact_link`'s CF-124 comment warns against two plans over
+# one body of work, and the way this stays on the right side of that is that the
+# draft table empties itself the moment the draft stops being a draft.
+
+PLAN_MINUTES = 15
+
+# A chart of six hundred bars is not a chart. This is a ceiling on modules, not
+# on tickets — the rollup still reads every descendant.
+PLAN_LIMIT = 200
+
+
+class PlanBarIn(BaseModel):
+    key: str = Field(min_length=1, max_length=32)
+    # Blank is a real value: it means "this module has no stated start", which
+    # is what an untouched backlog module looks like and has to stay tellable
+    # from a date somebody chose.
+    #
+    # The bound is loose on purpose. An exact `max_length=10` is the right
+    # length for an ISO date and the wrong rule to enforce here: it turns
+    # "next tuesday" into a 422 naming a field, while "2026-13-45" — the same
+    # mistake, one character shorter — reaches `_a_date` and comes back as a
+    # sentence. One kind of wrong date should not produce two kinds of error, so
+    # the field only stops something absurd and `_a_date` does the judging.
+    start: str = Field(default="", max_length=64)
+    due: str = Field(default="", max_length=64)
+
+
+class PlanDraftIn(BaseModel):
+    project_id: str = ""
+    bars: List[PlanBarIn] = Field(default_factory=list)
+
+
+class PlanApplyIn(BaseModel):
+    project_id: str = ""
+
+
+def _a_date(value: str, what: str) -> str:
+    """An ISO date, or the sentence saying why it is not one."""
+    text = (value or "").strip()
+    if not text:
+        return ""
+    try:
+        return date.fromisoformat(text).isoformat()
+    except ValueError:
+        raise HTTPException(400, f"{what} should be a date like 2026-03-19, not {text!r}.")
+
+
+def _span(items: list) -> tuple:
+    """The earliest start and latest finish across a set of tickets.
+
+    Blank rather than a guess when nothing in the set states a date: a module
+    whose tickets are all undated has no span, and inventing one from today
+    would put a bar on the chart that no ticket in OpenProject agrees with.
+    """
+    starts = [i["startDate"] for i in items if i.get("startDate")]
+    dues = [i["dueDate"] for i in items if i.get("dueDate")]
+    return (min(starts) if starts else "", max(dues) if dues else "")
+
+
+def _modules(items: list) -> list:
+    """The top-level tickets, each carrying what hangs underneath it.
+
+    A ticket is top-level when it has no parent, or when its parent is outside
+    the set — a child whose epic lives in another OpenProject project is the top
+    of the tree *here*, and dropping it would quietly lose work from the chart.
+
+    The walk is iterative and visit-guarded. OpenProject will not normally hand
+    back a cycle, but a parent chain is data from another system and a recursive
+    rollup that meets one does not return.
+    """
+    by_key = {i["key"]: i for i in items}
+    kids: dict = {}
+    for item in items:
+        parent = str(item["parent"]) if item.get("parent") else ""
+        if parent and parent in by_key:
+            kids.setdefault(parent, []).append(item)
+
+    roots = [i for i in items
+             if not i.get("parent") or str(i["parent"]) not in by_key]
+
+    out = []
+    for root in roots:
+        family, seen, stack = [root], {root["key"]}, [root["key"]]
+        while stack:
+            for child in kids.get(stack.pop(), []):
+                if child["key"] in seen:
+                    continue
+                seen.add(child["key"])
+                family.append(child)
+                stack.append(child["key"])
+        descendants = family[1:]
+        rolled_start, rolled_due = _span(family)
+        percents = [i["percentDone"] for i in family if i.get("percentDone") is not None]
+        out.append({
+            **root,
+            # What the bar is drawn from. The ticket's own dates when it has
+            # them, otherwise the span of its children — which is exactly what
+            # OpenProject shows for an automatically scheduled parent, so the
+            # chart and the tool agree about where a module sits.
+            "barStart": root.get("startDate") or rolled_start,
+            "barDue": root.get("dueDate") or rolled_due,
+            # Said separately so the page can show that a bar is derived rather
+            # than stated, and warn before somebody drags one.
+            "ownStart": root.get("startDate") or "",
+            "ownDue": root.get("dueDate") or "",
+            "rolledStart": rolled_start,
+            "rolledDue": rolled_due,
+            "children": len(descendants),
+            "openChildren": sum(1 for i in descendants if i.get("percentDone") != 100),
+            "percent": round(sum(percents) / len(percents)) if percents else None,
+        })
+    # Undated modules last: they have no place on a time axis, and sorting them
+    # to the front by an empty string would push everything real off the screen.
+    out.sort(key=lambda m: (not m["barStart"], m["barStart"], m["subject"]))
+    return out[:PLAN_LIMIT]
+
+
+def _drafts(account_id: int, project: str) -> dict:
+    return {row["external_key"]: row for row in db.all_rows(
+        "SELECT * FROM plan_draft WHERE account_id = ? AND project_id = ?",
+        (account_id, project))}
+
+
+@app.get("/api/plan")
+def read_plan(project_id: str = Query(default=""),
+              refresh: int = Query(default=0),
+              account: dict = Depends(require_owner)):
+    """The modules, where they sit, and where this person has dragged them.
+
+    Reads through the same five-minute cache the board uses, because it is the
+    same read of the same project and two copies of it would disagree by up to
+    five minutes for no reason anybody could see.
+    """
+    scope = _pms_scope(account, project_id)
+    key = (scope["project"], scope["pmsId"])
+    now = time.monotonic()
+    held = _overview_cache.get(key)
+    if held and not refresh and now - held["at"] < OVERVIEW_TTL_SECONDS:
+        payload, as_of, age = held["payload"], held["asOf"], int(now - held["at"])
+    else:
+        payload = _overview_payload(account, scope)
+        as_of, age = security.stamp(), 0
+        _overview_cache[key] = {"at": now, "asOf": as_of, "payload": payload}
+
+    modules = _modules(payload["items"])
+    held_draft = _drafts(account["id"], scope["project"])
+    # A draft for a ticket that is no longer top-level — or no longer there at
+    # all — is not shown and not shipped. It is left in the table rather than
+    # deleted on a read: a GET that quietly destroys somebody's unsent work
+    # because OpenProject was reshuffled for an afternoon is worse than a row
+    # nobody looks at.
+    for module in modules:
+        row = held_draft.get(module["key"])
+        if not row:
+            continue
+        module["draft"] = {"start": row["start_date"], "due": row["due_date"],
+                           "movedAt": row["moved_at"]}
+
+    return {
+        "project": scope["project"],
+        "openproject": payload["openproject"],
+        "modules": modules,
+        "total": len(modules),
+        "truncated": len(modules) >= PLAN_LIMIT,
+        "draftCount": sum(1 for m in modules if m.get("draft")),
+        # Drafts held against something the chart can no longer show. Counted so
+        # the page can offer to clear them rather than leaving them to rot.
+        "orphanDrafts": sum(1 for k in held_draft
+                            if k not in {m["key"] for m in modules}),
+        "asOf": as_of,
+        "ageSeconds": age,
+        "note": None if modules else
+                "Nothing in this OpenProject project sits at the top of a tree yet, "
+                "so there are no modules to arrange.",
+    }
+
+
+@app.put("/api/plan/draft")
+def save_plan_draft(body: PlanDraftIn, account: dict = Depends(require_owner)):
+    """Where the bars are now. Sends nothing anywhere.
+
+    Idempotent and whole: what arrives replaces this person's draft for the
+    tickets it names. A bar dragged back to where it started arrives with the
+    dates it was born with, and is deleted rather than stored — so "is there
+    anything to ship" stays the same question as "is this table empty".
+    """
+    scope = _pms_scope(account, body.project_id)
+    if len(body.bars) > PLAN_LIMIT:
+        raise HTTPException(400, f"That is more than {PLAN_LIMIT} bars.")
+
+    payload = _overview_cache.get((scope["project"], scope["pmsId"]), {}).get("payload")
+    if not payload:
+        payload = _overview_payload(account, scope)
+        _overview_cache[(scope["project"], scope["pmsId"])] = {
+            "at": time.monotonic(), "asOf": security.stamp(), "payload": payload}
+    live = {m["key"]: m for m in _modules(payload["items"])}
+
+    saved, dropped = 0, 0
+    for bar in body.bars:
+        module = live.get(bar.key)
+        if not module:
+            raise HTTPException(
+                404, f"#{bar.key} is not a module on this chart.")
+        start = _a_date(bar.start, f"The start of #{bar.key}")
+        due = _a_date(bar.due, f"The finish of #{bar.key}")
+        if start and due and due < start:
+            raise HTTPException(
+                400, f"#{bar.key} would finish on {due}, before it starts on {start}.")
+        was_start, was_due = module["barStart"], module["barDue"]
+        if start == was_start and due == was_due:
+            dropped += db.change(
+                "DELETE FROM plan_draft WHERE account_id = ? AND project_id = ? "
+                "AND external_key = ?", (account["id"], scope["project"], bar.key))
+            continue
+        db.write(
+            "INSERT INTO plan_draft (account_id, project_id, external_key, start_date, "
+            "due_date, was_start, was_due, moved_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT (account_id, project_id, external_key) DO UPDATE SET "
+            "start_date = excluded.start_date, due_date = excluded.due_date, "
+            "was_start = excluded.was_start, was_due = excluded.was_due, "
+            "moved_at = excluded.moved_at",
+            (account["id"], scope["project"], bar.key, start, due,
+             was_start, was_due, security.stamp()))
+        saved += 1
+
+    return {"ok": True, "saved": saved, "returned": dropped,
+            "draftCount": len(_drafts(account["id"], scope["project"])),
+            "note": "Nothing has been sent to OpenProject."}
+
+
+@app.delete("/api/plan/draft")
+def clear_plan_draft(project_id: str = Query(default=""),
+                     account: dict = Depends(require_owner)):
+    """Throw the sketch away and go back to what OpenProject says."""
+    scope = _pms_scope(account, project_id)
+    gone = db.change("DELETE FROM plan_draft WHERE account_id = ? AND project_id = ?",
+                     (account["id"], scope["project"]))
+    return {"ok": True, "cleared": gone}
+
+
+@app.post("/api/plan/preview")
+def preview_plan(body: PlanApplyIn, account: dict = Depends(require_owner)):
+    """What shipping this sketch would change, under a one-use token.
+
+    Every ticket is re-read here rather than taken from the cache. The cache is
+    up to five minutes old and this is the last moment before a write: the
+    `lockVersion` that goes into the payload has to be the one that was true
+    just now, or OpenProject's own refusal — the thing that stops a write
+    landing on top of somebody else's — is being fed a stale number.
+    """
+    scope = _pms_scope(account, body.project_id)
+    held = _drafts(account["id"], scope["project"])
+    if not held:
+        raise HTTPException(409, "Nothing has been moved, so there is nothing to ship.")
+
+    endpoint, token = _pms_for(account["id"])
+    frozen, changes, refused = [], [], []
+    for key, row in sorted(held.items()):
+        try:
+            found = openproject.work_package(endpoint, token, key)
+        except openproject.Refused as exc:
+            if exc.status == 404:
+                refused.append(f"#{key} is no longer in OpenProject.")
+                continue
+            raise HTTPException(502, str(exc))
+        except openproject.Blocked as exc:
+            raise HTTPException(502, str(exc))
+        if found.get("projectId") != scope["pmsId"]:
+            refused.append(f"#{key} has moved to another OpenProject project.")
+            continue
+
+        start, due = row["start_date"], row["due_date"]
+        now_start = found.get("startDate") or ""
+        now_due = found.get("dueDate") or ""
+        if start == now_start and due == now_due:
+            refused.append(f"#{key} is already where it was dragged to.")
+            continue
+        moved = []
+        if start != now_start:
+            moved.append(f"starts {now_start or '(unset)'} -> {start or '(unset)'}")
+        if due != now_due:
+            moved.append(f"finishes {now_due or '(unset)'} -> {due or '(unset)'}")
+        frozen.append({"key": key, "subject": found["subject"], "start": start,
+                       "due": due, "wasStart": now_start, "wasDue": now_due,
+                       "lockVersion": found.get("lockVersion"),
+                       "scheduleManually": found.get("scheduleManually")})
+        changes.append({"key": key, "subject": found["subject"],
+                        "url": found.get("url", ""), "said": "; ".join(moved),
+                        # A parent OpenProject schedules for itself has to be
+                        # taken off automatic scheduling for these dates to
+                        # stick. Said here, before anybody agrees, because it
+                        # changes how that ticket behaves from then on.
+                        "becomesManual": not found.get("scheduleManually")})
+
+    if not frozen:
+        raise HTTPException(409, " ".join(refused) or "There is nothing left to ship.")
+
+    proposal = security.new_token()
+    now = security.now()
+    db.write(
+        "INSERT INTO plan_proposal (token_hash, account_id, project_id, payload, "
+        "summary, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (security.token_hash(proposal), account["id"], scope["project"],
+         json.dumps(frozen), f"{len(frozen)} modules",
+         security.stamp(now), security.stamp(now + timedelta(minutes=PLAN_MINUTES))))
+
+    return {
+        "proposal": proposal,
+        "changes": changes,
+        "skipped": refused,
+        "becomingManual": sum(1 for c in changes if c["becomesManual"]),
+        "expiresInMinutes": PLAN_MINUTES,
+        "note": "Nothing has changed yet. These go to OpenProject only when you confirm.",
+    }
+
+
+@app.post("/api/plan/{proposal}/apply")
+def apply_plan(proposal: str, body: PlanApplyIn,
+               account: dict = Depends(require_owner)):
+    """Ship the sketch. One use, their own token, their own OpenProject account.
+
+    Partial success is real and is reported as such. Several work packages are
+    written one at a time and the third can be refused while the first two have
+    already landed — there is no transaction across another system's API. So
+    what comes back is per-ticket, and the draft rows that were sent are the
+    only ones deleted.
+    """
+    scope = _pms_scope(account, body.project_id)
+    row = db.one("SELECT * FROM plan_proposal WHERE token_hash = ?",
+                 (security.token_hash(proposal),))
+    if not row or row["account_id"] != account["id"]:
+        raise HTTPException(404, "No such plan to confirm. Preview it first.")
+    if row["applied_at"]:
+        raise HTTPException(409, "That plan has already been sent.")
+    if security.expired(row["expires_at"]):
+        raise HTTPException(409, "That plan was previewed too long ago. Preview it again.")
+    # The same single-use claim every other token in this service uses: the row
+    # is won with a conditional UPDATE, so two confirms race and one loses.
+    if not db.change("UPDATE plan_proposal SET applied_at = ? WHERE id = ? "
+                     "AND applied_at IS NULL", (security.stamp(), row["id"])):
+        raise HTTPException(409, "That plan has already been sent.")
+
+    endpoint, token = _pms_for(account["id"])
+    sent, failed = [], []
+    for bar in json.loads(row["payload"]):
+        try:
+            openproject.update(
+                endpoint, token, bar["key"], bar["lockVersion"],
+                start_date=bar["start"], due_date=bar["due"])
+        except openproject.Refused as exc:
+            failed.append({"key": bar["key"], "subject": bar["subject"],
+                           "why": _openproject_conflict(exc, bar["key"])})
+            continue
+        except openproject.Blocked as exc:
+            failed.append({"key": bar["key"], "subject": bar["subject"], "why": str(exc)})
+            continue
+        sent.append({"key": bar["key"], "subject": bar["subject"],
+                     "start": bar["start"], "due": bar["due"]})
+        db.change("DELETE FROM plan_draft WHERE account_id = ? AND project_id = ? "
+                  "AND external_key = ?", (account["id"], scope["project"], bar["key"]))
+
+    _overview_cache.pop((scope["project"], scope["pmsId"]), None)
+    return {
+        "ok": not failed,
+        "sent": sent,
+        "failed": failed,
+        "remaining": len(_drafts(account["id"], scope["project"])),
+        "note": f"{len(sent)} shipped to OpenProject."
+                + (f" {len(failed)} were refused and are still on your chart." if failed else ""),
+    }
+
+
+def _openproject_conflict(exc: "openproject.Refused", key: str) -> str:
+    """OpenProject's refusal, in the words of the thing the person did."""
+    if exc.status == 409:
+        return (f"#{key} was changed by somebody else after you previewed this. "
+                f"Refresh the chart and drag it again.")
+    if exc.status == 422:
+        return (f"OpenProject would not take those dates for #{key}: {exc}")
+    return str(exc)
 
 
 # ── which OpenProject project each ADAM project reads ────────────────
