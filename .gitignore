@@ -101,6 +101,18 @@ ticvai/_review-*/
 # Regenerated on demand by viewer/checks/capture-assets.mjs; never part of the package.
 /assets/
 
+# --- the standalone shell ----------------------------------------------------
+# `viewer/public/offline.html` is a personal portfolio export: a 6.9 MB
+# self-contained page carrying a CV, photographs and personal branding. It is
+# reached by the key sequence in `theme.js` and by nothing else.
+#
+# **It must not be committed.** The `github` remote is a public repository, so
+# committing it would publish a CV and personal photographs to the open web —
+# which is the opposite of the point. It is dropped onto the server by hand; a
+# deployment that does not have it simply never opens anything, because the
+# sequence does a HEAD first.
+/viewer/public/offline.html
+
 # --- the retired 3D avatar ---------------------------------------------------
 # `/avatar.html` was retired on 23 September 2026 and moved, whole, to
 # `_retired/avatar/`. It was never committed -- the page, its 48 KB of
