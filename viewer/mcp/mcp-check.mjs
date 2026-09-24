@@ -163,9 +163,10 @@ else fail(`${want.length} tools listed`, `got ${names.join(', ') || '(none)'}`);
 // What can actually be asserted about every tool: a description long enough to
 // choose by, and an object schema. **Not** that it declares a property or a
 // required key — `adam_decisions` lists every ADR with no argument, and
-// `adam_board` takes none at all. Two earlier versions of this check demanded
-// each in turn and failed a tool that was right, which is its own small lesson:
-// an assertion that fires on correct code teaches people to ignore the harness.
+// `adam_board` has one optional flag and needs none of it. Two earlier versions
+// of this check demanded each in turn and failed a tool that was right, which is
+// its own small lesson: an assertion that fires on correct code teaches people
+// to ignore the harness.
 const shaped = (list.result?.tools ?? []).every(
   (t) => t.description?.length > 40 && t.inputSchema?.type === 'object',
 );
@@ -193,6 +194,47 @@ const nowhere = parse(await mcp.send('tools/call', {
 }));
 if (/no folder/.test(nowhere.error ?? '')) pass('adam_pull refuses a folder that does not exist');
 else fail('adam_pull refuses a missing folder', JSON.stringify(nowhere).slice(0, 200));
+
+// ---- the connector knows what it is made of ---------------------------------
+//
+// Three files name the connector's contents: `version.mjs` hashes them,
+// `build-zip.ps1` copies them into the zip, `setup.ps1` installs them. They have
+// to be the same set, and the failure when they are not is silent and total --
+// a file shipped but not hashed means every machine computes a build the server
+// never offers, so every install reads as out of date forever and updating
+// changes nothing. Nobody would look here for that; they would look at the
+// network.
+
+console.log('\nthe connector manifest');
+{
+  const { FILES } = await import('./version.mjs');
+  const listed = [...FILES].sort();
+  const namesIn = (text, after) => {
+    // The PowerShell array literal that follows `after`, up to its closing
+    // paren. Quoted names only, so a comment mentioning a file does not count.
+    const at = text.indexOf(after);
+    if (at < 0) return null;
+    const chunk = text.slice(at + after.length, text.indexOf(')', at + after.length));
+    return [...chunk.matchAll(/'([^']+\.mjs)'/g)].map((m) => m[1]).sort();
+  };
+  const setup = await readFile(path.join(here, 'setup', 'setup.ps1'), 'utf8');
+  const zip = await readFile(path.join(here, 'setup', 'build-zip.ps1'), 'utf8');
+  const inSetup = namesIn(setup, '$Files = @(');
+  const inZip = namesIn(zip, 'foreach ($file in ');
+
+  if (String(inSetup) === String(listed)) pass(`setup.ps1 installs the ${listed.length} hashed files`);
+  else fail('setup.ps1 installs exactly what version.mjs hashes',
+    `hashed ${listed.join(' ')} | installed ${(inSetup ?? ['(not found)']).join(' ')}`);
+
+  if (String(inZip) === String(listed)) pass('build-zip.ps1 ships the same set');
+  else fail('build-zip.ps1 ships exactly what version.mjs hashes',
+    `hashed ${listed.join(' ')} | zipped ${(inZip ?? ['(not found)']).join(' ')}`);
+
+  const { buildOf, HERE } = await import('./version.mjs');
+  const build = await buildOf(HERE);
+  if (/^[0-9a-f]{12}$/.test(build)) pass(`this connector is build ${build}`);
+  else fail('the build id is twelve hex characters', String(build));
+}
 
 // ---- the live half ----------------------------------------------------------
 

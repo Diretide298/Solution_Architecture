@@ -38,6 +38,9 @@ import { buildCicd } from './lib/cicd.mjs';
 import { buildChronology } from './lib/build.mjs';
 import { buildUiux } from './lib/uiux.mjs';
 import { buildSearch } from './lib/search.mjs';
+// The connector's own manifest, so the two sides compute the build the same
+// way rather than agreeing by coincidence.
+import { buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate, callerIp } from './lib/session.mjs';
@@ -737,6 +740,22 @@ const server = http.createServer(async (req, res) => {
     // /api/auth/login is how you become anybody.
     if (API_ROUTES.test(url.pathname)) {
       return proxyToApi(req, res, url);
+    }
+
+    // ── the connector, so it can update itself ───────────────────────
+    //
+    // **Before the gate, and deliberately.** A developer whose connector is too
+    // old to sign in is exactly the developer who needs the update, and a
+    // version check behind the sign-in they cannot complete is a lock with the
+    // key inside. Nothing here is anybody's data: it is the same four files the
+    // setup zip hands out, which every developer already has a copy of.
+    if (url.pathname === '/connector/version' || url.pathname === '/connector/bundle') {
+      const build = await connectorBuild();
+      if (url.pathname === '/connector/version') {
+        return send(res, 200, JSON.stringify({ build }), MIME['.json']);
+      }
+      return send(res, 200, JSON.stringify({ build, files: await connectorFiles() }),
+        MIME['.json']);
     }
 
     // Which package, and which route of it. Before the gate, because the gate's

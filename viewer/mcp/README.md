@@ -57,9 +57,39 @@ A developer on two projects or roles runs setup once for each. Setup keeps a led
 registered in `registrations.txt` beside the installed connector, with copies of `setup.ps1`,
 `setup.cmd` and `uninstall.cmd`; `setup.ps1 -RemoveFolder <path>` removes one folder (both
 spellings), and `uninstall.cmd` removes every registration and the files. A session opened on
-a subfolder of a registered folder does not see ADAM — Claude Code matches the folder exactly. Rebuild the zip whenever anything in `viewer/mcp` changes; the README inside is stamped with
-the commit it was built from. The scripts are kept to plain ASCII on purpose — PowerShell 5.1 reads a
+a subfolder of a registered folder does not see ADAM — Claude Code matches the folder exactly.
+The scripts are kept to plain ASCII on purpose — PowerShell 5.1 reads a
 BOM-less script in the ANSI code page — and `build-zip.ps1` refuses to build if that slips.
+
+## Updating an installed connector
+
+**The zip is for the first install. After that the connector updates itself**, which is the
+difference between a change landing here and a change reaching anybody: handing out a new zip and
+asking eleven people to re-run setup is a distribution step that does not happen.
+
+A developer runs `/update-adam`, or the command it wraps:
+
+```
+node "%USERPROFILE%\.adam\connector\update.mjs"
+```
+
+It asks the viewer for `/connector/version`, compares, and replaces the files only if they differ,
+keeping what it replaced in `backup-<build>` beside the connector. The new code runs on the next
+Claude Code start — the connector cannot replace the files it is running from.
+
+Nobody has to remember to check: `server.mjs` asks on every start and says one line, with the
+command in it, only when there is something to say. It is best-effort and silent about failure, so
+a developer who is offline gets a connector that works and no noise.
+
+**The build is a hash of the shipped files, not a version number.** Nothing to bump and nothing to
+forget; two people are on the same build exactly when they are running the same code. `version.mjs`
+holds the list, and `setup.ps1` and `build-zip.ps1` copy the same six — if those three ever
+disagree, every install computes a build the server never offers and updating silently fixes
+nothing, so `mcp-check.mjs` compares the three lists and fails when they drift.
+
+What `update.mjs` will not do: fetch from any address but the configured one, write any path that
+is not already part of the connector, or run anything it downloads. It writes text files and tells
+you to restart.
 
 **By hand**, for Git Bash or a machine where the zip is not an option:
 

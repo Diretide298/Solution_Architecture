@@ -197,3 +197,34 @@ lines.on('close', () => process.exit(0));
 
 log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
   + `${client.project ? `, project ${client.project}` : ''}`);
+
+// Whether this connector is the one ADAM is serving.
+//
+// **Told, not done.** Updating replaces the files this process is running from,
+// so doing it here would leave a session half on one build and half on another.
+// One line, only when there is something to say, and the command to run is in
+// it — a notice that says "an update is available" and makes somebody go and
+// find out how is a notice they learn to ignore.
+//
+// Everything about this is best-effort: no await on the ready path, a short
+// timeout, and every failure swallowed. A developer offline, or on an older
+// ADAM that has no such route, gets a connector that works and says nothing.
+(async () => {
+  try {
+    const { buildOf, HERE } = await import('./version.mjs');
+    const res = await fetch(`${client.base}/connector/version`, {
+      signal: AbortSignal.timeout(2500),
+      headers: { accept: 'application/json' },
+    });
+    if (!res.ok) return;
+    const { build } = await res.json();
+    const mine = await buildOf(HERE);
+    if (!build || build === mine) return;
+    // path.join, so the command can be pasted on Windows: string concatenation
+    // produces `C:\Users\...\connector/update.mjs`, which works and looks
+    // like a typo, and a command somebody doubts is a command they do not run.
+    const { join } = await import('node:path');
+    log(`an update is available (${mine} → ${build}). `
+      + `Run: node "${join(HERE, 'update.mjs')}"`);
+  } catch { /* offline, older ADAM, or no route: not worth a word */ }
+})();

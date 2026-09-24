@@ -108,7 +108,13 @@ $Roles = [ordered]@{
         'naming-and-style', 'frontend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
         'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
 }
-$Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs')
+# The connector itself. `version.mjs` and `update.mjs` are part of it and not
+# an extra: without them an install has no way to tell it is out of date and
+# no way to fix it, which is the whole point of shipping them. The same six
+# are hashed by version.mjs and copied by build-zip.ps1 -- three lists that
+# have to agree, and the build id is what says when they do not.
+$Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs',
+          'version.mjs', 'update.mjs')
 # Kept beside the installed connector, so a folder can be removed later
 # without the zip.
 $Tools = @('setup.ps1', 'setup.cmd', 'uninstall.cmd')

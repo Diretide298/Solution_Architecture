@@ -42,7 +42,12 @@ $folder = Join-Path $top 'adam-connector'
 New-Item -ItemType Directory -Force -Path $folder | Out-Null
 
 try {
-    foreach ($file in 'server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs') {
+    # The same six files `mcp/version.mjs` hashes, and it has to stay the same
+    # six: the build id is computed from this set on both sides, so a file
+    # shipped here and not listed there -- or the other way round -- makes every
+    # install read as out of date forever.
+    foreach ($file in 'server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs',
+                      'version.mjs', 'update.mjs') {
         Copy-Item -LiteralPath (Join-Path $Mcp $file) -Destination $folder
     }
     Copy-Item -LiteralPath (Join-Path $Here 'setup.ps1') -Destination $folder
