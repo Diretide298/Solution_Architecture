@@ -6,6 +6,26 @@ changes when you run `/update-adam` in Claude Code and restart it.
 
 ## 24 September 2026
 
+### ADAM says when there is something new here
+
+A **What's new** chip appears in the top bar when these notes have changed, and
+disappears once you have opened them. It is driven by a hash of this page rather than a date, so
+fixing a typo does not call everybody back and a rebuild that changes no words does not either.
+
+Before this, the only way to reach this page was a link inside the account drawer — which is a link
+nobody finds.
+
+### The mascot is in ADAM
+
+Thirty frames of it, from neutral through working to total collapse. They arrived with an index
+badge burnt into every corner and a faint wash over the background that showed up as a pale
+rectangle on any dark panel; both are gone, and the frames are now part of ADAM rather than a zip
+somebody has to be sent.
+
+Only one is used so far — the one at the top of this page. The plan is that its expression tracks
+the **delivery's** state, never a person's: a sad robot next to somebody's name is a performance
+review, not a status light.
+
 ### The package downloads as a spreadsheet
 
 **Document → Download .xlsx.** The same section picker that builds the document now also writes a

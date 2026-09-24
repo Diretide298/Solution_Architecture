@@ -493,6 +493,80 @@ export const mentionHash = (m) =>
  * viewer — which used to carry it inline and may again — cannot end up with
  * two. Safe to call once per page; calling it twice rebinds the same nodes.
  */
+// ── "there is something new" ──────────────────────────────────────────
+//
+// The release notes were reachable from inside this drawer and nowhere else,
+// which is a link nobody finds: a page somebody has to already know about is a
+// page that does not get read. So the notes announce themselves, once, in the
+// bar — and stop the moment they have been opened.
+//
+// **What counts as new is a hash of the notes, not a date.** A date says the
+// file was touched; a hash says the words changed. Editing a typo an hour after
+// somebody read the page should not summon everybody back to it, and a rebuild
+// that rewrites the file without changing a word should not either.
+const SEEN_KEY = 'adam-updates-seen';
+
+// Asked once per page however many times the marker is attempted: the viewer and
+// the shared chrome both try, at different moments, and one question deserves
+// one answer.
+let stampAsked = null;
+const askStamp = () => (stampAsked ??= fetch('/updates/stamp', {
+  headers: { accept: 'application/json' },
+}).then((answer) => (answer.ok ? answer.json() : null))
+  .then((body) => body?.stamp ?? '')
+  .catch(() => ''));           // offline, or an older ADAM: say nothing at all
+
+async function markUpdates() {
+  if ($('updates-new')) return;
+
+  const stamp = await askStamp();
+  if (!stamp) return;
+
+  // Looked up after the await, not before: on the pages whose top bar is
+  // injected by mountAccountDrawer, the button does not exist when this first
+  // runs, and a later attempt is what places the chip there.
+  const toggle = $('account-toggle');
+  if (!toggle || $('updates-new')) return;
+
+  // Storage can be denied outright, and a reader in a private window should get
+  // a working page rather than a thrown error from a decoration.
+  let seen = null;
+  try { seen = localStorage.getItem(SEEN_KEY); } catch { /* treat as unseen */ }
+  if (seen === stamp) return;
+
+  const chip = document.createElement('a');
+  chip.id = 'updates-new';
+  chip.className = 'chip chip-new';
+  chip.href = '/updates.html';
+  chip.textContent = "What's new";
+  // Said out loud, because a coloured chip appearing in a toolbar is not an
+  // announcement to somebody using a screen reader.
+  chip.setAttribute('aria-label', 'What is new in ADAM — there are unread release notes');
+  toggle.parentNode.insertBefore(chip, toggle);
+}
+
+/** Called by the notes page itself: opening them is what marks them read. */
+export function markUpdatesSeen(stamp) {
+  try { localStorage.setItem(SEEN_KEY, stamp); } catch { /* nothing to do */ }
+  $('updates-new')?.remove();
+}
+
+// **Not waited on the drawer, deliberately.** The viewer mounts its drawer only
+// after the package index has been fetched and parsed — `bindAccountUI()` sits
+// after `await loadIndex(...)` in app.js — which on a package of a few thousand
+// screens is seconds. A notice that arrives after somebody has started reading
+// is a notice they do not see. The account button is static markup in the
+// viewer, so there is somewhere to put this as soon as the document is ready.
+//
+// Attempted again from mountAccountDrawer below, for the pages whose top bar
+// that function injects: there the button does not exist until it has run.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded',
+    () => { markUpdates().catch(() => {}); }, { once: true });
+} else {
+  markUpdates().catch(() => {});
+}
+
 export function mountAccountDrawer({ onTarget } = {}) {
   // In the viewer a mention is a selection on the page you are already on. On
   // a standalone page there is nothing to select, so it is a trip back.
@@ -520,6 +594,8 @@ export function mountAccountDrawer({ onTarget } = {}) {
 
   $('account-toggle').onclick = () =>
     ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
+  // Not awaited: the bar is drawn and usable whether or not this ever answers.
+  markUpdates().catch(() => {});
   $('account-panel').onclick = (e) => { if (e.target === $('account-panel')) closeAccountPanel(); };
   $('account-close').onclick = closeAccountPanel;
   // a verdict block asking for a sign-in

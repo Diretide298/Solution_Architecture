@@ -1,0 +1,159 @@
+{
+  "note": "ADAM mascot frames. step 1 is fine, step 30 is total collapse.",
+  "size": [
+    256,
+    204
+  ],
+  "frames": [
+    {
+      "step": 1,
+      "state": "neutral-start",
+      "file": "01-neutral-start.png"
+    },
+    {
+      "step": 2,
+      "state": "working",
+      "file": "02-working.png"
+    },
+    {
+      "step": 3,
+      "state": "frustrated",
+      "file": "03-frustrated.png"
+    },
+    {
+      "step": 4,
+      "state": "relieved",
+      "file": "04-relieved.png"
+    },
+    {
+      "step": 5,
+      "state": "surprised",
+      "file": "05-surprised.png"
+    },
+    {
+      "step": 6,
+      "state": "confused",
+      "file": "06-confused.png"
+    },
+    {
+      "step": 7,
+      "state": "angry-working",
+      "file": "07-angry-working.png"
+    },
+    {
+      "step": 8,
+      "state": "thinking",
+      "file": "08-thinking.png"
+    },
+    {
+      "step": 9,
+      "state": "unsure",
+      "file": "09-unsure.png"
+    },
+    {
+      "step": 10,
+      "state": "alert",
+      "file": "10-alert.png"
+    },
+    {
+      "step": 11,
+      "state": "shocked",
+      "file": "11-shocked.png"
+    },
+    {
+      "step": 12,
+      "state": "error",
+      "file": "12-error.png"
+    },
+    {
+      "step": 13,
+      "state": "angry",
+      "file": "13-angry.png"
+    },
+    {
+      "step": 14,
+      "state": "frustrated",
+      "file": "14-frustrated.png"
+    },
+    {
+      "step": 15,
+      "state": "head-in-hands",
+      "file": "15-head-in-hands.png"
+    },
+    {
+      "step": 16,
+      "state": "furious",
+      "file": "16-furious.png"
+    },
+    {
+      "step": 17,
+      "state": "overwhelmed",
+      "file": "17-overwhelmed.png"
+    },
+    {
+      "step": 18,
+      "state": "low-battery",
+      "file": "18-low-battery.png"
+    },
+    {
+      "step": 19,
+      "state": "facepalm",
+      "file": "19-facepalm.png"
+    },
+    {
+      "step": 20,
+      "state": "exhausted",
+      "file": "20-exhausted.png"
+    },
+    {
+      "step": 21,
+      "state": "collapsed-at-desk",
+      "file": "21-collapsed-at-desk.png"
+    },
+    {
+      "step": 22,
+      "state": "sad",
+      "file": "22-sad.png"
+    },
+    {
+      "step": 23,
+      "state": "crying",
+      "file": "23-crying.png"
+    },
+    {
+      "step": 24,
+      "state": "stressed",
+      "file": "24-stressed.png"
+    },
+    {
+      "step": 25,
+      "state": "defeated",
+      "file": "25-defeated.png"
+    },
+    {
+      "step": 26,
+      "state": "disappointed",
+      "file": "26-disappointed.png"
+    },
+    {
+      "step": 27,
+      "state": "failure",
+      "file": "27-failure.png"
+    },
+    {
+      "step": 28,
+      "state": "burned-out",
+      "file": "28-burned-out.png"
+    },
+    {
+      "step": 29,
+      "state": "doomed",
+      "file": "29-doomed.png"
+    },
+    {
+      "step": 30,
+      "state": "total-collapse",
+      "file": "30-total-collapse.png"
+    }
+  ]
+}

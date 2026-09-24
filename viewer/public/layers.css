@@ -3074,3 +3074,40 @@ textarea.rt-sendback-note {
   .admin-bar[data-chrome="full"] .chrome-layers,
   .admin-bar[data-chrome="full"] .chrome-divider { display: none; }
 }
+
+/* "What's new": the one chip in the bar that is making a claim rather than
+   offering a destination, so it is the one chip that carries the accent.
+   It removes itself once the notes have been opened, which is the only reason
+   shouting slightly is acceptable here. */
+.chip.chip-new,
+.admin-bar .chip.chip-new {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.chip.chip-new:hover,
+.admin-bar .chip.chip-new:hover {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The mascot on the release notes. A fixed width rather than a share of the
+   column, so it is the same size wherever it is used and two pages cannot show
+   the same character at two sizes. Hidden on a narrow screen: it is decoration,
+   and decoration is the first thing that should give up its space. */
+.up-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.up-mascot {
+  width: 96px;
+  height: auto;
+  flex: 0 0 auto;
+  image-rendering: auto;
+}
+@media (max-width: 640px) {
+  .up-mascot { display: none; }
+}

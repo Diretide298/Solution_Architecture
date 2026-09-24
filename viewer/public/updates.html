@@ -40,7 +40,15 @@
     <div id="updates" class="set-layout" hidden>
       <main class="set-content">
         <section class="admin-panel set-section">
-          <h2 class="admin-heading">What is new in ADAM</h2>
+          <div class="up-head">
+            <!-- The first place the mascot is used for anything. Decorative here
+                 and deliberately so: the frames react to the system's state, and
+                 a release-notes page has no state to react to. alt="" because a
+                 screen reader gains nothing from being told there is a robot. -->
+            <img class="up-mascot" src="/brand/mascot/02-working.png" alt="" aria-hidden="true"
+                 width="256" height="204" />
+            <h2 class="admin-heading">What is new in ADAM</h2>
+          </div>
           <!-- The build this ADAM is serving, so a question about whether a
                change has arrived is answered on the page that describes it
                rather than by asking somebody. -->

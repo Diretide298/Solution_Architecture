@@ -13,6 +13,7 @@
 
 import { requireSignIn, servedBuild } from '/validation.js';
 import { markdownBlock } from '/core.js';
+import { markUpdatesSeen } from '/account-drawer.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -44,6 +45,14 @@ if (await requireSignIn()) {
     // things like `1.10` that are not decisions and would 404.
     const body = markdownBlock(text, { adrLinks: false });
     $('up-body').replaceChildren(body);
+
+    // Read, so stop announcing them. Marked only once the notes are actually on
+    // the page: marking on navigation would clear the chip for somebody whose
+    // request failed, and they would never be told again.
+    try {
+      const stamped = await fetch('/updates/stamp', { headers: { accept: 'application/json' } });
+      if (stamped.ok) markUpdatesSeen((await stamped.json()).stamp ?? '');
+    } catch { /* the notes were read either way; the chip can wait */ }
   } catch (error) {
     $('up-body').replaceChildren();
     $('up-error').hidden = false;

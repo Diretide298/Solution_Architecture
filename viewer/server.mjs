@@ -292,7 +292,9 @@ function resolveRoute(pathname) {
 // and the client merges them back into the node it already has. What arrives
 // at boot is what the tree, the graph and the search need — names, kinds,
 // files and counts — and nothing that only a detail view will ask for.
-const DETAIL_FIELDS = ['description', 'properties'];
+// Held out of the slim index and served per contract: an operation's parameters,
+// responses and request body are what `adam_contract` with `operation` returns.
+const DETAIL_FIELDS = ['description', 'properties', 'parameters', 'responses', 'requestBody'];
 
 function splitDetail(full) {
   const slim = { ...full, nodes: [] };
@@ -822,6 +824,25 @@ const server = http.createServer(async (req, res) => {
           error: `${accountRole ?? role} accounts cannot read that`,
         }), MIME['.json']);
       }
+    }
+
+    // ── has anything changed since somebody last looked ──────────────
+    //
+    // A hash of the release notes rather than a date or a version, for the same
+    // reason the connector's build is one: there is nothing to bump and nothing
+    // to forget, and editing the notes is the only thing that can move it.
+    //
+    // This exists so the marker does not cost a page its bandwidth. Every page
+    // that draws the chrome asks this on load, and answering it by handing over
+    // the whole notes file would send a few kilobytes to every page view to find
+    // out that nothing has changed. Behind the gate, like the notes themselves.
+    if (url.pathname === '/updates/stamp') {
+      const notes = path.join(PUBLIC, 'updates.md');
+      const info = await stat(notes).catch(() => null);
+      if (!info?.isFile()) return send(res, 200, JSON.stringify({ stamp: '' }), MIME['.json']);
+      const body = await readFile(notes);
+      const stamp = createHash('sha256').update(body).digest('hex').slice(0, 12);
+      return send(res, 200, JSON.stringify({ stamp }), MIME['.json']);
     }
 
     // Which packages there are. Not per-package, so it sits outside the prefix
