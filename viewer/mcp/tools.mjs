@@ -216,6 +216,26 @@ function lookupFor(kind, id) {
 
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
+/**
+ * The ticket's comment thread, oldest first, so the newest - often QA saying
+ * why it came back - is the last thing read before the work starts.
+ * `undefined` is an ADAM server that does not send comments yet; `null` is a
+ * thread it could not read. Neither is shown as "no comments".
+ */
+function commentsSection(comments) {
+  if (comments === undefined) return '';
+  if (comments === null) {
+    return '\n## Comments\n\n_Could not be read from OpenProject - open the link above before starting._\n';
+  }
+  let out = `\n## Comments (${comments.length})\n\n`;
+  if (!comments.length) return `${out}_None._\n`;
+  for (const c of comments) {
+    const at = String(c.at ?? '').replace('T', ' ').replace(/:\d\dZ$/, ' UTC');
+    out += `### ${c.author || 'Unknown'} - ${at}\n\n${c.text}\n\n`;
+  }
+  return out;
+}
+
 function ticketReadme(wp, files, missing, when, decisions = []) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
@@ -227,6 +247,7 @@ function ticketReadme(wp, files, missing, when, decisions = []) {
     + 'run adam_pull again for the current ones.\n\n';
   out += `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
   if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
+  out += commentsSection(wp.comments);
   out += `\n## What this touches (${files.length})\n\n`;
   if (files.length) {
     for (const f of files) out += `- ${f.kind} \`${f.id}\` - [${f.file}](${f.file})\n`;
@@ -241,6 +262,28 @@ function ticketReadme(wp, files, missing, when, decisions = []) {
   if (missing.length) {
     out += `\nLinked but not found in the package: ${missing.map((m) => `${m.kind} \`${m.id}\``).join(', ')}.\n`;
   }
+  // The files above are summaries. On #20354 (24 September) an agent read them as the whole truth and
+  // reported three gaps that were not there - parameters, the item schema and row-level security - and
+  // proposed a change request for them. A gap is only a gap once the source says so.
+  out += '\n## Before you report a gap\n\n'
+    + 'The files above are ADAM\'s summaries of the package, not the package. Before telling anyone '
+    + 'something is missing, wrong or needs a change request, check the source yourself and say what you '
+    + 'checked:\n\n'
+    + '- **An operation:** `adam_contract` with `operation` lists its parameters, responses and request body. '
+    + 'If one still looks missing, read the YAML with `adam_file` at the contract path and line it gives. '
+    + '**Shared errors are implicit:** every operation may return 400, 401, 403, 404, 429 and 5xx from '
+    + '`contracts/shared/common.yaml` without listing them, so an operation listing no errors is not a gap '
+    + '(api-conventions section 5).\n'
+    + '- **Scope:** a venue-scoped list does not include tenant-level rows (venue_id null); that is the rule, '
+    + 'not a gap (naming-and-style 5.3).\n'
+    + '- **A table:** `adam_table` gives its migration; read the DDL with `adam_file`, including '
+    + '`900-foreign-keys.sql`, `910-indexes.sql` and `920-row-level-security.sql`, before saying a key, index '
+    + 'or policy is absent.\n'
+    + '- **A standard:** quote the rule and its file (e.g. `project-bible/setup/naming-and-style.md`). If the '
+    + 'same drift is in many tables, it is one package-wide change request, not this ticket\'s.\n\n'
+    + 'Report only what survives the check, and keep what you ruled out to one line. A real gap in the '
+    + 'contract is a change request (adam_draft_change); a question the contract cannot answer is for '
+    + 'whoever owns the ticket.\n';
   out += '\n## When you have finished\n\n'
     + 'Ask Claude to propose the change (adam_propose): the new status, % done, and a comment '
     + 'saying what was done. Check what it shows you, then say yes to apply it (adam_apply). '
@@ -286,6 +329,7 @@ async function pullOne(client, key, base, when) {
   return {
     key: wp.key, subject: wp.subject, status: wp.status, milestone: wp.version || null,
     due: wp.dueDate || null, folder, linked: files.length, notFound: missing.length,
+    ...(Array.isArray(wp.comments) ? { comments: wp.comments.length } : {}),
   };
 }
 
@@ -1086,7 +1130,7 @@ export const TOOLS = [
     description:
       'Save a ticket and everything it is linked to as files in the working folder, under '
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
-      + 'the files), ticket.json, one file per linked screen, journey, contract, table, service, '
+      + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
       + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. With no `key`, pulls '
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '

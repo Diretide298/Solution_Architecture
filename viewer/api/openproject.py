@@ -301,6 +301,40 @@ def work_package(endpoint: str, token: str, key: str) -> dict:
     return found
 
 
+# Enough of a thread to work from. A ticket with more has the rest at `url`.
+COMMENT_LIMIT = 50
+
+
+def comments(endpoint: str, token: str, key: str) -> list:
+    """
+    The work package's comments, oldest first, as `{author, at, text}`.
+
+    Only `Activity::Comment` entries: the field changes around them ("status
+    changed from New to In progress") are noise to somebody reading a thread.
+    OpenProject 10 gives the author as an href with no title, so names are
+    looked up once per person; a name that cannot be read (the token may not
+    see that user) stays as the user number rather than failing the ticket.
+    """
+    page = call(endpoint, token, f"work_packages/{key}/activities")
+    found, names = [], {}
+    for act in page.get("_embedded", {}).get("elements", []):
+        text = ((act.get("comment") or {}).get("raw") or "").strip()
+        if act.get("_type") != "Activity::Comment" or not text:
+            continue
+        user = (act.get("_links") or {}).get("user") or {}
+        who = user.get("title") or ""
+        uid = _id_from_href(user.get("href"))
+        if not who and uid is not None:
+            if uid not in names:
+                try:
+                    names[uid] = call(endpoint, token, f"users/{uid}").get("name") or ""
+                except (Refused, Blocked):
+                    names[uid] = ""
+            who = names[uid] or f"user {uid}"
+        found.append({"author": who, "at": act.get("createdAt"), "text": text})
+    return found[-COMMENT_LIMIT:]
+
+
 def statuses(endpoint: str, token: str) -> list:
     """Every status on the instance, as `{id, name, isClosed}`, in OpenProject's order.
     Whether a given change is *allowed* is OpenProject's call, made when it is sent."""

@@ -59,9 +59,11 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 1. `adam_pull` the ticket with `dir` set to this folder. Read `.adam/work/<ticket>/README.md`,
    then only the linked files it lists. Ask ADAM (`adam_screen`, `adam_journey`, `adam_contract`)
    rather than guessing a name or a shape.
+   **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
+   it back overrides the description where they differ - say so when it does.
 2. Build exactly what the ticket and its linked artefacts describe, in the app it names.
 3. Add tests next to the code (`*.test.ts[x]`). `pnpm lint`, `pnpm typecheck` and `pnpm test` must pass.
-4. `adam_propose` the ticket: **Closed**, 100% (see the statuses below), and a 2-4 line comment on what was built and
+4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
 ## When the package is wrong
@@ -85,11 +87,13 @@ package may be about to change.
 |---|---|
 | **New** | Not started. Never set it yourself. |
 | **In progress** | Work has started but is not finished - a build that stopped part-way, or tests still failing. |
-| **Closed** | Done: built as the ticket and its contract describe, and the tests pass. |
+| **Ready for QA** | Done on your side: built as the ticket and its contract describe, and the tests pass. **This is where finished work goes.** Say in the comment what QA should check. |
+| **Closed** | Set by QA after testing. **Never propose it yourself**, even when everything passes: the person who built it is not the person who says it works. |
 | **On hold** | Blocked on something outside this repository - a missing contract, an unanswered question, an open change request. Say what in the comment. |
 | **Rejected** | Only when the person says the ticket will not be done. Never on your own. |
 
-Pair the status with % done: In progress 10-90, Closed 100, On hold unchanged.
+Pair the status with % done: In progress 10-90, Ready for QA 100, On hold unchanged.
+If the live statuses have no QA status, stop and ask rather than choosing Closed.
 These are the statuses on pms.softlabsgroup.in. `adam_propose` with only a ticket number lists
 the live ones; if they differ from this table, use those.
 

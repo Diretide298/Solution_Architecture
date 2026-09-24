@@ -245,6 +245,44 @@ function operationIO(op, fromFile) {
   };
 }
 
+/** Every `$ref` under a subtree, by name: `Page` and `PurchaseOrder` from a paged `allOf`. */
+function refNames(node, depth = 0, out = new Set()) {
+  if (!node || typeof node !== 'object' || depth > 12) return out;
+  if (typeof node.$ref === 'string') out.add(node.$ref.split('/').pop());
+  for (const value of Object.values(node)) refNames(value, depth + 1, out);
+  return out;
+}
+
+/**
+ * The parameters and responses of one operation, as a developer reads them.
+ *
+ * `consumes`/`produces` are schema ids for the graph, and they miss what is not
+ * a schema: an inline `supplierId: string`, a shared `PageSize` parameter, the
+ * response codes. An agent handed only those reported "no parameters apart from
+ * status, no errors, no item schema" for an operation that has all of them
+ * (#20354, 24 September), and asked for a change request. So the list itself
+ * goes out, in the detail layer beside the description.
+ */
+function operationShape(op) {
+  const parameters = (Array.isArray(op.parameters) ? op.parameters : []).map((p) => (
+    typeof p?.$ref === 'string'
+      ? { ref: p.$ref.split('/').pop(), shared: true }
+      : {
+        name: p?.name ?? null,
+        in: p?.in ?? null,
+        required: Boolean(p?.required),
+        schema: p?.schema?.$ref ? p.schema.$ref.split('/').pop()
+          : [p?.schema?.type, p?.schema?.format].filter(Boolean).join(' ') || null,
+      }));
+  const responses = Object.entries(op.responses ?? {}).map(([code, r]) => ({
+    code,
+    description: typeof r?.$ref === 'string' ? r.$ref.split('/').pop() : (r?.description ?? ''),
+    schemas: [...refNames(r?.content ?? (typeof r?.$ref === 'string' ? { $ref: r.$ref } : {}))],
+  }));
+  const body = op.requestBody ? [...refNames(op.requestBody)] : [];
+  return { parameters, responses, requestBody: body };
+}
+
 /**
  * Platforms are declared as `"P04 POS"` — a code plus a label. Some entries
  * carry no code (`All platforms`, `Control Plane`), so the code is optional and
@@ -431,6 +469,7 @@ export async function buildIndex(root, contractsDir = 'contracts') {
           guestCallable: op['x-ticvai-guest-callable'] ?? null,
           consumes: io.consumes,
           produces: io.produces,
+          ...operationShape(op),
           consumers,
           // inherited from the contract's info block, where the taxonomy lives
           module: taxonomy.module,

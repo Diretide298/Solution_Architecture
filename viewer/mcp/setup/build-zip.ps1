@@ -9,7 +9,9 @@
           setup.cmd          what the developer runs
           uninstall.cmd
           README.txt
-          adam-connector\    the connector (server.mjs, client.mjs, tools.mjs,
+          docs\              the TICVAI plan, backend build plan, build readiness,
+                             client questions and design-gap response
+          adam-connector\   the connector (server.mjs, client.mjs, tools.mjs,
                              mcp-check.mjs), setup.ps1, and starters\ - the
                              backend and frontend skeletons and the coding
                              standards setup copies into a new project folder
@@ -61,6 +63,23 @@ try {
         $target = Join-Path (Join-Path $folder 'starters') $relative
         New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
         Copy-Item -LiteralPath $item.FullName -Destination $target
+    }
+
+    # The TICVAI documents a developer reads before starting: what is being
+    # built, in what order, and what is ready. Copied as they are from the
+    # repository root; a missing one stops the build rather than shipping a
+    # zip without it.
+    $docs = Join-Path $top 'docs'
+    New-Item -ItemType Directory -Force -Path $docs | Out-Null
+    foreach ($name in
+        'TICVAI - Backend Build Plan.xlsx',
+        'TICVAI - Build Readiness.md',
+        'TICVAI - Build Readiness.xlsx',
+        'TICVAI - Client Questions.xlsx',
+        'TICVAI - Design Gap Response (23 September).md',
+        'TICVAI - Development Plan (POS, Guest App, White Labelling).md',
+        'TICVAI - Development Plan (POS, Guest App, White Labelling).xlsx') {
+        Copy-Item -LiteralPath (Join-Path $Repo $name) -Destination $docs
     }
 
     # Which build this is, so "which version do you have" has an answer.

@@ -1986,6 +1986,13 @@ def read_work_package(
     except openproject.Refused as exc:
         raise HTTPException(404 if exc.status == 404 else 502, str(exc))
     _same_pms_project(found, scope, number)
+    # Read after the project check, so a ticket from another plan never has its
+    # thread fetched. A thread that cannot be read does not cost the ticket:
+    # `comments` is None and the reader is told, rather than shown "no comments".
+    try:
+        found["comments"] = openproject.comments(endpoint, token, number)
+    except (openproject.Blocked, openproject.Refused):
+        found["comments"] = None
 
     rows = db.all_rows(
         "SELECT * FROM artefact_link WHERE external_key = ? "
