@@ -399,6 +399,21 @@ export const changePassword = (current, replacement) =>
 // whether there is one and its last four characters — so nothing here can leak
 // a token into a page even by accident.
 export const mySettings = () => call('/api/settings/me');
+
+// Which connector build each install is running. A developer gets their own
+// machines; oversight gets everybody's. It does not say which build is current:
+// that is the viewer's answer, and `servedBuild` below asks the viewer for it —
+// two sources for one number is how the two come to disagree.
+export const connectorFleet = () => call('/api/connector/fleet');
+
+// The build the viewer is serving, from the viewer rather than the accounts
+// service. Unauthenticated and same-origin on purpose: it is the route a
+// connector that cannot sign in still has to be able to reach.
+export const servedBuild = async () => {
+  const answer = await fetch('/connector/version', { headers: { accept: 'application/json' } });
+  if (!answer.ok) throw new Error('the viewer did not say which build it serves');
+  return (await answer.json()).build ?? '';
+};
 export const saveGitIdentity = (gitEmail) =>
   call('/api/settings/git-identity', { method: 'PUT', body: { git_email: gitEmail } });
 // Checked against the OpenProject instance server-side before it is kept, so a

@@ -214,6 +214,21 @@
             and double-click <code>setup.cmd</code>. It checks your password, installs the connector
             and registers it with Claude Code — nothing below is needed.
           </p>
+          <!-- ── which build is installed, and whether it is the current one ── -->
+          <p class="auth-label">Builds</p>
+          <p class="auth-note" id="fleet-serving">Asking ADAM which build it is serving…</p>
+          <div class="admin-table" id="fleet-list"></div>
+          <p class="auth-note auth-fine">
+            A build is a hash of the connector’s own files, so two installs are on the same build
+            exactly when they are running the same code — there is no version to bump or forget.
+            An install reports itself when Claude Code starts, so a row that has not moved in weeks is
+            somebody who has not started Claude Code, not necessarily somebody who is behind.
+          </p>
+          <p class="auth-note auth-fine">
+            Behind? Run <code>/update-adam</code> in Claude Code, then restart it — the connector
+            cannot replace the files it is running from, so the new build is the next session’s.
+          </p>
+
           <p class="auth-label">Or by hand, once, in PowerShell or Git Bash — with Node.js 22+ and a copy of <code>viewer/mcp</code></p>
           <div class="set-mono" id="mcp-line">…</div>
           <div class="set-actions">

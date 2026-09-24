@@ -644,7 +644,34 @@ foreach ($file in ($Files + $Tools)) {
 }
 $server = Join-Path $InstallDir 'server.mjs'
 Good "copied to $InstallDir"
-Note 'You can delete the downloaded zip now - Claude Code uses this copy.'
+
+# /update-adam, for every folder rather than only this one.
+#
+# **This is what makes the zip a first-install-only thing.** The command also
+# ships in the project skeleton, but a developer who already has a repository
+# never gets that skeleton -- so the one command that keeps a connector current
+# would be missing from exactly the folders people actually work in, and the
+# answer to "how do I update" would go back to being "ask for the zip again".
+#
+# User scope: the commands folder under the profile is read in every project.
+# Written on every run so an older copy is replaced, and a failure here is a
+# Note rather than a stop -- the connector is installed and working, and the
+# developer can still run the one line the command wraps.
+$commandDir = Join-Path $env:USERPROFILE '.claude/commands'
+$commandFrom = Join-Path $Starters 'frontend/.claude/commands/update-adam.md'
+if (Test-Path -LiteralPath $commandFrom) {
+    try {
+        New-Item -ItemType Directory -Force -Path $commandDir | Out-Null
+        Copy-Item -LiteralPath $commandFrom -Destination (Join-Path $commandDir 'update-adam.md') -Force
+        Good '/update-adam available in every folder'
+    } catch {
+        Note "could not install /update-adam: $($_.Exception.Message)"
+        Note "update with: node ""$(Join-Path $InstallDir 'update.mjs')"""
+    }
+}
+
+Note 'You can delete the downloaded zip now - Claude Code uses this copy, and'
+Note '/update-adam keeps it current from here on.'
 
 # ---- 8. tell Claude Code about it --------------------------------------------
 Step 'Registering it with Claude Code'

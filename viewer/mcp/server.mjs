@@ -212,13 +212,31 @@ log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
 (async () => {
   try {
     const { buildOf, HERE } = await import('./version.mjs');
+    const { hostname } = await import('node:os');
+    const mine = await buildOf(HERE);
+
+    // Say which build this is, whether or not it is the current one.
+    //
+    // **Reported every start, not only when behind.** The useful question is
+    // "has the update reached everybody", and a table that only lists the
+    // stragglers cannot answer it -- silence would mean both "up to date" and
+    // "has not run ADAM in a month". Overwriting one row per machine keeps it
+    // to one row per machine however many times a day somebody restarts.
+    //
+    // Fire and forget, and deliberately not awaited before the version check:
+    // reporting is a courtesy to whoever is reading the fleet list, and no part
+    // of it may delay or break the connector the developer is waiting on.
+    client.service('/api/connector/seen', {
+      method: 'POST',
+      body: { build: mine, host: hostname(), agent: 'claude-code' },
+    }).catch(() => { /* older ADAM, or offline: nothing to say */ });
+
     const res = await fetch(`${client.base}/connector/version`, {
       signal: AbortSignal.timeout(2500),
       headers: { accept: 'application/json' },
     });
     if (!res.ok) return;
     const { build } = await res.json();
-    const mine = await buildOf(HERE);
     if (!build || build === mine) return;
     // path.join, so the command can be pasted on Windows: string concatenation
     // produces `C:\Users\...\connector/update.mjs`, which works and looks

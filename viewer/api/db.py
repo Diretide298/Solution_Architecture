@@ -817,6 +817,37 @@ CREATE TABLE IF NOT EXISTS plan_proposal (
   -- token race for the row and exactly one of them wins.
   applied_at  TEXT
 );
+
+-- Which build of the connector somebody is actually running.
+--
+-- **The point is the gap, not the number.** A change to the connector reaches a
+-- developer only when they run the update and restart, and until this table
+-- existed there was no way to tell the difference between "everybody has it"
+-- and "nobody has it" -- so an update could sit undelivered for a fortnight
+-- while the repository said it shipped.
+--
+-- Keyed on the account *and the host*: a developer with a laptop and a desktop
+-- is two installs that update separately, and collapsing them to one row would
+-- report whichever machine they happened to start last.
+--
+-- Nothing here is a credential or a path. `host` is a machine name the
+-- developer's own OS already hands to every service they talk to, and `build`
+-- is a hash of files this repository ships.
+CREATE TABLE IF NOT EXISTS connector_seen (
+  account_id INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  host       TEXT    NOT NULL DEFAULT '',
+  -- The 12 hexadecimal characters `version.mjs` computes. Empty when a
+  -- connector reported in but could not read its own files, which is worth
+  -- seeing rather than discarding.
+  build      TEXT    NOT NULL DEFAULT '',
+  agent      TEXT    NOT NULL DEFAULT '',
+  -- Overwritten on every start, so this is "last seen", not "first seen". A row
+  -- that has not moved in a month is a developer who has stopped using ADAM,
+  -- which is its own thing to know.
+  at         TEXT    NOT NULL,
+  PRIMARY KEY (account_id, host)
+);
+CREATE INDEX IF NOT EXISTS connector_seen_build ON connector_seen(build, at DESC);
 """
 
 # Indexes that cannot be created until the migration has run.

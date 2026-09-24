@@ -25,10 +25,21 @@ import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,
   changePassword, signOut, logoutAll, project, isAdmin, isOwner,
+  connectorFleet, servedBuild,
 } from '/validation.js';
 import { followSections } from '/sections.js';
 
 const $ = (id) => document.getElementById(id);
+
+/** A node with a class and its text. Local, like the one on the agents page:
+ *  three lines is less to carry than importing the viewer's whole core module
+ *  into a page that draws one table. */
+function el(tag, cls, text) {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text != null) node.textContent = text;
+  return node;
+}
 
 /** A one-line answer under a control. Tone is colour only — the sentence has to
  *  work without it, for the same reason an error is never just a red border. */
@@ -137,6 +148,85 @@ function drawConnector(state) {
     `-e ADAM_PROJECT=${project() ?? 'PROJECT-ID'} ` +
     `-e ADAM_EMAIL=${state.email} -e 'ADAM_PASSWORD=YOUR_PASSWORD' ` +
     "'--' node PATH-TO-REPO/viewer/mcp/server.mjs";
+}
+
+/** When an install last said anything, in words rather than a timestamp.
+ *
+ *  "3 days ago" is the form the question is asked in -- nobody reading this
+ *  wants to subtract dates to find out whether an update has landed. */
+function ago(stamp) {
+  const then = Date.parse(stamp);
+  if (!Number.isFinite(then)) return 'at some point';
+  const days = Math.floor((Date.now() - then) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 31) return `${days} days ago`;
+  const months = Math.round(days / 30);
+  return months <= 1 ? 'a month ago' : `${months} months ago`;
+}
+
+/**
+ * Who is on which build.
+ *
+ * Two independent sources, deliberately: the accounts service says what each
+ * install last reported, and the viewer says what it is serving. The comparison
+ * is made here because neither side should be asked to hold the other's number.
+ *
+ * **Failure is a sentence, not an empty panel.** The rest of this section tells
+ * somebody how to install a connector, and it has to keep working when the build
+ * list does not -- so nothing here can throw into `load()`.
+ */
+async function drawFleet() {
+  const host = $('fleet-list');
+  const lede = $('fleet-serving');
+  host.innerHTML = '';
+
+  const [serving, fleet] = await Promise.all([
+    servedBuild().catch(() => null),
+    connectorFleet().catch(() => null),
+  ]);
+
+  if (!fleet) {
+    say(lede, 'ADAM could not say which builds are installed.', 'bad');
+    return;
+  }
+
+  const installs = fleet.installs ?? [];
+  // The count of what is behind, not of what is installed: "four installs" is a
+  // fact nobody acts on, and "two are behind" is the whole reason to look.
+  const behind = serving ? installs.filter((i) => i.build !== serving).length : 0;
+  lede.textContent = serving
+    ? `ADAM is serving ${serving}.`
+      + (installs.length
+        ? ` ${behind === 0 ? 'Every install reporting in is on it.'
+          : `${behind} of ${installs.length} ${behind === 1 ? 'is' : 'are'} behind.`}`
+        : ' Nothing has reported a build yet.')
+    : 'This ADAM does not serve a build yet, so there is nothing to compare against.';
+  delete lede.dataset.tone;
+
+  if (!installs.length) {
+    host.append(el('p', 'auth-note auth-fine',
+      fleet.whole
+        ? 'No connector has reported in. An install reports itself when Claude Code '
+          + 'starts, and one that predates this feature reports nothing until it is updated.'
+        : 'Your connector has not reported in yet. It does so when Claude Code starts.'));
+    return;
+  }
+
+  for (const install of installs) {
+    const row = el('div', 'admin-row');
+    // Whose, only when it could be somebody else's: on a developer's own page
+    // every row is theirs and a column of one repeated name is noise.
+    row.append(el('span', 'account-name',
+      fleet.whole ? install.name : (install.host || 'this machine')));
+    if (fleet.whole) row.append(el('span', 'invite-who', install.host || 'unnamed machine'));
+    row.append(el('span', 'set-mono', install.build || 'unreadable'));
+    const current = serving && install.build === serving;
+    row.append(el('span', `ag-verdict${current || !serving ? '' : ' bad'}`,
+      !serving ? '' : current ? 'current' : 'behind'));
+    row.append(el('span', 'invite-who', `seen ${ago(install.at)}`));
+    host.append(row);
+  }
 }
 
 async function load() {
@@ -281,6 +371,11 @@ if (await requireSignIn()) {
   try {
     await load();
     $('settings').hidden = false;
+    // Not awaited and not inside load(): the build list is the one thing on this
+    // page that asks two services a question, and a page that will not show
+    // somebody their password form because a build list timed out is worse than
+    // a build list that arrives a moment late.
+    drawFleet().catch(() => {});
     wirePassword();
     wireConnections();
     wireSessions();

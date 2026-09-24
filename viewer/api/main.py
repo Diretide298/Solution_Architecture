@@ -3631,6 +3631,83 @@ def _batch_row(row, items: bool = True) -> dict:
     }
 
 
+# ── which build of the connector people are running ──────────────────────
+#
+# A change to the connector is not delivered when it is committed and not when
+# it is deployed: it is delivered when a developer has run the update and
+# restarted Claude Code. Those are days apart, and without this nobody can tell
+# which of them has happened. So the connector says what it is running, once per
+# start, and this is the only place that knows.
+#
+# **Reported, never enforced.** ADAM cannot make anybody update and must not
+# refuse to answer a connector that is behind -- a developer mid-task with an old
+# build needs a working tool, not a lecture. This is a list somebody reads.
+
+
+class ConnectorSeenIn(BaseModel):
+    # The 12 hexadecimal characters `version.mjs` computes. Bounded well above
+    # that so a connector reporting something unexpected gets a stored oddity
+    # somebody can see, rather than a 422 that disappears into a silent catch.
+    build: str = Field(default="", max_length=64)
+    host: str = Field(default="", max_length=120)
+    agent: str = Field(default="", max_length=60)
+
+
+@app.post("/api/connector/seen")
+def connector_seen(body: ConnectorSeenIn, account: dict = Depends(require_account)):
+    """A connector saying which build it is. The caller's own, always.
+
+    There is no account in the body and there will not be one: the connector
+    signs in as the developer, so the row is theirs by construction and nobody
+    can report a build on somebody else's behalf.
+    """
+    db.write(
+        "INSERT INTO connector_seen (account_id, host, build, agent, at) "
+        "VALUES (?, ?, ?, ?, ?) "
+        "ON CONFLICT(account_id, host) DO UPDATE SET "
+        "  build = excluded.build, agent = excluded.agent, at = excluded.at",
+        (account["id"], body.host.strip()[:120], body.build.strip()[:64],
+         body.agent.strip()[:60], security.stamp()),
+    )
+    return {"ok": True}
+
+
+@app.get("/api/connector/fleet")
+def connector_fleet(account: dict = Depends(require_account)):
+    """Who is on which build.
+
+    The same line as the agent usage above, and for the same reason: this names
+    people. A developer sees their own installs; oversight sees everybody's. It
+    is a delivery measure -- did the update land -- and would be a poor
+    performance one, so the split is not negotiable.
+
+    What it deliberately does not do is say which build is current. That is the
+    *viewer's* answer, not this service's -- this service has no connector files
+    to hash -- and the page asks `/connector/version` for it. Answering here
+    from a second source is how the two come to disagree.
+    """
+    whole = _may_read_agents(account)
+    rows = db.all_rows(
+        "SELECT c.*, a.name, a.email FROM connector_seen c "
+        "JOIN account a ON a.id = c.account_id "
+        + ("" if whole else "WHERE c.account_id = ? ")
+        + "ORDER BY c.at DESC",
+        () if whole else (account["id"],),
+    )
+    return {
+        "whole": whole,
+        "installs": [
+            {
+                "name": row["name"], "email": row["email"],
+                "mine": row["account_id"] == account["id"],
+                "host": row["host"], "build": row["build"],
+                "agent": row["agent"], "at": row["at"],
+            }
+            for row in rows
+        ],
+    }
+
+
 @app.get("/api/test-batches")
 def list_batches(project_id: str = Query(default=""),
                  account: dict = Depends(require_account)):

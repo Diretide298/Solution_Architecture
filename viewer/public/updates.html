@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — what is new</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">what is new</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/settings.html#connector">Your connector</a>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <div id="updates" class="set-layout" hidden>
+      <main class="set-content">
+        <section class="admin-panel set-section">
+          <h2 class="admin-heading">What is new in ADAM</h2>
+          <!-- The build this ADAM is serving, so a question about whether a
+               change has arrived is answered on the page that describes it
+               rather than by asking somebody. -->
+          <p class="auth-note set-lede" id="up-build">&nbsp;</p>
+          <p class="auth-error" id="up-error" hidden></p>
+          <div id="up-body">
+            <p class="auth-note auth-fine">Loading&hellip;</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="signed-out" class="auth-card" hidden>
+      <h1 class="auth-title">Sign in to read this</h1>
+      <p class="auth-note">This is ADAM's own release notes, and it is behind the same gate as everything else.</p>
+      <a class="chip" href="/login.html">Sign in</a>
+    </div>
+
+    <script type="module" src="/theme.js"></script>
+    <script type="module" src="/account-drawer.js"></script>
+    <script type="module" src="/updates.js"></script>
+  </body>
+</html>

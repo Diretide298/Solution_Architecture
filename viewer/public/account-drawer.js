@@ -142,6 +142,7 @@ const DRAWER_HTML = `
           <h3 class="drawer-group-title" id="drawer-mine">Your work</h3>
           <a class="drawer-link" href="/board.html">My work, and the testing gate</a>
           <a class="drawer-link" href="/agents.html">Agent activity</a>
+          <a class="drawer-link" href="/updates.html">What is new in ADAM</a>
         </nav>
 
         <nav class="drawer-group" aria-labelledby="drawer-reviews">
