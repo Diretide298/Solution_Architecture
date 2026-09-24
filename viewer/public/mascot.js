@@ -344,10 +344,13 @@ export function mountMascot() {
     return;
   }
 
-  // Clicking him is how you ask. The floating chat panel belongs to the wider
-  // redesign; until that lands this opens the chat page that already exists,
-  // which is the same conversation on the same key.
-  document.getElementById('mascot-hit').onclick = () => { location.href = '/chat.html'; };
+  // Clicking him is how you ask, and it opens over the page rather than
+  // navigating: you came to ask about what is on screen, and asking should not
+  // take it off screen. The full page is a button away inside the panel.
+  document.getElementById('mascot-hit').onclick = async () => {
+    const { toggleChatPanel } = await import('/chat-panel.js');
+    toggleChatPanel();
+  };
 
   // ── the engine ─────────────────────────────────────────────────────
 
