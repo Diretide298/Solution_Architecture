@@ -96,6 +96,13 @@ ticvai/_review-*/
 *.mp4
 *.mov
 *.webm
+# Except the mascot's two clips, which are not source media but part of the
+# application: the viewer serves them, and a deploy without them is a deploy
+# where the mascot silently falls back to a still. 4.8MB for the pair, and the
+# rule above still holds for everything else -- renders, screen recordings and
+# anything out of a design tool stay out.
+!/viewer/public/brand/mascot/mascot-idle.mp4
+!/viewer/public/brand/mascot/mascot-read.mp4
 
 # --- screenshot captures for decks and presentations -------------------------
 # Regenerated on demand by viewer/checks/capture-assets.mjs; never part of the package.

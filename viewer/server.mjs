@@ -579,6 +579,9 @@ const MIME = {
   '.ico': 'image/x-icon',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
+  // The mascot's clips. Without a type the browser downloads them instead of
+  // playing them, which looks exactly like a mascot that does not work.
+  '.mp4': 'video/mp4',
 };
 
 /**
@@ -641,7 +644,7 @@ const HANDOFF_EMBED_JS = `<script>
 <\/script>`;
 
 /** Already-compressed formats only get bigger. */
-const COMPRESSED = /^(image\/(png|jpeg|gif|webp)|font\/woff)/;
+const COMPRESSED = /^(image\/(png|jpeg|gif|webp)|font\/woff|video\/)/;
 
 /** JSON that has already been stringified once and will not change until the
  *  next rebuild, so it is compressed once rather than on every request. The

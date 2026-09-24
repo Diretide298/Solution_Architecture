@@ -3121,3 +3121,148 @@ textarea.rt-sendback-note {
 @media (max-width: 640px) {
   .up-mascot { display: none; }
 }
+
+/* ── Adam, docked in the corner ──────────────────────────────────────
+   Geometry and colours from the design handoff: 180px square at right 20 /
+   bottom 14, a chamfered edge with large top-left and bottom-right corners and
+   small top-right and bottom-left ones, drawn as a 1.5px gradient rim with a
+   blue glow behind it.
+
+   The rim is a padded parent behind a clipped child rather than a border,
+   because a border follows the box and not the clip-path, so a chamfered box
+   with a border shows the corners cut straight through it. */
+.mascot-dock {
+  position: fixed;
+  right: 20px;
+  bottom: 14px;
+  z-index: 60;
+  width: 180px;
+  height: 180px;
+  padding: 1.5px;
+  background: linear-gradient(160deg, #00c4e8, #0b6f8c 30%, #1a2c35 60%, #0b6f8c 85%, #00c4e8);
+  clip-path: polygon(22px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 22px),
+                     calc(100% - 22px) 100%, 8px 100%, 0 calc(100% - 8px), 0 22px);
+  filter: drop-shadow(0 0 5px rgb(0 196 232 / 0.55)) drop-shadow(0 0 16px rgb(0 196 232 / 0.25));
+}
+.mascot-dock::after {
+  /* The inner fill, clipped to the same shape one rim in. */
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  background: #040709;
+  clip-path: polygon(21px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 21px),
+                     calc(100% - 21px) 100%, 7px 100%, 0 calc(100% - 7px), 0 21px);
+  z-index: 0;
+}
+
+.mascot-hit {
+  position: absolute;
+  inset: 1.5px;
+  z-index: 1;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.mascot-stage { position: absolute; inset: 0; display: block; overflow: hidden; }
+.mascot-stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+}
+.mascot-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#mascot-c1 { opacity: 0; }
+
+/* Which of the three faces is showing: the keyed video, the still fallback when
+   the clips will not load, or the flat frame when the animation is switched off. */
+.mascot-dock[data-vid='ready'] .mascot-still,
+.mascot-dock[data-vid='ready'] .mascot-flat,
+.mascot-dock[data-vid='loading'] .mascot-still,
+.mascot-dock[data-vid='loading'] .mascot-flat,
+.mascot-dock[data-vid='flat'] canvas,
+.mascot-dock[data-vid='flat'] video,
+.mascot-dock[data-vid='flat'] .mascot-still,
+.mascot-dock[data-vid='fail'] canvas,
+.mascot-dock[data-vid='fail'] video,
+.mascot-dock[data-vid='fail'] .mascot-flat { display: none; }
+
+.mascot-still, .mascot-flat {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* The fallback bobs, so a still that is meant to be a moving character does not
+   read as a frozen one. */
+.mascot-dock[data-vid='fail'] .mascot-still { animation: mascot-bob 3.2s ease-in-out infinite; }
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-dock[data-vid='fail'] .mascot-still { animation: none; }
+}
+
+/* The controls.
+   **Inside the dock, not hanging off it.** `.mascot-dock` carries the chamfered
+   `clip-path`, and a clip-path clips descendants — so a button at `right:-8px`
+   is not floating beside the dock, it is sliced in half by it. They sit in a row
+   along the top edge, clear of the small top-right chamfer, and appear on hover
+   or keyboard focus. */
+.mascot-controls {
+  position: absolute;
+  z-index: 3;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 7px;
+  background: rgb(4 7 9 / 0.72);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+}
+.mascot-dock:hover .mascot-controls,
+.mascot-controls:focus-within { opacity: 1; }
+@media (hover: none) {
+  /* Nothing to hover with: a control nobody can reveal is a control nobody has. */
+  .mascot-controls { opacity: 1; }
+}
+
+.mascot-controls button {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #1a2c35;
+  border-radius: 5px;
+  background: #071015;
+  color: #93a9b1;
+  cursor: pointer;
+}
+.mascot-controls button:hover { border-color: #00c4e8; color: #00c4e8; }
+.mascot-controls button:focus-visible { outline: 2px solid #00c4e8; outline-offset: 1px; }
+.mascot-dock[data-sound='on'] .mascot-sound { color: #00c4e8; }
+.mascot-controls button svg { width: 13px; height: 13px; }
+.mascot-controls button[hidden] { display: none; }
+
+/* A narrow window has no room to spare, and this is the first thing that should
+   give it back. */
+@media (max-width: 900px) {
+  .mascot-dock { display: none; }
+}
