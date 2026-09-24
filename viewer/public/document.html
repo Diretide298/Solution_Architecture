@@ -53,6 +53,9 @@
 
         <div class="set-actions">
           <button id="dc-build" class="auth-button" type="button">Generate</button>
+          <!-- Not hidden behind Generate: the workbook is built by the server
+               from the same sections, so there is nothing to generate first. -->
+          <button id="dc-excel" class="chip" type="button">Download .xlsx</button>
           <button id="dc-download" class="chip" type="button" hidden>Download .md</button>
           <button id="dc-copy" class="chip" type="button" hidden>Copy</button>
           <button id="dc-print" class="chip" type="button" hidden>Print</button>

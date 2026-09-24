@@ -204,8 +204,11 @@ function domain(pkg) {
   if (events.length) {
     out.push(`### Events (${events.length})`, '');
     out.push(table(['Event', 'Published by', 'When', 'Consumed by'],
+      // `context` is the field. `name` is not one, so this printed a row of
+      // bare commas -- six consumers, none of them named.
       events.map((e) => [e.name || e.id, e.publisher, brief(e.emittedWhen, 140),
-        (e.consumers ?? []).map((c) => (typeof c === 'string' ? c : c.name ?? c.service)).join(', ')])), '');
+        (e.consumers ?? []).map((c) => (typeof c === 'string' ? c
+          : c.context ?? c.name ?? c.service ?? '')).filter(Boolean).join(', ')])), '');
   }
   return out.join('\n');
 }

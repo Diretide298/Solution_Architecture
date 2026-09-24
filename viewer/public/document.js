@@ -44,6 +44,10 @@ function drawSections() {
     box.value = section.id;
     box.checked = true;
     label.append(box, el('span', null, section.title));
+    // Said on the control rather than in a note underneath it: a section that
+    // silently contributes nothing to the document is the kind of thing
+    // somebody reports as a bug a fortnight later.
+    if (section.excelOnly) label.append(el('span', 'auth-fine', ' spreadsheet only'));
     host.append(label);
   }
 }
@@ -94,10 +98,20 @@ async function build() {
   try {
     // An empty build, to learn which sections this reader may have without
     // generating anything. The server narrows the list; the page does not.
-    const res = await auth.apiFetch('/document?sections=');
-    if (!res.ok) throw new Error(`the server answered ${res.status}`);
-    const first = await res.json();
-    state.available = first.available ?? [];
+    // Both lists, because the two outputs do not carry the same sections: the
+    // workbook has one for the wireframe boards and the document has none,
+    // a board being a picture. One picker drawn from the wider list, with the
+    // difference marked, rather than two pickers that mostly agree.
+    const [docRes, wbRes] = await Promise.all([
+      auth.apiFetch('/document?sections='),
+      auth.apiFetch('/workbook'),
+    ]);
+    if (!docRes.ok) throw new Error(`the server answered ${docRes.status}`);
+    const inDocument = new Set(((await docRes.json()).available ?? []).map((s) => s.id));
+    const sheets = wbRes.ok ? ((await wbRes.json()).available ?? []) : [];
+    state.available = sheets.length
+      ? sheets.map((s) => ({ ...s, excelOnly: !inDocument.has(s.id) }))
+      : [...inDocument].map((id) => ({ id, title: id }));
   } catch (error) {
     say(error.message);
     return;
@@ -105,6 +119,45 @@ async function build() {
   drawSections();
 
   $('dc-build').onclick = build;
+
+  // The same sections, as a spreadsheet. The file is built and named by the
+  // server, so this asks for it and hands the browser the bytes rather than
+  // assembling a workbook out of JSON the page would have to fetch twice.
+  $('dc-excel').onclick = async () => {
+    const wanted = chosen();
+    if (!wanted.length) { $('dc-says').textContent = 'Choose a section first.'; return; }
+    $('dc-excel').disabled = true;
+    $('dc-says').textContent = 'Building the workbook…';
+    try {
+      const res = await auth.apiFetch(`/workbook?sections=${encodeURIComponent(wanted.join(','))}`);
+      if (!res.ok) {
+        // The server says what is wrong in a sentence; a bare status code
+        // would send somebody to the network tab to find it out again.
+        let why = `the server answered ${res.status}`;
+        try { why = (await res.json()).error ?? why; } catch { /* not JSON */ }
+        throw new Error(why);
+      }
+      const blob = await res.blob();
+      // The name the server chose, off Content-Disposition, so the file is
+      // called the same thing however it was fetched.
+      const said = res.headers.get('content-disposition') ?? '';
+      const named = /filename="([^"]+)"/.exec(said)?.[1];
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = named
+        || `${auth.project() ?? 'adam'}-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      const sheets = res.headers.get('x-ticvai-sheets');
+      const rows = res.headers.get('x-ticvai-rows');
+      $('dc-says').textContent = sheets
+        ? `${sheets} sheets, ${Number(rows).toLocaleString()} rows.` : 'Downloaded.';
+    } catch (error) {
+      $('dc-says').textContent = error.message;
+    }
+    $('dc-excel').disabled = false;
+  };
 
   $('dc-download').onclick = () => {
     // A BOM, so Word on Windows reads the dashes and the quotes as written —

@@ -47,6 +47,8 @@ import { gate, callerIp } from './lib/session.mjs';
 import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
 import { buildDocument, SECTIONS } from './lib/document.mjs';
+import { buildSheets, SECTIONS as SHEET_SECTIONS } from './lib/workbook.mjs';
+import { writeWorkbook } from './lib/xlsx.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, 'public');
@@ -1099,6 +1101,67 @@ const server = http.createServer(async (req, res) => {
     // Which sections a reader may have is decided by the same rule that
     // decides which tabs they get: a client has no Decisions here either, and
     // the rule is read from audience.mjs rather than written a second time.
+    // The package as a spreadsheet. Same audience rules and the same section
+    // ids as /document, because it is the same package read for a different
+    // purpose -- one is for reading end to end, this one is for sorting,
+    // filtering and pasting a column into an estimate.
+    //
+    // The bytes are built here rather than in the browser: an .xlsx is a zip of
+    // XML, `lib/xlsx.mjs` already had the reading half for the decisions round
+    // trip, and writing it in Node keeps the package where it is read instead
+    // of shipping every table and column to a page to be reassembled.
+    if (route === 'workbook') {
+      if (!pkg.index) await refreshIndex(pkg, 'on demand');
+      const mine = layersFor(accountRole, role);
+      const allowed = SHEET_SECTIONS.map((s) => s.id).filter((id) => {
+        if (id === 'overview') return true;
+        // Section ids line up with layer keys. `wireframes` is the exception --
+        // the boards are part of the uiux layer, which is what a reader has to
+        // be allowed in order to see them drawn.
+        const layer = { frontend: 'frontend', contracts: 'contracts', domain: 'domain',
+                        backend: 'backend', services: 'services', decisions: 'decisions',
+                        wireframes: 'uiux' }[id];
+        return !layer || mine.includes(layer);
+      });
+      const asked = (url.searchParams.get('sections') ?? '').split(',').filter(Boolean);
+      const wanted = asked.length ? asked : allowed;
+      const meta = { id: pkg.id, name: pkg.name ?? pkg.id, on: new Date().toISOString().slice(0, 10) };
+
+      // Asking what is in it, without building it: the page draws the picker
+      // from this, and a picker that costs a workbook to render is one nobody
+      // opens twice.
+      if (url.searchParams.get('sections') === null) {
+        return send(res, 200, JSON.stringify({
+          project: pkg.id,
+          available: SHEET_SECTIONS.filter((x) => allowed.includes(x.id))
+            .map((x) => ({ id: x.id, title: x.title })),
+        }), { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
+      }
+
+      const sheets = buildSheets(pkg, meta, wanted, allowed);
+      if (!sheets.length) {
+        return send(res, 409, JSON.stringify({
+          error: 'Nothing to put in a workbook. Either no section was chosen, or the ones '
+            + 'chosen have not been built for this package.',
+        }), { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
+      }
+      const file = writeWorkbook(sheets);
+      // Named here rather than by the browser, so the name is right whether the
+      // file is saved from the page, curl or the connector.
+      const name = `${pkg.id}-${meta.on}.xlsx`;
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${name}"`,
+        'Content-Length': file.length,
+        // The date is in the file, so an ETag on the package alone would serve
+        // yesterday's workbook with today's name.
+        'Cache-Control': 'no-store',
+        'X-Ticvai-Sheets': String(sheets.length),
+        'X-Ticvai-Rows': String(sheets.reduce((n, s) => n + (s.rows?.length ?? 0), 0)),
+      });
+      return res.end(file);
+    }
+
     if (route === 'document') {
       if (!pkg.index) await refreshIndex(pkg, 'on demand');
       // The same two roles the tab strip is built from, and the same call:
